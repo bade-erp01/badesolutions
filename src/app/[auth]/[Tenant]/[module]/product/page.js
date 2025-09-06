@@ -1,0 +1,58 @@
+
+import dbConnect from "../../../../../../lib/mongoose";
+import {fetchUser} from "../../../../../../Functions/useerDataRefresh"
+import PRODUCTS from "../../../../../../models/Products";
+import Card from "@/app/Components/Card";
+import ProductSalesChart from "@/app/Components/productChart";
+
+export const metadata = {
+  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  description:
+    "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
+  keywords: [
+    "Business Automation",
+    "Enterprise Solutions",
+    "B.A.D.E",
+    "AI-powered Business",
+    "Workflow Optimization",
+    "Process Automation",
+  ],
+  author: "Business Automated Dynamic Enterprise",
+  robots: "index, follow", // Allows search engines to index and follow links
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: "#f4a8ff", // Sets browser tab color (good for branding)
+  ogTitle:
+    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
+  ogDescription:
+    "Streamline your business with AI-driven automation, real-time insights, and scalability",
+  ogImage: "/assets/bade.png", // Preview image when shared on social media
+  ogUrl: "https://badesolutions.com.ng",
+  twitterCard: "/assets/bade.png",
+  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  twitterDescription:
+    "Automate and optimize your enterprise with cutting-edge business solutions",
+  twitterImage: "/assets/bade.png",
+  favicon:'/favicon.ico'
+};
+
+export default async function EmployeeListpage() {
+  await dbConnect()
+  const userData = await fetchUser();
+  const businessInfo = userData.business;
+
+  const ProductList = await PRODUCTS.findByTenant(businessInfo.tenantId).lean();
+
+  return (
+    <div>
+      {userData.user.c_levelDash && (
+      <ProductSalesChart productsList={JSON.stringify(ProductList)} />
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        {ProductList.map(element => (
+           <Card key={element._id} data={JSON.parse(JSON.stringify(element))} module={'product'}/> 
+        ))}
+      </div>
+    </div>
+  )
+}

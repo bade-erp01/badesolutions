@@ -1,0 +1,184 @@
+"use client";
+import Nav1 from "@/app/Components/Nav1";
+import { FunnelIcon, BackwardIcon, ForwardIcon } from "@heroicons/react/24/outline";
+import Footer2 from "@/app/Components/Footer2";
+import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
+import BackButton from "@/app/Components/BackBotton";
+import Card from "@/app/Components/Card";
+import { useState, useMemo } from "react";
+import { useParams } from "next/navigation";
+import { Encrypt } from "../../../../../../../Functions/Mics";
+
+export default function Storelayout({ purchaselist, userData, VendorList }) {
+  const Params = useParams();
+  const [statusFilter, setStatusFilter] = useState("");
+  const [vendorFilter, setVendorFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [Vendors] = useState(JSON.parse(VendorList));
+  const itemsPerPage = 12;
+
+  // Helper to get vendor name from ID
+  const getVendorNameById = (id) => {
+    const vendor = Vendors.find((v) => v._id === id);
+    return vendor?.Name || "";
+  };
+
+  const filteredPurchases = useMemo(() => {
+    return purchaselist.PendingOrders.filter((item) => {
+      const vendorName = getVendorNameById(item.Vendor);
+      const statusMatch =
+        !statusFilter || item.status?.toLowerCase() === statusFilter.toLowerCase();
+      const vendorMatch =
+        !vendorFilter || vendorName.toLowerCase().includes(vendorFilter.toLowerCase());
+      const startMatch =
+        !startDate || new Date(item.recievedDate) >= new Date(startDate);
+      const endMatch =
+        !endDate || new Date(item.recievedDate) <= new Date(endDate);
+      return statusMatch && vendorMatch && startMatch && endMatch;
+    });
+  }, [statusFilter, vendorFilter, startDate, endDate, purchaselist.PendingOrders]);
+
+  const totalPages = Math.ceil(filteredPurchases.length / itemsPerPage);
+  const paginatedPurchases = filteredPurchases.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  return (
+    <div className="flex flex-col min-h-screen overflow-hidden">
+      <Nav1
+        user={userData.user}
+        business={userData.business}
+        page={`purchase`}
+        Module={filteredPurchases}
+      />
+
+      <div className="flex flex-1 text-white bt-2">
+        {/* Sidebar */}
+        <aside className="w-80 bg-[#1e1e20]/90 backdrop-blur-md text-white px-6 py-6 rounded-lg shadow-lg transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block border border-white/10">
+          <BackButton />
+          <hr className="my-4 border-white/20" />
+
+          {/* Filters Section */}
+          <div className="space-y-6">
+            <h2 className="text-lg font-semibold text-white/80">  Filter Options</h2>
+
+            {/* Status Filter */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-white/70">Status</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-md bg-[#2a2a2e] border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">All</option>
+                <option value="Draft">Draft</option>
+                <option value="approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="POSTED TO WAREHOUSE">Posted to inventory</option>
+              </select>
+            </div>
+
+            {/* Vendor Filter */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-white/70">Vendor</label>
+              <select
+                value={vendorFilter}
+                onChange={(e) => {
+                  setVendorFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-md bg-[#2a2a2e] border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">All Vendors</option>
+                {Vendors.map((vendor) => (
+                  <option key={vendor._id} value={vendor.Name}>
+                    {vendor.Name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Date Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-white/70">Start Date</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full px-3 py-2 rounded-md bg-[#2a2a2e] border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-white/70">End Date</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => {
+                    setEndDate(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full px-3 py-2 rounded-md bg-[#2a2a2e] border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* Export Button */}
+            {userData?.user?.isAdmin && filteredPurchases.length > 0 && (
+              <div className="pt-4">
+                <ExcelDownloadBtn data={filteredPurchases} page={Params.module} />
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-1 overflow-y-auto h-[500px] max-h-[600px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+            {paginatedPurchases.map((element) => (
+              <Card
+                key={element._id}
+                data={{ ...element, vendorName: getVendorNameById(element.Vendor) }}
+                module={`purchase-request`}
+              />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="mt-4 flex justify-between items-center px-4">
+            <span className="text-sm text-white/60">
+              Page {currentPage} of {totalPages}
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 text-sm rounded bg-black hover:bg-black disabled:opacity-30"
+              >
+                <BackwardIcon className="h-4 w-4 text-gray-500" />
+              </button>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 text-sm rounded bg-black hover:bg-black disabled:opacity-30"
+              >
+                <ForwardIcon className="h-4 w-4 text-gray-500" />
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+      <Footer2 />
+    </div>
+  );
+}
