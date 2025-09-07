@@ -395,8 +395,13 @@ export default async function TenantPage({ params }) {
                         Today is {element.name}'s birthday
                       </li>
                     ))}
-
-                    {tenantData.debtorsArray?.length > 0 && (
+                  </ul>
+                </div>
+              </aside>
+            </div>
+            {tenantData.debtorsArray?.length > 0 && (
+              <div className="w-full text-center mt-3">
+                  {tenantData.debtorsArray?.length > 0 && (
                       <div className="w-full text-center mt-3">
                         <Marquee
                           gradient={false}
@@ -419,33 +424,6 @@ export default async function TenantPage({ params }) {
                         </Marquee>
                       </div>
                     )}
-                  </ul>
-                </div>
-              </aside>
-            </div>
-            {tenantData.debtorsArray?.length > 0 && (
-              <div className="w-full text-center mt-3">
-                  <marquee
-                    className="font-medium w-full mt-2 md:mt-0 bg-grey-600"
-                    behavior="scroll"
-                    direction="left"
-                    scrollamount="3" // Adjusted for slower speed
-                    style={{ width: "70vw" }} // Ensures it spans the full screen width
-                  >
-                    <span className="text-gray-700 bg-red-200 px-2 py-1 rounded">
-                      ⚠️ Debtors:
-                    </span>
-                    {tenantData.debtorsArray.map((debtor) => (
-                      <span
-                        key={debtor._id}
-                        className="mx-1 text-white bg-gray-400 px-2 py-1 rounded"
-                      >
-                        {debtor.Username} owes{" "}
-                        {userData.business.currency?.currency.Symbol}
-                        {debtor.Debt?.toLocaleString()},
-                      </span>
-                    ))}
-                  </marquee>
                 </div>
             )}
             
