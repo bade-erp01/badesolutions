@@ -10,13 +10,34 @@ export default function DebtorsReportModal({ data }) {
     (data || []).filter((customer) => customer.Debt > 0)
   );
 
+  // 🔍 Detect and normalize date format
+  function normalizeDate(value) {
+    if (!value) return null;
+    const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
+    if (isSerial) {
+      const serial = parseFloat(value);
+      const baseDate = moment("1899-12-30");
+      const days = Math.floor(serial);
+      const timeFraction = serial - days;
+      const date = baseDate.clone().add(days, "days");
+      const time = moment.duration(timeFraction * 24, "hours");
+      return date.add(time).format("YYYY-MM-DD HH:mm:ss");
+    }
+    return moment(value).isValid()
+      ? moment(value).format("YYYY-MM-DD HH:mm:ss")
+      : "Invalid date";
+  }
+
+  // 📆 Calculate debt days from last payment
   const calculateDebtDays = (lastPayDate) => {
     if (!lastPayDate) return "N/A";
     const today = moment();
-    const lastPayment = moment(lastPayDate);
+    const normalized = normalizeDate(lastPayDate);
+    const lastPayment = moment(normalized);
     return today.diff(lastPayment, "days");
   };
 
+  // 🧾 Generate table rows
   const generateTableRows = (list) => {
     return list
       .map(
@@ -24,12 +45,12 @@ export default function DebtorsReportModal({ data }) {
         <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 4px;">${index + 1}</td>
           <td style="padding: 4px;">${item.Username}</td>
-          <td style="padding: 4px;">${item.CustomerCode}</td>
+          <td style="padding: 4px;">${item.CustomerCode || ""}</td>
           <td style="padding: 4px;">${item.phone}</td>
           <td style="padding: 4px;">${item.Email}</td>
           <td style="padding: 4px;">${item.Debt}</td>
           <td style="padding: 4px;">${item.creditLimit}</td>
-          <td style="padding: 4px;">${item.lastPayDate}</td>
+          <td style="padding: 4px;">${normalizeDate(item.lastPayDate)}</td>
           <td style="padding: 4px;">${calculateDebtDays(item.lastPayDate)}</td>
           <td style="padding: 4px;">${item.ContactPerson}</td>
         </tr>
@@ -38,19 +59,20 @@ export default function DebtorsReportModal({ data }) {
       .join("");
   };
 
+  // 📊 Show modal with filters and export
   const showModal = () => {
     Swal.fire({
       title: "Debtors Report",
       html: `
         <div style="margin-bottom: 10px; display: flex; gap: 10px;">
           <div style="flex: 1;">
-            <label style="font-size: 12px; font-weight: 600;">Customer</label><br/>
+            <label style="font-size: 12px; font-weight: 600;">Debtors</label><br/>
             <select id="customerFilter" style="
-            width: 100%;
-            padding: 4px;
-            font-size: 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
+              width: 100%;
+              padding: 4px;
+              font-size: 12px;
+              border: 1px solid #cbd5e0;
+              border-radius: 4px;
             ">
               <option value="">All</option>
               ${debtorsList
@@ -61,12 +83,12 @@ export default function DebtorsReportModal({ data }) {
           <div style="flex: 1;">
             <label style="font-size: 12px; font-weight: 600;">Debt Days</label><br/>
             <select id="debtDaysFilter" style="
-                width: 100%;
-                padding: 4px;
-                font-size: 12px;
-                border: 1px solid #cbd5e0;
-                border-radius: 4px;
-                ">
+              width: 100%;
+              padding: 4px;
+              font-size: 12px;
+              border: 1px solid #cbd5e0;
+              border-radius: 4px;
+            ">
               <option value="">All</option>
               <option value="0-30">Current (0–30 days)</option>
               <option value="31-60">31–60 Days</option>
@@ -152,7 +174,7 @@ export default function DebtorsReportModal({ data }) {
               Email: entry.Email,
               Debt: entry.Debt,
               "Credit Limit": entry.creditLimit,
-              "Last Payment": entry.lastPayDate,
+              "Last Payment": normalizeDate(entry.lastPayDate),
               "Debt Days": calculateDebtDays(entry.lastPayDate),
               "Contact Person": entry.ContactPerson,
             }));

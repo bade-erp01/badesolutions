@@ -10,13 +10,34 @@ export default function ReceivablesAgingModal({ data }) {
     (data || []).filter((customer) => customer.Debt > 0)
   );
 
+  // 🔍 Normalize date whether it's serial or standard
+  function normalizeDate(value) {
+    if (!value) return null;
+    const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
+    if (isSerial) {
+      const serial = parseFloat(value);
+      const baseDate = moment("1899-12-30");
+      const days = Math.floor(serial);
+      const timeFraction = serial - days;
+      const date = baseDate.clone().add(days, "days");
+      const time = moment.duration(timeFraction * 24, "hours");
+      return date.add(time).format("YYYY-MM-DD HH:mm:ss");
+    }
+    return moment(value).isValid()
+      ? moment(value).format("YYYY-MM-DD HH:mm:ss")
+      : null;
+  }
+
+  // 📆 Calculate debt days from normalized date
   const calculateDebtDays = (lastPayDate) => {
-    if (!lastPayDate) return null;
+    const normalized = normalizeDate(lastPayDate);
+    if (!normalized) return null;
     const today = moment();
-    const lastPayment = moment(lastPayDate);
+    const lastPayment = moment(normalized);
     return today.diff(lastPayment, "days");
   };
 
+  // 📊 Group debts into aging buckets
   const getAgingBuckets = () => {
     const buckets = {
       "Current (0–30 days)": 0,
@@ -38,6 +59,7 @@ export default function ReceivablesAgingModal({ data }) {
     return buckets;
   };
 
+  // 🧾 Show modal with aging summary
   const showModal = () => {
     const agingData = getAgingBuckets();
 
@@ -76,7 +98,6 @@ export default function ReceivablesAgingModal({ data }) {
           ">
             Download Excel
           </button>
-          
         </div>
       `,
       width: "50%",
@@ -90,25 +111,11 @@ export default function ReceivablesAgingModal({ data }) {
         );
 
         document.getElementById("downloadAgingExcel").onclick = () => {
-          const excelBtn = downloadExcel(clean, `Receivable Aging summary`);
+          const excelBtn = downloadExcel(clean, `Receivable Aging Summary`);
           if (excelBtn instanceof HTMLElement) {
             excelBtn.click();
           }
         };
-
-        // document.getElementById("downloadAgingPDF").onclick = () => {
-        //   const content = `
-        //     Receivable Aging Summary\n\n${clean
-        //       .map(row => `${row["Aging Bucket"]}: ₦${row["Total Debt"].toLocaleString()}`)
-        //       .join("\n")}
-        //   `;
-        //   const blob = new Blob([content], { type: "application/pdf" });
-        //   const url = URL.createObjectURL(blob);
-        //   const a = document.createElement("a");
-        //   a.href = url;
-        //   a.download = "Receivable_Aging_Summary.pdf";
-        //   a.click();
-        // };
       },
     });
   };

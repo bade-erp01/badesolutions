@@ -45,6 +45,32 @@ export default function CustomerForm({ userInfo, data, cust,}) {
     Debt: Number(cust.Debt) || 0,
   });
 
+  function normalizeDate(value) {
+  if (!value) return null;
+  const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
+  if (isSerial) {
+    const serial = parseFloat(value);
+    const baseDate = moment("1899-12-30");
+    const days = Math.floor(serial);
+    const timeFraction = serial - days;
+    const date = baseDate.clone().add(days, "days");
+    const time = moment.duration(timeFraction * 24, "hours");
+    return date.add(time).format("YYYY-MM-DD HH:mm:ss");
+  }
+  return moment(value).isValid()
+    ? moment(value).format("YYYY-MM-DD HH:mm:ss")
+    : null;
+}
+
+const calculateDebtDays = (lastPayDate) => {
+  const normalized = normalizeDate(lastPayDate);
+  if (!normalized) return null;
+  const today = moment();
+  const lastPayment = moment(normalized);
+  return today.diff(lastPayment, "days");
+}
+
+
   if (!cust) {
     return (
       <p className="text-center text-gray-500">Customer data not found.</p>
@@ -795,11 +821,11 @@ const MySwal = withReactContent(Swal);
 
             {userInfo.user.isAdmin ? (
               <div className="mb-2 ">
-            <label className="block text-sm font-semibold text-gray-700 tracking-wide ">
-                  {cust.lastPayDate && cust.Debt > 0 && moment(cust.lastPayDate).isValid()
-                    ? `🕒 Debt incurred: ${moment().diff(moment(cust.lastPayDate), "days")} day(s) ago`
+                <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                  {cust.lastPayDate && cust.Debt > 0 && calculateDebtDays(cust.lastPayDate) !== null
+                    ? `🕒 Debt incurred: ${calculateDebtDays(cust.lastPayDate)} day(s) ago`
                     : "✅ Not in Debt"}
-            </label>
+                </label>
             <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
               <input
                 type="number"

@@ -128,7 +128,7 @@ export default async function Productlayout({ children, params }) {
             <StockandSalesReport prouctlist={ProductList} PurchaseOrderList={JSON.stringify(PurchaseOrderList)} InvoiceList={JSON.stringify(InvoiceList)} Stores={JSON.stringify(storeList)} vendors={JSON.stringify(VendorList)} inventoryItem={JSON.stringify(ReportInventory)}/>
 
               {userData?.user?.isAdmin && (
-              <BulkUploader tenantId={userData.business.tenantId} title="Ensure to use recomenedd uplad template"/>
+              <BulkUploader tenantId={userData.business.tenantId} collectionName={'product'} />
              )}
 
               <ExcelDownloadBtn

@@ -148,10 +148,12 @@ const CustomerSchema = new mongoose.Schema(
     location: {
       type: mongoose.Types.ObjectId,
       ref: "Store",
+      index:true
     },
     BankJournal: {
       type: mongoose.Types.ObjectId,
       ref: "Account",
+      index:true
     },
     customer_code: {
       type: String,
@@ -185,10 +187,12 @@ const CustomerSchema = new mongoose.Schema(
     accountManager: {
       type: mongoose.Types.ObjectId,
       ref: "EMPLOYEES",
+      index:true
     },
     salesPerson: {
       type: mongoose.Types.ObjectId,
       ref: "EMPLOYEES",
+      index:true
     },
     creditRating: {
       type: String,
@@ -201,6 +205,7 @@ const CustomerSchema = new mongoose.Schema(
      isVerified: {
       type: Boolean,
       default: true,
+      index:true
     },
     ActivityLog:[activitySchema]
   },

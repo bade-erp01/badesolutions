@@ -11,7 +11,7 @@ import {useRouter} from "next/navigation"
 
 const MySwal = withReactContent(Swal);
 
-const BulkUploader = ({tenantId}) => {
+const BulkUploader = ({tenantId, collectionName}) => {
   const fileInputRef = useRef(null);
   const [jsonData, setJsonData] = useState([]);
   const [hasErrors, setHasErrors] = useState(false);
@@ -100,7 +100,7 @@ const BulkUploader = ({tenantId}) => {
         headers: { 'Content-Type': 'application/json',
           "Authorization": `Bearer ${tenantId}`
          },
-        body: JSON.stringify({collectionName:"products",data}),
+        body: JSON.stringify({collectionName:collectionName,data}),
         
       });
 
@@ -114,10 +114,10 @@ const BulkUploader = ({tenantId}) => {
   };
 
     return (
-    <div className="w-full">
+    <div className="w-full" title="Ensure to use recomended upload template">
         <input
         type="file"
-        accept=".xlsx, .xls"
+        accept=".xlsx, .xls, .csv"
         ref={fileInputRef}
         className="hidden"
         onChange={handleFileUpload}
