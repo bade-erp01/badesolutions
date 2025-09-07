@@ -76,7 +76,7 @@ export default async function crmLayout({ children, params }) {
             )}
 
              {userData?.user?.isAdmin && (
-              <BulkUploader tenantId={userData.business.tenantId} collectionName={'customerreports'} />
+              <BulkUploader tenantId={userData.business.tenantId} collectionName={'customer'} />
              )}
 
             {userData?.user?.isAdmin && result.CustomerList.length > 0 && (
