@@ -3,6 +3,7 @@ import Plotly from "plotly.js-dist-min";
 import Swal from "sweetalert2";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image"
 import {
   Encrypt,
   UpdateEmployeeData,
@@ -332,7 +333,8 @@ export default function SingleEmployeeView({
             <div className="flex items-center gap-6">
               <div className="w-28 h-28 rounded-lg overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-md border border-gray-300 flex items-center justify-center">
                 {data.image ? (
-                  <img
+                  <Image height={10}
+                  width={10}
                     src={data.image}
                     alt="Avatar"
                     className="w-full h-full object-cover"
@@ -1125,7 +1127,7 @@ export default function SingleEmployeeView({
                   Role Based Access & Control (RBAC)
                 </h2>
                 <p className="mt-1 text-sm/6 text-gray-600">
-                  Assign permissions based on {data.firstName}'s job roles.
+                  Assign permissions based on {data.firstName}&lsquo;s job roles.
                 </p>
 
                 <div className="mt-10 space-y-10 ">
@@ -1141,7 +1143,7 @@ export default function SingleEmployeeView({
             <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
               {data.Attachments.map((attachment, index) => (
                 <div key={attachment._id} className="relative w-full h-32 mb-4">
-                  <img
+                  <Image height={10} width={10}
                     src={Dencrypt(attachment.Url)}
                     alt={`Attachment ${index + 1}`}
                     className="w-full h-32 object-cover rounded border border-gray-300 hover:shadow-md"
@@ -1282,9 +1284,9 @@ function SalePersonChart({ customerId, customerName, business }) {
         ];
         const NDyArray = monthlySalesArray.map((item) => item.sold);
         const NDlayout = {
-          title: `${customerName}'s P2B Sales Trend for ${currentYear}`,
+          title: `${customerName}s P2B Sales Trend for ${currentYear}`,
         };
-        setTotalSales(`${customerName}'s P2B Sales Trend for ${currentYear}`);
+        setTotalSales(`${customerName} P2B Sales Trend for ${currentYear}`);
         const SECdata = [
           {
             x: NDxArray,

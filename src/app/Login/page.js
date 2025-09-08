@@ -232,7 +232,7 @@ export default function Login({userInfo,businessInfo}) {
 
                     <span className="text-xs text-gray-500 font-medium">
                       {time} <br />
-                      How's {location} today?
+                      How &apos s {location} today?
                     </span>
                   </div>
                 </div>

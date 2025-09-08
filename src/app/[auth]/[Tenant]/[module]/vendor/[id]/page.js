@@ -11,6 +11,7 @@ import { Encrypt, DecryptBAckend,EXPRESS_PRIVATE_URL } from "../../../../../../.
 import {driver} from "driver.js";
 import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
 import {useState} from 'react'
+import Image from "next/image"
 
 
 export default function SingleVendorpage({userInfo,Backdata,wh}) {
@@ -137,14 +138,14 @@ const RFP = async () => {
             <span
               className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200`}
             >
-              {Backdata.Name}'s Balance: {Backdata.Balance}
+              {Backdata.Name}&lsquo;s Balance: {Backdata.Balance}
             </span>
           </div>
           <div className="flex flex-wrap gap-8 items-center py-4">
             {/* Avatar */}
             <div className="flex items-center space-x-6">
               <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
-                <img
+                <Image height={10} width={10}
                   src={data.image || "https://img.icons8.com/?size=100&id=6LvtpL48Lmmx&format=png"}
                   alt="Avatar"
                   className="w-full h-full object-cover"

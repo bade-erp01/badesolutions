@@ -152,7 +152,7 @@ export default function NewEmployeeForm({userData}) {
     const vat = baseAmount * numberOfUsers * 0.075;
     const total = (baseAmount * numberOfUsers + vat) * 12; // Assuming the total is for a year
     setFormText(total);
-  }, []);
+  }, [formData.plan]);
 
 
 

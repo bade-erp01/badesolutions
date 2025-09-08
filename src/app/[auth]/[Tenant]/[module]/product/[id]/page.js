@@ -15,6 +15,7 @@ import BackButton from "@/app/Components/BackBotton";
 import {useState} from 'react'
 import CreateFocButton from "@/app/Components/CreatefocButton";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
+import Image from "next/image"
 
 
 export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor,
@@ -188,7 +189,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             <span
               className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200`}
             >
-              Total {Backdata.UMO}'s sold: {data.TotalSale}
+              Total {Backdata.UMO}`&lsquo;s sold: {data.TotalSale}
             </span>
           </div>
 
@@ -197,7 +198,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             {/* Avatar */}
             <div className="flex items-center space-x-6">
               <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
-                <img
+                <Image height={10} width={10}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
                   className="w-full h-full object-cover"
@@ -226,7 +227,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
               id="qrcode"
               className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center"
             >
-              <img
+              <Image width={10} height={10}
                 src={data.QrCode || ''}
                 alt="QrCode"
                 className="w-full h-full object-cover"

@@ -3,6 +3,7 @@ import { useSearchParams } from 'next/navigation';
 import jwt from 'jsonwebtoken'
 import Nav1 from '../../Components/Nav1';
 import Footer1 from '../../Components/Footer1';
+import Image from "next/image";
 import { ErrorMessage,SuccessToast,plsWait } from "../../../../Functions/Mics";
 
 
@@ -48,11 +49,13 @@ const AccountActivation = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="shadow-md rounded-lg pb-8 max-w-md w-full bg-yellow-600">
         <form className="flex flex-col items-center " onSubmit={handleSubmit}>
-          {token ? (<img
+          {token ? (
+            <Image height={10} width={10}
             src="/Thank you hanging sign on yellow background for business, marketing, flyers, banners, presentations and posters_ illustration.jpg"
             alt="Logo"
             className="w-100 h-60 mb-4 object-contain"
-          />):null}
+          />
+          ):null}
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
             Account Activation!
           </h1>

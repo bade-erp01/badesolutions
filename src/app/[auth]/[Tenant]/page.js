@@ -194,7 +194,7 @@ export default async function TenantPage({ params }) {
               <div className="bg-white p-5 rounded card-shadow shadow-md">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm text-gray-500">Today's Sales</h3>
+                    <h3 className="text-sm text-gray-500">Today&lsquo;s Sales</h3>
                     <p className="text-2xl text-green-600 font-bold mt-1">
                       {userData.business.currency?.currency.Symbol}
                       {tenantData.TodaySale?.toLocaleString()}
@@ -387,12 +387,12 @@ export default async function TenantPage({ params }) {
                           priority={false}
                           quality={100}
                           loading="lazy"
-                          alt={`${element.name}'s profile`}
+                          alt={`${element.name}s profile`}
                           className="inline-block w-6 h-6 rounded-full mr-2"
                           width={24}
                           height={24}
                         />
-                        Today is {element.name}'s birthday
+                        Today is {element.name}&lsquo;s birthday
                       </li>
                     ))}
                   </ul>
@@ -467,12 +467,12 @@ export default async function TenantPage({ params }) {
                             <li key={element._id} className="flex items-center gap-2">
                               <Image
                                 src="/person.png"
-                                alt={`${element.name}'s profile`}
+                                alt={`${element.name}s profile`}
                                 width={24}
                                 height={24}
                                 className="rounded-full"
                               />
-                              <span>🎉 Today is <strong>{element.name}</strong>'s birthday!</span>
+                              <span>🎉 Today is <strong>{element.name}</strong>&lsquo;s birthday!</span>
                             </li>
                           ))}
                         </ul>

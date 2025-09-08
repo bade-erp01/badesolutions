@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import {Image} from "next/image"
 import { Line } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/24/solid";
 import {
@@ -178,7 +179,7 @@ const ProductSalesChart = ({ productsList }) => {
 
       {bestSeller && (
         <div className="bg-gray-200 shadow-lg p-5 flex items-center gap-6 hover:shadow-md transition-all duration-300">
-          <img
+          <Image
             src={bestSeller.image || "/placeholder.png"}
             alt={bestSeller.Name}
             className="w-24 h-24 object-cover rounded-lg border border-gray-300"

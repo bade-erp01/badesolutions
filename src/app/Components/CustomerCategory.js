@@ -4,6 +4,7 @@ import {
   DocumentTextIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import {Image} from "next/image";
 import { useRef } from "react";
 import {
   Chart as ChartJS,
@@ -161,7 +162,7 @@ function CustomerCategoryPieChart({ customers, invoice }) {
                   key={debtor._id}
                   className="text-sm flex items-center justify-between py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 rounded-md"
                 >
-                  <img
+                  <Image
                     src={debtor.image}
                     alt={debtor.Username}
                     className="h-8 w-8 rounded-full shadow-sm"

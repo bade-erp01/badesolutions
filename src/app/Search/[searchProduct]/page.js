@@ -13,7 +13,7 @@ export default function SearchResultPage({ result,linkData }) {
 
   const [loading, setLoading] = useState(true);
   const [UserData] = useState(linkData)
-  const [resultArray] = useState(Dencrypt(result) || []);
+  const [resultArray] = useState(Dencrypt(result));
   const [filteredModules, setFilteredModules] = useState([]);
   const [error, setError] = useState(null);
 
@@ -69,14 +69,14 @@ export default function SearchResultPage({ result,linkData }) {
     };
     
     handleSearch();
-  }, [searchTerm]);
+  }, [searchTerm,resultArray]);
 
   if (loading) {
     return (
       <div className="w-full max-w-5xl flex flex-col items-center justify-between mb-3">
         <p className="text-sm text-gray-800">
           Searching for{" "}
-          <span className="text-purple-600 font-bold">"{searchTerm}"</span> in{" "}
+          <span className="text-purple-600 font-bold">&lsquo;{searchTerm}&lsquo;</span> in{" "}
           {page.searchProduct} List...
         </p>
         <div className="w-10" />
@@ -90,7 +90,7 @@ export default function SearchResultPage({ result,linkData }) {
          {filteredModules.length > 0 ? (
            <p className="text-sm text-gray-800 mb-4">
           Showing Search result for{" "}
-          <span className="text-purple-600 font-bold">"{searchTerm}"</span> in{" "}
+          <span className="text-purple-600 font-bold">&lsquo;{searchTerm}&lsquo;</span> in{" "}
           {page.searchProduct} List...
         </p>
          ):""}
@@ -106,7 +106,7 @@ export default function SearchResultPage({ result,linkData }) {
             <div className="col-span-full flex flex-col items-center py-12">
               <p className="text-lg text-gray-600 mb-2">
                 No results found for{" "}
-                <strong className="text-purple-700">"{searchTerm}"</strong>.
+                <strong className="text-purple-700">&lsquo;{searchTerm}&lsquo;</strong>.
               </p>
               <span className="text-sm text-gray-400">
                 Please try a different keyword.

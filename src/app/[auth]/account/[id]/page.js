@@ -1,5 +1,6 @@
 "use client";
 import Card from "@/app/Components/Card";
+import Image from "next/image";
 import { PhotoIcon, } from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
 import Link from "next/link";
@@ -8,7 +9,6 @@ import moment from "moment";
 import currency from "../../../../data/currencies.json";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import RenewButton from "@/app/Components/Renew"
 import {
   Encrypt,
@@ -30,7 +30,7 @@ export default function BusinessDatas({ data, userInfo }) {
 
 
   // upload
-   const uploadFiles = async (id,module) => {
+   const uploadFiles = async (id,moduleList) => {
       try {
         const { value: file } = await Swal.fire({
           title: "Select File",
@@ -72,7 +72,7 @@ export default function BusinessDatas({ data, userInfo }) {
               
               const resizedImage = canvas.toDataURL('image/jpeg', 0.7); // Adjust quality as needed
     
-              const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${module}`, {
+              const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${moduleList}`, {
                 method: "POST",
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
@@ -176,7 +176,9 @@ export default function BusinessDatas({ data, userInfo }) {
         <div className="flex items-center space-x-6">
           <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
             {formData.companyLogo ? (
-              <img
+              <Image
+              width={10}
+              height={10}
                 src={formData.companyLogo}
                 alt="Avatar"
                 className="w-full h-full object-cover"
@@ -209,7 +211,9 @@ export default function BusinessDatas({ data, userInfo }) {
         {/* Attachment */}
         <div className="flex items-center gap-3 bg-white shadow-md p-4 rounded-md">
           <div className="flex-shrink-0 w-10 h-10 overflow-hidden rounded-full border border-gray-300">
-            <img
+            <Image
+            height={10}
+            width={10}
               src={formData.currency?.currency.Flag}
               alt={`${formData.currency?.currency.CountryName} Flag`}
               className="w-full h-full object-cover"

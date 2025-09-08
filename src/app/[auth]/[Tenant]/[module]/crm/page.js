@@ -5,7 +5,7 @@ import Card from "@/app/Components/Card"
 
 export default async  function CustomerListpage({ params}) {
    const userData = await fetchUser();
-     const module = await params;
+     const moduleList = await params;
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(`${baseUrl}/api/crm`, {
       method: "GET",
@@ -37,7 +37,7 @@ return (
         <Card
           key={element._id}
           data={element}
-          module={`${module.module}`}
+          module={`${moduleList.module}`}
         />
       ))}
     </div>

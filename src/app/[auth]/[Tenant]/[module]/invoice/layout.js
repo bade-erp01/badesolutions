@@ -60,7 +60,7 @@ export const metadata = {
 };
 
 export default async function Employeelayout({ children, params }) {
-  const module = await params;
+  const moduleList = await params;
   const userData = await fetchUser();
   const InvoiceList = await Invoice.findByTenant(userData.business.tenantId).sort({ _id: -1 }).lean();
   const customersList =  await Customer.findByTenant(userData.business.tenantId).sort({ _id: -1 }).lean();
@@ -72,7 +72,7 @@ export default async function Employeelayout({ children, params }) {
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={module.module}
+        page={moduleList.module}
         Module={JSON.stringify(InvoiceList)}
       />
 

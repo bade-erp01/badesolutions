@@ -52,10 +52,11 @@ export const metadata = {
   twitterDescription:
     "Automate and optimize your enterprise with cutting-edge business solutions",
   twitterImage: "/assets/bade.png",
+  facicon:'/favicon'
 };
 
 export default async function paymentlayout({ children, params }) {
-  const module = await params;
+  const moduleList = await params;
   const userData = await fetchUser();
    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(`${baseUrl}/api/cashRegister`, {
@@ -75,7 +76,7 @@ export default async function paymentlayout({ children, params }) {
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={`${module.module}`}
+        page={`${moduleList.module}`}
         Module={PaymentList}
       />
 

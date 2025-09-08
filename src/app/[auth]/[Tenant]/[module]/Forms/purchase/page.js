@@ -19,15 +19,18 @@ export default function Storelayout({ purchaselist, userData, VendorList }) {
   const [Vendors] = useState(JSON.parse(VendorList));
   const itemsPerPage = 12;
 
-  // Helper to get vendor name from ID
+  // Helper function moved outside useMemo for stable reference
   const getVendorNameById = (id) => {
     const vendor = Vendors.find((v) => v._id === id);
     return vendor?.Name || "";
   };
 
+  // Memoized filtered purchases
   const filteredPurchases = useMemo(() => {
-    return purchaselist.PendingOrders.filter((item) => {
-      const vendorName = getVendorNameById(item.Vendor);
+    const pendingOrders = purchaselist?.PendingOrders || [];
+
+    return pendingOrders.filter((item) => {
+      const vendorName = getVendorNameById(item.Vendor) || "";
       const statusMatch =
         !statusFilter || item.status?.toLowerCase() === statusFilter.toLowerCase();
       const vendorMatch =
@@ -36,9 +39,10 @@ export default function Storelayout({ purchaselist, userData, VendorList }) {
         !startDate || new Date(item.recievedDate) >= new Date(startDate);
       const endMatch =
         !endDate || new Date(item.recievedDate) <= new Date(endDate);
+
       return statusMatch && vendorMatch && startMatch && endMatch;
     });
-  }, [statusFilter, vendorFilter, startDate, endDate, purchaselist.PendingOrders]);
+  }, [statusFilter, vendorFilter, startDate, endDate, purchaselist, Vendors]);
 
   const totalPages = Math.ceil(filteredPurchases.length / itemsPerPage);
   const paginatedPurchases = filteredPurchases.slice(
@@ -63,7 +67,7 @@ export default function Storelayout({ purchaselist, userData, VendorList }) {
 
           {/* Filters Section */}
           <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-white/80">  Filter Options</h2>
+            <h2 className="text-lg font-semibold text-white/80">Filter Options</h2>
 
             {/* Status Filter */}
             <div className="space-y-1">

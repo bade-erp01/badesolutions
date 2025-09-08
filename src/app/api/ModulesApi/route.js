@@ -11,10 +11,10 @@ export async function GET(req) {
 
   // Extract query parameters using URL and searchParams
   const url = new URL(req.url);
-  const module = url.searchParams.get("module");
+  const moduleList = url.searchParams.get("module");
   const tenantId = url.searchParams.get("tenantId");
 
-  if (!module) {
+  if (!moduleList) {
     return new Response(JSON.stringify({ error: "Module query parameter is required" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -22,7 +22,7 @@ export async function GET(req) {
   }
 
   //  fetching module data
-  const moduleData =  await getDataFromCollection(module.toLocaleLowerCase(),tenantId)
+  const moduleData =  await getDataFromCollection(moduleList.toLocaleLowerCase(),tenantId)
 
   return new Response(JSON.stringify(moduleData), {
     status: 200,

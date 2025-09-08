@@ -10,9 +10,9 @@ import Footer2 from '@/app/Components/Footer2';
 
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
-    const module = await params;
+    const moduleList = await params;
    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/account/${module.id}`, {
+  const res = await fetch(`${baseUrl}/api/account/${moduleList.id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

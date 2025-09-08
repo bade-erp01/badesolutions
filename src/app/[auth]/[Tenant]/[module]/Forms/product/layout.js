@@ -53,7 +53,7 @@ export const metadata = {
 
 
 export default async function Productlayout({ children, params }) {
-  const module = await params;
+  // const module = await params;
   const userData = await fetchUser();
    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/api/vendors`, {

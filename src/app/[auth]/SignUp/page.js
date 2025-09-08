@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Nav1 from "@/app/Components/Nav1";
 import Footer1 from "@/app/Components/Footer1";
+import Link from "next/link"
 
 export default function SignUpPage() {
   const params = useSearchParams();
@@ -121,13 +122,13 @@ export default function SignUpPage() {
 
               <p className="text-sm text-gray-500">
                 By signing up, you agree to our{" "}
-                <a href="/Terms" className="text-blue-600 underline">
+                <Link href="/Terms" className="text-blue-600 underline">
                   Terms of Service
-                </a>{" "}
+                </Link>{" "}
                 and{" "}
-                <a href="/Privacy" className="text-blue-600 underline">
+                <Link href="/Privacy" className="text-blue-600 underline">
                   Privacy Policy
-                </a>
+                </Link>
                 .
               </p>
 
@@ -154,9 +155,9 @@ export default function SignUpPage() {
 
               <p className="text-center mt-1 text-gray-600 text-sm">
                 Already have an account?{" "}
-                <a href="/Login" className="text-blue-600 underline">
+                <Link href="/Login" className="text-blue-600 underline">
                   Login here
-                </a>
+                </Link>
               </p>
             </form>
           </div>

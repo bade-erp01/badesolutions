@@ -53,7 +53,7 @@ export const metadata = {
 };
 
 export default async function storelayout({ children, params }) {
-  const module = await params;
+  const moduleList = await params;
   const userData = await fetchUser();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/api/storeApi`, {
@@ -98,7 +98,7 @@ export default async function storelayout({ children, params }) {
                 .replace(/\s+/g, "-")
                 .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                 userData?.user._id
-              )}/Module/Forms/${module.module.toLowerCase()}`}
+              )}/Module/Forms/${moduleList.module.toLowerCase()}`}
               className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
             >
               <PlusCircleIcon className="h-6 w-6 text-gray-100"/>

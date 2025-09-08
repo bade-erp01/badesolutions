@@ -31,7 +31,7 @@ export const metadata = {
 
 export default async function searchLayout({children, params }) {
   const userData = await fetchUser();
-  const module = await params;
+  const moduleList = await params;
 
   // Use a single config object for axios
   const config = {
@@ -43,7 +43,7 @@ export default async function searchLayout({children, params }) {
   };
 
   // make api request to server to get cached data
-  const url = `${EXPRESS_PRIVATE_URL}/${userData.business.companyName}/search/${module.searchProduct}`;
+  const url = `${EXPRESS_PRIVATE_URL}/${userData.business.companyName}/search/${moduleList.searchProduct}`;
   // Await axios call directly
   const { data } = await axios.get(url,config);
 
@@ -68,7 +68,7 @@ export default async function searchLayout({children, params }) {
            {data.length > 0 && (
               <ExcelDownloadBtn
                 data={data}
-                page={`Search result for ${module?.searchProduct || "Unknown Module"}`}
+                page={`Search result for ${moduleList?.searchProduct || "Unknown Module"}`}
               />
             )}
           </nav>

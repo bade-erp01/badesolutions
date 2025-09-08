@@ -44,14 +44,15 @@ export const metadata = {
   twitterCard: "/assets/bade.png",
   twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
   twitterDescription: "Automate and optimize your enterprise with cutting-edge business solutions",
-  twitterImage: "/assets/bade.png"
+  twitterImage: "/assets/bade.png",
+  favicon:'/favicon.ico'
 };
 
 export default async function storelayout({ params }) { // Removed unused 'children'
-  const module = await params;
+  const moduleList = await params;
   const userData = await fetchUser();
  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-   const res = await fetch(`${baseUrl}/api/purchase_request/${module.id}`, {
+   const res = await fetch(`${baseUrl}/api/purchase_request/${moduleList.id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

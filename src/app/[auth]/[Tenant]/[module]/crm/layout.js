@@ -15,7 +15,7 @@ import {ChartPieIcon, ClipboardDocumentListIcon,PlusCircleIcon } from "@heroicon
 
 export default async function crmLayout({ children, params }) {
   const userData = await fetchUser();
-  const module = await params;
+  const moduleList = await params;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/api/crm`, {
     method: "GET",
@@ -37,7 +37,7 @@ export default async function crmLayout({ children, params }) {
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={`${module.module}`}
+        page={`${moduleList.module}`}
         Module={result.CustomerList}
       />
 
@@ -54,7 +54,7 @@ export default async function crmLayout({ children, params }) {
                 href={`/${userData.business?.companyName
                   .toLowerCase()
                   .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData?.user._id)}/Module/Forms/${module.module.toLowerCase()}`}
+                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData?.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
               >
                 <PlusCircleIcon className="h-6 w-6 text-gray-100" />

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Swal from "sweetalert2";
 import withReactContent from 'sweetalert2-react-content';
 import { jsPDF } from "jspdf";
+import Image from "next/image"
 import autoTable from "jspdf-autotable";
 import {
   postPayment,
@@ -42,8 +43,15 @@ export default function CustomerForm({ userInfo, data, cust,}) {
   const router = useParams();
   const navigation = useRouter()
   const [BalanceData, setBalanceData] = useState({
-    Debt: Number(cust.Debt) || 0,
+    Debt: Number(cust.Debt)
   });
+  const [formData, setFormData] = useState({
+    bankJournal: "",
+    ...cust,
+  });
+  const [preview, setPreview] = useState(cust.Image );
+  const [attachment, setAttachment] = useState(null);
+
 
   function normalizeDate(value) {
   if (!value) return null;
@@ -388,12 +396,6 @@ const MySwal = withReactContent(Swal);
       };
 
   // Initialize form data (bankJournal may not exist on cust)
-  const [formData, setFormData] = useState({
-    bankJournal: "",
-    ...cust,
-  });
-  const [preview, setPreview] = useState(cust.Image || "");
-  const [attachment, setAttachment] = useState(null);
 
 
   // Prepare monthly sales data from data.SandS (array of invoices)
@@ -619,7 +621,9 @@ const MySwal = withReactContent(Swal);
         <div className="flex items-center space-x-6">
           <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
             {cust.image ? (
-              <img
+              <Image
+              width={10}
+              height={10}
                 src={cust.image}
                 alt="Avatar"
                 className="w-full h-full object-cover"

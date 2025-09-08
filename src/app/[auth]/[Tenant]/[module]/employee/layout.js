@@ -53,7 +53,7 @@ export const metadata = {
 };
 
 export default async function Employeelayout({ children, params }) {
-  const module = await params;
+  const moduleList = await params;
   const userData = await fetchUser();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/api/UsersApi`, {
@@ -70,7 +70,7 @@ export default async function Employeelayout({ children, params }) {
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={`${module.module}`}
+        page={`${moduleList.module}`}
         Module={EmployeeList}
       />
 

@@ -10,20 +10,20 @@ export async function GET(req) {
 
   // Extract query parameters using URL and searchParams
   const url = new URL(req.url);
-  const module = url.searchParams.get("module");
+  const moduleList = url.searchParams.get("module");
   const document = url.searchParams.get("document");
   const tenantId = url.searchParams.get("tenantId");
 
-  if (!document || !module) {
+  if (!document || !moduleList) {
     return new Response(JSON.stringify({ error: "Something went wrong...🥵🥵" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
   //  fetching module data
-  const moduleData =  await getDocumentById(module,tenantId,document)
+  const moduleData =  await getDocumentById(moduleList,tenantId,document)
 
-  return new Response(JSON.stringify(moduleData), {
+  return new Response(JSON.stringify(moduleList), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });

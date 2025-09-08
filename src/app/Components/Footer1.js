@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useRef } from "react";
 import Marquee from "react-fast-marquee";
 import Link from "next/link";
@@ -8,6 +8,8 @@ export default function Footer2() {
   const footerRef = useRef(null);
 
   useEffect(() => {
+    const node = footerRef.current;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -18,13 +20,13 @@ export default function Footer2() {
       { threshold: 0.5 }
     );
 
-    if (footerRef.current) {
-      observer.observe(footerRef.current);
+    if (node) {
+      observer.observe(node);
     }
 
     return () => {
-      if (footerRef.current) {
-        observer.unobserve(footerRef.current);
+      if (node) {
+        observer.unobserve(node);
       }
     };
   }, []);

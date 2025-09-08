@@ -4,6 +4,7 @@ import Nav1 from '../Components/Nav1';
 import Footer1 from '../Components/Footer1';
 import { useRouter } from 'next/navigation';
 import Marquee from "react-fast-marquee";
+import Image from "next/image"
 
 
 
@@ -33,8 +34,11 @@ export default function Pricing() {
                             "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg",
                             "https://allchannels.com.ng/logo.jpg"
                         ].map((src, index) => (
-                            <img
+                            <Image
                             key={index}
+                            width={10}
+                            height={10}
+                            priority={true}
                             src={src}
                             alt={`avatar-${index}`}
                             className="w-10 h-10 rounded-full border-2 border-white shadow-lg hover:scale-105 transition-transform duration-300"
@@ -52,7 +56,7 @@ export default function Pricing() {
                     {/* Personal Plan */}
                     <div className="bg-white shadow-lg rounded-lg p-6 text-center">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Basic License</h3>
-                         <p className="text-sm text-gray-700 mb-4">For Small SME'S</p>
+                         <p className="text-sm text-gray-700 mb-4">For Small SME&lsquo;S</p>
                         <div className="text-xl font-bold mb-2"><strike>₦1,500/ user / Month</strike></div>
                         <button disabled onClick={()=>(router.push('/auth/SignUp?plan=Basic'))} className="w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
                           <strike> Get Basic License</strike>

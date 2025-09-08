@@ -9,7 +9,7 @@ import Footer2 from '@/app/Components/Footer2';
 
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
-    const module = await params;
+    // const module = await params;
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">

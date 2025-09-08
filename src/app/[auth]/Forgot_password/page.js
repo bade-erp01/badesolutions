@@ -7,6 +7,7 @@ import Footer1 from "@/app/Components/Footer1";
 import {useRouter} from "next/navigation"
 import {ErrorMessage,SuccessToast,plsWait } from "../../../../Functions/Mics"
 import {EXPRESS_PRIVATE_URL} from '../../../../Functions/Functions'
+import Link from "next/link";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -94,9 +95,9 @@ export default function ForgotPasswordPage() {
 
               <p className="text-center mt-4 text-gray-500">
                 Remember your password?{" "}
-                <a href="/Login" className="text-blue-500">
+                <Link href="/Login" className="text-blue-500">
                   Login here
-                </a>
+                </Link>
               </p>
             </form>
           </div>

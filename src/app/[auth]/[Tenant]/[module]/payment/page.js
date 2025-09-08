@@ -33,7 +33,7 @@ export const metadata = {
 
 export default async function PaymentListpage({ params}) {
   const userData = await fetchUser();
-     const module = await params;
+     const moduleList = await params;
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(`${baseUrl}/api/cashRegister`, {
       method: "GET",
@@ -48,7 +48,7 @@ export default async function PaymentListpage({ params}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
       {PaymentList.map(payment => (
-        <Card key={payment._id} data={payment} module={`${module.module}`}/>
+        <Card key={payment._id} data={payment} module={`${moduleList.module}`}/>
       ))}
     </div>
   )
