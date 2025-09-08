@@ -11,7 +11,6 @@ import RenewSubscription from "@/app/Components/RenewSubcription"; // hypothetic
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
   viewport: "width=device-width, initial-scale=1",
-  themeColor: "#f4a8ff",
   ogTitle: "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
   ogDescription: "Streamline your business with AI-driven automation, real-time insights, and scalability",
   ogImage: "/assets/bade.png",

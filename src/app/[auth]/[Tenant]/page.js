@@ -23,10 +23,10 @@ export default async function TenantPage({ params }) {
           Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
         },
         // cache: 'no-store', // Ensures fresh data on every request
-        next: {
-        revalidate: 120 ,// revalidate every 3min
-        cache: "force-cache"
-      }
+      //   next: {
+      //   revalidate: 120 ,// revalidate every 3min
+      //   cache: "force-cache"
+      // }
       });
 
       const data = await res.json();

@@ -23,11 +23,11 @@ export default async function crmLayout({ children, params }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${userData.business.tenantId}`,
     },
-     // cache: 'no-store', // Ensures fresh data on every request
-    next: {
-      revalidate: 60 ,// revalidate every 60 seconds
-      cache: "force-cache"
-    }
+     cache: 'no-store', // Ensures fresh data on every request
+    // next: {
+    //   revalidate: 60 ,// revalidate every 60 seconds
+    //   cache: "force-cache"
+    // }
   });
 
   const result = await res.json();

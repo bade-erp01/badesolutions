@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "allchannels.com.ng", // ✅ Removed array brackets (should be a string)
         pathname: "/**",
       },
+       {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com", // ✅ Removed array brackets (should be a string)
+        pathname: "/**",
+      },
       {
         protocol: "https",
         hostname: "img.icons8.com", // ✅ Each hostname should be a separate object

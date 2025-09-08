@@ -1004,6 +1004,10 @@ function ProductChart({ productId, productName, umo, business }) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${Encrypt(business.tenantId)}`
           },
+          next: {
+            revalidate: 120 ,// revalidate every 3min
+            cache: "force-cache"
+          }
         });
 
 

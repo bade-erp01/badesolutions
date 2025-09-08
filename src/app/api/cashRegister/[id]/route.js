@@ -15,19 +15,36 @@ export async function GET(req, { params }) {
       return NextResponse.json({ error: 'Invalid customer ID' }, { status: 400 });
     }
 
-    await dbConnect()
+    await dbConnect();
     const payment = await payments.findById(id).lean();
-    
+
     if (!payment) {
       return NextResponse.json({ error: 'No payment found' }, { status: 404 });
     }
-    
+
     const cust = await Customer.findById(payment.customer);
-    const bank = await bankJournal.findById(payment.bankAccount);
+
+    let bank = null;
+    try {
+      bank = await bankJournal.findById(payment.bankAccount);
+      if (!bank) {
+        console.warn(`Bank account not found for ID: ${payment.bankAccount}`);
+      }
+    } catch (bankErr) {
+      console.error(`Error fetching bank account: ${bankErr.message}`);
+      // Optionally include partial response or a specific error
+      return NextResponse.json({ 
+        payment, 
+        cust, 
+        bank: null, 
+        warning: 'Bank account lookup failed' 
+      }, { status: 206 }); // 206 Partial Content
+    }
 
     return NextResponse.json({ payment, cust, bank }, { status: 200 });
 
   } catch (err) {
+    console.error(err.message);
     return NextResponse.json({ error: formatMongooseError(err) }, { status: 500 });
   }
 }

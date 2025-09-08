@@ -40,6 +40,7 @@ export default function DraftInvoicePage({
   // Use useState to store products
   const [inputValue, setInputValue] = useState("");
   const [productList, setProductList] = useState(products);
+  // const [qty,setQty] = useState('')
   const router = useRouter();
 
   useEffect(() => {
@@ -697,7 +698,7 @@ export default function DraftInvoicePage({
                         onChange={(e) =>
                           handleQtyChange(
                             bill._id, // lineId
-                            e.target.value, // new value
+                            e.target.value, // new value inputValue, setInputValue
                             "Qty", // toUpdate
                             Singlebill._id, // billId
                             bill.storeProductId, // storeId
