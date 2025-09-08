@@ -8,8 +8,9 @@ WORKDIR /app
 COPY package-lock.json ./package-lock.json
 COPY package.json ./package.json
 
+RUN npm install sass
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . ./
 
