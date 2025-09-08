@@ -4,7 +4,7 @@ import {
   DocumentTextIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import {Image} from "next/image";
+import Image from "next/image";
 import { useRef } from "react";
 import {
   Chart as ChartJS,
