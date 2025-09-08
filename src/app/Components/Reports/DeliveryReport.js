@@ -53,7 +53,7 @@ export default function DeliveryRportModal({ data, Stores, customers,users }) {
         </td>
         <td style="padding: 4px;">${item.DriverName.toLocaleString()}</td>
         <td style="padding: 4px;">${item.vehicleNumber.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.WayBillNo.toLocaleString()}</td>
+        <td style="padding: 4px;">${item.WayBillNo || ""}</td>
         <td style="padding: 4px;">${item.shippingFee.toLocaleString()}</td>
       </tr>
     `
