@@ -163,6 +163,8 @@ function CustomerCategoryPieChart({ customers, invoice }) {
                   className="text-sm flex items-center justify-between py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 rounded-md"
                 >
                   <Image
+                  height={10}
+                  width={10}
                     src={debtor.image}
                     alt={debtor.Username}
                     className="h-8 w-8 rounded-full shadow-sm"
