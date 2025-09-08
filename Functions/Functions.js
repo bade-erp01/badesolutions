@@ -14,7 +14,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 
-const EXPRESS_PRIVATE_URL = "http://localhost:3001" 
+// const EXPRESS_PRIVATE_URL = "http://localhost:3001" 
+const EXPRESS_PRIVATE_URL = "https://api.badsolutions.com.ng" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
 const IV = '1234567890123456'; // 16 chars
 
