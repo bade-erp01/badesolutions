@@ -187,7 +187,7 @@ export default function Nav1({ page, Module, user, business }) {
                 >
                   Why Bade?
                 </Link>
-                <Link
+                {/* <Link
                   href="/auth/Store"
                   className={`hover:text-pink-500 transition ${
                     pathName === "/auth/Store"
@@ -196,8 +196,8 @@ export default function Nav1({ page, Module, user, business }) {
                   }`}
                 >
                   Store
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   href="#"
                   className={`hover:text-pink-500 transition ${
                     pathName === "/Platforms"
@@ -206,7 +206,7 @@ export default function Nav1({ page, Module, user, business }) {
                   }`}
                 >
                   Platforms
-                </Link>
+                </Link> */}
                 <Link
                   href="/Pricing"
                   className={`hover:text-pink-500 transition ${
@@ -360,12 +360,6 @@ export default function Nav1({ page, Module, user, business }) {
             className="block py-2 text-blue-600 hover:bg-gray-100 rounded"
           >
             Home
-          </Link>
-          <Link
-            href="/products"
-            className="block py-2 text-blue-600 hover:bg-gray-100 rounded"
-          >
-            Products
           </Link>
           <Link
             href="/services"
