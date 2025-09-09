@@ -61,6 +61,9 @@ export default function ForgotPasswordPage() {
               alt="Forgot Password Image"
               width={350}
               height={350}
+              loading="eager"
+              quality={100}
+              priority={true}
               className="rounded-md"
             />
           </div>

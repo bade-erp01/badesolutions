@@ -26,25 +26,19 @@ export default function Pricing() {
                         speed={40}
                         className="w-full py-3"
                     >
-                        <div className="flex items-center gap-4 px-4">
-                        {[
-                            "/logo.jpg",
-                            "/logo2.jpg",
-                            "/logo3.jpg",
-                            "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg",
-                            "https://allchannels.com.ng/logo.jpg"
-                        ].map((src, index) => (
-                            <Image
-                            key={index}
+                        <div key={index} className="flex flex-col items-center group">
+                        <Image
                             width={40}
                             height={40}
-                            loading='eager'
+                            loading="eager"
                             priority={true}
-                            src={`${src}?width=80&quality=90`}
+                            src={`${item.src}?width=80&quality=90`}
                             alt={`avatar-${index}`}
-                            className="w-10 h-10 rounded-full border-2 border-white shadow-lg hover:scale-105 transition-transform duration-300"
-                            />
-                        ))}
+                            className="w-10 h-10 rounded-full border-2 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <span className="text-xs mt-1 text-center text-gray-700 group-hover:text-blue-500 group-hover:font-semibold transition duration-300">
+                            {item.label}
+                        </span>
                         </div>
                     </Marquee>
                     <p className="text-gray-500 text-sm mt-2 font-medium tracking-wide">
@@ -66,7 +60,7 @@ export default function Pricing() {
                             {/* <li>1 Admin User</li>
                             <li>Email support</li>
                             <li>Limited API usage</li> */}
-                            <li>Currently Not Available</li>
+                            <li>Comming Soon</li>
                         </ul>
                     </div>
                     {/* Standard Plan */}

@@ -50,9 +50,9 @@ export default function SignUpPage() {
               alt="Illustration"
               width={400}
               height={400}
-              priority={false}
+              priority={true}
               quality={100}
-              loading="lazy"
+              loading="eager"
               className="drop-shadow-xl transition-transform duration-500 hover:scale-105"
             />
           </div>
