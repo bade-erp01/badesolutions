@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {Image} from "next/image"
+import Image from "next/image"
 import { Line } from "react-chartjs-2";
 import { StarIcon } from "@heroicons/react/24/solid";
 import {
