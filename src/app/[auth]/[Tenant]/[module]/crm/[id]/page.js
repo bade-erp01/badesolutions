@@ -1180,7 +1180,7 @@ const MySwal = withReactContent(Swal);
               <tfoot>
                 <tr>
                   <td colSpan="5" className="px-2 py-1 text-white">
-                    <ExcelDownloadBtn data={data.transcations} page={`${cust.CustomerCode} transaction`} />
+                    <ExcelDownloadBtn data={data.transcations} page={`${cust.Username} transaction`} />
                   </td>
                 </tr>
               </tfoot>
