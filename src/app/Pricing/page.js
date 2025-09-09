@@ -36,10 +36,11 @@ export default function Pricing() {
                         ].map((src, index) => (
                             <Image
                             key={index}
-                            width={10}
-                            height={10}
+                            width={40}
+                            height={40}
+                            loading='eager'
                             priority={true}
-                            src={src}
+                            src={`${src}?width=80&quality=90`}
                             alt={`avatar-${index}`}
                             className="w-10 h-10 rounded-full border-2 border-white shadow-lg hover:scale-105 transition-transform duration-300"
                             />
