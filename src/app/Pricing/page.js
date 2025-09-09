@@ -21,11 +21,15 @@ export default function Pricing() {
                         Small Price for <span className="text-orange-500">Huge productivity boost 🚀</span>
                     </h1>
                     <div className="w-full text-center mt-6">
-                    <Marquee
-                        gradient={false}
-                        speed={40}
-                        className="w-full py-3"
-                    >
+                    <Marquee gradient={false} speed={40} className="w-full py-3">
+                    <div className="flex items-center gap-4 px-4">
+                        {[
+                        { src: "/logo.jpg", label: "Logo 1" },
+                        { src: "/logo2.jpg", label: "Logo 2" },
+                        { src: "/logo3.jpg", label: "Logo 3" },
+                        { src: "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg", label: "WhatsApp" },
+                        { src: "https://allchannels.com.ng/logo.jpg", label: "AllChannels" }
+                        ].map((item, index) => (
                         <div key={index} className="flex flex-col items-center group">
                         <Image
                             width={40}
@@ -40,6 +44,8 @@ export default function Pricing() {
                             {item.label}
                         </span>
                         </div>
+                        ))}
+                    </div>
                     </Marquee>
                     <p className="text-gray-500 text-sm mt-2 font-medium tracking-wide">
                         Trusted by forward-thinking businesses.
