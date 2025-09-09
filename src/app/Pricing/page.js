@@ -24,10 +24,10 @@ export default function Pricing() {
                     <Marquee gradient={false} speed={40} className="w-full py-3">
                     <div className="flex items-center gap-4 px-4">
                         {[
-                        { src: "/logo.jpg", label: "Logo 1" },
-                        { src: "/logo2.jpg", label: "Logo 2" },
-                        { src: "/logo3.jpg", label: "Logo 3" },
-                        { src: "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg", label: "WhatsApp" },
+                        { src: "/logo.jpg", label: "Synergy" },
+                        { src: "/logo2.jpg", label: "Tojec" },
+                        { src: "/logo3.jpg", label: "world Distributors" },
+                        { src: "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg", label: "Amaco Resources" },
                         { src: "https://allchannels.com.ng/logo.jpg", label: "AllChannels" }
                         ].map((item, index) => (
                         <div key={index} className="flex flex-col items-center group">
