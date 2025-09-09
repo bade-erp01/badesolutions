@@ -189,7 +189,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             <span
               className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200`}
             >
-              Total {Backdata.UMO}`&lsquo;s sold: {data.TotalSale}
+              Total sold: {data.TotalSale}
             </span>
           </div>
 
