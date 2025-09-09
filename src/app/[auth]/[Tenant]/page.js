@@ -105,7 +105,7 @@ export default async function TenantPage({ params }) {
         <aside
           className={`w-70 text-xs
           text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block bg-[#1e2939]`}
-          style={{ maxHeight: "580px", overflowY: "auto" }}
+          style={{ maxHeight: "580px", overflowY: "hidden" }}
         >
           <div className="flex items-center gap-2 mb-2">
             <CpuChipIcon className="h-7 w-7 text-gray-100" />
@@ -115,6 +115,7 @@ export default async function TenantPage({ params }) {
           </div>
           <hr />
           <nav className="space-y-3 text-xs">
+            <div className="w-full h-[320px] max-h-[300px] overflow-y-auto">
             {userData?.user?.Apps.map((app, index) => (
               <Link
                 key={index}
@@ -133,6 +134,8 @@ export default async function TenantPage({ params }) {
                 <span className="text-xs">{app.Name}</span>
               </Link>
             ))}
+            </div>
+
             {userData?.user?.isAdmin && (
               <Link
                 href={`/auth/Apps`}
