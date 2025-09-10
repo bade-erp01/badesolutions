@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import {React,useState,useEffect} from "react";
 import { Encrypt, ErrorMessage,SuccessToast,plsWait,} from "../../../../../../../Functions/Mics";
+import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 
@@ -112,7 +113,7 @@ export default function NewEmployeeForm({userData}) {
       }).then((paymentResult) => {
         if (paymentResult.isConfirmed) {
           plsWait('Processing...')
-          fetch("http://localhost:3001/purchase/License", {
+          fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
