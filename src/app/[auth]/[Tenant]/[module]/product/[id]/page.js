@@ -303,7 +303,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                 </label>
                 <div className="mt-2">
                   <h3 className="font-semibold text-gray-900">
-                    {formData.ADCcode}
+                    {formData.ADCcode || formData.ACDcode}
                   </h3>
                 </div>
               </div>
