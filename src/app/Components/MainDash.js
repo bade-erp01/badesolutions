@@ -50,7 +50,6 @@ export default function MainDash({ userData }) {
         <div className="space-y-3">
           <div className="h-4 bg-gray-300 rounded w-full"></div>
           <div className="h-4 bg-gray-300 rounded w-5/6"></div>
-          <div className="h-4 bg-gray-300 rounded w-4/6"></div>
         </div>
         <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div>
       </div>
@@ -60,7 +59,7 @@ export default function MainDash({ userData }) {
   if (error) {
     return (
       <div className="w-full px-6 py-8 text-center text-red-600">
-        <p>Dashboard server is currently unrachable... Try again later.</p>
+        <p>Dashboard server is currently unavailable... Try again later.</p>
       </div>
     );
   }
