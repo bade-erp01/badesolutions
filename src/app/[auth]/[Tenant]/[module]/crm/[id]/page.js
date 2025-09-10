@@ -622,9 +622,11 @@ const MySwal = withReactContent(Swal);
           <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
             {cust.image ? (
               <Image
-              width={10}
-              height={10}
-                src={cust.image}
+              width={40}
+              height={40}
+                src={cust.image || cust.Image}
+                loading="eager"
+                quality={100}
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />
