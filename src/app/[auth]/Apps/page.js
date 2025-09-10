@@ -5,7 +5,7 @@ import dummyData from "../../../data/dummyData.json";
 import Image from "next/image";
 import {EXPRESS_PRIVATE_URL} from "../../../../Functions/Functions"
 import Nav1 from "@/app/Components/Nav1";
-import Footer1 from "@/app/Components/Footer1";
+import Footer2 from "@/app/Components/Footer2";
 import {
   plsWait,
   ErrorMessage,
@@ -62,7 +62,7 @@ const ModulesPage = ({userInfo}) => {
           </div>
         )}
       </div>
-      <Footer1 />
+      <Footer2 />
     </>
   );
 };
