@@ -84,7 +84,7 @@ export default function MainDash({ userData }) {
   return (
     <>
       {userData.user.c_levelDash ? (
-        <div className="min-h-screen text-xs" style={{ maxHeight: "580px", overflowY: "auto" }}>
+        <div className="min-h-screen text-xs" style={{ maxHeight: "480px", overflowY: "auto" }}>
             {/* KPI cards */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <div className="bg-white p-5 rounded card-shadow shadow-md">

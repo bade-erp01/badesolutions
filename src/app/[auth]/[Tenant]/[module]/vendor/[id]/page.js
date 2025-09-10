@@ -158,7 +158,7 @@ const RFP = async () => {
             <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
             {!formData.block_vendor && userInfo.user.raiseLpo && (
             <span onClick={RFP}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
-              <ClipboardIcon class="h-6 w-6 text-gray-100" />
+              <ClipboardIcon className="h-6 w-6 text-gray-100" />
               Request for Purchase
             </span>
             )}
