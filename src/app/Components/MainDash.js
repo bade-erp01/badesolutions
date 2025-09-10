@@ -8,6 +8,7 @@ import {
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
+import { ScaleIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import moment from "moment";
 
@@ -29,9 +30,7 @@ export default function MainDash({ userData }) {
 
         const data = await res.json();
         setTenantData(data);
-        console.log(data);
       } catch (err) {
-        console.error("Error fetching tenant data:", err);
         setError("Unable to load tenant data. Please try again later.");
       } finally {
         setLoading(false);
