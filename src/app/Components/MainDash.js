@@ -58,9 +58,26 @@ export default function MainDash({ userData }) {
 
   if (error) {
     return (
-      <div className="w-full px-6 py-8 text-center text-red-600">
-        <p>Dashboard server is currently unavailable... Try again later.</p>
-      </div>
+    <div className="w-full px-6 py-10 flex flex-col items-center justify-center bg-red-50 border border-red-200 rounded-md shadow-sm">
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-10 w-10 text-red-500 mb-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+    >
+        <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 9v2m0 4h.01M4.93 4.93l14.14 14.14M12 2a10 10 0 100 20 10 10 0 000-20z"
+        />
+    </svg>
+    <h2 className="text-lg font-semibold text-red-700">Dashboard Unavailable</h2>
+    <p className="text-sm text-red-600 mt-2 max-w-md text-center">
+        The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.
+    </p>
+    </div>
     );
   }
 
