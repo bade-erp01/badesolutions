@@ -333,9 +333,12 @@ export default function SingleEmployeeView({
             <div className="flex items-center gap-6">
               <div className="w-28 h-28 rounded-lg overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-md border border-gray-300 flex items-center justify-center">
                 {data.image ? (
-                  <Image height={10}
-                  width={10}
+                  <Image height={40}
+                  width={40}
                     src={data.image}
+                    quality={100}
+                    loaing="eager"
+                    priority={true}
                     alt="Avatar"
                     className="w-full h-full object-cover"
                   />
