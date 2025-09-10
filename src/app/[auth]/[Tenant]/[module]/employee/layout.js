@@ -78,7 +78,7 @@ export default async function Employeelayout({ children, params }) {
         {/* Sidebar (collapsible on mobile) */}
         <aside
           className={`w-70  bg-[#1e1e20]/70 backdrop-blur-md 
-              text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block`}
+              text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block`}
           style={{ maxHeight: "600px", overflowY: "scroll" }}
         >
           <h2 className="text-lg  text-white font-bold mb-4">
@@ -89,20 +89,7 @@ export default async function Employeelayout({ children, params }) {
             {userData?.user?.isAdmin && EmployeeList.length > 0 && (
               <ExcelDownloadBtn data={EmployeeList} page="employee" />
             )}
-            {userData?.user?.isAdmin && (
-              <Link
-                href={`/auth/Apps`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <Image
-                  src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
-                  width={24}
-                  height={24}
-                  alt="Settings"
-                />
-                <small>App Store</small>
-              </Link>
-            )}
+            
           </nav>
 
           {/* Bottom Section with Settings Link */}
