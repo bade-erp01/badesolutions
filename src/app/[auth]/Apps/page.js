@@ -3,6 +3,7 @@ import "animate.css";
 import React, { useState, useEffect } from "react";
 import dummyData from "../../../data/dummyData.json";
 import Image from "next/image";
+import {EXPRESS_PRIVATE_URL} from "../../../../Functions/Functions"
 import Nav1 from "@/app/Components/Nav1";
 import Footer1 from "@/app/Components/Footer1";
 import {
@@ -88,7 +89,7 @@ const ModuleCard = ({ item,userInfo }) => {
       );
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      const request = await fetch("http://localhost:3001/api/Payment_Collection", {
+      const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/Payment_Collection`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
