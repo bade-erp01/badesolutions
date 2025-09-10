@@ -180,7 +180,7 @@ const ProductSalesChart = ({ productsList }) => {
       {bestSeller && (
         <div className="bg-gray-200 shadow-lg p-5 flex items-center gap-6 hover:shadow-md transition-all duration-300">
           <Image
-            src={bestSeller.image || "/placeholder.png"}
+            src={bestSeller.image || "/preview.png"}
             alt={bestSeller.Name}
             className="w-24 h-24 object-cover rounded-lg border border-gray-300"
           />
