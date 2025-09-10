@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
+import Image from "next/image"
 import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
@@ -26,12 +27,12 @@ export default function MainDash({ userData }) {
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch tenant data");
+        if (!res.ok) throw new Error("Failed to fetch dashboard data");
 
         const data = await res.json();
         setTenantData(data);
       } catch (err) {
-        setError("Unable to load tenant data. Please try again later.");
+        setError(" The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.");
       } finally {
         setLoading(false);
       }
@@ -74,7 +75,7 @@ export default function MainDash({ userData }) {
     </svg>
     <h2 className="text-lg font-semibold text-red-700">Dashboard Unavailable</h2>
     <p className="text-sm text-red-600 mt-2 max-w-md text-center">
-        The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.
+       {error}
     </p>
     </div>
     );
@@ -83,7 +84,7 @@ export default function MainDash({ userData }) {
   return (
     <>
       {userData.user.c_levelDash ? (
-        <>
+        <div className="min-h-screen">
             {/* KPI cards */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <div className="bg-white p-5 rounded card-shadow shadow-md">
@@ -288,7 +289,7 @@ export default function MainDash({ userData }) {
                     page={`Sales Team Performance`}
                   />
                 </div>
-                <hr />
+                
                 <div className="mt-6 border-t-2">
                   <h4 className="text-lg text-gray-500 font-semibold mb-4">
                     Upcoming Events 📆
@@ -346,7 +347,7 @@ export default function MainDash({ userData }) {
               © <span id="year">{moment().format("YYYY")}</span> Business
               Automated Dynamic Enterprise — All rights reserved.
             </footer>
-          </>
+          </div>
       ) : (
         <main className="flex-1">
           <section className="w-full max-w-screen-xl mx-auto p-6 h-[500px] overflow-y-auto bg-gradient-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
