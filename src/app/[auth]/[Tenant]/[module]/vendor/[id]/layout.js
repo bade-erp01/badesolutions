@@ -41,6 +41,7 @@ export const metadata = {
   twitterDescription:
     "Automate and optimize your enterprise with cutting-edge business solutions",
   twitterImage: "/assets/bade.png",
+  favicon:"/facicon.ico"
 };
 
 export default async function SingleVendorPagelayout({ params }) {
