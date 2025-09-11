@@ -84,49 +84,49 @@ export default function MainDash({ userData }) {
   return (
     <>
       {userData.user.c_levelDash ? (
-        <div className="min-h-screen text-xs" style={{ maxHeight: "480px", overflowY: "auto" }}>
+        <div className="min-h-screen text-xs" style={{ maxHeight: "100vh", overflowY: "auto" }}>
             {/* KPI cards */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              <div className="bg-white p-5 rounded card-shadow shadow-md">
+              <div className="bg-gradient-to-br from-green-100 to-green-50 p-5 rounded-lg shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm text-gray-500">
+                    <h3 className="text-sm text-gray-600">
                       Today&lsquo;s Sales
                     </h3>
-                    <p className="text-2xl text-green-600 font-bold mt-1">
+                    <p className="text-3xl text-green-700 font-extrabold mt-1">
                       {userData.business.currency?.currency.Symbol}
                       {tenantData.TodaySale?.toLocaleString()}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Updated at {moment().format("HH:MM")}
+                    <p className="text-xs text-gray-500 mt-1">
+                      Updated at {moment().format("HH:mm")}
                     </p>
                   </div>
-                  <div className="p-3 rounded-full bg-green-700 text-white text-xl shadow-md">
+                  <div className="p-4 rounded-full bg-green-600 text-white text-2xl shadow-md">
                     📈
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded card-shadow shadow-md">
+              <div className="bg-gradient-to-br from-gray-100 to-gray-50 p-5 rounded-lg shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm text-gray-500">Revenue</h3>
-                    <p className="text-2xl text-gray-500 font-bold mt-1">
+                    <h3 className="text-sm text-gray-600">Revenue</h3>
+                    <p className="text-3xl text-gray-700 font-extrabold mt-1">
                       {userData.business.currency?.currency.Symbol}
                       {tenantData.Revenue?.toLocaleString()}
                     </p>
                   </div>
-                  <div className="p-3 rounded-full bg-gray-500 text-white shadow-md">
+                  <div className="p-4 rounded-full bg-gray-600 text-white text-2xl shadow-md">
                     💰
                   </div>
                 </div>
               </div>
               {tenantData.yearlysales.length > 0 ? (
-                <div className="bg-white p-5 rounded-lg shadow-md">
+                <div className="bg-gradient-to-br from-red-100 to-red-50 p-5 rounded-lg shadow-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm text-gray-500">Avg Sales</h3>
-                      <p className="text-sm text-gray-800 font-semibold mt-1">
+                      <h3 className="text-sm text-gray-600">Avg Sales</h3>
+                      <p className="text-3xl text-red-700 font-extrabold mt-1">
                         {userData.business.currency?.currency.Symbol}
                         {Math.round(
                           tenantData.yearlysales.reduce(
@@ -136,8 +136,8 @@ export default function MainDash({ userData }) {
                         ).toLocaleString() || 0}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
-                      <ScaleIcon className="h-6 w-6 text-gray-900" />
+                    <div className="p-4 rounded-full bg-red-600 text-white text-2xl shadow-md">
+                      ⚖️
                     </div>
                   </div>
                 </div>
@@ -146,24 +146,23 @@ export default function MainDash({ userData }) {
               )}
 
               {tenantData.Bestproduct.length > 0 ? (
-                <div className="bg-white p-5 rounded card-shadow shadow-md">
+                <div className="bg-gradient-to-br from-yellow-100 to-yellow-50 p-5 rounded-lg shadow-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm text-gray-500">Best Seller</h3>
-                      <p className="text-sm text-gray-500 font-bold mt-1">
-                        {tenantData.Bestproduct[0]?.Name} [
-                        {tenantData.Bestproduct[0]?.TotalSale?.toLocaleString()}
-                        ]
+                      <h3 className="text-sm text-gray-600">Best Seller</h3>
+                      <p className="text-3xl text-yellow-700 font-extrabold mt-1">
+                        {tenantData.Bestproduct[0]?.Name}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {tenantData.Bestproduct[0]?.TotalSale?.toLocaleString()} sold
                       </p>
                     </div>
                     <Image
-                      src={tenantData.Bestproduct[0]?.image || null}
-                      width={58}
-                      height={58}
-                      quality={100}
-                      priority={true}
+                      src={tenantData.Bestproduct[0]?.image || "/placeholder.png"}
+                      width={64}
+                      height={64}
                       alt={tenantData.Bestproduct[0]?.Name}
-                      className="w-18 h-18 rounded-full"
+                      className="w-16 h-16 rounded-full border border-gray-300"
                     />
                   </div>
                 </div>
@@ -174,7 +173,7 @@ export default function MainDash({ userData }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Recent Activity / feed */}
-              <section className="lg:col-span-2">
+              <section className="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
                 <div className="bg-white rounded p-3 shadow-xl">
                   {/* Chart */}
                   <GenerealSalesMargin
@@ -240,78 +239,32 @@ export default function MainDash({ userData }) {
               </section>
 
               {/* Quick stats / chart placeholder */}
-              <aside className="bg-white rounded p-6 card-shadow text-xs">
-                <h4 className="text-sm text-gray-500 font-semibold mb-4">
-                  Sales target Millestone
+              <aside className="bg-white rounded-lg shadow-lg p-6">
+                <h4 className="text-lg font-semibold text-gray-700 mb-4">
+                  Sales Target Milestones
                 </h4>
 
                 {tenantData.result.map((person, index) => (
                   <div
                     key={index}
-                    className="text-xs bg-white rounded-lg p-4 mb-2 hover: border hover:border-gray-200  hover:shadow-md transition duration-200"
-                    title={`${person.firstName}`}
+                    className="bg-gray-50 p-4 rounded-lg mb-4 shadow-sm hover:shadow-md transition duration-200"
                   >
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-semibold text-gray-600 text-right justify-content-end">
-                        {userData.business.currency?.currency.Symbol}
-                        {person.totalSales?.toLocaleString()} /
-                        {userData.business.currency?.currency.Symbol}
-                        {person.salesTarget?.toLocaleString()}
+                      <span className="text-sm font-semibold text-gray-600">
+                        {person.firstName}
+                      </span>
+                      <span className="text-sm font-semibold text-green-600">
+                        {person.percentage.toFixed(2)}% achieved
                       </span>
                     </div>
-
-                    <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-1">
+                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-green-500 transition-all duration-300"
-                        style={{
-                          width: `${Math.min(
-                            Math.round(person.percentage),
-                            100
-                          )}%`,
-                        }}
+                        className="h-full bg-green-500"
+                        style={{ width: `${Math.min(person.percentage, 100)}%` }}
                       ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span className="text-gray-700 font-semibold truncate max-w-[100px]">
-                        {truncate(person.firstName, 10)}
-                      </span>
-                      <span className="text-green-600 font-medium text-xs">
-                        {`${parseFloat(person.percentage).toFixed(
-                          2
-                        )}% achieved`}
-                      </span>
                     </div>
                   </div>
                 ))}
-                <div className="text-center mt-6 border-bottom ">
-                  <ExcelDownloadBtn
-                    data={tenantData.result}
-                    page={`Sales Team Performance`}
-                  />
-                </div>
-                
-                <div className="mt-6 border-t-2">
-                  <h4 className="text-lg text-gray-500 font-semibold mb-4">
-                    Upcoming Events 📆
-                  </h4>
-                  <ul className="list-disc list-inside">
-                    {tenantData.birthdayCelebrants.map((element) => (
-                      <li key={element._id} className="text-gray-700 ">
-                        <Image
-                          src={"/person.png"}
-                          priority={false}
-                          quality={100}
-                          loading="lazy"
-                          alt={`${element.name}s profile`}
-                          className="inline-block w-6 h-6 rounded-full mr-2"
-                          width={24}
-                          height={24}
-                        />
-                        Today is {element.name}&lsquo;s birthday
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </aside>
             </div>
             {tenantData.debtorsArray?.length > 0 && (
