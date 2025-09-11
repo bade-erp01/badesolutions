@@ -112,7 +112,7 @@ export default function GenerealSalesMargin({
 
       <div>
         <div ref={lineRef} id="myPlot" style={{ width: "100%", height: "25%" }} />
-        <hr />
+ 
         {/* Uncomment below to show pie chart */}
         {/* <div ref={pieRef} id="PIE" style={{ width: "100%", height: "50%" }} /> */}
       </div>
