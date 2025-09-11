@@ -39,8 +39,9 @@ export async function GET(request,{params}) {
         const vendor = await vendorList.findById(purchase.Vendor).lean();
         const ProductList = await storeProduct.findByTenant(Dencrypt(tenantId), {
           WHIDS: purchase.WHID,
-          // isActivated:true,
-          isAservice: false,Vendor:purchase.Vendor
+          isActivated:true,
+          isAservice: false,
+          Vendor:purchase.Vendor
         }).lean();
         const Stores = await WHouse.findById(purchase.WHID).lean();
 
