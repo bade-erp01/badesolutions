@@ -68,7 +68,7 @@ export default async function Employeelayout({ children, params }) {
   const users = await EMPLOYEES.findByTenant(userData.business.tenantId).sort({ firstName: 1 }).lean();
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden text-xs">
+    <div className="flex flex-col min-h-screen overflow-hidden ">
       <Nav1
         user={userData.user}
         business={userData.business}
