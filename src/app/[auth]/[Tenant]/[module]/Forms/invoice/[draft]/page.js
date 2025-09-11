@@ -814,73 +814,87 @@ export default function DraftInvoicePage({
                   const availableProducts = productList.filter(
                     (product) => !orderedProductCodes.includes(product.ADCcode)
                   );
-                  return availableProducts.map((product) => (
+                    return availableProducts.map((product) => (
                     <option key={product._id} value={product.ADCcode}>
                       {product.productName}
                     </option>
-                  ));
-                })()}
-              </select>
-            </div>
+                    ));
+                  })()}
+                  </select>
+                </div>
 
-            {/* Datalist for medium and larger screens */}
-            <div className="hidden md:flex flex-col items-start justify-center space-y-4">
-              <label
-                htmlFor="productDatalist"
-                className="text-sm font-medium text-gray-700"
-              >
-                Search Product
-              </label>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  onChange={(e) => setInputValue(e.target.value)}
-                  type="text"
-                  value={inputValue}
-                  list="productsList"
-                  id="productDatalist"
-                  className="w-72 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                  placeholder="Type to search products..."
-                />
-
-                {inputValue && (
-                  <button
-                    title="Add to Order List"
-                    onClick={() => {
-                      const trimmedValue = inputValue.trim();
-                      if (trimmedValue !== "") {
-                        handleProductSelection(trimmedValue);
-                        setInputValue("");
-                      }
-                    }}
-                    className="flex items-center justify-center px-3 py-2 bg-orange-500 text-white rounded-md shadow hover:bg-orange-600 transition duration-200"
+                {/* Datalist for medium and larger screens */}
+                <div className="hidden md:flex flex-col items-start justify-center space-y-4">
+                  <label
+                  htmlFor="productDatalist"
+                  className="text-sm font-medium text-gray-700"
                   >
-                    <PlusIcon className="h-5 w-5 text-white" />
-                    <span className="ml-1 text-sm font-semibold">Add</span>
-                  </button>
-                )}
-              </div>
+                  Search Product
+                  </label>
 
-              <datalist id="productsList">
-                {(() => {
-                  const orderedProductCodes = Singlebill.orders.map(
+                  <div className="flex items-center space-x-2">
+                  <input
+                    onChange={(e) => {
+                    const val = e.target.value;
+                    setInputValue(val);
+
+                    // If user types or selects an exact ADCcode or exact product name,
+                    // automatically add it and clear the input.
+                    const orderedProductCodes = Singlebill.orders.map(
+                      (order) => order.item?.ADCcode
+                    );
+                    const availableProducts = productList.filter(
+                      (product) => !orderedProductCodes.includes(product.ADCcode)
+                    );
+
+                    const matched =
+                      availableProducts.find(
+                      (p) => p.ADCcode === val || p.productName === val
+                      ) || null;
+
+                    if (matched) {
+                      // add product by ADCcode
+                      handleProductSelection(matched.ADCcode);
+                      setInputValue("");
+                    }
+                    }}
+                    onKeyDown={(e) => {
+                    // allow Enter to add typed ADCcode
+                    if (e.key === "Enter") {
+                      const trimmed = inputValue.trim();
+                      if (trimmed !== "") {
+                      handleProductSelection(trimmed);
+                      setInputValue("");
+                      }
+                    }
+                    }}
+                    type="text"
+                    value={inputValue}
+                    list="productsList"
+                    id="productDatalist"
+                    className="w-72 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    placeholder="Type to search products..."
+                  />
+                  </div>
+
+                  <datalist id="productsList">
+                  {(() => {
+                    const orderedProductCodes = Singlebill.orders.map(
                     (order) => order.item?.ADCcode
-                  );
-                  const availableProducts = productList.filter(
+                    );
+                    const availableProducts = productList.filter(
                     (product) => !orderedProductCodes.includes(product.ADCcode)
-                  );
-                  return availableProducts.map((product) => (
+                    );
+                    return availableProducts.map((product) => (
                     <option key={product._id} value={product.ADCcode}>
                       {product.productName}
                     </option>
-                  ));
-                })()}
-              </datalist>
-            </div>
-          </div>
-        )}
-
-        {/* Summary Section */}
+                    ));
+                  })()}
+                  </datalist>
+                </div>
+                </div>
+              )} 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
           <div className="bg-gradient-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
             <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
