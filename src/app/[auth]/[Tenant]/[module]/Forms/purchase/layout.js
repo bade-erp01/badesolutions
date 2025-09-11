@@ -3,6 +3,7 @@ import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import Storelayout from "./page"
 import {Encrypt,Dencrypt} from "../../../../../../../Functions/Functions"
 import Vendor from "../../../../../../../models/Vendors"
+import Purchase from "../../../../../../../models/purchaseOrders"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -48,15 +49,18 @@ export default async function layout({children}) {
      const userData = await fetchUser();
     //  get vendor list
     const VendorList = await Vendor.findByTenant(userData.business.tenantId).lean();
-     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-       const res = await fetch(`${baseUrl}/api/storeApi/purchase-order`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`
-          }
-        })
+    const purcghaseList = await Purchase.findByTenant(userData.business.tenantId).sort({_id:-1}).lean();
+    const purchaseList = JSON.parse(JSON.stringify(purcghaseList))
+    // fetch purchase list
+    //  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    //    const res = await fetch(`${baseUrl}/api/storeApi/purchase-order`, {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`
+    //       }
+    //     })
     
-        const purchaseList = await res.json() 
-  return <Storelayout purchaselist={purchaseList} userData={userData} VendorList={JSON.stringify(VendorList)}/>
+    //     const purchaseList = await res.json() 
+  return <Storelayout purchaseList={purchaseList} userData={userData} VendorList={JSON.stringify(VendorList)}/>
 }

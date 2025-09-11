@@ -9,8 +9,9 @@ import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Encrypt } from "../../../../../../../Functions/Mics";
 
-export default function Storelayout({ purchaselist, userData, VendorList }) {
+export default function Storelayout({ purchaseList, userData, VendorList }) {
   const Params = useParams();
+  const [purchaselist] = useState(purchaseList);
   const [statusFilter, setStatusFilter] = useState("");
   const [vendorFilter, setVendorFilter] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -27,7 +28,7 @@ export default function Storelayout({ purchaselist, userData, VendorList }) {
 
   // Memoized filtered purchases
   const filteredPurchases = useMemo(() => {
-    const pendingOrders = purchaselist?.PendingOrders || [];
+    const pendingOrders = purchaselist || [];
 
     return pendingOrders.filter((item) => {
       const vendorName = getVendorNameById(item.Vendor) || "";
@@ -61,7 +62,7 @@ export default function Storelayout({ purchaselist, userData, VendorList }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar */}
-        <aside className="w-80 bg-[#1e1e20]/90 backdrop-blur-md text-white px-6 py-6 rounded-lg shadow-lg transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block border border-white/10">
+        <aside className="w-80 bg-[#1e1e20]/90 backdrop-blur-md text-white px-6 py-6 shadow-lg transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block border border-white/10">
           <BackButton />
           <hr className="my-4 border-white/20" />
 
@@ -169,14 +170,14 @@ export default function Storelayout({ purchaselist, userData, VendorList }) {
                 disabled={currentPage === 1}
                 className="px-3 py-1 text-sm rounded bg-black hover:bg-black disabled:opacity-30"
               >
-                <BackwardIcon className="h-4 w-4 text-gray-500" />
+                <BackwardIcon className="h-4 w-4 text-gray-500" /> prev
               </button>
               <button
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 text-sm rounded bg-black hover:bg-black disabled:opacity-30"
               >
-                <ForwardIcon className="h-4 w-4 text-gray-500" />
+                <ForwardIcon className="h-4 w-4 text-gray-500" /> Next
               </button>
             </div>
           </div>
