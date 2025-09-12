@@ -227,7 +227,7 @@ const DashboardCharts = ({ invoice, triggerButton = true }) => {
           onClick={showDashboardModal}
           className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
         >
-          <CursorArrowRaysIcon class="h-6 w-6 " />
+          <CursorArrowRaysIcon className="h-6 w-6 " />
           View Sales Dashboard
         </button>
       )}

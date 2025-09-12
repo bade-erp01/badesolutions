@@ -432,6 +432,7 @@ export default function BusinessDatas({ data, userInfo }) {
                   ? "This dosen't apply to my business"
                   : formData.allowCreditLimit}
               </option>
+              <option value=""> This dosen't apply to my business</option>
               <option value="Customer"> Customers</option>
               <option value="Warehouse"> Warehouse</option>
             </select>
