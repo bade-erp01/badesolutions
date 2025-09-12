@@ -286,7 +286,7 @@ function summarizeCustomerInvoices(customers, invoices) {
           tooltipEl.innerHTML = `
             <div style="text-align:center;">
               <strong>${customer.username}</strong><br/>
-              <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
+              <img src="${imageUrl.toString() || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
               <div style="margin-top:6px;">Total: ₦${customer.totalAmount.toLocaleString()}</div>
             </div>
           `;
