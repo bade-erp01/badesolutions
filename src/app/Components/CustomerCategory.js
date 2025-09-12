@@ -165,8 +165,11 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
                   className="text-sm flex items-center justify-between py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 rounded-md"
                 >
                   <Image
-                  height={10}
-                  width={10}
+                  height={40}
+                  width={40}
+                  quality={100}
+                  loading="eager"
+                  priority={true}
                     src={debtor.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}
                     alt={debtor.Username}
                     className="h-8 w-8 rounded-full shadow-sm"
