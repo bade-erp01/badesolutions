@@ -38,8 +38,17 @@ export default function MainDash({ userData }) {
       }
     };
 
-    fetchTenantData();
-  }, [userData?.business.tenantId]);
+    fetchTenantData(); // Initial fetch
+
+    // Set up interval for periodic refresh
+
+    const interval = setInterval(() => {
+      fetchTenantData(); // Re-fetch every 20 seconds
+    }, 20000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+
+  }, []);
 
   if (loading) {
     return (
