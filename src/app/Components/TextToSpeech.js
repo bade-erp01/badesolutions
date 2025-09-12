@@ -275,7 +275,7 @@ export default function TextToSpeechTrigger({ text }) {
     <span
       onClick={speakText}
       className="inline-flex items-center gap-1 cursor-pointer text-yellow-600 hover:text-yellow-800 transition"
-      title="Speak this text"
+      title="Bade Assist"
     >
       <SparklesIcon className="h-5 w-5 text-yellow-500" />
     </span>

@@ -52,6 +52,50 @@ export default function CustomerForm({ userInfo, data, cust,}) {
   const [preview, setPreview] = useState(cust.Image );
   const [attachment, setAttachment] = useState(null);
 
+  // for tts
+    function getCustomerSummary(customer) {
+      if (!customer) return "Invalid customer data.";
+
+      const {
+        name,
+        totalDebt = 0,
+        lastPayDate,
+        purchaseHistory = [],
+      } = customer;
+
+      const isOwing = totalDebt > 0;
+
+      const formattedDate = lastPayDate
+        ? new Date(lastPayDate).toLocaleDateString("en-NG", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "No payment recorded";
+
+      let advice = "";
+      if (!lastPayDate) {
+        advice =
+          "This customer has never made a payment. Consider offering a starter bundle or a small discount to encourage engagement.";
+      } else if (isOwing && totalDebt > 50000) {
+        advice =
+          "Customer owes a significant amount. Offer a flexible payment plan or loyalty reward to encourage settlement.";
+      } else if (!isOwing && purchaseHistory.length >= 3) {
+        advice =
+          "Customer is consistent and reliable. Consider upselling premium products or offering referral bonuses.";
+      } else {
+        advice =
+          "Maintain regular communication and offer seasonal promotions to boost interest.";
+      }
+
+      return `Customer Summary for ${name}:
+  - Total Debt: ₦${totalDebt.toLocaleString()}
+  - Owing: ${isOwing ? "Yes" : "No"}
+  - Last Payment Date: ${formattedDate}
+  - Sales Advice: ${advice}`;
+    }
+
+
   function normalizeDate(value) {
   if (!value) return null;
   const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
@@ -823,22 +867,20 @@ const MySwal = withReactContent(Swal);
       </Section>
 
       {/* Financials */}
-      <Section title="Financials">
-        <Grid columns={3}>
+        <Section title="Financials" subtitle="(Manage credit, debt, and payment settings)">
+          <Grid columns={3}>
 
-            {userInfo.user.isAdmin ? (
-              <div className="mb-2 ">
-                <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                  {cust.lastPayDate && cust.Debt > 0 && calculateDebtDays(cust.lastPayDate) !== null
-                    ? `🕒 Debt incurred: ${calculateDebtDays(cust.lastPayDate)} day(s) ago`
-                    : "✅ Not in Debt"}
-                </label>
-            <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
-              <input
-                type="number"
-                step={`any`}
-                value={BalanceData.Debt}
-                onChange={(e) => {
+          {userInfo.user.isAdmin ? (
+            <div className="mb-2 ">
+              <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                <TextToSpeechPlayer text={`${getCustomerSummary(cust)} .`} />
+              </label>
+          <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+            <input
+              type="number"
+              step={`any`}
+              value={BalanceData.Debt}
+              onChange={(e) => {
                   const raw = e.target.value.replace(/,/g, '');
                   const parsed = parseFloat(raw) || 0;
                   setBalanceData((prev) => ({
