@@ -12,25 +12,14 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct"
 import Footer2 from '@/app/Components/Footer2';
 import {ChartPieIcon, ClipboardDocumentListIcon,PlusCircleIcon } from "@heroicons/react/24/outline";
+import Customers from '../../../../../../models/Customer';
 
 export default async function crmLayout({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/crm`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-    },
-     cache: 'no-store', // Ensures fresh data on every request
-    // next: {
-    //   revalidate: 60 ,// revalidate every 60 seconds
-    //   cache: "force-cache"
-    // }
-  });
-
-  const result = await res.json();
+  // Fetch customers based on tenantId
+  const customerList = await Customers.findByTenant(userData.business.tenantId).lean();
+  const result = { CustomerList: JSON.parse(customerList) };
 
   return (
     <div className="flex flex-col h-screen">

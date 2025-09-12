@@ -25,7 +25,7 @@ export default async function CustomerListpage({ params }) {
 
         {/* Customer Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {JSON.parse(customerList).map((element) => (
+          {customerList.map((element) => (
             <Card
               key={element._id}
               data={element}
