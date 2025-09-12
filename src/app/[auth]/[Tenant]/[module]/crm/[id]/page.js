@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import Swal from "sweetalert2";
 import withReactContent from 'sweetalert2-react-content';
-import TextToSpeechPlayer from "@"
+import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import Image from "next/image"
 import autoTable from "jspdf-autotable";
 import {
