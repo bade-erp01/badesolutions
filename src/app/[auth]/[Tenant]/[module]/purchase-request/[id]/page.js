@@ -188,9 +188,9 @@ export default function DraftPurchasePage({
       const data = await response.json();
 
       if (data.message) {
-        SuccessToast(data.message);
-        // router.refresh();
-        window.location.reload(); // Consider using router.reload() if you're using Next.js router
+        SuccessToast(data.message); 
+        router.refresh();
+        // window.location.reload()/; // Consider using router.reload() if you're using Next.js router
       } else {
         throw new Error(data.error || "Unknown error occurred");
       }
@@ -263,7 +263,7 @@ export default function DraftPurchasePage({
 
       if (data.message) {
         // SuccessToast(data.message);
-        location.reload(); // Or use router.refresh() if you're in App Router
+        router.refresh(); // Or use router.refresh() if you're in App Router
       } else {
         throw new Error(data.error || "Update failed");
       }
@@ -291,7 +291,7 @@ export default function DraftPurchasePage({
 
       plsWait("Updating Request for Purchase");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/purchase-order?po=${Singlebill._id}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/VendorBillPost?po=${Singlebill._id}`;
 
       const response = await fetch(url, {
         method: "PATCH",
@@ -308,7 +308,7 @@ export default function DraftPurchasePage({
 
       if (data.message) {
         SuccessToast(data.message);
-        location.reload(); // Or use router.refresh() if you're in App Router
+        router.refresh(); // Or use router.refresh() if you're in App Router
       } else {
         throw new Error(data.error || "Update failed");
       }
