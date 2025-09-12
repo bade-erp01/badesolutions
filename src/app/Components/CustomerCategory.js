@@ -167,7 +167,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
                   <Image
                   height={10}
                   width={10}
-                    src={debtor.image.toString() || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}
+                    src={debtor.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}
                     alt={debtor.Username}
                     className="h-8 w-8 rounded-full shadow-sm"
                   />
@@ -208,7 +208,7 @@ function summarizeCustomerInvoices(customers, invoices) {
     return {
       username: customer.Username,
       totalAmount,
-      image: customer.image.toString() || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
+      image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
     };
   });
 
@@ -286,7 +286,7 @@ function summarizeCustomerInvoices(customers, invoices) {
           tooltipEl.innerHTML = `
             <div style="text-align:center;">
               <strong>${customer.username}</strong><br/>
-              <img src="${imageUrl.toString() || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
+              <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
               <div style="margin-top:6px;">Total: ₦${customer.totalAmount.toLocaleString()}</div>
             </div>
           `;

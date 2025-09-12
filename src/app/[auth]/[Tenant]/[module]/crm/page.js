@@ -14,6 +14,13 @@ export default async function CustomerListpage({ params }) {
       Customers.findByTenant(userData.business.tenantId).lean()
     ]);
 
+
+    const StringedCustomerList = JSON.parse(JSON.stringify(customerList || []));
+    const customerListWithImages = StringedCustomerList.map(cust => ({
+      ...cust,
+      image: cust.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
+    }));
+
     return (
       <div className=" ">
         {/* Dashboard */}
@@ -25,7 +32,7 @@ export default async function CustomerListpage({ params }) {
 
         {/* Customer Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {customerList.map((element) => (
+          {customerListWithImages.map((element) => (
             <Card
               key={element._id}
               data={element}
@@ -36,7 +43,6 @@ export default async function CustomerListpage({ params }) {
       </div>
     );
   } catch (error) {
-    console.error('Error loading customer list page:', error);
     return <div>Failed to load customer data.</div>;
   }
 }

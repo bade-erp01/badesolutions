@@ -431,9 +431,8 @@ export default function DraftInvoicePage({
         return;
       }
 
-      await Swal.fire(
-        "Please wait while we process your request. Please do not reload this page"
-      );
+      // loading indicator
+      plsWait("Please wait while i process your request. This should only take a bit. Do not reload this page...");
 
       const response = await fetch(
         `${EXPRESS_PRIVATE_URL}/${
