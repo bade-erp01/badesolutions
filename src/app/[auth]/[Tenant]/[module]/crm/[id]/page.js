@@ -14,7 +14,7 @@ import {
 } from "../../../../../../../Functions/Functions";
 import { useState } from "react";
 import { Line } from "react-chartjs-2";
-import {  PrinterIcon,CalendarDaysIcon,BanknotesIcon,SparklesIcon } from "@heroicons/react/24/outline";
+import {  PrinterIcon,CalendarDaysIcon,BanknotesIcon } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -51,7 +51,6 @@ export default function CustomerForm({ userInfo, data, cust,}) {
   });
   const [preview, setPreview] = useState(cust.Image );
   const [attachment, setAttachment] = useState(null);
-  const [ShowTTS, setShowTTS] = useState(false);
 
   function normalizeDate(value) {
   if (!value) return null;
@@ -719,19 +718,8 @@ const MySwal = withReactContent(Swal);
               <span className="text-sm font-semibold">Register Payment</span>
             </span>
           )}
-          {ShowTTS ? (
-            <span
-              onClick={() => setShowTTS(false)}
-              className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              aria-label="Disable Text to Speech"
-            >
-              <SparklesIcon className="h-5 w-5 text-yellow-500" />
-              <TextToSpeechPlayer text={`You are viewing the profile of ${cust.Username}. You can update their details, create invoices, print statements, schedule activities, and register payments based on your permissions.`} />
-            </span>
-          ) : (
-            ""
-          )}
 
+          <TextToSpeechPlayer text={`You are viewing the profile of ${cust.Username}. You can update their details, create invoices, print statements, schedule activities, and register payments based on your permissions.`} />
         </div>
       </Section>
 
