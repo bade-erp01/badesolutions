@@ -12,7 +12,7 @@ const RenewButton = ({ redirectUrl }) => {
       title: <strong>Proceed to Payment</strong>,
       html: (
         <div className="text-sm text-gray-700">
-          <p>You &apos re about to renew your subscription and unlock premium features.</p>
+          <p>You&apos;re about to renew your subscription and unlock premium features.</p>
           <p className="mt-2 font-medium text-indigo-600">Continue to secure payment?</p>
         </div>
       ),
