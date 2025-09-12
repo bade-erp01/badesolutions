@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import Swal from "sweetalert2";
 import withReactContent from 'sweetalert2-react-content';
-import { jsPDF } from "jspdf";
+import TextToSpeechPlayer from "@"
 import Image from "next/image"
 import autoTable from "jspdf-autotable";
 import {
@@ -719,6 +719,8 @@ const MySwal = withReactContent(Swal);
               <span className="text-sm font-semibold">Register Payment</span>
             </span>
           )}
+
+          <TextToSpeechPlayer text={`You are viewing the profile of ${cust.Username}. You can update their details, create invoices, print statements, schedule activities, and register payments based on your permissions.`} />
         </div>
       </Section>
 
