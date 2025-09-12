@@ -277,7 +277,7 @@ export default function TextToSpeechTrigger({ text }) {
       className="inline-flex items-center gap-1 cursor-pointer text-yellow-600 hover:text-yellow-800 transition"
       title="Speak this text"
     >
-      <SparklesIcon className="h-5 w-5" />
+      <SparklesIcon className="h-5 w-5 text-yellow-500" />
     </span>
   );
 }
