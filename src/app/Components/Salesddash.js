@@ -1,8 +1,12 @@
+"use client"
+
 import React, { useMemo, useState } from 'react';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import moment from 'moment';
 import Swal from 'sweetalert2';
+import {CursorArrowRaysIcon } from "@heroicons/react/24/outline";
 import withReactContent from 'sweetalert2-react-content';
+import { motion } from 'framer-motion';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -29,15 +33,16 @@ ChartJS.register(
 );
 
 const statusColors = {
-  Invoice: 'rgba(34,197,94,0.6)',     // green
-  Order: 'rgba(234,179,8,0.6)',       // yellow
-  Cancelled: 'rgba(239,68,68,0.6)',   // red
-  Unknown: 'rgba(107,114,128,0.6)'    // gray
+  Invoice: 'rgba(34,197,94,0.6)',
+  Order: 'rgba(234,179,8,0.6)',
+  Cancelled: 'rgba(239,68,68,0.6)',
+  Unknown: 'rgba(107,114,128,0.6)'
 };
 
 const MySwal = withReactContent(Swal);
 
-const DashboardCharts = ({ invoices, triggerButton = true }) => {
+const DashboardCharts = ({ invoice, triggerButton = true }) => {
+  const [invoices] = useState(JSON.parse(invoice || '[]'));
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
 
@@ -129,49 +134,47 @@ const DashboardCharts = ({ invoices, triggerButton = true }) => {
     }]
   };
 
-  // Modal content as a React node
   const modalContent = (
-    <div style={{ padding: '1.5rem', fontFamily: 'Segoe UI, sans-serif', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)', borderRadius: 16, minWidth: 320, maxWidth: 900 }}>
-      <h2 style={{ textAlign: 'center', fontWeight: 700, fontSize: 24, marginBottom: 24, color: '#4f46e5', letterSpacing: 1 }}>📊 Sales Dashboard</h2>
-      {/* KPI Cards */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className="p-6 bg-gradient-to-br from-slate-100 to-indigo-50 shadow-xl max-w-6xl mx-auto"
+    >
+      <h2 className="text-center font-bold text-2xl mb-6 text-gray-600 tracking-wide"> Sales Dashboard</h2>
+
       <div className="flex flex-wrap justify-center gap-6 mb-8">
-        <div className="bg-white shadow-lg rounded-xl p-6 w-64 text-center border-t-4 border-green-400">
-          <div className="text-sm text-gray-500 font-medium">Total Margin</div>
+        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-green-400">
+          <div className="text-sm text-gray-500">Total Margin</div>
           <div className="text-2xl font-bold text-gray-800 mt-2">₦{totalMargin.toLocaleString()}</div>
         </div>
-        <div className="bg-white shadow-lg rounded-xl p-6 w-64 text-center border-t-4 border-blue-400">
-          <div className="text-sm text-gray-500 font-medium">Total Invoices</div>
+        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-blue-400">
+          <div className="text-sm text-gray-500">Total Invoices</div>
           <div className="text-2xl font-bold text-gray-800 mt-2">{totalInvoices}</div>
         </div>
-        <div className="bg-white shadow-lg rounded-xl p-6 w-64 text-center border-t-4 border-red-400">
-          <div className="text-sm text-gray-500 font-medium">Cancelled Rate</div>
+        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-red-400">
+          <div className="text-sm text-gray-500">Cancelled Rate</div>
           <div className="text-2xl font-bold text-red-600 mt-2">{cancelledRate}%</div>
         </div>
       </div>
-      {/* Year Filter */}
+
       <div className="mb-6 text-center">
         <label htmlFor="year-select" className="text-sm font-medium text-gray-600 mr-2">Filter by Year:</label>
         <select
           id="year-select"
           value={selectedYear}
           onChange={e => setSelectedYear(e.target.value)}
-          className="px-3 py-2 text-sm rounded-md border border-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="px-3 py-2 text-sm rounded-md border border-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           {availableYears.map(year => (
-            <option className='text-black' key={year} value={year}>{year}</option>
+            <option key={year} value={year}>{year}</option>
           ))}
         </select>
       </div>
-      {/* Charts */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: '2rem',
-        marginBottom: '2rem',
-        alignItems: 'stretch'
-      }}>
-        <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e0e7ef', padding: 16, height: 340 }}>
-          <h3 style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '0.5rem', color: '#333' }}>Sales Margin by Year & Status</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="bg-white rounded-xl shadow-md p-4 h-[340px]">
+          <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">Sales Margin by Year & Status</h3>
           <Bar data={filteredMarginData} options={{
             responsive: true,
             maintainAspectRatio: false,
@@ -179,8 +182,8 @@ const DashboardCharts = ({ invoices, triggerButton = true }) => {
             scales: { x: { stacked: true }, y: { stacked: true } }
           }} height={260} />
         </div>
-        <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e0e7ef', padding: 16, height: 340 }}>
-          <h3 style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '0.5rem', color: '#333' }}>Invoice Status Distribution</h3>
+        <div className="bg-white rounded-xl shadow-md p-4 h-[340px]">
+          <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">Invoice Status Distribution</h3>
           <Doughnut data={donutData} options={{
             responsive: true,
             maintainAspectRatio: false,
@@ -188,26 +191,18 @@ const DashboardCharts = ({ invoices, triggerButton = true }) => {
           }} height={260} />
         </div>
       </div>
-      <div style={{
-        background: '#fff',
-        borderRadius: 12,
-        boxShadow: '0 2px 8px #e0e7ef',
-        padding: 16,
-        maxWidth: 900,
-        margin: '0 auto',
-        height: 340
-      }}>
-        <h3 style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '0.5rem', color: '#333' }}>YoY Sales Trend</h3>
+
+      <div className="bg-white rounded-xl shadow-md p-4 h-[340px]">
+        <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">YoY Sales Trend</h3>
         <Line data={areaData} options={{
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } }
         }} height={260} />
       </div>
-    </div>
+    </motion.div>
   );
 
-  // Show modal handler
   const showDashboardModal = () => {
     MySwal.fire({
       html: modalContent,
@@ -225,21 +220,21 @@ const DashboardCharts = ({ invoices, triggerButton = true }) => {
     });
   };
 
-  // Optionally render a trigger button
   return (
     <>
       {triggerButton && (
         <button
           onClick={showDashboardModal}
-          className="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition text-lg font-semibold mb-6"
+          className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
         >
+          <CursorArrowRaysIcon class="h-6 w-6 " />
           View Sales Dashboard
         </button>
       )}
-      {/* Optionally render the dashboard inline if not using modal */}
       {!triggerButton && modalContent}
     </>
   );
 };
 
 export default DashboardCharts;
+

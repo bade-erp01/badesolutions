@@ -434,7 +434,7 @@ export default function DraftPurchasePage({
                   </button>
                 )}
 
-                { Singlebill.status.toLowerCase() === "approved" && (
+                {user.allowInternalTransfers && Singlebill.status.toLowerCase() === "approved" && (
                   <button
                   onClick={() => updateRFP("POSTED TO WAREHOUSE")}
                   title="Update warehouse inventory items"
@@ -444,6 +444,7 @@ export default function DraftPurchasePage({
                   <span>Update Inventory</span>
                 </button>
                 )}
+                
                 {user.raiseLpo &&
                   Singlebill.status.toLowerCase() === "draft" && (
                   <button

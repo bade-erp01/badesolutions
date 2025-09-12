@@ -5,7 +5,6 @@ import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import { FunnelIcon, FolderOpenIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
-import SalesDashboard from "@/app/Components/Salesddash";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 
 export default function InvoiceLandingPage({ billList, userData }) {
@@ -13,11 +12,10 @@ export default function InvoiceLandingPage({ billList, userData }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showDashboard, setShowDashboard] = useState(false); // 👈 New state for toggling dashboard
 
   const bills = JSON.parse(billList);
   const params = useParams();
-  const itemsPerPage = userData?.user?.c_levelDash ? 5 : 6;
+  const itemsPerPage = 6;
 
   const filteredBills = bills.filter((bill) => {
     const statusMatch = !searchRef || bill.billStatus === searchRef;
@@ -36,19 +34,6 @@ export default function InvoiceLandingPage({ billList, userData }) {
   return (
     <div className="text-white text-xs">
       <div className=" mx-auto">
-
-        {/* 👇 Toggle Button + Dashboard */}
-        {userData?.user?.c_levelDash && (
-          <div className="mb-1">
-            <button
-              onClick={() => setShowDashboard((prev) => !prev)}
-              className="mb-1 px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded-md transition"
-            >
-              {showDashboard ? "Hide Dashboard" : "Show Dashboard"}
-            </button>
-            {showDashboard && <SalesDashboard invoices={bills} />}
-          </div>
-        )}
 
         {/* Filter Component */}
         <div className="border border-white/10 bg-gradient-to-br from-[#1a1a1f] to-[#111114] p-4 shadow-xl">

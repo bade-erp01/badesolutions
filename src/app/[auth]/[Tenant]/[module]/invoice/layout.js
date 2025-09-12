@@ -8,7 +8,7 @@ import Invoice from "../../../../../../models/Invoices";
 import Customer from "../../../../../../models/Customer";
 import EMPLOYEES from "../../../../../../models/Users";
 import {WHouse} from"../../../../../../models/Stores"
-import {Encrypt} from "../../../../../../Functions/Functions"
+import SalesDashboard from "@/app/Components/Salesddash";
 import InvoiceLandingPage from "./page"
 import {ArrowTrendingUpIcon} from "@heroicons/react/24/outline"
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
@@ -92,6 +92,10 @@ export default async function Employeelayout({ children, params }) {
             <SalesRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
 
             <DeliveryRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
+
+            {userData?.user?.c_levelDash && (
+            <SalesDashboard invoice={JSON.stringify(InvoiceList)} />
+            )}
           </nav>
 
           
