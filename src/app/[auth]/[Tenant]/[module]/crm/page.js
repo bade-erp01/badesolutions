@@ -1,48 +1,42 @@
 import CustomerCategoryPieChart from '@/app/Components/CustomerCategory';
 import { fetchUser } from '../../../../../../Functions/useerDataRefresh';
-import Card from "@/app/Components/Card"
+import Card from '@/app/Components/Card';
+import Customers from '../../../../../../models/Customer';
+import Invoices from '../../../../../../models/Invoices';
 
+export default async function CustomerListpage({ params }) {
+  try {
+    const userData = await fetchUser();
+    const moduleParams = params;
 
-export default async  function CustomerListpage({ params}) {
-   const userData = await fetchUser();
-     const moduleList = await params;
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const res = await fetch(`${baseUrl}/api/crm`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userData.business.tenantId}`,
-      },
-      next: {
-        revalidate: 120, // Cache for 2 minutes
-      },
-    });
-   
-     const result = await res.json()
+    const [invoiceList, customerList] = await Promise.all([
+      Invoices.find({ tenantId: userData.business.tenantId }).lean(),
+      Customers.findByTenant(userData.business.tenantId).lean()
+    ]);
 
-return (
-  <div className=" ">
-    {/* Header Section */}
+    return (
+      <div className=" ">
+        {/* Dashboard */}
+        {userData.user.c_levelDash && (
+          <div className="bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 backdrop-blur-md mb-5">
+            <CustomerCategoryPieChart customers={customerList} invoice={invoiceList} />
+          </div>
+        )}
 
-    {/* Dashboard */}
-    {userData.user.c_levelDash && (
-      <div className="bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 backdrop-blur-md mb-5">
-        <CustomerCategoryPieChart customers={result.CustomerList} invoice={result.Bills} />
+        {/* Customer Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          {customerList.map((element) => (
+            <Card
+              key={element._id}
+              data={element}
+              module={moduleParams.module}
+            />
+          ))}
+        </div>
       </div>
-    )}
-
-    {/* Customer Cards */}
-    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-      {result.CustomerList.map((element) => (
-        <Card
-          key={element._id}
-          data={element}
-          module={`${moduleList.module}`}
-        />
-      ))}
-    </div>
-  </div>
-);
-
+    );
+  } catch (error) {
+    console.error('Error loading customer list page:', error);
+    return <div>Failed to load customer data.</div>;
+  }
 }
-

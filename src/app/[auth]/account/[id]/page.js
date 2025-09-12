@@ -145,7 +145,6 @@ export default function BusinessDatas({ data, userInfo }) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    console.log(formData);
   };
 
   return (
