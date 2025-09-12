@@ -82,7 +82,7 @@ export default async function Employeelayout({ children, params }) {
         {/* Sidebar (collapsible on mobile) */}
         <aside
           className={` bg-[#1e1e20]/80 backdrop-blur-lg
-              text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block`}
+              text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block`}
           style={{ maxHeight: "600px", overflowY: "scroll" }}
         >
          <BackButton />
@@ -98,7 +98,7 @@ export default async function Employeelayout({ children, params }) {
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="relative w-full h-full flex-grow overflow-x-auto shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
+          <section className="relative w-full h-[520px] max-h-[600px] flex-grow overflow-x-auto shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
             {/* {children} */}
             <InvoiceLandingPage billList={JSON.stringify(InvoiceList)} userData={userData} />
           </section>
