@@ -5,7 +5,7 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,8 +30,10 @@ ChartJS.register(
   Title
 );
 
-function CustomerCategoryPieChart({ customers, invoice }) {
+function CustomerCategoryPieChart({ customersList, invoiceList }) {
   const pieRef = useRef(null);
+  const [customers] = useState(JSON.parse(customers || "[]"));
+  const [invoice] = useState(JSON.parse(invoice || "[]"));
 
   const categoryCount =
     customers?.reduce((acc, curr) => {
