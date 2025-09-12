@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import {
+  SparklesIcon,
+  PlayIcon,
+  PauseIcon,
+  StopIcon,
+  PlayPauseIcon,
+} from '@heroicons/react/24/outline';
 
 export default function TextToSpeechPlayer({ text }) {
   const [voices, setVoices] = useState([]);
@@ -8,35 +15,46 @@ export default function TextToSpeechPlayer({ text }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
-  const [pitch, setPitch] = useState(1);
+  const [pitch, setPitch] = useState(1.0);
   const [rate, setRate] = useState(0.9);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(1.0);
 
   const utteranceRef = useRef(null);
 
+  // Load settings from localStorage
+  useEffect(() => {
+    const savedSettings = JSON.parse(localStorage.getItem('ttsSettings'));
+    if (savedSettings) {
+      setPitch(savedSettings.pitch);
+      setRate(savedSettings.rate);
+      setVolume(savedSettings.volume);
+      setSelectedVoice(savedSettings.voice || null);
+    }
+  }, []);
+
+  // Load voices
   useEffect(() => {
     if ('speechSynthesis' in window) {
       const loadVoices = () => {
         const availableVoices = window.speechSynthesis.getVoices();
         setVoices(availableVoices);
 
-        // Auto-select Nigerian or English voice
-        const nigerianVoice = availableVoices.find(
-          (voice) =>
-            voice.lang === 'en-NG' ||
-            voice.name.toLowerCase().includes('nigerian') ||
-            voice.name.toLowerCase().includes('nigeria')
-        );
+        const preferredVoice =
+          availableVoices.find((v) =>
+            v.name.toLowerCase().includes('google uk english')
+          ) ||
+          availableVoices.find(
+            (v) =>
+              v.lang === 'en-NG' ||
+              v.name.toLowerCase().includes('nigerian') ||
+              v.name.toLowerCase().includes('nigeria')
+          ) ||
+          availableVoices.find((v) => v.lang.startsWith('en-'));
 
-        const fallbackVoice = availableVoices.find((voice) =>
-          voice.lang.startsWith('en-')
-        );
-
-        setSelectedVoice(nigerianVoice || fallbackVoice || null);
+        setSelectedVoice((prev) => prev || preferredVoice || null);
       };
 
       loadVoices();
-
       if (voices.length === 0) {
         window.speechSynthesis.onvoiceschanged = loadVoices;
       }
@@ -45,10 +63,23 @@ export default function TextToSpeechPlayer({ text }) {
     }
   }, []);
 
+  // Save settings to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      'ttsSettings',
+      JSON.stringify({
+        pitch,
+        rate,
+        volume,
+        voice: selectedVoice,
+      })
+    );
+  }, [pitch, rate, volume, selectedVoice]);
+
   const playAudio = () => {
     if (!('speechSynthesis' in window)) return;
 
-    window.speechSynthesis.cancel(); // Stop any ongoing speech
+    window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.voice = selectedVoice;
@@ -91,13 +122,18 @@ export default function TextToSpeechPlayer({ text }) {
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow-md max-w-md mx-auto space-y-4">
-      <h2 className="text-lg font-semibold">Text-to-Speech Player</h2>
+    <div className="p-6 bg-gradient-to-br from-yellow-50 to-white rounded-xl shadow-lg max-w-lg mx-auto space-y-6 border border-yellow-200">
+      <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+        Bade Assist <SparklesIcon className="h-5 w-5 text-yellow-500" />
+      </h2>
 
-      <p className="text-sm text-gray-700">Voice: {selectedVoice?.name || 'None selected'}</p>
+      <div className="text-sm text-gray-700">
+        <strong>Current Voice:</strong>{' '}
+        {selectedVoice?.name || 'None selected'}
+      </div>
 
       <select
-        className="w-full p-2 border rounded"
+        className="w-full p-2 border border-gray-300 rounded-md bg-white text-sm"
         value={selectedVoice?.name || ''}
         onChange={(e) => {
           const voice = voices.find((v) => v.name === e.target.value);
@@ -111,40 +147,40 @@ export default function TextToSpeechPlayer({ text }) {
         ))}
       </select>
 
-      <div className="flex gap-2">
+      <div className="flex gap-3 justify-center">
         <button
           onClick={playAudio}
           disabled={isSpeaking && !isPaused}
-          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+          className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
-          Play
+          <PlayIcon className="h-6 w-6" />
         </button>
         <button
           onClick={pauseAudio}
           disabled={!isSpeaking || isPaused}
-          className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 disabled:opacity-50"
+          className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
-          Pause
+          <PauseIcon className="h-6 w-6" />
         </button>
         <button
           onClick={resumeAudio}
           disabled={!isPaused}
-          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 disabled:opacity-50"
+          className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
-          Resume
+          <PlayPauseIcon className="h-6 w-6" />
         </button>
         <button
           onClick={stopAudio}
           disabled={!isSpeaking}
-          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 disabled:opacity-50"
+          className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
-          Stop
+          <StopIcon className="h-6 w-6" />
         </button>
       </div>
 
-      <div className="space-y-2">
-        <label className="block text-sm">
-          Pitch: {pitch.toFixed(1)}
+      <div className="space-y-4 text-sm">
+        <label>
+          <span className="block mb-1">Pitch: {pitch.toFixed(1)}</span>
           <input
             type="range"
             min="0"
@@ -156,8 +192,8 @@ export default function TextToSpeechPlayer({ text }) {
           />
         </label>
 
-        <label className="block text-sm">
-          Rate: {rate.toFixed(1)}
+        <label>
+          <span className="block mb-1">Rate: {rate.toFixed(1)}</span>
           <input
             type="range"
             min="0.5"
@@ -169,8 +205,8 @@ export default function TextToSpeechPlayer({ text }) {
           />
         </label>
 
-        <label className="block text-sm">
-          Volume: {volume.toFixed(1)}
+        <label>
+          <span className="block mb-1">Volume: {volume.toFixed(1)}</span>
           <input
             type="range"
             min="0"
