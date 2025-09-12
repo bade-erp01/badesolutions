@@ -167,7 +167,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
                   <Image
                   height={10}
                   width={10}
-                    src={debtor.image}
+                    src={debtor.image.toString() || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}
                     alt={debtor.Username}
                     className="h-8 w-8 rounded-full shadow-sm"
                   />
@@ -208,7 +208,7 @@ function summarizeCustomerInvoices(customers, invoices) {
     return {
       username: customer.Username,
       totalAmount,
-      image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
+      image: customer.image.toString() || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
     };
   });
 
