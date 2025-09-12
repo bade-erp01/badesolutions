@@ -624,7 +624,7 @@ const MySwal = withReactContent(Swal);
               <Image
               width={40}
               height={40}
-                src={cust.image || 'https://img.icons8.com/glyph-neue/64/gender-neutral-user.png'}
+                src={cust.image.toString() || 'https://img.icons8.com/glyph-neue/64/gender-neutral-user.png'}
                 loading="eager"
                 quality={100}
                 alt="Avatar"

@@ -208,7 +208,7 @@ function summarizeCustomerInvoices(customers, invoices) {
     return {
       username: customer.Username,
       totalAmount,
-      image: customer.image || "/placeholder.png",
+      image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
     };
   });
 
@@ -286,7 +286,7 @@ function summarizeCustomerInvoices(customers, invoices) {
           tooltipEl.innerHTML = `
             <div style="text-align:center;">
               <strong>${customer.username}</strong><br/>
-              <img src="${imageUrl}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
+              <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
               <div style="margin-top:6px;">Total: ₦${customer.totalAmount.toLocaleString()}</div>
             </div>
           `;
