@@ -190,7 +190,7 @@ export default function DraftPurchasePage({
       if (data.message) {
         SuccessToast(data.message); 
         router.refresh();
-        // window.location.reload()/; // Consider using router.reload() if you're using Next.js router
+        window.location.reload(); // Consider using router.reload() if you're using Next.js router
       } else {
         throw new Error(data.error || "Unknown error occurred");
       }
@@ -308,6 +308,7 @@ export default function DraftPurchasePage({
 
       if (data.message) {
         SuccessToast(data.message);
+        window.location.reload();
         router.refresh(); // Or use router.refresh() if you're in App Router
       } else {
         throw new Error(data.error || "Update failed");
@@ -433,7 +434,7 @@ export default function DraftPurchasePage({
                   </button>
                 )}
 
-                {Whouse.Status && user._id.toString() === Whouse?.StoreKeeper && Singlebill.status.toLowerCase() === "approved" && (
+                { Singlebill.status.toLowerCase() === "approved" && (
                   <button
                   onClick={() => updateRFP("POSTED TO WAREHOUSE")}
                   title="Update warehouse inventory items"
