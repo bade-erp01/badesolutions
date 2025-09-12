@@ -32,8 +32,8 @@ ChartJS.register(
 
 function CustomerCategoryPieChart({ customersList, invoiceList }) {
   const pieRef = useRef(null);
-  const [customers] = useState(JSON.parse(customers || "[]"));
-  const [invoice] = useState(JSON.parse(invoice || "[]"));
+  const [customers] = useState(customersList || []);
+  const [invoice] = useState(invoiceList || []);
 
   const categoryCount =
     customers?.reduce((acc, curr) => {
