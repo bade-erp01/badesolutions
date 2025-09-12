@@ -148,34 +148,34 @@ export default function TextToSpeechPlayer({ text }) {
       </select>
 
       <div className="flex gap-3 justify-center">
-        <button
+        <span
           onClick={playAudio}
           disabled={isSpeaking && !isPaused}
           className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
           <PlayIcon className="h-6 w-6" />
-        </button>
-        <button
+        </span>
+        <span
           onClick={pauseAudio}
           disabled={!isSpeaking || isPaused}
           className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
           <PauseIcon className="h-6 w-6" />
-        </button>
-        <button
+        </span>
+        <span
           onClick={resumeAudio}
           disabled={!isPaused}
           className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
           <PlayPauseIcon className="h-6 w-6" />
-        </button>
-        <button
+        </span>
+        <span
           onClick={stopAudio}
           disabled={!isSpeaking}
           className="bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full disabled:opacity-50"
         >
           <StopIcon className="h-6 w-6" />
-        </button>
+        </span>
       </div>
 
       <div className="space-y-4 text-sm">
