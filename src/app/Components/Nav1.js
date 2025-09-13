@@ -4,13 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import "animate.css";
+import { Squares2X2Icon } from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Encrypt } from "../../../Functions/Functions";
 import { useRouter } from "next/navigation";
 import { plsWait, ErrorMessage, SuccessToast } from "../../../Functions/Mics";
-import moment from "moment"
-import Logout from "@/app/Components/Logout"
+import moment from "moment";
+import Logout from "@/app/Components/Logout";
 
 export default function Nav1({ page, Module, user, business }) {
   const pathName = usePathname();
@@ -29,7 +30,7 @@ export default function Nav1({ page, Module, user, business }) {
     setWeekday(now.toLocaleDateString(undefined, { weekday: "short" }));
     setTime(
       // now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })
-      moment().format('HH:mm')
+      moment().format("HH:mm")
     );
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -72,7 +73,6 @@ export default function Nav1({ page, Module, user, business }) {
     }
   }
 
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredModules, setFilteredModules] = useState(Module || []);
 
@@ -80,10 +80,8 @@ export default function Nav1({ page, Module, user, business }) {
     setFilteredModules(Module || []);
   }, [Module]);
 
-
   const handleSearch = async (e) => {
-  
-     e.preventDefault();
+    e.preventDefault();
     const trimmedTerm = searchTerm.trim();
 
     if (!trimmedTerm) {
@@ -106,7 +104,9 @@ export default function Nav1({ page, Module, user, business }) {
 
     setTimeout(() => {
       router.push(
-        `/Search/${encodeURIComponent(page)}?search=${encodeURIComponent(trimmedTerm)}`
+        `/Search/${encodeURIComponent(page)}?search=${encodeURIComponent(
+          trimmedTerm
+        )}`
       );
       Swal.close();
       setSearchTerm("");
@@ -118,18 +118,20 @@ export default function Nav1({ page, Module, user, business }) {
   }, []);
 
   if (!hydrated) {
-  return (
-    <div className="p-4 space-y-4 animate-pulse">
-      <div className="h-4 bg-gray-300 rounded w-80"></div>
-    </div>
-  );
-}
-
+    return (
+      <div className="p-4 space-y-4 animate-pulse">
+        <div className="h-4 bg-gray-300 rounded w-80"></div>
+      </div>
+    );
+  }
 
   const sanitizedCompanyName = business?.companyName
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
+
+  const href =
+    business && user ? `/${sanitizedCompanyName}/${Encrypt(user._id)}` : "/";
 
   return (
     <>
@@ -141,16 +143,18 @@ export default function Nav1({ page, Module, user, business }) {
           <div className="container mx-auto flex justify-between items-center">
             {/* Logo */}
             <Link
-              href={
-                business && user
-                  ? `/${sanitizedCompanyName}/${Encrypt(user._id)}`
-                  : "/"
-              }
-              className="text-fuchsia-800 text-sm font-bold"
+              href={href}
+              className="text-fuchsia-800 text-sm font-bold flex items-center"
             >
-              {!page ? "Bade" : page?.toUpperCase()}
+              {page ? (
+                <>
+                  <Squares2X2Icon className="h-6 w-6 text-pink-500 mr-2 -mt-1" />
+                  {page.toUpperCase()}
+                </>
+              ) : (
+                "Bade"
+              )}
             </Link>
-
             {business && user ? (
               // Search Bar - Visible on Desktop
               Module?.length > 0 ? (
@@ -181,7 +185,7 @@ export default function Nav1({ page, Module, user, business }) {
                   href="#"
                   className={`hover:text-pink-500 transition ${
                     pathName === "/Why_Badde"
-                      ? "text-pink-500 bg-gray-100 p-2"
+                      ? "text-pink-500 bg-gray-100 "
                       : ""
                   }`}
                 >
@@ -211,7 +215,7 @@ export default function Nav1({ page, Module, user, business }) {
                   href="/Pricing"
                   className={`hover:text-pink-500 transition ${
                     pathName === "/Pricing"
-                      ? "text-pink-500 bg-gray-100 p-2"
+                      ? "text-pink-500 bg-gray-100 "
                       : ""
                   }`}
                 >
@@ -232,7 +236,6 @@ export default function Nav1({ page, Module, user, business }) {
                     </small>
                   </div>
                 </div>
-
 
                 {/* Dropdown Menu */}
                 <div className="relative inline-block text-left">
@@ -255,8 +258,16 @@ export default function Nav1({ page, Module, user, business }) {
                         alt="user image"
                       />
                     ) : (
-                      <Image src="/person.png" loading="lazy" alt="user image" priority={false}
-                        quality={100} height={25} width={25} className=" rounded-full object-cover" />
+                      <Image
+                        src="/person.png"
+                        loading="lazy"
+                        alt="user image"
+                        priority={false}
+                        quality={100}
+                        height={25}
+                        width={25}
+                        className=" rounded-full object-cover"
+                      />
                     )}
                   </button>
 
@@ -299,18 +310,18 @@ export default function Nav1({ page, Module, user, business }) {
                             Account settings ⚙️
                           </Link>
                         )}
-                       {user.Notification.length > 0 && ( <Link
-                          href={`/${sanitizedCompanyName}/Notification`}
-                          className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-300"
-                          role="menuitem"
-                          tabIndex={-1}
-                        >
-                          {user.Notification.length} Notifications 🔔
-                        </Link>
-                      )}
+                        {user.Notification.length > 0 && (
+                          <Link
+                            href={`/${sanitizedCompanyName}/Notification`}
+                            className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-300"
+                            role="menuitem"
+                            tabIndex={-1}
+                          >
+                            {user.Notification.length} Notifications 🔔
+                          </Link>
+                        )}
 
-                       <Logout/>
-
+                        <Logout />
                       </div>
                     </div>
                   )}
@@ -320,7 +331,7 @@ export default function Nav1({ page, Module, user, business }) {
               <Link
                 href="/Login"
                 className={`hover:text-pink-500 transition ${
-                  pathName === "/Login" ? "text-pink-500 bg-gray-100 p-2" : ""
+                  pathName === "/Login" ? "text-pink-500 bg-gray-100" : ""
                 }`}
               >
                 Login
