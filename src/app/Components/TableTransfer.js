@@ -1,20 +1,28 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function TransferTable({ TransfersList }) {
+export default function TransferTable({ TransfersLists ,StoreList}) {
+    const StoreLists = JSON.parse(StoreList || "[]");
+    const TransfersList = JSON.parse(TransfersLists || "[]");
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
+    // filtere and return store Name
+    const getStoreName = (storeId) => {
+        const store = StoreLists.find((s) => s._id === storeId);
+        return  store.WHName || "Unknown Store";
+    }
+
     // Filter logic
     const filteredTransfers = TransfersList.filter((transfer) => {
         const matchesSearch =
             transfer.billReferenceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            transfer.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            transfer.to.toLowerCase().includes(searchTerm.toLowerCase());
+            transfer.status.toLowerCase().includes(searchTerm.toLowerCase()) 
 
         const transferDate = new Date(transfer.transferedDate);
         const matchesDate =
@@ -35,8 +43,8 @@ export default function TransferTable({ TransfersList }) {
             {/* Search & Filter Controls */}
             <div className="flex flex-wrap gap-4 items-center justify-between bg-gray-100 p-4 rounded-lg shadow">
                 <input
-                    type="text"
-                    placeholder="Search by product or warehouse..."
+                    type="search"
+                    placeholder="Search by Reference or status..."
                     value={searchTerm}
                     onChange={(e) => {
                         setSearchTerm(e.target.value);
@@ -76,8 +84,8 @@ export default function TransferTable({ TransfersList }) {
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">From Warehouse</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">To Warehouse</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Quantity</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">ORDER Qty</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -86,14 +94,24 @@ export default function TransferTable({ TransfersList }) {
                                 key={index}
                                 className="hover:bg-gray-100 transition duration-200"
                             >
-                                <td className="px-6 py-4 text-sm">{transfer.billReferenceNo}</td>
-                                <td className="px-6 py-4 text-sm">{transfer.from}</td>
-                                <td className="px-6 py-4 text-sm">{transfer.to}</td>
+                                <td className="px-6 py-4 text-sm text-blue-400 :ishover:underline :visited:text-purple-600">
+                                    <Link href={`/`} >
+                                    {transfer.billReferenceNo}
+                                    </Link>
+                                </td>
+                                <td className="px-6 py-4 text-sm">{getStoreName(transfer.from)}</td>
+                                <td className="px-6 py-4 text-sm">{getStoreName(transfer.to)}</td>
                                 <td className="px-6 py-4 text-xs">{transfer.status}</td>
-                                <td className="px-6 py-4 text-sm">{transfer.orders.length}</td>
                                 <td className="px-6 py-4 text-sm">
                                     {new Date(transfer.transferedDate).toLocaleDateString()}
                                 </td>
+                                <td className="px-6 py-4 text-sm">{transfer.orders.length}</td>
+                                {/* get the value from the transfer.order.item.VendorPrice multiplied by transfer.orders.length for each item */}
+                                {/* <td className="px-6 py-4 text-sm">
+                                    {transfer.orders.reduce((total, order) => {
+                                        return total + (order.item?.VendorPrice || 0) * order.quantity;
+                                    }, 0).toFixed(2)}
+                                </td> */}
                             </tr>
                         ))}
                     </tbody>

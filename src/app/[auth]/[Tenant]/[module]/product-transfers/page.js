@@ -8,6 +8,7 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { storeProduct, WHouse } from "../../../../../../models/Stores";
 import ProductTransfer from "../../../../../../models/ProductTransfers";
 import TransferTable from "@/app/Components/TableTransfer";
+import BackButton from "@/app/Components/BackBotton";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -56,17 +57,21 @@ export const metadata = {
 export default async function TransferPage({ params }) {
   const moduleList = await params;
   const userData = await fetchUser();
+  const StoreLists = await WHouse.findByTenant(userData.business.tenantId).lean();
   const TransfersList = await ProductTransfer.findByTenant(
     userData.business.tenantId
   ).sort({_id:-1}).lean();
+
+//   /string the TransfersList to remove unwanted fields and reduce data size
+  const TransfersListStr = JSON.stringify(TransfersList);
+  const StoreListsStr = JSON.stringify(StoreLists);
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={`${moduleList.module}`}
-        Module={TransfersList}
+        page={`Transfered Products`}
       />
 
       <div className="flex flex-1 text-white bt-2">
@@ -99,6 +104,7 @@ export default async function TransferPage({ params }) {
               data={JSON.stringify(TransfersList)}
               page="Transfered Products"
             />
+            <BackButton />
           </nav> 
         </aside>{" "}
         {/* Main Content Area */}
@@ -106,7 +112,7 @@ export default async function TransferPage({ params }) {
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[520px] overflow-y-auto">
             {/* show each  transfer */}
             {TransfersList.length > 0 ? (
-                <TransferTable TransfersList={TransfersList} />
+                <TransferTable TransfersLists={TransfersListStr} StoreList={StoreListsStr} />
             ) : (
               <p className="text-gray-300 text-center mt-20">
                 No transfers found.
