@@ -138,7 +138,7 @@ const BulkUploader = ({ tenantId, collectionName }) => {
 
       <button
         onClick={() => fileInputRef.current.click()}
-        className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+        className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition w-full"
         aria-label="Upload bulk file"
       >
         <CloudArrowUpIcon className="h-5 w-5" />
@@ -147,7 +147,7 @@ const BulkUploader = ({ tenantId, collectionName }) => {
 
       <button
         onClick={downloadTemplate}
-        className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+        className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition w-full"
         aria-label="Download template"
       >
         <DocumentArrowDownIcon className="h-5 w-5" />
