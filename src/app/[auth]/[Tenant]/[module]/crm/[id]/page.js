@@ -76,16 +76,16 @@ export default function CustomerForm({ userInfo, data, cust,}) {
       let advice = "";
       if (!lastPayDate) {
         advice =
-          "This customer has never made a payment. Consider offering a starter bundle or a small discount to encourage engagement";
+          "This customer has never made a payment. Consider offering a starter bundle or a small discount to encourage engagement.";
       } else if (isOwing && totalDebt > 50000) {
         advice =
-          "Customer owes a significant amount. Offer a flexible payment plan or loyalty reward to encourage settlement";
+          "Customer owes a significant amount. Offer a flexible payment plan or loyalty reward to encourage settlement.";
       } else if (!isOwing && purchaseHistory.length >= 3) {
         advice =
-          "Customer is consistent and reliable. Consider upselling premium products or offering referral bonuses";
+          "Customer is consistent and reliable. Consider upselling premium products or offering referral bonuses.";
       } else {
         advice =
-          "Maintain regular communication and offer seasonal promotions to boost interest";
+          "Maintain regular communication and offer seasonal promotions to boost interest.";
       }
 
     return `
@@ -776,7 +776,7 @@ const MySwal = withReactContent(Swal);
             </span>
           )}
 
-          <TextToSpeechPlayer text={`${getCustomerSummary(cust)}.`} />
+          <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
         </div>
       </Section>
 
