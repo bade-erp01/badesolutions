@@ -89,10 +89,10 @@ export default function CustomerForm({ userInfo, data, cust,}) {
       }
 
       return `Customer Summary for ${Username}:
-  - Total Debt: ₦${totalDebt.toLocaleString()}
-  - Owing: ${isOwing ? "Yes" : "No"}
-  - Last Payment Date: ${formattedDate}
-  - My Sales Advice? ${advice}`;
+      - Total Debt: ₦${totalDebt.toLocaleString()}
+      - Owing: ${isOwing ? "Yes" : "No"}
+      - Last Payment Date: ${formattedDate}
+      - Want My Sales Advice?: ${advice}`;
     }
 
 
