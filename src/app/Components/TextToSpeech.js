@@ -229,7 +229,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SparklesIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon,BugAntIcon } from '@heroicons/react/24/outline';
 
 export default function TextToSpeechTrigger({ text }) {
   const [voice, setVoice] = useState(null);
@@ -237,18 +237,25 @@ export default function TextToSpeechTrigger({ text }) {
   useEffect(() => {
     if ('speechSynthesis' in window) {
       const loadVoices = () => {
-        const voices = window.speechSynthesis.getVoices();
+      const voices = window.speechSynthesis.getVoices();
 
-        const preferredVoice = voices.find((v) =>
+      const preferredVoice =
+        voices.find((v) =>
           v.name.toLowerCase().includes('google uk english female')
-        ) || voices.find((v) =>
+        ) ||
+        voices.find((v) =>
           v.name.toLowerCase().includes('google uk english')
-        ) || voices.find((v) =>
+        ) ||
+        voices.find((v) =>
+          v.lang === 'en-ZA' || v.name.toLowerCase().includes('south african')
+        ) ||
+        voices.find((v) =>
           v.lang === 'en-NG' || v.name.toLowerCase().includes('nigerian')
-        ) || voices.find((v) => v.lang.startsWith('en-'));
+        ) ||
+        voices.find((v) => v.lang.startsWith('en-'));
 
-        setVoice(preferredVoice || null);
-      };
+      setVoice(preferredVoice || null);
+    };
 
       loadVoices();
       if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -277,7 +284,7 @@ export default function TextToSpeechTrigger({ text }) {
       className="inline-flex items-center gap-1 cursor-pointer text-yellow-600 hover:text-yellow-800 transition"
       title="Bade Assist"
     >
-      <SparklesIcon className="h-5 w-5 text-yellow-500" />
+      <BugAntIcon className="h-5 w-5 text-yellow-500" />
     </span>
   );
 }
