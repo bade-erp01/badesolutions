@@ -114,7 +114,7 @@ export default function CustomerForm({ userInfo, data, cust,}) {
     - Register payments  
 
      Account Summary:
-    - Total Debt: ₦${totalDebt.toLocaleString()}
+    - Current Balance: ₦${totalDebt.toLocaleString()}
     - Currently Owing: ${isOwing ? "Yes" : "No"}
     - Last Payment Date: ${formattedDate}
 
