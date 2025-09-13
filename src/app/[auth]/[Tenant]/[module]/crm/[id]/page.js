@@ -100,11 +100,11 @@ export default function CustomerForm({ userInfo, data, cust,}) {
         - Review ledger activities  
         - Register payments  
 
-        Account Summary for ${cust.Username}:
+        Account Summary for ${cust.Username},
         - Total Debt: ₦${totalDebt.toLocaleString()}
         - Currently Owing: ${isOwing ? "Yes" : "No"},
         - Last Payment Date: ${formattedDate || "No payments made yet"},
-        
+
         - ${advice}
         `;
     }
