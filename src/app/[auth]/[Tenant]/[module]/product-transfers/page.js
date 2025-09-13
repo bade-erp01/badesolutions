@@ -7,6 +7,7 @@ import { Encrypt } from "../../../../../../Functions/Functions";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { storeProduct, WHouse } from "../../../../../../models/Stores";
 import ProductTransfer from "../../../../../../models/ProductTransfers";
+import TransferTable from "@/app/Components/TableTransfer";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -105,37 +106,7 @@ export default async function TransferPage({ params }) {
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[520px] overflow-y-auto">
             {/* show each  transfer */}
             {TransfersList.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-gray-800 text-white rounded-lg">
-                  <thead>
-                    <tr className="bg-gray-700">
-                      <th className="px-4 py-2 text-left">Product</th>
-                      <th className="px-4 py-2 text-left">From Warehouse</th>
-                      <th className="px-4 py-2 text-left">To Warehouse</th>
-                      <th className="px-4 py-2 text-left">Quantity</th>
-                      <th className="px-4 py-2 text-left">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {TransfersList.map((transfer, index) => (
-                      <tr
-                        key={index}
-                        className={`${
-                          index % 2 === 0 ? "bg-gray-800" : "bg-gray-700"
-                        }`}
-                      >
-                        <td className="px-4 py-2">{transfer.billReferenceNo}</td>
-                        <td className="px-4 py-2">{transfer.from}</td>
-                        <td className="px-4 py-2">{transfer.to}</td>
-                        <td className="px-4 py-2">{transfer.orders.length}</td>
-                        <td className="px-4 py-2">
-                          {new Date(transfer.transferedDate).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                <TransferTable TransfersList={TransfersList} />
             ) : (
               <p className="text-gray-300 text-center mt-20">
                 No transfers found.

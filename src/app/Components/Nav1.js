@@ -148,7 +148,7 @@ export default function Nav1({ page, Module, user, business }) {
             >
               {page ? (
                 <>
-                  <Squares2X2Icon className="h-6 w-6 text-pink-500 mr-2 -mt-1" />
+                  <Squares2X2Icon className="h-6 w-6 text-gray-700 mr-2 -mt-1 hover:text-pink-500 hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
                   {page.toUpperCase()}
                 </>
               ) : (
