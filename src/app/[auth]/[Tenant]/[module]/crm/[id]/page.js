@@ -57,10 +57,10 @@ export default function CustomerForm({ userInfo, data, cust,}) {
       if (!customer) return "Invalid customer data.";
 
       const {
-        name,
-        totalDebt = 0,
+        Username,
+        totalDebt = customer.Debt || 0,
         lastPayDate,
-        purchaseHistory = [],
+        purchaseHistory = data.SandS,
       } = customer;
 
       const isOwing = totalDebt > 0;
@@ -88,11 +88,11 @@ export default function CustomerForm({ userInfo, data, cust,}) {
           "Maintain regular communication and offer seasonal promotions to boost interest.";
       }
 
-      return `Customer Summary for ${name}:
+      return `Customer Summary for ${Username}:
   - Total Debt: ₦${totalDebt.toLocaleString()}
   - Owing: ${isOwing ? "Yes" : "No"}
   - Last Payment Date: ${formattedDate}
-  - Sales Advice: ${advice}`;
+  - My Sales Advice? ${advice}`;
     }
 
 
@@ -763,7 +763,7 @@ const MySwal = withReactContent(Swal);
             </span>
           )}
 
-          <TextToSpeechPlayer text={`You are viewing the profile of ${cust.Username}. You can update their details, create invoices, print statements, schedule activities, and register payments based on your permissions.`} />
+          <TextToSpeechPlayer text={`You are viewing the profile of ${cust.Username}. You can update their details, create invoices, print statements, schedule activities,view sales trend,Ledger activities, and register payments based on your permissions.`} />
         </div>
       </Section>
 
@@ -873,7 +873,7 @@ const MySwal = withReactContent(Swal);
           {userInfo.user.isAdmin ? (
             <div className="mb-2 ">
               <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                <TextToSpeechPlayer text={`${getCustomerSummary(cust)} .`} />
+                <TextToSpeechPlayer text={`${getCustomerSummary(cust)}.`} />
               </label>
           <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
             <input
