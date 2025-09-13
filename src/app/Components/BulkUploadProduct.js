@@ -145,14 +145,14 @@ const BulkUploader = ({ tenantId, collectionName }) => {
         Bulk Upload File
       </button>
 
-      <button
+      {/* <button
         onClick={downloadTemplate}
         className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition w-full"
         aria-label="Download template"
       >
         <DocumentArrowDownIcon className="h-5 w-5" />
         Download Template
-      </button>
+      </button> */}
 
       {isLoading && (
         <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
