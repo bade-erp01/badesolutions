@@ -99,7 +99,7 @@ export default async function storelayout({ children, params }) {
                 .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                 userData?.user._id
               )}/Module/Forms/${moduleList.module.toLowerCase()}`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
             >
               <PlusCircleIcon className="h-6 w-6 text-gray-100"/>
               <small>New Store</small>
@@ -115,7 +115,7 @@ export default async function storelayout({ children, params }) {
                     .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                     userData?.user._id
                   )}/vendor/vendor`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                  className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <UserGroupIcon
                     aria-hidden="true"
@@ -136,7 +136,7 @@ export default async function storelayout({ children, params }) {
                     .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                     userData?.user._id
                   )}/purchase/Forms/purchase`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                  className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
                   <small>Purchase Requests</small>
@@ -149,21 +149,13 @@ export default async function storelayout({ children, params }) {
                     .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                     userData?.user._id
                   )}/Module/Forms/transfer`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                  className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <ClipboardDocumentCheckIcon className="h-6 w-6 text-gray-100" />
                   <small>Product Transfer Request</small>
                 </Link>
             </>
           )}
-
-              <Link
-                href={`/auth/Apps`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                < ChartPieIcon className="h-7 w-7 text-gray-100" />
-                <small>Reporting</small>
-              </Link>
                 { StoreList.length > 0 && (
                   <ExcelDownloadBtn data={StoreList} page="store" />
                 )}

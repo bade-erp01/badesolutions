@@ -50,17 +50,6 @@ export default async function layout({children}) {
     //  get vendor list
     const VendorList = await Vendor.findByTenant(userData.business.tenantId).lean();
     const purcghaseList = await Purchase.findByTenant(userData.business.tenantId).sort({_id:-1}).lean();
-    const purchaseList = JSON.parse(JSON.stringify(purcghaseList))
-    // fetch purchase list
-    //  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    //    const res = await fetch(`${baseUrl}/api/storeApi/purchase-order`, {
-    //       method: "GET",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`
-    //       }
-    //     })
-    
-    //     const purchaseList = await res.json() 
+    const purchaseList = JSON.parse(JSON.stringify(purcghaseList)) 
   return <Storelayout purchaseList={purchaseList} userData={userData} VendorList={JSON.stringify(VendorList)}/>
 }
