@@ -58,7 +58,6 @@ export default async function TenantPage({ params }) {
         {/* Sidebar */}
         <aside className="w-72 bg-[#1e2939] text-white px-4 py-6 overflow-y-hidden" >
           <div className="flex items-center gap-2 mb-4">
-            <CpuChipIcon className="h-6 w-6 text-gray-100" />
             <h2 className="text-sm font-bold">Application Pane</h2>
           </div>
           <hr className="border-gray-600 mb-4" />
