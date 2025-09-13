@@ -88,11 +88,26 @@ export default function CustomerForm({ userInfo, data, cust,}) {
           "Maintain regular communication and offer seasonal promotions to boost interest.";
       }
 
-      return `Customer Summary for ${Username}:
-      - Total Debt: ₦${totalDebt.toLocaleString()}
-      - Owing: ${isOwing ? "Yes" : "No"}
-      - Last Payment Date: ${formattedDate}
-      - Want My Sales Advice?: ${advice}`;
+    return `
+        Customer Profile: ${cust.Username}
+
+        You have access to the following actions based on your permissions:
+        - Update customer details  
+        - Create invoices  
+        - Print account statements  
+        - Schedule activities  
+        - View sales trends  
+        - Review ledger activities  
+        - Register payments  
+
+        ---
+
+        Account Summary for ${cust.Username}:
+        - Total Debt: ₦${totalDebt.toLocaleString()}
+        - Currently Owing: ${isOwing ? "Yes" : "No"},
+        - Last Payment Date: ${formattedDate || "No payments made yet"},
+        - Sales Advice Requested: ${advice}
+        `;
     }
 
 
@@ -763,7 +778,7 @@ const MySwal = withReactContent(Swal);
             </span>
           )}
 
-          <TextToSpeechPlayer text={`You are viewing the profile of ${cust.Username}. You can update their details, create invoices, print statements, schedule activities,view sales trend,Ledger activities, and register payments based on your permissions.`} />
+          <TextToSpeechPlayer text={`${getCustomerSummary(cust)}.`} />
         </div>
       </Section>
 
@@ -872,9 +887,6 @@ const MySwal = withReactContent(Swal);
 
           {userInfo.user.isAdmin ? (
             <div className="mb-2 ">
-              <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                <TextToSpeechPlayer text={`${getCustomerSummary(cust)}.`} />
-              </label>
           <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
             <input
               type="number"
