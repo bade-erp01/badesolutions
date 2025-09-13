@@ -259,7 +259,7 @@ export default function MainDash({ userData }) {
                 {tenantData.result.map((person, index) => (
                   <div
                     key={index}
-                    className="text-xs bg-white rounded-lg p-4 mb-2 hover: border hover:border-gray-200  hover:shadow-md transition duration-200"
+                    className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover:shadow-md transition duration-200"
                     title={`${person.firstName}`}
                   >
                     <div className="flex justify-between items-center mb-2">
