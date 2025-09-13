@@ -104,7 +104,8 @@ export default function CustomerForm({ userInfo, data, cust,}) {
         - Total Debt: ₦${totalDebt.toLocaleString()}
         - Currently Owing: ${isOwing ? "Yes" : "No"},
         - Last Payment Date: ${formattedDate || "No payments made yet"},
-        - Sales Advice: ${advice}
+        
+        - ${advice}
         `;
     }
 
