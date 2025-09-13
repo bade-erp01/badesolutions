@@ -19,13 +19,21 @@ const SubscriptionReminder = ({ Business }) => {
           toast: true,
           position: 'bottom-end',
           icon: 'info',
-          title: `Your subscription expires in ${diffDays} day(s)`,
           showConfirmButton: false,
-          timer: 5000,
+          timer: 10000,
           timerProgressBar: true,
           customClass: {
             popup: 'swal2-subscription-toast'
-          }
+          },
+          html: `
+            <div style="display: flex; align-items: center;">
+              <img src="${Business.companyLogo}" alt="Company Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;" />
+              <div style="text-align: left;">
+                <strong style="font-size: 16px;">${Business.companyName}</strong><br/>
+                <span style="font-size: 14px;">Your subscription expires in <strong>${diffDays}</strong> day(s)</span>
+              </div>
+            </div>
+          `
         });
       }
     }
