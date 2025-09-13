@@ -281,10 +281,10 @@ export default function TextToSpeechTrigger({ text }) {
   return (
     <span
       onClick={speakText}
-      className="inline-flex items-center gap-1 cursor-pointer text-yellow-600 hover:text-yellow-800 transition"
-      title="Bade Assist"
+      className="inline-flex items-center gap-1 cursor-pointer  hover:text-yellow-200 transition"
+      title="Bug Ant Assist"
     >
-      <BugAntIcon className="h-5 w-5 text-yellow-500" />
+      <BugAntIcon className="h-5 w-5 text-black" />
     </span>
   );
 }
