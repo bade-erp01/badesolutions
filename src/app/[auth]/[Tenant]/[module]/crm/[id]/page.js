@@ -60,7 +60,7 @@ export default function CustomerForm({ userInfo, data, cust,}) {
         Username,
         totalDebt = customer.Debt || 0,
         lastPayDate,
-        purchaseHistory = data.SandS,
+        purchaseHistory = customer.SandS || [],
       } = customer;
 
       const isOwing = totalDebt > 0;
@@ -74,39 +74,53 @@ export default function CustomerForm({ userInfo, data, cust,}) {
         : "No payment recorded";
 
       let advice = "";
+
       if (!lastPayDate) {
         advice =
-          "This customer has never made a payment. Consider offering a starter bundle or a small discount to encourage engagement.";
+          "No payment history detected. Consider initiating engagement with a welcome offer, starter bundle, or introductory discount to build trust.";
+      } else if (isOwing && totalDebt > 100000) {
+        advice =
+          "Customer has a high outstanding balance. Recommend a structured repayment plan, possibly with milestone-based incentives to encourage timely settlement.";
       } else if (isOwing && totalDebt > 50000) {
         advice =
-          "Customer owes a significant amount. Offer a flexible payment plan or loyalty reward to encourage settlement.";
+          "Customer owes a significant amount. A loyalty-based discount or flexible payment option may improve recovery and retention.";
+      } else if (isOwing && totalDebt <= 5000) {
+        advice =
+          "Minor outstanding balance. A gentle reminder or automated nudge may suffice to prompt payment.";
+      } else if (!isOwing && purchaseHistory.length >= 5) {
+        advice =
+          "Customer demonstrates strong purchasing behavior. Consider offering exclusive access to premium products, early-bird promotions, or a referral incentive.";
       } else if (!isOwing && purchaseHistory.length >= 3) {
         advice =
-          "Customer is consistent and reliable. Consider upselling premium products or offering referral bonuses.";
+          "Customer is consistent and reliable. Upselling complementary products or bundling services could enhance value and increase average order size.";
+      } else if (!isOwing && purchaseHistory.length === 1) {
+        advice =
+          "Customer has made a single purchase. Follow up with a personalized recommendation or limited-time offer to encourage repeat business.";
       } else {
         advice =
-          "Maintain regular communication and offer seasonal promotions to boost interest.";
+          "Maintain regular communication, and consider seasonal campaigns or loyalty perks to deepen engagement.";
       }
 
-    return `
-        Customer Profile: ${cust.Username}
+      return `
+    📄 Customer Profile: ${Username}
 
-        You have access to the following actions based on your permissions:
-        - Update customer details  
-        - Create invoices  
-        - Print account statements  
-        - Schedule activities  
-        - View sales trends  
-        - Review ledger activities  
-        - Register payments  
+    🔧 Available Actions:
+    - Update customer details  
+    - Create invoices  
+    - Print account statements  
+    - Schedule activities  
+    - View sales trends  
+    - Review ledger activities  
+    - Register payments  
 
-        Account Summary for ${cust.Username},
-        - Total Debt: ₦${totalDebt.toLocaleString()}
-        - Currently Owing: ${isOwing ? "Yes" : "No"},
-        - Last Payment Date: ${formattedDate || "No payments made yet"},
+    📊 Account Summary:
+    - Total Debt: ₦${totalDebt.toLocaleString()}
+    - Currently Owing: ${isOwing ? "Yes" : "No"}
+    - Last Payment Date: ${formattedDate}
 
-        - ${advice}
-        `;
+    💡 Strategic Insight:
+    ${advice}
+    `;
     }
 
 
