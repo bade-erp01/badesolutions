@@ -9,6 +9,7 @@ import { fetchUser } from "../../../../Functions/useerDataRefresh";
 import { CpuChipIcon } from "@heroicons/react/24/outline";
 import Logout from "@/app/Components/Logout";
 import MainDash from "@/app/Components/MainDash";
+import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 
 export default async function TenantPage({ params }) {
   await dbConnect();
@@ -127,7 +128,7 @@ export default async function TenantPage({ params }) {
           </section>
         </main>
       </div>
-
+      <SubscriptionReminder Business={userData.business} />
       <Footer2 />
     </div>
   );
