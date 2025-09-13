@@ -17,6 +17,8 @@ export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
   const [tenantData, setTenantData] = useState(null);
   const [error, setError] = useState(null);
+  const truncate = (str, length = 20) =>
+    str && str.length > length ? str.substring(0, length) + "..." : str;
 
   useEffect(() => {
     const fetchTenantData = async () => {
