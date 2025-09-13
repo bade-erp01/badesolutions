@@ -102,9 +102,9 @@ export default function CustomerForm({ userInfo, data, cust,}) {
       }
 
       return `
-    📄 Customer Profile: ${Username}
+     Customer Profile: ${Username}
 
-    🔧 Available Actions:
+     Available Actions:
     - Update customer details  
     - Create invoices  
     - Print account statements  
@@ -113,12 +113,12 @@ export default function CustomerForm({ userInfo, data, cust,}) {
     - Review ledger activities  
     - Register payments  
 
-    📊 Account Summary:
+     Account Summary:
     - Total Debt: ₦${totalDebt.toLocaleString()}
     - Currently Owing: ${isOwing ? "Yes" : "No"}
     - Last Payment Date: ${formattedDate}
 
-    💡 Strategic Insight:
+    Strategic Insight:
     ${advice}
     `;
     }
