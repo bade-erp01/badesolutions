@@ -76,6 +76,7 @@ export async function PATCH(request) {
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.log(error);
     return new Response(
       JSON.stringify({ error: formatMongooseError(error)}),
       { status: 500, headers: { "Content-Type": "application/json" } }
