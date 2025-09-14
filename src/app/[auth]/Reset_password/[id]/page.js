@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {EXPRESS_PRIVATE_URL,Encrypt} from "../../../../../Functions/Functions"
 import {plsWait,ErrorMessage,SuccessToast} from "../../../../../Functions/Mics"
+import Footer1 from '@/app/Components/Footer1';
+import Nav1 from '@/app/Components/Nav1';
 
 const PasswordReset = ({params}) => {
   const UserId =  params.id;
@@ -49,9 +51,11 @@ const PasswordReset = ({params}) => {
   };
 
   return (
+    <>
+    <Nav1/>
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-fixed"
-      style={{ backgroundImage: "url('/images/bg.jpg')" }}
+      style={{ backgroundImage: "url('/bg.jpg')" }}
     >
       <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
         <h3 className="text-center text-2xl font-semibold text-gray-800 mb-4">
@@ -94,6 +98,8 @@ const PasswordReset = ({params}) => {
         </form>
       </div>
     </div>
+    <Footer1 />
+    </>
   );
 };
 
