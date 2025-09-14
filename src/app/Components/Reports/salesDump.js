@@ -10,50 +10,29 @@ const SalesDumpModal = ({ salesDatas }) => {
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
-    product: '',
-    customer: '',
-    vendor: ''
+    product: ''
   });
 
-  const handleExport = (filteredData) => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'SalesDump');
-
-    const filename = `Sales Dump [${filters.startDate || 'start'} - ${filters.endDate || 'end'}].xlsx`;
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, filename);
-  };
-
-  const applyFilters = () => {
+  const filterSales = (activeFilters) => {
     const filteredExport = [];
 
     salesArray.forEach((sale) => {
       const saleDate = new Date(sale.startDate);
-      const start = filters.startDate ? new Date(filters.startDate) : null;
-      const end = filters.endDate ? new Date(filters.endDate) : null;
-
-      const matchesCustomer = filters.customer
-        ? sale.customerName?.toLowerCase().includes(filters.customer.toLowerCase())
-        : true;
+      const start = activeFilters.startDate ? new Date(activeFilters.startDate) : null;
+      const end = activeFilters.endDate ? new Date(activeFilters.endDate) : null;
 
       const matchesDate =
         (!start || saleDate >= start) &&
         (!end || saleDate <= end);
 
-      if (!matchesCustomer || !matchesDate) return;
+      if (!matchesDate) return;
 
       sale.orders.forEach((order) => {
-        const matchesProduct = filters.product
-          ? order.item.Name?.toLowerCase().includes(filters.product.toLowerCase())
+        const matchesProduct = activeFilters.product
+          ? order.item.Name?.toLowerCase().includes(activeFilters.product.toLowerCase())
           : true;
 
-        const matchesVendor = filters.vendor
-          ? order.item.Vendor?.$oid?.includes(filters.vendor)
-          : true;
-
-        if (matchesProduct && matchesVendor) {
+        if (matchesProduct) {
           filteredExport.push({
             InvoiceNo: sale.billReferenceNo,
             Customer: sale.customerName,
@@ -69,31 +48,99 @@ const SalesDumpModal = ({ salesDatas }) => {
       });
     });
 
-    handleExport(filteredExport);
+    return filteredExport;
+  };
+
+  const handleExport = (filteredData) => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'SalesDump');
+
+    const filename = `Sales Dump [${filters.startDate || 'start'} - ${filters.endDate || 'end'}].xlsx`;
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, filename);
   };
 
   const openModal = () => {
     Swal.fire({
       title: 'Sales Dump Filters',
       html: `
-        <input type="date" id="startDate" class="swal2-input" placeholder="Start Date" />
-        <input type="date" id="endDate" class="swal2-input" placeholder="End Date" />
-        <input type="text" id="product" class="swal2-input" placeholder="Product Name" />
-        <input type="text" id="customer" class="swal2-input" placeholder="Customer Name" />
-        <input type="text" id="vendor" class="swal2-input" placeholder="Vendor ID" />
+        <div class="flex flex-col gap-2">
+          <input type="date" id="startDate" class="swal2-input" placeholder="Start Date" />
+          <input type="date" id="endDate" class="swal2-input" placeholder="End Date" />
+          <input type="text" id="product" class="swal2-input" placeholder="Product Name" />
+        </div>
       `,
-      confirmButtonText: 'Export to Excel',
+      confirmButtonText: 'Preview Results',
+      showCancelButton: true,
+      focusConfirm: false,
       preConfirm: () => {
-        setFilters({
+        return {
           startDate: document.getElementById('startDate').value,
           endDate: document.getElementById('endDate').value,
-          product: document.getElementById('product').value,
-          customer: document.getElementById('customer').value,
-          vendor: document.getElementById('vendor').value
+          product: document.getElementById('product').value
+        };
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const activeFilters = result.value;
+        setFilters(activeFilters);
+        const previewData = filterSales(activeFilters);
+
+        if (previewData.length === 0) {
+          Swal.fire('No results found', 'Try adjusting your filters.', 'info');
+          return;
+        }
+
+        const tableHtml = `
+          <div style="max-height:300px;overflow:auto;">
+            <table class="table-auto w-full text-left text-sm border border-gray-300">
+              <thead class="bg-gray-800 text-white">
+                <tr>
+                  <th class="px-2 py-1">Invoice</th>
+                  <th class="px-2 py-1">Customer</th>
+                  <th class="px-2 py-1">Product</th>
+                  <th class="px-2 py-1">Qty</th>
+                  <th class="px-2 py-1">Unit Price</th>
+                  <th class="px-2 py-1">Total</th>
+                  <th class="px-2 py-1">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${previewData
+                  .map(
+                    (row) => `
+                  <tr class="border-t">
+                    <td class="px-2 py-1">${row.InvoiceNo}</td>
+                    <td class="px-2 py-1">${row.Customer}</td>
+                    <td class="px-2 py-1">${row.Product}</td>
+                    <td class="px-2 py-1">${row.Quantity}</td>
+                    <td class="px-2 py-1">₦${row.UnitPrice.toLocaleString()}</td>
+                    <td class="px-2 py-1">₦${row.Total.toLocaleString()}</td>
+                    <td class="px-2 py-1">${new Date(row.Date).toLocaleDateString()}</td>
+                  </tr>
+                `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        Swal.fire({
+          title: 'Preview Sales Dump',
+          html: tableHtml,
+          confirmButtonText: 'Export to Excel',
+          showCancelButton: true,
+          customClass: {
+            popup: 'swal2-preview-popup'
+          }
+        }).then((exportResult) => {
+          if (exportResult.isConfirmed) {
+            handleExport(previewData);
+          }
         });
-      },
-      didClose: () => {
-        applyFilters();
       }
     });
   };
@@ -101,10 +148,10 @@ const SalesDumpModal = ({ salesDatas }) => {
   return (
     <button
       onClick={openModal}
-      className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
+      className="flex items-center gap-3 p-3 rounded-md hover:bg-indigo-600 bg-indigo-700 text-white transition text-sm font-semibold shadow-md"
     >
-      <FolderArrowDownIcon className="h-4 w-4 text-gray-100" />
-      Open Sales Dump
+      <FolderArrowDownIcon className="h-5 w-5 text-white" />
+      Export Sales Dump
     </button>
   );
 };

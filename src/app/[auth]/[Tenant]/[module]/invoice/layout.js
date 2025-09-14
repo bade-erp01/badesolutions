@@ -91,7 +91,7 @@ export default async function Employeelayout({ children, params }) {
 
             <DeliveryRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
 
-            <SalesDumpModal salesDatas={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
+            <SalesDumpModal salesDatas={JSON.stringify(InvoiceList)} Stores={JSON.stringify(Stores)} />
 
             {userData?.user?.c_levelDash && (
             <SalesDashboard invoice={JSON.stringify(InvoiceList)} />
