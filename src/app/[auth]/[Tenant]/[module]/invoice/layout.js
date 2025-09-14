@@ -1,7 +1,5 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Link from "next/link";
-import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import Invoice from "../../../../../../models/Invoices";
@@ -10,9 +8,9 @@ import EMPLOYEES from "../../../../../../models/Users";
 import {WHouse} from"../../../../../../models/Stores"
 import SalesDashboard from "@/app/Components/Salesddash";
 import InvoiceLandingPage from "./page"
-import {ArrowTrendingUpIcon} from "@heroicons/react/24/outline"
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
+import SalesDumpModal from "@/app/Components/Reports/salesDump";
 
 export const metadata = {
   title:
