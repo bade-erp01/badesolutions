@@ -2,15 +2,15 @@ import CustomerCategoryPieChart from '@/app/Components/CustomerCategory';
 import { fetchUser } from '../../../../../../Functions/useerDataRefresh';
 import Card from '@/app/Components/Card';
 import Customers from '../../../../../../models/Customer';
-import Invoices from '../../../../../../models/Invoices';
+// import Invoices from '../../../../../../models/Invoices';
 
 export default async function CustomerListpage({ params }) {
   try {
     const userData = await fetchUser();
     const moduleParams = params;
 
-    const [invoiceList, customerList] = await Promise.all([
-      Invoices.find({ tenantId: userData.business.tenantId }).lean(),
+    const [ customerList] = await Promise.all([
+      // Invoices.find({ tenantId: userData.business.tenantId }).lean(),
       Customers.findByTenant(userData.business.tenantId).lean()
     ]);
 
@@ -26,7 +26,7 @@ export default async function CustomerListpage({ params }) {
         {/* Dashboard */}
         {userData.user.c_levelDash && (
           <div className="bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 backdrop-blur-md mb-5">
-            <CustomerCategoryPieChart customersList={customerList} invoiceList={invoiceList} />
+            <CustomerCategoryPieChart customersList={customerList} />
           </div>
         )}
 

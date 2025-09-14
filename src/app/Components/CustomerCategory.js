@@ -1,7 +1,7 @@
 "use client";
 import {
   ExclamationTriangleIcon,
-  DocumentTextIcon,
+  CalculatorIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -34,6 +34,10 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
   const pieRef = useRef(null);
   const [customers] = useState(customersList || []);
   const [invoice] = useState(invoiceList || []);
+
+  // get debtors
+  const debtors = customers.filter(cust => cust.Debt > 0);
+
 
   const categoryCount =
     customers?.reduce((acc, curr) => {
@@ -104,9 +108,9 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
             bg: "bg-[#ffa2a2]",
           },
           {
-            title: "Total Invoices",
-            value: invoice.length,
-            icon: <DocumentTextIcon className="h-6 w-6 text-gray-900" />,
+            title: "Total Debtors",
+            value: debtors.length,
+            icon: <ExclamationTriangleIcon className="h-6 w-6 text-gray-900" />,
             bg: "bg-[#ffb86a]",
           },
           {
@@ -115,7 +119,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
               .filter((c) => c.Debt > 0)
               .reduce((acc, curr) => acc + curr.Debt, 0)
               .toLocaleString()}`,
-            icon: <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />,
+            icon: < CalculatorIcon className="h-6 w-6 text-red-500" />,
             bg: "bg-[#09090b]",
             textColor: "text-red-400",
           },
@@ -201,16 +205,16 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
 
 function summarizeCustomerInvoices(customers, invoices) {
   const summarized = customers.map((customer) => {
-    const customerInvoices = invoices.filter(
-      (invoice) => invoice.customer === customer._id
-    );
-    const totalAmount = customerInvoices.reduce(
-      (sum, invoice) => sum + invoice.grandTotal,
-      0
-    );
+    // const customerInvoices = invoices.filter(
+    //   (invoice) => invoice.customer === customer._id
+    // );
+    // const totalAmount = customerInvoices.reduce(
+    //   (sum, invoice) => sum + invoice.grandTotal,
+    //   0
+    // );
     return {
       username: customer.Username,
-      totalAmount,
+      totalAmount:customer.Debt,
       image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
     };
   });
@@ -220,7 +224,11 @@ function summarizeCustomerInvoices(customers, invoices) {
     datasets: [
       {
         label: "Total Amount",
-        data: summarized.map((item) => item.totalAmount),
+        data: summarized.map((item) => item.totalAmount).reduce((acc, val, idx) => {
+          acc.push((acc[idx - 1] || 0) + val);
+          return acc;
+        }, []),
+        fill: true,
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         borderColor: "#38bdf8",
         borderWidth: 2,
@@ -304,7 +312,7 @@ function summarizeCustomerInvoices(customers, invoices) {
       },
       title: {
         display: true,
-        text: `${new Date().getFullYear()} Monthly Sales Overview`,
+        text: `Debtors Overview`,
         font: { size: 20 },
         color: "#e2e8f0",
         padding: { top: 10, bottom: 20 },
@@ -328,7 +336,7 @@ function summarizeCustomerInvoices(customers, invoices) {
       y: {
         title: {
           display: true,
-          text: "Total Amount",
+          text: "Debt Amount",
           color: "#cbd5e1",
           font: { size: 16, weight: "bold" },
         },

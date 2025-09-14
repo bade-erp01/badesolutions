@@ -32,7 +32,6 @@ export default async function crmLayout({ children, params }) {
     userData = await fetchUser();
     customerList = await Customers.findByTenant(userData.business.tenantId).lean();
   } catch (error) {
-    console.error("CRM Layout failed to load:", error);
     return (
       <div className="text-red-500 p-6">
         Failed to load CRM layout. Please try again later.
