@@ -48,7 +48,7 @@ export default function Pricing() {
                     </div>
                     </Marquee>
                     <p className="text-gray-500 text-sm mt-2 font-medium tracking-wide">
-                        Trusted by forward-thinking businesses.
+                        Trusted by forward-thinking individuals and businesses worldwide.
                     </p>
                     </div>
                 </div>

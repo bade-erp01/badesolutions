@@ -136,7 +136,7 @@ export default function Nav1({ page, Module, user, business }) {
   return (
     <>
       <header
-        className="w-full flex items-center justify-between px-4 py-4 
+        className="w-full flex items-center justify-between px-5 py-5 
  z-20 relative "
       >
         <nav className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
