@@ -15,16 +15,16 @@ const PasswordReset = ({params}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    plsWait("please wait...")
-
+    
     if (newPassword !== confirmPassword) {
-      setError('❌ Passwords do not match.');
-      return;
+        setError('❌ Passwords do not match.');
+        return;
     } else {
-      setError('');
+        setError('');
     }
-
+    
     try {
+        plsWait("please wait...")
       const endpoint = `${EXPRESS_PRIVATE_URL}/api/Reset-password/${Encrypt(UserId)}/Security`;
 
       const response = await fetch(endpoint, {
