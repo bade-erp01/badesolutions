@@ -123,7 +123,7 @@ export default function Login({userInfo,businessInfo}) {
        <Nav1
         user={userInfo}
         business={businessInfo}
-        page={userInfo? `/dashboard`:'Bade'}
+        page={userInfo? `dashboard`:'Bade'}
         />
       <div className="min-h-screen flex items-center justify-center  p-4" >
         <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
