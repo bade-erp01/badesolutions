@@ -13,7 +13,7 @@ export default function Footer2() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          console.log("Footer is visible to the user");
+          // console.log("Footer is visible to the user");
           // Hook into analytics or trigger events here
         }
       },
