@@ -60,10 +60,24 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const InvoiceList = await Invoice.findByTenant(userData.business.tenantId).sort({ _id: -1 }).lean();
-  const customersList =  await Customer.findByTenant(userData.business.tenantId).sort({ _id: -1 }).lean();
-  const Stores = await WHouse.findByTenant(userData.business.tenantId).sort({ _id: -1 }).lean();
-  const users = await EMPLOYEES.findByTenant(userData.business.tenantId).sort({ firstName: 1 }).lean();
+  const [InvoiceList, customersList, Stores, users] = await Promise.all([
+  Invoice.findByTenant(userData.business.tenantId)
+    .sort({ _id: -1 })
+    .lean(),
+  Customer.findByTenant(userData.business.tenantId)
+    .select('Username')
+    .sort({ _id: -1 })
+    .lean(),
+  WHouse.findByTenant(userData.business.tenantId)
+    .select('WHName location')
+    .sort({ _id: -1 })
+    .lean(),
+  EMPLOYEES.findByTenant(userData.business.tenantId)
+    .select('firstName lastName')
+    .sort({ firstName: 1 })
+    .lean()
+]);
+
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden ">
