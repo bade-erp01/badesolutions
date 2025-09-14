@@ -204,7 +204,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
 }
 
 function summarizeCustomerInvoices(customers, invoices) {
-  const summarized = customers.map((customer) => {
+  const summarized = debtors.map((customer) => {
     // const customerInvoices = invoices.filter(
     //   (invoice) => invoice.customer === customer._id
     // );
