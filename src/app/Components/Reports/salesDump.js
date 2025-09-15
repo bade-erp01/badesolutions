@@ -42,7 +42,9 @@ const SalesDumpModal = ({ salesDatas }) => {
             InvoiceNo: sale.billReferenceNo,
             Customer: sale.customerName,
             Product: order.item.Name,
-            Quantity: order.Qty,
+            productId: order.item._id,
+            Case: order.Qty,
+            Pcs: order.Pcs,
             UnitPrice: order.priceListPrice,
             Total: order.total,
             ManufactureCode: order.item.Manufacture_code,
@@ -139,8 +141,8 @@ const SalesDumpModal = ({ salesDatas }) => {
         }
 
         const tableHtml = `
-        <div class="mb-2 grid grid-cols-1 gap-2">
-          <table class="table-auto text-left text-sm border border-gray-300 w-fit max-w-full">
+        <div class="mb-2 grid grid-cols-1 gap-2 w-100 max-w-full" style="max-height: 300px; overflow-y: auto;">
+          <table class="table-auto text-left text-sm border border-gray-300 w-100 max-w-full">
             <thead class="bg-gray-800 text-white">
               <tr>
                 <th class="px-2 py-1 whitespace-nowrap">Invoice</th>
