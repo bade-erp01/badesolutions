@@ -77,16 +77,7 @@ const SalesDumpModal = ({ salesDatas }) => {
       title:
         '<span style="font-size: 1.5rem; font-weight: 700;">📊 Sales Dump Filters</span>',
       html: `
-    <div style="
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 1rem;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    ">
+    <div>
       <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span>Start Date</span>
         <input type="date" id="startDate" class="swal2-input" placeholder="Start Date" style="flex: 1;" />
@@ -131,7 +122,7 @@ const SalesDumpModal = ({ salesDatas }) => {
         }
 
         const tableHtml = `
-          <div style="max-height:300px;overflow:auto;">
+           <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
             <table class="table-auto w-full text-left text-sm border border-gray-300">
               <thead class="bg-gray-800 text-white">
                 <tr>
