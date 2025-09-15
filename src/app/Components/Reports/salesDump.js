@@ -75,7 +75,7 @@ const SalesDumpModal = ({ salesDatas }) => {
   const openModal = () => {
     Swal.fire({
       title:
-        '<span style="font-size: 1.5rem; font-weight: 700;">📊 Sales Dump Filters</span>',
+        '<span style="font-size: 1.5rem; font-weight: 700;">Sales Dump Filters</span>',
       html: `
     <div>
       <div style="display: flex; align-items: center; gap: 0.5rem;">
