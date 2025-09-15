@@ -815,7 +815,7 @@ export default function DraftInvoicePage({
                   );
                     return availableProducts.map((product) => (
                     <option key={product._id} value={product.ADCcode}>
-                      {product.productName}
+                      {product.productName} Case:{product.currentQty} Pcs:{product.pcs}
                     </option>
                     ));
                   })()}
@@ -886,7 +886,7 @@ export default function DraftInvoicePage({
                     );
                     return availableProducts.map((product) => (
                     <option key={product._id} value={product.ADCcode}>
-                      {product.productName}
+                      {product.productName} Case:{product.currentQty} Pcs:{product.pcs}
                     </option>
                     ));
                   })()}
