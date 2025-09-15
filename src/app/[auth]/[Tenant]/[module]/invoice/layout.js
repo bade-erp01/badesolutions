@@ -1,6 +1,5 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import moment from 'moment';
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import Invoice from "../../../../../../models/Invoices";
@@ -61,14 +60,11 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const startOfYear = moment().startOf('year').toDate(); // Jan 1st, 00:00:00
-  const endOfYear = moment().endOf('year').toDate();     // Dec 31st, 23:59:59
   const [InvoiceList, customersList, Stores, users] = await Promise.all([
-  Invoice.find({
-      tenantId: userData.business.tenantId,
-      startDate: { $gte: startOfYear, $lte: endOfYear }
-    })
+
+  Invoice.findByTenant(userData.business.tenantId)
     .sort({ _id: -1 })
+    .limit(600)
     .lean(),
   Customer.findByTenant(userData.business.tenantId)
     .select('Username')
