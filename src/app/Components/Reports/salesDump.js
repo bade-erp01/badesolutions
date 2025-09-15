@@ -77,18 +77,35 @@ const SalesDumpModal = ({ salesDatas }) => {
       title:
         '<span style="font-size: 1.5rem; font-weight: 700;">Sales Dump Filters</span>',
       html: `
-    <div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span>Start Date</span>
-        <input type="date" id="startDate" class="swal2-input" placeholder="Start Date" style="flex: 1;" />
+    <div class="flex flex-col gap-4 max-w-md">
+      <div class="flex items-center gap-2">
+        <label for="startDate" class="w-24 text-sm font-medium text-gray-700">Start Date</label>
+        <input
+          type="date"
+          id="startDate"
+          placeholder="Start Date"
+          class="w-40 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
       </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span>End date</span>
-        <input type="date" id="endDate" class="swal2-input" placeholder="End Date" style="flex: 1;" />
+
+      <div class="flex items-center gap-2">
+        <label for="endDate" class="w-24 text-sm font-medium text-gray-700">End Date</label>
+        <input
+          type="date"
+          id="endDate"
+          placeholder="End Date"
+          class="w-40 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
       </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span>Product</span>
-        <input type="text" id="product" class="swal2-input" placeholder="Product Name" style="flex: 1;" />
+
+      <div class="flex items-center gap-2">
+        <label for="product" class="w-24 text-sm font-medium text-gray-700">Product</label>
+        <input
+          type="text"
+          id="product"
+          placeholder="Product Name"
+          class="w-40 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
       </div>
     </div>
   `,
