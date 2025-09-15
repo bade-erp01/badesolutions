@@ -139,40 +139,38 @@ const SalesDumpModal = ({ salesDatas }) => {
         }
 
         const tableHtml = `
-           <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
-            <table class="table-auto w-full text-left text-sm border border-gray-300">
-              <thead class="bg-gray-800 text-white">
-                <tr>
-                  <th class="px-2 py-1">Invoice</th>
-                  <th class="px-2 py-1">Customer</th>
-                  <th class="px-2 py-1">Product</th>
-                  <th class="px-2 py-1">Qty</th>
-                  <th class="px-2 py-1">Unit Price</th>
-                  <th class="px-2 py-1">Total</th>
-                  <th class="px-2 py-1">Date</th>
+        <div class="mb-2 grid grid-cols-1 gap-2">
+          <table class="table-auto text-left text-sm border border-gray-300 w-fit max-w-full">
+            <thead class="bg-gray-800 text-white">
+              <tr>
+                <th class="px-2 py-1 whitespace-nowrap">Invoice</th>
+                <th class="px-2 py-1 whitespace-nowrap">Customer</th>
+                <th class="px-2 py-1 whitespace-nowrap">Product</th>
+                <th class="px-2 py-1 whitespace-nowrap">Qty</th>
+                <th class="px-2 py-1 whitespace-nowrap">Unit Price</th>
+                <th class="px-2 py-1 whitespace-nowrap">Total</th>
+                <th class="px-2 py-1 whitespace-nowrap">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${previewData
+                .map(
+                  (row) => `
+                <tr class="border-t">
+                  <td class="px-2 py-1 whitespace-nowrap">${row.InvoiceNo}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">${row.Customer}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">${row.Product}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">${row.Quantity}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">₦${row.UnitPrice.toLocaleString()}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">₦${row.Total.toLocaleString()}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">${new Date(row.Date).toLocaleDateString()}</td>
                 </tr>
-              </thead>
-              <tbody>
-                ${previewData
-                  .map(
-                    (row) => `
-                  <tr class="border-t">
-                    <td class="px-2 py-1">${row.InvoiceNo}</td>
-                    <td class="px-2 py-1">${row.Customer}</td>
-                    <td class="px-2 py-1">${row.Product}</td>
-                    <td class="px-2 py-1">${row.Quantity}</td>
-                    <td class="px-2 py-1">₦${row.UnitPrice.toLocaleString()}</td>
-                    <td class="px-2 py-1">₦${row.Total.toLocaleString()}</td>
-                    <td class="px-2 py-1">${new Date(
-                      row.Date
-                    ).toLocaleDateString()}</td>
-                  </tr>
-                `
-                  )
-                  .join("")}
-              </tbody>
-            </table>
-          </div>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
         `;
 
         Swal.fire({
