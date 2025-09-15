@@ -141,14 +141,53 @@ const SalesDumpModal = ({ salesDatas }) => {
         }
 
         const tableHtml = `
+        <style>
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 12px;
+            }
+
+            th, td {
+              padding: 4px;
+              border: 1px solid #cbd5e0;
+              white-space: nowrap;
+            }
+
+            thead {
+              background-color: #edf2f7;
+              font-weight: 600;
+              color: #2d3748;
+            }
+
+            tr:hover {
+              background-color: #f7fafc;
+            }
+
+            select, input[type="date"] {
+              padding: 4px;
+              font-size: 12px;
+              border: 1px solid #cbd5e0;
+              border-radius: 4px;
+              width: 100%;
+            }
+
+            label {
+              font-weight: 600;
+              font-size: 12px;
+              display: block;
+              margin-bottom: 2px;
+            }
+          </style>
         <div class="mb-2 grid grid-cols-1 gap-2 w-100 max-w-full" style="max-height: 300px; overflow-y: auto;">
-          <table class="table-auto text-left text-sm border border-gray-300 w-100 max-w-full">
+          <table class="table-auto text-left text-sm border border-gray-300 w-full">
             <thead class="bg-gray-800 text-white">
               <tr>
                 <th class="px-2 py-1 whitespace-nowrap">Invoice</th>
                 <th class="px-2 py-1 whitespace-nowrap">Customer</th>
                 <th class="px-2 py-1 whitespace-nowrap">Product</th>
-                <th class="px-2 py-1 whitespace-nowrap">Qty</th>
+                <th class="px-2 py-1 whitespace-nowrap">Case</th>
+                <th class="px-2 py-1 whitespace-nowrap">Pcs</th>
                 <th class="px-2 py-1 whitespace-nowrap">Unit Price</th>
                 <th class="px-2 py-1 whitespace-nowrap">Total</th>
                 <th class="px-2 py-1 whitespace-nowrap">Date</th>
@@ -162,7 +201,8 @@ const SalesDumpModal = ({ salesDatas }) => {
                   <td class="px-2 py-1 whitespace-nowrap">${row.InvoiceNo}</td>
                   <td class="px-2 py-1 whitespace-nowrap">${row.Customer}</td>
                   <td class="px-2 py-1 whitespace-nowrap">${row.Product}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">${row.Quantity}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">${row.Case}</td>
+                  <td class="px-2 py-1 whitespace-nowrap">${row.Pcs}</td>
                   <td class="px-2 py-1 whitespace-nowrap">₦${row.UnitPrice.toLocaleString()}</td>
                   <td class="px-2 py-1 whitespace-nowrap">₦${row.Total.toLocaleString()}</td>
                   <td class="px-2 py-1 whitespace-nowrap">${new Date(row.Date).toLocaleDateString()}</td>
