@@ -595,7 +595,7 @@ export default function DraftInvoicePage({
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
           {/* CheckOut Button */}
           <div className="flex justify-evenly items-center gap-4">
-            {user.raiseInvoice &&
+            {user._id === Singlebill.invoicerId && user.raiseInvoice &&
               Singlebill.billStatus.toLowerCase() === "draft" &&
               moment(Singlebill.startDate).isSame(moment(), "day") && (
                 <button
@@ -608,7 +608,7 @@ export default function DraftInvoicePage({
                 </button>
               )}
 
-            {user.raiseInvoice &&
+            {user._id === Singlebill.invoicerId && user.raiseInvoice &&
               Singlebill.billStatus.toLowerCase() === "draft" && (
                 <button
                   title="Delete this draft"
@@ -690,7 +690,7 @@ export default function DraftInvoicePage({
                   {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
                   <td className="px-4 py-2 text-center">{bill.item.ACDcode}</td>
                   <td className="px-4 py-2 text-center">
-                    {Singlebill.billStatus.toLowerCase() === "draft" ? (
+                    {user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
                         defaultValue={bill.Qty || 0}
@@ -713,7 +713,7 @@ export default function DraftInvoicePage({
                   </td>
 
                   <td className="px-4 py-2 text-center">
-                    {Business.allowSkuSplitting &&
+                    {Business.allowSkuSplitting && user._id === Singlebill.invoicerId &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
@@ -771,7 +771,7 @@ export default function DraftInvoicePage({
                     {bill.total?.toFixed(2)}
                   </td>
                   <td>
-                    {user.raiseInvoice &&
+                    {user._id === Singlebill.invoicerId && user.raiseInvoice &&
                       Singlebill.billStatus.toLowerCase() === "draft" && (
                         <span
                           title={`Click to remove ${bill.item?.ADCcode?.toLowerCase()} from cart`}
@@ -788,7 +788,7 @@ export default function DraftInvoicePage({
           </table>
         </div>
 
-        {Singlebill.billStatus.toLowerCase() === "draft" && (
+        {user._id === Singlebill.invoicerId &&  Singlebill.billStatus.toLowerCase() === "draft" && (
           <div className="mb-8">
             {/* Dropdown for small screens */}
             <div className="block md:hidden">
@@ -910,7 +910,7 @@ export default function DraftInvoicePage({
               </div>
               <div className="flex justify-between">
                 <span>Discount Allowed:</span>
-                {Singlebill.billStatus === "Draft" ? (
+                {user._id === Singlebill.invoicerId && Singlebill.billStatus === "Draft" ? (
                   <input
                     type="number"
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
