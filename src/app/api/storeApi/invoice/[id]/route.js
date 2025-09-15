@@ -31,14 +31,13 @@ export async function GET(req, { params }) {
     const wareHouse = await WHouse.findById(invoice.whId).lean();
     const customer = await Customer.findById(invoice.customer).lean();
     //find store product that match the tenantId of the warehouse and Whid match the warehouse_id
-    const products = await storeProduct.findByTenant(wareHouse.tenantId,{
-      $or: [
-        { WHIDS: invoice.whId },
-        { isActivated: true },
-        // { currentQty: { $gt: 0 } },
-        // { pcs:  { $gt: 0 }  },
-        // {isAservice: true}// FOR FOC
-        ]}).lean();
+    const products = await storeProduct.findByTenant(wareHouse.tenantId, {
+      $and: [
+        { WHIDS: wareHouse._id },
+        { isActivated: true }
+      ]
+    }).lean();
+
 
     return new NextResponse(JSON.stringify({invoice,customer,wareHouse,products}), {
       status: 200,
