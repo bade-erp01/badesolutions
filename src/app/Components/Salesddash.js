@@ -150,7 +150,7 @@ const DashboardCharts = ({ invoice, triggerButton = true }) => {
         </div>
         <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-blue-400">
           <div className="text-sm text-gray-500">Total Invoices</div>
-          <div className="text-2xl font-bold text-gray-800 mt-2">{totalInvoices}</div>
+          <div className="text-2xl font-bold text-gray-800 mt-2">{totalInvoices > 100 ? totalInvoices : `+${totalInvoices}k`}</div>
         </div>
         <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-red-400">
           <div className="text-sm text-gray-500">Cancelled Rate</div>
