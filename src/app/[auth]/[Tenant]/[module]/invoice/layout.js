@@ -109,9 +109,9 @@ export default async function Employeelayout({ children, params }) {
 
             {/* <SalesDumpModal salesDatas={JSON.stringify(InvoiceList)} Stores={JSON.stringify(Stores)} /> */}
 
-            {/* {userData?.user?.c_levelDash && (
-            // <SalesDashboard invoice={JSON.stringify(InvoiceList)} />
-            )} */}
+            {userData?.user?.c_levelDash && (
+            <SalesDashboard invoice={JSON.stringify(InvoiceList)} />
+            )}
           </nav>
 
           
