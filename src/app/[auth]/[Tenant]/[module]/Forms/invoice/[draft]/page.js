@@ -796,7 +796,7 @@ export default function DraftInvoicePage({
                 htmlFor="productDropdown"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Select Product
+                Select {productList.length} Products
               </label>
               <select
                 onChange={(e) => {
@@ -828,7 +828,7 @@ export default function DraftInvoicePage({
                   htmlFor="productDatalist"
                   className="text-sm font-medium text-gray-700"
                   >
-                  Search Product
+                  Search {productList.length} Products
                   </label>
 
                   <div className="flex items-center space-x-2">
