@@ -34,10 +34,10 @@ export async function GET(req, { params }) {
     const products = await storeProduct.findByTenant(wareHouse.tenantId,{
       $or: [
         { WHIDS: invoice.whId },
-        { currentQty: { $gt: 0 } },
         { isActivated: true },
-        { pcs:  { $gt: 0 }  },
-        {isAservice: true}// FOR FOC
+        // { currentQty: { $gt: 0 } },
+        // { pcs:  { $gt: 0 }  },
+        // {isAservice: true}// FOR FOC
         ]}).lean();
 
     return new NextResponse(JSON.stringify({invoice,customer,wareHouse,products}), {
