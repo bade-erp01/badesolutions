@@ -180,7 +180,7 @@ const SalesDumpModal = ({ salesDatas }) => {
             }
           </style>
 
-          <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+          <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; max-height: 300px; overflow-y: auto; max-width: 100%;">
           <table class="table-auto text-left text-sm border border-gray-300 w-full">
             <thead class="bg-gray-800 text-white">
               <tr>
