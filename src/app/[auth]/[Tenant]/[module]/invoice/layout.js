@@ -64,7 +64,7 @@ export default async function Employeelayout({ children, params }) {
 
   Invoice.findByTenant(userData.business.tenantId)
     .sort({ _id: -1 })
-    .limit(600)
+    .limit(1000)
     .lean(),
   Customer.findByTenant(userData.business.tenantId)
     .select('Username')
