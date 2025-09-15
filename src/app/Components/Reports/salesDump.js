@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
+import Invoice from "../../../../models/Invoices";
 
 const SalesDumpModal = ({ salesDatas }) => {
   const salesArray = JSON.parse(salesDatas || "[]");
@@ -40,16 +41,27 @@ const SalesDumpModal = ({ salesDatas }) => {
         if (matchesProduct) {
           filteredExport.push({
             InvoiceNo: sale.billReferenceNo,
+            WB_No: sale.WayBillNo || "N/A",
+            Store: sale.whId,
+            Invoicer:sale.RaiseBy,
             Customer: sale.customerName,
             Product: order.item.Name,
+            Product_Code: order.item.ACDcode || order.item.ADCcode,
+            Trace:order.item.returnId,
+            Batch:order.item.BatchId,
+            Product_Category: order.item.category,
             productId: order.item._id,
             Case: order.Qty,
-            Pcs: order.Pcs,
+            Pcs: order.pcsReq,
+            Vat: order.vat || 0,
             UnitPrice: order.priceListPrice,
             Total: order.total,
             ManufactureCode: order.item.Manufacture_code,
             Vendor: order.item.Vendor?.$oid,
-            Date: sale.startDate,
+            Ord_Date: sale.startDate,
+            Inv_Date: sale.InvDate || "N/A",
+            Month: new Date(sale.startDate).toLocaleString("default", { month: "long" }).substring(0,3),
+            Year: new Date(sale.startDate).getFullYear(),
           });
         }
       });
@@ -185,30 +197,58 @@ const SalesDumpModal = ({ salesDatas }) => {
             <thead class="bg-gray-800 text-white">
               <tr>
                 <th class="px-2 py-1 whitespace-nowrap">Invoice</th>
+                <th class="px-2 py-1 whitespace-nowrap">WB No</th>
+                <th class="px-2 py-1 whitespace-nowrap">Store</th>
+                <th class="px-2 py-1 whitespace-nowrap">Invoicer</th>
                 <th class="px-2 py-1 whitespace-nowrap">Customer</th>
                 <th class="px-2 py-1 whitespace-nowrap">Product</th>
+                <th class="px-2 py-1 whitespace-nowrap">Product Code</th>
+                <th class="px-2 py-1 whitespace-nowrap">Trace</th>
+                <th class="px-2 py-1 whitespace-nowrap">Batch</th>
+                <th class="px-2 py-1 whitespace-nowrap">Category</th>
+                <th class="px-2 py-1 whitespace-nowrap">Product ID</th>
                 <th class="px-2 py-1 whitespace-nowrap">Case</th>
                 <th class="px-2 py-1 whitespace-nowrap">Pcs</th>
+                <th class="px-2 py-1 whitespace-nowrap">VAT</th>
                 <th class="px-2 py-1 whitespace-nowrap">Unit Price</th>
                 <th class="px-2 py-1 whitespace-nowrap">Total</th>
-                <th class="px-2 py-1 whitespace-nowrap">Date</th>
+                <th class="px-2 py-1 whitespace-nowrap">Manufacture Code</th>
+                <th class="px-2 py-1 whitespace-nowrap">Vendor</th>
+                <th class="px-2 py-1 whitespace-nowrap">Order Date</th>
+                <th class="px-2 py-1 whitespace-nowrap">Invoice Date</th>
+                <th class="px-2 py-1 whitespace-nowrap">Month</th>
+                <th class="px-2 py-1 whitespace-nowrap">Year</th>
               </tr>
             </thead>
             <tbody>
               ${previewData
                 .map(
-                  (row) => `
-                <tr class="border-t">
-                  <td class="px-2 py-1 whitespace-nowrap">${row.InvoiceNo}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">${row.Customer}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">${row.Product}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">${row.Case}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">${row.Pcs}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">₦${row.UnitPrice.toLocaleString()}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">₦${row.Total.toLocaleString()}</td>
-                  <td class="px-2 py-1 whitespace-nowrap">${new Date(row.Date).toLocaleDateString()}</td>
-                </tr>
-              `
+                  ({ sale, order }) => `
+                  <tr class="border-t">
+                    <td class="px-2 py-1 whitespace-nowrap">${sale.billReferenceNo}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${sale.WayBillNo || "N/A"}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${sale.whId}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${sale.RaiseBy}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${sale.customerName}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.Name}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.ACDcode || order.item.ADCcode}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.returnId}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.BatchId}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.category}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item._id}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.Qty}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.pcsReq}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">₦${order.vat?.toLocaleString() || "0"}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">₦${order.priceListPrice.toLocaleString()}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">₦${order.total.toLocaleString()}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.Manufacture_code}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${order.item.Vendor?.$oid || "N/A"}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${new Date(sale.startDate).toLocaleDateString()}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${sale.InvDate || "N/A"}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${new Date(sale.startDate).toLocaleString("default", { month: "long" }).substring(0, 3)}</td>
+                    <td class="px-2 py-1 whitespace-nowrap">${new Date(sale.startDate).getFullYear()}</td>
+                  </tr>
+                `
                 )
                 .join("")}
             </tbody>
