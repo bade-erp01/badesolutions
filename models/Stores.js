@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const { isEmail} = require('validator');
-const { Decimal128 } = require("mongodb");
+import mongoose from 'mongoose';
+import { isEmail} from 'validator';
+import { Decimal128 } from "mongodb";
 
 const SkuOpeningSchema = new mongoose.Schema({
 product:{

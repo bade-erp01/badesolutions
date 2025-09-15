@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
         item:{
@@ -76,19 +76,7 @@ const orderSchema = new mongoose.Schema({
         }
 })
 
-//credit note tracking array
-const creditNoteSchema = new mongoose.Schema({
-    creditNoteId:{
-        type:mongoose.Types.ObjectId,
-        ref:'Bills',
-        required:true,
-    },
-    creditNoteNo:{
-        type:String,
-        // required:true,
-        // unique:true,
-    },
-})
+
 
 //comment note tracking array
 const commentSchema = new mongoose.Schema({
@@ -163,7 +151,6 @@ const BillsSchema = new mongoose.Schema({
     },
     invoicelocation:{type:String,required:true},
     priceList:String,
-    CN:[creditNoteSchema],
     Comments:[commentSchema],
     invoicerId:{
         type:mongoose.Types.ObjectId,

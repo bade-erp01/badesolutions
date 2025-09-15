@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 const { isEmail } = require("validator");
 
 const activitySchema = new mongoose.Schema({
