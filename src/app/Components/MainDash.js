@@ -206,7 +206,7 @@ export default function MainDash({ userData }) {
                       <table className="w-full text-left text-sm">
                         <thead className="text-xs text-gray-500 border-b">
                           <tr>
-                           <th className="py-3">*</th> 
+                           <th className="py-3 border-r">*</th> 
                            <th className="py-3">Ref</th> 
                             <th className="py-3">Customer</th>
                             <th className="py-3">Grand Total</th>
@@ -218,7 +218,7 @@ export default function MainDash({ userData }) {
                         <tbody className="text-gray-700">
                           {tenantData.invoice.map((invoice, index) => (
                             <tr key={index} className="border-b">
-                              <td className="py-3">{index + 1}</td>
+                              <td className="py-3 border-r">{index + 1}</td>
                               <td className="py-3">
                                 {invoice.billReferenceNo}
                               </td>
