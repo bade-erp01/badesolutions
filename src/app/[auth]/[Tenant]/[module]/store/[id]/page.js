@@ -11,7 +11,7 @@ export default function Page({ products }) {
           <Card
             key={element._id}
             data={element}
-            module="store"
+            module="inventory"
             className="shadow-lg rounded-lg bg-white hover:shadow-xl transition-shadow duration-300"
           />
         ))}
