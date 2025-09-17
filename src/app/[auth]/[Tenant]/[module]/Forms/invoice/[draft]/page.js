@@ -695,6 +695,7 @@ export default function DraftInvoicePage({
                         type="number"
                         defaultValue={bill.Qty || 0}
                         onChange={(e) =>
+                        {
                           handleQtyChange(
                             bill._id, // lineId
                             e.target.value, // new value inputValue, setInputValue
@@ -704,7 +705,7 @@ export default function DraftInvoicePage({
                             userInfo.user._id, // userId
                             userInfo.business.companyName // companyName
                           )
-                        }
+                        }}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                       />
                     ) : (
@@ -719,7 +720,7 @@ export default function DraftInvoicePage({
                         type="number"
                         value={bill.pcsReq || 0}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                        onChange={(e) =>
+                        onChange={(e) =>{
                           handleQtyChange(
                             bill._id, // lineId
                             e.target.value, // new value
@@ -729,7 +730,7 @@ export default function DraftInvoicePage({
                             userInfo.user._id, // userId
                             userInfo.business.companyName // companyName
                           )
-                        }
+                        }}
                       />
                     ) : (
                       bill.pcsReq || 0
@@ -742,8 +743,8 @@ export default function DraftInvoicePage({
                         type="number"
                         value={bill.priceListPrice || 0}
                         className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                        onChange={(e) =>
-                          handleQtyChange(
+                        onChange={(e) =>{
+                           handleQtyChange(
                             bill._id, // lineId
                             e.target.value, // new value
                             "priceListPrice", // toUpdate
@@ -752,7 +753,7 @@ export default function DraftInvoicePage({
                             userInfo.user._id, // userId
                             userInfo.business.companyName // companyName
                           )
-                        }
+                        }}
                       />
                     ) : (
                       bill.priceListPrice
@@ -915,12 +916,12 @@ export default function DraftInvoicePage({
                     type="number"
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                     value={Singlebill.discount || 0}
-                    onChange={(e) =>
-                      updateDiscount(
+                    onChange={(e) =>{
+                       updateDiscount(
                         Singlebill._id,
                         parseFloat(e.target.value) || 0
                       )
-                    }
+                    }}
                   />
                 ) : (
                   <strong>
