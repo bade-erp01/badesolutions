@@ -380,7 +380,7 @@ export default function DraftInvoicePage({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ lineId, value , toUpdate, billI }),
+        body: JSON.stringify({ lineId, value , toUpdate, bill:bill._id }),
       });
 
       const data = await response.json();
@@ -389,7 +389,7 @@ export default function DraftInvoicePage({
         SuccessToast(data.message);
 
         // ✅ Revalidate the invoice data (instead of reload)
-        mutate(`/api/storeApi/invoice/${billId}`);
+        mutate(`/api/storeApi/invoice/${bill._id}`);
         router.refresh();
       } else {
         throw new Error(data.error || "An unknown error occurred.");
