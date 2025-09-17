@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
+import { Encrypt } from "../../../Functions/Functions";
 import Link from "next/link";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function TransferTable({ TransfersLists ,StoreList}) {
+export default function TransferTable({ TransfersLists ,StoreList,Business,User}) {
     const StoreLists = JSON.parse(StoreList || "[]");
     const TransfersList = JSON.parse(TransfersLists || "[]");
     const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +81,7 @@ export default function TransferTable({ TransfersLists ,StoreList}) {
                 <table className="min-w-full divide-y divide-gray-200 bg-white text-gray-800">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Product</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Reference</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">From Warehouse</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">To Warehouse</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Status</th>
@@ -95,7 +96,7 @@ export default function TransferTable({ TransfersLists ,StoreList}) {
                                 className="hover:bg-gray-100 transition duration-200"
                             >
                                 <td className="px-6 py-4 text-sm text-blue-400 :ishover:underline :visited:text-purple-600">
-                                    <Link href={`/`} >
+                                    <Link href={`/${Business.companyName}/${Encrypt(User._id)}/product-transfers/product-transfers/${Encrypt(transfer._id)}`} >
                                     {transfer.billReferenceNo}
                                     </Link>
                                 </td>

@@ -112,7 +112,7 @@ export default async function TransferPage({ params }) {
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[520px] overflow-y-auto">
             {/* show each  transfer */}
             {TransfersList.length > 0 ? (
-                <TransferTable TransfersLists={TransfersListStr} StoreList={StoreListsStr} />
+                <TransferTable TransfersLists={TransfersListStr} StoreList={StoreListsStr} Business={userData.business} User={userData.user}/>
             ) : (
               <p className="text-gray-300 text-center mt-20">
                 No transfers found.
