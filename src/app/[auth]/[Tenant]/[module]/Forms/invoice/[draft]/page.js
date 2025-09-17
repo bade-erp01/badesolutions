@@ -363,16 +363,19 @@ export default function DraftInvoicePage({
   };
 
   const handleQtyChange = async (
-    lineId,
+     lineId,
     value,
     toUpdate,
-    billId
+    billId,
+    storeId,
+    userId,
+    companyName
   ) => {
     try {
       plsWait('Updating cart...');
 
-      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Invoice/Cart/Update?user=${Encrypt(
-        user._id
+      const url = `${EXPRESS_PRIVATE_URL}/${companyName}/Invoice/Cart/Update?user=${Encrypt(
+        userId
       )}`;
 
       const response = await fetch(url, {
@@ -380,7 +383,7 @@ export default function DraftInvoicePage({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ lineId, value , toUpdate, bill:bill._id }),
+        body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
       });
 
       const data = await response.json();
@@ -389,7 +392,7 @@ export default function DraftInvoicePage({
         SuccessToast(data.message);
 
         // ✅ Revalidate the invoice data (instead of reload)
-        mutate(`/api/storeApi/invoice/${bill._id}`);
+        mutate(`/api/storeApi/invoice/${billId}`);
         router.refresh();
       } else {
         throw new Error(data.error || "An unknown error occurred.");
@@ -698,6 +701,8 @@ export default function DraftInvoicePage({
                             "Qty", // toUpdate
                             Singlebill._id, // billId
                             bill.storeProductId, // storeId
+                            userInfo.user._id, // userId
+                            userInfo.business.companyName // companyName
                           )
                         }
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
