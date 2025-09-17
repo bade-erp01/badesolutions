@@ -129,7 +129,7 @@ export default function MainDash({ userData }) {
         <div className="text-xs" style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent', }}>
           {/* KPI cards */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-90 overflow-y-auto">
+            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm text-gray-500">Today&lsquo;s Sales</h3>
