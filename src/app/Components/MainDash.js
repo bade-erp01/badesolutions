@@ -237,7 +237,7 @@ export default function MainDash({ userData }) {
                               </td>
                               <td className="py-3">
                                 {" "}
-                                <a href="#" className="text-indigo-600">
+                                <a href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/bill/bill/${Encrypt(invoice._id)}`} className="text-indigo-600">
                                   View
                                 </a>
                               </td>
@@ -253,7 +253,7 @@ export default function MainDash({ userData }) {
               {/* Quick stats / chart placeholder */}
               <aside className="bg-white rounded p-6 card-shadow text-xs">
                 <h4 className="text-sm text-gray-500 font-semibold mb-4">
-                  Sales target Millestone
+                  Sales Performance Millestone
                 </h4>
 
                 {tenantData.result.map((person, index) => (

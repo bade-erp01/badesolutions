@@ -32,10 +32,10 @@ export default async function TenantPage({ params }) {
         : 'generic';
 
     const greetings = {
-      en: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening', generic: 'Hello' },
-      fr: { morning: 'Bonjour', afternoon: 'Bon après-midi', evening: 'Bonsoir', generic: 'Salut' },
-      es: { morning: 'Buenos días', afternoon: 'Buenas tardes', evening: 'Buenas noches', generic: 'Hola' },
-      de: { morning: 'Guten Morgen', afternoon: 'Guten Tag', evening: 'Guten Abend', generic: 'Hallo' },
+      en: { morning: '🌅 Good morning', afternoon: '☀️ Good afternoon', evening: '🌇 Good evening', generic: '👋 Hello' },
+      fr: { morning: '🌅 Bonjour', afternoon: '☀️ Bon après-midi', evening: '🌇 Bonsoir', generic: '👋 Salut' },
+      es: { morning: '🌅 Buenos días', afternoon: '☀️ Buenas tardes', evening: '🌇 Buenas noches', generic: '👋 Hola' },
+      de: { morning: '🌅 Guten Morgen', afternoon: '☀️ Guten Tag', evening: '🌇 Guten Abend', generic: '👋 Hallo' },
     };
 
     return `${greetings[lang]?.[timeOfDay] || greetings.en[timeOfDay]}, ${name}.`;
@@ -119,7 +119,7 @@ export default async function TenantPage({ params }) {
                 {getLocalizedGreeting(userData.user.firstName)}
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                Overview of Business activity and performance
+              {`It's ${moment().format('dddd, Do MMMM YYYY')}`}
               </p>
             </header>
 
