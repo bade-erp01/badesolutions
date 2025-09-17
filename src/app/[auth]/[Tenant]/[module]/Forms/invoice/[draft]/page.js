@@ -380,7 +380,7 @@ export default function DraftInvoicePage({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
+        body: JSON.stringify({ lineId, value , toUpdate, billI }),
       });
 
       const data = await response.json();
