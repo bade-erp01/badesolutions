@@ -371,7 +371,7 @@ export default function DraftInvoicePage({
     try {
       plsWait('Updating cart...');
 
-      const url = `${EXPRESS_PRIVATE_URL}/${companyName}/Invoice/Cart/Update?user=${Encrypt(
+      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Invoice/Cart/Update?user=${Encrypt(
         user._id
       )}`;
 
@@ -697,7 +697,7 @@ export default function DraftInvoicePage({
                             e.target.value, // new value inputValue, setInputValue
                             "Qty", // toUpdate
                             Singlebill._id, // billId
-                            bill.storeProductId, // storeIde
+                            bill.storeProductId, // storeId
                           )
                         }
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
