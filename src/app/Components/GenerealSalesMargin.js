@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import moment from "moment";
 import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import "animate.css";
 
 /**
  * GenerealSalesMargin
@@ -98,7 +99,7 @@ export default function GenerealSalesMargin({
   }, [loading, computeAggregates, whs, businessColor]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate__animated animate__fadeInUp animate__faster ">
       <div className="flex items-center justify-between">
         <h3 className="text-lg text-gray-500 font-semibold">
           Total Converted Sales for {moment().format("YYYY")}
@@ -111,7 +112,7 @@ export default function GenerealSalesMargin({
       {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div>
-        <div ref={lineRef} id="myPlot" style={{ width: "100%", height: "25%" }} />
+        <div ref={lineRef} id="myPlot" className="max-h-75" style={{ width: "100%", height: "25%" }} />
  
         {/* Uncomment below to show pie chart */}
         {/* <div ref={pieRef} id="PIE" style={{ width: "100%", height: "50%" }} /> */}

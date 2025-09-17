@@ -47,23 +47,23 @@ export default async function TenantPage({ params }) {
     .replace(/[^a-z0-9-]/g, "");
 
   return (
-    <div className="flex flex-col  bg-gray-100">
+    <div className="flex flex-col bg-gray-100">
       <Nav1
         user={userData?.user}
         business={userData?.business}
         page={`${userData?.business?.companyName}!`}
       />
 
-      <div className="flex flex-1">
+      <div className="flex flex-2">
         {/* Sidebar */}
-        <aside className="w-72 bg-[#1e2939] text-white px-4 py-6 overflow-y-hidden" >
+        <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-y-hidden" >
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-sm font-bold">Application Pane</h2>
           </div>
           <hr className="border-gray-600 mb-4" />
 
           <nav className="space-y-4">
-            <div className="max-h-[500px] overflow-y-auto">
+            <div className="max-h-[480px] overflow-y-auto">
               {userData?.user?.Apps.map((app, index) => (
                 <Link
                   key={index}
@@ -112,9 +112,10 @@ export default async function TenantPage({ params }) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300"  >
-          <section className="max-w-screen-xl">
-            <header className="mb-4">
+        <main className="flex-2 max-w-screen-xl max-h-[490px] overflow-y-scroll p-6 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300"  
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent' }}>
+          <section className=" " >
+            <header className="mb-2">
               <h2 className="text-xl font-bold text-gray-900">
                 {getLocalizedGreeting(userData.user.firstName)}
               </h2>
