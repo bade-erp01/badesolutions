@@ -120,7 +120,7 @@ const paymentAction = async (id, action) => {
 
 
        {/* Activity Log */}
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">
             Activity Log
           </h3>
@@ -129,7 +129,7 @@ const paymentAction = async (id, action) => {
               <p key={index}>• {log.logMsg}</p>
             ))}
           </div>
-        </div>
+        </div> */}
     </section>
   );
 }

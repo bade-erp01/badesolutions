@@ -1,116 +1,69 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Card from "@/app/Components/Card";
+import PaymentListpage from "@/app/Components/PaymentList";
+import bankAccount from "../../../../../../models/BankAccount"
+import Customers from "../../../../../../models/Customer"
+import CreditCustomerPayment from "../../../../../../models/Creditpayment"
 
-export default function PaymentListpage({ params }) {
-  const [paymentList, setPaymentList] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [status, setStatus] = useState("");
-  const [customerId, setCustomerId] = useState("");
-  const [paymentDate, setPaymentDate] = useState("");
-  const itemsPerPage = 9;
+export const metadata = {
+  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  description:
+    "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
+  keywords: [
+    "Business Automation",
+    "Enterprise Solutions",
+    "B.A.D.E",
+    "AI-powered Business",
+    "Workflow Optimization",
+    "Process Automation",
+    "ERP in Nigeria",
+    "Bernard fidels ogoh",
+    "ERP in Abuja",
+    "ERP in Lagos",
+    "ERP in Port Harcourt",
+    "Locally built ERP",
+    "ERP for SMEs",
+    "ERP for Enterprises",
+    "ERP for Startups",
+    "ERP for Corporates",
+    "AI-powered ERP",
+    "AI-driven Business Solutions",
+    "AI Automation",
+    "Affordable ERP",
+    "Scalable ERP Solutions",
+  ],
+  author: "Business Automated Dynamic Enterprise",
+  robots: "index, follow", // Allows search engines to index and follow links
+  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff", // Moved themeColor here
+  ogTitle:
+    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
+  ogDescription:
+    "Streamline your business with AI-driven automation, real-time insights, and scalability",
+  ogImage: "/assets/bade.png", // Preview image when shared on social media
+  ogUrl: "https://badesolutions.com.ng",
+  twitterCard: "/assets/bade.png",
+  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  twitterDescription:
+    "Automate and optimize your enterprise with cutting-edge business solutions",
+  twitterImage: "/assets/bade.png",
+  facicon:'/favicon'
+};
 
-  const fetchData = async () => {
-    const userData = await fetchUser();
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+export default async function paymentlayout({ children, params }) {
+  const moduleList = await params;
+  const userData = await fetchUser();
+    
+    const Accounts = await bankAccount.findByTenant(userData.business.tenantId).lean()
+    const Customer = await Customers.findByTenant(userData.business.tenantId).lean()
+    const Payments  = await CreditCustomerPayment.findByTenant(userData.business.tenantId).sort({_id:-1}).limit(5000).lean()
 
-    const queryParams = new URLSearchParams({
-      page: currentPage.toString(),
-      limit: itemsPerPage.toString(),
-      ...(status && { status }),
-      ...(customerId && { customer: customerId }),
-      ...(paymentDate && { PaymentDate: paymentDate }),
-    });
-
-    const res = await fetch(`${baseUrl}/api/cashRegister?${queryParams.toString()}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userData.business.tenantId}`
-      }
-    });
-
-    const data = await res.json();
-    setPaymentList(data.items || []);
-    setTotalPages(data.totalPages || 1);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, status, customerId, paymentDate]);
+    // string all data for light weight
+    const Accountslist = JSON.stringify(Accounts) || "[]"
+    const CustomersList = JSON.stringify(Customer) || "[]"
+    const PaymentList = JSON.stringify(Payments) || "[]"
 
   return (
-    <div className="space-y-6">
-      {/* 🔍 Filters */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <input
-          type="text"
-          placeholder="Customer ID"
-          value={customerId}
-          onChange={(e) => setCustomerId(e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border px-3 py-2 rounded"
-        >
-          <option value="">All Statuses</option>
-          <option value="posted">Posted</option>
-          <option value="pending">Pending</option>
-          <option value="failed">Reversed</option>
-        </select>
-        <input
-          type="date"
-          value={paymentDate}
-          onChange={(e) => setPaymentDate(e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        <button
-          onClick={() => {
-            setStatus("");
-            setCustomerId("");
-            setPaymentDate("");
-            setCurrentPage(1);
-          }}
-          className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
-        >
-          Reset Filters
-        </button>
-      </div>
-
-      {/* 🧾 Payment Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-        {paymentList.length > 0 ? (
-          paymentList.map(payment => (
-            <Card key={payment._id} data={payment} module={`${params.module}`} />
-          ))
-        ) : (
-          <p className="text-center col-span-full">No payments found.</p>
-        )}
-      </div>
-
-      {/* 📄 Pagination Controls */}
-      <div className="flex justify-center items-center gap-4 mt-6">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          Previous
-        </button>
-        <span>{`Page ${currentPage} of ${totalPages}`}</span>
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <>
+    <PaymentListpage Payments={PaymentList} bank={Accountslist} Customers={CustomersList} userInfo={userData}/>
+    </>
   );
 }

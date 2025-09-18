@@ -1,14 +1,10 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Link from "next/link";
-import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
-import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import {Encrypt} from "../../../../../../Functions/Functions"
-import { ChartPieIcon, BackwardIcon, ForwardIcon } from "@heroicons/react/24/outline";
 import bankAccount from "../../../../../../models/BankAccount"
 import Customers from "../../../../../../models/Customer"
+import CreditCustomerPayment from "../../../../../../models/Creditpayment"
 import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
 
 export const metadata = {
@@ -58,18 +54,15 @@ export const metadata = {
 export default async function paymentlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const res = await fetch(`${baseUrl}/api/cashRegister`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${ userData.business.tenantId}`
-      }
-    })
     
-    const Accountslist = await bankAccount.findByTenant(userData.business.tenantId).lean()
-    const CustomersList = await Customers.findByTenant(userData.business.tenantId).lean()
-    const PaymentList = await res.json()
+    const Accounts = await bankAccount.findByTenant(userData.business.tenantId).lean()
+    const Customer = await Customers.findByTenant(userData.business.tenantId).lean()
+    const Payments  = await CreditCustomerPayment.findByTenant(userData.business.tenantId).sort({_id:-1}).limit(5000).lean()
+
+    // string all data for light weight
+    const Accountslist = JSON.stringify(Accounts) || "[]"
+    const CustomersList = JSON.stringify(Customer) || "[]"
+    const PaymentList = JSON.stringify(Payments) || "[]"
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -77,7 +70,7 @@ export default async function paymentlayout({ children, params }) {
         user={userData.user}
         business={userData.business}
         page={`${moduleList.module}`}
-        Module={PaymentList}
+        Module={[{}]}
       />
 
       <div
@@ -87,13 +80,13 @@ export default async function paymentlayout({ children, params }) {
         {/* Sidebar (collapsible on mobile) */}
         <aside
           className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block`}
+          text-white px-4 py-6 transition-all duration-300 h-[511px] max-h-[600px] overflow-y-auto md:block`}
           style={{ maxHeight: "600px", overflowY: "scroll" }}
         >
          <BackButton />
           <hr />
           <nav className="space-y-4">
-            <CashregisterReport data={PaymentList} banks={JSON.stringify(Accountslist)} customers={JSON.stringify(CustomersList)}/>
+            <CashregisterReport dataArray={PaymentList} banks={Accountslist} customers={CustomersList}/>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}

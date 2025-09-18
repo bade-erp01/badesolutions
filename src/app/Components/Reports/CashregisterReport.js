@@ -5,12 +5,14 @@ import { useState } from "react";
 import {downloadExcel} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
-export default function PaymentTableModal({ data, banks, customers }) {
+export default function PaymentTableModal({ dataArray, banks, customers }) {
+
+  const data = JSON.parse(dataArray);
   const [filteredData, setFilteredData] = useState(
       data.filter(item => item.status?.toLowerCase() !== "pending")
     );
   const [bankList] = useState(JSON.parse(banks) || []);
-  const [customersList] = useState(JSON.parse(customers) || []);
+  const [customersList] = useState(JSON.parse(customers)|| []);
 
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
@@ -30,7 +32,7 @@ export default function PaymentTableModal({ data, banks, customers }) {
         <td style="padding: 4px;">${index + 1}</td>
         <td style="padding: 4px; text-align: left;">${item.paymentReferenceNo.trim()}</td>
         <td style="padding: 4px;">${getCustomer(item.customer)}</td>
-        <td style="padding: 4px;">${getCustomer(item.type)}</td>
+        <td style="padding: 4px;">${item.type}</td>
         <td style="padding: 4px;">${getBankAccount(item.bankAccount)}</td>
         <td style="padding: 4px;">${item.Accountant}</td>
         <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
@@ -93,7 +95,7 @@ export default function PaymentTableModal({ data, banks, customers }) {
             <thead style="background-color: #edf2f7;">
               <tr>
                 <th style="padding: 4px;">#</th>
-                <th style="padding: 4px;">Period Ref</th>
+                <th style="padding: 4px;">Ref</th>
                 <th style="padding: 4px;">Customer</th>
                 <th style="padding: 4px;">Gateway</th>
                 <th style="padding: 4px;">Bank</th>
