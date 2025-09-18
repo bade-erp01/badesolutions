@@ -56,7 +56,7 @@ const PaymentReceipt = ({business,payment,cust}) => {
     const finalY = doc.lastAutoTable.finalY + 10;
     doc.setFontSize(12);
     doc.text(`Total Amount Paid in words: ${totalInWords(Payment.crAmount,business.currency.currency)}`, 20, finalY);
-    doc.text('Payment Method: Bank Transfer', 20, finalY + 7);
+    doc.text(`Payment Method:${Payment?.type}`, 20, finalY + 7);
     doc.text('Generated with Business Automated Dynamic Enterprise!', 105, finalY + 20, null, null, 'center');
 
     doc.save(`${Payment.paymentReferenceNo}.pdf`);
