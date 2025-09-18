@@ -474,6 +474,8 @@ export default function BusinessDatas({ data, userInfo }) {
             required
             value={formData.priceList2}
           />
+          {userInfo.business.subscriptionplan === "Standard" && (
+          <>
           <Input
             label="PriceList 3"
             type="text"
@@ -504,6 +506,8 @@ export default function BusinessDatas({ data, userInfo }) {
            type="text"
             required
           />
+          </>
+          )}
         </Grid>
       </Section>
 
