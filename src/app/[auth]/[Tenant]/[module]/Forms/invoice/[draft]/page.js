@@ -691,23 +691,24 @@ export default function DraftInvoicePage({
                   <td className="px-4 py-2 text-center">{bill.item.ACDcode}</td>
                   <td className="px-4 py-2 text-center">
                     {user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "draft" ? (
-                      <input
-                        type="number"
-                        defaultValue={bill.Qty || 0}
-                        onChange={(e) =>
-                        {
-                          handleQtyChange(
-                            bill._id, // lineId
-                            e.target.value, // new value inputValue, setInputValue
-                            "Qty", // toUpdate
-                            Singlebill._id, // billId
-                            bill.storeProductId, // storeId
-                            userInfo.user._id, // userId
-                            userInfo.business.companyName // companyName
-                          )
-                        }}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                      />
+                     <input
+                      type="number"
+                      defaultValue={bill.Qty || 0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) val = 0;
+                        handleQtyChange(
+                          bill._id,
+                          val,
+                          "Qty",
+                          Singlebill._id,
+                          bill.storeProductId,
+                          userInfo.user._id,
+                          userInfo.business.companyName
+                        );
+                      }}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                    />
                     ) : (
                       bill.Qty
                     )}
@@ -718,18 +719,21 @@ export default function DraftInvoicePage({
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
-                        value={bill.pcsReq || 0}
+                        defaultValue={bill.pcsReq || 0}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                        onChange={(e) =>{
+                        onBlur={(e) => {
+                          let val = e.target.value;
+                          if (val < 0) val = 0;
+
                           handleQtyChange(
                             bill._id, // lineId
-                            e.target.value, // new value
+                            val, // new value
                             "pcs", // toUpdate
                             Singlebill._id, // billId
                             bill.storeProductId, // storeId
                             userInfo.user._id, // userId
                             userInfo.business.companyName // companyName
-                          )
+                          );
                         }}
                       />
                     ) : (
@@ -739,20 +743,23 @@ export default function DraftInvoicePage({
                   <td className="px-4 py-2 text-center">
                     {Business.allowPriceChangeOnInvoice &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
-                      <input
+                     <input
                         type="number"
-                        value={bill.priceListPrice || 0}
+                        defaultValue={bill.priceListPrice || 0}
                         className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                        onChange={(e) =>{
-                           handleQtyChange(
+                        onBlur={(e) => {
+                          let val = e.target.value;
+                          if (val < 0) val = 0;
+
+                          handleQtyChange(
                             bill._id, // lineId
-                            e.target.value, // new value
+                            val, // new value
                             "priceListPrice", // toUpdate
                             Singlebill._id, // billId
                             bill.storeProductId, // storeId
                             userInfo.user._id, // userId
                             userInfo.business.companyName // companyName
-                          )
+                          );
                         }}
                       />
                     ) : (
@@ -912,15 +919,16 @@ export default function DraftInvoicePage({
               <div className="flex justify-between">
                 <span>Discount Allowed:</span>
                 {user._id === Singlebill.invoicerId && Singlebill.billStatus === "Draft" ? (
-                  <input
+                 <input
                     type="number"
+                    defaultValue={Singlebill.discount || 0}
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    value={Singlebill.discount || 0}
-                    onChange={(e) =>{
-                       updateDiscount(
+                    onBlur={(e) => {
+                      const val = parseFloat(e.target.value);
+                      updateDiscount(
                         Singlebill._id,
-                        parseFloat(e.target.value) || 0
-                      )
+                        isNaN(val) || val < 0 ? 0 : val
+                      );
                     }}
                   />
                 ) : (
