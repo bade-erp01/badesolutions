@@ -262,8 +262,8 @@ export default function DraftPurchasePage({
       const data = await response.json();
 
       if (data.message) {
-        // SuccessToast(data.message);
-        router.refresh(); // Or use router.refresh() if you're in App Router
+        SuccessToast(data.message);
+        location.reload(); // Or use router.refresh() if you're in App Router
       } else {
         throw new Error(data.error || "Update failed");
       }
@@ -526,14 +526,18 @@ export default function DraftPurchasePage({
                   <td className="px-4 py-2 text-center">{bill.item.ADCcode}</td>
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
-                      <input
-                        type="number"
-                        onChange={(e) =>
-                          handleQtyChange(e.target.value, bill._id, "Qty")
-                        }
-                        defaultValue={bill.Qty}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                      />
+                     <input
+                      defaultValue={bill.Qty}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                      onBlur={(e) => {
+                        const val = parseFloat(e.target.value);
+                        handleQtyChange(
+                          isNaN(val) || val < 0 ? 0 : val, // sanitized value
+                          bill._id,
+                          "Qty"
+                        );
+                      }}
+                    />
                     ) : (
                       bill.Qty
                     )}
@@ -541,27 +545,29 @@ export default function DraftPurchasePage({
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
                       <input
-                        type="text"
-                        onChange={(e) =>
-                          handleQtyChange(e.target.value, bill._id, "BatchNo")
-                        }
-                        defaultValue={bill.BatchNo}
-                        className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                      />
+                      type="text"
+                      defaultValue={bill.BatchNo}
+                      className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                      onBlur={(e) => {
+                        const val = e.target.value.trim(); // Optional: remove leading/trailing spaces
+                        handleQtyChange(val, bill._id, "BatchNo");
+                      }}
+                    />
                     ) : (
                       bill.BatchNo
                     )}
                   </td>
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
-                      <input
-                        type="date"
-                        onChange={(e) =>
-                          handleQtyChange(e.target.value, bill._id, "ExpDate")
-                        }
-                        defaultValue={bill.ExpDate}
-                        className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                      />
+                     <input
+                      type="date"
+                      defaultValue={bill.ExpDate}
+                      className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                      onBlur={(e) => {
+                        const val = e.target.value;
+                        handleQtyChange(val, bill._id, "ExpDate");
+                      }}
+                    />
                     ) : (
                       bill.ExpDate
                     )}
@@ -597,7 +603,7 @@ export default function DraftPurchasePage({
                 htmlFor="productDropdown"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Select Product
+                Select from {productList.length} Product
               </label>
               <select
                 onChange={() => handleProductSelection(e.target.value)}
@@ -627,7 +633,7 @@ export default function DraftPurchasePage({
                 htmlFor="productDatalist"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Search Product
+                Search from {productList.length} Products
               </label>
               <input
                 onChange={(e) => {
@@ -679,17 +685,18 @@ export default function DraftPurchasePage({
               <div className="flex justify-between">
                 <span>Discount Recieved:</span>
                 {Singlebill.status === "Draft" ? (
-                  <input
-                    type="number"
-                    className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    value={Singlebill.discount || 0}
-                    onChange={(e) =>
-                      setsingleBill({
-                        ...Singlebill,
-                        discount: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                  />
+                 <input
+                  type="number"
+                  defaultValue={Singlebill.discount || 0}
+                  className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                  onBlur={(e) => {
+                    const val = parseFloat(e.target.value);
+                    setsingleBill({
+                      ...Singlebill,
+                      discount: isNaN(val) || val < 0 ? 0 : val,
+                    });
+                  }}
+                />
                 ) : (
                   <strong>
                     {Business.currency?.currency.Symbol}
@@ -703,14 +710,15 @@ export default function DraftPurchasePage({
                 {Singlebill.status === "Draft" ? (
                   <input
                     type="number"
+                    defaultValue={Singlebill.shippingFee || 0}
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    value={Singlebill.shippingFee || 0}
-                    onChange={(e) =>
+                    onBlur={(e) => {
+                      const val = parseFloat(e.target.value);
                       setsingleBill({
                         ...Singlebill,
-                        shippingFee: parseFloat(e.target.value) || 0,
-                      })
-                    }
+                        shippingFee: isNaN(val) || val < 0 ? 0 : val,
+                      });
+                    }}
                   />
                 ) : (
                   <strong>
@@ -724,10 +732,11 @@ export default function DraftPurchasePage({
                 {Singlebill.status === "Draft" ? (
                   <textarea
                     className="w-full ml-2 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    value={Singlebill.Remarks || ""}
-                    onChange={(e) =>
-                      setsingleBill({ ...Singlebill, Remarks: e.target.value })
-                    }
+                    defaultValue={Singlebill.Remarks || ""}
+                    onBlur={(e) => {
+                      const val = e.target.value.trim(); // Optional: remove extra spaces
+                      setsingleBill({ ...Singlebill, Remarks: val });
+                    }}
                   />
                 ) : (
                  ""

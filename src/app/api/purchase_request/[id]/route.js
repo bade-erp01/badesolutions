@@ -37,13 +37,13 @@ export async function GET(request,{params}) {
         }
 
         const vendor = await vendorList.findById(purchase.Vendor).lean();
+        const Stores = await WHouse.findById(purchase.WHID).lean();
         const ProductList = await storeProduct.findByTenant(Dencrypt(tenantId), {
-          WHIDS: purchase.WHID,
+          WHIDS: Stores._id,
           isActivated:true,
           isAservice: false,
-          Vendor:purchase.Vendor
+          Vendor:vendor._id
         }).lean();
-        const Stores = await WHouse.findById(purchase.WHID).lean();
 
     return new Response(JSON.stringify({vendor,ProductList,Stores,purchase}), {
       status: 200,
