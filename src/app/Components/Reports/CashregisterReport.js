@@ -30,6 +30,7 @@ export default function PaymentTableModal({ data, banks, customers }) {
         <td style="padding: 4px;">${index + 1}</td>
         <td style="padding: 4px; text-align: left;">${item.paymentReferenceNo.trim()}</td>
         <td style="padding: 4px;">${getCustomer(item.customer)}</td>
+        <td style="padding: 4px;">${getCustomer(item.type)}</td>
         <td style="padding: 4px;">${getBankAccount(item.bankAccount)}</td>
         <td style="padding: 4px;">${item.Accountant}</td>
         <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
