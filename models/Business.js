@@ -100,6 +100,41 @@ const businessSchema = new mongoose.Schema(
       },
       // immutable: true, // Prevent modification after creation
     },
+     priceList1: {
+      type: String,
+      required: true,
+      default: "Pricelist1",
+    },
+     priceList2: {
+      type: String,
+      required: true,
+      default: "Pricelist2",
+    },
+     priceList3: {
+      type: String,
+      required: true,
+      default: "Pricelist3",
+    },
+     priceList4: {
+      type: String,
+      required: true,
+      default: "Pricelist4",
+    },
+     priceList5: {
+      type: String,
+      required: true,
+      default: "Pricelist5",
+    },
+     priceList6: {
+      type: String,
+      required: true,
+      default: "Pricelist6",
+    },
+     priceList7: {
+      type: String,
+      required: true,
+      default: "Pricelist7",
+    },
     subscriptionplan:{
       type:String,
       required:true,
