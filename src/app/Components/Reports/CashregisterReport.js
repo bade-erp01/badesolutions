@@ -63,8 +63,8 @@ export default function PaymentTableModal({ data, banks, customers }) {
             <label style="font-weight: 600; font-size: 12px;">Type</label><br/>
             <select id="typeFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              <option value="PMNT">PMNT</option>
-              <option value="REFUND">REFUND</option>
+              <option value="Cash">CASH</option>
+              <option value="Transfer">TRANSFER</option>
             </select>
           </div>
           <div>
@@ -94,6 +94,7 @@ export default function PaymentTableModal({ data, banks, customers }) {
                 <th style="padding: 4px;">#</th>
                 <th style="padding: 4px;">Period Ref</th>
                 <th style="padding: 4px;">Customer</th>
+                <th style="padding: 4px;">Gateway</th>
                 <th style="padding: 4px;">Bank</th>
                 <th style="padding: 4px;">Accountant</th>
                 <th style="padding: 4px;">Payment Date</th>
@@ -129,7 +130,7 @@ export default function PaymentTableModal({ data, banks, customers }) {
               (!start || itemDate.isSameOrAfter(start, "day")) &&
               (!end || itemDate.isSameOrBefore(end, "day"));
             const typeMatch =
-              !type || item.collectionRef?.toLowerCase() === type.toLowerCase();
+              !type || item.type?.toLowerCase() === type.toLowerCase();
             const customerMatch =
               !customer || item.customer?.toLowerCase() === customer.toLowerCase();
             const bankMatch =
@@ -180,6 +181,7 @@ export default function PaymentTableModal({ data, banks, customers }) {
                     "status":entry.status,
                     "Date":entry.PaymentDate,
                     "Journal":getBankAccount(entry.bankAccount),
+                    "Gateway":entry.type,
                     "Amount":entry.crAmount > 0 ? entry.crAmount : entry.drAmount
                   })
                 })
