@@ -566,7 +566,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist1"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist 1
+                  {businessInfo.priceList1} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -587,7 +587,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist2"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist2
+                  {businessInfo.priceList2} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -608,7 +608,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist3"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist3
+                 {businessInfo.priceList3} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -629,7 +629,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist4"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist4
+                  {businessInfo.priceList4} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -650,7 +650,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist5"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist5
+                  {businessInfo.priceList5} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -671,7 +671,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist6"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist6
+                  {businessInfo.priceList6} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -692,7 +692,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist7"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist7
+                 {businessInfo.priceList7} Price
                 </label>
                 <div className="mt-2">
                   <input
@@ -720,7 +720,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist1Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist1 Promo
+                  {businessInfo.priceList1} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -741,7 +741,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist2Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist2 Promo
+                   {businessInfo.priceList2} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -762,7 +762,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist3Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist3 Promo
+                   {businessInfo.priceList3} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -783,7 +783,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist4Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist4 Promo
+                  {businessInfo.priceList4} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -804,7 +804,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist5Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist5 Promo
+                  {businessInfo.priceList5} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -825,7 +825,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist6Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist6 Promo
+                  {businessInfo.priceList6} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -846,7 +846,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   htmlFor="Pricelist7Promo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist7 Promo
+                   {businessInfo.priceList7} Promo
                 </label>
                 <div className="mt-2">
                   <input
@@ -856,7 +856,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                     type="text"
                     step="any"
                     onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
+                    autoComplete="Pricelist7Promo-level1"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
                 </div>
