@@ -613,10 +613,10 @@ export default function DraftPurchasePage({
                 <option value={""}>Choose...</option>
                 {(() => {
                   const orderedProductCodes = Singlebill.orders.map(
-                    (order) => order.item?.ADCcode
+                    (order) => order.item?.ADCcode || order.item?.ACDcode
                   );
                   const availableProducts = productList.filter(
-                    (product) => !orderedProductCodes.includes(product.ADCcode)
+                    (product) => !orderedProductCodes.includes(product.ADCcode) || !orderedProductCodes.includes(product.ACDcode)
                   );
                   return availableProducts.map((product) => (
                     <option key={product._id} value={product.ADCcode}>
@@ -651,10 +651,10 @@ export default function DraftPurchasePage({
               <datalist id="productsList">
                 {(() => {
                   const orderedProductCodes = Singlebill.orders.map(
-                    (order) => order.item?.ADCcode
+                    (order) => order.item?.ADCcode || order.item?.ACDcode
                   );
                   const availableProducts = productList.filter(
-                    (product) => !orderedProductCodes.includes(product.ADCcode)
+                    (product) => !orderedProductCodes.includes(product.ADCcode) || !orderedProductCodes.includes(product.ACDcode)
                   );
                   return availableProducts.map((product) => (
                     <option key={product._id} value={product.ADCcode}>
