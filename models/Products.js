@@ -33,7 +33,7 @@ const ProductSchema = new mongoose.Schema(
     Name: {
       type: String,
       required: [true, "Provide a Product Name"],
-      unique: true,
+      index: true,
     },
     category: { type: String },
     image: {

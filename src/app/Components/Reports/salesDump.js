@@ -4,63 +4,97 @@ import Swal from "sweetalert2";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
-import Invoice from "../../../../models/Invoices";
+import { plsWait } from "../../../../Functions/Mics";
+import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
 
-const SalesDumpModal = ({ salesDatas }) => {
-  const salesArray = JSON.parse(salesDatas || "[]");
+const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
+  const [salesDatas, setSalesDatas] = useState([]);
+  const [ProductList] = useState(Products ? JSON.parse(Products) : []);
+  const [StoreList] = useState(Stores ? JSON.parse(Stores) : []);
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
     product: "",
   });
 
+  const productOptions = ProductList.map(
+      (product) => `<option value="${product.Name}">${product.Name}</option>`
+    ).join("");
+
+    //get prooduct name
+    const filterProductName = (id) => {
+      try {
+        const prod = ProductList.find((p) => p._id === id);
+        return prod ? prod.Name : "N/A";
+      } catch (error) {
+        return "N/A";
+      }
+    };
+
+
+    //get store name
+    const filterStoreName = (id) => {
+      try {
+        const store = StoreList.find((s) => s._id === id);
+        return store ? store.WHName : "N/A";
+      }
+      catch (error) {
+        return "N/A";
+      }
+    };
+
+    //get vendor name
+    const filterVendorName = (id) => {
+      try {
+        const vendor = Vendors.find((v) => v._id === id);
+        return vendor ? vendor.Name : "N/A";
+      }catch (error) {
+        return "N/A";
+      }
+    };
+
+
+
   const filterSales = (activeFilters) => {
+    if (!salesDatas || salesDatas.length === 0) return [];
     const filteredExport = [];
 
-    salesArray.forEach((sale) => {
+    salesDatas.forEach((sale) => {
       const saleDate = new Date(sale.startDate);
-      const start = activeFilters.startDate
-        ? new Date(activeFilters.startDate)
-        : null;
-      const end = activeFilters.endDate
-        ? new Date(activeFilters.endDate)
-        : null;
+      const start = activeFilters.startDate ? new Date(activeFilters.startDate) : null;
+      const end = activeFilters.endDate ? new Date(activeFilters.endDate) : null;
 
-      const matchesDate =
-        (!start || saleDate >= start) && (!end || saleDate <= end);
-
+      const matchesDate = (!start || saleDate >= start) && (!end || saleDate <= end);
       if (!matchesDate) return;
 
       sale.orders.forEach((order) => {
         const matchesProduct = activeFilters.product
-          ? order.item.Name?.toLowerCase().includes(
-              activeFilters.product.toLowerCase()
-            )
+          ? order.item.Name?.toLowerCase().includes(activeFilters.product.toLowerCase())
           : true;
 
         if (matchesProduct) {
           filteredExport.push({
-            InvoiceNo: sale.billReferenceNo,
+           "Inv-No": sale.billReferenceNo,
+            Status: sale.billStatus,
             WB_No: sale.WayBillNo || "N/A",
-            Store: sale.whId,
-            Invoicer:sale.RaiseBy,
+            Store: filterStoreName(sale.whId),
+            Invoicer: sale.RaiseBy,
             Customer: sale.customerName,
-            Product: order.item.Name,
-            Product_Code: order.item.ACDcode || order.item.ADCcode,
-            Trace:order.item.returnId,
-            Batch:order.item.BatchId,
-            Product_Category: order.item.category,
-            productId: order.item._id,
+            product: filterProductName(order.item._id),
+            "Sys-Code": order.item.ACDcode || order.item.ADCcode,
+            Trace: order.returnId,
+            Batch: order.BatchId,
+            Category: order.item.category,
             Case: order.Qty,
-            Pcs: order.pcsReq,
+            Pcs: order.pcsReq || 0,
             Vat: order.vat || 0,
-            UnitPrice: order.priceListPrice,
+            Unit: order.priceListPrice,
             Total: order.total,
-            ManufactureCode: order.item.Manufacture_code,
-            Vendor: order.item.Vendor?.$oid,
+            "Manuf-Code": order.item.Manufacture_code,
+            Vendor: filterVendorName(order.item.Vendor),
             Ord_Date: sale.startDate,
             Inv_Date: sale.InvDate || "N/A",
-            Month: new Date(sale.startDate).toLocaleString("default", { month: "long" }).substring(0,3),
+            Month: new Date(sale.startDate).toLocaleString("default", { month: "short" }),
             Year: new Date(sale.startDate).getFullYear(),
           });
         }
@@ -75,63 +109,44 @@ const SalesDumpModal = ({ salesDatas }) => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "SalesDump");
 
-    const filename = `Sales Dump [${filters.startDate || "start"} - ${
-      filters.endDate || "end"
-    }].xlsx`;
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    const filename = `Sales Dump [${filters.startDate || "start"} - ${filters.endDate || "end"}].xlsx`;
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, filename);
   };
 
   const openModal = () => {
     Swal.fire({
-      title:
-        '<span style="font-size: 1.5rem; font-weight: 700;">Sales Dump Filters</span>',
+      title: '<span style="font-size: 1.5rem; font-weight: 700;">Sales Dump Filters</span>',
       html: `
-    <div class="flex flex-col gap-4 max-w-md">
-      <div class="flex items-center gap-2">
-        <label for="startDate" class="w-24 text-sm font-medium text-gray-700">Start Date</label>
-        <input
-          type="date"
-          id="startDate"
-          placeholder="Start Date"
-          class="w-40 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-      </div>
-
-      <div class="flex items-center gap-2">
-        <label for="endDate" class="w-24 text-sm font-medium text-gray-700">End Date</label>
-        <input
-          type="date"
-          id="endDate"
-          placeholder="End Date"
-          class="w-40 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-      </div>
-
-      <div class="flex items-center gap-2">
-        <label for="product" class="w-24 text-sm font-medium text-gray-700">Product</label>
-        <input
-          type="text"
-          id="product"
-          placeholder="Product Name"
-          class="w-40 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-      </div>
-    </div>
-  `,
-      confirmButtonText: " Preview Results",
-      cancelButtonText: " Cancel",
+        <div class="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm max-w-2xl w-full">
+          <h2 class="text-2xl font-bold text-gray-800">Filter Sales Dump</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input type="date" id="startDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            </div>
+            <div>
+              <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input type="date" id="endDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            </div>
+           <div class="sm:col-span-2">
+              <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+              <select id="product" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <option value="">-- Select Product --</option>
+                ${productOptions}
+              </select>
+            </div>
+          </div>
+        </div>
+      `,
+      confirmButtonText: "Preview Results",
+      cancelButtonText: "Cancel",
       showCancelButton: true,
       customClass: {
         popup: "bg-gray-900 text-white rounded-xl",
-        confirmButton:
-          "bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500",
-        cancelButton:
-          "bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600",
+        confirmButton: "bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500",
+        cancelButton: "bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600",
       },
       focusConfirm: false,
       preConfirm: () => {
@@ -141,8 +156,25 @@ const SalesDumpModal = ({ salesDatas }) => {
           product: document.getElementById("product").value,
         };
       },
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
+        plsWait("Generating export data...");
+
+        const request = await fetch(
+          `${EXPRESS_PRIVATE_URL}/api/Report/Generate?Startdate=${result.value.startDate}&Enddate=${result.value.endDate}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tenantData}`,
+            },
+          }
+        );
+
+        const data = await request.json();
+        setSalesDatas(data.invoice);
+        Swal.close();
+
         const activeFilters = result.value;
         setFilters(activeFilters);
         const previewData = filterSales(activeFilters);
@@ -153,107 +185,54 @@ const SalesDumpModal = ({ salesDatas }) => {
         }
 
         const tableHtml = `
-        <style>
+          <style>
+            .swal2-popup {
+              max-width: 90vw !important;
+              width: auto !important;
+            }
             table {
               width: 100%;
               border-collapse: collapse;
-              font-size: 12px;
+              font-size: 0.875rem;
+              overflow-x: auto;
             }
-
             th, td {
-              padding: 4px;
+              padding: 0.5rem;
               border: 1px solid #cbd5e0;
-              white-space: nowrap;
+              text-align: left;
             }
-
             thead {
-              background-color: #edf2f7;
-              font-weight: 600;
-              color: #2d3748;
+              background-color: #4a5568;
+              color: #fff;
+              position: relative;
             }
-
-            tr:hover {
+            tbody tr:nth-child(even) {
               background-color: #f7fafc;
             }
-
-            select, input[type="date"] {
-              padding: 4px;
-              font-size: 12px;
-              border: 1px solid #cbd5e0;
-              border-radius: 4px;
-              width: 100%;
-            }
-
-            label {
-              font-weight: 600;
-              font-size: 12px;
-              display: block;
-              margin-bottom: 2px;
+            tbody tr:hover {
+              background-color: #edf2f7;
             }
           </style>
-
-          <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; max-height: 300px; overflow-y: auto; max-width: 100%;">
-          <table class="table-auto text-left text-sm border border-gray-300 w-full">
-            <thead class="bg-gray-800 text-white">
-              <tr>
-                <th class="px-2 py-1 whitespace-nowrap">Invoice</th>
-                <th class="px-2 py-1 whitespace-nowrap">WB No</th>
-                <th class="px-2 py-1 whitespace-nowrap">Store</th>
-                <th class="px-2 py-1 whitespace-nowrap">Invoicer</th>
-                <th class="px-2 py-1 whitespace-nowrap">Customer</th>
-                <th class="px-2 py-1 whitespace-nowrap">Product</th>
-                <th class="px-2 py-1 whitespace-nowrap">Product Code</th>
-                <th class="px-2 py-1 whitespace-nowrap">Trace</th>
-                <th class="px-2 py-1 whitespace-nowrap">Batch</th>
-                <th class="px-2 py-1 whitespace-nowrap">Category</th>
-                <th class="px-2 py-1 whitespace-nowrap">Product ID</th>
-                <th class="px-2 py-1 whitespace-nowrap">Case</th>
-                <th class="px-2 py-1 whitespace-nowrap">Pcs</th>
-                <th class="px-2 py-1 whitespace-nowrap">VAT</th>
-                <th class="px-2 py-1 whitespace-nowrap">Unit Price</th>
-                <th class="px-2 py-1 whitespace-nowrap">Total</th>
-                <th class="px-2 py-1 whitespace-nowrap">Manufacture Code</th>
-                <th class="px-2 py-1 whitespace-nowrap">Vendor</th>
-                <th class="px-2 py-1 whitespace-nowrap">Order Date</th>
-                <th class="px-2 py-1 whitespace-nowrap">Invoice Date</th>
-                <th class="px-2 py-1 whitespace-nowrap">Month</th>
-                <th class="px-2 py-1 whitespace-nowrap">Year</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${previewData
-                .map(
-                  ({ sale, order }) => `
-                  <tr class="border-t">
-                    <td class="px-2 py-1 whitespace-nowrap">${sale.billReferenceNo}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${sale.WayBillNo || "N/A"}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${sale.whId}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${sale.RaiseBy}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${sale.customerName}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.Name}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.ACDcode || order.item.ADCcode}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.returnId}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.BatchId}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.category}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item._id}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.Qty}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.pcsReq}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">₦${order.vat?.toLocaleString() || "0"}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">₦${order.priceListPrice.toLocaleString()}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">₦${order.total.toLocaleString()}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.Manufacture_code}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${order.item.Vendor?.$oid || "N/A"}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${new Date(sale.startDate).toLocaleDateString()}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${sale.InvDate || "N/A"}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${new Date(sale.startDate).toLocaleString("default", { month: "long" }).substring(0, 3)}</td>
-                    <td class="px-2 py-1 whitespace-nowrap">${new Date(sale.startDate).getFullYear()}</td>
-                  </tr>
-                `
-                )
-                .join("")}
-            </tbody>
-          </table>
-        </div>
+          <div style="max-height: 60vh; overflow-y: auto;">
+            <table>
+              <thead>
+                <tr class="text-xs">
+                  ${Object.keys(previewData[0]).map((key) => `<th>${key}</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${previewData
+                  .map(
+                    (row) =>
+                      `<tr class="text-xs">${Object.values(row)
+                        .map((value) => `<td class="text-xs">${value}</td>`)
+                        .join("")}
+                      </tr>`
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
         `;
 
         Swal.fire({
@@ -274,12 +253,8 @@ const SalesDumpModal = ({ salesDatas }) => {
   };
 
   return (
-    <button
-      onClick={openModal}
-      className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
-    >
-      <FolderArrowDownIcon className="h-5 w-5 text-white" />
-      Export Sales Dump
+    <button onClick={openModal} className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full" > 
+    <FolderArrowDownIcon className="h-5 w-5 text-white" /> Export Sales Dump 
     </button>
   );
 };

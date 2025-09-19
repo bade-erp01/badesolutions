@@ -6,11 +6,14 @@ import Invoice from "../../../../../../models/Invoices";
 import Customer from "../../../../../../models/Customer";
 import EMPLOYEES from "../../../../../../models/Users";
 import {WHouse} from"../../../../../../models/Stores"
+import PRODUCTS from "../../../../../../models/Products"
+import Vendor from "../../../../../../models/Vendors"
 import SalesDashboard from "@/app/Components/Salesddash";
 import InvoiceLandingPage from "./page"
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
 import SalesDumpModal from "@/app/Components/Reports/salesDump";
+import {Encrypt} from "../../../../../../Functions/Functions"
 
 export const metadata = {
   title:
@@ -60,7 +63,7 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const [InvoiceList, customersList, Stores, users] = await Promise.all([
+  const [InvoiceList, customersList, Stores, users, Products,Vendors] = await Promise.all([
 
   Invoice.findByTenant(userData.business.tenantId)
     .sort({ _id: -1 })
@@ -77,7 +80,15 @@ export default async function Employeelayout({ children, params }) {
   EMPLOYEES.findByTenant(userData.business.tenantId)
     .select('firstName lastName')
     .sort({ firstName: 1 })
-    .lean()
+    .lean(),
+  PRODUCTS.findByTenant(userData.business.tenantId)
+    .select('Name')
+    .sort({ Name: 1 })
+    .lean(),
+  Vendor.findByTenant(userData.business.tenantId)
+    .select('Name')
+    .sort({ Name: 1 })
+    .lean(),
 ]);
 
 
@@ -107,7 +118,7 @@ export default async function Employeelayout({ children, params }) {
 
             <DeliveryRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
 
-            {/* <SalesDumpModal salesDatas={JSON.stringify(InvoiceList)} Stores={JSON.stringify(Stores)} /> */}
+            <SalesDumpModal Products={JSON.stringify(Products)} tenantData={Encrypt(userData.business.tenantId)} Stores={JSON.stringify(Stores)}  Vendors={Vendors}/>
 
             {userData?.user?.c_levelDash && (
             <SalesDashboard invoice={JSON.stringify(InvoiceList)} />

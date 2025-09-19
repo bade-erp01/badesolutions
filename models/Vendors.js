@@ -6,7 +6,7 @@ const VendorSchema = new mongoose.Schema(
     Name: {
       type: String,
       required: [true, "Provide a Product Name"],
-      unique: true,
+      index: true,
     },
     Address: {
       type: String,
