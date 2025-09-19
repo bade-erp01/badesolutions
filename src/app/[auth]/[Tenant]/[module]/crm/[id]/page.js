@@ -9,6 +9,7 @@ import autoTable from "jspdf-autotable";
 import {
   postPayment,
   // GenerateSummary,
+  pricelistSetter,
   EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../../../Functions/Functions";
@@ -973,7 +974,7 @@ const MySwal = withReactContent(Swal);
               className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
             >
               {/* Default option from customer */}
-              <option value={cust.priceList}>{cust.priceList}</option>
+              <option value={cust.priceList}>{pricelistSetter(cust.priceList,userInfo.business)}</option>
 
               {/* Dynamic options based on subscription plan */}
               {userInfo.business.subscriptionplan === "Basic" ? (
