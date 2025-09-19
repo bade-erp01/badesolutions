@@ -9,7 +9,7 @@ import {
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { ScaleIcon } from "@heroicons/react/24/outline";
+import { ScaleIcon,InboxArrowDownIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
@@ -98,7 +98,7 @@ export default function MainDash({ userData }) {
 
   if (error) {
     return (
-      <div className="w-full px-6 py-10 flex flex-col items-center justify-center bg-red-50 border border-red-200 rounded-md shadow-sm">
+      <div className="w-full px-6 py-10 flex flex-col items-center justify-center bg-grey-200 border border-red-200 rounded-md shadow-sm">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-10 w-10 text-red-500 mb-4"
@@ -185,30 +185,20 @@ export default function MainDash({ userData }) {
               ""
             )}
 
-            {tenantData.Bestproduct.length > 0 ? (
+            
               <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm text-gray-500">Best Seller</h3>
-                    <p className="text-sm text-gray-500 font-bold mt-1">
-                      {tenantData.Bestproduct[0]?.Name} [
-                      {tenantData.Bestproduct[0]?.TotalSale?.toLocaleString()}]
+                    <h3 className="text-sm text-gray-500">Pending Expenses</h3>
+                    <p className="text-2xl text-gray-600 font-bold mt-1">
+                      {tenantData.Expenses?.length || 0} 
                     </p>
                   </div>
-                  <Image
-                    src={tenantData.Bestproduct[0]?.image || null}
-                    width={58}
-                    height={58}
-                    quality={100}
-                    priority={true}
-                    alt={tenantData.Bestproduct[0]?.Name}
-                    className="w-18 h-18 rounded-full"
-                  />
+                  <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
+                  <InboxArrowDownIcon className="h-6 w-6 text-gray-900" />
+                  </div>
                 </div>
               </div>
-            ) : (
-              ""
-            )}
           </section>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
