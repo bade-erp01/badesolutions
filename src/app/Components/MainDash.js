@@ -74,8 +74,8 @@ export default function MainDash({ userData }) {
     fetchTenantData(); // Initial fetch
 
     const interval = setInterval(() => {
-      fetchTenantData(); // Re-fetch every 20 seconds
-    }, 120000);
+      fetchTenantData(); // Re-fetch every 1min
+    }, 60000);
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, [userData, EXPRESS_PRIVATE_URL, Encrypt]);
@@ -138,7 +138,7 @@ export default function MainDash({ userData }) {
                     {tenantData.TodaySale?.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                   Auto Updates every 2 minutes
+                   Auto Updates every 1 minutes
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-green-700 text-white text-xl shadow-md">
