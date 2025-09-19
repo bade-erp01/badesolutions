@@ -463,6 +463,7 @@ export default function BusinessDatas({ data, userInfo }) {
       <Section title="Pricelists Management">
         <Grid>
           <Input
+          name={"priceList1"}
             label="PriceList 1"
             value={formData.priceList1}
             type="text"
@@ -470,6 +471,7 @@ export default function BusinessDatas({ data, userInfo }) {
             onChange={handleChange}
           />
           <Input
+          name={"priceList2"}
             label="PriceList 2"
             type="text"
             required
@@ -479,6 +481,7 @@ export default function BusinessDatas({ data, userInfo }) {
           {userInfo.business.subscriptionplan === "Standard" && (
           <>
           <Input
+          name={"priceList3"}
             label="PriceList 3"
             type="text"
             required
@@ -486,6 +489,7 @@ export default function BusinessDatas({ data, userInfo }) {
             onChange={handleChange}
           />
           <Input
+          name={"priceList4"}
             label="PriceList 4"
             value={formData.priceList4}
             type="text"
@@ -493,6 +497,7 @@ export default function BusinessDatas({ data, userInfo }) {
             onChange={handleChange}
           />
           <Input
+          name={"priceList5"}
             label="PriceList 5"
             value={formData.priceList6}
             type="text"
@@ -500,6 +505,7 @@ export default function BusinessDatas({ data, userInfo }) {
             onChange={handleChange}
           />
           <Input
+            name={"priceList6"}
             label="PriceList 6"
             value={formData.priceList6}
             type="text"
@@ -507,6 +513,7 @@ export default function BusinessDatas({ data, userInfo }) {
             onChange={handleChange}
           />
           <Input
+          name={"priceList7"}
             label="PriceList 7"
             value={formData.priceList7}
            type="text"
