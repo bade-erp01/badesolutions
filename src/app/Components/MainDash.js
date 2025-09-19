@@ -204,22 +204,18 @@ export default function MainDash({ userData }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}
             <section className="lg:col-span-2">
-              <div className="bg-white rounded p-3 shadow-xl">
-                {/* Chart */}
-                <GenerealSalesMargin
-                  yearlysales={tenantData.yearlysales}
-                  warehouses={tenantData.warehouses}
-                />
-              </div>
+                <div className="bg-white rounded p-3 shadow-xl">
+                  {/* Chart */}
+                  <GenerealSalesMargin
+                    yearlysales={tenantData.yearlysales}
+                    warehouses={tenantData.warehouses}
+                  />
+                </div>
 
-              {/* Properties table */}
-              {sortedInvoices.length > 0 && (
-                <>
+                {/* Properties table */}
                   <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg text-gray-500 font-semibold">
-                        Recent Sales
-                      </h3>
+                      <h3 className="text-lg text-gray-500 font-semibold">Recent Sales</h3>
                     </div>
 
                     <div className="overflow-y-hidden max-h-96">
@@ -234,41 +230,46 @@ export default function MainDash({ userData }) {
                             <th className="py-3">Status</th>
                           </tr>
                         </thead>
+
                         <tbody className="text-gray-700">
-                          {paginatedInvoices.map((invoice, index) => (
-                            <tr key={index} className="border-b animate__animated animate__fadeInRight text-xs">
-                              <td className="py-3 border-r">
-                                {(currentPage - 1) * itemsPerPage + index + 1}
-                              </td>
-                              <td className="p-3 font-semibold text-blue-700">
-                                 <Link
-                                  href={`/${
-                                    userData.business.companyName
-                                  }/${Encrypt(
-                                    userData.user._id
-                                  )}/bill/bill/${Encrypt(invoice._id)}`}
-                                  className="text-indigo-600"
+                          {paginatedInvoices.length > 0 ? (
+                            paginatedInvoices.map((invoice, index) => (
+                              <tr key={index} className="border-b animate__animated animate__fadeInRight text-xs">
+                                <td className="py-3 border-r">
+                                  {(currentPage - 1) * itemsPerPage + index + 1}
+                                </td>
+                                <td className="p-3 font-semibold text-blue-700">
+                                  <Link
+                                    href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/bill/bill/${Encrypt(invoice._id)}`}
+                                    className="text-indigo-600"
+                                  >
+                                    {invoice.billReferenceNo}/{invoice.invoicelocation}
+                                  </Link>
+                                </td>
+                                <td className="py-3">{invoice.customerName}</td>
+                                <td className="py-3">
+                                  {userData.business.currency?.currency.Symbol}
+                                  {invoice.grandTotal?.toLocaleString()}
+                                </td>
+                                <td className="py-3">{invoice.RaiseBy}</td>
+                                <td
+                                  className={`py-3 ${
+                                    invoice.billStatus !== "Cancelled"
+                                      ? "text-green-600"
+                                      : "text-red-600"
+                                  }`}
                                 >
-                                  {invoice.billReferenceNo}/{invoice.invoicelocation}
-                                </Link>
-                              </td>
-                              <td className="py-3">{invoice.customerName}</td>
-                              <td className="py-3">
-                                {userData.business.currency?.currency.Symbol}
-                                {invoice.grandTotal?.toLocaleString()}
-                              </td>
-                              <td className="py-3">{invoice.RaiseBy}</td>
-                              <td
-                                className={`py-3 ${
-                                  invoice.billStatus !== "Cancelled"
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                                }`}
-                              >
-                                {invoice.billStatus}
+                                  {invoice.billStatus}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={6} className="py-6 text-center text-gray-500 text-sm">
+                                No invoices found for this page.
                               </td>
                             </tr>
-                          ))}
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -304,9 +305,8 @@ export default function MainDash({ userData }) {
                       </button>
                     </div>
                   </div>
-                </>
-              )}
-            </section>
+                
+              </section>
 
             {/* Quick stats / chart placeholder */}
             <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
