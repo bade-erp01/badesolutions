@@ -2,10 +2,10 @@
 import Swal from "sweetalert2";
 import moment from "moment";
 import { useState } from "react";
-import {downloadExcel} from "../../../../Functions/Functions"
+import {downloadExcel,pricelistSetter} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
-export default function SalesRportModal({ data, Stores, customers,users }) {
+export default function SalesRportModal({ data, Stores, customers,users,business }) {
   const [filteredData, setFilteredData] = useState(
       JSON.parse(data).filter(item => item.billStatus?.toLowerCase() !== "draft")
     );
@@ -49,7 +49,7 @@ export default function SalesRportModal({ data, Stores, customers,users }) {
         ${item.billStatus.toUpperCase()}
         </span>
         </td>
-        <td style="padding: 4px;">${item.priceList}</td>
+        <td style="padding: 4px;">${pricelistSetter(item.priceList,business)}</td>
         <td style="padding: 4px;">${item.taxRate.toLocaleString()}</td>
         <td style="padding: 4px;">${item.discount.toLocaleString()}</td>
         <td style="padding: 4px;">${item.subTotal.toLocaleString()}</td>
@@ -125,15 +125,13 @@ export default function SalesRportModal({ data, Stores, customers,users }) {
             <label style="font-weight: 600; font-size: 12px;">PriceList</label><br/>
             <select id="PriceList" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-             <option value="PriceList1">PriceList 1</option>
-             <option value="PriceList2">PriceList 2</option>
-             <option value="PriceList3">PriceList 3</option>
-             <option value="PriceList4">PriceList 4</option>
-             <option value="PriceList5">PriceList 5</option>
-             <option value="PriceList6">PriceList 6</option>
-             <option value="PriceList7">PriceList 7</option>
-             <option value="PriceList8">PriceList 8</option>
-             <option value="PriceList9">PriceList 9</option>
+             <option value="PriceList1">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList2">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList3">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList4">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList5">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList6">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList7">${pricelistSetter(business.priceList1,business)}</option>
             </select>
           </div>
         </div>
@@ -249,7 +247,7 @@ export default function SalesRportModal({ data, Stores, customers,users }) {
                     Customer: getCustomer(entry.customer),
                     Rep: getUser(entry.salesPerson),
                     status: entry.billStatus,
-                    "Pricelist":entry.priceList,
+                    "Pricelist":pricelistSetter(entry.priceList,business),
                     "Ord Date": entry.startDate,
                     "Inv Date": entry.DELIVERYDATE
                       ? moment(entry.DELIVERYDATE).format("YYYY-MM-DD")
