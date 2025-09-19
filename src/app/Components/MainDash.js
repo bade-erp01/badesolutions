@@ -186,19 +186,20 @@ export default function MainDash({ userData }) {
             )}
 
             
-              {/* <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
+              <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm text-gray-500">Pending Expenses</h3>
                     <p className="text-2xl text-gray-600 font-bold mt-1">
-                      {tenantData.Expenses?.length || 0} 
+                      {/* {tenantData.Expenses?.length || 0}  */}
+                      0
                     </p>
                   </div>
                   <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
                   <InboxArrowDownIcon className="h-6 w-6 text-gray-900" />
                   </div>
                 </div>
-              </div> */}
+              </div>
           </section>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
