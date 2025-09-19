@@ -172,6 +172,10 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
         );
 
         const data = await request.json();
+        if (!request.ok) {
+          Swal.fire("Error", data.message || "Failed to fetch sales data.", "error");
+          return;
+        }
         setSalesDatas(data.invoice);
         Swal.close();
 
