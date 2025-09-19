@@ -284,7 +284,7 @@ export default function TextToSpeechTrigger({ text }) {
       className="inline-flex items-center gap-1 cursor-pointer  hover:text-yellow-200 transition"
       title="Bug Ant Assist"
     >
-      <LightBulbIcon className="h-5 w-5 text-pink-200 hover:text-pink-500 hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
+      <LightBulbIcon className="h-5 w-5 text-pink-400 hover:text-pink-600 hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
     </span>
   );
 }
