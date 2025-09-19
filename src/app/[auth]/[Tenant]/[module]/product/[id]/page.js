@@ -965,12 +965,13 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-x-6">
-                {user.isAdmin && !Backdata.FOCID && !Backdata.isAservice && (
-                  <CreateFocButton
-                    productId={Backdata._id}
-                    business={businessInfo}
-                  />
+                {businessInfo.subscriptionplan === "Standard" &&  user.isAdmin && !Backdata.FOCID && !Backdata.isAservice && (
+                    <CreateFocButton
+                      productId={Backdata._id}
+                      business={businessInfo}
+                    />
                 )}
+
                 {user.editProduct && (
                   <button
                     type="submit"
