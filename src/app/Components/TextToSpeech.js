@@ -229,7 +229,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SparklesIcon,BugAntIcon } from '@heroicons/react/24/outline';
+import { LightBulbIcon } from '@heroicons/react/24/outline';
 
 export default function TextToSpeechTrigger({ text }) {
   const [voice, setVoice] = useState(null);
@@ -284,7 +284,7 @@ export default function TextToSpeechTrigger({ text }) {
       className="inline-flex items-center gap-1 cursor-pointer  hover:text-yellow-200 transition"
       title="Bug Ant Assist"
     >
-      <BugAntIcon className="h-5 w-5 text-black" />
+      <LightBulbIcon className="h-5 w-5 text-yellow-400" />
     </span>
   );
 }
