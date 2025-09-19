@@ -972,12 +972,26 @@ const MySwal = withReactContent(Swal);
               onChange={handleChange}
               className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
             >
+              {/* Default option from customer */}
               <option value={cust.priceList}>{cust.priceList}</option>
-              {Array.from({ length: 9 }, (_, i) => i + 1).map((num) => (
-                <option key={num} value={`PriceList${num}`}>
-                  {`PriceList ${num}`}
-                </option>
-              ))}
+
+              {/* Dynamic options based on subscription plan */}
+              {userInfo.business.subscriptionplan === "Basic" ? (
+               <>
+               <option value="Pricelist1" title={`Basic Tier`}>{userInfo.business.priceList1}</option>
+               <option value="Pricelist2" title={`Basic Tier`}>{userInfo.business.priceList2}</option>
+               </>
+              ):(
+                <>
+                <option value="Pricelist1" title={`Standard Tier`}>{userInfo.business.priceList1}</option>
+                <option value="Pricelist2" title={`Standard Tier`}>{userInfo.business.priceList2}</option>
+                <option value="Pricelist3" title={`Standard Tier`}>{userInfo.business.priceList3}</option>
+                <option value="Pricelist4" title={`Standard Tier`}>{userInfo.business.priceList4}</option>
+                <option value="Pricelist5" title={`Standard Tier`}>{userInfo.business.priceList5}</option>
+                <option value="Pricelist6" title={`Standard Tier`}>{userInfo.business.priceList6}</option>
+                <option value="Pricelist7" title={`Standard Tier`}>{userInfo.business.priceList7}</option>
+                </>
+              )}
             </select>
           </div>
           <div>
