@@ -395,6 +395,8 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                 </div>
               </div>
 
+               {businessData.business.subscriptionplan === "Standard" && (
+                <>
               <div className="sm:col-span-2 sm:col-start-1">
                 <label
                   htmlFor="Pricelist3"
@@ -494,6 +496,8 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   />
                 </div>
               </div>
+              </>
+              )}
             </div>
           </div>
 
