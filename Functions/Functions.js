@@ -801,7 +801,7 @@ const pricelistSetter = (priceList, Business) => {
     case 'Pricelist7':
       return Business.priceList7; 
     default:
-      return priceList || 'N/A';
+      return 'N/A';
   }
 };
 

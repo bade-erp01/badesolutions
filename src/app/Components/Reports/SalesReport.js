@@ -126,12 +126,12 @@ export default function SalesRportModal({ data, Stores, customers,users,business
             <select id="PriceList" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
              <option value="PriceList1">${pricelistSetter(business.priceList1,business)}</option>
-             <option value="PriceList2">${pricelistSetter(business.priceList1,business)}</option>
-             <option value="PriceList3">${pricelistSetter(business.priceList1,business)}</option>
-             <option value="PriceList4">${pricelistSetter(business.priceList1,business)}</option>
-             <option value="PriceList5">${pricelistSetter(business.priceList1,business)}</option>
-             <option value="PriceList6">${pricelistSetter(business.priceList1,business)}</option>
-             <option value="PriceList7">${pricelistSetter(business.priceList1,business)}</option>
+             <option value="PriceList2">${pricelistSetter(business.priceList2,business)}</option>
+             <option value="PriceList3">${pricelistSetter(business.priceList3,business)}</option>
+             <option value="PriceList4">${pricelistSetter(business.priceList4,business)}</option>
+             <option value="PriceList5">${pricelistSetter(business.priceList5,business)}</option>
+             <option value="PriceList6">${pricelistSetter(business.priceList6,business)}</option>
+             <option value="PriceList7">${pricelistSetter(business.priceList7,business)}</option>
             </select>
           </div>
         </div>
