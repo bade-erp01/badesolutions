@@ -467,12 +467,14 @@ export default function BusinessDatas({ data, userInfo }) {
             value={formData.priceList1}
             type="text"
             required
+            onChange={handleChange}
           />
           <Input
             label="PriceList 2"
             type="text"
             required
             value={formData.priceList2}
+            onChange={handleChange}
           />
           {userInfo.business.subscriptionplan === "Standard" && (
           <>
@@ -481,30 +483,35 @@ export default function BusinessDatas({ data, userInfo }) {
             type="text"
             required
             value={formData.priceList3}
+            onChange={handleChange}
           />
           <Input
             label="PriceList 4"
             value={formData.priceList4}
             type="text"
             required
+            onChange={handleChange}
           />
           <Input
             label="PriceList 5"
             value={formData.priceList6}
             type="text"
             required
+            onChange={handleChange}
           />
           <Input
             label="PriceList 6"
             value={formData.priceList6}
             type="text"
             required
+            onChange={handleChange}
           />
           <Input
             label="PriceList 7"
             value={formData.priceList7}
            type="text"
             required
+            onChange={handleChange}
           />
           </>
           )}
