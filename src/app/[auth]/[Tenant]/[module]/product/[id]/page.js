@@ -602,7 +602,9 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   />
                 </div>
               </div>
-
+              
+              {businessInfo.subscriptionplan === "Standard" && (
+                <>
               <div className="sm:col-span-2 sm:col-start-1">
                 <label
                   htmlFor="Pricelist3"
@@ -707,6 +709,8 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                   />
                 </div>
               </div>
+              </>
+              )}
             </div>
             <br />
 
