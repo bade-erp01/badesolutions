@@ -14,7 +14,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 
-// const EXPRESS_PRIVATE_URL = "http://localhost:3001" 
+// const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
 const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
 const IV = '1234567890123456'; // 16 chars
@@ -784,6 +784,26 @@ async function GenerateSummary(customerId) {
 }
 
 
+const pricelistSetter = (priceList, Business) => {
+  switch (priceList) {
+    case 'Pricelist1':
+      return Business.priceList1;
+    case 'Pricelist2':
+      return Business.priceList2;
+    case 'Pricelist3':
+      return Business.priceList3;
+    case 'Pricelist4':
+      return Business.priceList4;
+    case 'Pricelist5':
+      return Business.priceList5;
+    case 'Pricelist6':
+      return Business.priceList6;
+    case 'Pricelist7':
+      return Business.priceList7; 
+    default:
+      return priceList || 'N/A';
+  }
+};
 
 
 
@@ -802,5 +822,6 @@ module.exports = {
   CryptoJSdecrypt,
   postPayment,
   GenerateSummary,
-  EXPRESS_PRIVATE_URL
+  EXPRESS_PRIVATE_URL,
+  pricelistSetter
 };

@@ -103,7 +103,7 @@ export default async function Employeelayout({ children, params }) {
           <hr />
           <nav className="space-y-4">
             {/* sales report modal */}
-            <SalesRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
+            <SalesRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)} business={userData.business}/>
 
             <DeliveryRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
 
