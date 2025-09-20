@@ -13,12 +13,20 @@ export default function Pricing() {
 
     return (
         <>
-            <Nav1 />
-            <div className=" py-16 px-6 md:px-12">
+            <div className=" py-16 px-6 md:px-12" 
+                 style={{
+          backgroundImage: 'url("/john-vid-Bdd7oMnJohg-unsplash.jpg")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "grayscale(30%)",
+          zIndex: -2,
+        }}
+            >
+        <Nav1 />
                 {/* Header Section */}
                 <div className="text-center mb-12">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Small Price for <span className="text-orange-500">Huge productivity boost 🚀</span>
+                        Small Price for <span className="text-white">Huge productivity boost 🚀</span>
                     </h1>
                     <div className="w-full text-center mt-6">
                     <Marquee gradient={false} speed={40} className="w-full py-3">
@@ -40,14 +48,14 @@ export default function Pricing() {
                             alt={`avatar-${index}`}
                             className="w-10 h-10 rounded-full border-2 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
                         />
-                        <span className="text-xs mt-1 text-center text-gray-700 group-hover:text-blue-500 group-hover:font-semibold transition duration-300">
-                            {item.label}
+                        <span className="text-sm font-semibold mt-1 text-center text-white group-hover:text-blue-500 group-hover:font-semibold transition duration-300">
+                            {/* {item.label} */}
                         </span>
                         </div>
                         ))}
                     </div>
                     </Marquee>
-                    <p className="text-gray-500 text-sm mt-2 font-medium tracking-wide">
+                    <p className="text-white text-md mt-2 font-semibold tracking-wide">
                         Trusted by forward-thinking individuals and businesses worldwide.
                     </p>
                     </div>
@@ -109,7 +117,7 @@ export default function Pricing() {
                     </div>
                 </div>
                 {/* Footer Note */}
-                <div className="text-center text-sm text-gray-500 mt-12">
+                <div className="text-center text-sm text-white font-bold mt-12">
                     <p>Contact Support: <b><a href='mailto:Operations@badesolutions.com.ng'>Operations@badesolutions.com.ng</a></b></p>
                     <br />
                     <h5>Fully Built Nigerian ERP Tailored to meet your Business Needs.</h5>

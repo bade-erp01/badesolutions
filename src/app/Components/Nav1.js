@@ -152,7 +152,7 @@ export default function Nav1({ page, Module, user, business }) {
                   {page.toUpperCase()}
                 </>
               ) : (
-                "Bade"
+                <h5 className="font-bold ">BADE</h5>
               )}
             </Link>
             {business && user ? (

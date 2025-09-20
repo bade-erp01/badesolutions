@@ -77,14 +77,6 @@ export async function GET(req) {
     const SandS = invoicesRaw.filter((invoices) => {
       return invoices.startDate.substring(0, 4) === currentYear;
     });
-    
-      // const creditNotes = await creditNote.find({
-      //   $and: [
-      //     { status: { $ne: "closed" } },
-      //     { Date: { $regex: `^${req.query.Year}` } }
-      //   ],
-      // });
-  
 
     const responsePayload = {
       result,
@@ -93,7 +85,6 @@ export async function GET(req) {
       Accounts,
       Region,
       SandS,
-    //   Contact,
       transcations,
       invoicetranscations,
     };

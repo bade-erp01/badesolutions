@@ -37,14 +37,16 @@ export const metadata = {
 export default function Home() {
   return (
     <div className="">
+     
+      {/* Hero section */}
       <div
         className=""
         style={{
           backgroundImage: 'url("/josh-calabrese-Ca8r0PSWg9Q-unsplash.jpg")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      filter: 'grayscale(30%)',
-      zIndex: -2,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "grayscale(30%)",
+          zIndex: -2,
         }}
       >
         <Nav1 />
@@ -64,8 +66,10 @@ export default function Home() {
                 Business Automated Dynamic Enterprise.
               </span>
             </h1>
-            <p className="mt-2 text-sm text-pretty text-grey-400 sm:text-xl/8 
-              bg-white/20 backdrop-blur-xs rounded-xl px-6 py-4 border border-white/20 shadow-lg">
+            <p
+              className="mt-2 text-sm text-pretty text-grey-400 sm:text-xl/8 
+              bg-white/20 backdrop-blur-xs rounded-xl px-6 py-4 border border-white/20 shadow-lg"
+            >
               Streamline Your Success with 🚀 AI-powered automation, seamless
               collaboration, and real-time insights—all in one scalable ERP
               solution.
