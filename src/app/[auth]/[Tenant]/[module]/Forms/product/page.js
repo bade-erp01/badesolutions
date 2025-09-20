@@ -395,7 +395,7 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                 </div>
               </div>
 
-               {businessData.business.subscriptionplan === "Standard" && (
+               {businessData.subscriptionplan === "Standard" && (
                 <>
               <div className="sm:col-span-2 sm:col-start-1">
                 <label
