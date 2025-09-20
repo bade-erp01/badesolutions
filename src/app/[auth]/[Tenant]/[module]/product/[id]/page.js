@@ -201,7 +201,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                 <Image height={40} width={40}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
-                  className="w-full h-full object-cover"
+                  className="object-cover"
                   loading="eager"
                   priority={true}
                   quality={100}
