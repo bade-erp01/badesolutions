@@ -4,6 +4,7 @@ const CreditPaymentSchema = new mongoose.Schema( {
     type:{
         type:String,
         enum:['Cash', 'Transfer'],
+        required:true
     },
     paymentReferenceNo:{
         type:String,
