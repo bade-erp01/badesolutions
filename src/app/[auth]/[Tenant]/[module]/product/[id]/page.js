@@ -199,7 +199,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             <div className="flex items-center space-x-6">
               <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
                 <Image height={10} width={10}
-                  src={data.image || data.QrCode || "/preview.png"}
+                  src={data.image || "/preview.png"}
                   alt="Avatar"
                   className="w-full h-full object-cover"
                   loading="eager"
