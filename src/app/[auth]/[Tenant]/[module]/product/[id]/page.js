@@ -198,10 +198,10 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             {/* Avatar */}
             <div className="flex items-center space-x-6">
               <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
-                <Image height={40} width={40}
+                <Image height={60} width={60}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                   loading="eager"
                   priority={true}
                   quality={100}
