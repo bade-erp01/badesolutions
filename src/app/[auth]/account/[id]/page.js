@@ -173,7 +173,7 @@ export default function BusinessDatas({ data, userInfo }) {
       <div className="flex flex-wrap gap-8 items-center py-4">
         {/* Avatar */}
         <div className="flex items-center space-x-6">
-          <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
+          <div className="w-28 h-28 rounded-full overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
             {formData.companyLogo ? (
               <Image
               width={10}

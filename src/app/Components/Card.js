@@ -47,7 +47,7 @@ const Card = ({ data, module }) => {
           priority
         />
         <div className="flex flex-col justify-center w-full">
-          <p className="text-base font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>
+          <p className=" font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>
           <small className="text-gray-500 mt-1 text-xs">{truncate(subtitle)}</small>
         </div>
       </div>
