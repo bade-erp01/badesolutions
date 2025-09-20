@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
 
 const CreditPaymentSchema = new mongoose.Schema( {  
-
+    type:{
+        type:String,
+        enum:['Cash', 'Transfer'],
+    },
     paymentReferenceNo:{
         type:String,
         // unique:true,
