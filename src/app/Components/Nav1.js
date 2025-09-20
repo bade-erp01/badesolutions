@@ -9,9 +9,9 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Encrypt } from "../../../Functions/Functions";
 import { useRouter } from "next/navigation";
-import { plsWait, ErrorMessage, SuccessToast } from "../../../Functions/Mics";
 import moment from "moment";
 import Logout from "@/app/Components/Logout";
+import UserNotification from "@/app/Components/UserNotification";
 
 export default function Nav1({ page, Module, user, business }) {
   const pathName = usePathname();
@@ -137,7 +137,7 @@ export default function Nav1({ page, Module, user, business }) {
     <>
       <header
         className="w-full flex items-center justify-between px-5 py-5 
- z-20 relative "
+ z-20 relative animate__animated animate__flipInX animate__delay-2s "
       >
         <nav className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
           <div className="container mx-auto flex justify-between items-center">
@@ -191,26 +191,6 @@ export default function Nav1({ page, Module, user, business }) {
                 >
                   Why Bade?
                 </Link>
-                {/* <Link
-                  href="/auth/Store"
-                  className={`hover:text-pink-500 transition ${
-                    pathName === "/auth/Store"
-                      ? "text-pink-500 bg-gray-100 p-2"
-                      : ""
-                  }`}
-                >
-                  Store
-                </Link> */}
-                {/* <Link
-                  href="#"
-                  className={`hover:text-pink-500 transition ${
-                    pathName === "/Platforms"
-                      ? "text-pink-500 bg-gray-100 p-2"
-                      : ""
-                  }`}
-                >
-                  Platforms
-                </Link> */}
                 <Link
                   href="/Pricing"
                   className={`hover:text-pink-500 transition ${
@@ -249,7 +229,7 @@ export default function Nav1({ page, Module, user, business }) {
                     {user?.image ? (
                       <Image
                         src={user.image}
-                        className="drop-shadow-lg border-2 rounded-full object-cover"
+                        className="drop-shadow-sm border-2 rounded-full object-cover"
                         // loading="lazy"
                         priority={true}
                         quality={100}
@@ -273,7 +253,7 @@ export default function Nav1({ page, Module, user, business }) {
 
                   {isDropdownOpen && (
                     <div
-                      className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                      className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none animate__animated animate__slideInRight"
                       role="menu"
                       aria-orientation="vertical"
                       aria-labelledby="menu-button"
@@ -311,14 +291,15 @@ export default function Nav1({ page, Module, user, business }) {
                           </Link>
                         )}
                         {user.Notification.length > 0 && (
-                          <Link
-                            href={`/${sanitizedCompanyName}/Notification`}
-                            className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-300"
-                            role="menuitem"
-                            tabIndex={-1}
-                          >
-                            {user.Notification.length} Notifications 🔔
-                          </Link>
+                          // <Link
+                          //   href={`/${sanitizedCompanyName}/Notification`}
+                          //   className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-300"
+                          //   role="menuitem"
+                          //   tabIndex={-1}
+                          // >
+                          //   {user.Notification.length} Notifications 🔔
+                          // </Link>
+                          <UserNotification user={user} />
                         )}
 
                         <Logout />
