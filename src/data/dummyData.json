@@ -105,16 +105,6 @@
 "Description": "Manage your business finances with precision—from expenses to reports—all in one intelligent accounting suite.",
 "apps": [
 {
-"id": 11,
-"Name": "Analytics",
-"url": "report",
-"icon": "https://img.icons8.com/stickers/100/marketing.png",
-"installed": false,
-"Description": "Gain deep financial insights through dynamic reports and dashboards tailored to your business KPIs.",
-"alt": "",
-"Amount": 200000
-},
-{
 "id": 18,
 "Name": "Expense",
 "url": "expense",

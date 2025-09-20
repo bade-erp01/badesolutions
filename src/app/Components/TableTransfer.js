@@ -86,7 +86,7 @@ export default function TransferTable({ TransfersLists ,StoreList,Business,User}
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">To Warehouse</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Status</th>
                             <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">Date</th>
-                            <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">ORDER Qty</th>
+                            {/* <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">ORDER Qty</th> */}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -106,7 +106,7 @@ export default function TransferTable({ TransfersLists ,StoreList,Business,User}
                                 <td className="px-6 py-4 text-sm">
                                     {new Date(transfer.transferedDate).toLocaleDateString()}
                                 </td>
-                                <td className="px-6 py-4 text-sm">{transfer.orders.length}</td>
+                                
                                 {/* get the value from the transfer.order.item.VendorPrice multiplied by transfer.orders.length for each item */}
                                 {/* <td className="px-6 py-4 text-sm">
                                     {transfer.orders.reduce((total, order) => {

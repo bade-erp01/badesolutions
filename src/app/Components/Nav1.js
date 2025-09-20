@@ -137,7 +137,7 @@ export default function Nav1({ page, Module, user, business }) {
     <>
       <header
         className="w-full flex items-center justify-between px-5 py-5 
- z-20 relative animate__animated animate__flipInX animate__delay-2s "
+ z-20 relative animate__animated animate__flipInX animate__delay-1s "
       >
         <nav className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
           <div className="container mx-auto flex justify-between items-center">
