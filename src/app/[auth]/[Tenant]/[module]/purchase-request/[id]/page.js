@@ -1,5 +1,5 @@
 "use client";
-import { React, useState } from "react";
+import { React, useState ,useRef} from "react";
 import Swal from "sweetalert2";
 import BackButton from "@/app/Components/BackBotton";
 import Image from "next/image";
@@ -199,7 +199,7 @@ export default function DraftPurchasePage({
     }
   };
 
-  const DeleteDraftPo = async (id) => {
+  const DeleteDraftPo = async (id, userId) => {
     try {
       const result = await Swal.fire({
         title: "Are you sure?",

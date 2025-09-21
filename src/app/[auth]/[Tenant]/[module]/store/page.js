@@ -2,7 +2,6 @@ import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Link from "next/link";
 import Card from "@/app/Components/Card";
-import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { Encrypt } from "../../../../../../Functions/Functions";

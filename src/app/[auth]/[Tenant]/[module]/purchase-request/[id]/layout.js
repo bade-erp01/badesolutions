@@ -1,9 +1,12 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
-import {Encrypt} from "../../../../../../../Functions/Functions"
+import {Encrypt,Dencrypt} from "../../../../../../../Functions/Functions"
 // Removed unused import BackButton
 import DraftPurchasePage from './page'
+import PurchaseOrder from "../../../../../../../models/purchaseOrders";
+import { WHouse, storeProduct} from "../../../../../../../models/Stores";
+import Vendor from "../../../../../../../models/Vendors";
 import { notFound } from "next/navigation"; // Import the notFound function
 
 
@@ -48,35 +51,40 @@ export const metadata = {
   favicon:'/favicon.ico'
 };
 
-export default async function storelayout({ params }) { // Removed unused 'children'
+export default async function storelayout({ params }) { 
   const moduleList = await params;
   const userData = await fetchUser();
- const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-   const res = await fetch(`${baseUrl}/api/purchase_request/${moduleList.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`
-      }
-    })
+const items = await PurchaseOrder.findById(Dencrypt(moduleList.id)).lean();
+// if not found show 404 page
+if (!items) {
+  return notFound(); // Correctly invoke the notFound function
+}
 
-    const items = await res.json()
+ const StoreLists = await WHouse.findById(items.WHID).lean();
+ const StoreListsStr = JSON.stringify(StoreLists);
+ const StoreListsObj = JSON.parse(StoreListsStr);
 
-    // if not found show 404 page
-    if (!res.ok || !items) {
-      notFound(); // Correctly invoke the notFound function
-    }
+ const VendorList = await Vendor.findById(items.Vendor).lean();
+  const VendorListStr = JSON.stringify(VendorList);
+  const VendorListObj = JSON.parse(VendorListStr);
+
+   const storeProductList = await storeProduct.findByTenant(userData.business.tenantId,{ WHIDS: StoreLists._id,
+          isActivated:true,
+          isAservice: false,
+          Vendor:VendorList._id}).lean();
+  const storeProductStr = JSON.stringify(storeProductList);
+  const storeProductPar = JSON.parse(storeProductStr);
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={items.purchase.billReferenceNo}
+        page={items.billReferenceNo}
       />
 
       <div>
-        <DraftPurchasePage  user={userData.user} customer={items.vendor} bill={items.purchase} products={items.ProductList} Business={userData.business} Whouse={items.Stores} />
+        <DraftPurchasePage  user={userData.user} customer={VendorListObj} bill={items} products={storeProductPar} Business={userData.business} Whouse={StoreListsObj} />
       </div>
       <Footer2 />
     </div>
