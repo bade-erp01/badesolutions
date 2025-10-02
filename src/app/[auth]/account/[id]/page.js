@@ -155,9 +155,10 @@ export default function BusinessDatas({ data, userInfo }) {
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h4 className="text-xl font-bold text-gray-800">
-          {formData.companyName.charAt(0).toUpperCase() +
+          {/* {formData.companyName.charAt(0).toUpperCase() +
             formData.companyName.slice(1)}
-          &apos;s Business profile
+          &apos;s  */}
+          Business profile
         </h4>
         <span
           className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
