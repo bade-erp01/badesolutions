@@ -538,7 +538,7 @@ export default function BusinessDatas({ data, userInfo }) {
             />
             <Checkbox
               label={
-                formData.allowPriceChangeOnInvoice
+                formData.allowSkuSplitting
                   ? "Product Splitting Allowed"
                   : "Product Splitting Blocked"
               }
