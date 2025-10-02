@@ -9,8 +9,7 @@ import {
   UpdateEmployeeData,
   EXPRESS_PRIVATE_URL,
   Dencrypt,
-} from "../../../../../../../Functions/Functions";
-import BackButton from "@/app/Components/BackBotton";
+} from "../../../../../../../Functions/Functions"
 import {
   PhotoIcon,
   PaperClipIcon,
@@ -317,7 +316,6 @@ export default function SingleEmployeeView({
   return (
     <>
       <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2">
-        <BackButton />
         {/* form starts here */}
         <div className="space-y-5 mx-auto">
           <div className="flex flex-wrap items-center justify-between gap-4">
