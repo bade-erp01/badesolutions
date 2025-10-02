@@ -538,7 +538,7 @@ export default function BusinessDatas({ data, userInfo }) {
             />
             <Checkbox
               label={
-                formData.allowSkuSplitting
+                formData.allowPriceChangeOnInvoice
                   ? "Product Splitting Allowed"
                   : "Product Splitting Blocked"
               }
@@ -587,7 +587,7 @@ export default function BusinessDatas({ data, userInfo }) {
       <Section title="Installed Business Apps">
         <div className="overflow-x-auto p-2">
           {data && data.modules.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
               {data.modules.map((data) => (
                 <Link
                   key={data._id}

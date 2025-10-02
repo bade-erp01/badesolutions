@@ -12,16 +12,10 @@ export default function Footer2() {
       >
         <span className="text-xs md:text-base text-gray-200">
           📢 You can request a customized business email that reflects your brand identity.{" "}
-          <Link
-            href="/contact-sales"
-            className="text-indigo-400 underline hover:text-indigo-300 ml-2"
-          >
-            Contact Sales
-          </Link>
         </span>
-
+        {" "}
         <span className="text-xs md:text-base text-gray-200">
-          🌍This Space is available for advert, grab this opportunity to reach other B.A.D.E users.{" "}
+          🌍This Space is available for advert, grab this special offer to reach other B.A.D.E users.{" "}
           <Link
             href="/contact-sales"
             className="text-indigo-400 underline hover:text-indigo-300 ml-2"
