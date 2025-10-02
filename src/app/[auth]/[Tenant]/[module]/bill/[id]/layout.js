@@ -1,8 +1,6 @@
 import SingleInvoice from './page';
-import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
-import Invoice from '../../../../../../../models/Invoices'
-import {Dencrypt} from '../../../../../../../Functions/Functions'
-import Customer from  '../../../../../../../models/Customer'
+import { fetchUser, } from '../../../../../../../Functions/useerDataRefresh';
+import axios from "axios"
 
 export const metadata = {
   title: "Stores Settings | B.A.D.E ERP Platform",
@@ -54,15 +52,39 @@ export const metadata = {
   favicon:'favicon.ico'
 };
 
-
 export default async function StoreLayout({ params }) {
   const userInfo = await fetchUser();
-  const Inv = await Invoice.findById(Dencrypt(await params?.id)).lean()
-  const cust = await Customer.findById(Inv.customer)
+  const Params = await params
+  let Inv = [], cust = []
+
+  try {
+     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+ 
+     const res = await axios.get(`${baseUrl}/api/Invoice/${Params.id}`, {
+       headers: {
+         'Content-Type': 'application/json',
+         dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+         Authorization: `Bearer ${userInfo.business.tenantId}`,
+       },
+     });
+ 
+     const data = await res.data;
+
+     Inv = data.Inv || [];
+     cust = data.cust || [];
+ 
+   } catch (err) {
+     return (
+       <div className="text-red-500 p-6">
+         Failed to load. Please try again later.
+       </div>
+     );
+   }
+
 
   return (
     <div>
-      <SingleInvoice userInfo={userInfo} SinglebillItem={JSON.stringify(Inv)} customerList={JSON.stringify(cust)} />
+      <SingleInvoice userInfo={userInfo} SinglebillItem={Inv} customerList={cust} />
     </div>
   );
 }

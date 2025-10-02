@@ -17,17 +17,19 @@ const PaymentReceipt = ({business,payment,cust}) => {
 
    new Promise((resolve) => setTimeout(resolve, 1000))
     // Header
-    doc.setFontSize(18);
+    doc.setFontSize(11);
     doc.text('Payment Receipt', 105, 20, null, null, 'center');
 
     // Company Info
-    doc.setFontSize(11);
+    doc.setFontSize(18);
     doc.text(`${business.companyName}`, 20, 35);
-    doc.text(business.shopAddress.toLowerCase() + " " + business.companyState.toLowerCase() + " " + business.companyCity.toLowerCase() || "", 20, 42);
+    doc.setFontSize(8);
+    doc.text(business.shopAddress.toLowerCase() || "", 20, 42);
     doc.text(`${business.email} | ${business.Tel}`, 20, 49);
 
     // Receipt Info
-    doc.text(`Receipt Ref: #${Payment.paymentReferenceNo}`, 150, 35);
+    doc.setFontSize(11);
+    doc.text(`Ref: #${Payment.paymentReferenceNo}`, 150, 35);
     doc.text(`Print Date: ${moment().format('l')}`, 150, 42);
 
     // Table Data
@@ -54,8 +56,8 @@ const PaymentReceipt = ({business,payment,cust}) => {
 
     // Footer
     const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(12);
-    doc.text(`Total Amount Paid in words: ${totalInWords(Payment.crAmount,business.currency.currency)}`, 20, finalY);
+    doc.setFontSize(10);
+    doc.text(`In words: ${totalInWords(Payment.crAmount,business.currency.currency)}`, 20, finalY);
     doc.text(`Payment Method:${Payment?.type}`, 20, finalY + 7);
     doc.text('Generated with Business Automated Dynamic Enterprise!', 105, finalY + 20, null, null, 'center');
 

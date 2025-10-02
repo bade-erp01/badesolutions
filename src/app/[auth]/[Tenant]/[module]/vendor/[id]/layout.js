@@ -46,14 +46,16 @@ export const metadata = {
 
 export default async function SingleVendorPagelayout({ params }) {
   const userData = await fetchUser();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const Params = await params;
 
-  const res = await fetch(`${baseUrl}/api/vendors/${Params.id}`, {
+  const res = await fetch(`${baseUrl}/api/Vendor/${Params.id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+      dbConnect:`Bearer ${userData.business.rustyRoof}`,
+      access:`${Encrypt(userData.user._id)}`
     },
     // Optional: Add caching headers if needed
     next: { revalidate: 120 }, // Revalidate every 2 minutes

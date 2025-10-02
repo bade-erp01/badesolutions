@@ -1,16 +1,19 @@
 import SingleStoreProductpage from './page';
 import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
-import {Dencrypt} from '../../../../../../../Functions/Functions'
+import {Encrypt} from '../../../../../../../Functions/Functions'
 
 export default async function StoreLayout({ params }) {
-  const userInfo = await fetchUser();
+ try{
+   const userInfo = await fetchUser();
   const param = await params
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/storeApi/inventory-items/${param.id}`, {
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const res = await fetch(`${baseUrl}/api/SingleStorePoduct/${param.id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${ userInfo.business.tenantId}`
+      "Authorization": `Bearer ${ userInfo.business.tenantId}`,
+       dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+       access:`${Encrypt(userInfo.user._id)}`
     }
   })
 
@@ -21,5 +24,12 @@ export default async function StoreLayout({ params }) {
       <SingleStoreProductpage userInfo={userInfo} storeProduct={StoreProd} />
     </div>
   );
+ }catch(err){
+   return (
+    <p className='text-black'>
+    Error Loading data. Try again later
+    </p>
+  );
+ }
 }
 

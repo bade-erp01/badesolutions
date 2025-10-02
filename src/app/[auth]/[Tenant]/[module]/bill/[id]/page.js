@@ -19,8 +19,8 @@ import { AtSymbolIcon,ArrowPathRoundedSquareIcon, PrinterIcon,DocumentDuplicateI
 export default function InvoicePage({ userInfo, SinglebillItem, customerList }) {
   const Router = useRouter()
   const [expanded, setExpanded] = useState(false);
-  const [cust] = useState(JSON.parse(customerList))
-  const [Singlebill] = useState(JSON.parse(SinglebillItem))
+  const [cust] = useState(customerList)
+  const [Singlebill] = useState(SinglebillItem)
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
 
   // 🛠️ Safe image loader as Data URL
@@ -384,7 +384,11 @@ const cancelSales = async (orderId) => {
   try {
     const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/SingleReturn/${Encrypt(orderId)}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+         "Content-Type": "application/json" ,
+          dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+          access:`${Encrypt(userInfo.user._id)}`
+      },
       body: JSON.stringify({ id:Encrypt(orderId) }),
     });
 
@@ -503,7 +507,11 @@ const cancelSales = async (orderId) => {
 
               const request = await fetch(api, {
                 method: "GET",
-                headers: { "content-type": "application/json" },
+                headers: { 
+                  "content-type": "application/json",
+                   dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+                   access:`${Encrypt(userInfo.user._id)}`
+                 },
               });
               const response = await request.json();
 

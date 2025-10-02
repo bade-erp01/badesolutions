@@ -1,5 +1,6 @@
 import BusinessDatas from './page';
 import { fetchUser } from '../../../../../Functions/useerDataRefresh';
+import dbConnect from "../../../../../lib/mongoose"
 import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import Link from "next/link"
@@ -11,19 +12,10 @@ import { notFound } from 'next/navigation';
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
-  //  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  // const res = await fetch(`${baseUrl}/api/account/${moduleList.id}`, {
-  //   method: "GET",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "Authorization": `Bearer ${ userData.business.tenantId}`
-  //   }
-  // })
 
   const business = await Business.findById(moduleList.id).lean()
 
   if(!business) return notFound()
-
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">

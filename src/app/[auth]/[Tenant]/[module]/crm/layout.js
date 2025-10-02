@@ -1,6 +1,4 @@
-import CustomerListpage from './page';
 import { fetchUser } from '../../../../../../Functions/useerDataRefresh';
-import Customers from '../../../../../../models/Customer';
 import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import DebtorsReportModal from "@/app/Components/Reports/DebtorsReport";
@@ -10,6 +8,7 @@ import { Encrypt } from '../../../../../../Functions/Mics';
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import Footer2 from '@/app/Components/Footer2';
+import axios from "axios";
 import {
   ClipboardDocumentListIcon,
   PlusCircleIcon
@@ -26,11 +25,22 @@ function CustomerCardSkeleton() {
 }
 
 export default async function crmLayout({ children, params }) {
-  let userData, customerList;
+  let userData;
+  let customerList = [];
 
   try {
     userData = await fetchUser();
-    customerList = await Customers.findByTenant(userData.business.tenantId).lean();
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+
+    const res = await axios.get(`${baseUrl}/api/crm`, {
+      headers: {
+        'Content-Type': 'application/json',
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+        Authorization: `Bearer ${userData.business.tenantId}`,
+      },
+    });
+
+    customerList = res.data; // ✅ Fix: axios returns data in `res.data`, not `res.json()`
   } catch (error) {
     return (
       <div className="text-red-500 p-6">
@@ -39,7 +49,7 @@ export default async function crmLayout({ children, params }) {
     );
   }
 
-  const moduleParams = params;
+  const moduleParams = await params;
 
   return (
     <div className="flex flex-col h-screen">

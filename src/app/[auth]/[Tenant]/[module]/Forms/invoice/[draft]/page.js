@@ -61,6 +61,8 @@ export default function DraftInvoicePage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+           dbConnect:`Bearer ${Business.rustyRoof}`,
+           access:`${Encrypt(user._id)}`
         },
       });
 
@@ -302,6 +304,8 @@ export default function DraftInvoicePage({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+           dbConnect:`Bearer ${Business.rustyRoof}`,
+           access:`${Encrypt(user._id)}`
         },
         body: JSON.stringify({ product: cleanedProducts._id }), // Ensure it's sent as an object
       });
@@ -341,7 +345,11 @@ export default function DraftInvoicePage({
       }/Draft/salesDelete?id=${Encrypt(bill._id)}&user=${Encrypt(user._id)}`;
       const response = await fetch(url, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json", 
+          dbConnect:`Bearer ${Business.rustyRoof}`,
+          access:`${Encrypt(user._id)}`
+        },
       });
       const data = await response.json();
 
@@ -382,6 +390,8 @@ export default function DraftInvoicePage({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          dbConnect:`Bearer ${Business.rustyRoof}`,
+          access:`${Encrypt(user._id)}`
         },
         body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
       });
@@ -443,6 +453,8 @@ export default function DraftInvoicePage({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Business._id}`,
+            dbConnect:`Bearer ${Business.rustyRoof}`,
+            access:`${Encrypt(user._id)}`
           },
           body: JSON.stringify({ billId: bill._id, customer: customer._id }),
         }
@@ -477,6 +489,8 @@ export default function DraftInvoicePage({
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          dbConnect:`Bearer ${Business.rustyRoof}`,
+          access:`${Encrypt(user._id)}`
         },
         body: JSON.stringify({ lineId, billId: bill._id }),
       });

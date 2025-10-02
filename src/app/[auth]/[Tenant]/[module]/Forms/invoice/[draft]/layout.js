@@ -14,7 +14,8 @@ export default async function StoreLayout2({ params }) {
     const res = await axios.get(`${baseUrl}/api/storeApi/invoice/${Dencrypt(decoy.draft)}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${userData.business.tenantId}`
+        Authorization: `Bearer ${userData.business.tenantId}`,
+        dbConnect:`Bearer ${userData.business.rustyRoof}`,
       }
     });
 

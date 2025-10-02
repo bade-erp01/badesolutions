@@ -13,15 +13,15 @@ import Invoice from '../../../../../models/Invoices';
 
 export async function GET(req) {
   try {
-    await dbConnect();
     const { searchParams } = new URL(req.url);
     const customerId = searchParams.get('id');
     const tenantId = req.headers.get('authorization')?.split(' ')[1];
-
-
+    const dbToken = req.headers.get('dbconnect')?.split(' ')[1];
+    console.log(dbToken)
     if (!ObjectId.isValid(customerId)) {
       return Response.json({ error: 'Invalid customer ID' }, { status: 400 });
     }
+    await dbConnect(dbToken);
 
     const currentYear = moment().format('YYYY');
 

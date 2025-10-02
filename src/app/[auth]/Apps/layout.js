@@ -1,4 +1,3 @@
-
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E] || Apps Store",
   description: "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",

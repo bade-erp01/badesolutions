@@ -1,245 +1,245 @@
 [
-{
-"id": 122234343,
-"Name": "Sales",
-"Amount": 50000,
-"icon": "https://img.icons8.com/stickers/50/purchase-order.png",
-"Description": "Take control of your sales lifecycle—from customer engagement to payment processing—with this comprehensive suite of integrated sales tools.",
-"apps": [
-{
-"id": 3,
-"Name": "Stores Operations",
-"url": "store",
-"icon": "https://img.icons8.com/arcade/64/garage-closed.png",
-"installed": false,
-"Description": "Optimize your warehouse workflows with real-time inventory tracking, inbound/outbound management, and seamless stock movement.",
-"alt": "",
-"Amount": 300000
-},
-{
-"id": 8,
-"Name": "Product Management",
-"url": "product",
-"icon": "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
-"installed": false,
-"Description": "Manage your entire product catalog with tools for pricing strategies, categorization, and lifecycle tracking to stay ahead of demand.",
-"alt": "",
-"Amount": 50000
-},
-{
-"id": 9,
-"Name": "CRM",
-"url": "customer",
-"icon": "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
-"installed": false,
-"Description": "Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease.",
-"alt": "",
-"Amount": 100000
-},
-{
-"id": 5,
-"Name": "Cash Register",
-"url": "Payment",
-"icon": "https://img.icons8.com/dusk/64/cash-register.png",
-"installed": false,
-"Description": "Simplify point-of-sale transactions with a digital register that handles cash, card, and mobile payments while tracking every transaction.",
-"alt": "",
-"Amount": 50000
-}
-]
-},
-{
-"id": 122234344,
-"Amount": 10000,
-"Name": "Human Resource Management",
-"icon": "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
-"Description": "Streamline every aspect of your workforce operations with this powerful HR suite—empowering your business with employee data control, appraisal automation, payroll, and leave tracking.",
-"apps": [
-{
-"id": 1,
-"Name": "Employee Management",
-"url": "employee",
-"icon": "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
-"installed": true,
-"Description": "Centralize all employee records in one place—manage profiles, roles, documents, and organizational structure with precision and ease.",
-"Amount": 0.0,
-"color": "bg-red-300"
-},
-{
-"id": 12,
-"Name": "Staff Appraisal",
-"url": "appraisal",
-"icon": "https://img.icons8.com/stickers/50/add-to-favorites.png",
-"installed": false,
-"Description": "Set clear performance goals, collect feedback, and track employee growth with a customizable appraisal system that boosts team development.",
-"alt": "",
-"Amount": 50000
-},
-{
-"id": 14,
-"Name": "Time Off",
-"url": "timeoff",
-"icon": "https://img.icons8.com/hands/100/time.png",
-"installed": false,
-"Description": "Easily manage vacation, sick leave, and remote work requests with a flexible time-off system tailored for team coordination and compliance.",
-"alt": "",
-"Amount": 100000
-},
-{
-"id": 17,
-"Name": "Pay Roll Pro",
-"url": "payroll",
-"icon": "https://img.icons8.com/stickers/50/pay-date.png",
-"installed": false,
-"Description": "Automate salary processing, tax deductions, and benefits administration—Pay Roll Pro ensures payroll accuracy and regulatory compliance with ease.",
-"alt": "",
-"Amount": 10000
-}
-]
-},
-{
-"id": 122234345,
-"Name": "Accounting",
-"Amount": 10000,
-"icon": "https://img.icons8.com/matisse/100/estimate.png",
-"Description": "Manage your business finances with precision—from expenses to reports—all in one intelligent accounting suite.",
-"apps": [
-{
-"id": 18,
-"Name": "Expense",
-"url": "expense",
-"icon": "https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/external-expense-online-money-service-flaticons-lineal-color-flat-icons.png",
-"installed": false,
-"Description": "Track, categorize, and manage company expenses in real time to control spending and boost accountability.",
-"alt": "",
-"Amount": 200000
-},
-{
-"id": 20,
-"Name": "Accounting",
-"url": "accounting",
-"icon": "https://img.icons8.com/matisse/100/estimate.png",
-"installed": false,
-"Description": "Automate journal entries, balance sheets, and ledgers with ease—all while maintaining full financial compliance.",
-"alt": "",
-"Amount": 200000
-},
-{
-"id": 21,
-"Name": "Asset Register",
-"url": "asset",
-"icon": "https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-asset-finance-flaticons-flat-flat-icons.png",
-"installed": false,
-"Description": "Keep track of all company assets, their value, depreciation, and location through a centralized register.",
-"alt": "",
-"Amount": 200000
-}
-]
-},
-{
-"id": 366377473,
-"Name": "Marketing Tools",
-"Amount": 10000,
-"icon": "https://img.icons8.com/external-flat-design-circle/50/external-46-business-and-investment-flat-design-circle.png",
-"Description": "Unlock powerful digital campaigns and streamline your outreach with tools built for modern, data-driven marketing teams.",
-"apps": [
-{
-"id": 4,
-"Name": "Email Marketing",
-"url": "emailmarketing",
-"icon": "https://img.icons8.com/external-flat-design-circle/50/external-46-business-and-investment-flat-design-circle.png",
-"installed": false,
-"Description": "Design and deliver email campaigns, automate follow-ups, and track engagement to convert subscribers into loyal customers.",
-"alt": "",
-"Amount": 200000
-},
-{
-"id": 23,
-"Name": "Contacts",
-"url": "contacts",
-"icon": "https://img.icons8.com/?size=80&id=raEdgvcDAxS3&format=png",
-"installed": false,
-"Description": "Organize and segment your contact database for personalized outreach, lead nurturing, and campaign targeting.",
-"alt": "",
-"Amount": 200000
-},
-{
-"id": 25,
-"Name": "Ads",
-"url": "Ads",
-"icon": "https://img.icons8.com/?size=80&id=raEdgvcDAxS3&format=png",
-"installed": false,
-"Description": "Create, manage, and optimize digital ad campaigns across platforms to reach your ideal audience and maximize ROI.",
-"alt": "",
-"Amount": 200000
-},
-{
-"id": 26,
-"Name": "Lead Generator",
-"url": "Lead",
-"icon": "https://img.icons8.com/?size=80&id=raEdgvcDAxS3&format=png",
-"installed": false,
-"Description": "Capture high-quality leads with forms, landing pages, and smart tracking tools to fuel your sales pipeline.",
-"alt": "",
-"Amount": 200000
-}
-]
-},
-{
-"id": 366377474,
-"Name": "Help Desk",
-"Amount": 10000,
-"icon": "https://img.icons8.com/3d-fluency/94/help.png",
-"Description": "Deliver timely, effective support to your customers with our Help Desk module—streamlining ticket resolution, communication, and service tracking in one place.",
-"apps": [
-{
-"id": 10,
-"Name": "Help Desk",
-"url": "Helpdesk",
-"icon": "https://img.icons8.com/3d-fluency/94/help.png",
-"installed": false,
-"Description": "Streamline support operations by capturing, tracking, and resolving customer issues efficiently—complete with ticket routing, response automation, and performance insights.",
-"alt": "",
-"Amount": 150000
-}
-]
-},
-{
-"id": 366377475,
-"Amount": 10000,
-"icon": "https://img.icons8.com/?size=80&id=Ko5RoHIUJkgi&format=png",
-"Name": "Events",
-"Description": "Plan, promote, and manage events effortlessly—from registrations and reminders to follow-ups—all in one powerful toolkit.",
-"apps": [
-{
-"id": 15,
-"Name": "Events",
-"url": "Events",
-"icon": "https://img.icons8.com/?size=80&id=Ko5RoHIUJkgi&format=png",
-"installed": false,
-"Description": "Schedule, promote, and track events with real-time engagement tools that make organizing seamless and impactful.",
-"alt": "",
-"Amount": 0
-}
-]
-},
-{
-"id": 366377477,
-"Amount": 10000,
-"icon": "https://img.icons8.com/keek/100/map-marker.png",
-"Name": "Field Sales",
-"Description": "Empower your on-the-go sales force with tools that track visits, manage customer interactions, and close deals in the field.",
-"apps": [
-{
-"id": 16,
-"Name": "Field Sales",
-"url": "/api/v1/POS/dashboard?page=1&limit=10&category=all",
-"icon": "https://img.icons8.com/keek/100/map-marker.png",
-"installed": false,
-"Description": "Equip your reps with real-time data, mobile sales tools, and route planning to boost productivity while on the move.",
-"alt": "",
-"Amount": 1000000
-}
-]
-}
+    {
+        "id": 122234343,
+        "Name": "Sales",
+        "Amount": 50000,
+        "icon": "https://img.icons8.com/stickers/50/purchase-order.png",
+        "Description": "Take control of your sales lifecycle—from customer engagement to payment processing—with this comprehensive suite of integrated sales tools.",
+        "apps": [
+            {
+                "id": 3,
+                "Name": "Stores Operations",
+                "url": "store",
+                "icon": "https://img.icons8.com/arcade/64/garage-closed.png",
+                "installed": false,
+                "Description": "Optimize your warehouse workflows with real-time inventory tracking, inbound/outbound management, and seamless stock movement.",
+                "alt": "",
+                "Amount": 300000
+            },
+            {
+                "id": 8,
+                "Name": "Product Management",
+                "url": "product",
+                "icon": "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
+                "installed": false,
+                "Description": "Manage your entire product catalog with tools for pricing strategies, categorization, and lifecycle tracking to stay ahead of demand.",
+                "alt": "",
+                "Amount": 50000
+            },
+            {
+                "id": 9,
+                "Name": "CRM",
+                "url": "customer",
+                "icon": "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
+                "installed": false,
+                "Description": "Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease.",
+                "alt": "",
+                "Amount": 100000
+            },
+            {
+                "id": 5,
+                "Name": "Cash Register",
+                "url": "Payment",
+                "icon": "https://img.icons8.com/dusk/64/cash-register.png",
+                "installed": false,
+                "Description": "Simplify point-of-sale transactions with a digital register that handles cash, card, and mobile payments while tracking every transaction.",
+                "alt": "",
+                "Amount": 50000
+            }
+        ]
+    },
+    {
+        "id": 122234344,
+        "Amount": 10000,
+        "Name": "Human Resource Management",
+        "icon": "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
+        "Description": "Streamline every aspect of your workforce operations with this powerful HR suite—empowering your business with employee data control, appraisal automation, payroll, and leave tracking.",
+        "apps": [
+            {
+                "id": 1,
+                "Name": "Employee Management",
+                "url": "employee",
+                "icon": "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
+                "installed": true,
+                "Description": "Centralize all employee records in one place—manage profiles, roles, documents, and organizational structure with precision and ease.",
+                "Amount": 0.0,
+                "color": "bg-red-300"
+            },
+            {
+                "id": 12,
+                "Name": "Staff Appraisal",
+                "url": "appraisal",
+                "icon": "https://img.icons8.com/stickers/50/add-to-favorites.png",
+                "installed": false,
+                "Description": "Set clear performance goals, collect feedback, and track employee growth with a customizable appraisal system that boosts team development.",
+                "alt": "",
+                "Amount": 50000
+            },
+            {
+                "id": 14,
+                "Name": "Time Off",
+                "url": "timeoff",
+                "icon": "https://img.icons8.com/hands/100/time.png",
+                "installed": false,
+                "Description": "Easily manage vacation, sick leave, and remote work requests with a flexible time-off system tailored for team coordination and compliance.",
+                "alt": "",
+                "Amount": 100000
+            },
+            {
+                "id": 17,
+                "Name": "Pay Roll Pro",
+                "url": "payroll",
+                "icon": "https://img.icons8.com/stickers/50/pay-date.png",
+                "installed": false,
+                "Description": "Automate salary processing, tax deductions, and benefits administration—Pay Roll Pro ensures payroll accuracy and regulatory compliance with ease.",
+                "alt": "",
+                "Amount": 10000
+            }
+        ]
+    },
+    {
+        "id": 122234345,
+        "Name": "Accounting",
+        "Amount": 10000,
+        "icon": "https://img.icons8.com/matisse/100/estimate.png",
+        "Description": "Manage your business finances with precision—from expenses to reports—all in one intelligent accounting suite.",
+        "apps": [
+            {
+                "id": 18,
+                "Name": "Expense",
+                "url": "expense",
+                "icon": "https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/external-expense-online-money-service-flaticons-lineal-color-flat-icons.png",
+                "installed": false,
+                "Description": "Track, categorize, and manage company expenses in real time to control spending and boost accountability.",
+                "alt": "",
+                "Amount": 200000
+            },
+            {
+                "id": 20,
+                "Name": "Accounting",
+                "url": "accounting",
+                "icon": "https://img.icons8.com/matisse/100/estimate.png",
+                "installed": false,
+                "Description": "Automate journal entries, balance sheets, and ledgers with ease—all while maintaining full financial compliance.",
+                "alt": "",
+                "Amount": 200000
+            },
+            {
+                "id": 21,
+                "Name": "Asset Register",
+                "url": "asset",
+                "icon": "https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-asset-finance-flaticons-flat-flat-icons.png",
+                "installed": false,
+                "Description": "Keep track of all company assets, their value, depreciation, and location through a centralized register.",
+                "alt": "",
+                "Amount": 200000
+            }
+        ]
+    },
+    {
+        "id": 366377473,
+        "Name": "Marketing Tools",
+        "Amount": 10000,
+        "icon": "https://img.icons8.com/external-flat-design-circle/50/external-46-business-and-investment-flat-design-circle.png",
+        "Description": "Unlock powerful digital campaigns and streamline your outreach with tools built for modern, data-driven marketing teams.",
+        "apps": [
+            {
+                "id": 4,
+                "Name": "Email Marketing",
+                "url": "emailmarketing",
+                "icon": "https://img.icons8.com/external-flat-design-circle/50/external-46-business-and-investment-flat-design-circle.png",
+                "installed": false,
+                "Description": "Design and deliver email campaigns, automate follow-ups, and track engagement to convert subscribers into loyal customers.",
+                "alt": "",
+                "Amount": 200000
+            },
+            {
+                "id": 23,
+                "Name": "Contacts",
+                "url": "contacts",
+                "icon": "https://img.icons8.com/?size=80&id=raEdgvcDAxS3&format=png",
+                "installed": false,
+                "Description": "Organize and segment your contact database for personalized outreach, lead nurturing, and campaign targeting.",
+                "alt": "",
+                "Amount": 200000
+            },
+            {
+                "id": 25,
+                "Name": "Ads",
+                "url": "Ads",
+                "icon": "https://img.icons8.com/?size=80&id=raEdgvcDAxS3&format=png",
+                "installed": false,
+                "Description": "Create, manage, and optimize digital ad campaigns across platforms to reach your ideal audience and maximize ROI.",
+                "alt": "",
+                "Amount": 200000
+            },
+            {
+                "id": 26,
+                "Name": "Lead Generator",
+                "url": "Lead",
+                "icon": "https://img.icons8.com/?size=80&id=raEdgvcDAxS3&format=png",
+                "installed": false,
+                "Description": "Capture high-quality leads with forms, landing pages, and smart tracking tools to fuel your sales pipeline.",
+                "alt": "",
+                "Amount": 200000
+            }
+        ]
+    },
+    {
+        "id": 366377474,
+        "Name": "Help Desk",
+        "Amount": 10000,
+        "icon": "https://img.icons8.com/3d-fluency/94/help.png",
+        "Description": "Deliver timely, effective support to your customers with our Help Desk module—streamlining ticket resolution, communication, and service tracking in one place.",
+        "apps": [
+            {
+                "id": 10,
+                "Name": "Help Desk",
+                "url": "Helpdesk",
+                "icon": "https://img.icons8.com/3d-fluency/94/help.png",
+                "installed": false,
+                "Description": "Streamline support operations by capturing, tracking, and resolving customer issues efficiently—complete with ticket routing, response automation, and performance insights.",
+                "alt": "",
+                "Amount": 150000
+            }
+        ]
+    },
+    {
+        "id": 366377475,
+        "Amount": 10000,
+        "icon": "https://img.icons8.com/?size=80&id=Ko5RoHIUJkgi&format=png",
+        "Name": "Events",
+        "Description": "Plan, promote, and manage events effortlessly—from registrations and reminders to follow-ups—all in one powerful toolkit.",
+        "apps": [
+            {
+                "id": 15,
+                "Name": "Events",
+                "url": "Events",
+                "icon": "https://img.icons8.com/?size=80&id=Ko5RoHIUJkgi&format=png",
+                "installed": false,
+                "Description": "Schedule, promote, and track events with real-time engagement tools that make organizing seamless and impactful.",
+                "alt": "",
+                "Amount": 0
+            }
+        ]
+    },
+    {
+        "id": 366377477,
+        "Amount": 10000,
+        "icon": "https://img.icons8.com/keek/100/map-marker.png",
+        "Name": "Field Sales",
+        "Description": "Empower your on-the-go sales force with tools that track visits, manage customer interactions, and close deals in the field.",
+        "apps": [
+            {
+                "id": 16,
+                "Name": "Field Sales",
+                "url": "/api/v1/POS/dashboard?page=1&limit=10&category=all",
+                "icon": "https://img.icons8.com/keek/100/map-marker.png",
+                "installed": false,
+                "Description": "Equip your reps with real-time data, mobile sales tools, and route planning to boost productivity while on the move.",
+                "alt": "",
+                "Amount": 1000000
+            }
+        ]
+    }
 ]

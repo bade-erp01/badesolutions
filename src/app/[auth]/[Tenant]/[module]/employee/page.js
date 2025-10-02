@@ -1,5 +1,3 @@
-
-import dbConnect from "../../../../../../lib/mongoose";
 import {fetchUser} from "../../../../../../Functions/useerDataRefresh"
 import Users from "../../../../../../models/Users"
 import Link from "next/link";
@@ -35,7 +33,6 @@ export const metadata = {
 };
 
 export default async function EmployeeListpage() {
-  await dbConnect()
   const userData = await fetchUser();
   const businessInfo = userData.business;
 
@@ -43,9 +40,9 @@ export default async function EmployeeListpage() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-        {EmployeeList.map(employee => (
-           <Card key={employee._id} data={JSON.parse(JSON.stringify(employee))} module={'employee'}/> 
-        ))}
+       {EmployeeList.sort((a, b) => a.firstName.localeCompare(b.firstName)).map(employee => (
+        <Card key={employee._id} data={JSON.parse(JSON.stringify(employee))} module="employee" />
+      ))}
     </div>
   )
 }

@@ -216,7 +216,7 @@ function summarizeCustomerInvoices(customers, invoices) {
     //   0
     // );
     return {
-      username: customer.Username,
+      username: customer.Username.substring(0,5),
       totalAmount:customer.Debt,
       image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
     };
@@ -277,7 +277,7 @@ function summarizeCustomerInvoices(customers, invoices) {
             tooltipEl = document.createElement("div");
             tooltipEl.id = "chartjs-tooltip";
             tooltipEl.style.position = "absolute";
-            tooltipEl.style.background = "#1e293b";
+            tooltipEl.style.background = "#1e293b6c";
             tooltipEl.style.border = "1px solid #38bdf8";
             tooltipEl.style.borderRadius = "8px";
             tooltipEl.style.padding = "10px";

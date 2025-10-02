@@ -42,7 +42,7 @@ const statusColors = {
 const MySwal = withReactContent(Swal);
 
 const DashboardCharts = ({ invoice, triggerButton = true }) => {
-  const [invoices] = useState(JSON.parse(invoice || '[]'));
+  const [invoices] = useState(invoice || []);
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
 

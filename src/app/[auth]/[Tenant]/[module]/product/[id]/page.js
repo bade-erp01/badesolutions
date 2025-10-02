@@ -1,63 +1,81 @@
 "use client";
-import { useParams, useSearchParams,useRouter} from "next/navigation";
-import {PhotoIcon,UserCircleIcon,ChevronDownIcon,} from "@heroicons/react/24/outline";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import {
+  PhotoIcon,
+  UserCircleIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
 import Link from "next/link";
-import { plsWait, ErrorMessage,SuccessToast } from "../../../../../../../Functions/Mics";
+import {
+  plsWait,
+  ErrorMessage,
+  SuccessToast,
+} from "../../../../../../../Functions/Mics";
 import axios from "axios";
 import moment from "moment";
-import { useEffect } from 'react';
-import Plotly from 'plotly.js-dist-min';
-import { Encrypt, DecryptBAckend,EXPRESS_PRIVATE_URL,CryptoJSdecrypt } from "../../../../../../../Functions/Functions";
-import {driver} from "driver.js";
+import { useEffect } from "react";
+import Plotly from "plotly.js-dist-min";
+import {
+  Encrypt,
+  DecryptBAckend,
+  EXPRESS_PRIVATE_URL,
+  CryptoJSdecrypt,
+} from "../../../../../../../Functions/Functions";
+import { driver } from "driver.js";
 import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
-import BackButton from "@/app/Components/BackBotton";
-import {useState} from 'react'
+import { useState } from "react";
 import CreateFocButton from "@/app/Components/CreatefocButton";
+import DeleteButton from "@/app/Components/DeleteProduct"
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import Image from "next/image"
+import Image from "next/image";
 
-
-export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor,
-  storeProducts
+export default function SingleProductpage({
+  userInfo,
+  businessInfo,
+  Backdata,
+  vendor,
+  storeProducts,
 }) {
   const [user] = useState(userInfo);
   const [data] = useState(Backdata);
-  const [StoreProduct] = useState(JSON.parse(storeProducts))
-  const navigation = useParams()
-  const router = useRouter()
-  const link = `/${navigation.auth}/${navigation.Tenant}/product/product/${Encrypt(Backdata.CopyID)}?Modules=product`
+  const [StoreProduct] = useState(storeProducts);
+  const navigation = useParams();
+  const router = useRouter();
+  const [isOpen3, setIsOpen3] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const link = `/${navigation.auth}/${navigation.Tenant
+    }/product/product/${Encrypt(Backdata.CopyID)}?Modules=product`;
   const [BuyingPrice, setBuyingPrice] = useState({
-      BuyingPrice: Number(Backdata.BuyingPrice) || 0,
-    });
+    BuyingPrice: Number(Backdata.BuyingPrice) || 0,
+  });
 
-  useProductEditTour(Backdata.Name) // for driver
+  useProductEditTour(Backdata.Name); // for driver
 
-
-   const uploadFiles = async (id,module) => {
+  const uploadFiles = async (id, module) => {
     try {
       const { value: file } = await Swal.fire({
         title: "Select File",
         input: "file",
         inputAttributes: {
-          "accept": "image/*",
-          "aria-label": "Upload your File"
-        }
+          accept: "image/*",
+          "aria-label": "Upload your File",
+        },
       });
       if (file) {
-        plsWait('Uploading...⌛')
+        plsWait("Uploading...⌛");
         const reader = new FileReader();
         reader.onload = async (e) => {
           // Resize image
           const img = new window.Image();
           img.onload = async () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
             const maxWidth = 800; // Set your desired max width
             const maxHeight = 600; // Set your desired max height
             let width = img.width;
             let height = img.height;
-  
+
             if (width > height) {
               if (width > maxWidth) {
                 height *= maxWidth / width;
@@ -69,118 +87,124 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                 height = maxHeight;
               }
             }
-  
+
             canvas.width = width;
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
-            
-            const resizedImage = canvas.toDataURL('image/jpeg', 0.7); // Adjust quality as needed
-  
-            const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${module}`, {
-              method: "POST",
-              body: JSON.stringify({ image: resizedImage }),
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-  
+
+            const resizedImage = canvas.toDataURL("image/jpeg", 0.7); // Adjust quality as needed
+
+            const request = await fetch(
+              `${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${module}`,
+              {
+                method: "POST",
+                body: JSON.stringify({ image: resizedImage }),
+                headers: {
+                  "Content-Type": "application/json",
+                  dbConnect: `Bearer ${business.rustyRoof}`,
+                  access: `${Encrypt(user._id)}`,
+                },
+              }
+            );
+
             const response = await request.json();
-            if(response.message){
+            if (response.message) {
               Swal.fire({
-              title: "Your uploaded File",
-              imageUrl: resizedImage,
-              imageAlt: "The uploaded File"
-            });
-             location.reload();
+                title: "Your uploaded File",
+                imageUrl: resizedImage,
+                imageAlt: "The uploaded File",
+              });
+              location.reload();
             }
-  
           };
           img.src = e.target.result;
         };
         reader.readAsDataURL(file);
       }
     } catch (error) {
-      ErrorMessage('Error uploading file:', error);
+      ErrorMessage("Error uploading file:", error);
     }
-  }
-  
+  };
 
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
     "X-Requested-With": "XMLHttpRequest",
+    dbConnect: `Bearer ${businessInfo.rustyRoof}`,
+    access: `${Encrypt(userInfo._id)}`,
   });
 
-   const [formData, setFormData] = useState({...data})
+  const [formData, setFormData] = useState({ ...data });
 
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
-    
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
-
 
   // update vendor prce
   const UpdateBuyingPrice = async (value) => {
-  try {
-    plsWait("Updating Buying price...");
-
-    const priceValue = parseFloat(value);
-    if (isNaN(priceValue) || priceValue <= 0) {
-      throw new Error("Please enter a valid buying price greater than zero.");
-    }
-
-    const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/${Backdata._id}/BuyingPrice_change`, {
-      method: 'PATCH',
-      headers: headers, // Use the state-defined headers
-      body: JSON.stringify({
-        productId: Backdata._id,
-        updatedBuyingPrice: priceValue,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.message) {
-      SuccessToast(data.message);
-      location.reload();
-    } else {
-      throw new Error(data.error || "Failed to update buying price.");
-    }
-
-  } catch (error) {
-    ErrorMessage(error.message);
-  } 
-};
-
-
-
-  const handleSubmit = async (e) =>{
     try {
-      e.preventDefault()
-      plsWait('Updating Product...')
-     const { data } = await axios.patch(`${EXPRESS_PRIVATE_URL}/${businessInfo.companyName}/Products/${Encrypt(Backdata._id)}/edit`,formData,{headers})
+      plsWait("Updating Buying price...");
 
-     if (data && data.result) {
-       SuccessToast(data.result);
-       router.refresh();
-     } else {
-       throw new Error(data.error);
-     }
+      const priceValue = parseFloat(value);
+      if (isNaN(priceValue) || priceValue <= 0) {
+        throw new Error("Please enter a valid buying price greater than zero.");
+      }
 
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/${Backdata._id}/BuyingPrice_change`,
+        {
+          method: "PATCH",
+          headers: headers, // Use the state-defined headers
+          body: JSON.stringify({
+            productId: Backdata._id,
+            updatedBuyingPrice: priceValue,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.message) {
+        SuccessToast(data.message);
+        location.reload();
+      } else {
+        throw new Error(data.error || "Failed to update buying price.");
+      }
     } catch (error) {
-      ErrorMessage(error.message)
+      ErrorMessage(error.message);
     }
-  }
+  };
 
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      plsWait("Updating Product...");
+      const { data } = await axios.patch(
+        `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(
+          Backdata._id
+        )}/edit`,
+        formData,
+        { headers }
+      );
+
+      if (data && data.result) {
+        SuccessToast(data.result);
+        router.refresh();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      ErrorMessage(error.message);
+    }
+  };
 
   return (
     <>
       <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
-        <BackButton />
         <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h4 className="text-xl font-bold text-gray-800">
@@ -198,7 +222,9 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             {/* Avatar */}
             <div className="flex items-center space-x-6">
               <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
-                <Image height={60} width={60}
+                <Image
+                  height={60}
+                  width={60}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
                   className="w-full h-full object-cover"
@@ -225,19 +251,21 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
 
             {/* qrcode */}
             {data.QrCode && (
-            <div
-              id="qrcode"
-              className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center"
-            >
-              <Image width={10} height={10}
-                src={data.QrCode || ''}
-                alt="QrCode"
-                className="w-full h-full object-cover"
-                loading="eager"
-                priority={true}
-                quality={100}
-              />
-            </div>
+              <div
+                id="qrcode"
+                className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center"
+              >
+                <Image
+                  width={10}
+                  height={10}
+                  src={data.QrCode || ""}
+                  alt="QrCode"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  priority={true}
+                  quality={100}
+                />
+              </div>
             )}
           </div>
 
@@ -247,262 +275,287 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
             productName={Backdata.Name}
             umo={Backdata.UMO}
             business={businessInfo}
+            user={userInfo}
           />
+          <div className="border rounded-lg overflow-hidden">
+            <span
+              onClick={() => setIsOpen3(!isOpen3)}
+              className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+            >
+              <h2 className="text-base/7 font-semibold text-gray-900">
+                Product Information
+              </h2>
+              <svg
+                className={`w-5 h-5 transform transition-transform duration-300 ${isOpen3 ? "rotate-180" : ""
+                  }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </span>
+            <div
+              className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen3 ? "block" : "hidden"
+                }`}
+            >
+              <div className="border-b bg- border-gray-900/10 pb-12">
+                <p className="mt-1 text-sm/6 text-gray-600">
+                  Ensure to provide correct Information.
+                </p>
 
-          <div className="border-b bg- border-gray-900/10 pb-12">
-            <h2 className="text-base/7 font-semibold text-gray-900">
-              Product Information
-            </h2>
-            <p className="mt-1 text-sm/6 text-gray-600">
-              Ensure to provide correct Information.
-            </p>
+                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="Name"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Name
+                    </label>
+                    <div className="mt-2">
+                      {!Backdata.FOCID && !Backdata.isAservice ? (
+                        <input
+                          id="Name"
+                          name="Name"
+                          type="text"
+                          value={formData.Name}
+                          required
+                          onChange={handleChange}
+                          autoComplete="Name-name"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      ) : (
+                        <>
+                          <h3 className="font-semibold text-gray-900">
+                            {formData.Name}
+                          </h3>
+                          <small title="Free of charge Product [FOC]">
+                            {formData.CopyID && Backdata.isAservice && (
+                              <Link href={`${link}`} className="text-blue-700 ">
+                                View alternate Product for {formData.Name}
+                              </Link>
+                            )}
+                          </small>
+                        </>
+                      )}
+                    </div>
+                  </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="Name"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Name
-                </label>
-                <div className="mt-2">
-                  {!Backdata.FOCID && !Backdata.isAservice ? (
-                    <input
-                      id="Name"
-                      name="Name"
-                      type="text"
-                      value={formData.Name}
-                      required
-                      onChange={handleChange}
-                      autoComplete="Name-name"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  ) : (
-                    <>
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="ADCcode"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Product Code
+                    </label>
+                    <div className="mt-2">
                       <h3 className="font-semibold text-gray-900">
-                        {formData.Name}
+                        {formData.ADCcode || formData.ACDcode}
                       </h3>
-                      <small title="Free of charge Product [FOC]">
-                        {formData.CopyID && Backdata.isAservice && (
-                          <Link href={`${link}`} className="text-blue-700 ">
-                            View alternate Product for {formData.Name}
-                          </Link>
-                        )}
-                      </small>
-                    </>
-                  )}
-                </div>
-              </div>
+                    </div>
+                  </div>
 
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="ADCcode"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Product Code
-                </label>
-                <div className="mt-2">
-                  <h3 className="font-semibold text-gray-900">
-                    {formData.ADCcode || formData.ACDcode}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="category"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Product category
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.category}
-                    id="category"
-                    name="category"
-                    type="text"
-                    onChange={handleChange}
-                    autoComplete="category-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-             <div className="sm:col-span-2">
-                <label
-                  htmlFor="BuyingPrice"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Buying Price
-                </label>
-                <div className="mt-2">
-                  {user.isAccountant ? (
-                    <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="category"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Product category
+                    </label>
+                    <div className="mt-2">
                       <input
-                        value={BuyingPrice.BuyingPrice}
-                        required
-                        id="BuyingPrice"
-                        name="BuyingPrice"
-                        type="number"
-                        step="any"
-                        onChange={(e) => {
-                          const raw = e.target.value.replace(/,/g, '');
-                          const parsed = parseFloat(raw) || 0;
-                          setBuyingPrice((prev) => ({
-                            ...prev,
-                            BuyingPrice: parsed,
-                          }));
-                        }}
-                        autoComplete="address-level1"
+                        value={formData.category}
+                        id="category"
+                        name="category"
+                        type="text"
+                        onChange={handleChange}
+                        autoComplete="category-level2"
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       />
-                      <span
-                        onClick={() => UpdateBuyingPrice(BuyingPrice.BuyingPrice)}
-                        className="mt-3 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-purple-600 hover:bg-purple-800 transition-colors duration-200 shadow-md cursor-pointer"
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="BuyingPrice"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Buying Price
+                    </label>
+                    <div className="mt-2">
+                      {user.isAccountant ? (
+                        <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                          <input
+                            value={BuyingPrice.BuyingPrice}
+                            required
+                            id="BuyingPrice"
+                            name="BuyingPrice"
+                            type="number"
+                            step="any"
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, "");
+                              const parsed = parseFloat(raw) || 0;
+                              setBuyingPrice((prev) => ({
+                                ...prev,
+                                BuyingPrice: parsed,
+                              }));
+                            }}
+                            autoComplete="address-level1"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                          <span
+                            onClick={() =>
+                              UpdateBuyingPrice(BuyingPrice.BuyingPrice)
+                            }
+                            className="mt-3 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-purple-600 hover:bg-purple-800 transition-colors duration-200 shadow-md cursor-pointer"
+                          >
+                            Update Buying Price
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="block w-full rounded-md bg-gray-100 px-3 py-1.5 text-base text-gray-700 border border-gray-300 sm:text-sm/6">
+                          {BuyingPrice.BuyingPrice?.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Manufacturer"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Manufacturer
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.Manufacturer}
+                        id="Manufacturer"
+                        name="Manufacturer"
+                        type="text"
+                        onChange={handleChange}
+                        autoComplete="postal-code"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="Pieces"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Define Pieces in {formData.UMO || "Case"}
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.Pieces}
+                        id="Pieces"
+                        required
+                        name="Pieces"
+                        onChange={handleChange}
+                        type="number"
+                        autoComplete="Pieces-level2"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Vendor"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Vendor
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        id="Vendor"
+                        name="Vendor"
+                        required
+                        onChange={handleChange}
+                        autoComplete="stateOfOrigin"
+                        className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       >
-                        Update Buying Price
-                      </span>
-                    </div>
-                  ):(
-                    <div className="block w-full rounded-md bg-gray-100 px-3 py-1.5 text-base text-gray-700 border border-gray-300 sm:text-sm/6">
-                      {BuyingPrice.BuyingPrice?.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </div>
-                  )}
-                  
-                </div>
-              </div>
+                        {/* <option  value={formData.Vendor}> {formData.Vendor}</option> */}
+                        {(() => {
+                          const Selectedvendor = vendor.find(
+                            (person) => person._id === formData.Vendor
+                          );
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Manufacturer"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Manufacturer
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Manufacturer}
-                    id="Manufacturer"
-                    name="Manufacturer"
-                    type="text"
-                    onChange={handleChange}
-                    autoComplete="postal-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                          if (Selectedvendor) {
+                            return (
+                              <option defaultValue={Selectedvendor._id}>
+                                {Selectedvendor.Name} [CURRENT]
+                              </option>
+                            );
+                          } else {
+                            return <option value="">Select one</option>;
+                          }
+                        })()}
 
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Pieces"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Define Pieces in {formData.UMO || 'Case'}
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pieces}
-                    id="Pieces"
-                    required
-                    name="Pieces"
-                    onChange={handleChange}
-                    type="number"
-                    autoComplete="Pieces-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Vendor"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Vendor
-                </label>
-                <div className="mt-2">
-                  <select
-                    id="Vendor"
-                    name="Vendor"
-                    required
-                    onChange={handleChange}
-                    autoComplete="stateOfOrigin"
-                    className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  >
-                    {/* <option  value={formData.Vendor}> {formData.Vendor}</option> */}
-                    {(() => {
-                      const Selectedvendor = vendor.find(
-                        (person) => person._id === formData.Vendor
-                      );
-
-                      if (Selectedvendor) {
-                        return (
-                          <option defaultValue={Selectedvendor._id}>
-                            {Selectedvendor.Name} [CURRENT]
+                        {vendor.map((Vend) => (
+                          <option key={Vend._id} value={Vend._id}>
+                            {Vend.Name}
                           </option>
-                        );
-                      } else {
-                        return <option value="">Select one</option>;
-                      }
-                    })()}
+                        ))}
+                      </select>
+                      <ChevronDownIcon
+                        aria-hidden="true"
+                        className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                      />
+                    </div>
+                  </div>
 
-                    {vendor.map((Vend) => (
-                      <option key={Vend._id} value={Vend._id}>
-                        {Vend.Name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                  />
-                </div>
-              </div>
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="UMO"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Unit of Measure
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.UMO}
+                        id="UMO"
+                        name="UMO"
+                        type="text"
+                        onChange={handleChange}
+                        autoComplete="workTelephone"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="UMO"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Unit of Measure
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.UMO}
-                    id="UMO"
-                    name="UMO"
-                    type="text"
-                    onChange={handleChange}
-                    autoComplete="workTelephone"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="color"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Color
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.color}
+                        id="color"
+                        name="color"
+                        onChange={handleChange}
+                        type="color"
+                        autoComplete="address-level2"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
 
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="color"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Color
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.color}
-                    id="color"
-                    name="color"
-                    onChange={handleChange}
-                    type="color"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              {/* <div className="sm:col-span-2">
+                  {/* <div className="sm:col-span-2">
                 <label
                   htmlFor="Sellable"
                   className="block text-sm font-medium text-gray-900"
@@ -521,7 +574,7 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                 </div>
               </div> */}
 
-              {/* <div className="sm:col-span-2">
+                  {/* <div className="sm:col-span-2">
                 <label
                   htmlFor="Ecom_sale"
                   className="block text-sm font-medium text-gray-900"
@@ -540,337 +593,363 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                 </div>
               </div> */}
 
-              <div id="others" className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="VAT"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  VAT
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.VAT.$numberDecimal}
-                    id="VAT"
-                    name="VAT"
-                    onChange={handleChange}
-                    type="text"
-                    step="any"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
+                  <div id="others" className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="VAT"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      VAT
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.VAT.$numberDecimal}
+                        id="VAT"
+                        name="VAT"
+                        onChange={handleChange}
+                        type="text"
+                        step="any"
+                        autoComplete="address-level2"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Pricelist1"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      {businessInfo.priceList1} Price
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.Pricelist1}
+                        id="Pricelist1"
+                        name="Pricelist1"
+                        type="text"
+                        step="any"
+                        onChange={handleChange}
+                        autoComplete="Pricelist-level1"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Pricelist2"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      {businessInfo.priceList2} Price
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.Pricelist2}
+                        onChange={handleChange}
+                        id="Pricelist2"
+                        name="Pricelist2"
+                        type="text"
+                        step="any"
+                        autoComplete="Pricelist2-code"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  {businessInfo.subscriptionplan === "Standard" && (
+                    <>
+                      <div className="sm:col-span-2 sm:col-start-1">
+                        <label
+                          htmlFor="Pricelist3"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList3} Price
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist3}
+                            id="Pricelist3"
+                            name="Pricelist3"
+                            onChange={handleChange}
+                            type="text"
+                            step="any"
+                            autoComplete="Pricelist-level2"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist4"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList4} Price
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist4}
+                            id="Pricelist4"
+                            name="Pricelist4"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist1-level1"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist5"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList5} Price
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist5}
+                            onChange={handleChange}
+                            id="Pricelist5"
+                            name="Pricelist5"
+                            type="text"
+                            step="any"
+                            autoComplete="Pricelist1-code"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2 sm:col-start-1">
+                        <label
+                          htmlFor="Pricelist6"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList6} Price
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist6}
+                            id="Pricelist6"
+                            name="Pricelist6"
+                            step="any"
+                            onChange={handleChange}
+                            type="text"
+                            autoComplete="Pricelist1-level2"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist7"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList7} Price
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist7}
+                            id="Pricelist7"
+                            name="Pricelist7"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist1-level1"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist1"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList1} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist1}
-                    id="Pricelist1"
-                    name="Pricelist1"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist2"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList2} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist2}
-                    onChange={handleChange}
-                    id="Pricelist2"
-                    name="Pricelist2"
-                    type="text"
-                    step="any"
-                    autoComplete="Pricelist2-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              {businessInfo.subscriptionplan === "Standard" && (
-
-                <>
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Pricelist3"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                 {businessInfo.priceList3} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist3}
-                    id="Pricelist3"
-                    name="Pricelist3"
-                    onChange={handleChange}
-                    type="text"
-                    step="any"
-                    autoComplete="Pricelist-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist4"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList4} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist4}
-                    id="Pricelist4"
-                    name="Pricelist4"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist5"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList5} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist5}
-                    onChange={handleChange}
-                    id="Pricelist5"
-                    name="Pricelist5"
-                    type="text"
-                    step="any"
-                    autoComplete="Pricelist1-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Pricelist6"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList6} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist6}
-                    id="Pricelist6"
-                    name="Pricelist6"
-                    step="any"
-                    onChange={handleChange}
-                    type="text"
-                    autoComplete="Pricelist1-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist7"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                 {businessInfo.priceList7} Price
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist7}
-                    id="Pricelist7"
-                    name="Pricelist7"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-              </>
-              )}
             </div>
             <br />
 
-            <h2 className="text-base/7 font-semibold text-gray-900">
-              Promo Section
-            </h2>
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              {/* promo section */}
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist1Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
+            <div className="border rounded-lg overflow-hidden">
+              <span
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+              >
+                <h2 className="text-base/7 font-semibold text-gray-900">
+                  Promo Section
+                </h2>
+                <svg
+                  className={`w-5 h-5 transform transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+                    }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  {businessInfo.priceList1} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist1Promo}
-                    id="Pricelist1Promo"
-                    name="Pricelist1Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
                   />
-                </div>
-              </div>
+                </svg>
+              </span>
+              <div
+                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen ? "block" : "hidden"
+                  }`}
+              >
+                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  {/* promo section */}
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Pricelist1Promo"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      {businessInfo.priceList1} Promo
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.Pricelist1Promo}
+                        id="Pricelist1Promo"
+                        name="Pricelist1Promo"
+                        type="text"
+                        step="any"
+                        onChange={handleChange}
+                        autoComplete="Pricelist1-level1"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist2Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                   {businessInfo.priceList2} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist2Promo}
-                    id="Pricelist2Promo"
-                    name="Pricelist2Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Pricelist2Promo"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      {businessInfo.priceList2} Promo
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.Pricelist2Promo}
+                        id="Pricelist2Promo"
+                        name="Pricelist2Promo"
+                        type="text"
+                        step="any"
+                        onChange={handleChange}
+                        autoComplete="Pricelist1-level1"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
 
-              {businessInfo.subscriptionplan === "Standard" && (
-                
-                <>
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist3Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                   {businessInfo.priceList3} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist3Promo}
-                    id="Pricelist3Promo"
-                    name="Pricelist3Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist3Promo"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                  {businessInfo.subscriptionplan === "Standard" && (
+                    <>
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist3Promo"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList3} Promo
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist3Promo}
+                            id="Pricelist3Promo"
+                            name="Pricelist3Promo"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist3Promo"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist4Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList4} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist4Promo}
-                    id="Pricelist4Promo"
-                    name="Pricelist4Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist4Promo"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist4Promo"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList4} Promo
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist4Promo}
+                            id="Pricelist4Promo"
+                            name="Pricelist4Promo"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist4Promo"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist5Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList5} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist5Promo}
-                    id="Pricelist5Promo"
-                    name="Pricelist5Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist5Promo"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist5Promo"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList5} Promo
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist5Promo}
+                            id="Pricelist5Promo"
+                            name="Pricelist5Promo"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist5Promo"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist6Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {businessInfo.priceList6} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist6Promo}
-                    id="Pricelist6Promo"
-                    name="Pricelist6Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist6Promo"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist6Promo"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList6} Promo
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist6Promo}
+                            id="Pricelist6Promo"
+                            name="Pricelist6Promo"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist6Promo"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist7Promo"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                   {businessInfo.priceList7} Promo
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.Pricelist7Promo}
-                    id="Pricelist7Promo"
-                    name="Pricelist7Promo"
-                    type="text"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist7Promo-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="Pricelist7Promo"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          {businessInfo.priceList7} Promo
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist7Promo}
+                            id="Pricelist7Promo"
+                            name="Pricelist7Promo"
+                            type="text"
+                            step="any"
+                            onChange={handleChange}
+                            autoComplete="Pricelist7Promo-level1"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
-              </>
-              )}
             </div>
           </div>
 
@@ -894,49 +973,75 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                 />
               </div>
               {/* store product  */}
-                <table className="w-full text-left text-xs text-black border border-gray-300">
-                  <caption className="text-start font-bold text-sm text-gray-600">
-                    {data.Name} In Store Inventory
-                  </caption>
+              <table className="w-full text-left text-xs text-black border border-gray-300">
+                <caption className="text-start font-bold text-sm text-gray-600">
+                  {data.Name} In Store Inventory
+                </caption>
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="border border-gray-300 px-2 py-1">#</th>
                     <th className="border border-gray-300 px-2 py-1">Store</th>
-                    <th className="border border-gray-300 px-2 py-1">Product</th>
-                    <th className="border border-gray-300 px-2 py-1">Quantity in store</th>
+                    <th className="border border-gray-300 px-2 py-1">
+                      Product
+                    </th>
+                    <th className="border border-gray-300 px-2 py-1">
+                      Quantity in store
+                    </th>
                     <th className="border border-gray-300 px-2 py-1"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {StoreProduct?.map((log, index) =>
                     log.products.map((product, pIndex) => (
-                      <tr key={`${index}-${pIndex}`} className="border border-gray-300">
-                        <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                      <tr
+                        key={`${index}-${pIndex}`}
+                        className="border border-gray-300"
+                      >
                         <td className="border border-gray-300 px-2 py-1">
-                          <Link className="text-blue-600 hover:underline visited:text-purple-600" href={`/${navigation.auth}/${navigation.Tenant}/inventory/inventory/${Encrypt(product._id)}?Modules=inventory`}>
+                          {index + 1}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          <Link
+                            className="text-blue-600 hover:underline visited:text-purple-600"
+                            href={`/${navigation.auth}/${navigation.Tenant
+                              }/inventory/inventory/${Encrypt(
+                                product._id
+                              )}?Modules=inventory`}
+                          >
                             {log.warehouseName}
                           </Link>
                         </td>
-                        <td className="border border-gray-300 px-2 py-1">{product.productName}</td>
-                        <td className="border border-gray-300 px-2 py-1">Case:{product.currentQty}, Pcs:{product.Rolls}</td>
-                        <td className="border border-gray-300 px-2 py-1 w-40 text-white"> 
-                           <ExcelDownloadBtn data={[{
-                            Store:log.warehouseName,
-                            Product:product.productName,
-                            Qty:`Case:${product.currentQty}, Pcs:${product.Rolls}`
-                           }]} page={`${log.warehouseName.substring(0,4) || "store"}-${product.productName.substring(0,4) || "product"}`} />
+                        <td className="border border-gray-300 px-2 py-1">
+                          {product.productName}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          Case:{product.currentQty}, Pcs:{product.Rolls}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1 w-40 text-white">
+                          <ExcelDownloadBtn
+                            data={[
+                              {
+                                Store: log.warehouseName,
+                                Product: product.productName,
+                                Qty: `Case:${product.currentQty}, Pcs:${product.Rolls}`,
+                              },
+                            ]}
+                            page={`${log.warehouseName.substring(0, 4) || "store"
+                              }-${product.productName.substring(0, 4) || "product"
+                              }`}
+                          />
                         </td>
                       </tr>
                     ))
                   )}
                 </tbody>
-                <tfoot>
-                 
-                </tfoot>
+                {/* <tfoot className="p-2">
+                  <p className={`text-black font-semibold`}>Refresh table to get updated values </p>
+                </tfoot> */}
               </table>
 
-                {/* Price change */}
-               <div className="mt-10">
+              {/* Price change */}
+              <div className="mt-10">
                 <h3 className="text-sm font-semibold text-gray-800 mb-3">
                   Historical Price Change
                 </h3>
@@ -952,8 +1057,13 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
                     </thead>
                     <tbody>
                       {formData.ActivityLog?.map((log, index) => (
-                        <tr key={index} className="border-b border-gray-200 hover:bg-gray-100">
-                          <td className="py-2 px-3">{new Date(log.date).toLocaleDateString()}</td>
+                        <tr
+                          key={index}
+                          className="border-b border-gray-200 hover:bg-gray-100"
+                        >
+                          <td className="py-2 px-3">
+                            {new Date(log.date).toLocaleDateString()}
+                          </td>
                           <td className="py-2 px-3">{log.message}</td>
                           <td className="py-2 px-3">{log.difference}</td>
                           <td className="py-2 px-3">{log.overallImpact}</td>
@@ -965,11 +1075,26 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-x-6">
-                {businessInfo.subscriptionplan === "Standard" &&  user.isAdmin && !Backdata.FOCID && !Backdata.isAservice && (
+                {businessInfo.subscriptionplan === "Standard" &&
+                  user.isAdmin &&
+                  !Backdata.FOCID &&
+                  !Backdata.isAservice && (
                     <CreateFocButton
                       productId={Backdata._id}
                       business={businessInfo}
+                      user={user}
                     />
+                  )}
+
+                {
+                  user.isAdmin &&
+                  !Backdata.FOCID &&
+                  !Backdata.isAservice && 
+                  Backdata.TotalSale < 1 &&(
+                  <DeleteButton 
+                  productId={Backdata._id}
+                  business={businessInfo}
+                  user={user}/>
                 )}
 
                 {user.editProduct && (
@@ -989,8 +1114,6 @@ export default function SingleProductpage({userInfo,businessInfo,Backdata,vendor
   );
 }
 
-
-
 function Section({ title, children }) {
   return (
     <div className="space-y-2">
@@ -1000,32 +1123,31 @@ function Section({ title, children }) {
   );
 }
 
-
-
-function ProductChart({ productId, productName, umo, business }) {
+function ProductChart({ productId, productName, umo, business, user }) {
   const [loading, setLoading] = useState(true);
   const [monthlySalesArray, setMonthlySalesArray] = useState([]);
-  const [errormssg,setErrorMssg] = useState("");
+  const [errormssg, setErrorMssg] = useState("");
   const [tottalSales, setTotalSales] = useState();
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         const currentYear = moment().format("YYYY");
-        const url = `${EXPRESS_PRIVATE_URL}/${business.companyName}/SalseandStock?Year=${currentYear}`;
+        const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}`;
 
         const response = await fetch(url, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${Encrypt(business.tenantId)}`
+            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
+            dbConnect: `Bearer ${business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
           },
           next: {
-            revalidate: 120 ,// revalidate every 3min
-            cache: "force-cache"
-          }
+            revalidate: 120,
+            cache: "force-cache",
+          },
         });
-
 
         const result = await response.json();
         if (!result?.invoice) return;
@@ -1047,7 +1169,6 @@ function ProductChart({ productId, productName, umo, business }) {
           return acc;
         }, {});
 
-        // Fill missing months
         for (let i = 1; i <= 12; i++) {
           const monthStr = i.toString().padStart(2, "0");
           if (!monthlySales[monthStr]) {
@@ -1067,26 +1188,45 @@ function ProductChart({ productId, productName, umo, business }) {
       }
     };
 
-    fetchProductData();
+    fetchProductData(); // Initial fetch
+
+    // const intervalId = setInterval(fetchProductData, 120000); // Repeat every 2 min
+
+    // return () => clearInterval(intervalId); // Cleanup on unmount
   }, [productId, productName, umo, business]);
 
   useEffect(() => {
     if (!loading && monthlySalesArray.length > 0) {
-      const NDxArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const NDxArray = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       const NDyArray = monthlySalesArray.map((item) => item.sold);
       const totalSales = NDyArray.reduce((sum, val) => sum + val, 0).toFixed(1);
 
-      const chartTitle = `estimated net sales of ${business.currency?.currency?.Symbol}${totalSales} for ${moment().format("YYYY")}`;
+      const chartTitle = `estimated net sales of ${business.currency?.currency?.Symbol
+        }${totalSales} for ${moment().format("YYYY")}`;
       const chartColor = business?.Color || "#1e2939";
 
-      const dataPlot = [{
-        x: NDxArray,
-        y: NDyArray,
-        type: "scabarter",
-        mode: "lines+markers",
-        marker: { color: chartColor },
-      }];
+      const dataPlot = [
+        {
+          x: NDxArray,
+          y: NDyArray,
+          type: "scabarter",
+          mode: "lines+markers",
+          marker: { color: chartColor },
+        },
+      ];
       setTotalSales(chartTitle);
 
       const layoutPlot = { title: chartTitle };
@@ -1095,39 +1235,39 @@ function ProductChart({ productId, productName, umo, business }) {
     }
   }, [loading, monthlySalesArray, business]);
 
- return (
-  <>
-    {/* Show error if exists */}
-    {errormssg ? (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500 text-lg font-semibold">
-          {errormssg}
-        </div>
-      </div>
-    ) : (
-      // No error: show loading spinner or chart
-      loading ? (
+  return (
+    <>
+      {/* Show error if exists */}
+      {errormssg ? (
         <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
+          <div className="text-red-500 text-lg font-semibold">{errormssg}</div>
         </div>
-      ) : (
-        <div id="code">
-          <h5 className="text-lg font-semibold text-gray-700 mb-1">
-            📈 Month-on-Month Sales Insight for {productName},{tottalSales} 
-            <br/>
-            <hr/>
-            <br/>
-            <i className="text-gray-500 text-sm">Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}</i>
-          </h5>
-          <div id="myPlot" className="" style={{ width: "100%", height: "400px" }} />
-        </div>
-      )
-    )}
-  </>
-);
-
+      ) : // No error: show loading spinner or chart
+        loading ? (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <div id="code">
+            <h5 className="text-lg font-semibold text-gray-700 mb-1">
+              📈 Month-on-Month Sales Insight for {productName},{tottalSales}
+              <br />
+              <hr />
+              <br />
+              <i className="text-gray-500 text-sm">
+                Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
+              </i>
+            </h5>
+            <div
+              id="myPlot"
+              className=""
+              style={{ width: "100%", height: "400px" }}
+            />
+          </div>
+        )}
+    </>
+  );
 }
-
 
 function useProductEditTour(product) {
   useEffect(() => {
@@ -1156,7 +1296,8 @@ function useProductEditTour(product) {
               element: "#qrcode",
               popover: {
                 title: "QR-CODE",
-                description: "Scan the QR code to view product on another device.",
+                description:
+                  "Scan the QR code to view product on another device.",
                 side: "right",
                 align: "end",
               },
@@ -1165,7 +1306,8 @@ function useProductEditTour(product) {
               element: "#others",
               popover: {
                 title: "VAT & Others",
-                description: "Manage VAT and other applicable charges on the product.",
+                description:
+                  "Manage VAT and other applicable charges on the product.",
                 side: "left",
                 align: "start",
               },

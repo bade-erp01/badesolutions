@@ -6,21 +6,32 @@ import { formatMongooseError } from "../../../../Functions/Functions";
 import { Encrypt } from "../../../../Functions/Mics";
 import { NextResponse } from 'next/server';
 
-// Ensure Mongoose connection is established
-await dbConnect();
 
 // Replace direct MongoDB client usage with Mongoose models
 // Example for GET request
 export async function GET(request) {
   try {
     const authHeader = request.headers.get("authorization");
+    const dbHeader = request.headers.get("dbConnect");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    if (!dbHeader || !dbHeader.startsWith("Bearer ")) {
+      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+
     const token = authHeader.split(" ")[1];
+    const dbtoken = dbHeader.split(" ")[1];
+    // Ensure Mongoose connection is established
+    await dbConnect(dbtoken);
     const employees = await Users.findByTenant(token);
     return new NextResponse(JSON.stringify(employees), {
       status: 200,

@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import { plsWait ,ErrorMessage,SuccessToast} from '../../../../../../../Functions/Mics';
-import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
+import {EXPRESS_PRIVATE_URL,Encrypt} from "../../../../../../../Functions/Functions"
 import {  PrinterIcon } from "@heroicons/react/24/outline";
 import PaymentReceipt from "@/app/Components/PrintReciept"
 
@@ -29,11 +29,13 @@ const paymentAction = async (id, action) => {
     plsWait('Processing...')
     await new Promise((resolve) => setTimeout(resolve, 3000));
     const res = await fetch(
-      `${ EXPRESS_PRIVATE_URL}/${userInfo.business.companyName}/payment/revoke/${id}?action=${action}&user=${userInfo.user._id}`,
+      `${ EXPRESS_PRIVATE_URL}/api/payment/revoke/${id}?action=${action}&user=${userInfo.user._id}`,
       {
         method: "PATCH",
         headers: { 
-            "Content-Type": "application/json" 
+            "Content-Type": "application/json",
+             dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+             access:`${Encrypt(userInfo.user._id)}`
         },
         body: JSON.stringify({ date: moment().format("L") }),
       }
@@ -53,7 +55,7 @@ const paymentAction = async (id, action) => {
 };
 
   return (
-    <section className=" mx-auto p-6 md:p-10 bg-white shadow-xl rounded-xl animate__animated animate__fadeIn">
+    <section className="  p-6 md:p-10 bg-white shadow-xl rounded-xl animate__animated animate__fadeIn">
       {/* Header Section */}
       <div className="flex flex-col items-center mb-8">
         

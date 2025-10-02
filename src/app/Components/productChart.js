@@ -26,30 +26,31 @@ ChartJS.register(
 );
 
 const ProductSalesChart = ({ productsList }) => {
-  const [products] = useState(JSON.parse(productsList));
+  const [products] = useState(productsList);
   const filtered = products.filter((p) => p.TotalSale > 0);
-  const sorted = [...filtered].sort((a, b) => b.TotalSale - a.TotalSale);
-  const bestSeller = sorted[0];
+  const sorted = [...filtered];
+  const bestSort = products.sort((a,b)=>b.TotalSale -a.TotalSale);
+  const bestSeller = bestSort[0]
 
   const gradientFill = (ctx) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, "rgba(245, 251, 255, 0.62)");
+    gradient.addColorStop(0, "rgba(250, 72, 40, 0.62)");
     gradient.addColorStop(1, "rgba(205, 203, 211, 0.69)");
     return gradient;
   };
 
   const gradientBorder = (ctx) => {
     const gradient = ctx.createLinearGradient(0, 0, 600, 0);
-    gradient.addColorStop(0, "#cf5d11fb");
-    gradient.addColorStop(1, "#a9c1e6ff");
+    gradient.addColorStop(0, "#cf1e11b2");
+    gradient.addColorStop(1, "#94d4eefb");
     return gradient;
   };
 
   const data = {
-    labels: sorted.map((p) => p.Name.trim()),
+    labels: sorted.map((p) => p.Name.substring(0,7).trim()),
     datasets: [
       {
-        label: "Total Sold",
+        label: "Heat Map",
         data: sorted.map((p) => p.TotalSale),
         fill: true,
         backgroundColor: (context) => gradientFill(context.chart.ctx),
@@ -106,7 +107,7 @@ const ProductSalesChart = ({ productsList }) => {
 
           const index = tooltipModel.dataPoints[0].dataIndex;
           const product = sorted[index];
-          const imageUrl = product.image || "/placeholder.png";
+          const imageUrl = product.image || "/preview.png";
 
           tooltipEl.innerHTML = `
             <div style="text-align:center;">
@@ -180,8 +181,11 @@ const ProductSalesChart = ({ productsList }) => {
       {bestSeller && (
         <div className="bg-gray-200 shadow-lg p-5 flex items-center gap-6 hover:shadow-md transition-all duration-300">
           <Image
-            src={bestSeller.image || bestSeller.QrCode || "/preview.png"}
+            src={bestSeller.image || "/preview.png"}
             alt={bestSeller.Name}
+            width={50}
+            height={50}
+            quality={100}
             className="w-24 h-24 object-cover rounded-lg border border-gray-300"
           />
           <div>

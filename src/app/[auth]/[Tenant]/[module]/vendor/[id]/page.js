@@ -25,6 +25,8 @@ export default function SingleVendorpage({userInfo,Backdata,wh}) {
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
     "X-Requested-With": "XMLHttpRequest",
+     dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+     access:`${Encrypt(userInfo.user._id)}`
   });
 
 
@@ -440,7 +442,9 @@ function ProductChart({ productId, productName, umo, business }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${Encrypt(business.tenantId)}`
+            "Authorization": `Bearer ${Encrypt(business.tenantId)}`,
+            dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+            access:`${Encrypt(userInfo.user._id)}`
           },
         });
 

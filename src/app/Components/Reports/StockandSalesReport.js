@@ -13,17 +13,17 @@ export default function StockandSalesReport({
   Stores,
   inventoryItem
 }) {
-  const product = prouctlist || [];
-  const storeList = JSON.parse(Stores || "[]");
-  const vendorlist = JSON.parse(vendors || "[]");
-  const invoices = JSON.parse(InvoiceList || "[]").filter(
+  const product = prouctlist ;
+  const storeList = Stores ;
+  const vendorlist = vendors ;
+  const invoices = InvoiceList.filter(
     invoice => {
-      const status = (invoice.billStatus || "").toLowerCase();
+      const status = invoice.billStatus.toLowerCase();
       return status !== "draft" && status !== "cancelled";
     }
   );
   // returned ordder
-  const returns = JSON.parse(InvoiceList || "[]").filter(
+  const returns = InvoiceList.filter(
     invoice => {
       const status = (invoice.billStatus || "").toLowerCase();
       return  status === "cancelled";
@@ -31,13 +31,13 @@ export default function StockandSalesReport({
   );
 
   // purchased
-  const purchases = JSON.parse(PurchaseOrderList || "[]").filter(
+  const purchases = PurchaseOrderList.filter(
     invoice => {
       const status = (invoice.status || "");
       return status === "POSTED TO WAREHOUSE" 
     }
   );
-  const inventory = JSON.parse(inventoryItem || "[]");
+  const inventory = inventoryItem;
 
   // find venddor
  const getVendor = (id) => {

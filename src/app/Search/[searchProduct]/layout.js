@@ -39,11 +39,13 @@ export default async function searchLayout({children, params }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
       "X-Requested-With": "XMLHttpRequest",
+      dbConnect:`Bearer ${userData.business.rustyRoof}`,
+      access:`${Encrypt(userData.user._id)}`,
     },
   };
 
   // make api request to server to get cached data
-  const url = `${EXPRESS_PRIVATE_URL}/${userData.business.companyName}/search/${moduleList.searchProduct}`;
+  const url = `${EXPRESS_PRIVATE_URL}/api/search/${moduleList.searchProduct}`;
   // Await axios call directly
   const { data } = await axios.get(url,config);
 

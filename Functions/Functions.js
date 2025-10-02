@@ -642,7 +642,7 @@ async function postPayment(customerId, user, config) {
   });
 
   try {
-    const response = await fetch(`/api/crm/${Encrypt(customerId)}`, {
+    const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/Payment/${customerId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

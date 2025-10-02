@@ -229,7 +229,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LightBulbIcon } from '@heroicons/react/24/outline';
+import { MegaphoneIcon  } from '@heroicons/react/24/outline';
 
 export default function TextToSpeechTrigger({ text }) {
   const [voice, setVoice] = useState(null);
@@ -281,10 +281,10 @@ export default function TextToSpeechTrigger({ text }) {
   return (
     <span
       onClick={speakText}
-      className="inline-flex items-center gap-1 cursor-pointer  hover:text-yellow-200 transition"
-      title="Bug Ant Assist"
+      className="inline-flex items-center gap-1 cursor-pointer  hover:text-black transition"
+      title="Bug-Ant Assist"
     >
-      <LightBulbIcon className="h-5 w-5 text-pink-400 hover:text-pink-600 hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
+      <MegaphoneIcon  className="h-5 w-5 text-black hover:text-black hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
     </span>
   );
 }

@@ -4,7 +4,7 @@ import Swal from 'sweetalert2'
 import { totalInWords,EXPRESS_PRIVATE_URL ,Dencrypt} from "../../../Functions/Functions";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 
-export const showDeliveryModal = (id,user) => {
+export const showDeliveryModal = (id,user,business) => {
     // const router = useRouter()
   Swal.fire({
     title: `
@@ -87,7 +87,8 @@ export const showDeliveryModal = (id,user) => {
         fetch(url, {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                dbConnect:`Bearer ${business.rustyRoof}`,
             },
             body: JSON.stringify(deliveryData)
         }).then(response => {

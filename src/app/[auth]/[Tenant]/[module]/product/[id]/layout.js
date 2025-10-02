@@ -1,13 +1,12 @@
-import React from 'react'
-import SingleProductpage  from "./page"
-import { Dencrypt } from '../../../../../../../Functions/Functions'
-import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
-import dbConnect from "../../../../../../../lib/mongoose";
-import Products from "../../../../../../../models/Products";
-import {WHouse,storeProduct} from "../../../../../../../models/Stores"
-import axios from "axios"
-
-
+import React from "react";
+import SingleProductpage from "./page";
+import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
+import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
+import Nav1 from "@/app/Components/Nav1";
+import Footer2 from "@/app/Components/Footer2";
+import Link from "next/link";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import BackButton from "@/app/Components/BackBotton";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -50,57 +49,85 @@ export const metadata = {
   twitterDescription:
     "Automate and optimize your enterprise with cutting-edge business solutions",
   twitterImage: "/assets/bade.png",
-  favicon:'favicon.ico'
+  favicon: "favicon.ico",
 };
 
+export default async function layout({ params, children }) {
+  const userInfo = await fetchUser();
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const decoy = await params;
 
-export default async function layout({params}) {
-    await dbConnect()
-    const userInfo = await fetchUser();
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const decoy = await params;
-    // Step 1: Get all tenant warehouses
-    const stores = await WHouse.findByTenant(userInfo.business.tenantId).lean();
+  const res = await fetch(`${baseUrl}/api/Product/${Dencrypt(decoy.id)}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userInfo.business.tenantId}`,
+      dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+      access: `${Encrypt(userInfo.user._id)}`,
+    },
+  });
 
-    // Step 2: Decrypt product ID
-    const decryptedProductId = Dencrypt(decoy.id);
+  const data = await res.json();
 
-    // Step 3: Fetch products per warehouse and format output
-    const storeProducts = await Promise.all(
-      stores.map(async store => {
-        const products = await storeProduct.findByTenant(
-          userInfo.business.tenantId,
-          { productId: decryptedProductId, WHIDS: store._id }
-        ).lean();
-
-        return {
-          warehouseName: store.WHName,
-          products
-        };
-      })
-    );
-
-    // Step 4: Display result
-
-    // // find the store product by id
-    // const product = await storeProduct.findById({productId : Dencrypt(decoy.id)});
-
-      const res = await axios.get(
-        `${baseUrl}/api/ProductsApi/${Dencrypt(decoy.id)}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userInfo.business.tenantId}`,
-          },
-        }
-      );
-    
-      const data = await res.data;
-    
+  if (!res.ok) {
     return (
-    <div>
-         <SingleProductpage userInfo={userInfo.user} businessInfo={userInfo.business} Backdata={data.Product} vendor={data.Vend} module={decoy.module} storeProducts={JSON.stringify(storeProducts)}/>
+      <div className="text-black p-6">
+        Failed to load. Please try again later.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen overflow-hidden">
+      <Nav1
+        user={userInfo.user}
+        business={userInfo.business}
+        page={data.product.Name}
+      />
+
+      <div className="flex flex-1 text-white bt-2">
+        {/* Sidebar */}
+        <aside
+          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[510px] md:block"
+          style={{ overflowY: "auto" }}
+        >
+          <h2 className="text-lg font-bold mb-4">Product Management</h2>
+          <hr />
+          <nav className="space-y-4">
+            {userInfo?.user?.createProduct && (
+              <Link
+                href={`/${userInfo.business.companyName
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                  userInfo.user._id
+                )}/Module/Forms/${decoy.module.toLowerCase()}`}
+                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              >
+                <PlusCircleIcon className="h-4 w-4 text-gray-100" />
+                <span className="text-xs">New Product</span>
+              </Link>
+            )}
+            <BackButton/>
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1">
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[520px] overflow-y-auto">
+            <SingleProductpage
+              userInfo={userInfo.user}
+              businessInfo={userInfo.business}
+              Backdata={data.product}
+              vendor={data.vendorList}
+              module={decoy.module}
+              storeProducts={data.inventoryItem}
+            />
+          </section>
+        </main>
+      </div>
+
+      <Footer2 />
     </div>
-   
-  )
+  );
 }

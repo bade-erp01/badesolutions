@@ -7,12 +7,12 @@ import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
 export default function PaymentTableModal({ dataArray, banks, customers }) {
 
-  const data = JSON.parse(dataArray);
+  const data = dataArray;
   const [filteredData, setFilteredData] = useState(
       data.filter(item => item.status?.toLowerCase() !== "pending")
     );
-  const [bankList] = useState(JSON.parse(banks) || []);
-  const [customersList] = useState(JSON.parse(customers)|| []);
+  const [bankList] = useState(banks || []);
+  const [customersList] = useState(customers || []);
 
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);

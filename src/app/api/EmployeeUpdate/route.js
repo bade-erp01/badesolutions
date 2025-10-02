@@ -5,38 +5,37 @@ import { ObjectId } from "mongodb";
 import { formatMongooseError } from "../../../../Functions/Functions";
 
 // Ensure Mongoose connection is established
-await dbConnect();
 
 // get single user data
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+// export async function GET(request) {
+  //   try {
+//     const { searchParams } = new URL(request.url);
+//     const userId = searchParams.get('userId');
 
-    if (!userId) {
-      return new Response('User ID is required', { status: 400 });
-    }
+//     if (!userId) {
+//       return new Response('User ID is required', { status: 400 });
+//     }
 
-    const employee = await Users.findById(userId);
+//     const employee = await Users.findById(userId);
 
-    if (!employee) {
-      return new Response('User not found', { status: 404 });
-    }
+//     if (!employee) {
+  //       return new Response('User not found', { status: 404 });
+//     }
 
-    return new Response(JSON.stringify(employee), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    return new Response(
-      `Internal Server Error: ${error.message}`,
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  }
-}
+//     return new Response(JSON.stringify(employee), {
+//       status: 200,
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (error) {
+  //     return new Response(
+//       `Internal Server Error: ${error.message}`,
+//       {
+//         status: 500,
+//         headers: { "Content-Type": "application/json" },
+//       }
+//     );
+//   }
+// }
 
 
 
@@ -45,14 +44,14 @@ export async function PATCH(request) {
   try {
     const body = await request.json();
     const { id, form, ...updateData } = body;
-
+    
     if (!id) {
       return new Response(
         JSON.stringify({ error: "Missing ID parameter." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
+    
     const updateFields = form || updateData;
     if (!Object.keys(updateFields).length) {
       return new Response(
@@ -61,6 +60,7 @@ export async function PATCH(request) {
       );
     }
     
+    await dbConnect("BadeAdmin");
     const result = await Users.findByIdAndUpdate(new ObjectId(id), updateFields, { new: true });
 
 

@@ -1,11 +1,16 @@
 "use client";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback,useRef } from "react";
 import Image from "next/image";
 import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
   Encrypt,
 } from "../../../Functions/Functions";
+import {
+  ErrorMessage,
+    SuccessToast,
+    plsWait,
+} from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
@@ -14,15 +19,19 @@ import moment from "moment";
 import Link from "next/link";
 
 export default function MainDash({ userData }) {
-   const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [tenantData, setTenantData] = useState(null);
+  const inactivityTimer = useRef(null);
+  const intervalRef = useRef(null);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+  const [status, setStatus] = useState("Active"); // UI status indicator
+  
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
-
+  const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
+  
   // 🧠 Memoized sorted invoices
   const sortedInvoices = useMemo(() => {
     return tenantData?.invoice?.sort(
@@ -49,12 +58,27 @@ export default function MainDash({ userData }) {
     }
   }, [totalPages]);
 
-  useEffect(() => {
+    useEffect(() => {
+
     const fetchTenantData = async () => {
+      const isVisible = document.visibilityState === "visible";
+      const isOnline = navigator.onLine;
+
+      if (!isVisible || !isOnline || status === "Inactive") {
+      //  ErrorMessage("⏸ Fetch paused due to:", {
+      //     visibility: isVisible,
+      //     online: isOnline,
+      //     activity: status
+      //   });
+        return;
+      }
+
+      // console.log("▶️ Fetching tenant data...");
       try {
         const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Report`, {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
+            dbConnect: `Bearer ${userData.business.rustyRoof}`,
           },
         });
 
@@ -71,13 +95,63 @@ export default function MainDash({ userData }) {
       }
     };
 
-    fetchTenantData(); // Initial fetch
+    const resetInactivityTimer = () => {
+      // if (status === "Inactive") {
+      //   console.log("🔄 User became active again");
+      // }
+      setStatus("Active");
+      clearTimeout(inactivityTimer.current);
+      inactivityTimer.current = setTimeout(() => {
+        setStatus("Inactive");
+      }, INACTIVITY_LIMIT);
+    };
 
-    const interval = setInterval(() => {
-      fetchTenantData(); // Re-fetch every 1min
-    }, 60000);
+    // Initial fetch
+    fetchTenantData();
+    resetInactivityTimer();
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    // Set interval for periodic fetch
+    intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
+
+    // Tab visibility
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // console.log("👁️ Tab became visible");
+        fetchTenantData();
+      } 
+    };
+
+    // Network status
+    const handleOnline = () => {
+      SuccessToast("🌐 Back online");
+      fetchTenantData();
+    };
+
+    const handleOffline = () => {
+      plsWait("📴Currently Offline")
+    };
+
+    // User activity listeners
+    const activityEvents = ["mousemove", "keydown", "scroll", "touchstart"];
+    activityEvents.forEach((event) =>
+      window.addEventListener(event, resetInactivityTimer)
+    );
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalRef.current);
+      clearTimeout(inactivityTimer.current);
+      activityEvents.forEach((event) =>
+        window.removeEventListener(event, resetInactivityTimer)
+      );
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
   }, [userData, EXPRESS_PRIVATE_URL, Encrypt]);
 
 
@@ -312,7 +386,7 @@ export default function MainDash({ userData }) {
             {/* Quick stats / chart placeholder */}
             <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
                 <h3 className="text-lg text-gray-500 font-semibold mb-4">
-                 🗿 Quick Stats
+                 🗿 Quick Stats Widget
                 </h3>
               <div className="flex flex-col">
                 <h4 className="text-sm text-gray-500 font-semibold mb-4">
@@ -367,21 +441,7 @@ export default function MainDash({ userData }) {
                   Upcoming Events 📆
                 </h4>
                 <ul className="list-disc list-inside">
-                  {tenantData.birthdayCelebrants.map((element) => (
-                    <li key={element._id} className="text-gray-700 ">
-                      <Image
-                        src={"/person.png"}
-                        priority={false}
-                        quality={100}
-                        loading="lazy"
-                        alt={`${element.name}s profile`}
-                        className="inline-block w-6 h-6 rounded-full mr-2"
-                        width={24}
-                        height={24}
-                      />
-                      Today is {element.name}&lsquo;s birthday
-                    </li>
-                  ))}
+                  {/* show something here */}
                 </ul>
               </div>
               </div>
@@ -427,40 +487,7 @@ export default function MainDash({ userData }) {
             {/* Birthday Marquee */}
             <div className="mt-6">
               <div className="w-full text-center">
-                {tenantData.birthdayCelebrants?.length > 0 ? (
-                  <div className="bg-indigo-50 rounded-lg py-2 px-4 shadow-inner">
-                    <marquee
-                      behavior="scroll"
-                      direction="left"
-                      scrollamount="3"
-                      className="text-sm text-indigo-700 font-medium"
-                      style={{ width: "100%" }}
-                    >
-                      <ul className="flex gap-6 list-none">
-                        {tenantData.birthdayCelebrants.map((element) => (
-                          <li
-                            key={element._id}
-                            className="flex items-center gap-2"
-                          >
-                            <Image
-                              src="/person.png"
-                              alt={`${element.name}s profile`}
-                              width={24}
-                              height={24}
-                              className="rounded-full"
-                            />
-                            <span>
-                              🎉 Today is <strong>{element.name}</strong>
-                              &lsquo;s birthday!
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </marquee>
-                  </div>
-                ) : (
-                  ""
-                )}
+                {/* shw birthday celebrant here */}
               </div>
             </div>
           </section>

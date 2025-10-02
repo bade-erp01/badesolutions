@@ -1,12 +1,7 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Link from "next/link";
-import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
-import BackButton from "@/app/Components/BackBotton";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import Users from "../../../../../../models/Users";
-import { Encrypt } from "../../../../../../Functions/Functions";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -55,16 +50,17 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
+  // await dbConnect("BadeAdmin")
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/api/UsersApi`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${userData.business.tenantId}`,
+      dbConnect:`Bearer ${`BadeAdmin`}`,
     },
   });
   const EmployeeList = await await res.json();
-
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
@@ -78,40 +74,19 @@ export default async function Employeelayout({ children, params }) {
         {/* Sidebar (collapsible on mobile) */}
         <aside
           className={`w-70  bg-[#1e1e20]/70 backdrop-blur-md 
-              text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
+              text-white px-4 py-6 transition-all duration-300 h-[510px] max-h-[600px] overflow-y-hidden md:block`}
+          style={{ maxHeight: "600px", overflowY: "hidden" }}
         >
           <h2 className="text-lg  text-white font-bold mb-4">
             Employee Management
           </h2>
           <hr />
-          <nav className="space-y-4  h-[500px] max-h-[600px] overflow-y-auto ">
+          <nav className="space-y-4  h-[500px] max-h-[600px] overflow-y-hidden ">
             {userData?.user?.isAdmin && EmployeeList.length > 0 && (
               <ExcelDownloadBtn data={EmployeeList} page="employee" />
             )}
             
           </nav>
-
-          {/* Bottom Section with Settings Link */}
-          <div className="absolute bottom-4 left-4">
-            {userData?.user?.isAdmin && (
-              <Link
-                href={`/${userData?.business?.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/SetUp`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <Image
-                  src="https://img.icons8.com/3d-fluency/94/gear--v1.png"
-                  width={24}
-                  height={24}
-                  alt="Settings"
-                />
-                <span>Settings</span>
-              </Link>
-            )}
-          </div>
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">

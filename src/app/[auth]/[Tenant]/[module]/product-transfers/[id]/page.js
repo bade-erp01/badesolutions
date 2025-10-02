@@ -2,14 +2,26 @@ import React from 'react';
 
 export default function ProductTransfersPage({ Transfer }) {
   return (
-    <div className="bg-white text-gray-800 p-6 font-sans max-w-full mx-auto border border-gray-200 rounded-xl shadow-lg">
-      <header className="border-b border-gray-300 pb-4 mb-6">
-        <h1 className="text-center text-3xl font-extrabold text-indigo-600">Product Transfer Invoice</h1>
-        <p className="text-center text-sm text-gray-500 mt-1">Bill Reference No: <span className="font-medium">{Transfer.billReferenceNo}</span></p>
+    <div className="bg-white text-gray-800 p-8 font-sans max-w-4xl mx-auto border border-gray-300 rounded-lg shadow-md">
+      {/* Invoice Header */}
+      <header className="border-b border-gray-300 pb-6 mb-8">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-indigo-600">Company Name</h1>
+            <p className="text-sm text-gray-500">123 Business Street, City, Country</p>
+            <p className="text-sm text-gray-500">Email: info@company.com | Phone: +123 456 7890</p>
+          </div>
+          <div className="text-right">
+            <h2 className="text-xl font-bold text-gray-700">Invoice</h2>
+            <p className="text-sm text-gray-500">Date: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-500">Invoice #: {Transfer.billReferenceNo}</p>
+          </div>
+        </div>
       </header>
 
+      {/* Transfer Details */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">📦 Transfer Details</h2>
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Transfer Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <p><span className="font-semibold text-gray-600">Status:</span> {Transfer.status}</p>
           <p><span className="font-semibold text-gray-600">Transfer Date:</span> {Transfer.transferedDate}</p>
@@ -18,14 +30,15 @@ export default function ProductTransfersPage({ Transfer }) {
         </div>
       </section>
 
-      <section>
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">🧾 Orders</h2>
+      {/* Orders Table */}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Order Details</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
-            <thead className="bg-indigo-50 text-indigo-700">
+          <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+            <thead className="bg-gray-100 text-gray-700">
               <tr>
                 <th className="text-left px-4 py-3 border">Product</th>
-                <th className="text-left px-4 py-3 border">Qty</th>
+                <th className="text-left px-4 py-3 border">Quantity</th>
                 <th className="text-left px-4 py-3 border">Transaction</th>
                 <th className="text-left px-4 py-3 border">Received</th>
               </tr>
@@ -43,6 +56,12 @@ export default function ProductTransfersPage({ Transfer }) {
           </table>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-300 pt-6 mt-8 text-sm text-gray-500">
+        <p>Thank you for your business!</p>
+        <p className="mt-2">Terms: Payment is due within 30 days. Late payments may be subject to additional fees.</p>
+      </footer>
     </div>
   );
 }

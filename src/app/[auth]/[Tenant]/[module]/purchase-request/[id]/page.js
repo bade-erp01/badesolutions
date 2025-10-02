@@ -68,7 +68,10 @@ export default function DraftPurchasePage({
                   method: "POST",
                   body: JSON.stringify({ image: resizedImage }),
                   headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+                    dbConnect: `Bearer ${Business.rustyRoof}`,
+                    access: `${Encrypt(user._id)}`,
                   },
                 });
 
@@ -152,7 +155,12 @@ export default function DraftPurchasePage({
         `${EXPRESS_PRIVATE_URL}/api/VendorProduct/lpo?product=${cleanedProducts._id}&po=${bill._id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            dbConnect: `Bearer ${Business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
+          },
         }
       );
 
@@ -180,9 +188,12 @@ export default function DraftPurchasePage({
 
       const response = await fetch(url, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            dbConnect: `Bearer ${Business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
+          },
       });
 
       const data = await response.json();
@@ -223,8 +234,11 @@ export default function DraftPurchasePage({
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
-        },
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            dbConnect: `Bearer ${Business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
+          },
       });
 
       const data = await response.json();
@@ -254,9 +268,12 @@ export default function DraftPurchasePage({
 
       const response = await fetch(url, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            dbConnect: `Bearer ${Business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
+          },
       });
 
       const data = await response.json();
@@ -299,9 +316,12 @@ export default function DraftPurchasePage({
           // ...Singlebill,
           status: status,
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            dbConnect: `Bearer ${Business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
+          },
       });
 
       const data = await response.json();
@@ -367,7 +387,7 @@ export default function DraftPurchasePage({
                 href={`tel:${cust.vendor_tel}`}
                 className="hover:underline text-indigo-700"
               >
-                {cust.vendor_tel}
+                {cust.vendor_tel || "N/A"}
               </a>
             </p>
             <p>
@@ -376,7 +396,7 @@ export default function DraftPurchasePage({
                 href={`mailto:${cust.email}`}
                 className="hover:underline text-indigo-700"
               >
-                {cust.email}
+                {cust.email || "N/A"}
               </a>
             </p>
             <p>
@@ -393,7 +413,7 @@ export default function DraftPurchasePage({
               <button
                 onClick={() => updateRFP("Pending")}
                     title="Process this draft to order"
-                    className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-green-600 text-white font-semibold hover:shadow-xl hover:bg-green-500 transition duration-200 ease-in-out"
+                    className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-green-600 text-white font-semibold hover:shadow-xl hover:bg-green-500 transition duration-200 ease-in-out text-xs"
                   >
                     <KeyIcon className="h-6 w-6 text-white" />
                     <span>Lock Request</span>
@@ -404,7 +424,7 @@ export default function DraftPurchasePage({
                   {user.raiseLpo &&
                   Singlebill.status.toLowerCase() === "draft" && (
                       <div>
-                        <button className="inline-flex items-center justify-center bg-indigo-300  border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl hover:bg-indigo-400 transition duration-200 ease-in-out" onClick={uploadLPOFile}>
+                        <button className="inline-flex items-center justify-center bg-indigo-300  border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl hover:bg-indigo-400 transition duration-200 ease-in-out text-xs" onClick={uploadLPOFile}>
                           upload Attachement 
                           <PaperClipIcon className="h-6 w-6 text-white`" />
                         </button>
@@ -418,7 +438,7 @@ export default function DraftPurchasePage({
                   title="Set this purchase request back to draft"
                   className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-md hover:shadow-lg hover:from-green-500 hover:to-blue-400 transition-all duration-200 ease-in-out"
                   >
-                 <PencilIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200" />
+                 <PencilIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200 text-xs" />
                   <span>Set to Draft</span>
                   </button>
                 )}
@@ -429,7 +449,7 @@ export default function DraftPurchasePage({
                   title="Approve this purchase request"
                    className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-orange-600 to-orange-500 text-white font-medium shadow-md hover:shadow-lg hover:from-purple-500 hover:to-orange-400 transition-all duration-200 ease-in-out"
                   >
-                 <CheckBadgeIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200" />
+                 <CheckBadgeIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200 text-xs" />
                   <span>Approve</span>
                   </button>
                 )}
@@ -438,7 +458,7 @@ export default function DraftPurchasePage({
                   <button
                   onClick={() => updateRFP("POSTED TO WAREHOUSE")}
                   title="Update warehouse inventory items"
-                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-teal-600 to-teal-500 text-white font-semibold shadow-md hover:shadow-lg hover:from-teal-500 hover:to-teal-400 transition-all duration-200 ease-in-out"
+                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-teal-600 to-teal-500 text-white font-semibold shadow-md hover:shadow-lg hover:from-teal-500 hover:to-teal-400 transition-all duration-200 ease-in-out text-xs"
                   >
                 <ArrowTrendingUpIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200" />
                   <span>Update Inventory</span>
@@ -450,7 +470,7 @@ export default function DraftPurchasePage({
                   <button
                     title="Delete this draft"
                     onClick={() => DeleteDraftPo(Singlebill._id)}
-                    className="inline-flex items-center justify-center bg-red-300 border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl hover:bg-red-200 transition duration-200 ease-in-out"
+                    className="inline-flex items-center justify-center bg-red-300 border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl hover:bg-red-200 transition duration-200 ease-in-out text-xs"
                   >
                     Delete
                     <TrashIcon className="h-6 w-6 text-white" />
@@ -462,7 +482,7 @@ export default function DraftPurchasePage({
           {bill.status.toLowerCase() !== "draft" && (
             <button
               title={`Download and Print ${Singlebill.status}`}
-              className=" group inline-flex items-center rounded-lg justify-center gap-3 px-6 py-3 bg-white text-gray-800 font-semibold border hover:text-orange-700 transition duration-200 ease-in-out"
+              className=" group inline-flex items-center rounded-lg justify-center gap-3 px-6 py-3 bg-white text-gray-800 font-semibold border hover:text-orange-700 transition duration-200 ease-in-out text-xs"
             >
               <span>Print</span>
               <PrinterIcon className="h-5 w-5 text-white" />

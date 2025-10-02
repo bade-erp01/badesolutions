@@ -7,14 +7,14 @@ import { TruckIcon } from "@heroicons/react/24/outline";
 
 export default function DeliveryRportModal({ data, Stores, customers,users }) {
  const [filteredData, setFilteredData] = useState(
-  JSON.parse(data).filter(item => {
+  data?.filter(item => {
     const status = item.billStatus?.toLowerCase();
     return status === "invoice" || status === "cancelled";
   })
 );
-  const [StoresList] = useState(JSON.parse(Stores)  || []);
-  const [customersList] = useState(JSON.parse(customers) || []);
-  const [usersList] = useState(JSON.parse(users) || []);
+  const [StoresList] = useState(Stores || []);
+  const [customersList] = useState(customers || []);
+  const [usersList] = useState(users || []);
   const [searchPeriod, setSearchPeriod] = useState('')
 
   const getCustomer = (id) => {

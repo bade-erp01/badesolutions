@@ -12,12 +12,12 @@ export default function StockReportModal({
   prodductList,
 }) {
   const [filteredData, setFilteredData] = useState(
-    JSON.parse(data).filter(
+    data.filter(
       (item) => item.billStatus?.toLowerCase() !== "draft"
     )
   );
-  const [StoresList] = useState(JSON.parse(Stores) || []);
-  const [customersList] = useState(JSON.parse(vendors) || []);
+  const [StoresList] = useState(Stores || []);
+  const [customersList] = useState(vendors || []);
 
   const getVendor = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
@@ -155,7 +155,7 @@ export default function StockReportModal({
           const Store = document.getElementById("Store").value;
           const Prdouct = document.getElementById("Prdouct").value;
 
-          const filtered = JSON.parse(data).filter((item) => {
+          const filtered = data.filter((item) => {
             
             return (
               item.billStatus?.toLowerCase() !== "draft" &&

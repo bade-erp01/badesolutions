@@ -12,9 +12,9 @@ const Card = ({ data, module }) => {
     str && str.length > length ? str.substring(0, length) + "..." : str;
 
   const title =
+    data.Name ||
     data.firstName ||
     data.Description ||
-    data.Name ||
     data.WHName ||
     data.productName ||
     data.billReferenceNo ||
@@ -28,10 +28,11 @@ const Card = ({ data, module }) => {
     data.Email ||
     data.billStatus ||
     data.ADCcode ||
+    data.ACDcode ||
     data.status ||
     `${data.currentQty ? `${data.currentQty} :case,` : ""}${data.pcs ? `${data.pcs}:pcs` : ""}`;
 
-  const imageSrc = data.image || data.QrCode || data.Image || data.icon || "/preview.png";
+  const imageSrc = data.image || data.Image || data.icon || "/preview.png";
 
   const linkHref = `/${auth}/${Tenant}/${module}/${module}/${Encrypt(data._id)}?Modules=${module}`;
 
@@ -44,7 +45,8 @@ const Card = ({ data, module }) => {
           height={60}
           alt={truncate(title) || "photo"}
           className="rounded-md object-cover w-16 h-16"
-          priority
+          quality={100}
+          priority={true}
         />
         <div className="flex flex-col justify-center w-full">
           <p className=" font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>

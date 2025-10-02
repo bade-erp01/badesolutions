@@ -1,28 +1,15 @@
 "use client";
 
-import { Dencrypt,EXPRESS_PRIVATE_URL,Encrypt } from "../../../../../../../Functions/Functions";
+import { Dencrypt,EXPRESS_PRIVATE_URL,Encrypt } from "../../../../../../../../Functions/Functions";
 import { useSearchParams,useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
-import { plsWait, ErrorMessage, SuccessToast, } from "../../../../../../../Functions/Mics";
+import { plsWait, ErrorMessage, SuccessToast, } from "../../../../../../../../Functions/Mics";
 import {WrenchScrewdriverIcon,ChartPieIcon,ShieldExclamationIcon,PuzzlePieceIcon,CloudArrowUpIcon,QueueListIcon,CloudArrowDownIcon} from "@heroicons/react/24/outline"
 
-export default function Page({ staffs, stores }) {
-  const searchParams = useSearchParams();
+export default function Page({ staffs, store }) {
+  // const searchParams = useSearchParams();
   const Router = useRouter();
-  const storeParam = searchParams.get("store");
-
-  const decryptedStoreId = useMemo(
-    () => (storeParam ? Dencrypt(storeParam) : null),
-    [storeParam]
-  );
-
-  const parsedStores = useMemo(() => {
-    try {
-      return JSON.parse(stores);
-    } catch {
-      return [];
-    }
-  }, [stores]);
+  // const storeParam = searchParams.get("store");
 
   const parsedStaffs = useMemo(() => {
     try {
@@ -32,36 +19,15 @@ export default function Page({ staffs, stores }) {
     }
   }, [staffs]);
 
-  const [selectedStore, setSelectedStore] = useState([]);
   const [formData, setFormData] = useState({
-    WHName: "",
-    Email: "",
-    InvoiceNo: "",
-    Address: "",
-    Status: false,
-    limit: "0",
-    StoreManager: "",
-    StoreKeeper: "",
+    WHName: store.WHName || "",
+    Email: store.Email || "",
+    Address: store.Address || "",
+    Status: store.Status || false,
+    limit: store.limit?.$numberDecimal || "0",
+    StoreManager: store.StoreManager || "",
+    StoreKeeper: store.StoreKeeper || "",
   });
-
-  useEffect(() => {
-    if (decryptedStoreId) {
-      const foundStore = parsedStores.find((s) => s._id === decryptedStoreId);
-      setSelectedStore(foundStore ? [foundStore] : []);
-      if (foundStore) {
-        setFormData({
-          WHName: foundStore.WHName || "",
-          Email: foundStore.Email || "",
-          InvoiceNo: foundStore.InvoiceNo || "",
-          Address: foundStore.Address || "",
-          Status: foundStore.Status || false,
-          limit: foundStore.limit?.$numberDecimal || "0",
-          StoreManager: foundStore.StoreManager || "",
-          StoreKeeper: foundStore.StoreKeeper || "",
-        });
-      }
-    }
-  }, [decryptedStoreId, parsedStores]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -97,15 +63,12 @@ export default function Page({ staffs, stores }) {
       });
   };
 
-  const Store = selectedStore[0];
 
   return (
     <div>
-      {Store && (
+      
         <div className="m-5 bg-gray-100 p-6 shadow-sm ">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            <WrenchScrewdriverIcon className="h-6 w-6 text-gray-800 inline-block mr-2" /> {Store.WHName}
-          </h3>
+         
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -133,20 +96,6 @@ export default function Page({ staffs, stores }) {
                 type="email"
                 name="Email"
                 value={formData.Email}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700"
-              />
-            </div>
-
-            {/* Invoice No */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Invoice No
-              </label>
-              <input
-                type="text"
-                name="InvoiceNo"
-                value={formData.InvoiceNo}
                 onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700"
               />
@@ -206,13 +155,13 @@ export default function Page({ staffs, stores }) {
                 onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 bg-white"
               >
-                <option value={Store.StoreManager}>
-                  {Store.StoreManager
+                {/* <option value={Store.StoreManager}>
+                  {formData.StoreManager
                     ? parsedStaffs.find(staff => staff._id === Store.StoreManager)?.firstName + " (Current)"
                     : "Select Manager"}
-                </option>
+                </option> */}
                 {parsedStaffs
-                  .filter((staff) => staff._id !== Store.StoreManager)
+                  .filter((staff) => staff._id !== store.StoreManager)
                   .map((staff, index) => (
                     <option key={index} value={staff._id}>
                       {staff.firstName} {staff.lastName}
@@ -233,15 +182,15 @@ export default function Page({ staffs, stores }) {
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 bg-white"
               >
                 {/* find and display current StoreKeeper FirstName  */}
-                {Store.StoreKeeper && (
-                  <option value={Store.StoreKeeper}>
-                    {Store.StoreKeeper
-                      ? parsedStaffs.find(staff => staff._id === Store.StoreKeeper)?.firstName + " (Current)"
+                {formData.StoreKeeper && (
+                  <option value={store.StoreKeeper}>
+                    {store.StoreKeeper
+                      ? parsedStaffs.find(staff => staff._id === store.StoreKeeper)?.firstName + " (Current)"
                       : "Select StoreKeeper"}
                   </option>
                 )}
                 {parsedStaffs
-                  .filter((staff) => staff._id !== Store.StoreKeeper)
+                  .filter((staff) => staff._id !== store.StoreKeeper)
                   .map((staff, index) => (
                     <option key={index} value={staff._id}>
                       {staff.firstName} {staff.lastName}
@@ -261,7 +210,6 @@ export default function Page({ staffs, stores }) {
             </div>
           </form>
         </div>
-      )}
     </div>
   );
 }

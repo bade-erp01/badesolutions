@@ -1,7 +1,10 @@
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Dencrypt } from "../../../../../../../Functions/Functions";
+import { Dencrypt,Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
 import SinglePymentpage from "./page";
+import Nav1 from "@/app/Components/Nav1"
+import BackButton from "@/app/Components/BackBotton"
+import Footer2 from "@/app/Components/Footer2"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -49,27 +52,53 @@ export const metadata = {
 export default async function paymentlayout({ params }) {
   const decoy = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   const res = await axios.get(
-    `${baseUrl}/api/cashRegister/${Dencrypt(decoy.id)}`,
+    `${baseUrl}/api/cashRegister/${decoy.id}`,
     {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${userData.business.tenantId}`,
+        dbConnect:`Bearer ${userData.business.rustyRoof}`,
+        access:`${Encrypt(userData.user._id)}`
       },
     }
   );
 
   const data = await res.data;
   return (
-    <div>
-      <SinglePymentpage
-        userInfo={userData}
-        payment={data.payment}
-        cust={data.cust}
-        bank={data.bank}
-      />
-    </div>
-  );
+     <div className="flex flex-col min-h-screen overflow-hidden">
+       <Nav1
+         user={userData.user}
+         business={userData.business}
+         page={`${data.Payment.type}~${data.Payment.paymentReferenceNo}/${data.Payment.PaymentDate}`}
+       />
+ 
+       <div className="flex flex-1 text-white bt-2 ">
+         {/* Sidebar (collapsible on mobile) */}
+         <aside
+           className={`bg-[#1e1e20]/80 backdrop-blur-lg
+           text-white px-4 py-6 transition-all duration-300 h-[511px] max-h-[600px] overflow-y-auto md:block`}
+           style={{ maxHeight: "600px", overflowY: "scroll" }}
+         >
+           <BackButton />
+           <hr />
+           
+         </aside>{" "}
+         {/* Main Content Area */}
+         <main className="flex-1 ">
+           <section className="w-full max-w-screen-xl flex flex-col gap-6 rounded-lg p-6 relative z-10 h-[510px] overflow-y-auto">
+            <SinglePymentpage
+              userInfo={userData}
+              payment={data.Payment}
+              cust={data.Customers}
+              bank={data.Accounts}
+            />
+            </section>
+         </main>
+       </div>
+       <Footer2 />
+     </div>
+   );
 }

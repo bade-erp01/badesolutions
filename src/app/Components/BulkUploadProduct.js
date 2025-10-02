@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { CloudArrowUpIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
-import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import { EXPRESS_PRIVATE_URL,Encrypt } from "../../../Functions/Functions";
 import { plsWait } from "../../../Functions/Mics";
 import { useRouter } from "next/navigation";
 
@@ -101,7 +101,9 @@ const BulkUploader = ({ tenantId, collectionName }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tenantId}`,
+          'Authorization': `Bearer ${tenantId.business.tenantId}`,
+           dbConnect:`Bearer ${tenantId.business.rustyRoof}`,
+           access:`${Encrypt(tenantId.user._id)}`
         },
         body: JSON.stringify({ collectionName, data }),
       });

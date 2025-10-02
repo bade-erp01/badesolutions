@@ -1,5 +1,6 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
+import dbConnect from "../../../../../../lib/mongoose"
 import Link from "next/link";
 import Card from "@/app/Components/Card";
 import Footer2 from "@/app/Components/Footer2";
@@ -54,12 +55,13 @@ export const metadata = {
 export default async function storelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/storeApi`, {
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const res = await fetch(`${baseUrl}/api/Stores`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${userData.business.tenantId}`,
+      dbConnect: `Bearer ${userData.business.rustyRoof}`,
     },
     next: {
       revalidate: 120, // 2 minutes

@@ -52,12 +52,14 @@ export const metadata = {
 export default async function layout({children,params}) {
      const userData = await fetchUser();
      const Module = await params
-     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-       const res = await fetch(`${baseUrl}/api/vendors`, {
+     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+       const res = await fetch(`${baseUrl}/api/Vendors`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`
+            "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`,
+            dbConnect:`Bearer ${userData.business.rustyRoof}`,
+            access:`${Encrypt(userData.user._id)}`
           }
         })
     
@@ -121,25 +123,7 @@ export default async function layout({children,params}) {
                   </nav>
         
                   {/* Bottom Section with Settings Link */}
-                  <div className="absolute bottom-4 left-4">
-                    {userData?.user?.isAdmin && (
-                      <Link
-                        href={`/${userData?.business?.companyName
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")
-                          .replace(/[^a-z0-9-]/g, "")}/SetUp`}
-                        className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                      >
-                        <Image
-                          src="https://img.icons8.com/3d-fluency/94/gear--v1.png"
-                          width={24}
-                          height={24}
-                          alt="Settings"
-                        />
-                        <span>Settings</span>
-                      </Link>
-                    )}
-                  </div>
+                 
                 </aside>{" "}
                 {/* Main Content Area */}
                 <main className="flex-1 ">

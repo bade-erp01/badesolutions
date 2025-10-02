@@ -23,8 +23,6 @@ import RenewSubscription from "@/app/Components/RenewSubcription"; // hypothetic
 };
 
 export default async function Layout({ children }) {
-  await dbConnect();
-
   const userData = await fetchUser();
   const userInfo = userData?.user;
   const businessInfo = userData?.business;

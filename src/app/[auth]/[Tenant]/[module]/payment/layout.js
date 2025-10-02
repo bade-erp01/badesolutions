@@ -1,12 +1,3 @@
-import Nav1 from "@/app/Components/Nav1";
-import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Footer2 from "@/app/Components/Footer2";
-import BackButton from "@/app/Components/BackBotton";
-import bankAccount from "../../../../../../models/BankAccount"
-import Customers from "../../../../../../models/Customer"
-import CreditCustomerPayment from "../../../../../../models/Creditpayment"
-import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
-
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description:
@@ -48,55 +39,10 @@ export const metadata = {
   twitterDescription:
     "Automate and optimize your enterprise with cutting-edge business solutions",
   twitterImage: "/assets/bade.png",
-  facicon:'/favicon'
+  facicon: "/favicon",
 };
 
 export default async function paymentlayout({ children, params }) {
-  const moduleList = await params;
-  const userData = await fetchUser();
-    
-    const Accounts = await bankAccount.findByTenant(userData.business.tenantId).lean()
-    const Customer = await Customers.findByTenant(userData.business.tenantId).lean()
-    const Payments  = await CreditCustomerPayment.findByTenant(userData.business.tenantId).sort({_id:-1}).limit(5000).lean()
 
-    // string all data for light weight
-    const Accountslist = JSON.stringify(Accounts) || "[]"
-    const CustomersList = JSON.stringify(Customer) || "[]"
-    const PaymentList = JSON.stringify(Payments) || "[]"
-
-  return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
-      <Nav1
-        user={userData.user}
-        business={userData.business}
-        page={`${moduleList.module}`}
-        Module={[{}]}
-      />
-
-      <div
-        className="flex flex-1 text-white bt-2 "
-       
-      >
-        {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 h-[511px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
-        >
-         <BackButton />
-          <hr />
-          <nav className="space-y-4">
-            <CashregisterReport dataArray={PaymentList} banks={Accountslist} customers={CustomersList}/>
-          </nav>
-        </aside>{" "}
-        {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6 relative z-10 h-[510px] overflow-y-auto">
-            {children}
-          </section>
-        </main>
-      </div>
-      <Footer2 />
-    </div>
-  );
+  return (<>{children}</>);
 }

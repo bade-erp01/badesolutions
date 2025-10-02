@@ -13,7 +13,7 @@ export default function InvoiceLandingPage({ billList, userData }) {
   const [endDate, setEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const bills = JSON.parse(billList);
+  const bills = billList;
   const params = useParams();
   const itemsPerPage = 6;
 

@@ -6,6 +6,7 @@ import ProductTransfer from "../../../../../../../models/ProductTransfers";
 import BackButton from "@/app/Components/BackBotton";
 import { WHouse } from "../../../../../../../models/Stores";
 import Page from './page';
+import dbConnect from "../../../../../../../lib/mongoose"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -54,6 +55,7 @@ export const metadata = {
 export default async function TransferPage({ params }) {
   const moduleList = await params;
   const userData = await fetchUser();
+  await dbConnect(userData.business.rustyRoof)
   const WHouses = await WHouse.findByTenant(userData.business.tenantId).lean();
   const TransfersList = await ProductTransfer.findById(Dencrypt(moduleList.id)).lean();
 

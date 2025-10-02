@@ -7,11 +7,11 @@ import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
 export default function SalesRportModal({ data, Stores, customers,users,business }) {
   const [filteredData, setFilteredData] = useState(
-      JSON.parse(data).filter(item => item.billStatus?.toLowerCase() !== "draft")
+      data?.filter(item => item.billStatus?.toLowerCase() !== "draft")
     );
-  const [StoresList] = useState(JSON.parse(Stores) || []);
-  const [customersList] = useState(JSON.parse(customers) || []);
-  const [usersList] = useState(JSON.parse(users) || []);
+  const [StoresList] = useState(Stores || []);
+  const [customersList] = useState(customers || []);
+  const [usersList] = useState(users || []);
   const [searchPeriod, setSearchPeriod] = useState('')
 
   const getCustomer = (id) => {

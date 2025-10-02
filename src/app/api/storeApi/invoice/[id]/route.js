@@ -16,8 +16,8 @@ export async function GET(req, { params }) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-
-    await dbConnect();
+    const dbToken = req.headers.get('dbconnect')?.split(' ')[1];
+    await dbConnect(dbToken);
 
     const invoice = await Invoice.findById(id).lean();
     // check if there is invoice before proceeding

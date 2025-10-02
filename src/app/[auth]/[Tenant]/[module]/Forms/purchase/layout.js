@@ -2,8 +2,6 @@
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import Storelayout from "./page"
 import {Encrypt,Dencrypt} from "../../../../../../../Functions/Functions"
-import Vendor from "../../../../../../../models/Vendors"
-import Purchase from "../../../../../../../models/purchaseOrders"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -47,9 +45,23 @@ export const metadata = {
 
 export default async function layout({children}) {
      const userData = await fetchUser();
+
+      const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+       const res = await fetch(`${baseUrl}/api/Purchasees`, {
+         method: "GET",
+         headers: {
+           "Content-Type": "application/json",
+           "Authorization": `Bearer ${ userData.business.tenantId}`,
+            dbConnect:`Bearer ${userData.business.rustyRoof}`,
+            access:`${Encrypt(userData.user._id)}`
+         }
+       })
+     
+       const data = await res.json()
+  
     //  get vendor list
-    const VendorList = await Vendor.findByTenant(userData.business.tenantId).lean();
-    const purcghaseList = await Purchase.findByTenant(userData.business.tenantId).sort({_id:-1}).lean();
-    const purchaseList = JSON.parse(JSON.stringify(purcghaseList)) 
-  return <Storelayout purchaseList={purchaseList} userData={userData} VendorList={JSON.stringify(VendorList)}/>
+    const VendorList = data.VendorList
+    const purchaseList = data.purcghaseList
+
+  return <Storelayout purchaseList={purchaseList} userData={userData} VendorList={VendorList}/>
 }

@@ -2,139 +2,122 @@ import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
-import Invoice from "../../../../../../models/Invoices";
-import Customer from "../../../../../../models/Customer";
-import EMPLOYEES from "../../../../../../models/Users";
-import {WHouse} from"../../../../../../models/Stores"
-import PRODUCTS from "../../../../../../models/Products"
-import Vendor from "../../../../../../models/Vendors"
 import SalesDashboard from "@/app/Components/Salesddash";
-import InvoiceLandingPage from "./page"
+import InvoiceLandingPage from "./page";
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
 import SalesDumpModal from "@/app/Components/Reports/salesDump";
-import {Encrypt} from "../../../../../../Functions/Functions"
+import { Encrypt } from "../../../../../../Functions/Functions";
+import axios from "axios";
 
 export const metadata = {
-  title:
-    "Business Automated Dynamic Enterprise [B.A.D.E]",
-  description:
-    "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
+  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  description: "Automate, Optimize, and Scale Your Business Operations",
   keywords: [
-    "Business Automation",
-    "Enterprise Solutions",
-    "B.A.D.E",
-    "AI-powered Business",
-    "Workflow Optimization",
-    "Process Automation",
-    "ERP in Nigeria",
-    "Bernard fidels ogoh",
-    "ERP in Abuja",
-    "ERP in Lagos",
-    "ERP in Port Harcourt",
-    "Locally built ERP",
-    "ERP for SMEs",
-    "ERP for Enterprises",
-    "ERP for Startups",
-    "ERP for Corporates",
-    "AI-powered ERP",
-    "AI-driven Business Solutions",
-    "AI Automation",
-    "Affordable ERP",
-    "Scalable ERP Solutions",
+    "Business Automation", "Enterprise Solutions", "B.A.D.E", "AI-powered Business",
+    "Workflow Optimization", "ERP in Nigeria", "Bernard fidels ogoh", "ERP for SMEs",
+    "Scalable ERP Solutions"
   ],
   author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow", // Allows search engines to index and follow links
+  robots: "index, follow",
   viewport: "width=device-width, initial-scale=1",
-  themeColor: "#f4a8ff", // Sets browser tab color (good for branding)
-  ogTitle:
-    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
-  ogDescription:
-    "Streamline your business with AI-driven automation, real-time insights, and scalability",
-  ogImage: "/assets/bade.png", // Preview image when shared on social media
+  themeColor: "#f4a8ff",
+  ogTitle: "Next-Level Automation",
+  ogDescription: "Streamline your business with AI-driven automation",
+  ogImage: "/assets/bade.png",
   ogUrl: "https://badesolutions.com.ng",
   twitterCard: "/assets/bade.png",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription:
-    "Automate and optimize your enterprise with cutting-edge business solutions",
+  twitterTitle: "B.A.D.E",
+  twitterDescription: "Automate and optimize your enterprise",
   twitterImage: "/assets/bade.png",
 };
 
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const [InvoiceList, customersList, Stores, users, Products,Vendors] = await Promise.all([
 
-  Invoice.findByTenant(userData.business.tenantId)
-    .sort({ _id: -1 })
-    .limit(1000)
-    .lean(),
-  Customer.findByTenant(userData.business.tenantId)
-    .select('Username')
-    .sort({ _id: -1 })
-    .lean(),
-  WHouse.findByTenant(userData.business.tenantId)
-    .select('WHName location')
-    .sort({ _id: -1 })
-    .lean(),
-  EMPLOYEES.findByTenant(userData.business.tenantId)
-    .select('firstName lastName')
-    .sort({ firstName: 1 })
-    .lean(),
-  PRODUCTS.findByTenant(userData.business.tenantId)
-    .select('Name')
-    .sort({ Name: 1 })
-    .lean(),
-  Vendor.findByTenant(userData.business.tenantId)
-    .select('Name')
-    .sort({ Name: 1 })
-    .lean(),
-]);
+  let invoiceList = [], customersList = [], stores = [], users = [], products = [], vendors = [];
 
+  try {
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+
+    const res = await axios.get(`${baseUrl}/api/Invoice`, {
+      headers: {
+        'Content-Type': 'application/json',
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+        Authorization: `Bearer ${userData.business.tenantId}`,
+      },
+    });
+
+    const data = await res.data;
+    invoiceList = data.invoices || [];
+    customersList = data.customers || [];
+    stores = data.stores || [];
+    users = data.users || [];
+    products = data.products || [];
+    vendors = data.vendors || [];
+
+  } catch (err) {
+    return (
+      <div className="text-red-500 p-6">
+        Failed to load. Please try again later.
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden ">
+    <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
         page={moduleList.module}
-        Module={JSON.stringify(InvoiceList)}
+        Module={invoiceList}
       />
 
-      <div
-        className="flex flex-1 text-white bt-2"
-      >
-        {/* Sidebar (collapsible on mobile) */}
+      <div className="flex flex-1 text-white bt-2">
         <aside
-          className={` bg-[#1e1e20]/80 backdrop-blur-lg
-              text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
+          className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-hidden md:block"
         >
-         <BackButton />
+          <BackButton />
           <hr />
           <nav className="space-y-4">
-            {/* sales report modal */}
-            <SalesRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)} business={userData.business}/>
+            <SalesRportModal
+              data={invoiceList}
+              customers={customersList}
+              Stores={stores}
+              users={users}
+              business={userData.business}
+            />
 
-            <DeliveryRportModal data={JSON.stringify(InvoiceList)} customers={JSON.stringify(customersList)} Stores={JSON.stringify(Stores)} users={JSON.stringify(users)}/>
+            <DeliveryRportModal
+              data={invoiceList}
+              customers={customersList}
+              Stores={stores}
+              users={users}
+              business={userData.business}
+            />
 
-            <SalesDumpModal Products={JSON.stringify(Products)} tenantData={Encrypt(userData.business.tenantId)} Stores={JSON.stringify(Stores)}  Vendors={Vendors}/>
+            <SalesDumpModal
+              Products={products}
+              tenantData={Encrypt(userData.business.tenantId)}
+              Stores={stores}
+              Vendors={vendors}
+              business={userData.business}
+            />
 
             {userData?.user?.c_levelDash && (
-            <SalesDashboard invoice={JSON.stringify(InvoiceList)} />
+              <SalesDashboard invoice={invoiceList} />
             )}
           </nav>
+        </aside>
 
-          
-        </aside>{" "}
-        {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="relative w-full h-[520px] max-h-[600px] flex-grow overflow-x-auto shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
-            {/* {children} */}
-            <InvoiceLandingPage billList={JSON.stringify(InvoiceList)} userData={userData} />
+        <main className="flex-1">
+          <section className="relative w-full h-[520px] max-h-[600px] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
+            <InvoiceLandingPage billList={invoiceList} userData={userData} />
           </section>
         </main>
       </div>
+
       <Footer2 />
     </div>
   );

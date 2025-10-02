@@ -1,8 +1,7 @@
 import Footer2 from "@/app/Components/Footer2";
 import Nav1 from "@/app/Components/Nav1";
 import Link from "next/link";
-import Image from "next/image";
-import dbConnect from "../../../../lib/mongoose";
+import Image from "next/image"
 import moment from "moment";
 import { Encrypt } from "../../../../Functions/Functions";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
@@ -12,7 +11,6 @@ import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 
 export default async function TenantPage({ params }) {
-  await dbConnect();
   const userData = await fetchUser();
 
   const languages = ['es', 'en', 'de', 'fr'];
@@ -63,7 +61,7 @@ export default async function TenantPage({ params }) {
           <hr className="border-gray-600 mb-4" />
 
           <nav className="space-y-4">
-            <div className="max-h-[480px] overflow-y-auto">
+            <div className="max-h-[83.5vh] overflow-y-hidden">
               {userData?.user?.Apps.map((app, index) => (
                 <Link
                   key={index}
@@ -71,7 +69,7 @@ export default async function TenantPage({ params }) {
                   title={app.Description || ""}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
-                  <Image src={app.icon} width={24} height={24} alt={app.Name} />
+                  <Image src={app.icon || "https://img.icons8.com/deco/48/open-box.png"} width={24} height={24} alt={app.Name} />
                   <span className="text-xs">{app.Name}</span>
                 </Link>
               ))}
@@ -112,8 +110,10 @@ export default async function TenantPage({ params }) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-2 max-w-screen-xl max-h-[510px] overflow-y-scroll p-6 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300"  
-        style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent' }}>
+        <main
+          className="flex-2 max-w-screen-xl h-[83.5vh] overflow-y-scroll p-6 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent' }}
+        >
           <section className=" " >
             <header className="mb-2">
               <h2 className="text-xl font-bold text-gray-900">

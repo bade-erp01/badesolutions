@@ -7,7 +7,6 @@ import BackButton from "@/app/Components/BackBotton";
 import Card from "@/app/Components/Card";
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Encrypt } from "../../../../../../../Functions/Mics";
 
 export default function Storelayout({ purchaseList, userData, VendorList }) {
   const Params = useParams();
@@ -17,7 +16,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [Vendors] = useState(JSON.parse(VendorList));
+  const [Vendors] = useState(VendorList);
   const itemsPerPage = 12;
 
   // Helper function moved outside useMemo for stable reference

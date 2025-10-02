@@ -3,6 +3,7 @@ import { UpdateEmployeeData, } from "../../../Functions/Functions";
 import {useState, useEffect} from 'react'
 import {useRouter} from 'next/navigation'
 import { ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics";
+import {Encrypt} from "../../../Functions/Functions"
 
 export default function AccessControl({userInfo,businessInfo,data }) {
  const [businessModules] = useState([...businessInfo.modules])
@@ -20,9 +21,9 @@ export default function AccessControl({userInfo,businessInfo,data }) {
       const response = await fetch("/api/EmployeeUpdate", {
         method: "PUT",
         body,
-        cache: "no-store",
-        next: {
-          revalidate: 60,
+        headers:{
+          dbConnect:`Bearer ${businessInfo.rustyRoof}`,
+          access:`${Encrypt(formData._id)}`
         },
         timeout: 10000, // ✅ 10s timeout for better error handling
       });
@@ -1218,7 +1219,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
           <div className="group grid size-4 grid-cols-1">
             <input
               id={`${app.Name}-${index}`}
-              checked={isChecked}
+              checked={isChecked || false}
               onChange={handleChange2}
               name={app.Name}
               type="checkbox"

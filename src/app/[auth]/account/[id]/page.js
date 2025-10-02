@@ -26,9 +26,6 @@ export default function BusinessDatas({ data, userInfo }) {
     // Helper function to truncate text to 10 characters
   const truncate = (str) => (str && str.length > 10 ? str.substring(0, 15) + "..." : str);
 
-
-
-
   // upload
    const uploadFiles = async (id,moduleList) => {
       try {
@@ -77,6 +74,9 @@ export default function BusinessDatas({ data, userInfo }) {
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
                   'Content-Type': 'application/json',
+                  dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+                  access:`${Encrypt(userInfo.user._id)}`
+                  
                 },
               });
     
@@ -107,6 +107,7 @@ export default function BusinessDatas({ data, userInfo }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${userInfo.business.tenantId}`,
       "X-Requested-With": "XMLHttpRequest",
+      dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
     },
   };
 

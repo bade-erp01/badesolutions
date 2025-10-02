@@ -12,9 +12,9 @@ export default function PaymentListpage({ bank, Customers, Payments }) {
   const [paymentDate, setPaymentDate] = useState("");
   const [accountId, setAccountId] = useState("");
 
-  const CustomersList = useMemo(() => JSON.parse(Customers) || [], [Customers]);
-  const PaymentList = useMemo(() => JSON.parse(Payments) || [], [Payments]);
-  const Accountslist = useMemo(() => JSON.parse(bank) || [], [bank]);
+  const CustomersList = useMemo(() =>Customers || [], [Customers]);
+  const PaymentList = useMemo(() => Payments || [], [Payments]);
+  const Accountslist = useMemo(() => bank || [], [bank]);
 
   const itemsPerPage = 12;
 

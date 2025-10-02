@@ -1,5 +1,6 @@
 "use client";
 import Nav1 from "@/app/Components/Nav1";
+import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
 import BackButton from "@/app/Components/BackBotton";
 import Image from "next/image";
 import { useState } from "react";
@@ -10,7 +11,6 @@ import {
   ErrorMessage,
 } from "../../../../../../../Functions/Mics";
 import axios from "axios";
-import {} from "../../../../../../../Functions/Mics";
 import { useRouter } from "next/navigation";
 
 export default function SingleStoreProductpage({ storeProduct, userInfo }) {
@@ -32,7 +32,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
       plsWait("Updating Fields...");
 
       const response = await axios.patch(
-        `/api/storeApi/inventory-items?id=${Encrypt(formData._id)}`, // Replace with your actual endpoint
+        `${EXPRESS_PRIVATE_URL}/api/Adjust/Product/${Encrypt(formData._id)}`, // Replace with your actual endpoint
         {
           currentQty: formData.currentQty,
           pcs: formData.pcs,
@@ -42,12 +42,14 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`, // Replace with your actual token
+            dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+            access:`${Encrypt(userInfo.user._id)}`
           },
         }
       );
 
       // Inside your async function (e.g., handleSubmit)
-      if (response.data.data) {
+      if (response.data.message) {
         SuccessToast(response.data.message);
         router.refresh(); // This will reload server-side data and re-render the page
       } else {

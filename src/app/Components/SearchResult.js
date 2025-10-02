@@ -66,6 +66,7 @@ const SearchCard = ({ data, module, UserData }) => {
     data.Email ||
     data.billStatus ||
     data.ADCcode ||
+    data.ACDcode ||
     data.status ||
     `${data.currentQty ? `${data.currentQty} :case, ` : ""}${data.pcs ? `${data.pcs}:pcs` : ""}`;
 
@@ -74,8 +75,8 @@ const SearchCard = ({ data, module, UserData }) => {
       <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
         <MagnifyingGlassIcon className="h-7 w-7 text-purple-500" />
         <div className="flex flex-col justify-center w-full">
-          <p className="text-base font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>
-          <small className="text-sm text-gray-500 mt-1 text-xs">{truncate(subtitle)}</small>
+          <p className="font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>
+          <small className="text-sm text-gray-500 mt-1">{truncate(subtitle)}</small>
         </div>
       </div>
     </Link>

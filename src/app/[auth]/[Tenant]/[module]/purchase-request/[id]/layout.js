@@ -54,37 +54,34 @@ export const metadata = {
 export default async function storelayout({ params }) { 
   const moduleList = await params;
   const userData = await fetchUser();
-const items = await PurchaseOrder.findById(Dencrypt(moduleList.id)).lean();
-// if not found show 404 page
-if (!items) {
-  return notFound(); // Correctly invoke the notFound function
-}
 
- const StoreLists = await WHouse.findById(items.WHID).lean();
- const StoreListsStr = JSON.stringify(StoreLists);
- const StoreListsObj = JSON.parse(StoreListsStr);
+   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const res = await fetch(`${baseUrl}/api/Purchase/${moduleList.id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userData.business.tenantId}`,
+      dbConnect: `Bearer ${userData.business.rustyRoof}`,
+    },
+  });
 
- const VendorList = await Vendor.findById(items.Vendor).lean();
-  const VendorListStr = JSON.stringify(VendorList);
-  const VendorListObj = JSON.parse(VendorListStr);
+  if (!res.ok) {
+    return notFound(); // Correctly invoke the notFound function
+  }
 
-   const storeProductList = await storeProduct.findByTenant(userData.business.tenantId,{ WHIDS: StoreLists._id,
-          isActivated:true,
-          isAservice: false,
-          Vendor:VendorList._id}).lean();
-  const storeProductStr = JSON.stringify(storeProductList);
-  const storeProductPar = JSON.parse(storeProductStr);
+  const data = await res.json();
+
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={items.billReferenceNo}
+        page={`RFP/${data.purchaseOrder.billReferenceNo}`}
       />
 
       <div>
-        <DraftPurchasePage  user={userData.user} customer={VendorListObj} bill={items} products={storeProductPar} Business={userData.business} Whouse={StoreListsObj} />
+        <DraftPurchasePage  user={userData.user} customer={data.vendor} bill={data.purchaseOrder} products={data.storeProductList} Business={userData.business} Whouse={data.WH} />
       </div>
       <Footer2 />
     </div>

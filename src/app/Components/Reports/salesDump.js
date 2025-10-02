@@ -7,10 +7,10 @@ import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
 import { plsWait } from "../../../../Functions/Mics";
 import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
 
-const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
+const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
   const [salesDatas, setSalesDatas] = useState([]);
-  const [ProductList] = useState(Products ? JSON.parse(Products) : []);
-  const [StoreList] = useState(Stores ? JSON.parse(Stores) : []);
+  const [ProductList] = useState(Products || []);
+  const [StoreList] = useState(Stores || []);
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
@@ -18,7 +18,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
   });
 
   const productOptions = ProductList.map(
-      (product) => `<option value="${product.Name}">${product.Name}</option>`
+      (product) => `<option value="${product._id}">${product.Name}</option>`
     ).join("");
 
     //get prooduct name
@@ -57,7 +57,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
 
   const filterSales = (activeFilters) => {
     if (!salesDatas || salesDatas.length === 0) return [];
-    const filteredExport = [];
+    const filteredExport = [];    
 
     salesDatas.forEach((sale) => {
       const saleDate = new Date(sale.startDate);
@@ -69,7 +69,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
 
       sale.orders.forEach((order) => {
         const matchesProduct = activeFilters.product
-          ? order.item.Name?.toLowerCase().includes(activeFilters.product.toLowerCase())
+          ? order.item._id?.toString().includes(activeFilters.product.toString())
           : true;
 
         if (matchesProduct) {
@@ -167,6 +167,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors}) => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${tenantData}`,
+              dbConnect:`Bearer ${business.rustyRoof}`,
             },
           }
         );

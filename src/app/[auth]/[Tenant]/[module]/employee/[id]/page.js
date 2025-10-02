@@ -3,7 +3,7 @@ import Plotly from "plotly.js-dist-min";
 import Swal from "sweetalert2";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image"
+import Image from "next/image";
 import {
   Encrypt,
   UpdateEmployeeData,
@@ -41,6 +41,9 @@ export default function SingleEmployeeView({
   const [Error, setError] = useState("");
   const [formData, setFormData] = useState({ ...data });
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
+  const [isOpen3, setIsOpen3] = useState(false);
 
   const DeleteAttachment = async (id, model, attachmentId) => {
     Swal.fire({
@@ -60,6 +63,8 @@ export default function SingleEmployeeView({
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
+            dbConnect: `Bearer ${businessInfo.rustyRoof}`,
+            access: `${Encrypt(userInfo._id)}`,
           }
         );
 
@@ -128,6 +133,8 @@ export default function SingleEmployeeView({
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
                   "Content-Type": "application/json",
+                  dbConnect: `Bearer ${businessInfo.rustyRoof}`,
+                  access: `${Encrypt(userInfo._id)}`,
                 },
               }
             );
@@ -219,6 +226,8 @@ export default function SingleEmployeeView({
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
                   "Content-Type": "application/json",
+                  dbConnect: `Bearer ${businessInfo.rustyRoof}`,
+                  access: `${Encrypt(userInfo._id)}`,
                 },
               }
             );
@@ -333,8 +342,9 @@ export default function SingleEmployeeView({
             <div className="flex items-center gap-6">
               <div className="w-28 h-28 rounded-lg overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-md border border-gray-300 flex items-center justify-center">
                 {data.image ? (
-                  <Image height={40}
-                  width={40}
+                  <Image
+                    height={40}
+                    width={40}
                     src={data.image}
                     quality={100}
                     loaing="eager"
@@ -363,19 +373,19 @@ export default function SingleEmployeeView({
             {/* Attachment */}
             {userInfo.isAdmin && (
               <div className="flex-1 min-w-[220px]">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Attach Document
-              </label>
-              <button
-                onClick={() => {
-                  uploadLPOFile(Encrypt(data._id), "Employee");
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md shadowtransition"
-              >
-                <PaperClipIcon className="h-5 w-5" />
-                <span className="text-sm font-medium">Upload</span>
-              </button>
-            </div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Attach Document
+                </label>
+                <button
+                  onClick={() => {
+                    uploadLPOFile(Encrypt(data._id), "Employee");
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md shadowtransition"
+                >
+                  <PaperClipIcon className="h-5 w-5" />
+                  <span className="text-sm font-medium">Upload</span>
+                </button>
+              </div>
             )}
           </div>
           {/* chart  */}
@@ -385,783 +395,875 @@ export default function SingleEmployeeView({
             business={businessInfo}
           />
           <br />
-          <form
-            onSubmit={handleSubmit}
-            className="border-b bg- border-gray-900/10 pb-12"
-          >
-            <h2 className="text-base/7 font-semibold text-gray-900">
-              Personal Information
-            </h2>
-            <p className="mt-1 text-sm/6 text-gray-600">
-              Ensure to provide correct Information.
-            </p>
-
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="first-name"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  First Name
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    autoComplete="given-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="last-name"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Last Name
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    autoComplete="family-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="city"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Email
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Email"
-                    name="Email"
-                    type="email"
-                    value={formData.Email}
-                    onChange={handleChange}
-                    autoComplete="Email-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="region"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Date of Birth
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="DOB"
-                    name="DOB"
-                    type="date"
-                    value={formData.DOB}
-                    onChange={handleChange}
-                    autoComplete="address-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor=""
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Telephone
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="telephone"
-                    name="telephone"
-                    type="tel"
-                    value={formData.telephone}
-                    onChange={handleChange}
-                    autoComplete=""
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Country"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Country
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Country"
-                    name="Country"
-                    type="text"
-                    value="Nigeria"
-                    readOnly
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="region"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  State / Province
-                </label>
-                <div className="mt-2">
-                  <select
-                    id="stateOfOrigin"
-                    name="stateOfOrigin"
-                    onChange={handleChange}
-                    autoComplete="stateOfOrigin"
-                    className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  >
-                    <option value={formData.stateOfOrigin}>
-                      {" "}
-                      {formData.stateOfOrigin || "Choose..."}
-                    </option>
-                    {states.map((state, index) => (
-                      <option value={state} key={index}>
-                        {state}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="workTelephone"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Work Line
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="workTelephone"
-                    name="workTelephone"
-                    type="tel"
-                    value={formData.workTelephone}
-                    onChange={handleChange}
-                    autoComplete="workTelephone"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="nextOfKin"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Next of Kin
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="nextOfKin"
-                    name="nextOfKin"
-                    value={formData.nextOfKin}
-                    onChange={handleChange}
-                    type="text"
-                    autoComplete="nextOfKin"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="EmaergencyContact"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Emergency Contact Name
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="EmaergencyContact"
-                    name="EmaergencyContact"
-                    type="text"
-                    value={formData.EmaergencyContact}
-                    onChange={handleChange}
-                    autoComplete="EmaergencyContact"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="EmaergencyContactNumber"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Emergency Contact number
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.EmaergencyContactNumber}
-                    onChange={handleChange}
-                    id="EmaergencyContactNumber"
-                    name="EmaergencyContactNumber"
-                    type="tel"
-                    autoComplete="EmaergencyContactNumber"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="col-span-full">
-                <label
-                  htmlFor="HomeAddress"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  House address
-                </label>
-                <div className="mt-2">
-                  <input
-                    value={formData.HomeAddress}
-                    onChange={handleChange}
-                    id="HomeAddress"
-                    name="HomeAddress"
-                    type="text"
-                    autoComplete="HomeAddress"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Gender"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Gender
-                </label>
-
-                <div className="flex items-center gap-x-3">
-                  <input
-                    value={formData.Gender}
-                    onChange={handleChange}
-                    id="Gender"
-                    name="Gender"
-                    type="text"
-                    autoComplete="Gender"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-            </div>
+          <div className="border rounded-lg overflow-hidden">
             <button
-              type="submit"
-              className="bg-slate-500 rounded-md px-3 py-2 mt-3 text-sm font-semibold text-white hover:bg-slate-700 transition"
+              onClick={() => setIsOpen(!isOpen)}
+              className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
             >
-              Update Personal infomation
+              <h2 className="text-base/7 font-semibold text-gray-900">
+                Personal Information
+              </h2>
+              <svg
+                className={`w-5 h-5 transform transition-transform duration-300 ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </button>
-          </form>
+            <div
+              className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                isOpen ? "block" : "hidden"
+              }`}
+            >
+              <form
+                onSubmit={handleSubmit}
+                className="border-b bg- border-gray-900/10 pb-12"
+              >
+                <p className="mt-1 text-sm/6 text-gray-600">
+                  Ensure to provide correct Information.
+                </p>
+
+                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="first-name"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      First Name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        autoComplete="given-name"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="last-name"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Last Name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        autoComplete="family-name"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="city"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Email
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="Email"
+                        name="Email"
+                        type="email"
+                        value={formData.Email}
+                        onChange={handleChange}
+                        autoComplete="Email-level2"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="region"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Date of Birth
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="DOB"
+                        name="DOB"
+                        type="date"
+                        value={formData.DOB}
+                        onChange={handleChange}
+                        autoComplete="address-level1"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor=""
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Telephone
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="telephone"
+                        name="telephone"
+                        type="tel"
+                        value={formData.telephone}
+                        onChange={handleChange}
+                        autoComplete=""
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="Country"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Country
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="Country"
+                        name="Country"
+                        type="text"
+                        value="Nigeria"
+                        readOnly
+                        autoComplete="address-level2"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="region"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      State / Province
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        id="stateOfOrigin"
+                        name="stateOfOrigin"
+                        onChange={handleChange}
+                        autoComplete="stateOfOrigin"
+                        className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      >
+                        <option value={formData.stateOfOrigin}>
+                          {" "}
+                          {formData.stateOfOrigin || "Choose..."}
+                        </option>
+                        {states.map((state, index) => (
+                          <option value={state} key={index}>
+                            {state}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDownIcon
+                        aria-hidden="true"
+                        className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="workTelephone"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Work Line
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="workTelephone"
+                        name="workTelephone"
+                        type="tel"
+                        value={formData.workTelephone}
+                        onChange={handleChange}
+                        autoComplete="workTelephone"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="nextOfKin"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Next of Kin
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="nextOfKin"
+                        name="nextOfKin"
+                        value={formData.nextOfKin}
+                        onChange={handleChange}
+                        type="text"
+                        autoComplete="nextOfKin"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="EmaergencyContact"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Emergency Contact Name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        id="EmaergencyContact"
+                        name="EmaergencyContact"
+                        type="text"
+                        value={formData.EmaergencyContact}
+                        onChange={handleChange}
+                        autoComplete="EmaergencyContact"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="EmaergencyContactNumber"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Emergency Contact number
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.EmaergencyContactNumber}
+                        onChange={handleChange}
+                        id="EmaergencyContactNumber"
+                        name="EmaergencyContactNumber"
+                        type="tel"
+                        autoComplete="EmaergencyContactNumber"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-span-full">
+                    <label
+                      htmlFor="HomeAddress"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      House address
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.HomeAddress}
+                        onChange={handleChange}
+                        id="HomeAddress"
+                        name="HomeAddress"
+                        type="text"
+                        autoComplete="HomeAddress"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="Gender"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Gender
+                    </label>
+
+                    <div className="flex items-center gap-x-3">
+                      <input
+                        value={formData.Gender}
+                        onChange={handleChange}
+                        id="Gender"
+                        name="Gender"
+                        type="text"
+                        autoComplete="Gender"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="bg-slate-500 rounded-md px-3 py-2 mt-3 text-sm font-semibold text-white hover:bg-slate-700 transition"
+                >
+                  Update Personal infomation
+                </button>
+              </form>
+            </div>
+          </div>
 
           {/* work information */}
           {user.isHRM && (
-            <form
-              onSubmit={handleSubmit}
-              className="border-b border-gray-900/10 pb-12"
-            >
-              <h2 className="text-base/7 font-semibold text-gray-900">
-                Work Information
-              </h2>
-
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-2 sm:col-start-1">
-                  <label
-                    htmlFor="city"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Work Location
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="workLocation"
-                      name="workLocation"
-                      type="text"
-                      value={formData.workLocation}
-                      onChange={handleChange}
-                      autoComplete="address-level2"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="staffId"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Staff ID Number
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="staffId"
-                      name="staffId"
-                      value={formData.staffId}
-                      onChange={handleChange}
-                      type="text"
-                      autoComplete="address-level1"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Department"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Department
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Department"
-                      name="Department"
-                      value={formData.Department}
-                      onChange={handleChange}
-                      type="text"
-                      autoComplete="Department"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2 sm:col-start-1">
-                  <label
-                    htmlFor="jobTittle"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Job Tittle
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="jobTittle"
-                      name="jobTittle"
-                      type="text"
-                      value={formData.jobTittle}
-                      onChange={handleChange}
-                      autoComplete="jobTittle"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="pension"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Pension No
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="pension"
-                      name="pension"
-                      value={formData.pension}
-                      onChange={handleChange}
-                      type="text"
-                      autoComplete="pension"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2 sm:col-start-1">
-                  <label
-                    htmlFor="city"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Account Number
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="nextOfKin"
-                      name="nextOfKin"
-                      type="text"
-                      value={formData.pension}
-                      onChange={handleChange}
-                      autoComplete="address-level2"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="BankName"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Bank Name
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="BankName"
-                      name="BankName"
-                      value={formData.BankName}
-                      onChange={handleChange}
-                      type="text"
-                      autoComplete="BankName"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="StartDate"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Employment Date
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="StartDate"
-                      name="StartDate"
-                      value={formData.StartDate}
-                      onChange={handleChange}
-                      type="date"
-                      autoComplete="StartDate"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="EndDate"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Dismissal Date
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="EndDate"
-                      name="EndDate"
-                      value={formData.EndDate}
-                      onChange={handleChange}
-                      type="date"
-                      autoComplete="EndDate"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Salary"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Basic Salary
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Salary"
-                      name="Salary"
-                      value={formData.Salary}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      autoComplete="Salary"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Medical"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Medical
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Medical"
-                      name="Medical"
-                      value={formData.Medical}
-                      onChange={handleChange}
-                      type="number"
-                      autoComplete="Medical"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Transport"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Transport
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Transport"
-                      name="Transport"
-                      value={formData.Transport}
-                      onChange={handleChange}
-                      type="number"
-                      autoComplete="Transport"
-                      step="any"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Welfare"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Welfare
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Welfare"
-                      name="Welfare"
-                      value={formData.Welfare}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      autoComplete="Welfare"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="penDeduction"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Pension Deduction
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="penDeduction"
-                      name="penDeduction"
-                      type="number"
-                      step="any"
-                      value={formData.penDeduction}
-                      onChange={handleChange}
-                      autoComplete="penDeduction"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="pfa"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Pension Administrator
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="pfa"
-                      name="pfa"
-                      value={formData.pfa}
-                      onChange={handleChange}
-                      type="text"
-                      autoComplete="pfa"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="workEmail"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Work Email
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="workEmail"
-                      name="workEmail"
-                      value={formData.workEmail}
-                      onChange={handleChange}
-                      type="text"
-                      autoComplete="workEmail"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Sales_Target"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Sales Target
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Sales_Target"
-                      name="Sales_Target"
-                      value={formData.Sales_Target}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      autoComplete="Sales_Target"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Target_Start"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Target Start
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Target_Start"
-                      name="Target_Start"
-                      value={formData.Target_Start}
-                      onChange={handleChange}
-                      type="date"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="Deadline"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Target End
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="Deadline"
-                      name="Deadline"
-                      value={formData.Deadline}
-                      onChange={handleChange}
-                      type="date"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="ExpenseLimit"
-                    className="block text-sm/6 font-medium text-gray-900"
-                  >
-                    Expense Limit
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="ExpenseLimit"
-                      name="ExpenseLimit"
-                      value={formData.ExpenseLimit}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      autoComplete="ExpenseLimit"
-                      className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                  </div>
-                </div>
-
-                {/* <div className="sm:col-span-2">
-                <label
-                  htmlFor="ExpenseLimit"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Expense Limit
-                </label>
-                <div className="mt-2">
-                  <input
-                    id=" ExpenseLimit"
-                    name=""
-                    value={formData.ExpenseLimit}
-                     onChange={handleChange}
-                    type="number"
-                    step="any"
-                    autoComplete="ExpenseLimit"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div> */}
-              </div>
+            <div className="border rounded-lg overflow-hidden">
               <button
-                type="submit"
-                className="bg-slate-500 rounded-md px-3 py-2 mt-3 text-sm font-semibold text-white hover:bg-slate-700 transition"
+                onClick={() => setIsOpen2(!isOpen2)}
+                className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
               >
-                Update work infomation
+                <h2 className="text-base/7 font-semibold text-gray-900">
+                  Work Information
+                </h2>
+                <svg
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    isOpen2 ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               </button>
-            </form>
+              <div
+                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                  isOpen2 ? "block" : "hidden"
+                }`}
+              >
+                <form
+                  onSubmit={handleSubmit}
+                  className="border-b border-gray-900/10 pb-12"
+                >
+                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div className="sm:col-span-2 sm:col-start-1">
+                      <label
+                        htmlFor="city"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Work Location
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="workLocation"
+                          name="workLocation"
+                          type="text"
+                          value={formData.workLocation}
+                          onChange={handleChange}
+                          autoComplete="address-level2"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="staffId"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Staff ID Number
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="staffId"
+                          name="staffId"
+                          value={formData.staffId}
+                          onChange={handleChange}
+                          type="text"
+                          autoComplete="address-level1"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Department"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Department
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Department"
+                          name="Department"
+                          value={formData.Department}
+                          onChange={handleChange}
+                          type="text"
+                          autoComplete="Department"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2 sm:col-start-1">
+                      <label
+                        htmlFor="jobTittle"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Job Tittle
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="jobTittle"
+                          name="jobTittle"
+                          type="text"
+                          value={formData.jobTittle}
+                          onChange={handleChange}
+                          autoComplete="jobTittle"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="pension"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Pension No
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="pension"
+                          name="pension"
+                          value={formData.pension}
+                          onChange={handleChange}
+                          type="text"
+                          autoComplete="pension"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2 sm:col-start-1">
+                      <label
+                        htmlFor="city"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Account Number
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="nextOfKin"
+                          name="nextOfKin"
+                          type="text"
+                          value={formData.pension}
+                          onChange={handleChange}
+                          autoComplete="address-level2"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="BankName"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Bank Name
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="BankName"
+                          name="BankName"
+                          value={formData.BankName}
+                          onChange={handleChange}
+                          type="text"
+                          autoComplete="BankName"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="StartDate"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Employment Date
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="StartDate"
+                          name="StartDate"
+                          value={formData.StartDate}
+                          onChange={handleChange}
+                          type="date"
+                          autoComplete="StartDate"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="EndDate"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Dismissal Date
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="EndDate"
+                          name="EndDate"
+                          value={formData.EndDate}
+                          onChange={handleChange}
+                          type="date"
+                          autoComplete="EndDate"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Salary"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Basic Salary
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Salary"
+                          name="Salary"
+                          value={formData.Salary}
+                          onChange={handleChange}
+                          type="number"
+                          step="any"
+                          autoComplete="Salary"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Medical"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Medical
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Medical"
+                          name="Medical"
+                          value={formData.Medical}
+                          onChange={handleChange}
+                          type="number"
+                          autoComplete="Medical"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Transport"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Transport
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Transport"
+                          name="Transport"
+                          value={formData.Transport}
+                          onChange={handleChange}
+                          type="number"
+                          autoComplete="Transport"
+                          step="any"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Welfare"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Welfare
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Welfare"
+                          name="Welfare"
+                          value={formData.Welfare}
+                          onChange={handleChange}
+                          type="number"
+                          step="any"
+                          autoComplete="Welfare"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="penDeduction"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Pension Deduction
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="penDeduction"
+                          name="penDeduction"
+                          type="number"
+                          step="any"
+                          value={formData.penDeduction}
+                          onChange={handleChange}
+                          autoComplete="penDeduction"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="pfa"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Pension Administrator
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="pfa"
+                          name="pfa"
+                          value={formData.pfa}
+                          onChange={handleChange}
+                          type="text"
+                          autoComplete="pfa"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="workEmail"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Work Email
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="workEmail"
+                          name="workEmail"
+                          value={formData.workEmail}
+                          onChange={handleChange}
+                          type="text"
+                          autoComplete="workEmail"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Sales_Target"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Sales Target
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Sales_Target"
+                          name="Sales_Target"
+                          value={formData.Sales_Target}
+                          onChange={handleChange}
+                          type="number"
+                          step="any"
+                          autoComplete="Sales_Target"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Target_Start"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Target Start
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Target_Start"
+                          name="Target_Start"
+                          value={formData.Target_Start}
+                          onChange={handleChange}
+                          type="date"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="Deadline"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Target End
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="Deadline"
+                          name="Deadline"
+                          value={formData.Deadline}
+                          onChange={handleChange}
+                          type="date"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="ExpenseLimit"
+                        className="block text-sm/6 font-medium text-gray-900"
+                      >
+                        Expense Limit
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          id="ExpenseLimit"
+                          name="ExpenseLimit"
+                          value={formData.ExpenseLimit}
+                          onChange={handleChange}
+                          type="number"
+                          step="any"
+                          autoComplete="ExpenseLimit"
+                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        />
+                      </div>
+                    </div>
+
+                    {/* <div className="sm:col-span-2">
+                        <label
+                          htmlFor="ExpenseLimit"
+                          className="block text-sm/6 font-medium text-gray-900"
+                        >
+                          Expense Limit
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            id=" ExpenseLimit"
+                            name=""
+                            value={formData.ExpenseLimit}
+                            onChange={handleChange}
+                            type="number"
+                            step="any"
+                            autoComplete="ExpenseLimit"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                      </div> */}
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-slate-500 rounded-md px-3 py-2 mt-3 text-sm font-semibold text-white hover:bg-slate-700 transition"
+                  >
+                    Update work infomation
+                  </button>
+                </form>
+              </div>
+            </div>
           )}
           {/* ends heree */}
 
           <div className="border-b border-gray-900/10 pb-12">
             {user.isAdmin && (
-              <>
-                <h2 className="text-base/7 font-semibold text-gray-900">
-                  Role Based Access & Control (RBAC)
-                </h2>
-                <p className="mt-1 text-sm/6 text-gray-600">
-                  Assign permissions based on {data.firstName}&lsquo;s job roles.
-                </p>
+              <div className="border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setIsOpen3(!isOpen3)}
+                  className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+                >
+                  <h2 className="text-base/7 font-semibold text-gray-900">
+                    Role Based Access & Control (RBAC)
+                  </h2>
+                  <svg
+                    className={`w-5 h-5 transform transition-transform duration-300 ${
+                      isOpen3 ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                <div
+                  className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                    isOpen3 ? "block" : "hidden"
+                  }`}
+                >
+                  <p className="mt-1 text-sm/6 text-gray-600">
+                    Assign permissions based on {data.firstName}&lsquo;s job
+                    roles.
+                  </p>
 
-                <div className="mt-10 space-y-10 ">
-                  <AccessControl businessInfo={businessInfo} data={data} />
+                  <div className="mt-10 space-y-10 ">
+                    <AccessControl businessInfo={businessInfo} data={data} />
+                  </div>
                 </div>
-              </>
+              </div>
             )}
+
             {user.isAdmin && (
               <>
                 <h5 className="mt-6 text-sm font-semibold text-gray-900">
                   Files and Attachements
                 </h5>
-            <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {data.Attachments.map((attachment, index) => (
-                <div key={attachment._id} className="relative w-full h-32 mb-4">
-                  <Image height={10} width={10}
-                    src={Dencrypt(attachment.Url)}
-                    alt={`Attachment ${index + 1}`}
-                    className="w-full h-32 object-cover rounded border border-gray-300 hover:shadow-md"
-                  />
-                  <button
-                    className="absolute top-1 right-1 text-red-500 hover:text-red-700 transition"
-                    onClick={() =>
-                      DeleteAttachment(userInfo._id, "Employee", attachment._id)
-                    }
-                  >
-                    Remove
-                  </button>
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {data.Attachments.map((attachment, index) => (
+                    <div
+                      key={attachment._id}
+                      className="relative w-full h-32 mb-4"
+                    >
+                      <Image
+                        height={10}
+                        width={10}
+                        src={Dencrypt(attachment.Url)}
+                        alt={`Attachment ${index + 1}`}
+                        className="w-full h-32 object-cover rounded border border-gray-300 hover:shadow-md"
+                      />
+                      <button
+                        className="absolute top-1 right-1 text-red-500 hover:text-red-700 transition"
+                        onClick={() =>
+                          DeleteAttachment(
+                            userInfo._id,
+                            "Employee",
+                            attachment._id
+                          )
+                        }
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
               </>
             )}
           </div>
@@ -1226,13 +1328,15 @@ function SalePersonChart({ customerId, customerName, business }) {
     const fetchSalesData = async () => {
       try {
         const currentYear = moment().format("YYYY");
-        const url = `${EXPRESS_PRIVATE_URL}/${business.companyName}/SalseandStock?Year=${currentYear}`;
+        const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}`;
 
         const request = await fetch(url, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${business.token}`, // Optional
+            Authorization: `Bearer ${business.token}`,
+            dbConnect: `Bearer ${business.rustyRoof}`,
+            // access: `${Encrypt(userInfo._id)}`,
           },
         });
 
@@ -1303,7 +1407,6 @@ function SalePersonChart({ customerId, customerName, business }) {
         setChartData({ SECdata, NDlayout });
       } catch (err) {
         setErrorMsg("Error generating chart.");
-        console.error("❌", err.message);
       } finally {
         setLoading(false);
       }
