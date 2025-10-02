@@ -587,13 +587,13 @@ export default function BusinessDatas({ data, userInfo }) {
       <Section title="Installed Business Apps">
         <div className="overflow-x-auto p-2">
           {data && data.modules.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 ">
               {data.modules.map((data) => (
                 <Link
                   key={data._id}
                   href={`#`}
                   title={data.Description}
-                  className="block w-full h-full"
+                  className="block w-full h-full text-xs"
                   style={{ textDecoration: "none" }}
                 >
                   <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
