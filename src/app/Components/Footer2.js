@@ -19,6 +19,16 @@ export default function Footer2() {
             Contact Sales
           </Link>
         </span>
+
+        <span className="text-xs md:text-base text-gray-200">
+          🌍This Space is available for advert, grab this opportunity to reach other B.A.D.E users.{" "}
+          <Link
+            href="/contact-sales"
+            className="text-indigo-400 underline hover:text-indigo-300 ml-2"
+          >
+            Contact Sales
+          </Link>
+        </span>
       </Marquee>
     </footer>
   );
