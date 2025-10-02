@@ -66,7 +66,7 @@ export default async function SetUpLayout({children, params }) {
             </aside>{" "}
             {/* Main Content Area */}
             <main className="flex-1 ">
-              <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg  relative z-10 h-[500px] overflow-y-auto">
+              <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg  relative z-10 h-[520px] overflow-y-auto">
                 <BusinessDatas data={business} userInfo={userData} />
                 {/* {children} */}
               </section>
