@@ -2,6 +2,7 @@ import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
+import BackButton from "@/app/Components/BackBotton";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -77,9 +78,7 @@ export default async function Employeelayout({ children, params }) {
               text-white px-4 py-6 transition-all duration-300 h-[510px] max-h-[600px] overflow-y-hidden md:block`}
           style={{ maxHeight: "600px", overflowY: "hidden" }}
         >
-          <h2 className="text-lg  text-white font-bold mb-4">
-            Employee Management
-          </h2>
+          <BackButton/>
           <hr />
           <nav className="space-y-4  h-[500px] max-h-[600px] overflow-y-hidden ">
             {userData?.user?.isAdmin && EmployeeList.length > 0 && (
