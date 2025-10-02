@@ -418,25 +418,6 @@ export default function BusinessDatas({ data, userInfo }) {
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Credit Limit Application
-            </label>
-            <select
-              name="allowCreditLimit"
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-            >
-              <option value={formData.allowCreditLimit}>
-                {formData.allowCreditLimit === ""
-                  ? "This dosen't apply to my business"
-                  : formData.allowCreditLimit}
-              </option>
-              <option value=""> This dosen't apply to my business</option>
-              <option value="Customer"> Customers</option>
-              <option value="Warehouse"> Warehouse</option>
-            </select>
-          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -500,7 +481,7 @@ export default function BusinessDatas({ data, userInfo }) {
           <Input
           name={"priceList5"}
             label="PriceList 5"
-            value={formData.priceList6}
+            value={formData.priceList5}
             type="text"
             required
             onChange={handleChange}
