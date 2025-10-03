@@ -9,6 +9,7 @@ import { CpuChipIcon } from "@heroicons/react/24/outline";
 import Logout from "@/app/Components/Logout";
 import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
+import BirthdayGreetings from "@/app/Components/BithdayToast"
 
 export default async function TenantPage({ params }) {
   const userData = await fetchUser();
@@ -129,6 +130,7 @@ export default async function TenantPage({ params }) {
         </main>
       </div>
       <SubscriptionReminder Business={userData.business} />
+      <BirthdayGreetings Business={userData.business} user={userData.user}/>
       <Footer2 />
     </div>
   );
