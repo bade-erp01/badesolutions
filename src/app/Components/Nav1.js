@@ -161,7 +161,7 @@ export default function Nav1({ page, Module, user, business }) {
                 <form
                   onSubmit={handleSearch}
                   title={`Search through ${page} collection ...🪄✨`}
-                  className="md:flex items-center bg-white rounded-md px-3 py-1 shadow shadow-purple-300"
+                  className="md:flex items-center bg-white rounded-md px-3 py-1 shadow shadow-gray-300"
                 >
                   <input
                     type="search"
