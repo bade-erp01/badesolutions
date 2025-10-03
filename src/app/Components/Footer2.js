@@ -13,7 +13,7 @@ export default function Footer2() {
         <span className="text-xs md:text-base text-gray-200">
           📢 You can request a customized business email that reflects your brand identity.{" "}
         </span>
-        {" "}
+        {" "} |  {" "}
         <span className="text-xs md:text-base text-gray-200">
           🌍This Space is available for advert, grab this special offer to reach other B.A.D.E users.{" "}
           <Link
