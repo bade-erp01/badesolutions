@@ -205,153 +205,165 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
   };
 
 // print waybill
-  const printWayBill = async (business, customer, bill) => {
-    try {
-      plsWait("Setting things up, Ensure your printer is connected⌛...");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
+ const printWayBill = async (business, customer, bill, userInfo) => {
+  try {
+    plsWait("Setting things up, Ensure your printer is connected⌛...");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      // 🖼️ Logo (browser-safe)
-      if (userInfo.business.companyLogo) {
-        try {
-          const logoDataURL = await loadImageAsDataURL(userInfo.business.companyLogo);
-          doc.addImage(logoDataURL, "JPEG", 10, 10, 40, 30);
-        } catch (imgErr) {
-          console.warn("Logo failed to load:", imgErr.message);
-        }
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    let currentY = margin;
+
+    // 🖼️ Logo
+    if (business.companyLogo) {
+      try {
+        const logoDataURL = await loadImageAsDataURL(business.companyLogo);
+        const logoWidth = pageWidth * 0.2;
+        const logoHeight = logoWidth * 0.75;
+        doc.addImage(logoDataURL, "JPEG", margin, currentY, logoWidth, logoHeight);
+      } catch (imgErr) {
+        console.warn("Logo failed to load:", imgErr.message);
       }
+    }
 
-      // 🏢 Business Info
-      const rightX = pageWidth - 10;
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 0);
-      doc.text(business.companyName, rightX, 20, { align: "right" });
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(10);
-      doc.text(business.shopAddress.toLowerCase() + " " + business.companyState.toLowerCase() + " " + business.companyCity.toLowerCase() || "[Your Business Address]", rightX, 26, { align: "right" });
-      doc.text(`${business.email}`, rightX, 32, { align: "right" });
-      doc.text(`(${business.Tel}) ${business.Tel}`, rightX, 38, { align: "right" });
-      doc.text(`Invoiced By: ${bill.RaiseBy}`, rightX, 44, { align: "right" });
+    // 🏢 Business Info
+    doc.setFontSize(17);
+    doc.setFont("helvetica", "bold");
+    doc.text(business.companyName, pageWidth - margin, currentY + 5, { align: "right" });
+    doc.setFontSize(10);
+    const address = `${business.shopAddress}, ${business.companyCity}, ${business.companyState}`;
+    const wrappedAddress = doc.splitTextToSize(address.toLowerCase(), pageWidth * 0.5);
+    doc.text(wrappedAddress, pageWidth - margin, currentY + 12, { align: "right" });
+    doc.text(`${business.email}`, pageWidth - margin, currentY + 20, { align: "right" });
+    doc.text(`(${business.Tel})`, pageWidth - margin, currentY + 26, { align: "right" });
+    doc.text(`Invoiced By: ${bill.RaiseBy}`, pageWidth - margin, currentY + 32, { align: "right" });
 
-      // 🔳 QR Branding
-      const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-      doc.addImage(qrDataURL, "PNG", pageWidth - 40, 50, 30, 30);
+    currentY += 50;
 
-      // 🚚 Customer Info
-      doc.setFontSize(17);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
-      doc.text(`${bill.WayBillNo}`, 10, 58);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(13);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, 66);
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(10);
-      doc.text(`Address: ${customer?.billingAddress || "N/A"}`, 10, 70);
-      doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, 74);
-      doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName}`, 10, 79);
-      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, 84);
+    // 🔳 QR Code
+    const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
+    doc.addImage(qrDataURL, "PNG", pageWidth - margin - 30, currentY, 30, 30);
 
-      // 📋 Metadata Table
-      autoTable(doc, {
-        startY: 87,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          [`${bill.billStatus} No:`, `${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`],
-          ["Order Date:", bill.startDate || ""],
-          ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
-        ],
-        theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1, overflow: "linebreak" },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
+    // 🚚 Customer Info
+    doc.setFontSize(17);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${bill.WayBillNo}`, margin, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(13);
+    doc.text(`${bill.customerName?.toUpperCase() || ""}`, margin, currentY + 8);
+    doc.setFontSize(10);
+    doc.text(`Address: ${customer?.billingAddress || "N/A"}`, margin, currentY + 14);
+    doc.text(`Phone: ${customer?.phone || "N/A"}`, margin, currentY + 18);
+    doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName}`, margin, currentY + 22);
+    doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, margin, currentY + 26);
 
-      // 📊 Invoice Table
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 3,
-        head: [["#", "Product", "Code",  "Case", "Pcs",]],
-        body: bill.orders.map((ord, i) => [
-          i + 1,
-          `${ord.item?.Name}`,
-          ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
-          ord.Qty,
-          ord.pcsReq || 0,
-        ]),
-        theme: "striped",
-        styles: { fontSize: 9 },
-      });
+    // 📋 Metadata Table
+    autoTable(doc, {
+      startY: currentY + 30,
+      tableWidth: pageWidth * 0.4,
+      margin: { left: pageWidth - pageWidth * 0.4 - margin },
+      body: [
+        [`${bill.billStatus} No:`, `${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`],
+        // ["Order Date:", bill.startDate || ""],
+        // ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
+      ],
+      theme: "plain",
+      styles: { fontSize: 9, cellPadding: 1 },
+      columnStyles: {
+        0: { fontStyle: "bold", halign: "right" },
+        1: { halign: "right" },
+      },
+    });
 
-      // 💰 Summary Table
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 5,
-        tableWidth: pageWidth - 20,
-        margin: { left: 10 },
-        head: [],
-        body: [
-          [{ content: "Approved By Sign & Date:", colSpan: 2, styles: { halign: "start" } }],
-          [{ content: "Supplied By Sign & Date:", colSpan: 2, styles: { halign: "start" } }],
-          [{ content: "Checked By:", colSpan: 2, styles: { halign: "start" } }],
-        ],
-        theme: "striped",
-        styles: {
-          fontSize: 10,
-          cellPadding: 4,
-          textColor: [0, 0, 0],
-          lineColor: [200, 200, 200],
-          lineWidth: 0.5,
-        },
-      });
+    // 📊 Invoice Table with Pagination
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 5,
+      head: [["#", "Product", "Code", "Case", "Pcs"]],
+      body: bill.orders.map((ord, i) => [
+        i + 1,
+        ord.item?.Name,
+        ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
+        ord.Qty,
+        ord.pcsReq || 0,
+      ]),
+      theme: "grid",
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        halign: "start",
+        valign: "middle",
+        lineColor: [200, 200, 200],
+        lineWidth: 0.2,
+      },
+      headStyles: {
+        fillColor: [0, 102, 204],
+        textColor: 255,
+        fontStyle: "bold",
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245],
+      },
+      didDrawPage: function (data) {
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.height || pageSize.getHeight();
+        const pageWidth = pageSize.width || pageSize.getWidth();
+        const pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
+        doc.setFontSize(9);
+        doc.text(`Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`, margin, pageHeight - 10);
+        doc.text(`visit: badesolutions.com.ng`, pageWidth - 60, pageHeight - 10);
+        doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, { align: "center" });
+      },
+    });
 
-      // ✍️ Signatures
-      const signatureY = doc.lastAutoTable.finalY + 20;
-      doc.setFontSize(10);
-      doc.text(`${business.invoicePolicy}`, 10, signatureY);
-      doc.text(`Driver Name, Sign & Date: _${bill.DriverName},___________________________`, 10, signatureY + 15);
-      doc.text(`Vehicle Number: ______________${bill.vehicleNumber}____________`, 10, signatureY + 22);
-      doc.text(`Customer Sign & Date: ____________________________________________`, 10, signatureY + 30);
-      if (bill.DeliveryComment) {
-        doc.text(`Comment: ${bill.DeliveryComment}`, 10, signatureY + 36);
-      }
+    // 💰 Summary Table
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 5,
+      margin: { left: margin },
+      body: [
+        [{ content: "Approved By Sign & Date:", colSpan: 2 }],
+        [{ content: "Supplied By Sign & Date:", colSpan: 2 }],
+        [{ content: "Checked By:", colSpan: 2 }],
+        [{ content: `Driver Name, Sign & Date: _${bill.DriverName},___________________________`, colSpan: 2 }],
+        [{ content: `Vehicle Number: ______________${bill.vehicleNumber}____________`, colSpan: 2 }],
+        [{ content: `Customer Sign & Date: ____________________________________________`, colSpan: 2 }],  
+        [{ content: `Comment: ${bill.DeliveryComment}`, colSpan: 2 }],
+      ],
+      theme: "striped",
+      styles: {
+        fontSize: 10,
+        cellPadding: 4,
+        textColor: [0, 0, 0],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.5,
+      },
+    });
 
-      
-
-      // 📎 Footer
-      doc.setFontSize(9);
-      doc.text(`This wayBill is generated on Business Automated Dynamic Enterprise`, 10, 280);
-
-      // 📄 Pagination
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, 290, { align: "right" });
-      }
-
-      // 🖨️ Preview or Save
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const win = window.open(url, "_blank");
-      if (win) {
-        win.onload = () => {
-          Swal.close();
-          win.print();
-        };
-      } else {
-        doc.save(`${bill.customerName || "invoice"}.pdf`);
+    // ✍️ Signatures
+    const signatureY = doc.lastAutoTable.finalY + 20;
+    doc.setFontSize(10);
+    doc.text(`${business.invoicePolicy}`, margin, signatureY);
+    
+    // 🖨️ Preview or Save
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
+    if (win) {
+      win.onload = () => {
         Swal.close();
-      }
-    } catch (error) {
-    } finally {
+        win.print();
+      };
+    } else {
+      doc.save(`${bill.customerName || "invoice"}.pdf`);
       Swal.close();
     }
-  };
+  } catch (error) {
+    console.error("Error generating Waybill:", error);
+  } finally {
+    Swal.close();
+  }
+};
 
 
 const cancelSales = async (orderId) => {
