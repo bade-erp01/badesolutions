@@ -206,8 +206,8 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
 function summarizeCustomerInvoices(customers, invoices) {
  const summarized = customers
   .filter(cust => cust.Debt > 0)
-  .sort((a, b) => b.Debt - a.Debt) // Sort by highest debt first
   .map(customer => {
+  // .sort((a, b) => b.Debt - a.Debt) // Sort by highest debt first
     // const customerInvoices = invoices.filter(
     //   (invoice) => invoice.customer === customer._id
     // );
@@ -216,28 +216,25 @@ function summarizeCustomerInvoices(customers, invoices) {
     //   0
     // );
     return {
-      username: customer.Username.substring(0,5),
+      username: customer.Username,
       totalAmount:customer.Debt,
       image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
     };
   });
 
   const chartData = {
-    labels: summarized.map((item) => item.username),
+    labels: summarized.map((item) => item.username.substring(0,5)),
     datasets: [
       {
         label: "Total Amount",
-        data: summarized.map((item) => item.totalAmount).reduce((acc, val, idx) => {
-          acc.push((acc[idx - 1] || 0) + val);
-          return acc;
-        }, []),
+        data: summarized.map((item) => item.totalAmount),
         fill: true,
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         borderColor: "#38bdf8",
         borderWidth: 2,
         tension: 0.4,
-        pointRadius: 5,
-        pointHoverRadius: 8,
+        pointRadius: 2,
+        pointHoverRadius: 4,
         pointBackgroundColor: "#fff",
         pointBorderColor: "#38bdf8",
       },
@@ -300,8 +297,8 @@ function summarizeCustomerInvoices(customers, invoices) {
           tooltipEl.innerHTML = `
             <div style="text-align:center;">
               <strong>${customer.username}</strong><br/>
-              <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:60px;height:auto;border-radius:4px;margin-top:4px;" />
-              <div style="margin-top:6px;">Total: ₦${customer.totalAmount.toLocaleString()}</div>
+              <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:30px;height:auto;border-radius:4px;margin-top:4px;" />
+              <div style="margin-top:6px;">Debt: ₦${customer.totalAmount.toLocaleString()}</div>
             </div>
           `;
 
