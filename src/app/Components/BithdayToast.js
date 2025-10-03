@@ -12,25 +12,50 @@ const BirthdayGreetings = ({ user, Business }) => {
   useEffect(() => {
     if (!user?.DOB || !Business?.companyName) return;
 
-    const today = moment().startOf('day');
+    const now = moment();
+    const today = now.clone().startOf('day');
     const birthdayThisYear = moment(user.DOB).year(today.year()).startOf('day');
 
-    if (birthdayThisYear.isSame(today)) {
-      // 🎉 Trigger Confetti
+    const toastKey = `birthday-toast-${user._id}-${today.format('YYYY-MM-DD')}`;
+    const toastData = JSON.parse(localStorage.getItem(toastKey) || '{}');
+
+    // Reset at midnight
+    if (toastData.date !== today.format('YYYY-MM-DD')) {
+      localStorage.removeItem(toastKey);
+    }
+
+    // Determine time slot
+    const currentHour = now.hour();
+    const timeSlot = currentHour < 12 ? 'morning' : 'evening';
+
+    // Check if toast for this slot has been shown
+    if (
+      birthdayThisYear.isSame(today) &&
+      (!toastData[timeSlot] || toastData.date !== today.format('YYYY-MM-DD'))
+    ) {
+      // Update localStorage
+      const updatedToastData = {
+        ...toastData,
+        date: today.format('YYYY-MM-DD'),
+        [timeSlot]: true,
+      };
+      localStorage.setItem(toastKey, JSON.stringify(updatedToastData));
+
+      // 🎉 Confetti burst
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
       });
 
-      // 🔊 Play Birthday Sound
+      // 🔊 Play birthday sound
       if (audioRef.current) {
         audioRef.current.play().catch((err) => {
           console.warn("Audio playback failed:", err);
         });
       }
 
-      // 🎂 Show Toast
+      // 🎂 Show SweetAlert2 toast
       MySwal.fire({
         toast: true,
         position: 'bottom-end',
@@ -59,7 +84,7 @@ const BirthdayGreetings = ({ user, Business }) => {
     <>
       {/* 🔊 Birthday Sound */}
       <audio ref={audioRef} preload="auto">
-        <source src="/086060_tadawav-85939.mp3" type="audio/mpeg" />
+        <source src="/sounds/happy-birthday.mp3" type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
     </>
