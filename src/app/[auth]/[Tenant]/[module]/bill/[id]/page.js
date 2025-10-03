@@ -546,7 +546,7 @@ const cancelSales = async (orderId) => {
             <button
               title={`Cancel and return SKU in ${Singlebill.billStatus}`}
               onClick={() =>
-                showDeliveryModal(Singlebill._id, Encrypt(userInfo.user._id))
+                showDeliveryModal(Singlebill._id, Encrypt(userInfo.user._id),userInfo.business)
               }
               className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-blue-500 transition duration-200 ease-in-out mr-2 hover:bg-blue-600 text-white font-semibold border border-blue-400 hover:shadow-lg"
             >
