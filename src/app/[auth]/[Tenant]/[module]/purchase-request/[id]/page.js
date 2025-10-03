@@ -626,7 +626,7 @@ export default function DraftPurchasePage({
                 Select from {productList.length} Product
               </label>
               <select
-                onChange={() => handleProductSelection(e.target.value)}
+                onBlur={() => handleProductSelection(e.target.value)}
                 id="productDropdown"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
               >
@@ -656,7 +656,7 @@ export default function DraftPurchasePage({
                 Search from {productList.length} Products
               </label>
               <input
-                onChange={(e) => {
+                onBlur={(e) => {
                   if (e.target.value.trim() !== "") {
                     handleProductSelection(e.target.value);
                   }
