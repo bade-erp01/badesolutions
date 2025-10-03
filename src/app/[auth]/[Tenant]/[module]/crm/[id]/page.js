@@ -50,7 +50,7 @@ ChartJS.register(
   Legend
 );
 
-export default function CustomerForm({ userInfo, data, cust }) {
+export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   const router = useParams();
   const navigation = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -1264,7 +1264,7 @@ export default function CustomerForm({ userInfo, data, cust }) {
                 >
                   {/* Show the current sales person as the first option if available */}
                   {(() => {
-                    const salespers = data.employees.find(
+                    const salespers = salesPerson.find(
                       (person) => person._id === cust.salesPerson
                     );
                     if (salespers) {
@@ -1279,7 +1279,7 @@ export default function CustomerForm({ userInfo, data, cust }) {
                   })()}
 
                   {/* List all employees except the current sales person to avoid duplicate */}
-                  {data.employees
+                  {salesPerson
                     .filter((num) => num._id !== cust.salesPerson)
                     .map((num) => (
                       <option key={num._id} value={num._id}>
@@ -1300,7 +1300,7 @@ export default function CustomerForm({ userInfo, data, cust }) {
                 >
                   {/* Show the current sales person as the first option if available */}
                   {(() => {
-                    const Manager = data.employees.find(
+                    const Manager = salesPerson.find(
                       (person) => person._id === cust.accountManager
                     );
                     if (Manager) {
@@ -1315,7 +1315,7 @@ export default function CustomerForm({ userInfo, data, cust }) {
                   })()}
 
                   {/* List all employees except the current sales person to avoid duplicate */}
-                  {data.employees
+                  {salesPerson
                     .filter((num) => num._id !== cust.accountManager)
                     .map((num) => (
                       <option key={num._id} value={num._id}>

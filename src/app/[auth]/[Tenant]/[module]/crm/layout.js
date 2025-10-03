@@ -8,6 +8,7 @@ import { Encrypt } from '../../../../../../Functions/Mics';
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import Footer2 from '@/app/Components/Footer2';
+
 import axios from "axios";
 import {
   ClipboardDocumentListIcon,
@@ -95,7 +96,7 @@ export default async function crmLayout({ children, params }) {
             {userData?.user?.isAdmin && (
               <>
                 <BulkUploader
-                  tenantId={userData.business.tenantId}
+                  tenantId={userData}
                   collectionName="customer"
                 />
                 {customerList.length > 0 && (

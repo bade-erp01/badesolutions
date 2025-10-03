@@ -2,11 +2,15 @@ import SingleCustomerpage from './page';
 import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
 import { Dencrypt } from '../../../../../../../Functions/Functions';
 import axios from 'axios';
+import Employee from "../../../../../../../models/Users"
 
 export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
   const decoy = await params;
   let data = {};
+  const staffRaw = await Employee.findByTenant(userData.business.tenantId)
+  const StringedStaff = JSON.stringify(staffRaw)
+  const ParsedStaff = JSON.parse(StringedStaff)
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
@@ -34,6 +38,7 @@ export default async function StoreLayout2({ params }) {
         userInfo={userData}
         data={data}
         cust={data.result}
+        salesPerson={ParsedStaff}
       />
     </div>
   );

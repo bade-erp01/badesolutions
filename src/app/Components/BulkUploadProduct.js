@@ -5,22 +5,16 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { CloudArrowUpIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
-import { EXPRESS_PRIVATE_URL,Encrypt } from "../../../Functions/Functions";
+import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../Functions/Functions";
 import { plsWait } from "../../../Functions/Mics";
 import { useRouter } from "next/navigation";
 
 const MySwal = withReactContent(Swal);
 
-const REQUIRED_FIELDS = ['name', 'email', 'age'];
-
 const BulkUploader = ({ tenantId, collectionName }) => {
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  const validateEntry = (entry) => {
-    return REQUIRED_FIELDS.every((field) => entry[field]);
-  };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -32,33 +26,27 @@ const BulkUploader = ({ tenantId, collectionName }) => {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const parsedData = XLSX.utils.sheet_to_json(sheet);
 
-      const faultyEntries = parsedData.filter((entry) => !validateEntry(entry));
-      const hasInvalid = faultyEntries.length > 0;
-
-      showPreviewModal(parsedData, hasInvalid, faultyEntries);
+      showPreviewModal(parsedData);
     } catch (error) {
       Swal.fire('❌ Error', 'Failed to parse file.', 'error');
     }
   };
 
-  const showPreviewModal = (data, hasInvalid, faultyEntries) => {
+  const showPreviewModal = (data) => {
     const tableHeaders = Object.keys(data[0] || {}).map(
       (key) => `<th style="padding:8px; border-bottom:1px solid #ddd;">${key}</th>`
     ).join('');
 
-    const tableRows = data.map((row, i) => {
-      const isFaulty = faultyEntries.includes(row);
-      return `
-        <tr style="background-color:${isFaulty ? '#ffe4e6' : i % 2 === 0 ? '#fff' : '#f9f9f9'};">
-          ${Object.values(row).map(
-            (val) => `<td style="padding:8px; border-bottom:1px solid #eee;">${val}</td>`
-          ).join('')}
-        </tr>
-      `;
-    }).join('');
+    const tableRows = data.map((row, i) => `
+      <tr style="background-color:${i % 2 === 0 ? '#fff' : '#f9f9f9'};">
+        ${Object.values(row).map(
+          (val) => `<td style="padding:8px; border-bottom:1px solid #eee;">${val}</td>`
+        ).join('')}
+      </tr>
+    `).join('');
 
     MySwal.fire({
-      title: hasInvalid ? '⚠️ Invalid Entries Found' : '✅ Data Preview',
+      title: '✅ Data Preview',
       html: `
         <div style="max-height:300px; overflow-y:auto; width:1000px;">
           <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -68,15 +56,15 @@ const BulkUploader = ({ tenantId, collectionName }) => {
         </div>
         <div style="margin-top:16px; text-align:right;">
           <button id="uploadToDB" style="
-            background-color: ${hasInvalid ? '#9ca3af' : '#2563eb'};
+            background-color: #2563eb;
             color: white;
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 14px;
             border: none;
-            cursor: ${hasInvalid ? 'not-allowed' : 'pointer'};
+            cursor: pointer;
           ">
-            ${hasInvalid ? 'Fix Errors First' : 'Upload to DB'}
+            Upload to DB
           </button>
         </div>
       `,
@@ -84,12 +72,10 @@ const BulkUploader = ({ tenantId, collectionName }) => {
       width: '1100px',
       didOpen: () => {
         const btn = document.getElementById('uploadToDB');
-        if (!hasInvalid) {
-          btn.onclick = () => {
-            plsWait('Uploading to server...');
-            uploadToDB(data);
-          };
-        }
+        btn.onclick = () => {
+          plsWait('Uploading to server...');
+          uploadToDB(data);
+        };
       },
     });
   };
@@ -102,8 +88,8 @@ const BulkUploader = ({ tenantId, collectionName }) => {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${tenantId.business.tenantId}`,
-           dbConnect:`Bearer ${tenantId.business.rustyRoof}`,
-           access:`${Encrypt(tenantId.user._id)}`
+          dbConnect: `Bearer ${tenantId.business.rustyRoof}`,
+          access: `${Encrypt(tenantId.user._id)}`
         },
         body: JSON.stringify({ collectionName, data }),
       });
