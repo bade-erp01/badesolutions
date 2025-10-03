@@ -225,7 +225,7 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
       // 🏢 Business Info
       const rightX = pageWidth - 10;
       doc.setFontSize(16);
-      doc.setTextColor(255, 140, 0);
+      doc.setTextColor(0, 0, 0);
       doc.text(business.companyName, rightX, 20, { align: "right" });
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(10);
@@ -245,7 +245,7 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
       doc.text(`${bill.WayBillNo}`, 10, 58);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(13);
-      doc.setTextColor(0, 102, 204);
+      doc.setTextColor(0, 0, 0);
       doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, 66);
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(10);
@@ -280,7 +280,7 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
         body: bill.orders.map((ord, i) => [
           i + 1,
           `${ord.item?.Name}`,
-          ord.item?.ADCcode || "N/A",
+          ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
           ord.Qty,
           ord.pcsReq || 0,
         ]),
