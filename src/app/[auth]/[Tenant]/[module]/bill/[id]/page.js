@@ -311,9 +311,8 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
         const pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
         doc.setFontSize(9);
-        doc.text(`Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`, margin, pageHeight - 10);
-        doc.text(`visit: badesolutions.com.ng`, pageWidth - 60, pageHeight - 10);
-        doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, { align: "center" });
+        doc.text(`${business.invoicePolicy}`, margin, pageHeight - 10);
+        doc.text(`Page ${pageNumber}`, pageWidth - 60, pageHeight - 10);
       },
     });
 
@@ -339,11 +338,6 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
         lineWidth: 0.5,
       },
     });
-
-    // ✍️ Signatures
-    const signatureY = doc.lastAutoTable.finalY + 20;
-    doc.setFontSize(10);
-    doc.text(`${business.invoicePolicy}`, margin, signatureY);
     
     // 🖨️ Preview or Save
     const blob = doc.output("blob");
