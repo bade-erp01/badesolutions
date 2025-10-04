@@ -9,6 +9,22 @@ const BirthdayGreetings = ({ user, Business }) => {
   const MySwal = withReactContent(Swal);
   const audioRef = useRef(null);
 
+  // 🎉 Extended list of birthday messages
+  const birthdayMessages = [
+    `On behalf of ${Business.companyName.toLowerCase()}, we celebrate you on this special day. May your year be filled with joy and success! 🎈`,
+    `Cheers to you, ${user.firstName?.toUpperCase() || 'User'}! ${Business.companyName.toLowerCase()} wishes you laughter, love, and cake today! 🍰`,
+    `Happy Birthday from all of us at ${Business.companyName.toLowerCase()}! May your day be as amazing as you are! 🌟`,
+    `Wishing you a fantastic birthday, ${user.firstName?.toUpperCase() || 'User'}! ${Business.companyName.toLowerCase()} sends hugs, smiles, and confetti! 🎊`,
+    `It’s your day! ${Business.companyName.toLowerCase()} celebrates your awesomeness. Have all the fun in the world! 🥳`,
+    `Sending birthday magic your way, ${user.firstName?.toUpperCase() || 'User'}! ${Business.companyName.toLowerCase()} hopes your day sparkles with happiness. ✨`,
+    `From all of us at ${Business.companyName.toLowerCase()}, may your birthday be filled with sunshine, smiles, and sweet surprises! 🌞`,
+    `Today is all about you, ${user.firstName?.toUpperCase() || 'User'}! ${Business.companyName.toLowerCase()} is proud to celebrate your brilliance. 💡`,
+    `Another year of greatness begins! ${Business.companyName.toLowerCase()} is cheering you on—go shine! 💫`,
+    `You’re not just a year older—you’re a year better! ${Business.companyName.toLowerCase()} celebrates your growth and glow. 🌱`,
+    `Let the balloons fly and the music play! ${Business.companyName.toLowerCase()} wishes you a birthday full of unforgettable moments. 🎶`,
+    `To the incredible ${user.firstName?.toUpperCase() || 'User'}, ${Business.companyName.toLowerCase()} sends love, laughter, and limitless joy. ❤️`,
+  ];
+
   useEffect(() => {
     if (!user?.DOB || !Business?.companyName) return;
 
@@ -55,6 +71,10 @@ const BirthdayGreetings = ({ user, Business }) => {
         });
       }
 
+      // 🎂 Pick a random message
+      const randomMessage =
+        birthdayMessages[Math.floor(Math.random() * birthdayMessages.length)];
+
       // 🎂 Show SweetAlert2 toast
       MySwal.fire({
         toast: true,
@@ -71,7 +91,7 @@ const BirthdayGreetings = ({ user, Business }) => {
             <div style="text-align: left;">
               <strong style="font-size: 15px;">HAPPY BIRTHDAY ${user.firstName?.toUpperCase() || 'User'} 🎉</strong><br/>
               <span style="font-size: 14px;">
-                On behalf of ${Business.companyName.toLowerCase()}, we celebrate you on this special day. Have all the fun in the world!...CHEERS! 🥂
+                ${randomMessage}
               </span>
             </div>
           </div>
@@ -84,7 +104,7 @@ const BirthdayGreetings = ({ user, Business }) => {
     <>
       {/* 🔊 Birthday Sound */}
       <audio ref={audioRef} preload="auto">
-        <source src="/sounds/happy-birthday.mp3" type="audio/mpeg" />
+        <source src="/086060_tadawav-85939.mp3" type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
     </>
