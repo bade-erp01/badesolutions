@@ -6,7 +6,7 @@ import {PhotoIcon,UserCircleIcon,ChevronDownIcon,} from "@heroicons/react/24/out
 import { useEffect, useState } from "react";
 import { ErrorMessage,SuccessToast,plsWait } from "../../../../../../../Functions/Mics";
 import {Encrypt,EXPRESS_PRIVATE_URL} from '../../../../../../../Functions/Functions'
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation";
 
 export default function StoreForm({business, user}) {
     const states = NaijaStates.states();

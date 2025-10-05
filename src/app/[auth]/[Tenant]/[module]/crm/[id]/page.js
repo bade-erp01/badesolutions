@@ -698,16 +698,15 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
     try {
       // Use destructuring for required IDs
-      const { user } = userInfo;
-      const { _id: customerId, location: whId } = cust;
+      const  user  = userInfo;
 
       // Avoid unnecessary template literals
-      const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${user._id}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${user.user._id}`;
 
       // Await axios call directly
       const { data } = await axios.post(
         url,
-        { customer: customerId, whId },
+        { customer: cust._id, whId:cust.location },
         config
       );
 
@@ -1070,7 +1069,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
                     <span
                       onClick={() => UpdateCustomerBalance(BalanceData.Debt)}
-                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-purple-600 hover:bg-purple-800 transition-colors duration-200 shadow-md cursor-pointer"
+                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-red-600 hover:bg-red-800 transition-colors duration-200 shadow-md cursor-pointer"
                     >
                       Update Balance
                     </span>

@@ -31,7 +31,6 @@ export default function DraftPurchasePage({
   Swal.close();
   const router = useRouter();
 
-
   // upload docs
       const processAndUploadFile = async (file) => {
         return new Promise((resolve) => {
@@ -146,13 +145,14 @@ export default function DraftPurchasePage({
   const handleProductSelection = async (productId) => {
     plsWait("Adding product to list");
 
-    const cleanedProducts = productList.find((product) => {
-      return product.ADCcode === productId;
-    });
+
+    const cleanedProducts = await productList.find((product) => {
+        return product.item.ACDcode === productId;
+      });
 
     try {
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/VendorProduct/lpo?product=${cleanedProducts._id}&po=${bill._id}`,
+        `${EXPRESS_PRIVATE_URL}/api/VendorProduct/lpo?product=${cleanedProducts.storeId}&po=${bill._id}`,
         {
           method: "PUT",
           headers: {
@@ -246,7 +246,7 @@ export default function DraftPurchasePage({
       if (data.message) {
         SuccessToast(data.message);
         setTimeout(() => {
-          router.back();
+          router.push(`/${Business.companyName}/${Encrypt(user._id)}/vendor/vendor`);
         }, 2000);
       } else {
         throw new Error(data.error || "Something went wrong");
@@ -631,19 +631,11 @@ export default function DraftPurchasePage({
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
               >
                 <option value={""}>Choose...</option>
-                {(() => {
-                  const orderedProductCodes = Singlebill.orders.map(
-                    (order) => order.item?.ADCcode || order.item?.ACDcode
-                  );
-                  const availableProducts = productList.filter(
-                    (product) => !orderedProductCodes.includes(product.ADCcode) || !orderedProductCodes.includes(product.ACDcode)
-                  );
-                  return availableProducts.map((product) => (
-                    <option key={product._id} value={product.ADCcode}>
-                      {product.productName}
+                {productList.map((product) => (
+                    <option key={product.storeId} value={product.item.ADCcode || product.item.ACDcode}>
+                      {product.item.Name}
                     </option>
-                  ));
-                })()}
+                ))}
               </select>
             </div>
 
@@ -669,19 +661,11 @@ export default function DraftPurchasePage({
                 placeholder="Type to search products..."
               />
               <datalist id="productsList">
-                {(() => {
-                  const orderedProductCodes = Singlebill.orders.map(
-                    (order) => order.item?.ADCcode || order.item?.ACDcode
-                  );
-                  const availableProducts = productList.filter(
-                    (product) => !orderedProductCodes.includes(product.ADCcode) || !orderedProductCodes.includes(product.ACDcode)
-                  );
-                  return availableProducts.map((product) => (
-                    <option key={product._id} value={product.ADCcode}>
-                      {product.productName}
+                {productList.map((product) => (
+                    <option key={product.storeId} value={product.item.ACDcode || product.item.ADCcode}>
+                      {product.item.Name}
                     </option>
-                  ));
-                })()}
+                ))}
               </datalist>
             </div>
           </div>

@@ -39,7 +39,7 @@ export default function DraftInvoicePage({
 }) {
   // Use useState to store products
   const [inputValue, setInputValue] = useState("");
-  const [productList, setProductList] = useState(products);
+  const [productList, setProductList] = useState(products || []);
   // const [qty,setQty] = useState('')
   const router = useRouter();
 
@@ -52,9 +52,7 @@ export default function DraftInvoicePage({
     try {
       // plsWait("Updating Discount Received"); // starts spinner or loading indicator
 
-      const url = `${EXPRESS_PRIVATE_URL}/${
-        Business.companyName
-      }/Draft/discount/update?user=${Encrypt(user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/discount/update?user=${Encrypt(user._id)}`;
 
       const response = await fetch(url, {
         body: JSON.stringify({ billId, value }),
@@ -199,7 +197,7 @@ export default function DraftInvoicePage({
         body: bill.orders.map((ord, i) => [
           i + 1,
           `${ord.item?.Name}`,
-          ord.item?.ACDcode || "N/A",
+          ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
           ord.priceListPrice || 0,
           ord.Qty || 0,
           ord.pcsReq || 0,
@@ -284,7 +282,6 @@ export default function DraftInvoicePage({
         Swal.close();
       }
     } catch (error) {
-      console.error("PDF generation failed:", error);
       Swal.close();
     }
   };
@@ -295,9 +292,13 @@ export default function DraftInvoicePage({
       // return
       plsWait("Adding product...");
       // find the product and return the id
-      const cleanedProducts = productList.find((product) => {
-        return product.ADCcode === productId;
+      const cleanedProducts = await products.find((product) => {
+        return product.item.ACDcode === productId;
       });
+
+     if(!cleanedProducts){
+      throw new Error('Product not found')
+     }
 
       const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/add/order?order_id=${bill._id}&productId=${productId}&priceList=${customer.priceList}`;
       const res = await fetch(url, {
@@ -307,11 +308,12 @@ export default function DraftInvoicePage({
            dbConnect:`Bearer ${Business.rustyRoof}`,
            access:`${Encrypt(user._id)}`
         },
-        body: JSON.stringify({ product: cleanedProducts._id }), // Ensure it's sent as an object
+        body: JSON.stringify({ product: cleanedProducts.storeId }), // Ensure it's sent as an object
       });
       const data = await res.json();
       if (data.message) {
         SuccessToast(data.message);
+        setInputValue("")
         // Use Next.js router.reload() instead of window.location.reload()
         router.refresh();
       } else {
@@ -319,7 +321,8 @@ export default function DraftInvoicePage({
       }
     } catch (error) {
       ErrorMessage(error.message);
-       router.refresh();
+      setInputValue("")
+      router.refresh();
     }
   };
 
@@ -822,26 +825,21 @@ export default function DraftInvoicePage({
               </label>
               <select
                 onChange={(e) => {
-                  handleProductSelection(e.target.value);
+                  if(e.target.value !== ""){
+                   handleProductSelection(e.target.value);
+                  }
                 }}
                 id="productDropdown"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
               >
-                <option value={""}>Choose...</option>
-                {(() => {
-                  const orderedProductCodes = Singlebill.orders.map(
-                    (order) => order.item?.ADCcode
-                  );
-                  const availableProducts = productList.filter(
-                    (product) => !orderedProductCodes.includes(product.ADCcode)
-                  );
-                    return availableProducts.map((product) => (
-                    <option key={product._id} value={product.ADCcode}>
-                      {product.productName} [ Case:{product.currentQty} Pcs:{product.pcs} ]
+                  <option value={""}>Choose...</option>
+                 { products.map((product) => (
+                    <option key={product.item._id} value={product.item.ACDcode || product.item.ADCcode }>
+                      {product.item.Name} [ Case:{product.Case} Pcs:{product.pcs} ]
                     </option>
-                    ));
-                  })()}
-                  </select>
+                   ))
+                  }
+                </select>
                 </div>
 
                 {/* Datalist for medium and larger screens */}
@@ -854,64 +852,32 @@ export default function DraftInvoicePage({
                   </label>
 
                   <div className="flex items-center space-x-2">
-                  <input
-                    onChange={(e) => {
-                    const val = e.target.value;
-                    setInputValue(val);
-
-                    // If user types or selects an exact ADCcode or exact product name,
-                    // automatically add it and clear the input.
-                    const orderedProductCodes = Singlebill.orders.map(
-                      (order) => order.item?.ADCcode
-                    );
-                    const availableProducts = productList.filter(
-                      (product) => !orderedProductCodes.includes(product.ADCcode)
-                    );
-
-                    const matched =
-                      availableProducts.find(
-                      (p) => p.ADCcode === val || p.productName === val
-                      ) || null;
-
-                    if (matched) {
-                      // add product by ADCcode
-                      handleProductSelection(matched.ADCcode);
-                      setInputValue("");
+                 <input
+                  type="text"
+                  defaultValue={inputValue}
+                  list="productsList"
+                  id="productDatalist"
+                  onBlur={(e) => {
+                    const trimmedValue = e.target.value.trim();
+                    setInputValue(trimmedValue);
+                    if (trimmedValue !== "") {
+                      handleProductSelection(trimmedValue);
+                      setInputValue("")
                     }
-                    }}
-                    onKeyDown={(e) => {
-                    // allow Enter to add typed ADCcode
-                    if (e.key === "Enter") {
-                      const trimmed = inputValue.trim();
-                      if (trimmed !== "") {
-                      handleProductSelection(trimmed);
-                      setInputValue("");
-                      }
-                    }
-                    }}
-                    type="text"
-                    value={inputValue}
-                    list="productsList"
-                    id="productDatalist"
-                    className="w-72 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                    placeholder="Type to search products..."
-                  />
+                      e.target.value = ""
+                  }}
+                  className="w-72 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  placeholder="Type to search products..."
+                />
                   </div>
 
                   <datalist id="productsList">
-                  {(() => {
-                    const orderedProductCodes = Singlebill.orders.map(
-                    (order) => order.item?.ADCcode
-                    );
-                    const availableProducts = productList.filter(
-                    (product) => !orderedProductCodes.includes(product.ADCcode)
-                    );
-                    return availableProducts.map((product) => (
-                    <option key={product._id} value={product.ADCcode}>
-                      {product.productName} [ Case:{product.currentQty} Pcs:{product.pcs} ]
+                  { products.map((product) => (
+                    <option key={product.item._id} value={product.item.ACDcode || product.item.ADCcode }>
+                      {product.item.Name} [ Case:{product.Case} Pcs:{product.pcs} ]
                     </option>
-                    ));
-                  })()}
+                   ))
+                  }
                   </datalist>
                 </div>
                 </div>
