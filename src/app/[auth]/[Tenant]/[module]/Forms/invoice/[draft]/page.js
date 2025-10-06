@@ -658,6 +658,7 @@ export default function DraftInvoicePage({
             <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
               <tr>
                 {[
+                  "S/N",
                   "Product",
                   "Photo",
                   // "Trace",
@@ -680,11 +681,14 @@ export default function DraftInvoicePage({
               </tr>
             </thead>
             <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill) => (
+              {Singlebill.orders.map((bill,index) => (
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-gray-50 transition"
                 >
+                  <td>
+                    {index ++}
+                  </td>
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center">
                     <a
                       href={`/${userInfo.business.companyName}/${Encrypt(userInfo.user._id)}/product/product/${Encrypt(bill.item._id)}?Modules=product`}
