@@ -224,7 +224,7 @@ const generatePdf = async (business, customer, bill) => {
     doc.setFontSize(10);
     doc.text(`${totalInWords(bill.grandTotal, business.currency?.currency)}`, 10, currentY);
     currentY += 10;
-    doc.text("Authorized Signatries", 10, currentY);
+    doc.text("Authorized signatories", 10, currentY);
     currentY += 10;
     doc.text(`${business.companyName.toLowerCase()} _______________________________`, 10, currentY);
     currentY += 10;
