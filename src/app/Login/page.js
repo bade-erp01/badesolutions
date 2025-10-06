@@ -209,11 +209,11 @@ export default function Login({userInfo,businessInfo,ReCAPTCHAKey}) {
                   I forgot
                 </Link>
               </div>
-                <ReCAPTCHA
+                {/* <ReCAPTCHA
                   sitekey={ReCAPTCHAKey}
                   size="invisible"
                   ref={recaptchaRef}
-                />
+                /> */}
               <div className="flex items-center justify-between mt-2">
                 <button className="bg-black text-white rounded p-2 ml-2 shadow-md">
                   Login
