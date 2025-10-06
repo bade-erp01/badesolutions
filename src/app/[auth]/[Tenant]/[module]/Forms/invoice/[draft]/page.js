@@ -182,12 +182,13 @@ const generatePdf = async (business, customer, bill) => {
     // 📊 Invoice Table
     autoTable(doc, {
       startY: currentY,
-      head: [["#", "Product", "Code", "Price", "CASE", "PCS", "VAT", "Total"]],
+      head: [["#", "Product", "Code", "Price","Promo", "CASE", "PCS", "VAT", "Total"]],
       body: bill.orders.map((ord, i) => [
         i + 1,
         ord.item?.Name || "N/A",
         ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
         ord.priceListPrice || 0,
+        ord.promotionData || 0,
         ord.Qty || 0,
         ord.pcsReq || 0,
         ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
