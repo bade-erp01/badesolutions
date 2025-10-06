@@ -1015,7 +1015,7 @@ export default function SingleProductpage({
                           {product.productName}
                         </td>
                         <td className="border border-gray-300 px-2 py-1">
-                          Case:{product.currentQty}, Pcs:{product.Rolls}
+                          Case:{product.currentQty}, Pcs:{product.pcs}
                         </td>
                         <td className="border border-gray-300 px-2 py-1 w-40 text-white">
                           <ExcelDownloadBtn
@@ -1023,7 +1023,7 @@ export default function SingleProductpage({
                               {
                                 Store: log.warehouseName,
                                 Product: product.productName,
-                                Qty: `Case:${product.currentQty}, Pcs:${product.Rolls}`,
+                                Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
                               },
                             ]}
                             page={`${log.warehouseName.substring(0, 4) || "store"

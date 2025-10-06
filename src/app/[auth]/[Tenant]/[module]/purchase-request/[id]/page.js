@@ -502,6 +502,7 @@ export default function DraftPurchasePage({
                   // "Trace",
                   "Code",
                   "Case",
+                  "Pcs",
                   "Batch",
                   "eXPIRY DATE",
                   "Price",
@@ -523,13 +524,13 @@ export default function DraftPurchasePage({
                   key={bill._id}
                   className="border-t hover:bg-orange-50 transition"
                 >
-                  <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center">
-                    <a
-                      href={`/${Business.companyName}/Product/${bill.item._id}`}
+                  <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center text-xs">
+                    <Link
+                      href={`/${Business.companyName}/${Encrypt(user._id)}/product/product/${Encrypt(bill.item.productId)}`}
                       className="hover:underline"
                     >
                       {bill.item.productName}
-                    </a>
+                    </Link>
                   </td>
                   <td className="px-4 py-2 text-center">
                     <Image
@@ -539,29 +540,54 @@ export default function DraftPurchasePage({
                       width={38}
                       height={38}
                       alt="preview"
-                      className="rounded-md border border-gray-200"
+                      className="rounded-md "
                     />
                   </td>
                   {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
-                  <td className="px-4 py-2 text-center">{bill.item.ADCcode}</td>
+                  <td className="px-4 py-2 text-center text-xs">{bill.item.ADCcode || bill.item.ACDcode}
+                  </td>
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
                      <input
                       defaultValue={bill.Qty}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
                       onBlur={(e) => {
                         const val = parseFloat(e.target.value);
+                        if(val !==""){
                         handleQtyChange(
                           isNaN(val) || val < 0 ? 0 : val, // sanitized value
                           bill._id,
                           "Qty"
                         );
+                      }
                       }}
                     />
                     ) : (
                       bill.Qty
                     )}
                   </td>
+                  {Business.subscriptionplan === "Standard" ?(
+                  <td>
+                  {Singlebill.status.toLowerCase() === "draft" ? (
+                     <input
+                      defaultValue={bill.pcs || 0}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
+                      onBlur={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if(val !==""){
+                          handleQtyChange(
+                            isNaN(val) || val < 0 ? 0 : val, // sanitized value
+                            bill._id,
+                            "Pcs"
+                          );
+                        }
+                      }}
+                    />
+                    ) : (
+                      bill.pcs || 0
+                    )}
+                  </td>
+                  ):0}
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
                       <input
@@ -582,7 +608,7 @@ export default function DraftPurchasePage({
                      <input
                       type="date"
                       defaultValue={bill.ExpDate}
-                      className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                      className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 texxt-xs"
                       onBlur={(e) => {
                         const val = e.target.value;
                         handleQtyChange(val, bill._id, "ExpDate");
@@ -626,7 +652,7 @@ export default function DraftPurchasePage({
                 Select from {productList.length} Product
               </label>
               <select
-                onBlur={() => handleProductSelection(e.target.value)}
+                onBlur={(e) => handleProductSelection(e.target.value)}
                 id="productDropdown"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
               >

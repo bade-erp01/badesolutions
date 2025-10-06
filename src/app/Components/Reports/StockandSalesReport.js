@@ -80,7 +80,8 @@ export default function StockandSalesReport({
             Product: order.storeProductId ||  order.storeproductId,
             Vendor: item.Vendor || "",
             Store: purchase.WHID || "",
-            Purchased: 0,
+            PurchCase: 0,
+            PurchPcs: 0,
             Sold: 0,
             Stock: 0,
             pcs:0,
@@ -88,7 +89,33 @@ export default function StockandSalesReport({
             rPcs:0,
             productId:item._id
           };
-          existing.Purchased += order.Qty || 0;
+          existing.PurchCase += order.Qty || 0;
+          summaryMap.set(id, existing);
+        });
+      }
+    });
+
+    // purchase pcs
+     purchases.forEach(purchase => {
+      if (!isWithinDateRange(purchase.recievedDate)) return;
+      if (Array.isArray(purchase.orders)) {
+        purchase.orders.forEach(order => {
+          const item = order.item || {};
+          const id = order.storeProductId || order.storeproductId;
+          const existing = summaryMap.get(id) || {
+            Product: order.storeProductId ||  order.storeproductId,
+            Vendor: item.Vendor || "",
+            Store: purchase.WHID || "",
+            PurchCase: 0,
+            PurchPcs: 0,
+            Sold: 0,
+            Stock: 0,
+            pcs:0,
+            rStock:0,
+            rPcs:0,
+            productId:item._id
+          };
+          existing.PurchPcs += order.pcs || order.pcs || 0;
           summaryMap.set(id, existing);
         });
       }
@@ -105,7 +132,8 @@ export default function StockandSalesReport({
             Product: order.storeProductId ||  order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
-            Purchased: 0,
+             PurchCase: 0,
+            PurchPcs: 0,
             Sold: 0,// for case
             pcs:0,
             Stock: 0,
@@ -130,7 +158,8 @@ export default function StockandSalesReport({
             Product: order.storeProductId ||  order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
-            Purchased: 0,
+            PurchCase: 0,
+            PurchPcs: 0,
             Sold: 0,
             pcs:0,
             Stock: 0,
@@ -155,7 +184,8 @@ export default function StockandSalesReport({
             Product: order.storeProductId ||  order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
-            Purchased: 0,
+             PurchCase: 0,
+            PurchPcs: 0,
             Sold: 0,
             pcs:0,
             Stock: 0,
@@ -181,7 +211,8 @@ export default function StockandSalesReport({
             Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
-            Purchased: 0,
+            PurchCase: 0,
+            PurchPcs: 0,
             Sold: 0,
             pcs:0,
             Stock: 0,
@@ -282,9 +313,10 @@ export default function StockandSalesReport({
                   <th style="padding: 6px; text-align: left;">Product</th>
                   <th style="padding: 6px; text-align: left;">Vendor</th>
                   <th style="padding: 6px; text-align: left;">Store</th>
-                  <th style="padding: 6px; text-align: right;">Purchased</th>
-                  <th style="padding: 6px; text-align: right;">Case Sold</th>
-                  <th style="padding: 6px; text-align: right;">Pcs Sold</th>
+                  <th style="padding: 6px; text-align: right;">Case [Buy]</th>
+                  <th style="padding: 6px; text-align: right;">Pcs [Buy]</th>
+                  <th style="padding: 6px; text-align: right;">Case [Sell]</th>
+                  <th style="padding: 6px; text-align: right;">Pcs [Sell]</th>
                   <th style="padding: 6px; text-align: right;">Case Retured</th>
                   <th style="padding: 6px; text-align: right;">Pcs Retured</th>
                   <th style="padding: 6px; text-align: right;">Avail. Stock</th>
@@ -296,7 +328,8 @@ export default function StockandSalesReport({
                     <td style="padding: 6px;">${getSToreProdduct(item.Product)}</td>
                     <td style="padding: 6px;">${getVendor(item.Vendor)}</td>
                     <td style="padding: 6px;">${getSTore(item.Store)}</td>
-                    <td style="padding: 6px; text-align: right;">${item.Purchased} Case</td>
+                    <td style="padding: 6px; text-align: right;">${item.PurchCase}</td>
+                    <td style="padding: 6px; text-align: right;">${item.PurchPcs}</td>
                     <td style="padding: 6px; text-align: right;">${item.Sold}</td>
                     <td style="padding: 6px; text-align: right;">${item.pcs}</td>
                     <td style="padding: 6px; text-align: right;">${item.rStock}</td>
