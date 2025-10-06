@@ -686,10 +686,10 @@ export default function DraftInvoicePage({
                   key={bill._id}
                   className="border-t hover:bg-gray-50 transition"
                 >
-                  <td>
-                    {index ++}
+                  <td className="flex-2 px-4 py-2 font-small text-center">
+                    {index + 1}
                   </td>
-                  <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center">
+                  <td className="flex-2 px-4 py-2 text-indigo-700 font-small text-center">
                     <a
                       href={`/${userInfo.business.companyName}/${Encrypt(userInfo.user._id)}/product/product/${Encrypt(bill.item._id)}?Modules=product`}
                       className="hover:underline text-sm"
