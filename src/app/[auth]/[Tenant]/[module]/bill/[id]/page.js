@@ -56,153 +56,169 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
 
 
   // 📄 Full PDF generator
-  const generatePdf = async (business, customer, bill) => {
-    try {
-      plsWait("Setting things up, Ensure your printer is connected⌛...");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
+ const generatePdf = async (business, customer, bill) => {
+  try {
+    plsWait("Setting things up, Ensure your printer is connected ⌛...");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      // 🖼️ Logo (browser-safe)
-      if (userInfo.business.companyLogo) {
-        try {
-          const logoDataURL = await loadImageAsDataURL(userInfo.business.companyLogo);
-          doc.addImage(logoDataURL, "JPEG", 10, 10, 40, 30);
-        } catch (imgErr) {
-          console.warn("Logo failed to load:", imgErr.message);
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 10;
+    let currentY = margin;
+
+    // 🖼️ Logo
+    if (business.companyLogo) {
+          try {
+            const logo = await loadImageAsDataURL(business.companyLogo);
+            doc.addImage(logo, "JPEG", 10, 12, 30, 30);
+          } catch (err) {
+            console.warn("Logo failed to load");
+          }
         }
-      }
+    
+        doc.setFontSize(16).setFont("helvetica", "bold");
+        doc.text(business.companyName || "", pageWidth - 10, 12, { align: "right" });
+    
+        doc.setFontSize(8).setTextColor(0, 0, 0);
+        doc.text(`${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`, pageWidth - 10, 20, { align: "right" });
+        doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
+        doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, { align: "right" });
+    
+        currentY = 50;
+    
+        // 🚚 Customer Info + 🔳 QR Code in same row
+        doc.setFontSize(17).setTextColor(0, 0, 0).setFont("helvetica", "bold");
+        doc.text(`${bill.billStatus?.slice(0,3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`, 10, currentY);
+        currentY += 10;
+    
+        // Left Column: Customer Info
+        doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
+        doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
+        doc.setFontSize(10);
+        doc.text(`Address: ${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
+        doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, currentY + 12);
+        doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
+        doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
 
-      // 🏢 Business Info
-      const rightX = pageWidth - 10;
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont("helvetica", "bold");
-      doc.text(business.companyName, rightX, 20, { align: "right" })
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(10);
-      doc.text(business.shopAddress.toLowerCase() + " " + business.companyState.toLowerCase() + " " + business.companyCity.toLowerCase() || "[Your Business Address]", rightX, 26, { align: "right" });
-      doc.text(`${business.email}`, rightX, 32, { align: "right" });
-      doc.text(`(${business.Tel}) ${business.Tel}`, rightX, 38, { align: "right" });
-      doc.text(`Invoiced By: ${bill.RaiseBy}`, rightX, 44, { align: "right" });
+    // Right Column: QR Code
+    // try {
+    //   const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
+    //   doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
+    // } catch (err) {
+    //   console.warn("QR code failed to generate");
+    // }
 
-      // 🔳 QR Branding
-      const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-      doc.addImage(qrDataURL, "PNG", pageWidth - 40, 50, 30, 30);
+    currentY += 2;
 
-      // 🚚 Customer Info
-      doc.setFontSize(17);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
-      doc.text(`${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`, 10, 58);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(13);
-      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, 66);
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(10);
-      doc.text(`Address: ${customer?.billingAddress || "N/A"}`, 10, 70);
-      doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, 74);
-      doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName}`, 10, 79);
-      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, 84);
+    // 🧾 Bill Metadata
+    autoTable(doc, {
+      startY: currentY,
+      tableWidth: 80,
+      margin: { left: pageWidth - 90 },
+      head: [],
+      body: [
+        [`${bill.billStatus} No:`, `${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`],
+        ["Waybill No:", bill.WayBillNo || ""],
+        ["Order Date:", bill.startDate || ""],
+        ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
+      ],
+      theme: "plain",
+      styles: { fontSize: 9, cellPadding: 1 },
+      columnStyles: {
+        0: { fontStyle: "bold", halign: "right" },
+        1: { halign: "right" },
+      },
+    });
+    currentY = doc.lastAutoTable.finalY + 10;
 
-      // 📋 Metadata Table
-      autoTable(doc, {
-        startY: 87,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          [`${bill.billStatus} No:`, `${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`],
-          ["Waybill No:", bill.WayBillNo || ""],
-          ["Order Date:", bill.startDate || ""],
-          ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
-        ],
-        theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1, overflow: "linebreak" },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
+    // 📊 Invoice Table
+    autoTable(doc, {
+      startY: currentY,
+      head: [["#", "Product", "Code", "Price","Promo", "Case", "Pcs", "VAT", "Total"]],
+      body: bill.orders.map((ord, i) => [
+        i + 1,
+        `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
+        ord.item?.ACDcode || "N/A",
+        ord.priceListPrice.toFixed(2),
+        ord.promotionData || 0,
+        ord.Qty,
+        ord.pcsReq || 0,
+        ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
+        ord.total.toFixed(2),
+      ]),
+      theme: "grid",
+      styles: { fontSize: 9 },
+    });
+    currentY = doc.lastAutoTable.finalY + 10;
 
-      // 📊 Invoice Table
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 3,
-        head: [["#", "Product", "Code", "Price", "Case", "Pcs", "VAT", "Total"]],
-        body: bill.orders.map((ord, i) => [
-          i + 1,
-          `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
-          ord.item?.ACDcode || "N/A",
-          ord.priceListPrice.toFixed(2),
-          ord.Qty,
-          ord.pcsReq || 0,
-          ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
-          ord.total.toFixed(2),
-        ]),
-        theme: "grid",
-        styles: { fontSize: 9 },
-      });
+    // 💰 Summary Table
+    autoTable(doc, {
+      startY: currentY,
+      tableWidth: 76,
+      margin: { left: pageWidth - 90 },
+      head: [],
+      body: [
+        ["Tax Rate", `${bill.taxRate.toFixed(2) || 0} (inc in sub.)`],
+        ["Subtotal", bill.subTotal.toFixed(2) || 0],
+        ["Discount", bill.discount.toFixed(2) || 0],
+        ["Total Due", bill.grandTotal.toFixed(2) || 0],
+      ],
+      theme: "grid",
+      styles: { fontSize: 9, cellPadding: 1 },
+      columnStyles: {
+        0: { fontStyle: "bold", halign: "right" },
+        1: { halign: "right" },
+      },
+    });
+    currentY = doc.lastAutoTable.finalY + 10;
 
-      // 💰 Summary Table
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 1,
-        tableWidth: 76,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          ["Tax Rate", `${bill.taxRate.toFixed(2) || 0} (inc in sub.)`],
-          ["Subtotal", bill.subTotal.toFixed(2) || 0],
-          ["Discount", bill.discount.toFixed(2) || 0],
-          ["Total Due", bill.grandTotal.toFixed(2) || 0],
-        ],
-        theme: "grid",
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
+    // ✍️ Signatures
+    doc.setFontSize(10);
+    doc.text(`${totalInWords(bill.grandTotal, business.currency?.currency)}`, margin, currentY);
+    currentY += 10;
+    doc.text("Authorized Signatures", margin, currentY);
+    currentY += 10;
+    doc.text(`${business.companyName.toLowerCase()} _______________________________`, margin, currentY);
+    currentY += 10;
+    doc.text("Customer Sign & Date _______________________________", margin, currentY);
+    currentY += 10;
+    if (business.invoicePolicy) {
+      doc.text(business.invoicePolicy, margin, currentY);
+      currentY += 10;
+    }
 
-      // ✍️ Signatures
-      const signatureY = doc.lastAutoTable.finalY + 20;
-      doc.setFontSize(10);
-      doc.text(`${totalInWords(bill.grandTotal, business.currency.currency)}`, 10, signatureY);
-      doc.text("Authorized Signatures", 10, signatureY + 15);
-      doc.text("Customer Sign & Date _______________________________", 10, signatureY + 22);
-      doc.text(`${business.companyName.toLowerCase()} _______________________________`, 10, signatureY + 30);
-      if (business.invoicePolicy) {
-        doc.text(business.invoicePolicy, 10, signatureY + 40);
-      }
+    // 📎 Footer
+    doc.setFontSize(9);
+    doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
 
-      // 📎 Footer
-      doc.setFontSize(9);
-      doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, 10, 280);
+    // 📄 Page Numbers
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10, { align: "right" });
+    }
 
-      // 📄 Pagination
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, 290, { align: "right" });
-      }
+    // 🖨️ Preview or Save
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
 
-      // 🖨️ Preview or Save
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const win = window.open(url, "_blank");
-      if (win) {
-        win.onload = () => {
-          Swal.close();
-          win.print();
-        };
-      } else {
-        doc.save(`${bill.customerName || "invoice"}.pdf`);
+    if (win) {
+      win.onload = () => {
         Swal.close();
-      }
-    } catch (error) {
-    } finally {
+        win.print();
+      };
+    } else {
+      doc.save(`${bill.customerName || "invoice"}.pdf`);
       Swal.close();
     }
-  };
+  } catch (error) {
+    Swal.close();
+    console.error("Error generating PDF:", error);
+  }
+};
+
 
 // print waybill
  const printWayBill = async (business, customer, bill, userInfo) => {
@@ -603,6 +619,7 @@ const cancelSales = async (orderId) => {
             <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
               <tr>
                 {[
+                  "#",
                   "Product",
                   "Photo",
                   "Trace",
@@ -624,18 +641,14 @@ const cancelSales = async (orderId) => {
               </tr>
             </thead>
             <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill) => (
+              {Singlebill.orders.map((bill,index) => (
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-orange-50 transition"
                 >
-                  <td className="px-4 py-2 text-indigo-700 font-medium text-center">
-                    <a
-                      href={`/${userInfo.business.companyName}/Product/${bill.item._id}`}
-                      className="hover:underline"
-                    >
+                  <td className="px-4 py-2 text-center text-xs">{index+1}</td>
+                  <td className="px-4 py-2 font-medium text-center text-xs">
                       {bill.item.Name}
-                    </a>
                   </td>
                   <td className="px-4 py-2 text-center">
                     <Image
@@ -645,23 +658,23 @@ const cancelSales = async (orderId) => {
                       width={38}
                       height={38}
                       alt="preview"
-                      className="rounded-md border border-gray-200"
+                      className="rounded-md"
                     />
                   </td>
-                  <td className="px-4 py-2 text-center">{bill.returnId}</td>
-                  <td className="px-4 py-2 text-center">{bill.item.ADCcode}</td>
-                  <td className="px-4 py-2 text-center">{bill.Qty}</td>
-                  <td className="px-4 py-2 text-center">{bill.pcsReq || 0}</td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">{bill.returnId}</td>
+                  <td className="px-4 py-2 text-center text-xs">{bill.item.ADCcode || bill.item.ACDcode}</td>
+                  <td className="px-4 py-2 text-center text-xs">{bill.Qty}</td>
+                  <td className="px-4 py-2 text-center text-xs">{bill.pcsReq || 0}</td>
+                  <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency.currency.Symbol}
                     {bill.priceListPrice.toFixed(2)}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency.currency.Symbol}
                     {bill.promotionData.toFixed(2) || 0}
                   </td>
-                  <td className="px-4 py-2 text-center">0</td>
-                  <td className="px-4 py-2 font-bold text-right">
+                  <td className="px-4 py-2 text-center text-xs">0</td>
+                  <td className="px-4 py-2 font-bold text-right text-xs">
                     {userInfo.business.currency.currency.Symbol}
                     {bill.total?.toFixed(2)}
                   </td>

@@ -156,7 +156,7 @@ const generatePdf = async (business, customer, bill) => {
     // Right Column: QR Code
     try {
       const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-      doc.addImage(qrDataURL, "PNG", pageWidth - 50, currentY, 35, 35);
+      doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
     } catch (err) {
       console.warn("QR code failed to generate");
     }
