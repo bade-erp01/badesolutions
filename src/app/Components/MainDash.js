@@ -482,7 +482,7 @@ export default function MainDash({ userData }) {
                               {payment.crAmount.toLocaleString()}
                             </span>
                             <span className="text-xs text-gray-500">
-                              {payment.collectionRef}
+                              {payment.collectionRef}/{payment.type}
                             </span>
                           </div>
                           <span className="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">
