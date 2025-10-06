@@ -110,72 +110,80 @@ export default function DraftInvoicePage({
   };
 
   // Dummy implementations for missing functions (replace with your actual implementations)
-  const generatePdf = async (business, customer, bill) => {
+   const generatePdf = async (business, customer, bill) => {
     try {
       plsWait("Setting things up ⌛...");
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
+  
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
-
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let currentY = 10; // Start at the top of the page
+  
       // 🖼️ Logo Image
       if (business.companyLogo) {
         try {
-          const logo = await loadImageAsDataURL(Business.companyLogo);
-          doc.addImage(logo, "JPEG", 10, 10, 40, 30);
+          const logo = await loadImageAsDataURL(business.companyLogo);
+          doc.addImage(logo, "JPEG", 10, currentY, 40, 30);
+          currentY += 40; // Move down after the logo
         } catch (err) {
           console.warn("Logo failed to load");
         }
       }
-
+  
       // 🏢 Business Info
-      const rightX = pageWidth - 10;
       doc.setFontSize(16).setFont("helvetica", "bold");
-      doc.text(business.companyName || "", rightX, 20, { align: "right" });
-
+      doc.text(business.companyName || "", pageWidth - 10, currentY, { align: "right" });
+      currentY += 10;
+  
       doc.setFontSize(10).setTextColor(0, 0, 0);
-      doc.text(business.shopAddress.toLowerCase() + " " + business.companyState.toLowerCase() + " " + business.companyCity.toLowerCase() || "[Your Business Address]", rightX, 26, {
-        align: "right",
-      });
-      doc.text(business.email || "", rightX, 32, { align: "right" });
-      doc.text(`(${business.Tel}) ${business.Tel}`, rightX, 38, {
-        align: "right",
-      });
-      doc.text(`${bill.billStatus} By: ${bill.RaiseBy || ""}`, rightX, 44, {
-        align: "right",
-      });
-
+      doc.text(
+        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
+        pageWidth - 10,
+        currentY,
+        { align: "right" }
+      );
+      currentY += 6;
+      doc.text(business.email || "", pageWidth - 10, currentY, { align: "right" });
+      currentY += 6;
+      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, currentY, { align: "right" });
+      currentY += 10;
+  
       // 🔳 QR Code
       try {
-        const qrDataURL = await QRCode.toDataURL(
-          "https://badesolutions.com.ng"
-        );
-        doc.addImage(qrDataURL, "PNG", pageWidth - 40, 50, 30, 30);
+        const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
+        doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 30, 30);
       } catch (err) {
         console.warn("QR code failed to generate");
       }
-
+      currentY += 40;
+  
       // 🚚 Customer Info
       doc.setFontSize(15).setTextColor(255, 0, 0).setFont("helvetica", "bold");
-      doc.text("QUOTATION", 10, 58);
+      doc.text("QUOTATION", 10, currentY);
+      currentY += 10;
+  
       doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, 66);
-
+      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
+      currentY += 6;
+  
       doc.setFontSize(10);
-      doc.text(`Address: ${customer?.billingAddress || "N/A"}`, 10, 70);
-      doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, 74);
+      doc.text(`Address: ${customer?.billingAddress || "N/A"}`, 10, currentY);
+      currentY += 6;
+      doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, currentY);
+      currentY += 6;
       doc.text(
-        `Contact Person: ${
-          customer?.contactPerson || bill.customerName || "N/A"
-        }`,
+        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
         10,
-        79
+        currentY
       );
-      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, 84);
-
-      // 🧾 Bill Metadata (Optional Fields Could Be Re-enabled)
+      currentY += 6;
+      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY);
+      currentY += 10;
+  
+      // 🧾 Bill Metadata
       autoTable(doc, {
-        startY: 87,
+        startY: currentY,
         tableWidth: 80,
         margin: { left: pageWidth - 90 },
         head: [],
@@ -187,13 +195,12 @@ export default function DraftInvoicePage({
           1: { halign: "right" },
         },
       });
-
+      currentY = doc.lastAutoTable.finalY + 10;
+  
       // 📊 Invoice Table
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 3,
-        head: [
-          ["#", "Product", "Code", "Price", "CASE", "PCS", "VAT", "Total"],
-        ],
+        startY: currentY,
+        head: [["#", "Product", "Code", "Price", "CASE", "PCS", "VAT", "Total"]],
         body: bill.orders.map((ord, i) => [
           i + 1,
           `${ord.item?.Name}`,
@@ -207,10 +214,11 @@ export default function DraftInvoicePage({
         theme: "grid",
         styles: { fontSize: 9 },
       });
-
+      currentY = doc.lastAutoTable.finalY + 10;
+  
       // 💰 Summary Table
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 3,
+        startY: currentY,
         tableWidth: 76,
         margin: { left: pageWidth - 90 },
         head: [],
@@ -227,51 +235,57 @@ export default function DraftInvoicePage({
           1: { halign: "right" },
         },
       });
-
+      currentY = doc.lastAutoTable.finalY + 10;
+  
       // ✍️ Signatures
-      const signatureY = doc.lastAutoTable.finalY + 20;
       doc.setFontSize(10);
       doc.text(
         `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
         10,
-        signatureY
+        currentY
       );
-      doc.text("Authorized Signatures", 10, signatureY + 15);
+      currentY += 10;
+      doc.text("Authorized Signatures", 10, currentY);
+      currentY += 10;
       doc.text(
         "Customer Sign & Date _______________________________",
         10,
-        signatureY + 22
+        currentY
       );
+      currentY += 10;
       doc.text(
         `${business.companyName.toLowerCase()} _______________________________`,
         10,
-        signatureY + 30
+        currentY
       );
-      if (business.invoicePolicy)
-        doc.text(business.invoicePolicy, 10, signatureY + 40);
-
+      currentY += 10;
+      if (business.invoicePolicy) {
+        doc.text(business.invoicePolicy, 10, currentY);
+        currentY += 10;
+      }
+  
       // 📎 Footer
       doc.setFontSize(9);
       doc.text(
         `This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`,
         10,
-        280
+        pageHeight - 20
       );
-
+  
       // 📄 Page Numbers
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, 290, {
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10, {
           align: "right",
         });
       }
-
+  
       // 📥 Output
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       const win = window.open(url, "_blank");
-
+  
       if (win) {
         win.onload = () => {
           Swal.close();
@@ -283,6 +297,7 @@ export default function DraftInvoicePage({
       }
     } catch (error) {
       Swal.close();
+      console.error("Error generating PDF:", error);
     }
   };
 
