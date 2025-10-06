@@ -686,13 +686,13 @@ export default function DraftInvoicePage({
                   key={bill._id}
                   className="border-t hover:bg-gray-50 transition"
                 >
-                  <td className="flex-2 px-4 py-2 font-small text-center">
+                  <td className="flex-2 px-4 py-2 font-small text-center text-xs">
                     {index + 1}
                   </td>
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-small text-center">
                     <a
                       href={`/${userInfo.business.companyName}/${Encrypt(userInfo.user._id)}/product/product/${Encrypt(bill.item._id)}?Modules=product`}
-                      className="hover:underline text-sm"
+                      className="hover:underline text-xs"
                     >
                       {bill.item.Name}
                     </a>
@@ -705,12 +705,12 @@ export default function DraftInvoicePage({
                       width={38}
                       height={38}
                       alt="preview"
-                      className="rounded-md border border-gray-200"
+                      className="rounded-md "
                     />
                   </td>
                   {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
-                  <td className="px-4 py-2 text-center">{bill.item.ACDcode}</td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">{bill.item.ACDcode}</td>
+                  <td className="px-4 py-2 text-center text-xs">
                     {user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "draft" ? (
                      <input
                       type="number"
@@ -728,14 +728,14 @@ export default function DraftInvoicePage({
                           userInfo.business.companyName
                         );
                       }}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
                     />
                     ) : (
                       bill.Qty
                     )}
                   </td>
 
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">
                     {Business.allowSkuSplitting && user._id === Singlebill.invoicerId &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
@@ -761,7 +761,7 @@ export default function DraftInvoicePage({
                       bill.pcsReq || 0
                     )}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">
                     {Business.allowPriceChangeOnInvoice &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                      <input
@@ -788,14 +788,14 @@ export default function DraftInvoicePage({
                     )}
                   </td>
 
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency?.currency.Symbol}
                     {bill.promotionData || 0}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-center text-xs">
                     {bill.item.VAT.$numberDecimal}
                   </td>
-                  <td className="px-4 py-2 font-bold text-right">
+                  <td className="px-4 py-2 font-bold text-right text-xs">
                     {userInfo.business.currency?.currency.Symbol}
                     {bill.total?.toFixed(2)}
                   </td>
