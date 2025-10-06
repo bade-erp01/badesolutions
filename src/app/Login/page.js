@@ -10,11 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {Encrypt,EXPRESS_PRIVATE_URL} from "../../../Functions/Functions"
 import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Login({userInfo,businessInfo,ReCAPTCHAKey}) {
   const dispatch = useDispatch();
-  const recaptchaRef = useRef();
+  // const recaptchaRef = useRef();
   // const userInfo = useSelector((state) => state.user.userInfo);
   // const businessInfo = useSelector((state) => state.user.businessInfo);
   const router = useRouter();
