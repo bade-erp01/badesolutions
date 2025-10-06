@@ -189,8 +189,8 @@ const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
     }
 
     // 📎 Footer
-    doc.setFontSize(9);
-    doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
+    // doc.setFontSize(9);
+    // doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
 
     // 📄 Page Numbers
     const totalPages = doc.internal.getNumberOfPages();
