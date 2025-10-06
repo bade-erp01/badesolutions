@@ -653,7 +653,7 @@ export default function DraftInvoicePage({
 
         {/* Print Button */}
         {/* Product Table */}
-        <div className="overflow-x-auto max-h-100 overflow-y-auto rounded-lg border border-gray-200 bg-white mb-8">
+        <div className=" rounded-sm border border-gray-200 bg-white mb-8">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
               <tr>
@@ -688,7 +688,7 @@ export default function DraftInvoicePage({
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center">
                     <a
                       href={`/${userInfo.business.companyName}/${Encrypt(userInfo.user._id)}/product/product/${Encrypt(bill.item._id)}?Modules=product`}
-                      className="hover:underline"
+                      className="hover:underline text-sm"
                     >
                       {bill.item.Name}
                     </a>
