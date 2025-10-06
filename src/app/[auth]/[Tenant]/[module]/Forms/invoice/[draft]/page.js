@@ -687,7 +687,7 @@ export default function DraftInvoicePage({
                 >
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center">
                     <a
-                      href={`/${userInfo.business.companyName}/Product/${bill.item._id}`}
+                      href={`/${userInfo.business.companyName}/${Encrypt(userInfo.user._id)}/product/product/${Encrypt(bill.item._id)}?Modules=product`}
                       className="hover:underline"
                     >
                       {bill.item.Name}
