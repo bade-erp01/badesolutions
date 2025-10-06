@@ -1,20 +1,22 @@
 "use client";
-import React, { useState, useEffect, useMemo, useCallback,useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import Image from "next/image";
 import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
   Encrypt,
 } from "../../../Functions/Functions";
-import {
-  ErrorMessage,
-    SuccessToast,
-    plsWait,
-} from "../../../Functions/Mics";
+import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { ScaleIcon,InboxArrowDownIcon } from "@heroicons/react/24/outline";
+import { ScaleIcon, InboxArrowDownIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
@@ -27,16 +29,18 @@ export default function MainDash({ userData }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
-  
+
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
   const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
-  
+
   // 🧠 Memoized sorted invoices
   const sortedInvoices = useMemo(() => {
-    return tenantData?.invoice?.sort(
-      (a, b) => b.billReferenceNo - a.billReferenceNo
-    ) || [];
+    return (
+      tenantData?.invoice?.sort(
+        (a, b) => b.billReferenceNo - a.billReferenceNo
+      ) || []
+    );
   }, [tenantData]);
 
   // 🧠 Memoized paginated invoices
@@ -50,26 +54,28 @@ export default function MainDash({ userData }) {
   }, [sortedInvoices]);
 
   // ⏱ Debounced page change
-  const handlePageChange = useCallback((page) => {
-    if (page >= 1 && page <= totalPages) {
-      setTimeout(() => {
-        setCurrentPage(page);
-      }, 300); // 300ms debounce
-    }
-  }, [totalPages]);
+  const handlePageChange = useCallback(
+    (page) => {
+      if (page >= 1 && page <= totalPages) {
+        setTimeout(() => {
+          setCurrentPage(page);
+        }, 300); // 300ms debounce
+      }
+    },
+    [totalPages]
+  );
 
-    useEffect(() => {
-
+  useEffect(() => {
     const fetchTenantData = async () => {
       const isVisible = document.visibilityState === "visible";
       const isOnline = navigator.onLine;
 
       if (!isVisible || !isOnline || status === "Inactive") {
-      //  ErrorMessage("⏸ Fetch paused due to:", {
-      //     visibility: isVisible,
-      //     online: isOnline,
-      //     activity: status
-      //   });
+        //  ErrorMessage("⏸ Fetch paused due to:", {
+        //     visibility: isVisible,
+        //     online: isOnline,
+        //     activity: status
+        //   });
         return;
       }
 
@@ -118,7 +124,7 @@ export default function MainDash({ userData }) {
       if (document.visibilityState === "visible") {
         // console.log("👁️ Tab became visible");
         fetchTenantData();
-      } 
+      }
     };
 
     // Network status
@@ -128,7 +134,7 @@ export default function MainDash({ userData }) {
     };
 
     const handleOffline = () => {
-      plsWait("📴Currently Offline")
+      plsWait("📴Currently Offline");
     };
 
     // User activity listeners
@@ -153,7 +159,6 @@ export default function MainDash({ userData }) {
       window.removeEventListener("offline", handleOffline);
     };
   }, [userData, EXPRESS_PRIVATE_URL, Encrypt]);
-
 
   if (loading) {
     return (
@@ -200,7 +205,13 @@ export default function MainDash({ userData }) {
   return (
     <>
       {userData.user.c_levelDash ? (
-        <div className="text-xs" style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent', }}>
+        <div
+          className="text-xs"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "#453d46ff transparent",
+          }}
+        >
           {/* KPI cards */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
@@ -212,7 +223,7 @@ export default function MainDash({ userData }) {
                     {tenantData.TodaySale?.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                   Auto Updates every 1 minutes
+                    Auto Updates every 1 minutes
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-green-700 text-white text-xl shadow-md">
@@ -259,191 +270,233 @@ export default function MainDash({ userData }) {
               ""
             )}
 
-            
-              <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm text-gray-500">Pending Expenses</h3>
-                    <p className="text-2xl text-gray-600 font-bold mt-1">
-                      {/* {tenantData.Expenses?.length || 0}  */}
-                      0
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
+            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">Pending Expenses</h3>
+                  <p className="text-2xl text-gray-600 font-bold mt-1">
+                    {/* {tenantData.Expenses?.length || 0}  */}0
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
                   <InboxArrowDownIcon className="h-6 w-6 text-gray-900" />
-                  </div>
                 </div>
               </div>
+            </div>
           </section>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}
             <section className="lg:col-span-2">
-                <div className="bg-white rounded p-3 shadow-xl">
-                  {/* Chart */}
-                  <GenerealSalesMargin
-                    yearlysales={tenantData.yearlysales}
-                    warehouses={tenantData.warehouses}
-                  />
-                </div>
-
-                {/* Properties table */}
-                  <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg text-gray-500 font-semibold">Recent Sales</h3>
-                    </div>
-
-                    <div className="overflow-y-hidden max-h-96">
-                      <table className="w-full text-left text-sm">
-                        <thead className="text-xs text-gray-500 border-b">
-                          <tr>
-                            <th className="py-3 border-r">S/N</th>
-                            <th className="p-3">Ref</th>
-                            <th className="py-3">Customer</th>
-                            <th className="py-3">Grand Total</th>
-                            <th>Raised By</th>
-                            <th className="py-3">Status</th>
-                          </tr>
-                        </thead>
-
-                        <tbody className="text-gray-700">
-                          {paginatedInvoices.length > 0 ? (
-                            paginatedInvoices.map((invoice, index) => (
-                              <tr key={index} className="border-b animate__animated animate__fadeInRight text-xs">
-                                <td className="py-3 border-r">
-                                  {(currentPage - 1) * itemsPerPage + index + 1}
-                                </td>
-                                <td className="p-3 font-semibold text-blue-700">
-                                  <Link
-                                    href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/bill/bill/${Encrypt(invoice._id)}`}
-                                    className="text-indigo-600"
-                                  >
-                                    {invoice.billReferenceNo}/{invoice.invoicelocation}
-                                  </Link>
-                                </td>
-                                <td className="py-3">{invoice.customerName}</td>
-                                <td className="py-3">
-                                  {userData.business.currency?.currency.Symbol}
-                                  {invoice.grandTotal?.toLocaleString()}
-                                </td>
-                                <td className="py-3">{invoice.RaiseBy}</td>
-                                <td
-                                  className={`py-3 ${
-                                    invoice.billStatus !== "Cancelled"
-                                      ? "text-green-600"
-                                      : "text-red-600"
-                                  }`}
-                                >
-                                  {invoice.billStatus}
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan={6} className="py-6 text-center text-gray-500 text-sm">
-                                No invoices found for this page.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Pagination Controls */}
-                    <div className="flex justify-center items-center gap-2 mt-4 text-sm">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-                      >
-                        Prev
-                      </button>
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handlePageChange(i + 1)}
-                          className={`px-3 py-1 rounded border ${
-                            currentPage === i + 1
-                              ? "bg-indigo-600 text-white"
-                              : "border-gray-300 hover:bg-gray-100"
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                
-              </section>
-
-            {/* Quick stats / chart placeholder */}
-            <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
-                <h3 className="text-lg text-gray-500 font-semibold mb-4">
-                 🗿 Quick Stats Widget
-                </h3>
-              <div className="flex flex-col">
-                <h4 className="text-sm text-gray-500 font-semibold mb-4">
-                Sales Performance Millestone
-              </h4>
-
-              {tenantData.result.map((person, index) => (
-                <div
-                  key={index}
-                  className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
-                  title={`${person.firstName}`}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs font-semibold text-gray-600 text-right justify-content-end">
-                      {userData.business.currency?.currency.Symbol}
-                      {person.totalSales?.toLocaleString()} /
-                      {userData.business.currency?.currency.Symbol}
-                      {person.salesTarget?.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-1">
-                    <div
-                      className="h-full bg-green-500 transition-all duration-300"
-                      style={{
-                        width: `${Math.min(
-                          Math.round(person.percentage),
-                          100
-                        )}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span className="text-gray-700 font-semibold truncate max-w-[100px]">
-                      {truncate(person.firstName, 10)}
-                    </span>
-                    <span className="text-green-600 font-medium text-xs">
-                      {`${parseFloat(person.percentage).toFixed(2)}% achieved`}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              <div className="text-center mt-6 border-bottom ">
-                <ExcelDownloadBtn
-                  data={tenantData.result}
-                  page={`Sales Team Performance`}
+              <div className="bg-white rounded p-3 shadow-xl">
+                {/* Chart */}
+                <GenerealSalesMargin
+                  yearlysales={tenantData.yearlysales}
+                  warehouses={tenantData.warehouses}
                 />
               </div>
 
-              <div className="mt-6 border-t-2">
-                <h4 className="text-lg text-gray-500 font-semibold mb-4">
-                  Upcoming Events 📆
-                </h4>
-                <ul className="list-disc list-inside">
-                  {/* show something here */}
-                </ul>
+              {/* Properties table */}
+              <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg text-gray-500 font-semibold">
+                    Recent Sales
+                  </h3>
+                </div>
+
+                <div className="overflow-y-hidden max-h-96">
+                  <table className="w-full text-left text-sm">
+                    <thead className="text-xs text-gray-500 border-b">
+                      <tr>
+                        <th className="py-3 border-r">S/N</th>
+                        <th className="p-3">Ref</th>
+                        <th className="py-3">Customer</th>
+                        <th className="py-3">Grand Total</th>
+                        <th>Raised By</th>
+                        <th className="py-3">Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="text-gray-700">
+                      {paginatedInvoices.length > 0 ? (
+                        paginatedInvoices.map((invoice, index) => (
+                          <tr
+                            key={index}
+                            className="border-b animate__animated animate__fadeInRight text-xs"
+                          >
+                            <td className="py-3 border-r">
+                              {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+                            <td className="p-3 font-semibold text-blue-700">
+                              <Link
+                                href={`/${
+                                  userData.business.companyName
+                                }/${Encrypt(
+                                  userData.user._id
+                                )}/bill/bill/${Encrypt(invoice._id)}`}
+                                className="text-indigo-600"
+                              >
+                                {invoice.billReferenceNo}/
+                                {invoice.invoicelocation}
+                              </Link>
+                            </td>
+                            <td className="py-3">{invoice.customerName}</td>
+                            <td className="py-3">
+                              {userData.business.currency?.currency.Symbol}
+                              {invoice.grandTotal?.toLocaleString()}
+                            </td>
+                            <td className="py-3">{invoice.RaiseBy}</td>
+                            <td
+                              className={`py-3 ${
+                                invoice.billStatus !== "Cancelled"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {invoice.billStatus}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="py-6 text-center text-gray-500 text-sm"
+                          >
+                            No invoices found for this page.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i + 1)}
+                      className={`px-3 py-1 rounded border ${
+                        currentPage === i + 1
+                          ? "bg-indigo-600 text-white"
+                          : "border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
+            </section>
+
+            {/* Quick stats / chart placeholder */}
+            <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
+              <h3 className="text-lg text-gray-500 font-semibold mb-4">
+                🗿 Quick Stats Widget
+              </h3>
+              <div className="flex flex-col">
+                <h4 className="text-sm text-gray-500 font-semibold mb-4">
+                  Sales Performance Millestone
+                </h4>
+
+                {tenantData.result.map((person, index) => (
+                  <div
+                    key={index}
+                    className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
+                    title={`${person.firstName}`}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-semibold text-gray-600 text-right justify-content-end">
+                        {userData.business.currency?.currency.Symbol}
+                        {person.totalSales?.toLocaleString()} /
+                        {userData.business.currency?.currency.Symbol}
+                        {person.salesTarget?.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-1">
+                      <div
+                        className="h-full bg-green-500 transition-all duration-300"
+                        style={{
+                          width: `${Math.min(
+                            Math.round(person.percentage),
+                            100
+                          )}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span className="text-gray-700 font-semibold truncate max-w-[100px]">
+                        {truncate(person.firstName, 10)}
+                      </span>
+                      <span className="text-green-600 font-medium text-xs">
+                        {`${parseFloat(person.percentage).toFixed(
+                          2
+                        )}% achieved`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                <div className="text-center mt-6 border-bottom ">
+                  <ExcelDownloadBtn
+                    data={tenantData.result}
+                    page={`Sales Team Performance`}
+                  />
+                </div>
+
+                <div className="mt-6 border-t-2">
+                  <h4 className="text-lg text-gray-500 font-semibold mb-4">
+                    📆 Todays Payments
+                  </h4>
+                  <ul
+                    className="list-disc list-inside space-y-2 text-sm text-gray-700  overflow-y-auto max-h-80"
+                    style={{
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "#453d46ff transparent",
+                    }}
+                  >
+                    {tenantData.revenuePayments.length > 0 ? (
+                      tenantData.revenuePayments.map((payment) => (
+                        <li
+                          key={payment._id}
+                          className="flex items-center justify-between px-4 py-2 bg-white shadow-sm rounded-md border border-gray-200 hover:shadow-md hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-800 font-semibold">
+                              {userData.business.currency?.currency.Symbol}
+                              {payment.crAmount.toLocaleString()}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {payment.collectionRef}
+                            </span>
+                          </div>
+                          <span className="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">
+                            Ref: {payment.paymentReferenceNo.slice(0, 6)}
+                          </span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-gray-500 italic">
+                        No revenue payments recorded yet.
+                      </li>
+                    )}
+                  </ul>
+                </div>
               </div>
             </aside>
           </div>
