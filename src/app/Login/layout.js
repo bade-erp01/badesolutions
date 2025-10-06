@@ -30,6 +30,6 @@ export default async function layout({ children,params }) {
     const businessInfo = userData.business; 
 
   return <>
-        < Login userInfo={userInfo} businessInfo={businessInfo}/>
+        < Login userInfo={userInfo} businessInfo={businessInfo} ReCAPTCHAKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}/>
         </>;
 }

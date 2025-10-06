@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import Nav1 from "../Components/Nav1";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,10 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {Encrypt,EXPRESS_PRIVATE_URL} from "../../../Functions/Functions"
 import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
 
-export default function Login({userInfo,businessInfo}) {
+export default function Login({userInfo,businessInfo,ReCAPTCHAKey}) {
   const dispatch = useDispatch();
-
+  const recaptchaRef = useRef();
   // const userInfo = useSelector((state) => state.user.userInfo);
   // const businessInfo = useSelector((state) => state.user.businessInfo);
   const router = useRouter();
@@ -79,6 +80,8 @@ export default function Login({userInfo,businessInfo}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = await recaptchaRef.current.executeAsync();
+    recaptchaRef.current.reset();
     plsWait("Verifying Credentials. Please wait...");
 
     try {
@@ -151,6 +154,7 @@ export default function Login({userInfo,businessInfo}) {
                             </span>
                             <input type="email" placeholder="Tenant Id" className="bg-transparent outline-none flex-1 text-gray-700 placeholder-gray-400" />
                         </div> */}
+              
               <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
                 <span className="mr-2 text-gray-400">
                   <svg
@@ -205,6 +209,11 @@ export default function Login({userInfo,businessInfo}) {
                   I forgot
                 </Link>
               </div>
+                <ReCAPTCHA
+                  sitekey={ReCAPTCHAKey}
+                  size="invisible"
+                  ref={recaptchaRef}
+                />
               <div className="flex items-center justify-between mt-2">
                 <button className="bg-black text-white rounded p-2 ml-2 shadow-md">
                   Login
