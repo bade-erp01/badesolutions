@@ -1,5 +1,4 @@
 
-import dbConnect from "../../../lib/mongoose";
 import {fetchUser} from "../../../Functions/useerDataRefresh"
 import Login from './page'
 
@@ -23,13 +22,12 @@ export const metadata = {
 };
 
 export default async function layout({ children,params }) {
-  await dbConnect();
-
+  
     const userData = await fetchUser();
     const userInfo = userData.user;
     const businessInfo = userData.business; 
 
   return <>
-        < Login userInfo={userInfo} businessInfo={businessInfo} ReCAPTCHAKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}/>
+        < Login userInfo={userInfo} businessInfo={businessInfo} />
         </>;
 }

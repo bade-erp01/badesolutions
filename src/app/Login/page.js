@@ -12,7 +12,7 @@ import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
 // import ReCAPTCHA from "react-google-recaptcha";
 
-export default function Login({userInfo,businessInfo,ReCAPTCHAKey}) {
+export default function Login({userInfo,businessInfo}) {
   const dispatch = useDispatch();
   // const recaptchaRef = useRef();
   // const userInfo = useSelector((state) => state.user.userInfo);
