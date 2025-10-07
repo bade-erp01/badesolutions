@@ -585,7 +585,7 @@ export default function DraftPurchasePage({
                     />
                     ) : (
                       <td className="px-4 py-2 text-center text-xs">
-                        bill.pcs || 0
+                        {bill.pcs || 0}
                       </td>
                     )}
                   </td>
