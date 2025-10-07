@@ -791,8 +791,8 @@ export default function InvoicePage({
           )}
 
           {/* duplicate */}
-          {Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
-            <button
+            {userInfo.business.subscriptionplan === "Standard" && userInfo.user.raiseInvoice && Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
+              <button
               title={`Re-Bill ${Singlebill.billReferenceNo}`}
               onClick={Rebill}
               className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-green-200 transition duration-200 ease-in-out mr-2 hover:bg-green-600 font-semibold"
