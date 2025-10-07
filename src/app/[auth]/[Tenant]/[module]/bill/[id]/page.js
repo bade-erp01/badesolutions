@@ -669,7 +669,7 @@ export default function InvoicePage({
               </h3>
               <p className="text-gray-500">{userInfo.business.email}</p>
               <p className="text-gray-500">{userInfo.business.Tel}</p>
-              <p className="text-gray-500">{userInfo.business.shopAddress}</p>
+              <p className="text-gray-500">{userInfo.business.shopAddress.slice(0,10)}</p>
               <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
               <h2
                 className={`mt-3 font-bold text-base ${
