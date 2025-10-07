@@ -53,7 +53,7 @@ export default async function TenantPage({ params }) {
         page={`${userData?.business?.companyName}!`}
       />
 
-      <div className="flex flex-2">
+      <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
         {/* Sidebar */}
         <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-y-hidden" >
           <div className="flex items-center gap-2 mb-4">
@@ -62,7 +62,7 @@ export default async function TenantPage({ params }) {
           <hr className="border-gray-600 mb-4" />
 
           <nav className="space-y-4">
-            <div className="max-h-[83vh] overflow-y-hidden">
+            <div className=" bg-grey-100 max-h-[40vh] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#d9d1daff transparent' }}>
               {userData?.user?.Apps.map((app, index) => (
                 <Link
                   key={index}
