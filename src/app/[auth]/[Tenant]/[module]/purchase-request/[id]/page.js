@@ -584,10 +584,16 @@ export default function DraftPurchasePage({
                       }}
                     />
                     ) : (
-                      bill.pcs || 0
+                      <td className="px-4 py-2 text-center text-xs">
+                        bill.pcs || 0
+                      </td>
                     )}
                   </td>
-                  ):0}
+                  ):(
+                    <td className="px-4 py-2 text-center text-xs">
+                         0
+                    </td>
+                  )}
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
                       <input
@@ -618,10 +624,10 @@ export default function DraftPurchasePage({
                       bill.ExpDate
                     )}
                   </td>
-                  <td className="px-4 py-2 text-center">
-                    {bill.item.VendorPrice}
+                  <td className="px-4 py-2 text-center text-xs">
+                    {bill.buyingPrice}
                   </td>
-                  <td className="px-4 py-2 font-bold text-right">
+                  <td className="px-4 py-2 font-bold text-right text-xs">
                     {Business.currency?.currency.Symbol}
                     {bill.total?.toFixed(2)}
                   </td>
