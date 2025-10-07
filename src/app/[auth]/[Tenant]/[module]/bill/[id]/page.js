@@ -664,7 +664,7 @@ export default function InvoicePage({
               alt="logo"
             />
             <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+              <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">
                 {userInfo.business.companyName}
               </h3>
               <p className="text-gray-500">{userInfo.business.email}</p>
@@ -679,14 +679,14 @@ export default function InvoicePage({
                 {Singlebill.billStatus.toUpperCase()} /{" "}
                 {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
               </h2>
-              <h2 className=" mb-2 text-lg font-bold text-indigo-700 tracking-wide">
+              <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-wide">
                 {Singlebill.WayBillNo}
               </h2>
             </div>
           </div>
 
           <div className="text-right text-sm text-gray-700 space-y-1 min-w-[220px]">
-            <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+            <h3 className="text-lg font-bold text-gray-900 tracking-tight">
               {Singlebill.customerName?.toUpperCase()}
             </h3>
             <p>
