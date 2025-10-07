@@ -80,8 +80,8 @@ export default function Login({userInfo,businessInfo}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = await recaptchaRef.current.executeAsync();
-    recaptchaRef.current.reset();
+    // const token = await recaptchaRef.current.executeAsync();
+    // recaptchaRef.current.reset();
     plsWait("Verifying Credentials. Please wait...");
 
     try {
