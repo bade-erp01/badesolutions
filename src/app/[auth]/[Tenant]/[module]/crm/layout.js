@@ -8,6 +8,7 @@ import { Encrypt } from '../../../../../../Functions/Mics';
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import Footer2 from '@/app/Components/Footer2';
+import { notFound } from 'next/navigation';
 
 import axios from "axios";
 import {
@@ -31,6 +32,14 @@ export default async function crmLayout({ children, params }) {
 
   try {
     userData = await fetchUser();
+    const AppFinder = userData.user.Apps.find(app=>{
+        return app.Name === "CRM"
+      })
+    
+      if(!AppFinder){
+        return notFound()
+      }
+
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
     const res = await axios.get(`${baseUrl}/api/crm`, {

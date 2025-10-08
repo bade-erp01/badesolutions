@@ -1,6 +1,7 @@
 import SingleInvoice from './page';
 import { fetchUser, } from '../../../../../../../Functions/useerDataRefresh';
 import axios from "axios"
+import { notFound } from 'next/navigation';
 
 export const metadata = {
   title: "Stores Settings | B.A.D.E ERP Platform",
@@ -56,6 +57,14 @@ export default async function StoreLayout({ params }) {
   const userInfo = await fetchUser();
   const Params = await params
   let Inv = [], cust = []
+
+      const AppFinder = userInfo.user.Apps.find(app=>{
+          return app.Name === "CRM"
+        })
+      
+        if(!AppFinder){
+          return notFound()
+        }
 
   try {
      const baseUrl = process.env.EXPRESS_PRIVATE_URL;
