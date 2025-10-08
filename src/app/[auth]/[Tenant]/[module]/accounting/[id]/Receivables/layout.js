@@ -136,12 +136,9 @@ export default async function AccountingPage({ children, params }) {
                   <span className="text-xs">{cashRegister.Name}</span>
                 </Link>
               )}
+               
                <Link
-                  href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${cashRegister.url
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}/${cashRegister.url
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}`}
+                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/credit-note/credit-note`}
                   title={"Credit Notes"}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
@@ -150,12 +147,8 @@ export default async function AccountingPage({ children, params }) {
                 </Link>
                 
                  <Link
-                  href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${cashRegister.url
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}/${cashRegister.url
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}`}
-                  title={"Credit Notes"}
+                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/${moduleList.id}/${moduleList.id}/debitnote`}
+                  title={"Debit Notes"}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <BanknotesIcon className="h-5 w-5 text-gray-100" />
