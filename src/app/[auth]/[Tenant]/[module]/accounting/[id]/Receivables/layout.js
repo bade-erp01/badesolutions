@@ -8,7 +8,8 @@ import Link from "next/link"
 import Image from "next/image"
 import DebtorsReportModal from "@/app/Components/Reports/DebtorsReport";
 import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
-import { UserGroupIcon,BanknotesIcon } from "@heroicons/react/24/outline";
+import { CreditCardIcon,BanknotesIcon } from "@heroicons/react/24/outline";
+import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
 import { notFound } from 'next/navigation';
 
 export const metadata = {
@@ -87,6 +88,11 @@ export default async function AccountingPage({ children, params }) {
               <BackButton />
               <DebtorsReportModal data={data.Customers} />
               <ReceivablesAgingModal data={data.Customers} />
+              <CashregisterReport
+                dataArray={data.Payments}
+                banks={data.Accounts}
+                customers={data.Customers}
+              />
               {crmFinder && (
                 <Link
                   href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${crmFinder.url
@@ -130,6 +136,31 @@ export default async function AccountingPage({ children, params }) {
                   <span className="text-xs">{cashRegister.Name}</span>
                 </Link>
               )}
+               <Link
+                  href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${cashRegister.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${cashRegister.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                  title={"Credit Notes"}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <CreditCardIcon className="h-5 w-5 text-gray-100" />
+                  <span className="text-xs">Credit Notes</span>
+                </Link>
+                
+                 <Link
+                  href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${cashRegister.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${cashRegister.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                  title={"Credit Notes"}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <BanknotesIcon className="h-5 w-5 text-gray-100" />
+                  <span className="text-xs">Debit Notes</span>
+                </Link>
             </nav>
           </aside>
 
