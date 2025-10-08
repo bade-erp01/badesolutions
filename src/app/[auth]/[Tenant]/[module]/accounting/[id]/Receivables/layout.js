@@ -137,11 +137,13 @@ export default async function AccountingPage({ children, params }) {
                 </Link>
               )}
                
-               <Link
-                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/credit-note/credit-note`}
-                  title={"Credit Notes"}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
+               {(userData.user.creditOfficer || userData.user.isAccountant)  && (
+                <>
+                 <Link
+                 href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/credit-note/credit-note`}
+                 title={"Credit Notes"}
+                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                 >
                   <CreditCardIcon className="h-5 w-5 text-gray-100" />
                   <span className="text-xs">Credit Notes</span>
                 </Link>
@@ -154,6 +156,9 @@ export default async function AccountingPage({ children, params }) {
                   <BanknotesIcon className="h-5 w-5 text-gray-100" />
                   <span className="text-xs">Debit Notes</span>
                 </Link>
+                </>
+              )}
+
             </nav>
           </aside>
 

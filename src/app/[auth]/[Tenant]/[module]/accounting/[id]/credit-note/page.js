@@ -84,7 +84,7 @@ export default async function AccountingPage({ children, params }) {
             <nav className="space-y-2">
               <BackButton />
 
-             {userData.user.creditOfficer && (
+             {(userData.user.creditOfficer || userData.user.isAccountant) && (
                <CreditNoteModal customersList={data.customers} baseUrl={baseUrl} userData={userData}/>
              )}
 
