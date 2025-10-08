@@ -1,162 +1,161 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import Link from "next/link"
-import {useParams} from "next/navigation"
+import Nav1 from "@/app/Components/Nav1";
+import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
+import Footer2 from "@/app/Components/Footer2";
+import BackButton from "@/app/Components/BackBotton";
 import {Encrypt} from "../../../../../../../../Functions/Mics"
+import Link from "next/link"
+import Image from "next/image"
+import { notFound } from 'next/navigation';
+import CreditNoteModal from "@/app/Components/Accounting/CreditNoteModal"
+import CreditnoteTable from "@/app/Components/CreditnoteTable"
 
-export default function Page({ data }) {
-  const [creditNotes, setCreditNotes] = useState(data.cn || []);
-  const [filteredNotes, setFilteredNotes] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const notesPerPage = 10;
-  const Path = useParams()
+export const metadata = {
+  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  description: "Automate, Optimize, and Scale Your Business Operations",
+  keywords: [/* ...keywords omitted for brevity... */],
+  author: "Business Automated Dynamic Enterprise",
+  robots: "index, follow",
+  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
+  ogTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  ogDescription: "Streamline your business with AI-driven automation",
+  ogImage: "/assets/bade.png",
+  ogUrl: "https://badesolutions.com.ng",
+  twitterCard: "/assets/bade.png",
+  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  twitterDescription: "Automate and optimize your enterprise",
+  twitterImage: "/assets/bade.png",
+  favicon: "favicon.ico",
+};
 
-  useEffect(() => {
-    setFilteredNotes(creditNotes);
-  }, [creditNotes]);
+export default async function AccountingPage({ children, params }) {
+  const userData = await fetchUser();
+  const moduleList = await params;
 
-  const totalPages = Math.ceil(filteredNotes.length / notesPerPage);
-  const startIndex = (currentPage - 1) * notesPerPage;
-  const endIndex = startIndex + notesPerPage;
+   // check if user has access to crm and cash register
+  const AccountingFinder = userData.user.Apps.find(app=>{
+    return app.Name === "Accounting"
+  })
 
-  const handleSearch = (e) => {
-    const search = e.target.value.toLowerCase();
-    setSearchTerm(search);
-    const filtered = creditNotes.filter(note =>
-      note.customer?.toLowerCase().includes(search) ||
-      note.CreditId?.toLowerCase().includes(search) ||
-      note.Date?.toLowerCase().includes(search)
-    );
-    setFilteredNotes(filtered);
-    setCurrentPage(1);
-  };
+  if(!AccountingFinder){
+    return notFound()
+  }
 
-  return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-3 bg-gray-300">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-black mb-2">Credit Notes</h1>
-        <p className="text-gray-600">Manage and track your credit notes issued to customers</p>
-      </div>
+  // check if user has access to crm and cash register
+  const crmFinder = userData.user.Apps.find(app=>{
+    return app.Name === "CRM"
+  })
 
-      {/* Search and Filters */}
-      <div className="mb-6">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search by customer name or invoice number..."
-            className="w-full p-4 pl-12 rounded-lg bg-gray-800 text-white border border-gray-700 
-                     focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-            onChange={handleSearch}
-            value={searchTerm}
-          />
-          <svg
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+  const cashRegister = userData.user.Apps.find(app=>{
+    return app.Name === "Cash Register"
+  })
+
+  // fetch all credit payment from all bank account
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+    const res = await fetch(`${baseUrl}/api/Customer/Memo`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userData.business.tenantId}`,
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+        access: `${Encrypt(userData.user._id)}`,
+      },
+    });
+  
+    const data = await res.json()
+
+  try {
+   
+    return (
+      <div className="flex flex-col min-h-screen overflow-hidden">
+        <Nav1
+          user={userData.user}
+          business={userData.business}
+          page={`${moduleList.module} / ${moduleList.id}`}
+        />
+
+        <div className="flex flex-1 text-white bt-2">
+          {/* Sidebar */}
+          <aside
+            className="w-72 bg-[#1e1e20] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[520px] md:block"
+            style={{ overflowY: "auto" }}
           >
-            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-      </div>
+            {/* <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>
+            <hr className="border-gray-100 mb-4" /> */}
+            <nav className="space-y-2">
+              <BackButton />
 
-      {/* Table */}
-      <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs uppercase bg-gray-900 text-gray-300">
-              <tr>
-                <th className="px-6 py-4 font-medium">Ref #</th>
-                <th className="px-6 py-4 font-medium">Customer</th>
-                <th className="px-6 py-4 font-medium">Accountant</th>
-                <th className="px-6 py-4 font-medium">Amount</th>
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700 text-xs">
-              {filteredNotes.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-400">
-                    <div className="flex flex-col items-center">
-                      <svg className="w-12 h-12 mb-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <p className="text-lg">No credit notes found</p>
-                      <p className="text-sm text-gray-500">Try adjusting your search terms</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredNotes.slice(startIndex, endIndex).map((note, index) => (
-                  <tr key={index} className="hover:bg-gray-700/50 transition-colors duration-200 text-xs">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link href={`/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/${Path._id}/${Path._id}/${Encrypt(note._id)}`} className='text-blue-300'>
-                      {note.CreditId}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{note.customer}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{note.raisedBy}</td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium">
-                      {Number(note.Total).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {new Date(note.Date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        note.status === 'Closed' ? 'bg-green-500/20 text-green-400' :
-                        note.status === 'Open' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-red-500/20 text-red-400'
-                      }`}>
-                        {note.status.charAt(0).toUpperCase() + note.status.slice(1)}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+             {userData.user.creditOfficer && (
+               <CreditNoteModal customersList={data.customers} baseUrl={baseUrl} userData={userData}/>
+             )}
+
+              {crmFinder && (
+                <Link
+                  href={`/${userData.business.companyName}/${Encrypt(
+                    userData.user._id
+                  )}/${crmFinder.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${crmFinder.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                  title={crmFinder.Description || ""}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      crmFinder.icon ||
+                      "https://img.icons8.com/deco/48/open-box.png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={crmFinder.Name}
+                  />
+                  <span className="text-xs">{crmFinder.Name}</span>
+                </Link>
               )}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      {/* Pagination */}
-      {filteredNotes.length > 0 && (
-        <div className="flex justify-between items-center mt-6 bg-gray-800 px-6 py-4 rounded-lg">
-          <button
-            className="px-4 py-2 bg-gray-700 rounded-md text-gray-300 hover:bg-gray-600 
-                     disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            ← Previous
-          </button>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400">
-              Page <span className="font-medium text-white">{currentPage}</span> of{' '}
-              <span className="font-medium text-white">{totalPages}</span>
-            </span>
-          </div>
-          <button
-            className="px-4 py-2 bg-gray-700 rounded-md text-gray-300 hover:bg-gray-600 
-                     disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next →
-          </button>
+              {cashRegister && (
+                <Link
+                  href={`/${userData.business.companyName}/${Encrypt(
+                    userData.user._id
+                  )}/${cashRegister.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${cashRegister.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                  title={cashRegister.Description || ""}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      cashRegister.icon ||
+                      "https://img.icons8.com/deco/48/open-box.png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={cashRegister.Name}
+                  />
+                  <span className="text-xs">{cashRegister.Name}</span>
+                </Link>
+              )}
+            </nav>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[510px] overflow-y-auto">
+             <CreditnoteTable data={data}/>
+            </section>
+          </main>
         </div>
-      )}
-    </div>
-  );
+
+        <Footer2 />
+      </div>
+    );
+  } catch (err) {
+    return (
+      <div className="text-black p-6">
+        Failed to load. Please try again later.
+      </div>
+    );
+  }
 }
