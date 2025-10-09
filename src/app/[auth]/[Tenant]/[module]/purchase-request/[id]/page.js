@@ -625,7 +625,7 @@ export default function DraftPurchasePage({
                     )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {bill.buyingPrice}
+                    {bill.buyingPrice} 
                   </td>
                   <td className="px-4 py-2 font-bold text-right text-xs">
                     {Business.currency?.currency.Symbol}
