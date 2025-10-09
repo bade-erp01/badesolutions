@@ -27,9 +27,9 @@ ChartJS.register(
 
 const ProductSalesChart = ({ productsList }) => {
   const [products] = useState(productsList);
-  const filtered = products.filter((p) => p.TotalSale > 0);
+  const filtered = products.sort((a,b)=>b.TotalSale - a.TotalSale).filter((p) => p.TotalSale > 0);
   const sorted = [...filtered];
-  const bestSort = products.sort((a,b)=>b.TotalSale -a.TotalSale);
+  const bestSort = products.sort((a,b)=>b.TotalSale - a.TotalSale);
   const bestSeller = bestSort[0]
 
   const gradientFill = (ctx) => {
