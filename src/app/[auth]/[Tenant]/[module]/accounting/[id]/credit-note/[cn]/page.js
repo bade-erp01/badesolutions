@@ -6,6 +6,7 @@ import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
   const Params = useParams()
+  console.log(Params)
 
   const handleApprove = async (action) => {
     if (!confirm(`Are you sure you want to ${action} this credit note?`)) return;
@@ -30,7 +31,11 @@ export default function Page({ data,userData,baseurl }) {
       if (!response.ok) throw new Error('Failed to approve credit note');
       const request = await response.json()
       SuccessToast(request.message)
-      Router.back();
+      if(action === "Delete"){
+        Router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/${Params.module}/credit-note/credit-note`)
+      }else{
+        Router.refresh();
+      }
     } catch (error) {
       ErrorMessage(error.message);
       Router.refresh();

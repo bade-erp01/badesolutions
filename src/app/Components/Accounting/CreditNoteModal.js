@@ -121,9 +121,7 @@ const CreditNoteModal = ({ customersList, baseUrl, userData }) => {
           });
           //redirect to the cn for approval
           Router.push(
-            `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/${
-              Path._id
-            }/${Path._id}/${Encrypt(response.data)}`
+            `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/credit-note/credit-note/${Encrypt(response.data)}`
           );
         } else {
           ErrorMessage(response.error);
