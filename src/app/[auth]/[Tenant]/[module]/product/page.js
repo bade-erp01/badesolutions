@@ -15,7 +15,7 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Automate, Optimize, and Scale Your Business Operations",
-  keywords: [/* ...keywords omitted for brevity... */],
+  keywords: [],
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
   viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
@@ -33,7 +33,8 @@ export const metadata = {
 export default async function Productlayout({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+
   try {
     const res = await fetch(`${baseUrl}/api/Products`, {
       method: "GET",
@@ -42,11 +43,7 @@ export default async function Productlayout({ children, params }) {
         Authorization: `Bearer ${userData.business.tenantId}`,
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         access: `${Encrypt(userData.user._id)}`
-      },
-      // next: {
-      //   revalidate: 60,
-      //   // cache: "no-store"
-      // }
+      }
     });
 
     if (!res.ok) throw new Error("Failed to fetch product data");
@@ -62,7 +59,7 @@ export default async function Productlayout({ children, params }) {
     } = await res.json();
 
     return (
-      <div className="flex flex-col min-h-screen overflow-hidden">
+      <div className="flex flex-col min-h-screen overflow-hidden max-h-[100dvh]">
         <Nav1
           user={userData.user}
           business={userData.business}
@@ -70,10 +67,10 @@ export default async function Productlayout({ children, params }) {
           Module={[{}]}
         />
 
-        <div className="flex flex-1 text-white bt-2">
+        <div className="flex flex-1 text-white bt-2 max-h-[90dvh]">
           {/* Sidebar */}
           <aside
-            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[520px] md:block"
+            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block"
             style={{ overflowY: "auto" }}
           >
             <h2 className="text-lg font-bold mb-4">Product Management</h2>
@@ -118,23 +115,23 @@ export default async function Productlayout({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[510px] overflow-y-auto">
-               <div>
-                    {userData.user.c_levelDash && (
-                     <ProductSalesChart productsList={productList} />
-                    )}
-              
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                      {productList.sort((a, b) => a.Name.localeCompare(b.Name)).map(element => (
-                         <Card key={element._id} data={element} module={'product'}/> 
-                      ))}
-                    </div>
-                  </div>
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[90dvh]">
+              <div className="max-h-[90dvh] overflow-y-auto">
+                {userData.user.c_levelDash && (
+                  <ProductSalesChart productsList={productList} />
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
+                  {productList.sort((a, b) => a.Name.localeCompare(b.Name)).map(element => (
+                    <Card key={element._id} data={element} module={'product'} />
+                  ))}
+                </div>
+              </div>
             </section>
           </main>
+        <Footer2 />
         </div>
 
-        <Footer2 />
       </div>
     );
   } catch (err) {
