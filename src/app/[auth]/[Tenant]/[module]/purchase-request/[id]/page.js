@@ -544,7 +544,7 @@ export default function DraftPurchasePage({
                     />
                   </td>
                   {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
-                  <td className="px-4 py-2 text-center text-xs">{bill.item.ADCcode || bill.item.ACDcode}
+                  <td className="px-4 py-2 text-center text-xs">{bill?.item?.ADCcode || bill?.item?.ACDcode}
                   </td>
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
@@ -634,7 +634,7 @@ export default function DraftPurchasePage({
                   {user.raiseInvoice &&
                     Singlebill.status.toLowerCase() === "draft" && (
                       <td
-                        title={`Click to remove ${bill.item?.ADCcode?.toLowerCase()} from cart`}
+                        title={`Click to remove product from cart`}
                       >
                         <button onClick={() => removeLineItem(bill._id)}>
                           <TrashIcon className="w-5 h-5 text-red-500" />
