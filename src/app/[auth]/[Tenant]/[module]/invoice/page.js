@@ -15,7 +15,7 @@ export default function InvoiceLandingPage({ billList, userData }) {
 
   const bills = billList;
   const params = useParams();
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
 
   const filteredBills = bills.filter((bill) => {
     const statusMatch = !searchRef || bill.billStatus === searchRef;
@@ -34,9 +34,12 @@ export default function InvoiceLandingPage({ billList, userData }) {
   return (
     <div className="text-white text-xs">
       <div className=" mx-auto">
-
         {/* Filter Component */}
         <div className="border border-white/10 bg-gradient-to-br from-[#1a1a1f] to-[#111114] p-4 shadow-xl">
+         {/* Header */}
+        <div className="border-b pb-4 mb-6">
+          <h1 className="text-2xl font-bold text-gray-200">Invoice Management</h1>
+        </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Status Dropdown */}
             <div className="flex flex-col">
@@ -47,7 +50,7 @@ export default function InvoiceLandingPage({ billList, userData }) {
                 className="bg-[#1f1f24] text-white border border-white/30 rounded-md px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
                 value={searchRef}
                 onChange={(e) => {
-                  setSearchRef(e.target.value);
+                  setSearchRef(e.target.value); 
                   setCurrentPage(1);
                 }}
               >

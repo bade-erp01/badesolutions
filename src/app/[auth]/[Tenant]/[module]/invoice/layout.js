@@ -66,7 +66,7 @@ export default async function Employeelayout({ children, params }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col max-h-[100dvh] overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
@@ -74,9 +74,9 @@ export default async function Employeelayout({ children, params }) {
         Module={invoiceList}
       />
 
-      <div className="flex flex-1 text-white bt-2">
+      <div className="flex flex-1 text-white bt-2 max-h-[100dvh]">
         <aside
-          className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-hidden md:block"
+          className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300  max-h-[100dvh] overflow-y-hidden md:block"
         >
           <BackButton />
           <hr />
@@ -112,7 +112,7 @@ export default async function Employeelayout({ children, params }) {
         </aside>
 
         <main className="flex-1">
-          <section className="relative w-full h-[520px] max-h-[600px] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
+          <section className="relative w-full max-h-[83vh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
             <InvoiceLandingPage billList={invoiceList} userData={userData} />
           </section>
         </main>
