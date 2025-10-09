@@ -67,7 +67,7 @@ try {
           {/* Main Content */}
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[510px] overflow-y-auto">
-             <Page data={data}/>
+             <Page data={data} userData={userData} baseurl={baseUrl}/>
             </section>
           </main>
         </div>
