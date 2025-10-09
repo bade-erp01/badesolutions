@@ -111,7 +111,7 @@ const CreditNoteModal = ({ customersList, baseUrl, userData }) => {
           MySwal.fire({
             icon: "success",
             title: "Success!",
-            text: "Credit note has been created successfully.",
+            text: "Credit note has been created successfully. Awaiting Approval",
             customClass: {
               popup: "rounded-lg",
               confirmButton:

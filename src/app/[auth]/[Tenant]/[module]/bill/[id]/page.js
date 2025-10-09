@@ -754,7 +754,7 @@ export default function InvoicePage({
                 onClick={() => cancelSales(Singlebill._id)}
                 className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-red-500 transition duration-200 ease-in-out mr-2 hover:bg-red-600 text-white font-semibold border border-red-400 hover:shadow-lg"
               >
-                <ArrowPathRoundedSquareIcon className="w-7 h-7 text-gray-400" />
+                < ArrowUturnLeftIcon className="w-7 h-7 text-white" />
                 <span>
                   Cancel {Singlebill.billStatus}/{Singlebill.billReferenceNo}
                 </span>
@@ -797,8 +797,8 @@ export default function InvoicePage({
               onClick={Rebill}
               className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-green-200 transition duration-200 ease-in-out mr-2 hover:bg-green-600 font-semibold"
             >
-              <ArrowUturnLeftIcon className="w-7 h-7 text-gray-700" />
-              <span>Re-Bill</span>
+              <ArrowPathRoundedSquareIcon className="w-7 h-7 text-gray-700" />
+              <span>Recycle</span>
             </button>
           )}
 
