@@ -664,7 +664,7 @@ export default function DraftPurchasePage({
               >
                 <option value={""}>Choose...</option>
                 {productList.map((product) => (
-                    <option key={product.storeId} value={product.item.ADCcode || product.item.ACDcode}>
+                    <option key={product.storeId} value={product?.item?.ADCcode || product?.item?.ACDcode}>
                       {product.item.Name}
                     </option>
                 ))}
@@ -694,7 +694,7 @@ export default function DraftPurchasePage({
               />
               <datalist id="productsList">
                 {productList.map((product) => (
-                    <option key={product.storeId} value={product.item.ACDcode || product.item.ADCcode}>
+                    <option key={product.storeId} value={product?.item?.ACDcode || product?.item?.ADCcode}>
                       {product.item.Name}
                     </option>
                 ))}

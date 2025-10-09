@@ -130,7 +130,7 @@ export default async function Productlayout({ children, params }) {
             </section>
           </main>
         <Footer2 />
-        </div>
+        </div> 
 
       </div>
     );
