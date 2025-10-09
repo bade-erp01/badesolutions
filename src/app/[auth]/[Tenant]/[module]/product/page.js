@@ -129,9 +129,9 @@ export default async function Productlayout({ children, params }) {
               </div>
             </section>
           </main>
-        <Footer2 />
         </div> 
 
+        <Footer2 />
       </div>
     );
   } catch (err) {

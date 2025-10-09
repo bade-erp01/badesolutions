@@ -379,7 +379,7 @@ export default function DraftPurchasePage({
 
           <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
             <h3 className="text-xl font-bold text-gray-900 tracking-tight">
-              {cust.Name?.toUpperCase()}
+              {cust?.Name?.toUpperCase()}
             </h3>
             <p>
               {/* <span className="mr-1">📞</span> */}
@@ -665,7 +665,7 @@ export default function DraftPurchasePage({
                 <option value={""}>Choose...</option>
                 {productList.map((product) => (
                     <option key={product.storeId} value={product?.item?.ADCcode || product?.item?.ACDcode}>
-                      {product.item.Name}
+                      {product?.item?.Name}
                     </option>
                 ))}
               </select>
@@ -695,7 +695,7 @@ export default function DraftPurchasePage({
               <datalist id="productsList">
                 {productList.map((product) => (
                     <option key={product.storeId} value={product?.item?.ACDcode || product?.item?.ADCcode}>
-                      {product.item.Name}
+                      {product?.item?.Name}
                     </option>
                 ))}
               </datalist>
