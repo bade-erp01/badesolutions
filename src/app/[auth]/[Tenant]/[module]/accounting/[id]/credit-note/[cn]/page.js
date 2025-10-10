@@ -6,7 +6,6 @@ import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
   const Params = useParams()
-  console.log(Params)
 
   const handleApprove = async (action) => {
     if (!confirm(`Are you sure you want to ${action} this credit note?`)) return;

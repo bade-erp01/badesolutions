@@ -71,7 +71,7 @@ export default async function AccountingPage({ children, params }) {
         <div className="flex flex-1 text-white bt-2">
           {/* Sidebar */}
           <aside
-            className="w-72 bg-[#1e2939] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[520px] md:block"
+            className="w-72 bg-[#1e2939] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
             style={{ overflowY: "auto" }}
           >
             {/* <h2 className="text-lg font-bold mb-4">Accounting</h2>
@@ -92,7 +92,7 @@ export default async function AccountingPage({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[510px] overflow-y-auto">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[90dvh] overflow-y-auto">
               {children}
             </section>
           </main>

@@ -5,14 +5,14 @@ export default function Page({ data }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const payments = data?.Payments.slice(0, 300).filter(
+  const payments = data?.Payments?.slice(0, 300).filter(
     (entry) => entry.cr && entry.status === "posted" && entry.collectionRef === "PMNT"
   ) || [];
 
   const customerList = data?.Customers || [];
 
   const totalPages = Math.ceil(payments.length / itemsPerPage);
-  const paginatedPayments = payments.slice(
+  const paginatedPayments = payments?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -47,9 +47,9 @@ export default function Page({ data }) {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-black divide-y divide-gray-200">
+            <tbody className="bg-gray-600 divide-y divide-gray-200">
               {paginatedPayments.map((item) => (
-                <tr key={item._id} className="hover:bg-gray-50 transition-colors">
+                <tr key={item._id} className="hover:bg-gray-700/50 transition-colors">
                   <td className="px-4 py-2 truncate">{item.paymentReferenceNo}</td>
                   <td className="px-4 py-2 truncate">{Getcustomer(item.customer)}</td>
                   <td className="px-4 py-2 truncate">
