@@ -86,13 +86,28 @@ export default async function AccountingPage({ children, params }) {
             <hr className="border-gray-100 mb-4" />
             <nav className="space-y-2">
               <BackButton />
-              <DebtorsReportModal data={data.Customers} />
-              <ReceivablesAgingModal data={data.Customers} />
-              <CashregisterReport
-                dataArray={data.Payments}
-                banks={data.Accounts}
-                customers={data.Customers}
-              />
+              
+                {(userData.user.creditOfficer || userData.user.isAccountant)  && (
+                 <>
+                  <Link
+                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/credit-note/credit-note`}
+                  title={"Credit Notes"}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                  >
+                   <CreditCardIcon className="h-5 w-5 text-gray-100" />
+                   <span className="text-xs">Credit Notes</span>
+                 </Link>
+                 
+                  <Link
+                   href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/debit-note/debit-note`}
+                   title={"Debit Notes"}
+                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                 >
+                   <BanknotesIcon className="h-5 w-5 text-gray-100" />
+                   <span className="text-xs">Debit Notes</span>
+                 </Link>
+                 </>
+                )}
               {crmFinder && (
                 <Link
                   href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${crmFinder.url
@@ -137,28 +152,13 @@ export default async function AccountingPage({ children, params }) {
                 </Link>
               )}
                
-               {(userData.user.creditOfficer || userData.user.isAccountant)  && (
-                <>
-                 <Link
-                 href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/credit-note/credit-note`}
-                 title={"Credit Notes"}
-                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                 >
-                  <CreditCardIcon className="h-5 w-5 text-gray-100" />
-                  <span className="text-xs">Credit Notes</span>
-                </Link>
-                
-                 <Link
-                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/debit-note/debit-note`}
-                  title={"Debit Notes"}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <BanknotesIcon className="h-5 w-5 text-gray-100" />
-                  <span className="text-xs">Debit Notes</span>
-                </Link>
-                </>
-              )}
-
+              <DebtorsReportModal data={data.Customers} />
+              <ReceivablesAgingModal data={data.Customers} />
+              <CashregisterReport
+                dataArray={data.Payments}
+                banks={data.Accounts}
+                customers={data.Customers}
+              />
             </nav>
           </aside>
 
