@@ -97,7 +97,7 @@ export default function DebitnoteTable({ data }) {
                   <tr key={index} className="hover:bg-gray-700/50 transition-colors duration-200 text-xs">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link href={`/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/${Path.id}/${Path.id}/${Encrypt(note._id)}`} className='text-blue-300'>
-                      {note.DeditId}
+                      {note.DebitId}
                       </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">{note.customer}</td>

@@ -95,7 +95,7 @@ const DebitNoteModal = ({ customersList, baseUrl, userData }) => {
       if (result.isConfirmed) {
         plsWait("Working on things..please wait.");
         //  send this to your API here
-        const request = await fetch(`${baseUrl}/api/Credit/new`, {
+        const request = await fetch(`${baseUrl}/api/DebitNote/new`, {
           method: "POST",
           body: JSON.stringify(result.value),
           headers: {
@@ -111,7 +111,7 @@ const DebitNoteModal = ({ customersList, baseUrl, userData }) => {
           MySwal.fire({
             icon: "success",
             title: "Success!",
-            text: "Credit note has been created successfully. Awaiting Approval",
+            text: "Dedit note has been created successfully. Awaiting Approval",
             customClass: {
               popup: "rounded-lg",
               confirmButton:

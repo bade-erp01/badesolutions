@@ -29,7 +29,7 @@ export default async function layout({params}) {
     const moduleList = await params;
     // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const res = await fetch(`${baseUrl}/api/Memo/${moduleList.cn}`, {
+    const res = await fetch(`${baseUrl}/api/DebitNote/${moduleList.dn}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ try {
         <Nav1
           user={userData.user}
           business={userData.business}
-          page={`${data.CreditId}`}
+          page={`${data.DebitId}`}
         />
 
         <div className="flex flex-1 text-white bt-2">
@@ -56,7 +56,7 @@ try {
             className="w-72 bg-[#1e1e20] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
             style={{ overflowY: "auto" }}
           >
-            <h2 className="text-lg font-bold mb-4">{data.CreditId}</h2>
+            <h2 className="text-lg font-bold mb-4">{data.DebitId}</h2>
             <hr className="border-gray-100 mb-4" />
             <nav className="space-y-2">
               <BackButton />

@@ -6,13 +6,12 @@ import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
   const Params = useParams()
-  console.log(Params)
 
   const handleApprove = async (action) => {
-    if (!confirm(`Are you sure you want to ${action} this credit note?`)) return;
+    if (!confirm(`Are you sure you want to ${action} this debit note?`)) return;
     plsWait('')
     try {
-      const response = await fetch(`${baseurl}/api/Customer/Memo/${Params.cn}`,
+      const response = await fetch(`${baseurl}/api/Debit/Memo/${Params.dn}`,
         {
           method: "PATCH",
           body:JSON.stringify({
@@ -28,11 +27,11 @@ export default function Page({ data,userData,baseurl }) {
         }
       );
 
-      if (!response.ok) throw new Error('Failed to approve credit note');
+      if (!response.ok) throw new Error('Failed to approve Debit note');
       const request = await response.json()
       SuccessToast(request.message)
       if(action === "Delete"){
-        Router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/${Params.module}/credit-note/credit-note`)
+        Router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/${Params.module}/debit-note/debit-note`)
       }else{
         Router.refresh();
       }
@@ -46,7 +45,7 @@ export default function Page({ data,userData,baseurl }) {
     <div className="p-6 w-full bg-white shadow-lg rounded-lg">
       {/* Header */}
       <div className="border-b pb-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Credit Note Details</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Debit Note Details</h1>
       </div>
 
       {/* Main Content */}
@@ -54,8 +53,8 @@ export default function Page({ data,userData,baseurl }) {
         {/* Left Column */}
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-600">Credit Note ID</label>
-            <p className="mt-1 text-gray-800">{data?.CreditId}</p>
+            <label className="text-sm font-medium text-gray-600">Debit Note ID</label>
+            <p className="mt-1 text-gray-800">{data?.DebitId}</p>
           </div>
 
           <div>
