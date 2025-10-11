@@ -1566,7 +1566,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                         <td className="px-2 py-1">
                           {(() => {
                             const assignedId = Dencrypt(activity.assignTo);
-                            const employee = data.employees.find(
+                            const employee = salesPerson.find(
                               (emp) => emp._id === assignedId
                             );
                             return employee
