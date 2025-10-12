@@ -10,6 +10,7 @@ export default function Page({ data }) {
   ) || [];
 
   const customerList = data?.Customers || [];
+  const Accounts = data?.Accounts || [];
 
   const totalPages = Math.ceil(payments.length / itemsPerPage);
   const paginatedPayments = payments?.slice(
@@ -25,6 +26,15 @@ export default function Page({ data }) {
       return "n/a";
     }
   };
+
+  const GetAccounts = (id) =>{
+    try{
+      const bank = Accounts.find(acc => acc._id.toString() === id.toString());
+      return bank?.bankName || "n/a";
+    }catch(err){
+      return "n/a";
+    }
+  }
  
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -67,7 +77,7 @@ export default function Page({ data }) {
                     </span>
                   </td>
                   <td className="px-4 py-2 truncate">{new Date(item.PaymentDate).toLocaleDateString()}</td>
-                  <td className="px-4 py-2 truncate">{item.bankAccount}</td>
+                  <td className="px-4 py-2 truncate">{GetAccounts(item.bankAccount)}</td>
                   <td className="px-4 py-2 font-medium">{item.crAmount.toLocaleString()}</td>
                 </tr>
               ))}
