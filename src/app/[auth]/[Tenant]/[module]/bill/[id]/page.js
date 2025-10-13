@@ -791,7 +791,7 @@ export default function InvoicePage({
           )}
 
           {/* duplicate */}
-            {userInfo.business.subscriptionplan === "Standard" && userInfo.user.raiseInvoice && Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
+            {/* {userInfo.business.subscriptionplan === "Standard" && userInfo.user.raiseInvoice && Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
               <button
               title={`Re-Bill ${Singlebill.billReferenceNo}`}
               onClick={Rebill}
@@ -799,8 +799,8 @@ export default function InvoicePage({
             >
               <ArrowPathRoundedSquareIcon className="w-7 h-7 text-gray-700" />
               <span>Recycle</span>
-            </button>
-          )}
+            </button> */}
+          {/* )} */}
 
           <button
             title={`Download and Print ${Singlebill.billStatus}`}
