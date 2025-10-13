@@ -1,16 +1,19 @@
-import SingleCustomerpage from './page';
+import React, { Suspense, lazy } from 'react';
 import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
 import { Dencrypt } from '../../../../../../../Functions/Functions';
 import axios from 'axios';
-import Employee from "../../../../../../../models/Users"
+import Employee from "../../../../../../../models/Users";
+import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
+
+const SingleCustomerpage = lazy(() => import('./page'));
 
 export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
   const decoy = await params;
   let data = {};
-  const staffRaw = await Employee.findByTenant(userData.business.tenantId)
-  const StringedStaff = JSON.stringify(staffRaw)
-  const ParsedStaff = JSON.parse(StringedStaff)
+  const staffRaw = await Employee.findByTenant(userData.business.tenantId);
+  const StringedStaff = JSON.stringify(staffRaw);
+  const ParsedStaff = JSON.parse(StringedStaff);
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
@@ -33,13 +36,13 @@ export default async function StoreLayout2({ params }) {
   }
 
   return (
-    <div>
+    <Suspense fallback={<SuspenenseFallBack  pagedata={`${data.result?.Username}`}/>}>
       <SingleCustomerpage
         userInfo={userData}
         data={data}
         cust={data.result}
         salesPerson={ParsedStaff}
       />
-    </div>
+    </Suspense>
   );
 }

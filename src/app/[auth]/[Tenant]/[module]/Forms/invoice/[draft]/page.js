@@ -1,13 +1,14 @@
 "use client";
 
 import { mutate } from "swr"; // make sure this is imported
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense} from "react";
 import QRCode from "qrcode";
 import Swal from "sweetalert2";
 import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
+import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
 import {
   totalInWords,
   Encrypt,
@@ -507,7 +508,7 @@ const generatePdf = async (business, customer, bill) => {
   const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
 
   return (
-    <>
+    <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
       <Nav1
         user={userInfo.user}
         business={userInfo.business}
@@ -966,6 +967,6 @@ const generatePdf = async (business, customer, bill) => {
         </div>
       </div>
       <Footer2 />
-    </>
+    </Suspense>
   );
 }

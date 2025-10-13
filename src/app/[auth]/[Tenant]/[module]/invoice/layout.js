@@ -14,9 +14,15 @@ export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Automate, Optimize, and Scale Your Business Operations",
   keywords: [
-    "Business Automation", "Enterprise Solutions", "B.A.D.E", "AI-powered Business",
-    "Workflow Optimization", "ERP in Nigeria", "Bernard fidels ogoh", "ERP for SMEs",
-    "Scalable ERP Solutions"
+    "Business Automation",
+    "Enterprise Solutions",
+    "B.A.D.E",
+    "AI-powered Business",
+    "Workflow Optimization",
+    "ERP in Nigeria",
+    "Bernard fidels ogoh",
+    "ERP for SMEs",
+    "Scalable ERP Solutions",
   ],
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
@@ -36,14 +42,19 @@ export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
 
-  let invoiceList = [], customersList = [], stores = [], users = [], products = [], vendors = [];
+  let invoiceList = [],
+    customersList = [],
+    stores = [],
+    users = [],
+    products = [],
+    vendors = [];
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
     const res = await axios.get(`${baseUrl}/api/Invoice`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         Authorization: `Bearer ${userData.business.tenantId}`,
       },
@@ -56,7 +67,6 @@ export default async function Employeelayout({ children, params }) {
     users = data.users || [];
     products = data.products || [];
     vendors = data.vendors || [];
-
   } catch (err) {
     return (
       <div className="text-red-500 p-6">
@@ -75,45 +85,44 @@ export default async function Employeelayout({ children, params }) {
       />
 
       <div className="flex flex-1 text-white bt-2 max-h-[100dvh]">
-        <aside
-          className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300  max-h-[100dvh] overflow-y-hidden md:block"
-        >
+        <aside className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300  max-h-[100dvh] overflow-y-hidden md:block">
           <BackButton />
           <hr />
           <nav className="space-y-4">
-            <SalesRportModal
-              data={invoiceList}
-              customers={customersList}
-              Stores={stores}
-              users={users}
-              business={userData.business}
-            />
+              <SalesRportModal
+                data={invoiceList}
+                customers={customersList}
+                Stores={stores}
+                users={users}
+                business={userData.business}
+              />
 
-            <DeliveryRportModal
-              data={invoiceList}
-              customers={customersList}
-              Stores={stores}
-              users={users}
-              business={userData.business}
-            />
+              <DeliveryRportModal
+                data={invoiceList}
+                customers={customersList}
+                Stores={stores}
+                users={users}
+                business={userData.business}
+              />
 
-            <SalesDumpModal
-              Products={products}
-              tenantData={Encrypt(userData.business.tenantId)}
-              Stores={stores}
-              Vendors={vendors}
-              business={userData.business}
-            />
+              <SalesDumpModal
+                Products={products}
+                tenantData={Encrypt(userData.business.tenantId)}
+                Stores={stores}
+                Vendors={vendors}
+                business={userData.business}
+              />
 
-            {userData?.user?.c_levelDash && (
-              <SalesDashboard invoice={invoiceList} />
-            )}
+              {userData?.user?.c_levelDash && (
+                <SalesDashboard invoice={invoiceList} />
+              )}
+            
           </nav>
         </aside>
 
         <main className="flex-1">
           <section className="relative w-full max-h-[83vh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
-            <InvoiceLandingPage billList={invoiceList} userData={userData} />
+              <InvoiceLandingPage billList={invoiceList} userData={userData} />
           </section>
         </main>
       </div>

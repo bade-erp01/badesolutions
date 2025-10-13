@@ -1,10 +1,12 @@
-import SingleInvoice from './page';
-import { fetchUser, } from '../../../../../../../Functions/useerDataRefresh';
-import axios from "axios"
-import { notFound } from 'next/navigation';
+import React, { Suspense } from "react";
+import SingleInvoice from "./page";
+import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
+import axios from "axios";
+import { notFound } from "next/navigation";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 
 export const metadata = {
-  title: "Stores Settings | B.A.D.E ERP Platform",
+  title: "B.A.D.E ERP Platform",
   description:
     "Configure and manage your stores with B.A.D.E — Nigeria’s leading AI-powered ERP solution for businesses of all sizes. Built for scalability, automation, and real-time insights.",
   keywords: [
@@ -50,46 +52,48 @@ export const metadata = {
   themeColor: "#f4a8ff",
   applicationName: "B.A.D.E ERP",
   creator: "Bernard Fidels Ogoh",
-  favicon:'favicon.ico'
+  favicon: "favicon.ico",
 };
 
-export default async function StoreLayout({ params }) {
-  const userInfo = await fetchUser();
-  const Params = await params
-  let Inv = [], cust = []
 
-      const AppFinder = userInfo.user.Apps.find(app=>{
-          return app.Name === "CRM"
-        })
-      
-        if(!AppFinder){
-          return notFound()
-        }
+
+// Async data fetching component
+async function StoreLayoutContent({ params }) {
+  const userInfo = await fetchUser();
+  const Params = await params;
+  let Inv = [],
+    cust = [];
+
+  const AppFinder = userInfo.user.Apps.find((app) => {
+    return app.Name === "CRM";
+  });
+
+  if (!AppFinder) {
+    return notFound();
+  }
 
   try {
-     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
- 
-     const res = await axios.get(`${baseUrl}/api/Invoice/${Params.id}`, {
-       headers: {
-         'Content-Type': 'application/json',
-         dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-         Authorization: `Bearer ${userInfo.business.tenantId}`,
-       },
-     });
- 
-     const data = await res.data;
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
-     Inv = data.Inv || [];
-     cust = data.cust || [];
- 
-   } catch (err) {
-     return (
-       <div className="text-red-500 p-6">
-         Failed to load. Please try again later.
-       </div>
-     );
-   }
+    const res = await axios.get(`${baseUrl}/api/Invoice/${Params.id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+        Authorization: `Bearer ${userInfo.business.tenantId}`,
+      },
+    });
 
+    const data = await res.data;
+
+    Inv = data.Inv || [];
+    cust = data.cust || [];
+  } catch (err) {
+    return (
+      <div className="text-red-500 p-6">
+        Failed to load. Please try again later.
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -98,3 +102,11 @@ export default async function StoreLayout({ params }) {
   );
 }
 
+// Main component with Suspense
+export default function StoreLayout({ params }) {
+  return (
+    <Suspense fallback={<SuspenenseFallBack pagedata="invoice" />}>
+      <StoreLayoutContent params={params} />
+    </Suspense>
+  );
+}

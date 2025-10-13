@@ -6,6 +6,10 @@ import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import { FunnelIcon, FolderOpenIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
+import React, { Suspense } from "react";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+
+
 
 export default function InvoiceLandingPage({ billList, userData }) {
   const [searchRef, setSearchRef] = useState("");
@@ -32,6 +36,7 @@ export default function InvoiceLandingPage({ billList, userData }) {
   );
 
   return (
+    <Suspense fallback={<SuspenenseFallBack pagedata={"invoice List"} />}>
     <div className="text-white text-xs">
       <div className=" mx-auto">
         {/* Filter Component */}
@@ -182,5 +187,6 @@ export default function InvoiceLandingPage({ billList, userData }) {
         </div>
       </div>
     </div>
+    </Suspense>
   );
 }

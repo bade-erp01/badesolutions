@@ -12,12 +12,11 @@ const SECRET_KEY = "THESTARTUPWAY";
 const fetchUser = async () => {
   "use server";
   try {
-    await dbConnect(); // Ensure database connection
     // Retrieve cookies
     const cookieStore = await cookies();
     const userToken = cookieStore.get("userInfo")?.value;
     const businessToken = cookieStore.get("businessInfo")?.value;
-
+    
     if (!userToken || !businessToken) {
       //redirect to login page
       return { error: "Session expired, please log in again." };
@@ -32,7 +31,8 @@ const fetchUser = async () => {
     } catch (error) {
       return { error: "Invalid session tokens, please log in again." };
     }
-
+    
+    await dbConnect(); // Ensure database connection
     // Fetch user & business details
     const rawUserInfo = await User.findById(decodedUser.data)
       .select("-password -__v -createdAt -updatedAt -opsCode")

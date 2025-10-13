@@ -9,36 +9,26 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import Footer2 from '@/app/Components/Footer2';
 import { notFound } from 'next/navigation';
-
 import axios from "axios";
 import {
   ClipboardDocumentListIcon,
   PlusCircleIcon
 } from "@heroicons/react/24/outline";
+import React, { Suspense } from 'react';
+import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
 
-// Skeleton loader for customer cards
-function CustomerCardSkeleton() {
-  return (
-    <div className="animate-pulse bg-gray-800 rounded-lg p-4 h-40">
-      <div className="h-6 bg-gray-600 rounded w-3/4 mb-2"></div>
-      <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-    </div>
-  );
-}
 
 export default async function crmLayout({ children, params }) {
-  let userData;
+  const userData = await fetchUser(); // Fetch user data
+
   let customerList = [];
 
   try {
-    userData = await fetchUser();
-    const AppFinder = userData.user.Apps.find(app=>{
-        return app.Name === "CRM"
-      })
+    const AppFinder = userData.user.Apps.find(app => app.Name === "CRM");
     
-      if(!AppFinder){
-        return notFound()
-      }
+    if (!AppFinder) {
+      return notFound();
+    }
 
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
@@ -124,17 +114,20 @@ export default async function crmLayout({ children, params }) {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6">
-            {customerList.length === 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <CustomerCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : (
-              children
-            )}
-          </section>
+          <Suspense fallback={<SuspenenseFallBack pagedata={"Customer"} />}>
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6">
+              {customerList.length === 0 ? (
+                <>
+                  <div className="text-center text-gray-700">
+                    <h2 className="text-2xl font-semibold mb-4">No Customers Found</h2>
+                    <p className="mb-6">It looks like you haven't added any customers yet. Start by creating a new customer to manage your relationships effectively.</p>
+                  </div>
+                </>
+              ) : (
+                children
+              )}
+            </section>
+          </Suspense>
         </main>
       </div>
 
