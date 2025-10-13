@@ -50,7 +50,7 @@ export default function Page({ data }) {
           <table className="w-full table-auto divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
-                {["Ref No", "Customer", "Rep", "Accountant", "Type", "Status", "Date", "Bank", "CR"].map((header) => (
+                {["Ref No", "Customer", "Accountant", "Type", "Status", "Date", "Bank", "CR"].map((header) => (
                   <th key={header} className="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                     {header}
                   </th>
@@ -62,9 +62,6 @@ export default function Page({ data }) {
                 <tr key={item._id} className="hover:bg-gray-700/50 transition-colors">
                   <td className="px-4 py-2 truncate">{item.paymentReferenceNo}</td>
                   <td className="px-4 py-2 truncate">{Getcustomer(item.customer)}</td>
-                  <td className="px-4 py-2 truncate">
-                    <span title={item.remarks}>{item.remarks?.slice(0, 8)}...</span>
-                  </td>
                   <td className="px-4 py-2 truncate">{item.Accountant}</td>
                   <td className="px-4 py-2">
                     <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
