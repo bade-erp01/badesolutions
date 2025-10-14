@@ -169,7 +169,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
 
         {/* Activity Log */}
         <div className="mt-10">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Activity Log</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">Audit Log</h3>
           <div className="relative max-h-64 overflow-y-auto bg-gray-50 rounded-md p-4">
             <div className="border-l border-gray-500 pl-6 space-y-6">
               {storeProduct.ActivitiyLog?.map((log, index) => (
