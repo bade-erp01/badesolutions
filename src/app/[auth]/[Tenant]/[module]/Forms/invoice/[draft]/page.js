@@ -324,7 +324,7 @@ const generatePdf = async (business, customer, bill) => {
       if (!result.isConfirmed) {
         return;
       }
-
+      plsWait("Deleting draft. Please wait.")
       const url = `${EXPRESS_PRIVATE_URL}/${
         Business.companyName
       }/Draft/salesDelete?id=${Encrypt(bill._id)}&user=${Encrypt(user._id)}`;
@@ -340,9 +340,7 @@ const generatePdf = async (business, customer, bill) => {
 
       if (data.message) {
         SuccessToast(data.message);
-        setTimeout(() => {
-          router.back();
-        }, 1200);
+        router.back();
       } else {
         ErrorMessage(data.error || "Failed to delete draft invoice.");
         Swal.close();
