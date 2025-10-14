@@ -42,12 +42,7 @@ export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
 
-  let invoiceList = [],
-    customersList = [],
-    stores = [],
-    users = [],
-    products = [],
-    vendors = [];
+  let invoiceList = []
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
@@ -62,11 +57,11 @@ export default async function Employeelayout({ children, params }) {
 
     const data = await res.data;
     invoiceList = data.invoices || [];
-    customersList = data.customers || [];
-    stores = data.stores || [];
-    users = data.users || [];
-    products = data.products || [];
-    vendors = data.vendors || [];
+    // customersList = data.customers || [];
+    // stores = data.stores || [];
+    // users = data.users || [];
+    // products = data.products || [];
+    // vendors = data.vendors || [];
   } catch (err) {
     return (
       <div className="text-red-500 p-6">
@@ -89,29 +84,29 @@ export default async function Employeelayout({ children, params }) {
           <BackButton />
           <hr />
           <nav className="space-y-4">
-              <SalesRportModal
+              {/* <SalesRportModal
                 data={invoiceList}
                 customers={customersList}
                 Stores={stores}
                 users={users}
                 business={userData.business}
-              />
+              /> */}
 
-              <DeliveryRportModal
+              {/* <DeliveryRportModal
                 data={invoiceList}
                 customers={customersList}
                 Stores={stores}
                 users={users}
                 business={userData.business}
-              />
+              /> */}
 
-              <SalesDumpModal
+              {/* <SalesDumpModal
                 Products={products}
                 tenantData={Encrypt(userData.business.tenantId)}
                 Stores={stores}
                 Vendors={vendors}
                 business={userData.business}
-              />
+              /> */}
 
               {userData?.user?.c_levelDash && (
                 <SalesDashboard invoice={invoiceList} />
