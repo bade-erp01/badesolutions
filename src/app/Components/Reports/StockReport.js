@@ -2,35 +2,54 @@
 import Swal from "sweetalert2";
 import moment from "moment";
 import { useState } from "react";
+import { plsWait ,Encrypt} from "../../../../Functions/Mics";
 import { downloadExcel } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
-export default function StockReportModal({
-  data,
-  Stores,
-  vendors,
-  prodductList,
-}) {
-  const [filteredData, setFilteredData] = useState(
-    data.filter(
-      (item) => item.billStatus?.toLowerCase() !== "draft"
-    )
-  );
-  const [StoresList] = useState(Stores || []);
-  const [customersList] = useState(vendors || []);
+export default function StockReportModal({ baseUrl, userData }) {
+  const [filteredData, setFilteredData] = useState([]);
+  const [data, setData] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      plsWait("Loading Stock Valuation Report...");
+      const res = await fetch(`${baseUrl}/api/Products/report`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData.business.tenantId}`,
+          dbConnect: `Bearer ${userData.business.rustyRoof}`,
+          access: `${Encrypt(userData.user._id)}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch product data");
+
+      const fetchedData = await res.json();
+      setData(fetchedData);
+
+      const initialFilteredData = fetchedData?.inventoryItem?.filter(
+        (item) => item.billStatus?.toLowerCase() !== "draft"
+      );
+      setFilteredData(initialFilteredData);
+      showModal()
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const getVendor = (id) => {
-    const selectedCustomer = customersList.find((cust) => cust._id === id);
+    const selectedCustomer = data?.customersList.find((cust) => cust._id === id);
     return selectedCustomer?.Name || "";
   };
 
   const getSTore = (id) => {
-    const selectedBank = StoresList.find((bank) => bank._id === id);
+    const selectedBank = data?.StoresList.find((bank) => bank._id === id);
     return selectedBank?.WHName || "";
   };
 
   const getValue = (productId, caseQty, pcsQty) => {
-    const product = prodductList.find((prod) => prod._id === productId);
+    const product = data.prodductList.find((prod) => prod._id === productId);
     if (!product?.BuyingPrice || !product?.Pieces) return 0;
 
     const unitPrice = product.BuyingPrice / product.Pieces;
@@ -87,6 +106,11 @@ export default function StockReportModal({
   };
 
   const showModal = () => {
+    if (!data) {
+      Swal.fire("Error", "Data not loaded. Please try again.", "error");
+      return;
+    }
+
     Swal.fire({
       title: "Stock Value Report",
       html: `
@@ -96,8 +120,8 @@ export default function StockReportModal({
             <label style="font-weight: 600; font-size: 12px;">Vendors</label><br/>
             <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${customersList
-                .map((c) => `<option value="${c._id}">${c.Name}</option>`)
+              ${data.vendorList
+                .map((c) => `<option value="${c._id}">${c.NAME}</option>`)
                 .join("")}
             </select>
           </div>
@@ -105,7 +129,7 @@ export default function StockReportModal({
             <label style="font-weight: 600; font-size: 12px;">Store</label><br/>
             <select id="Store" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${StoresList.map(
+              ${data.StoresList.map(
                 (b) => `<option value="${b._id}">${b.WHName}</option>`
               ).join("")}
             </select>
@@ -114,7 +138,7 @@ export default function StockReportModal({
             <label style="font-weight: 600; font-size: 12px;">Prdouct</label><br/>
             <select id="Prdouct" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${prodductList.map(
+              ${data.prodductList.map(
                 (b) => `<option value="${b._id}">${b.Name}</option>`
               ).join("")}
             </select>
@@ -147,112 +171,12 @@ export default function StockReportModal({
       `,
       width: "70%",
       showConfirmButton: false,
-      didOpen: () => {
-        const tableBody = document.getElementById("paymentTableBody");
-
-        const applyFilters = () => {
-          const customer = document.getElementById("customerFilter").value;
-          const Store = document.getElementById("Store").value;
-          const Prdouct = document.getElementById("Prdouct").value;
-
-          const filtered = data.filter((item) => {
-            
-            return (
-              item.billStatus?.toLowerCase() !== "draft" &&
-              (!customer ||
-                item.Vendor?.toLowerCase() === customer.toLowerCase()) &&
-              (!Store || item.WHIDS?.toLowerCase() === Store.toLowerCase()) &&
-              (!Prdouct|| item.productId?.toLowerCase() === Prdouct.toLowerCase())
-            );
-          });
-
-          setFilteredData(filtered);
-          updateTable(filtered);
-        };
-
-        const updateTable = (filtered) => {
-          tableBody.innerHTML = generateTableRows(filtered);
-
-          const downloadContainer = document.getElementById("tableDownloadBtn");
-          if (downloadContainer) {
-            downloadContainer.innerHTML = "";
-
-            if (filtered.length > 0) {
-              const button = document.createElement("button");
-              button.innerHTML = `
-                <span style="
-                  display: inline-flex;
-                  align-items: center;
-                  gap: 6px;
-                  font-size: 13px;
-                  background-color: #2b6cb0;
-                  color: white;
-                  padding: 6px 12px;
-                  border-radius: 6px;
-                  border: none;
-                  cursor: pointer;
-                ">
-                  <svg data-slot="icon" height="16" width="16" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
-                  </svg>
-                  Download Excel
-                </span>
-              `;
-              button.onclick = () => {
-                const clean = filtered.map((entry) => ({
-                  Store: getSTore(entry.WHIDS),
-                  Product: entry.productName.trim(),
-                  Code: entry.ADCcode,
-                  Vendor: getVendor(entry.Vendor),
-                  CASE: entry.currentQty,
-                  PCS: entry.pcs,                  
-                  "Last Purchase Date": entry.LastBatchDate,
-                  Expiry: entry.ExpDate,
-                  "Vendor Price": entry.VendorPrice,
-                  Value: getValue(entry.productId, entry.currentQty, entry.pcs),
-                }));
-
-                // Add total row to Excel
-                clean.push({
-                  Store: "",
-                  Product: "",
-                  Code: "",
-                  Vendor: "",
-                  CASE: "",
-                  PCS: "",
-                  "Last Purchase Date": "",
-                  Expiry: "",
-                  "Vendor Price": "Total",
-                  Value: getTotalValue(filtered),
-                });
-
-                const excelBtn = downloadExcel(clean, `Stock Valuation Report`);
-                if (excelBtn instanceof HTMLElement) {
-                  excelBtn.click();
-                }
-              };
-              downloadContainer.appendChild(button);
-            }
-          }
-        };
-
-        ["Store", "customerFilter","Prdouct"].forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) {
-            el.addEventListener("input", applyFilters);
-            el.addEventListener("change", applyFilters);
-          }
-        });
-
-        // Initial render
-        updateTable(filteredData);
-      },
     });
   };
-
+  
   return (
     <button
-      onClick={showModal}
+      onClick={fetchData}
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
       <ArrowTrendingUpIcon className="w-4 h-4 inline-block" />

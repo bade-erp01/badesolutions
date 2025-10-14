@@ -50,12 +50,12 @@ export default async function Productlayout({ children, params }) {
 
     const {
       productList,
-      inventoryItem,
-      ReportInventory,
-      storeList,
-      vendorList,
-      PurchaseOrderList,
-      invoiceList
+      // inventoryItem,
+      // ReportInventory,
+      // storeList,
+      // vendorList,
+      // PurchaseOrderList,
+      // invoiceList
     } = await res.json();
 
     return (
@@ -89,21 +89,23 @@ export default async function Productlayout({ children, params }) {
                 </Link>
               )}
 
-              <StockReportModal
-                data={inventoryItem}
-                Stores={storeList}
-                vendors={vendorList}
-                prodductList={productList}
-              />
+              {/* <StockReportModal */}
+                {/* // data={inventoryItem} */}
+                {/* // Stores={storeList} */}
+                {/* // vendors={vendorList} */}
+                {/* // prodductList={productList} */}
+                {/* baseUrl={baseUrl} */}
+                {/* userData={userData} */}
+              {/* /> */}
 
-              <StockandSalesReport
+              {/* <StockandSalesReport
                 prouctlist={productList}
                 PurchaseOrderList={PurchaseOrderList}
                 InvoiceList={invoiceList}
                 Stores={storeList}
                 vendors={vendorList}
                 inventoryItem={ReportInventory}
-              />
+              /> */}
 
               {userData?.user?.isAdmin && (
                 <BulkUploader tenantId={userData} collectionName="product" />
