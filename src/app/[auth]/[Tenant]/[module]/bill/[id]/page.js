@@ -598,6 +598,7 @@ export default function InvoicePage({
     }
 
     try {
+      plsWait("Processing cancellation Request...");
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/SingleReturn/${Encrypt(
           orderId
@@ -615,11 +616,9 @@ export default function InvoicePage({
 
       const result = await res.json();
 
-      if (result.message) {
+      if (res.ok) {
         SuccessToast(result.message);
-        setTimeout(() => {
           Router.refresh();
-        }, 2000);
       } else {
         throw new Error(result.error || "Cancellation failed");
       }
