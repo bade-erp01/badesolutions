@@ -26,8 +26,9 @@ export default async function layout({ children,params }) {
     const userData = await fetchUser();
     const userInfo = userData.user;
     const businessInfo = userData.business; 
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   return <>
-        < Login userInfo={userInfo} businessInfo={businessInfo} />
+        < Login userInfo={userInfo} businessInfo={businessInfo} url={baseUrl}/>
         </>;
 }

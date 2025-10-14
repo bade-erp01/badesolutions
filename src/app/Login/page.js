@@ -12,7 +12,7 @@ import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
 // import ReCAPTCHA from "react-google-recaptcha";
 
-export default function Login({userInfo,businessInfo}) {
+export default function Login({userInfo,businessInfo,url}) {
   const dispatch = useDispatch();
   // const recaptchaRef = useRef();
   // const userInfo = useSelector((state) => state.user.userInfo);
@@ -85,7 +85,7 @@ export default function Login({userInfo,businessInfo}) {
     plsWait("Verifying Credentials. Please wait...");
 
     try {
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/v1/Login`, {
+      const response = await fetch(`${url}/api/v1/Login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

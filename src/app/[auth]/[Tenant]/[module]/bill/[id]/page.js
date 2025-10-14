@@ -584,10 +584,10 @@ export default function InvoicePage({
     if (!confirmed.isConfirmed) return;
 
     const { value: opCode } = await Swal.fire({
-      title: "Enter Operational Code",
+      title: "Security Check point",
       input: "password",
-      inputLabel: "Operational Code",
-      inputPlaceholder: "Enter the code",
+      inputLabel: "Enter Ops Code to proceed",
+      inputPlaceholder: "Type in Ops code 🔐",
       showCancelButton: true,
       confirmButtonText: "Submit",
     });
@@ -626,6 +626,7 @@ export default function InvoicePage({
       ErrorMessage(
         err.message || "An error occurred while cancelling the order."
       );
+      Router.refresh();
     }
   };
 
