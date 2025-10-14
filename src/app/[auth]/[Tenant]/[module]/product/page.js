@@ -59,7 +59,7 @@ export default async function Productlayout({ children, params }) {
     } = await res.json();
 
     return (
-      <div className="flex flex-col min-h-screen overflow-hidden max-h-[100dvh]">
+      <div className="flex flex-col min-h-screen overflow-hidden">
         <Nav1
           user={userData.user}
           business={userData.business}
@@ -67,10 +67,10 @@ export default async function Productlayout({ children, params }) {
           Module={[{}]}
         />
 
-        <div className="flex flex-1 text-white bt-2 max-h-[90dvh]">
+        <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
           {/* Sidebar */}
           <aside
-            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block"
+            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block "
             style={{ overflowY: "auto" }}
           >
             <h2 className="text-lg font-bold mb-4">Product Management</h2>
@@ -115,8 +115,8 @@ export default async function Productlayout({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[90dvh]">
-              <div className="max-h-[90dvh] overflow-y-auto">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative ">
+              <div className="max-h-[83dvh] overflow-y-auto">
                 {userData.user.c_levelDash && (
                   <ProductSalesChart productsList={productList} />
                 )}
