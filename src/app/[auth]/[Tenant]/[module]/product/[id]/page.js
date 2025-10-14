@@ -14,7 +14,7 @@ import {
 } from "../../../../../../../Functions/Mics";
 import axios from "axios";
 import moment from "moment";
-import { useEffect } from "react";
+import { useEffect,Suspense } from "react";
 import Plotly from "plotly.js-dist-min";
 import {
   Encrypt,
@@ -29,6 +29,7 @@ import CreateFocButton from "@/app/Components/CreatefocButton";
 import DeleteButton from "@/app/Components/DeleteProduct"
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Image from "next/image";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 
 export default function SingleProductpage({
   userInfo,
@@ -203,7 +204,7 @@ export default function SingleProductpage({
   };
 
   return (
-    <>
+    <Suspense fallback={<SuspenenseFallBack pagedata={`${data.Name}`} />}>
       <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
         <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -1110,7 +1111,7 @@ export default function SingleProductpage({
           </div>
         </form>
       </div>
-    </>
+    </Suspense>
   );
 }
 
