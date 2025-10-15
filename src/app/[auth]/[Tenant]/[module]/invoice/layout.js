@@ -8,7 +8,7 @@ import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
 import SalesDumpModal from "@/app/Components/Reports/salesDump";
 import { Encrypt } from "../../../../../../Functions/Functions";
-import axios from "axios";
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -41,34 +41,7 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-
-  let invoiceList = []
-
-  try {
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-
-    const res = await axios.get(`${baseUrl}/api/Invoice`, {
-      headers: {
-        "Content-Type": "application/json",
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
-        Authorization: `Bearer ${userData.business.tenantId}`,
-      },
-    });
-
-    const data = await res.data;
-    invoiceList = data.invoices || [];
-    // customersList = data.customers || [];
-    // stores = data.stores || [];
-    // users = data.users || [];
-    // products = data.products || [];
-    // vendors = data.vendors || [];
-  } catch (err) {
-    return (
-      <div className="text-red-500 p-6">
-        Failed to load. Please try again later.
-      </div>
-    );
-  }
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   return (
     <div className="flex flex-col max-h-[100dvh] overflow-hidden">
@@ -76,7 +49,7 @@ export default async function Employeelayout({ children, params }) {
         user={userData.user}
         business={userData.business}
         page={moduleList.module}
-        Module={invoiceList}
+        Module={[{}]}
       />
 
       <div className="flex flex-1 text-white bt-2 max-h-[100dvh]">
@@ -108,16 +81,16 @@ export default async function Employeelayout({ children, params }) {
                 business={userData.business}
               /> */}
 
-              {userData?.user?.c_levelDash && (
+              {/* {userData?.user?.c_levelDash && (
                 <SalesDashboard invoice={invoiceList} />
-              )}
+              )} */}
             
           </nav>
         </aside>
 
         <main className="flex-1">
           <section className="relative w-full max-h-[83vh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
-              <InvoiceLandingPage billList={invoiceList} userData={userData} />
+              <InvoiceLandingPage baseUrl={baseUrl} userData={userData} />
           </section>
         </main>
       </div>
