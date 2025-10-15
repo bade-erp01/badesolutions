@@ -61,7 +61,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   }, [currentPage, searchRef, startDate, endDate]);
 
   return (
-    <Suspense fallback={<SuspenenseFallBack pagedata={"invoice List"} />}>
+    <Suspense fallback={ <SuspenenseFallBack pagedata={'Invoice List'}/>}>
       <div className="text-white text-xs">
         <div className="mx-auto">
           {/* Filter Component */}
@@ -116,12 +116,12 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                               <span
                                 className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                                   bill.billStatus === "Invoice"
-                                    ? "bg-green-500/30 text-white"
-                                    : bill.billStatus === "Order"
-                                    ? "bg-yellow-500/30 text-white"
-                                    : bill.billStatus === "Cancelled"
-                                    ? "bg-red-500/30 text-white"
-                                    : "bg-gray-500/30 text-white"
+                                    ? "bg-green-500/30 text-green-300"
+                                : bill.billStatus === "Order"
+                                ? "bg-yellow-500/30 text-yellow-200"
+                                : bill.billStatus === "Cancelled"
+                                ? "bg-red-500/30 text-red-300"
+                                : "bg-gray-500/30 text-gray-300"
                                 }`}
                               >
                                 {bill.billStatus}
