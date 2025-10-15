@@ -73,14 +73,14 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
           </div>
 
           {/* Table Container */}
-          <div className="bg-gray-300 shadow-lg border border-white/10">
+          <div className="bg-gray-600 shadow-lg border border-white/10">
             {isLoading ? ( // Show loading fallback while data is being fetched
               <SuspenenseFallBack pagedata={'Invoice List'}/>
             ) : (
               <>
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-xs">
-                    <thead className="bg-white/10 text-black uppercase text-xs sticky top-0 z-10">
+                    <thead className="bg-white/10 text-white uppercase text-xs sticky top-0 z-10">
                       <tr>
                         <th className="px-4 py-3 text-left">Ref No</th>
                         <th className="px-4 py-3 text-left">Customer</th>
@@ -98,11 +98,11 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                             : `/${params.auth}/${params.Tenant}/bill/bill/${Encrypt(bill._id)}`;
 
                         return (
-                          <tr key={bill._id} className="hover:bg-white/5 transition text-xs text-black">
+                          <tr key={bill._id} className="hover:bg-white/5 transition text-xs text-white">
                             <td className="px-4 py-3 border-t border-white/10">
                               <Link
                                 href={url}
-                                className="text-indigo-400 hover:text-indigo-300 underline font-medium"
+                                className="text-indigo-400 hover:text-indigo-300 underline font-medium font-bold"
                               >
                                 {bill?.billReferenceNo && bill?.invoicelocation
                                   ? `${bill.billReferenceNo}/${bill.invoicelocation}`
