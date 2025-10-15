@@ -8,7 +8,7 @@ export default function SuspenenseFallBack({pagedata}) {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Loading {pagedata}…
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+        <p className="text-sm text-gray-900 dark:text-gray-300 text-center">
           We're securely retrieving your {pagedata} data. This usually takes a few seconds.
         </p>
       </div>
