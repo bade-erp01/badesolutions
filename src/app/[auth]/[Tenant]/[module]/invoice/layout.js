@@ -10,6 +10,7 @@ import SalesDumpModal from "@/app/Components/Reports/salesDump";
 import { Encrypt } from "../../../../../../Functions/Functions";
 
 
+
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Automate, Optimize, and Scale Your Business Operations",
