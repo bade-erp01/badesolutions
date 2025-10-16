@@ -85,11 +85,11 @@ export default async function AccountingPage({ children, params }) {
               <BackButton />
 
              {(userData.user.creditOfficer || userData.user.isAccountant) && (
-               <DebitNoteModal customersList={data.customers} baseUrl={baseUrl} userData={userData}/>
+               <DebitNoteModal Accounts={data.bankAccounts} customersList={data.customers} baseUrl={baseUrl} userData={userData}/>
              )}
 
               {crmFinder && (
-                <Link
+                <Link 
                   href={`/${userData.business.companyName}/${Encrypt(
                     userData.user._id
                   )}/${crmFinder.url

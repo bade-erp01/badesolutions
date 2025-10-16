@@ -1220,6 +1220,18 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                   ))}
                 </select>
               </div>
+              {/* Vat on customer invoices */}
+              {/* {userInfo.business.subscriptionplan === "Standard" && (
+              <Input
+                label="VAT Percentage (%)"
+                name="vatPercentage"
+                type="number"
+                min={0}
+                step="any"
+                onChange={handleChange}
+                value={formData?.vatPercentage?.$numberDecimal || 0}
+              />
+              )} */}
             </Grid>
           </Section>
 

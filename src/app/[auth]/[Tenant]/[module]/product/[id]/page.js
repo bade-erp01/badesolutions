@@ -599,7 +599,7 @@ export default function SingleProductpage({
                       htmlFor="VAT"
                       className="block text-sm/6 font-medium text-gray-900"
                     >
-                      VAT
+                      VAT Percentage (%)
                     </label>
                     <div className="mt-2">
                       <input
@@ -607,9 +607,9 @@ export default function SingleProductpage({
                         id="VAT"
                         name="VAT"
                         onChange={handleChange}
-                        type="text"
+                        type="number"
                         step="any"
-                        autoComplete="address-level2"
+                        autoComplete="VAT"
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       />
                     </div>
@@ -618,7 +618,7 @@ export default function SingleProductpage({
                   <div className="sm:col-span-2">
                     <label
                       htmlFor="Pricelist1"
-                      className="block text-sm/6 font-medium text-gray-900"
+                      className="block text-sm font-medium text-gray-900"
                     >
                       {businessInfo.priceList1} Price
                     </label>
@@ -631,11 +631,24 @@ export default function SingleProductpage({
                         step="any"
                         onChange={handleChange}
                         autoComplete="Pricelist-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                       />
                     </div>
+                      <label
+                        htmlFor="VatpriceList1"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      >
+                        <input
+                        checked={formData.VatpriceList1 || false}
+                        onChange={handleChange}
+                        id="VatpriceList1"
+                        name="VatpriceList1"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList1}?
+                      </label>
                   </div>
-
                   <div className="sm:col-span-2">
                     <label
                       htmlFor="Pricelist2"
@@ -655,6 +668,20 @@ export default function SingleProductpage({
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       />
                     </div>
+                    <label
+                        htmlFor="VatpriceList2"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      >
+                        <input
+                        checked={formData.VatpriceList2 || false}
+                        onChange={handleChange}
+                        id="VatpriceList2"
+                        name="VatpriceList2"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList2}?
+                      </label>
                   </div>
 
                   {businessInfo.subscriptionplan === "Standard" && (
@@ -678,6 +705,20 @@ export default function SingleProductpage({
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
+                        <label
+                        htmlFor="VatpriceList3"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      >
+                        <input
+                        checked={formData.VatpriceList3 || false}
+                        onChange={handleChange}
+                        id="VatpriceList3"
+                        name="VatpriceList3"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList3}?
+                      </label>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -699,6 +740,20 @@ export default function SingleProductpage({
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
+                        <label
+                        htmlFor="VatpriceList4"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      >
+                        <input
+                        checked={formData.VatpriceList4 || false}
+                        onChange={handleChange}
+                        id="VatpriceList4"
+                        name="VatpriceList4"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList4}?
+                      </label>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -720,6 +775,20 @@ export default function SingleProductpage({
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
+                        <label
+                        htmlFor="VatpriceList5"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      >
+                        <input
+                        checked={formData.VatpriceList5 || false}
+                        onChange={handleChange}
+                        id="VatpriceList5"
+                        name="VatpriceList5"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList5}?
+                      </label>
                       </div>
 
                       <div className="sm:col-span-2 sm:col-start-1">
@@ -741,6 +810,20 @@ export default function SingleProductpage({
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
+                        <label
+                        htmlFor="VatpriceList6"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      >
+                        <input
+                        checked={formData.VatpriceList6 || false}
+                        onChange={handleChange}
+                        id="VatpriceList6"
+                        name="VatpriceList6"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList6}?
+                      </label>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -762,6 +845,20 @@ export default function SingleProductpage({
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
+                        <label
+                        htmlFor="VatpriceList7"
+                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                        >
+                        <input
+                          checked={formData.VatpriceList7 || false}
+                          onChange={handleChange}
+                          id="VatpriceList7"
+                          name="VatpriceList7"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                      />
+                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList7}?
+                      </label>
                       </div>
                     </>
                   )}

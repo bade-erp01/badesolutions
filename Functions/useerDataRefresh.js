@@ -55,7 +55,6 @@ const fetchUser = async () => {
       business: JSON.parse(JSON.stringify(rawBusinessInfo)),
     };
   } catch (err) {
-    console.error( err.message);
     return { error: "An unexpected error occurred, please try again later." };
   }
 };

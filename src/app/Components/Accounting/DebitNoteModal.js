@@ -14,14 +14,19 @@ import { useRouter, useParams } from "next/navigation";
 
 const MySwal = withReactContent(Swal);
 
-const DebitNoteModal = ({ customersList, baseUrl, userData }) => {
+const DebitNoteModal = ({ customersList, baseUrl, userData,Accounts }) => {
   const [customers] = useState(customersList);
+  const [bankAccounts] = useState(Accounts);
   const Router = useRouter();
   const Path = useParams();
 
   const openModal = () => {
     const customerOptions = customers
       .map((c) => `<option value="${c._id}">${c.Username}</option>`)
+      .join("");
+    
+    const accountOptions = bankAccounts
+      .map((a) => `<option value="${a._id}">${a.bankName} - ${a.bankCode}</option>`)
       .join("");
 
     MySwal.fire({
@@ -44,6 +49,13 @@ const DebitNoteModal = ({ customersList, baseUrl, userData }) => {
             <input type="text" id="customerSearch" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Search customer" oninput="filterCustomers(this.value)">
             <select id="customerDropdown" class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
               ${customerOptions}
+            </select>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-left text-xs font-medium text-gray-700 mb-1">Debit Account</label>
+            <select id="bankDropdown" required class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
+              ${accountOptions}
             </select>
           </div>
 
@@ -80,13 +92,14 @@ const DebitNoteModal = ({ customersList, baseUrl, userData }) => {
         const Total = document.getElementById("creditAmount").value;
         const reference = document.getElementById("creditRemarks").value;
         const customerId = document.getElementById("customerDropdown").value;
+        const bankID = document.getElementById("bankDropdown").value;
 
-        if (!Date || !Total || !customerId || !reference) {
+        if (!Date || !Total || !customerId || !reference || !bankID) {
           Swal.showValidationMessage("Please fill in all required fields");
           return false;
         }
 
-        return { Date, Total, reference, customerId };
+        return { Date, Total, reference, customerId, bankID };
       },
       confirmButtonText: "Create",
       showCancelButton: true,
