@@ -115,29 +115,29 @@ const ScheduledActivity = ({ Sales,customerName }) => {
 
       {/* Pagination + Export */}
       <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-        <button
+        <span
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
           className="px-3 py-1 bg-white border rounded hover:bg-gray-100 disabled:opacity-50"
         >
           ← Prev
-        </button>
+        </span>
         <span>
           Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
         </span>
-        <button
+        <span
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={currentPage === totalPages}
           className="px-3 py-1 bg-white border rounded hover:bg-gray-100 disabled:opacity-50"
         >
           Next →
-        </button>
-        <button
+        </span>
+        <span
           onClick={exportToCSV}
           className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
         >
           Export CSV
-        </button>
+        </span>
       </div>
     </section>
   );
