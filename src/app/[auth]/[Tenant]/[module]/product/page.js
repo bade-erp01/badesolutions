@@ -141,7 +141,6 @@ export default async function Productlayout({ children, params }) {
   } catch (err) {
     return (
       <div className="text-black p-6">
-        {err.message}
         Failed to load. Please try again later.
       </div>
     );
