@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono, Inter, DM_Sans } from "next/font/google";
 import "./globals.css";
 import ClientProvider from "./ClientProvider";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -53,7 +54,10 @@ export default function RootLayout({ children }) {
               className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72rem]"
             />
           </div>
-          <ClientProvider>{children}</ClientProvider>
+          <ClientProvider>
+            {children}
+            <Analytics />
+          </ClientProvider>
         </div>
       </body>
     </html>
