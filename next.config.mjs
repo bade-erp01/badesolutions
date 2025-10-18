@@ -26,6 +26,11 @@ const nextConfig = {
         protocol:"https",
         hostname:"www.currencyremitapp.com",
         pathname:"/**"
+      },
+      {
+        protocol:"https",
+        hostname:"api.badesolutions.com.ng",
+        pathname:"/**"
       }
     ],
   },
