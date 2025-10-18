@@ -308,7 +308,17 @@ export default function StockReportModal({ baseUrl, userData }) {
             <table>
               <thead>
                 <tr>
-                  <th>#</th><th>Store</th><th>Product</th><th>Code</th><th>Vendor</th><th>Case</th><th>Pcs</th><th>Last Purch. Date</th><th>Expiry Date</th><th>Price</th><th>Value</th>
+                  <th>#</th>
+                  <th>Store</th>
+                  <th>Product</th>
+                  <th>Code</th>
+                  <th>Vendor</th>
+                  <th>Case</th>
+                  <th>Pcs</th>
+                  <th>Last Purch. Date</th>
+                  <th>Expiry Date</th>
+                  <th>Price</th>
+                  <th>Value</th>
                 </tr>
               </thead>
               <tbody>
