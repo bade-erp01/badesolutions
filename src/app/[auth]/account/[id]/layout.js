@@ -13,7 +13,9 @@ export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
 
-  const business = await Business.findById(moduleList.id).lean()
+  const RawBusiness = await Business.findById(moduleList.id).lean();
+  const parsedBusiness = JSON.parse(JSON.stringify(RawBusiness));
+  const business = JSON.parse(JSON.stringify(parsedBusiness));
 
   if(!business) return notFound()
 
