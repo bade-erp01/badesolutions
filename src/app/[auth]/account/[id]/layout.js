@@ -29,11 +29,10 @@ export default async function SetUpLayout({children, params }) {
             className="flex flex-1 text-white bt-2"
           >
             {/* Sidebar (collapsible on mobile) */}
-            <aside
-              className={`bg-[#1e1e20]/70 backdrop-blur-md 
-                  text-white px-4 py-6 transition-all duration-300 overflow-y-auto md:block`}
-              style={{ maxHeight: "600px", overflowY: "scroll" }}
-            >
+             <aside
+          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          style={{ overflowY: "auto" }}
+        >
             <BackButton />
               <hr />
               <nav className="space-y-4  overflow-y-auto ">
@@ -66,7 +65,7 @@ export default async function SetUpLayout({children, params }) {
             </aside>{" "}
             {/* Main Content Area */}
             <main className="flex-1 ">
-              <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg  relative z-10 h-[510px] overflow-y-auto">
+              <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg  relative z-10 max-h-[83dvh] overflow-y-auto">
                 <BusinessDatas data={business} userInfo={userData} />
                 {/* {children} */}
               </section>
