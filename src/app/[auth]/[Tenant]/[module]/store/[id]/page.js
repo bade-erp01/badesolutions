@@ -88,9 +88,8 @@ export default async function storelayout({ children, params }) {
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
         <aside
-          className={`w-70 bg-[#1e1e20]/70 backdrop-blur-md 
-              text-white px-4 py-6 transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "580px", overflowY: "auto" }}
+          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          style={{ overflowY: "auto" }}
         >
           <BackButton />
           <hr />

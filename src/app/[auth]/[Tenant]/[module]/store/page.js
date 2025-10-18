@@ -82,10 +82,9 @@ export default async function storelayout({ children, params }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className={`w-70 bg-[#1e1e20]/70 backdrop-blur-md 
-              text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
+       <aside
+          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          style={{ overflowY: "auto" }}
         >
           <h2 className="text-lg text-white font-bold mb-4">
             Store Management
