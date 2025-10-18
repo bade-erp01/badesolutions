@@ -151,7 +151,7 @@ export default function BusinessDatas({ data, userInfo }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-5xl mx-3 p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8  text-xs"
+      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8 text-xs"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h4 className="text-xl font-bold text-gray-800">
