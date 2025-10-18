@@ -89,16 +89,14 @@ export default async function Productlayout({ children, params }) {
                 </Link>
               )}
 
-              {/* <StockReportModal
-                data={inventoryItem} 
-                 Stores={storeList} 
-                vendors={vendorList} 
-                 prodductList={productList} 
-
-
+               <StockReportModal
+                // data={inventoryItem} 
+                //  Stores={storeList} 
+                // vendors={vendorList} 
+                //  prodductList={productList} 
                 baseUrl={baseUrl}
                 userData={userData}
-              /> */}
+              /> 
 
               {/* <StockandSalesReport
                 prouctlist={productList}
