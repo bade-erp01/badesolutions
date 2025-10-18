@@ -13,7 +13,7 @@ export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
 
-  const RawBusiness = await Business.findById(moduleList.id).lean();
+  const RawBusiness = await Business.findById(moduleList.id).select("-payStackApiKey").lean();
   const parsedBusiness = JSON.parse(JSON.stringify(RawBusiness));
   const business = JSON.parse(JSON.stringify(parsedBusiness));
 
