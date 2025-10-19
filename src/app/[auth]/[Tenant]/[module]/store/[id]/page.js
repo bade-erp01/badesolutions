@@ -88,7 +88,8 @@ export default async function storelayout({ children, params }) {
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
         <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          className={`w-70 bg-[#1e1e20]/70 backdrop-blur-md 
+              text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
           style={{ overflowY: "auto" }}
         >
           <BackButton />
@@ -144,8 +145,8 @@ export default async function storelayout({ children, params }) {
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg  relative z-10 h-[520px] overflow-y-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg  relative z-10 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 max-h-[80dvh]">
               {data.products
                 .sort((a, b) => a.productName.localeCompare(b.productName))
                 .map((element) => (
