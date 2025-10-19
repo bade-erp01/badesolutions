@@ -4,18 +4,60 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import { SwatchIcon } from "@heroicons/react/24/outline";
 import { downloadExcel } from "../../../../Functions/Functions";
+import { Encrypt } from "../../../../Functions/Functions";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
+import { useState } from "react";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function StockandSalesReport({
-  prouctlist,
-  vendors,
-  PurchaseOrderList,
-  InvoiceList,
-  Stores,
-  inventoryItem
+  baseUrl,
+  userData
 }) {
-  const product = prouctlist ;
-  const storeList = Stores ;
-  const vendorlist = vendors ;
+
+  const [loading, setLoading] = useState(false);
+  const [prouctlist, setProuctlist] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [PurchaseOrderList, setPurchaseOrderList] = useState([]);
+  const [InvoiceList, setInvoiceList] = useState([]);
+  const [Stores, setStores] = useState([]);
+  const [inventoryItem, setInventoryItem] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      plsWait("Loading Stock Valuation Report...");
+      const res = await fetch(`${baseUrl}/api/Products/report`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData.business.tenantId}`,
+          dbConnect: `Bearer ${userData.business.rustyRoof}`,
+          access: `${Encrypt(userData.user._id)}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch product data");
+
+      const fetchedData = await res.json();
+      // assign data
+      setProuctlist(fetchedData.productList);
+      setVendors(fetchedData.vendorList);
+      setPurchaseOrderList(fetchedData.PurchaseOrderList);
+      setInvoiceList(fetchedData.invoiceList);
+      setStores(fetchedData.storeList);
+      setInventoryItem(fetchedData.ReportInventory);
+      showModal();
+      setLoading(false);
+    } catch (error) {
+      ErrorMessage(error.message);
+      setLoading(false);
+    } 
+  };
+
+  const product = prouctlist;
+  const storeList = Stores;
+  const vendorlist = vendors;
   const invoices = InvoiceList.filter(
     invoice => {
       const status = invoice.billStatus.toLowerCase();
@@ -26,7 +68,7 @@ export default function StockandSalesReport({
   const returns = InvoiceList.filter(
     invoice => {
       const status = (invoice.billStatus || "").toLowerCase();
-      return  status === "cancelled";
+      return status === "cancelled";
     }
   );
 
@@ -34,13 +76,13 @@ export default function StockandSalesReport({
   const purchases = PurchaseOrderList.filter(
     invoice => {
       const status = (invoice.status || "");
-      return status === "POSTED TO WAREHOUSE" 
+      return status === "POSTED TO WAREHOUSE"
     }
   );
   const inventory = inventoryItem;
 
   // find venddor
- const getVendor = (id) => {
+  const getVendor = (id) => {
     const selectedCustomer = vendorlist.find((cust) => cust._id === id);
     return selectedCustomer?.Name || "";
   };
@@ -77,17 +119,17 @@ export default function StockandSalesReport({
           const item = order.item || {};
           const id = order.storeProductId || order.storeproductId;
           const existing = summaryMap.get(id) || {
-            Product: order.storeProductId ||  order.storeproductId,
+            Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
             Store: purchase.WHID || "",
             PurchCase: 0,
             PurchPcs: 0,
             Sold: 0,
             Stock: 0,
-            pcs:0,
-            rStock:0,
-            rPcs:0,
-            productId:item._id
+            pcs: 0,
+            rStock: 0,
+            rPcs: 0,
+            productId: item._id
           };
           existing.PurchCase += order.Qty || 0;
           summaryMap.set(id, existing);
@@ -96,24 +138,24 @@ export default function StockandSalesReport({
     });
 
     // purchase pcs
-     purchases.forEach(purchase => {
+    purchases.forEach(purchase => {
       if (!isWithinDateRange(purchase.recievedDate)) return;
       if (Array.isArray(purchase.orders)) {
         purchase.orders.forEach(order => {
           const item = order.item || {};
           const id = order.storeProductId || order.storeproductId;
           const existing = summaryMap.get(id) || {
-            Product: order.storeProductId ||  order.storeproductId,
+            Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
             Store: purchase.WHID || "",
             PurchCase: 0,
             PurchPcs: 0,
             Sold: 0,
             Stock: 0,
-            pcs:0,
-            rStock:0,
-            rPcs:0,
-            productId:item._id
+            pcs: 0,
+            rStock: 0,
+            rPcs: 0,
+            productId: item._id
           };
           existing.PurchPcs += order.pcs || order.pcs || 0;
           summaryMap.set(id, existing);
@@ -127,19 +169,19 @@ export default function StockandSalesReport({
       if (Array.isArray(invoice.orders)) {
         invoice.orders.forEach(order => {
           const item = order.item || {};
-          const id = order.storeProductId ||  order.storeproductId
+          const id = order.storeProductId || order.storeproductId
           const existing = summaryMap.get(id) || {
-            Product: order.storeProductId ||  order.storeproductId,
+            Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
-             PurchCase: 0,
+            PurchCase: 0,
             PurchPcs: 0,
             Sold: 0,// for case
-            pcs:0,
+            pcs: 0,
             Stock: 0,
-            rStock:0,
-            rPcs:0,
-            productId:item._id
+            rStock: 0,
+            rPcs: 0,
+            productId: item._id
           };
           existing.Sold += order.Qty || 0;
           summaryMap.set(id, existing);
@@ -153,19 +195,19 @@ export default function StockandSalesReport({
       if (Array.isArray(invoice.orders)) {
         invoice.orders.forEach(order => {
           const item = order.item || {};
-          const id = order.storeProductId ||  order.storeproductId;
+          const id = order.storeProductId || order.storeproductId;
           const existing = summaryMap.get(id) || {
-            Product: order.storeProductId ||  order.storeproductId,
+            Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
             PurchCase: 0,
             PurchPcs: 0,
             Sold: 0,
-            pcs:0,
+            pcs: 0,
             Stock: 0,
-            rStock:0,
-            rPcs:0,
-            productId:item._id
+            rStock: 0,
+            rPcs: 0,
+            productId: item._id
           };
           existing.pcs += order.pcsReq || 0;
           summaryMap.set(id, existing);
@@ -179,19 +221,19 @@ export default function StockandSalesReport({
       if (Array.isArray(invoice.orders)) {
         invoice.orders.forEach(order => {
           const item = order.item || {};
-          const id = order.storeProductId ||  order.storeproductId;
+          const id = order.storeProductId || order.storeproductId;
           const existing = summaryMap.get(id) || {
-            Product: order.storeProductId ||  order.storeproductId,
+            Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
             Store: invoice.whId || "",
-             PurchCase: 0,
+            PurchCase: 0,
             PurchPcs: 0,
             Sold: 0,
-            pcs:0,
+            pcs: 0,
             Stock: 0,
-            rStock:0,//returneed case
-            rPcs:0,
-            productId:item._id
+            rStock: 0,//returneed case
+            rPcs: 0,
+            productId: item._id
           };
           existing.rStock += order.Qty || 0;
           summaryMap.set(id, existing);
@@ -200,13 +242,13 @@ export default function StockandSalesReport({
     });
 
     // for returned pcs
-     // for returns case
+    // for returns case
     returns.forEach(invoice => {
       if (!isWithinDateRange(invoice.startDate)) return;
       if (Array.isArray(invoice.orders)) {
         invoice.orders.forEach(order => {
           const item = order.item || {};
-          const id = order.storeProductId ||  order.storeproductId;
+          const id = order.storeProductId || order.storeproductId;
           const existing = summaryMap.get(id) || {
             Product: order.storeProductId || order.storeproductId,
             Vendor: item.Vendor || "",
@@ -214,11 +256,11 @@ export default function StockandSalesReport({
             PurchCase: 0,
             PurchPcs: 0,
             Sold: 0,
-            pcs:0,
+            pcs: 0,
             Stock: 0,
-            rStock:0,
-            rPcs:0,//returneed pcsReq
-            productId:item._id
+            rStock: 0,
+            rPcs: 0,//returneed pcsReq
+            productId: item._id
           };
           existing.rPcs += order.pcsReq || 0;
           summaryMap.set(id, existing);
@@ -272,9 +314,9 @@ export default function StockandSalesReport({
           </div>
           <div>
             <label style="font-size: 12px; color: #4a5568;">Product</label>
-            <select id="product" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
+            <select id="product" disabled style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
-              ${product.map(p => `<option value="${p._id}" disabled readOnly>${p.Name}</option>`).join("")}
+              ${product.map(p => `<option value="${p._id}" >${p.Name}</option>`).join("")}
             </select>
           </div>
         </div>
@@ -288,8 +330,18 @@ export default function StockandSalesReport({
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 12px;
+            margin-right: 5px;
           ">
             ⬇ Download Excel
+          </button>
+           <button disabled id="downloadPdfBtn" class="swal2-confirm swal2-styled" style="
+            background-color: #2b6cb0;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+          ">
+            ⬇ Download PDF
           </button>
         </div>
       `,
@@ -346,7 +398,10 @@ export default function StockandSalesReport({
         renderTable();
 
         ["startDate", "endDate", "vendor", "store", "product"].forEach(id => {
-          document.getElementById(id).addEventListener("change", renderTable);
+          const element = document.getElementById(id);
+          if (element) {
+            element.addEventListener("change", renderTable);
+          }
         });
 
         document.getElementById("downloadExcelBtn").onclick = () => {
@@ -364,15 +419,49 @@ export default function StockandSalesReport({
             Product: getSToreProdduct(item.Product),
             Vendor: getVendor(item.Vendor),
             Store: getSTore(item.Store),
-            Purchased: `${item.Purchased}`,
-            "Case Sold": item.Sold,
-            "pcs Sold": item.pcs,
-            "Returned Case" : item.rStock,
-            "Returned Pcs" : item.rPcs,
+            "Case Buy": item.PurchCase,
+            "Pcs Buy": item.PurchPcs,
+            "Case Sell": item.Sold,
+            "pcs Sell": item.pcs,
+            "Returned Case": item.rStock,
+            "Returned Pcs": item.rPcs,
             "current Stock": item.Stock
           }));
 
           downloadExcel(excelData, "Stock_and_Sales_Report");
+        };
+
+        document.getElementById("downloadPdfBtn").onclick = () => {
+          const filters = {
+            startDate: document.getElementById("startDate").value,
+            endDate: document.getElementById("endDate").value,
+            vendor: document.getElementById("vendor").value,
+            store: document.getElementById("store").value,
+            product: document.getElementById("product").value
+          };
+
+          const data = getStockAndSalesSummary(filters);
+
+          const pdfData = data.map(item => [
+            getSToreProdduct(item.Product),
+            getVendor(item.Vendor),
+            getSTore(item.Store),
+            item.PurchCase,
+            item.PurchPcs,
+            item.Sold,
+            item.pcs,
+            item.rStock,
+            item.rPcs,
+            item.Stock
+          ]);
+
+          const doc = new jsPDF();
+          doc.autoTable({
+            head: [["Product", "Vendor", "Store", "Case [Buy]", "Pcs [Buy]", "Case [Sell]", "Pcs [Sell]", "Case Retured", "Pcs Retured", "Avail. Stock"]],
+            body: pdfData,
+          });
+
+          doc.save("Stock_and_Sales_Report.pdf");
         };
       }
     });
@@ -380,8 +469,9 @@ export default function StockandSalesReport({
 
   return (
     <button
-      onClick={showModal}
+      onClick={()=>fetchData()}
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
+      disabled={loading}
     >
       <SwatchIcon className="h-5 w-5" />
       Stock & Sales Report

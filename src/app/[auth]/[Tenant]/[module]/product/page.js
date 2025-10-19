@@ -90,22 +90,14 @@ export default async function Productlayout({ children, params }) {
               )}
 
                <StockReportModal
-                // data={inventoryItem} 
-                //  Stores={storeList} 
-                // vendors={vendorList} 
-                //  prodductList={productList} 
                 baseUrl={baseUrl}
                 userData={userData}
               /> 
 
-              {/* <StockandSalesReport
-                prouctlist={productList}
-                PurchaseOrderList={PurchaseOrderList}
-                InvoiceList={invoiceList}
-                Stores={storeList}
-                vendors={vendorList}
-                inventoryItem={ReportInventory}
-              /> */}
+              <StockandSalesReport
+                baseUrl={baseUrl}
+                userData={userData}
+              />
 
               {userData?.user?.isAdmin && (
                 <BulkUploader tenantId={userData} collectionName="product" />

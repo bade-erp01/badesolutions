@@ -3,6 +3,7 @@ import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import Link from "next/link";
 import StockReportModal from "@/app/Components/Reports/StockReport";
+import StockandSalesReport from "@/app/Components/Reports/StockandSalesReport";
 import {
   ChartBarIcon,
   CurrencyDollarIcon,
@@ -58,7 +59,6 @@ export default async function AccountingPage({ children, params }) {
   { label: "Account Payables", icon: BanknotesIcon, url: 'Payables' },
   { label: "Profit & Loss", icon: PresentationChartLineIcon, url: 'ProfitLoss' },
   { label: "Revenue Center", icon: BuildingLibraryIcon, url: 'RevenueCenter' },
-  { label: "Stock and Sales", icon: ShoppingCartIcon, url: 'StockSales' },
 ];
 
     return (
@@ -91,6 +91,10 @@ export default async function AccountingPage({ children, params }) {
                 </Link>
               ))}
               <StockReportModal
+                baseUrl={baseUrl}
+                userData={userData}
+              />
+              <StockandSalesReport
                 baseUrl={baseUrl}
                 userData={userData}
               />
