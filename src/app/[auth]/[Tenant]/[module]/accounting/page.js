@@ -2,6 +2,7 @@ import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import Link from "next/link";
+import StockReportModal from "@/app/Components/Reports/StockReport";
 import {
   ChartBarIcon,
   CurrencyDollarIcon,
@@ -37,6 +38,7 @@ export const metadata = {
 export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   
     // check if user has access to crm and cash register
     const AccountingFinder = userData.user.Apps.find(app=>{
@@ -56,7 +58,6 @@ export default async function AccountingPage({ children, params }) {
   { label: "Account Payables", icon: BanknotesIcon, url: 'Payables' },
   { label: "Profit & Loss", icon: PresentationChartLineIcon, url: 'ProfitLoss' },
   { label: "Revenue Center", icon: BuildingLibraryIcon, url: 'RevenueCenter' },
-  { label: "Inventory Valuation", icon: CubeIcon, url: 'InventoryValuation' },
   { label: "Stock and Sales", icon: ShoppingCartIcon, url: 'StockSales' },
 ];
 
@@ -71,22 +72,28 @@ export default async function AccountingPage({ children, params }) {
         <div className="flex flex-1 text-white bt-2">
           {/* Sidebar */}
           <aside
-            className="w-72 bg-[#1e2939] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
+            className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
             style={{ overflowY: "auto" }}
           >
             {/* <h2 className="text-lg font-bold mb-4">Accounting</h2>
             <hr className="border-gray-100 mb-4" /> */}
             <nav className="space-y-2">
-              {MenuItems.map(({ label, icon: Icon ,url}, index) => (
+              {MenuItems.map(({ label, icon: Icon, url }, index) => (
                 <Link
                   key={index}
-                  href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/${url}/${url}`}
+                  href={`/${userData.business.companyName}/${Encrypt(
+                    userData.user._id
+                  )}/${moduleList.module}/${moduleList.module}/${url}/${url}`}
                   className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full"
                 >
                   <Icon className="h-5 w-5 text-[#fcfcfc] group-hover:scale-110 transition-transform" />
                   <span className="group-hover:text-[#f9f6fa]">{label}</span>
                 </Link>
               ))}
+              <StockReportModal
+                baseUrl={baseUrl}
+                userData={userData}
+              />
             </nav>
           </aside>
 
