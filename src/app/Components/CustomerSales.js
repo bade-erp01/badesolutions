@@ -59,7 +59,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <input
-          type="text"
+          type="search"
           placeholder="Search INV No or Customer"
           className="px-3 py-2 border rounded w-full"
           value={searchTerm}
@@ -90,30 +90,35 @@ const ScheduledActivity = ({ Sales,customerName }) => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto text-xs">
-        <table className="min-w-full text-sm text-gray-700">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="px-4 py-2">INV No</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Date</th>
-              <th className="px-4 py-2">Total</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 text-xs">
-            {paginatedSales.map((inv, idx) => (
-              <tr key={idx} className="hover:bg-gray-50">
-                <td className="px-4 py-2">{inv.billReferenceNo}</td>
-                <td className="px-4 py-2">{inv.billStatus}</td>
-                <td className="px-4 py-2">{moment(inv.startDate).format('MMM D, YYYY')}</td>
-                <td className="px-4 py-2">₦{inv.grandTotal.toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <table className="min-w-full text-sm text-gray-700">
+            <tbody className="divide-y divide-gray-200 text-xs">
+          {paginatedSales.map((inv, idx) => (
+           <React.Fragment key={idx}>
+              <details className="bg-white rounded-lg shadow overflow-x-auto text-xs">
+                <summary className="px-2 py-2 cursor-pointer hover:bg-gray-50 text-indigo-700">
+                    {inv.billReferenceNo} - [{moment(inv.startDate).format('MMM D, YYYY')}] - {inv.grandTotal.toLocaleString()}
+                </summary>
+                <tr>
+                  <td colSpan="4" className="px-4 py-2 bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {inv.orders?.map((order, orderIdx) => (
+                        <div key={orderIdx} className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs">
+                          <p><strong>Product:</strong> {order.item.Name}</p>
+                          <h4 className="font-semibold mb-2">Case: {order.Qty}, Pcs: {order.pcsReq}</h4>
+                          <h4 className="font-semibold mb-2">Sold @: {order.priceListPrice.toLocaleString()}</h4>
+                          <h4 className="font-semibold mb-2">Total: {order.total.toLocaleString()}</h4>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              </details>
+            </React.Fragment>
+          ))}
+            </tbody>
+          </table>
 
-      {/* Pagination + Export */}
+        {/* Pagination + Export */}
       <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
         <span
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
