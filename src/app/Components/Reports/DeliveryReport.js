@@ -3,19 +3,51 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import { useState } from "react";
 import {downloadExcel} from "../../../../Functions/Functions"
+import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 import { TruckIcon } from "@heroicons/react/24/outline";
 
-export default function DeliveryRportModal({ data, Stores, customers,users }) {
- const [filteredData, setFilteredData] = useState(
-  data?.filter(item => {
-    const status = item.billStatus?.toLowerCase();
-    return status === "invoice" || status === "cancelled";
-  })
-);
-  const [StoresList] = useState(Stores || []);
-  const [customersList] = useState(customers || []);
-  const [usersList] = useState(users || []);
+export default function DeliveryRportModal({user,business, baseUrl }) {
+ const [filteredData, setFilteredData] = useState([]);
+  const [StoresList, setStoresList] = useState([]);
+  const [customersList, setCustomersList] = useState([]);
+  const [usersList] = useState(user);
   const [searchPeriod, setSearchPeriod] = useState('')
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+      try {
+        setLoading(true);
+        plsWait("Loading Report data...");
+        const res = await fetch(`${baseUrl}/api/Invoice/report`, {
+          method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${business.tenantId}`,
+              dbConnect: `Bearer ${business.rustyRoof}`,
+              // access: `${Encrypt(userData.user._id)}`,
+            },
+          });
+    
+          if (!res.ok) throw new Error("Failed to fetch data");
+          
+          const fetchedData = await res.json();
+          // assign data
+          setCustomersList(fetchedData.customers);
+          setStoresList(fetchedData.stores);
+          
+          setTimeout(() => {
+            setFilteredData(fetchedData.invoices?.filter(item => {
+              const status = item.billStatus?.toLowerCase();
+              return status === "invoice" || status === "cancelled";
+            }));
+            showModal();
+          }, 1000);
+          setLoading(false);
+        } catch (error) {
+          ErrorMessage(error.message);
+          setLoading(false);
+        } 
+      };
 
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
@@ -34,8 +66,7 @@ export default function DeliveryRportModal({ data, Stores, customers,users }) {
   };
 
   const generateTableRows = (data) => {
-    return data
-      .map(
+    return data.map(
         (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 4px;">${index + 1}</td>
@@ -87,7 +118,7 @@ export default function DeliveryRportModal({ data, Stores, customers,users }) {
             <label style="font-weight: 600; font-size: 12px;">Customer</label><br/>
             <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${customersList
+              ${customersList.sort((a, b) => a.Username.localeCompare(b.Username))
                 .map((c) => `<option value="${c._id}">${c.Username}</option>`)
                 .join("")}
             </select>
@@ -244,11 +275,12 @@ export default function DeliveryRportModal({ data, Stores, customers,users }) {
 
   return (
     <button
-      onClick={showModal}
+      onClick={fetchData}
+      disabled={loading}
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
       <TruckIcon className="w-4 h-4 inline-block" />
-      Generate Logistics Report
+       Logistics Report
     </button>
   );
 }

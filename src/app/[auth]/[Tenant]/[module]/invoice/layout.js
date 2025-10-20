@@ -7,6 +7,7 @@ import InvoiceLandingPage from "./page";
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
 import SalesDumpModal from "@/app/Components/Reports/salesDump";
+import EMPLOYEES from "../../../../../../models/Users";
 import { Encrypt } from "../../../../../../Functions/Functions";
 
 
@@ -42,6 +43,9 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
+  const user = await EMPLOYEES.findByTenant(userData.business.tenantId).lean();
+  const stringedUser = JSON.stringify(user);
+  const parsedUser = JSON.parse(stringedUser);
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   return (
@@ -58,33 +62,27 @@ export default async function Employeelayout({ children, params }) {
           <BackButton />
           <hr />
           <nav className="space-y-4">
-              {/* <SalesRportModal
-                data={invoiceList}
-                customers={customersList}
-                Stores={stores}
-                users={users}
+              <SalesRportModal
                 business={userData.business}
-              /> */}
+                baseUrl={baseUrl}
+                user={parsedUser}
+              />
 
-              {/* <DeliveryRportModal
-                data={invoiceList}
-                customers={customersList}
-                Stores={stores}
-                users={users}
+              <DeliveryRportModal
+                baseUrl={baseUrl}
                 business={userData.business}
-              /> */}
+                user={parsedUser}
+              />
 
               {/* <SalesDumpModal
-                Products={products}
-                tenantData={Encrypt(userData.business.tenantId)}
-                Stores={stores}
-                Vendors={vendors}
+                baseUrl={baseUrl}
                 business={userData.business}
+                user={parsedUser}
               /> */}
 
-              {/* {userData?.user?.c_levelDash && (
-                <SalesDashboard invoice={invoiceList} />
-              )} */}
+              {userData?.user?.c_levelDash && (
+                <SalesDashboard  business={userData.business} baseUrl={baseUrl} />
+              )}
             
           </nav>
         </aside>

@@ -4,15 +4,47 @@ import moment from "moment";
 import { useState } from "react";
 import {downloadExcel,pricelistSetter} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
+import {plsWait,ErrorMessage} from "../../../../Functions/Mics"
 
-export default function SalesRportModal({ data, Stores, customers,users,business }) {
-  const [filteredData, setFilteredData] = useState(
-      data?.filter(item => item.billStatus?.toLowerCase() !== "draft")
-    );
-  const [StoresList] = useState(Stores || []);
-  const [customersList] = useState(customers || []);
-  const [usersList] = useState(users || []);
+export default function SalesRportModal({user, business,baseUrl }) {
+  const [StoresList, setStoresList] = useState([]);
+  const [customersList, setCustomersList] = useState([]);
+  const [usersList] = useState(user);
   const [searchPeriod, setSearchPeriod] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      plsWait("Loading Report Data...");
+      const res = await fetch(`${baseUrl}/api/Invoice/report`, {
+        method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${business.tenantId}`,
+            dbConnect: `Bearer ${business.rustyRoof}`,
+            // access: `${Encrypt(userData.user._id)}`,
+          },
+        });
+  
+        if (!res.ok) throw new Error("Failed to fetch product data");
+        
+        const fetchedData = await res.json();
+        // assign data
+        setCustomersList(fetchedData.customers);
+        setStoresList(fetchedData.stores);
+        setFilteredData(fetchedData.invoices?.filter(item => item.billStatus?.toLowerCase() !== "draft"));
+        setTimeout(() => {
+          showModal();
+        }, 1000);
+        setLoading(false);
+      } catch (error) {
+        ErrorMessage(error.message);
+        setLoading(false);
+      } 
+    };
+    
 
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
@@ -95,7 +127,7 @@ export default function SalesRportModal({ data, Stores, customers,users,business
             <label style="font-weight: 600; font-size: 12px;">Customer</label><br/>
             <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${customersList
+              ${customersList.sort((a, b) => a.Username.localeCompare(b.Username))
                 .map((c) => `<option value="${c._id}">${c.Username}</option>`)
                 .join("")}
             </select>
@@ -194,17 +226,16 @@ export default function SalesRportModal({ data, Stores, customers,users,business
               (!start || itemDate.isSameOrAfter(start, "day")) &&
               (!end || itemDate.isSameOrBefore(end, "day")) &&
               othersMatch &&
-              (!Rep || item.salesPerson?.toLowerCase() === Rep.toLowerCase()) &&
+              (!Rep || item.salesPerson?.toLowerCase() === (Rep.toLowerCase())) &&
               (!Status ||
                 item.billStatus?.toLowerCase() === Status.toLowerCase()) &&
               (!customer ||
-                item.customer?.toLowerCase() === customer.toLowerCase()) &&
-              (!Store || item.whId?.toLowerCase() === Store.toLowerCase())&&
-              (!PriceList || item.priceList.toLowerCase() === PriceList.toLowerCase())
+                item.customer === customer) &&
+              (!Store || item.whId === Store)&&
+              (!PriceList || item.priceList?.toLowerCase() === PriceList.toLowerCase())
             );
           });
 
-          setFilteredData(filtered);
           updateTable(filtered);
         };
 
@@ -297,7 +328,8 @@ export default function SalesRportModal({ data, Stores, customers,users,business
 
   return (
     <button
-      onClick={showModal}
+      onClick={fetchData}
+      disabled={loading}
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
       <ArrowTrendingUpIcon className="w-4 h-4 inline-block" />
