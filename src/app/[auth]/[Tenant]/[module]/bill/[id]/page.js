@@ -878,7 +878,9 @@ export default function InvoicePage({
                     {userInfo.business.currency.currency.Symbol}
                     {bill.promotionData.toFixed(2) || 0}
                   </td>
-                  <td className="px-4 py-2 text-center text-xs">0</td>
+                  <td className="px-4 py-2 text-center text-xs">
+                    {bill.vat > 0 && bill.item.VAT ? bill.item.VAT.$numberDecimal : 0}
+                  </td>
                   <td className="px-4 py-2 font-bold text-right text-xs">
                     {userInfo.business.currency.currency.Symbol}
                     {bill.total?.toFixed(2)}

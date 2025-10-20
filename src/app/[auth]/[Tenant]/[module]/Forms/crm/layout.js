@@ -51,19 +51,7 @@ export default async function crmLayout({ params }) {
           <BackButton />
           <hr />
           <nav className="space-y-4">
-           
-            {userData?.user?.raiseInvoice && (
-              <Link
-                href={`/${userData.business.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/invoice/invoice`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <ClipboardDocumentListIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Invoicing</span>
-              </Link>
-            )}
+           {/* display on pane */}
           </nav>
         </aside>
 
