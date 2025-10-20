@@ -17,6 +17,8 @@ import {
 } from "@heroicons/react/24/outline";
 import {Encrypt} from "../../../../../../Functions/Mics"
 import { notFound } from 'next/navigation';
+import SalesRportModal from "@/app/Components/Reports/SalesReport";
+import EMPLOYEES from "../../../../../../models/Users";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -39,6 +41,9 @@ export const metadata = {
 export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
+  const user = await EMPLOYEES.findByTenant(userData.business.tenantId).lean();
+  const stringedUser = JSON.stringify(user);
+  const parsedUser = JSON.parse(stringedUser);
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   
     // check if user has access to crm and cash register
@@ -52,7 +57,6 @@ export default async function AccountingPage({ children, params }) {
 
   try {
    const MenuItems = [
-  { label: "Sales Report", icon: ChartBarIcon, url: 'SalesReport' },
   { label: "Expense Report", icon: CurrencyDollarIcon, url: 'ExpenseReport' },
   { label: "Balance Sheet", icon: DocumentChartBarIcon, url: 'BalanceSheet' },
   { label: "Account Receivable", icon: DocumentTextIcon, url: 'Receivables' },
@@ -78,6 +82,11 @@ export default async function AccountingPage({ children, params }) {
             {/* <h2 className="text-lg font-bold mb-4">Accounting</h2>
             <hr className="border-gray-100 mb-4" /> */}
             <nav className="space-y-2">
+              <SalesRportModal
+                business={userData.business}
+                baseUrl={baseUrl}
+                user={parsedUser}
+              />
               {MenuItems.map(({ label, icon: Icon, url }, index) => (
                 <Link
                   key={index}
@@ -90,14 +99,8 @@ export default async function AccountingPage({ children, params }) {
                   <span className="group-hover:text-[#f9f6fa]">{label}</span>
                 </Link>
               ))}
-              <StockReportModal
-                baseUrl={baseUrl}
-                userData={userData}
-              />
-              <StockandSalesReport
-                baseUrl={baseUrl}
-                userData={userData}
-              />
+              <StockReportModal baseUrl={baseUrl} userData={userData} />
+              <StockandSalesReport baseUrl={baseUrl} userData={userData} />
             </nav>
           </aside>
 
