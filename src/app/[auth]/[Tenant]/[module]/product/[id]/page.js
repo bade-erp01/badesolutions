@@ -627,7 +627,7 @@ export default function SingleProductpage({
                         value={formData.Pricelist1}
                         id="Pricelist1"
                         name="Pricelist1"
-                        type="text"
+                        type="number"
                         step="any"
                         onChange={handleChange}
                         autoComplete="Pricelist-level1"
@@ -662,7 +662,7 @@ export default function SingleProductpage({
                         onChange={handleChange}
                         id="Pricelist2"
                         name="Pricelist2"
-                        type="text"
+                        type="number"
                         step="any"
                         autoComplete="Pricelist2-code"
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -699,7 +699,7 @@ export default function SingleProductpage({
                             id="Pricelist3"
                             name="Pricelist3"
                             onChange={handleChange}
-                            type="text"
+                            type="number"
                             step="any"
                             autoComplete="Pricelist-level2"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -733,7 +733,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist4}
                             id="Pricelist4"
                             name="Pricelist4"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist1-level1"
@@ -769,7 +769,7 @@ export default function SingleProductpage({
                             onChange={handleChange}
                             id="Pricelist5"
                             name="Pricelist5"
-                            type="text"
+                            type="number"
                             step="any"
                             autoComplete="Pricelist1-code"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -805,7 +805,7 @@ export default function SingleProductpage({
                             name="Pricelist6"
                             step="any"
                             onChange={handleChange}
-                            type="text"
+                            type="number"
                             autoComplete="Pricelist1-level2"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
@@ -838,7 +838,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist7}
                             id="Pricelist7"
                             name="Pricelist7"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist1-level1"
@@ -908,7 +908,7 @@ export default function SingleProductpage({
                         value={formData.Pricelist1Promo}
                         id="Pricelist1Promo"
                         name="Pricelist1Promo"
-                        type="text"
+                        type="number"
                         step="any"
                         onChange={handleChange}
                         autoComplete="Pricelist1-level1"
@@ -929,7 +929,7 @@ export default function SingleProductpage({
                         value={formData.Pricelist2Promo}
                         id="Pricelist2Promo"
                         name="Pricelist2Promo"
-                        type="text"
+                        type="number"
                         step="any"
                         onChange={handleChange}
                         autoComplete="Pricelist1-level1"
@@ -952,7 +952,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist3Promo}
                             id="Pricelist3Promo"
                             name="Pricelist3Promo"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist3Promo"
@@ -973,7 +973,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist4Promo}
                             id="Pricelist4Promo"
                             name="Pricelist4Promo"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist4Promo"
@@ -994,7 +994,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist5Promo}
                             id="Pricelist5Promo"
                             name="Pricelist5Promo"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist5Promo"
@@ -1015,7 +1015,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist6Promo}
                             id="Pricelist6Promo"
                             name="Pricelist6Promo"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist6Promo"
@@ -1036,7 +1036,7 @@ export default function SingleProductpage({
                             value={formData.Pricelist7Promo}
                             id="Pricelist7Promo"
                             name="Pricelist7Promo"
-                            type="text"
+                            type="number"
                             step="any"
                             onChange={handleChange}
                             autoComplete="Pricelist7Promo-level1"
