@@ -840,7 +840,7 @@ export default function InvoicePage({
               </tr>
             </thead>
             <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill, index) => (
+              {Singlebill.orders?.map((bill, index) => (
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-orange-50 transition"
@@ -872,11 +872,11 @@ export default function InvoicePage({
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency.currency.Symbol}
-                    {bill.priceListPrice.toFixed(2)}
+                    {bill.priceListPrice?.toFixed(2)}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency.currency.Symbol}
-                    {bill.promotionData.toFixed(2) || 0}
+                    {bill.promotionData?.toFixed(2) || 0}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.vat > 0 && bill.item.VAT ? bill.item.VAT.$numberDecimal : 0}
@@ -909,7 +909,7 @@ export default function InvoicePage({
                 <span>Discount:</span>
                 <strong>
                   {userInfo.business.currency.currency.Symbol}
-                  {Singlebill.discount.toFixed(2) || 0}
+                  {Singlebill.discount?.toFixed(2) || 0}
                 </strong>
               </div>
               <div className="flex justify-between">
