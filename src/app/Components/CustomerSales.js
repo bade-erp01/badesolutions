@@ -95,7 +95,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
           {paginatedSales.map((inv, idx) => (
            <React.Fragment key={idx}>
               <details className="bg-white rounded-lg shadow overflow-x-auto text-xs">
-                <summary className="px-2 py-2 cursor-pointer hover:bg-gray-50 text-indigo-700">
+                <summary className="px-2 py-2 cursor-pointer hover:bg-gray-50 ">
                     {inv.billReferenceNo} - [{moment(inv.startDate).format('MMM D, YYYY')}] - {inv.grandTotal.toLocaleString()}
                 </summary>
                 <tr>

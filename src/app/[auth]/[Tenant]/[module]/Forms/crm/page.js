@@ -58,12 +58,14 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
     if (!validateForm()) return;
 
     try {
-      plsWait('')
+      plsWait('Submitung customer data...');
       const config = {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
+          dbConnect: `Bearer ${businessData.rustyRoof}`,
           "X-Requested-With": "XMLHttpRequest",
+          access: `${Encrypt(userData._id)}`,
         },
       };
 
@@ -89,7 +91,6 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
   };
 
   return (
-   <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-50 to-white">
   <div className="w-full max-w-6xl p-8 bg-white shadow-2xl border border-gray-100">
     <form className="space-y-8" onSubmit={handleSubmit} autoComplete="off">
       <div>
@@ -276,7 +277,6 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
       </div>
     </form>
   </div>
-</div>
 
   );
 }
