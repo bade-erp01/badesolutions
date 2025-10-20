@@ -742,7 +742,7 @@ const generatePdf = async (business, customer, bill) => {
                     )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {Business.allowPriceChangeOnInvoice &&
+                    {user._id === Singlebill.invoicerId && Business.allowPriceChangeOnInvoice &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                      <input
                         type="number"
