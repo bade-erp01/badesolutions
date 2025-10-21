@@ -4,9 +4,6 @@ import { showDeliveryModal } from "@/app/Components/Delivery";
 import { React, useState } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
-import Footer2 from "@/app/Components/Footer2";
-import Nav1 from "@/app/Components/Nav1";
-import BackButton from "@/app/Components/BackBotton";
 import {
   totalInWords,
   EXPRESS_PRIVATE_URL,
@@ -632,17 +629,9 @@ export default function InvoicePage({
 
   return (
     <>
-      <Nav1
-        user={userInfo.user}
-        business={userInfo.business}
-        page={`${Singlebill.billStatus.toUpperCase()} / ${
-          Singlebill.billReferenceNo
-        } /${Singlebill.invoicelocation}`}
-      />
       <div className="max-w-5xl text-xs mx-auto px-6 py-10 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
-          <BackButton />
           <span
             className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
               isCancelled
@@ -995,7 +984,6 @@ export default function InvoicePage({
           {Singlebill.invoicelocation}
         </div>
       </div>
-      <Footer2 />
     </>
   );
 }

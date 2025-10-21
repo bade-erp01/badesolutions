@@ -4,6 +4,9 @@ import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import axios from "axios";
 import { notFound } from "next/navigation";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import Nav1 from "@/app/Components/Nav1";
+import BackButton from "@/app/Components/BackBotton";
+import Footer2 from "@/app/Components/Footer2";
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -95,11 +98,58 @@ async function StoreLayoutContent({ params }) {
     );
   }
 
-  return (
-    <div>
-      <SingleInvoice userInfo={userInfo} SinglebillItem={Inv} customerList={cust} />
+ return (
+  <div className="flex flex-col">
+    {/* Navigation Bar */}
+    <Nav1
+     user={userInfo.user}
+     business={userInfo.business}
+     page={`${Inv.billStatus?.toUpperCase() || "N/A"} / ${
+      Inv.billReferenceNo || "N/A"
+     } /${Inv.invoicelocation || "N/A"}`}
+    />
+
+    {/* Main Content Area */}
+    <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
+     {/* Aside (Left Sidebar) */}
+     <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-hidden">
+      <BackButton />
+      <hr className="my-4 border-gray-700" />
+      <nav className="flex-grow">
+        <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+        
+         <ul className="divide-y divide-gray-700">
+          {Inv.ActivityLog?.map((log, index) => {
+            return (
+             <li key={index} className="py-3 px-4 text-sm">
+              <div className="flex justify-between items-center">
+                <span>{log.logMsg}</span>
+              </div>
+              <hr className="border-gray-500" />
+             </li>
+            );
+          }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}
+         </ul>
+        </div>
+      </nav>
+     </aside>
+
+     {/* Main Content (Right Side) */}
+     <main className="flex-1 overflow-hidden">
+      <section className=" flex-2 max-w-screen-xl h-[83vh] overflow-y-scroll">
+        <SingleInvoice
+         userInfo={userInfo}
+         SinglebillItem={Inv}
+         customerList={cust}
+        />
+      </section>
+     </main>
     </div>
-  );
+
+    {/* Footer */}
+    <Footer2 />
+  </div>
+ );
 }
 
 // Main component with Suspense
