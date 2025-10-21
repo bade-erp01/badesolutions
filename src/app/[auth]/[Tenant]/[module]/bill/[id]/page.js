@@ -33,7 +33,6 @@ export default function InvoicePage({
 }) {
   const Router = useRouter();
   const path = useParams();
-  const [expanded, setExpanded] = useState(false);
   const [cust] = useState(customerList);
   const [Singlebill] = useState(SinglebillItem);
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
@@ -954,29 +953,6 @@ export default function InvoicePage({
             </p>
           </div>
         </div>
-        {/* aCTIVITYLOG */}
-
-        <button
-          className="text-blue-500 text-sm mt-2 hover:underline"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? "Close Activity" : "Show Activity"}
-        </button>
-
-        {expanded && (
-          <div className="bg-white rounded-lg shadow-md p-5">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-              📋 Activity Log
-            </h3>
-            <ul className="divide-y divide-gray-200" start="0">
-              {Singlebill.ActivityLog.map((log, index) => (
-                <li key={index} className="py-3 text-gray-700 text-sm">
-                  {log.logMsg}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
         {/* Footer Reference */}
         <div className="mt-12 pt-8 border-t text-center text-sm text-gray-400 tracking-wide">

@@ -121,7 +121,7 @@ async function StoreLayoutContent({ params }) {
          <ul className="divide-y divide-gray-700">
           {Inv.ActivityLog?.map((log, index) => {
             return (
-             <li key={index} className="py-3 px-4 text-sm">
+             <li key={index} className="py-3 px-4 text-xs">
               <div className="flex justify-between items-center">
                 <span>{log.logMsg}</span>
               </div>
