@@ -103,7 +103,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       {inv.orders?.map((order, orderIdx) => (
                         <div key={orderIdx} className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs">
-                          <p><strong>Product:</strong> {order.item.Name}</p>
+                          <p className='text-purple-800'><strong>Product:</strong> {order.item.Name}</p>
                           <h4 className="font-semibold mb-2">Case: {order.Qty}, Pcs: {order.pcsReq}</h4>
                           <h4 className="font-semibold mb-2">Sold @: {order.priceListPrice.toLocaleString()}</h4>
                           <h4 className="font-semibold mb-2">Total: {order.total.toLocaleString()}</h4>
