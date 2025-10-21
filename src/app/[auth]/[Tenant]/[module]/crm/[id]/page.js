@@ -1001,9 +1001,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               />
               <Input
                 label="Contact Person"
-                name="ContactPerson"
+                name="contactPerson"
                 type="text"
-                value={formData.ContactPerson}
+                value={formData.contactPerson}
                 onChange={handleChange}
               />
             </Grid>
@@ -1021,13 +1021,19 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               <Input
                 label="State"
                 name="State"
-                value={formData.state}
+                value={formData.State}
                 onChange={handleChange}
               />
               <Input
                 label="Address"
                 name="billingAddress"
                 value={formData.billingAddress}
+                onChange={handleChange}
+              />
+               <Input
+                label="Region"
+                name="Region"
+                value={formData.Region}
                 onChange={handleChange}
               />
             </Grid>
