@@ -140,7 +140,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
     - Register payments  
 
      Account Summary:
-    - Current Balance: ₦${totalDebt.toLocaleString()}
+    - Current Balance: ₦${totalDebt?.toLocaleString()}
     - Currently Owing: ${isOwing ? "Yes" : "No"}
     - Last Payment Date: ${formattedDate}
 
@@ -550,7 +550,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   // Prepare monthly sales data for Jan-Dec (month-on-month)
   const monthlySales = Array.from({ length: 12 }, (_, i) => {
     const monthNum = i + 1;
-    const monthLabel = new Date(0, i).toLocaleString("default", {
+    const monthLabel = new Date(0, i)?.toLocaleString("default", {
       month: "short",
     }); // "Jan", "Feb", etc.
     // Sum all grandTotal for this month
@@ -634,7 +634,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         ticks: {
           color: "#ccc",
           callback: function (value) {
-            return `${value.toLocaleString()}`;
+            return `${value?.toLocaleString()}`;
           },
         },
         grid: {
@@ -1096,7 +1096,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                     </label>
 
                     <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
-                      {formData.Debt.toLocaleString()}
+                      {formData.Debt?.toLocaleString()}
                     </div>
                   </div>
                 </>
@@ -1450,23 +1450,23 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                         <tr key={idx} title={tx.ReferenceNo}>
                           <td className="px-2 py-1">
                             {tx.ReferenceNo.length > 50
-                              ? `${tx.ReferenceNo.substring(0, 50)}...`
+                              ? `${tx.ReferenceNo?.substring(0, 50)}...`
                               : tx.ReferenceNo}
                           </td>
                           <td className="px-2 py-1">
                             {moment(tx.Date).format("MMM D, YYYY")}
                           </td>
                           <td className="px-2 py-1">
-                            CR: {tx.CreditAmount.toLocaleString()}
+                            CR: {tx.CreditAmount?.toLocaleString()}
                           </td>
                           <td className="px-2 py-1">
-                            DR: {tx.DebitAmount.toLocaleString()}
+                            DR: {tx.DebitAmount?.toLocaleString()}
                           </td>
                           <td
                             className={`px-2 py-1 ${tx.Balance < 0 ? "text-green-700" : "text-black"
                               } font-semibold`}
                           >
-                            {tx.Balance.toLocaleString()}
+                            {tx.Balance?.toLocaleString()}
                           </td>
                         </tr>
                       ))}
