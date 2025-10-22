@@ -48,6 +48,10 @@ export default function DraftInvoicePage({
     Swal.close();
   }, []);
 
+  const createdAt = moment(bill.createdAt);
+  const now = moment();
+  const isOlderThan24Hours = now.diff(createdAt, "hours") < 24;
+
   // update discount of draft
   const updateDiscount = async (billId, value) => {
     try {
@@ -592,9 +596,10 @@ const generatePdf = async (business, customer, bill) => {
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
           {/* CheckOut Button */}
           <div className="flex justify-evenly items-center gap-4">
+            
             {user._id === Singlebill.invoicerId && user.raiseInvoice &&
               Singlebill.billStatus.toLowerCase() === "draft" &&
-              moment(Singlebill.startDate).isSame(moment(), "day") && (
+               isOlderThan24Hours && (
                 <button
                   title="Process this draft to order"
                   onClick={processInvoice}
