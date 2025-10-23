@@ -91,6 +91,11 @@ export default function Page({ data,userData,baseurl }) {
           </div>
 
           <div>
+            <label className="text-sm font-medium text-gray-600">Credit Account</label>
+            <p className="mt-1 text-gray-800">{data?.bankID?.bankName}</p>
+          </div>
+
+          <div>
             <label className="text-sm font-medium text-gray-600">Raised By</label>
             <p className="mt-1 text-gray-800">{data?.raisedBy}</p>
           </div>
@@ -141,21 +146,6 @@ export default function Page({ data,userData,baseurl }) {
           Reverse
         </button>
         )}
-      </div>
-
-      {/* Activity Log */}
-      <div className="mt-8 border-t pt-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Activity Log</h2>
-        <div className="space-y-2">
-          {data?.ActivityLog?.map((activity, index) => (
-            <div
-              key={index}
-              className="text-sm text-gray-600 bg-gray-50 p-3 rounded"
-            >
-              {activity.message}
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

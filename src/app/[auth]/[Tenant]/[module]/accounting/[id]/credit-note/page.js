@@ -85,7 +85,7 @@ export default async function AccountingPage({ children, params }) {
               <BackButton />
 
              {(userData.user.creditOfficer || userData.user.isAccountant) && (
-               <CreditNoteModal customersList={data.customers} baseUrl={baseUrl} userData={userData}/>
+               <CreditNoteModal customersList={data.customers} baseUrl={baseUrl} userData={userData} BankAccounts={data.bankAccounts}/>
              )}
 
               {crmFinder && (
