@@ -141,7 +141,6 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
      Account Summary:
     - Current Balance: ₦${totalDebt?.toLocaleString()}
-    - Currently Owing: ${isOwing ? "Yes" : "No"}
     - Last Payment Date: ${formattedDate}
 
     Strategic Insight:
@@ -744,12 +743,12 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           &apos;s profile
         </h4>
         <span
-          className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${cust.category === "Lead"
-              ? "bg-red-50 text-red-600 border-red-200"
-              : "bg-indigo-50 text-indigo-700 border-indigo-200"
+          className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${cust.Debt < 0
+              ? "text-sm text-yellow-700 bg-purple-300 border border-purple-600 rounded-md px-4 py-2"
+              : "text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2"
             }`}
         >
-          {cust.category}
+         Balance: {cust.Debt}
         </span>
       </div>
 
