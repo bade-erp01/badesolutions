@@ -125,25 +125,11 @@ export default function InvoicePage({
       // Left Column: Customer Info
       doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
       doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(10);
-      doc.text(
-        `Address: ${customer?.billingAddress || "N/A"}`,
-        10,
-        currentY + 6
-      );
-      doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(
-        `Contact Person: ${
-          customer?.contactPerson || bill.customerName || "N/A"
-        }`,
-        10,
-        currentY + 18
-      );
-      doc.text(
-        `Download Date: ${moment().format("YYYY-MM-DD")}`,
-        10,
-        currentY + 24
-      );
+      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
+      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
+      doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
+      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
 
       // Right Column: QR Code
       // try {
@@ -162,12 +148,6 @@ export default function InvoicePage({
         margin: { left: pageWidth - 90 },
         head: [],
         body: [
-          [
-            `${bill.billStatus} No:`,
-            `${bill.billStatus?.slice(0, 3).toUpperCase()}/${
-              bill.billReferenceNo
-            }/${bill.invoicelocation}`,
-          ],
           ["Waybill No:", bill.WayBillNo || ""],
           ["Order Date:", bill.startDate || ""],
           [
@@ -427,23 +407,11 @@ export default function InvoicePage({
         margin,
         currentY + 8
       );
-      doc.setFontSize(10);
-      doc.text(
-        `Address: ${customer?.billingAddress || "N/A"}`,
-        margin,
-        currentY + 14
-      );
-      doc.text(`Phone: ${customer?.phone || "N/A"}`, margin, currentY + 18);
-      doc.text(
-        `Contact Person: ${customer?.contactPerson || bill.customerName}`,
-        margin,
-        currentY + 22
-      );
-      doc.text(
-        `Download Date: ${moment().format("YYYY-MM-DD")}`,
-        margin,
-        currentY + 26
-      );
+      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
+      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
+      doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
+      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
 
       // 📋 Metadata Table
       autoTable(doc, {
@@ -675,24 +643,27 @@ export default function InvoicePage({
 
           <div className="text-right text-sm text-gray-700 space-y-1 min-w-[220px]">
             <h3 className="text-lg font-bold text-gray-900 tracking-tight">
-              {Singlebill.customerName?.toUpperCase()}
+              {Singlebill.customer?.Username?.toUpperCase()}
             </h3>
+            <p>
+                {Singlebill.customer.billingAddress}
+            </p>
             <p>
               <span className="mr-1">📞</span>
               <a
-                href={`tel:${cust.phone}`}
+                href={`tel:${Singlebill.customer.phone}`}
                 className="hover:underline text-indigo-700"
               >
-                {cust.phone}
+                {Singlebill.customer.phone}
               </a>
             </p>
             <p>
               <span className="mr-1">✉️</span>
               <a
-                href={`mailto:${cust.Email}`}
+                href={`mailto:${Singlebill.customer.Email}`}
                 className="hover:underline text-indigo-700"
               >
-                {cust.Email}
+                {Singlebill.customer.Email}
               </a>
             </p>
             <p>
@@ -769,7 +740,7 @@ export default function InvoicePage({
             <button
               title={`Print WayBill ${Singlebill.billStatus}`}
               onClick={() => {
-                printWayBill(userInfo.business, cust, Singlebill);
+                printWayBill(userInfo.business, Singlebill.customer, Singlebill);
               }}
               className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-blue-200 transition duration-200 ease-in-out mr-2 hover:bg-blue-600 text-white font-semibold border border-blue-400 hover:shadow-lg"
             >
@@ -792,7 +763,7 @@ export default function InvoicePage({
 
           <button
             title={`Download and Print ${Singlebill.billStatus}`}
-            onClick={() => generatePdf(userInfo.business, cust, Singlebill)}
+            onClick={() => generatePdf(userInfo.business, Singlebill.customer, Singlebill)}
             className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-orange-50 to-white text-gray-800 font-semibold border border-orange-200 hover:shadow-lg hover:border-orange-400 hover:text-orange-700 transition duration-200 ease-in-out"
           >
             <PrinterIcon className="w-7 h-7 text-gray-700" />

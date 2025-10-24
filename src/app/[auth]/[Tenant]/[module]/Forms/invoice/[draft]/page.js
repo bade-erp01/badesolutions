@@ -176,9 +176,9 @@ const generatePdf = async (business, customer, bill) => {
     // Left Column: Customer Info
     doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
     doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-    doc.setFontSize(10);
-    doc.text(`Address: ${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
-    doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, currentY + 12);
+    doc.setFontSize(8).setTextColor(0, 0, 0);
+    doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
+    doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
     doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
     doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
 
@@ -593,21 +593,16 @@ const generatePdf = async (business, customer, bill) => {
               {Singlebill.customerName?.toUpperCase()}
             </h3>
             <p>
-              <span className="mr-1">📞</span>
-              <a
-                href={`tel:${cust.phone}`}
-                className="hover:underline text-indigo-700"
-              >
-                {cust.phone}
-              </a>
+              <span className="mr-1">📌</span>
+                {Singlebill.customer.billingAddress}
             </p>
             <p>
               <span className="mr-1">✉️</span>
               <a
-                href={`mailto:${cust.Email}`}
+                href={`mailto:${Singlebill.customer.Email}`}
                 className="hover:underline text-indigo-700"
               >
-                {cust.Email}
+                {Singlebill.customer.Email}
               </a>
             </p>
             <p>
@@ -651,7 +646,7 @@ const generatePdf = async (business, customer, bill) => {
           {bill.billStatus.toLowerCase() === "draft" && (
             <button
               title={`Download and Print ${Singlebill.billStatus}`}
-              onClick={() => generatePdf(Business, customer, bill)}
+              onClick={() => generatePdf(Business, Singlebill.customer, bill)}
               className="inline-flex items-center justify-center px-3 py-3 rounded-lg  text-white font-semibold hover:shadow-xl hover:bg-blue-100 transition duration-200 ease-in-out"
             >
               <PrinterIcon className="h-6 w-6 text-gray-500" />
