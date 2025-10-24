@@ -66,7 +66,7 @@ const PaymentReceipt = ({business,payment,cust}) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-white rounded shadow-md">
+    <div className="flex flex-col items-center justify-center p-2">
       <button
         onClick={generatePDF}
         className="px-6 py-2  text-black rounded hover:bg-orange-300 transition"

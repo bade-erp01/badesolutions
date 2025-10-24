@@ -79,8 +79,8 @@ export default async function paymentlayout({ children, params }) {
         {/* Sidebar (collapsible on mobile) */}
         <aside
           className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 h-[511px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
+          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
+          style={{ overflowY: "auto" }}
         >
           <BackButton />
           <hr />
@@ -94,7 +94,7 @@ export default async function paymentlayout({ children, params }) {
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6 relative z-10 h-[510px] overflow-y-auto">
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
            <PaymentListpage Payments={data.Payments} bank={data.Accounts} Customers={data.Customers} userInfo={userData}/>
           </section>
         </main>
