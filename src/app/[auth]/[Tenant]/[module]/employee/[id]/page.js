@@ -9,7 +9,7 @@ import {
   UpdateEmployeeData,
   EXPRESS_PRIVATE_URL,
   Dencrypt,
-} from "../../../../../../../Functions/Functions"
+} from "../../../../../../../Functions/Functions";
 import {
   PhotoIcon,
   PaperClipIcon,
@@ -39,34 +39,51 @@ export default function SingleEmployeeView({
   const [data] = useState(Backdata);
   const [Error, setError] = useState("");
   const [formData, setFormData] = useState({ ...data });
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
   const [isOpen3, setIsOpen3] = useState(false);
+  const router = useRouter();
 
   // DeactivateUser/ activate user account
   const DeactivateUser = async (id) => {
-    try{
-      plsWait("Applying changes, Please wait...")
+    try {
+      const { isConfirmed } = await Swal.fire({
+        title: "Proceed with Action?",
+        text: "If user is currently active, they will be logged out and their access will be removed.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#6B7280",
+        confirmButtonText: "Yes, update it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+        focusCancel: true,
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      plsWait("Applying changes, Please wait...");
       const response = await fetch(`/api/EmployeeUpdate/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-           access: `${Encrypt(userInfo._id)}`,
+          access: `${Encrypt(userInfo._id)}`,
         },
       });
       const data = await response.json();
       if (response.ok) {
         SuccessToast(data.message);
-        router.refresh();
+        location.reload();
       } else {
-       ErrorMessage(data.error);
-       router.refresh();
+        ErrorMessage(data.error);
+        location.reload();
       }
-    }catch(err){
+    } catch (err) {
       ErrorMessage(err.message);
     }
-  }
+  };
 
   const DeleteAttachment = async (id, model, attachmentId) => {
     Swal.fire({
@@ -1330,9 +1347,13 @@ export default function SingleEmployeeView({
                 onClick={() => DeactivateUser(Encrypt(data._id))}
                 className={`rounded-md 
                 ${data.status === "suspended" ? "bg-green-600" : "bg-red-600"}
-                px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-${data.status === "suspended" ? "bg-green-800" : "bg-red-800"} focus-visible:outline-indigo-600 transition`}
+                px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-${
+                  data.status === "suspended" ? "bg-green-800" : "bg-red-800"
+                } focus-visible:outline-indigo-600 transition`}
               >
-                {data.status === "suspended" ? "Activate User Account":"Deactivate User Account"}
+                {data.status === "suspended"
+                  ? "Activate User Account"
+                  : "Deactivate User Account"}
               </button>
             )}
           </div>

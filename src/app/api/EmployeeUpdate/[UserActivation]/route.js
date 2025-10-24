@@ -19,10 +19,10 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: 'No user found' }, { status: 404 });
     }
 
-    let status = user.status
+    const status = user.status
 
     const getUpdateStatus = () => {
-        if(status === "Suspened"){
+        if(status === "suspended"){
             return "active"
         }else{
             return "suspended"
