@@ -44,6 +44,30 @@ export default function DraftInvoicePage({
   // const [qty,setQty] = useState('')
   const router = useRouter();
 
+  // check epirt date function
+   const checkExpiryDate = (createdAt) => {
+     try {
+       // Expiry is 24 hours later
+       const expiryTime = moment(createdAt).add(24, "hours");
+
+       // Current time
+       const now = moment();
+
+       // Calculate time left
+       const duration = moment.duration(expiryTime.diff(now));
+       if (duration.asMilliseconds() <= 0) {
+         return "⛔ Expired";
+       } else {
+         const hours = Math.floor(duration.asHours());
+         const minutes = duration.minutes();
+         const seconds = duration.seconds();
+         return `⏳Expire in: ${hours}h ${minutes}m ${seconds}s`;
+       }
+     } catch (err) {
+       return "";
+     }
+   };
+
   useEffect(() => {
     Swal.close();
   }, []);
@@ -964,9 +988,9 @@ const generatePdf = async (business, customer, bill) => {
         </div>
 
         {/* Footer Reference */}
-        <div className="mt-12 pt-8 border-t text-center text-sm text-gray-400 tracking-wide">
-          {Singlebill.billStatus.toUpperCase()} / {Singlebill.billReferenceNo} /{" "}
-          {Singlebill.invoicelocation}
+        <div className="mt-12 pt-8 border-t text-center text-md text-gray-800 tracking-wide">
+          {/* show time from vreation to 24 hrs expiration */}
+          {checkExpiryDate(Singlebill.createdAt)}
         </div>
       </div>
       <Footer2 />
