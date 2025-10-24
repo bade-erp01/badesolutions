@@ -180,6 +180,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
             type="number"
             onChange={handleChange}
             value={formData.Debt || 0}
+            required
             className={`mt-2 block w-full  border ${
               errors.Debt ? "border-red-400" : "border-gray-300"
             } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
