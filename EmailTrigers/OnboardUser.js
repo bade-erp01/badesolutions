@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer'
-import UserOnboardingTemplate from '../EmailTrigers/EmailTemplates/UserOnboardingTemplate'
 import jwt from 'jsonwebtoken'
 import Business from '../models/Business';
 import dbConnect from '../lib/Mongodb';
@@ -27,12 +26,13 @@ async function userOnboardingMail(doc) {
     const Biz = await Business.findOne({tenantId:doc.tenantId}) 
 
     const config = {
-        host: 'smtp.zoho.com',
+        host: "smtp.gmail.com",
+        service: "gmail",
         port : 465,
         secure: true,
         auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASSWORD
+            user: "operations.bade@gmail.com",
+            pass: process.env.EMAIL2PASS
         },
         tls: { rejectUnauthorized: false }
     };
@@ -42,12 +42,14 @@ async function userOnboardingMail(doc) {
     await transporter.verify();
     
     let message = {
-        from: `"${Biz.companyName.toUpperCase() || process.env.EMAIL}" <${process.env.EMAIL}>`,
+        from: `"Businesss Automated Dynamic Enterprise" <${process.env.EMAIL || process.env.EMAIL2}>`,
         to: doc.Email,
-        subject: `User Invitation 📧`,
-        html: `<p>Hello ${doc.firstName}, You have been invited to onboard on BADE with ${Biz.companyName}. Here is your login credential.<br/> Email: ${doc.email}</p><br/>
+        subject: `${Biz.companyName} User Invitation 📧`,
+        html: `<p>Hello ${doc.firstName}, ${Biz.companyName} invites you to onboard on Businesss Automated Dynamic Enterprise . Here is your login credential.<br/> Email: ${doc.Email}</p><br/>
         <p> Ensure to reset your Password then contact your Administrator to grant you access to Enviroment.</p>
-        <br/> <a href="https://badesolutions.com.ng/auth/Forgot_password">RESET PASSWORD HERE</a>`,//html template
+        <br/> <a href="https://badesolutions.com.ng/auth/Forgot_password">RESET PASSWORD HERE</a>
+
+        <br/> <a>** Do not reply to this email **</a>`,//html template
         headers: {
             'X-Priority': '1', // High priority 
             'X-MSMail-Priority': 'High', // Microsoft email priority

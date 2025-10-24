@@ -188,7 +188,7 @@ export async function sendInvite(id) {
   });
 
   try {
-    const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/invitation/${encodeURIComponent(id)}`, {
+    const response = await fetch(`/api/EmployeeUpdate/invitation/${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: {
         Accept: "application/json",
