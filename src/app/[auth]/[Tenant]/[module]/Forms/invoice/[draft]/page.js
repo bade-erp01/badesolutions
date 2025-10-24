@@ -310,7 +310,7 @@ const generatePdf = async (business, customer, bill) => {
       throw new Error('Product not found')
      }
 
-      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/add/order?order_id=${bill._id}&productId=${productId}&priceList=${customer.priceList}`;
+      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/add/order?order_id=${bill._id}&productId=${productId}&priceList=${Singlebill.customer.priceList}`;
       const res = await fetch(url, {
         method: "PUT",
         headers: {
