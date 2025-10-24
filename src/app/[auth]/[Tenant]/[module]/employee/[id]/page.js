@@ -44,6 +44,30 @@ export default function SingleEmployeeView({
   const [isOpen2, setIsOpen2] = useState(false);
   const [isOpen3, setIsOpen3] = useState(false);
 
+  // DeactivateUser/ activate user account
+  const DeactivateUser = async (id) => {
+    try{
+      plsWait("Applying changes, Please wait...")
+      const response = await fetch(`/api/EmployeeUpdate/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+           access: `${Encrypt(userInfo._id)}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        SuccessToast(data.message);
+        router.refresh();
+      } else {
+       ErrorMessage(data.error);
+       router.refresh();
+      }
+    }catch(err){
+      ErrorMessage(err.message);
+    }
+  }
+
   const DeleteAttachment = async (id, model, attachmentId) => {
     Swal.fire({
       title: "Are you sure?",
@@ -175,7 +199,6 @@ export default function SingleEmployeeView({
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // console.log(formData);
   };
 
   const handleSubmit = async (e) => {
@@ -1304,9 +1327,12 @@ export default function SingleEmployeeView({
             ) : (
               <button
                 type="submit"
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline-indigo-600 transition"
+                onClick={() => DeactivateUser(Encrypt(data._id))}
+                className={`rounded-md 
+                ${data.status === "suspended" ? "bg-green-600" : "bg-red-600"}
+                px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-${data.status === "suspended" ? "bg-green-800" : "bg-red-800"} focus-visible:outline-indigo-600 transition`}
               >
-                Deactivate User Account
+                {data.status === "suspended" ? "Activate User Account":"Deactivate User Account"}
               </button>
             )}
           </div>
