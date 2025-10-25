@@ -467,7 +467,7 @@ const generatePdf = async (business, customer, bill) => {
             dbConnect:`Bearer ${Business.rustyRoof}`,
             access:`${Encrypt(user._id)}`
           },
-          body: JSON.stringify({ billId: bill._id, customer: customer._id }),
+          body: JSON.stringify({ billId: bill._id, customer: Singlebill.customer._id }),
         }
       );
 
@@ -530,7 +530,7 @@ const generatePdf = async (business, customer, bill) => {
     business: Business,
   };
   const Singlebill = bill;
-  const cust = customer;
+  const cust = Singlebill.customer;
   const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
 
   return (
