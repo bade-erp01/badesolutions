@@ -47,12 +47,10 @@ export default function DebtorsReportModal({ data }) {
           <td style="padding: 4px;">${item.Username}</td>
           <td style="padding: 4px;">${item.CustomerCode || ""}</td>
           <td style="padding: 4px;">${item.phone}</td>
-          <td style="padding: 4px;">${item.Email}</td>
-          <td style="padding: 4px;">${item.Debt}</td>
+          <td style="padding: 4px;">${item.Debt.toLocaleString()}</td>
           <td style="padding: 4px;">${item.creditLimit}</td>
           <td style="padding: 4px;">${normalizeDate(item.lastPayDate)}</td>
           <td style="padding: 4px;">${calculateDebtDays(item.lastPayDate)}</td>
-          <td style="padding: 4px;">${item.ContactPerson}</td>
         </tr>
       `
       )
@@ -105,12 +103,10 @@ export default function DebtorsReportModal({ data }) {
                 <th style="padding: 4px;">Customer</th>
                 <th style="padding: 4px;">Code</th>
                 <th style="padding: 4px;">Phone</th>
-                <th style="padding: 4px;">Email</th>
                 <th style="padding: 4px;">Debt</th>
                 <th style="padding: 4px;">Credit Limit</th>
                 <th style="padding: 4px;">Last Payment</th>
                 <th style="padding: 4px;">Debt Days</th>
-                <th style="padding: 4px;">Contact Person</th>
               </tr>
             </thead>
             <tbody id="debtorsTableBody"></tbody>
@@ -163,7 +159,7 @@ export default function DebtorsReportModal({ data }) {
           tableBody.innerHTML = generateTableRows(filtered);
 
           const totalDebt = filtered.reduce((sum, cust) => sum + parseFloat(cust.Debt || 0), 0);
-          totalDebtCell.textContent = totalDebt.toFixed(2);
+          totalDebtCell.textContent = totalDebt.toFixed(2).toLocaleString();
 
           const button = document.getElementById("downloadDebtorsExcel");
           button.onclick = () => {
@@ -172,7 +168,7 @@ export default function DebtorsReportModal({ data }) {
               Code: entry.CustomerCode,
               Phone: entry.phone,
               Email: entry.Email,
-              Debt: entry.Debt,
+              Debt: entry.Debt?.toLocaleString(),
               "Credit Limit": entry.creditLimit,
               "Last Payment": normalizeDate(entry.lastPayDate),
               "Debt Days": calculateDebtDays(entry.lastPayDate),
