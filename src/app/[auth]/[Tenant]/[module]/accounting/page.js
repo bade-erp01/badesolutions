@@ -14,6 +14,7 @@ import {
   BuildingLibraryIcon,
   CubeIcon,
   ShoppingCartIcon,
+  TableCellsIcon
 } from "@heroicons/react/24/outline";
 import {Encrypt} from "../../../../../../Functions/Mics"
 import { notFound } from 'next/navigation';
@@ -63,6 +64,7 @@ export default async function AccountingPage({ children, params }) {
   { label: "Account Payables", icon: BanknotesIcon, url: 'Payables' },
   { label: "Profit & Loss", icon: PresentationChartLineIcon, url: 'ProfitLoss' },
   { label: "Revenue Center", icon: BuildingLibraryIcon, url: 'RevenueCenter' },
+  { label: "Chart of Accounts", icon: TableCellsIcon, url: 'Chart-Of-Account' },
 ];
 
     return (
