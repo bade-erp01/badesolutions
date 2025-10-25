@@ -79,7 +79,7 @@ export default function DraftInvoicePage({
   // update discount of draft
   const updateDiscount = async (billId, value) => {
     try {
-      // plsWait("Updating Discount Received"); // starts spinner or loading indicator
+      plsWait("Updating Discount"); // starts spinner or loading indicator
 
       const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/discount/update?user=${Encrypt(user._id)}`;
 
@@ -719,8 +719,10 @@ const generatePdf = async (business, customer, bill) => {
                      <input
                       type="number"
                       defaultValue={bill.Qty || 0}
+                      min={0}
                       onBlur={(e) => {
                         let val = e.target.value;
+                        if (val < 0) return
                         if (val < 0) val = 0;
                         handleQtyChange(
                           bill._id,
@@ -748,8 +750,8 @@ const generatePdf = async (business, customer, bill) => {
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                         onBlur={(e) => {
                           let val = e.target.value;
+                          if (val < 0) return
                           if (val < 0) val = 0;
-
                           handleQtyChange(
                             bill._id, // lineId
                             val, // new value
@@ -774,8 +776,8 @@ const generatePdf = async (business, customer, bill) => {
                         className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                         onBlur={(e) => {
                           let val = e.target.value;
+                          if (val < 0) return
                           if (val < 0) val = 0;
-
                           handleQtyChange(
                             bill._id, // lineId
                             val, // new value
@@ -913,6 +915,7 @@ const generatePdf = async (business, customer, bill) => {
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                     onBlur={(e) => {
                       const val = parseFloat(e.target.value);
+                      if (val < 0) return
                       updateDiscount(
                         Singlebill._id,
                         isNaN(val) || val < 0 ? 0 : val
