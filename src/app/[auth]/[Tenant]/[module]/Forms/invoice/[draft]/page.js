@@ -467,7 +467,7 @@ const generatePdf = async (business, customer, bill) => {
             dbConnect:`Bearer ${Business.rustyRoof}`,
             access:`${Encrypt(user._id)}`
           },
-          body: JSON.stringify({ billId: bill._id, customer: Singlebill.customer._id }),
+          body: JSON.stringify({ billId: bill._id, customer: Singlebill.customer._id,restriction:userInfo.business?.InvoiceRestriction }),
         }
       );
 
@@ -615,19 +615,26 @@ const generatePdf = async (business, customer, bill) => {
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
           {/* CheckOut Button */}
           <div className="flex justify-evenly items-center gap-4">
-            
-            {user._id === Singlebill.invoicerId && user.raiseInvoice &&
-              Singlebill.billStatus.toLowerCase() === "draft" &&
-               isOlderThan24Hours && (
-                <button
-                  title="Process this draft to order"
-                  onClick={processInvoice}
-                  className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-green-300 text-white font-semibold hover:shadow-xl hover:bg-green-500 transition duration-200 ease-in-out"
-                >
-                  <ShoppingCartIcon className="h-6 w-6 text-gray-500" />
-                  <span className="text-gray-500">CheckOut Draft</span>
-                </button>
-              )}
+           {(
+              (!userInfo.business.InvoiceRestriction &&
+                user._id === Singlebill.invoicerId &&
+                user.raiseInvoice &&
+                Singlebill.billStatus.toLowerCase() === "draft") ||
+              (userInfo.business.InvoiceRestriction &&
+                user._id === Singlebill.invoicerId &&
+                user.raiseInvoice &&
+                Singlebill.billStatus.toLowerCase() === "draft" &&
+                isOlderThan24Hours)
+            ) && (
+              <button
+                title="Process this draft to order"
+                onClick={processInvoice}
+                className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-green-300 text-white font-semibold hover:shadow-xl hover:bg-green-500 transition duration-200 ease-in-out"
+              >
+                <ShoppingCartIcon className="h-6 w-6 text-gray-500" />
+                <span className="text-gray-500">CheckOut Draft</span>
+              </button>
+            )}          
 
             {user._id === Singlebill.invoicerId && user.raiseInvoice &&
               Singlebill.billStatus.toLowerCase() === "draft" && (
@@ -987,8 +994,19 @@ const generatePdf = async (business, customer, bill) => {
 
         {/* Footer Reference */}
         <div className="mt-12 pt-8 border-t text-center text-md text-gray-800 tracking-wide">
-          {/* show time from vreation to 24 hrs expiration */}
-          {checkExpiryDate(Singlebill.createdAt)}
+          
+          {userInfo.business.InvoiceRestriction ? (
+              <>{checkExpiryDate(Singlebill.createdAt)}</>
+            ) : (
+              <h2
+                className={`mt-3 font-bold text-base ${
+                  isCancelled ? "text-red-600" : "text-gray-800"
+                }`}
+              >
+                {Singlebill.billStatus.toUpperCase()} /{" "}
+                {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
+              </h2>
+            )}
         </div>
       </div>
       <Footer2 />

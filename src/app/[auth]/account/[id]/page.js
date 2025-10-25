@@ -547,6 +547,16 @@ export default function BusinessDatas({ data, userInfo }) {
               checked={formData.allowSkuSplitting}
               onChange={handleChange}
             />
+            <Checkbox
+              label={
+                formData.InvoiceRestriction
+                  ? "Do not apply Restriction on Draft sales"
+                  : "Apply Restriction on Draft sales After 24Hrs"
+              }
+              name="InvoiceRestriction"
+              checked={formData.InvoiceRestriction}
+              onChange={handleChange}
+            />
           </Grid>
         </Section>
       )}

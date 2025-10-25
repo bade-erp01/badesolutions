@@ -37,12 +37,11 @@ export async function PATCH(request,{params}) {
       });
     }
     
-    
     const { id } = await params;
-
+    
     //CHECK IF THE BUSINESSIS ALREADY ACTIVATED
     const biz =  await Business.findById(Dencrypt(id))
-
+    
     if (!biz.isActive){
       throw new Error('Account update failed. Contact Support.')
     }

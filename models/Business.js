@@ -158,6 +158,12 @@ const businessSchema = new mongoose.Schema(
     },
     industryType:{
        type:String,
+    },
+    version:{
+      type:String,
+    },
+    InvoiceRestriction:{
+      type: Boolean, default: false 
     }
   },
   { timestamps: true }
