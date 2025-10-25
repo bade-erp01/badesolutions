@@ -441,7 +441,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       doc.text(`Period: ${startDate} to ${endDate}`, 20, 35);
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
-      doc.text(`Current Balance: ${cust.Debt.toFixed(2)}`, 20, 42);
+      doc.text(`Current Balance: ${cust.Debt.toFixed(2).toLocaleString()}`, 20, 42);
 
       // 🖼️ Logo
       doc.addImage(imageDataURL, "PNG", 150, 10, 35, 35);
@@ -452,9 +452,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         i + 1,
         tx.ReferenceNo.toUpperCase(),
         `${moment(new Date(tx.Date)).format("YYYY-MM-DD")}`,
-        `${tx.CreditAmount.toFixed(2)}`,
-        `${tx.DebitAmount.toFixed(2)}`,
-        `${tx.Balance.toFixed(2)}`,
+        `${tx.CreditAmount.toFixed(2).toLocaleString()}`,
+        `${tx.DebitAmount.toFixed(2).toLocaleString()}`,
+        `${tx.Balance.toFixed(2).toLocaleString()}`,
       ]);
 
       // ➕ Add final "Current Balance" row
@@ -463,7 +463,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         "Current Balance",
         "", // Empty CR
         "", // Empty DR
-        `${cust.Debt.toFixed(2)}`,
+        `${cust.Debt.toFixed(2).toLocaleString()}`,
       ]);
 
       // 📋 Table with page footer and styled final row
@@ -748,7 +748,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               : "text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2"
             }`}
         >
-         Balance: {cust.Debt}
+         Balance: {cust.Debt.toLocaleString()}
         </span>
       </div>
 
