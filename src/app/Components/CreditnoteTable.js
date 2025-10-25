@@ -42,7 +42,7 @@ export default function CreditnoteTable({ data }) {
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <div className="relative">
           <input
             type="text"
@@ -64,7 +64,7 @@ export default function CreditnoteTable({ data }) {
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">

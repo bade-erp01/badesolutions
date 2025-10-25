@@ -15,7 +15,29 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Automate, Optimize, and Scale Your Business Operations",
-  keywords: [],
+  keywords: [
+    "Business Automation",
+    "Enterprise Solutions",
+    "B.A.D.E",
+    "AI-powered Business",
+    "Workflow Optimization",
+    "Process Automation",
+    "ERP in Nigeria",
+    "Bernard fidels ogoh",
+    "ERP in Abuja",
+    "ERP in Lagos",
+    "ERP in Port Harcourt",
+    "Locally built ERP",
+    "ERP for SMEs",
+    "ERP for Enterprises",
+    "ERP for Startups",
+    "ERP for Corporates",
+    "AI-powered ERP",
+    "AI-driven Business Solutions",
+    "AI Automation",
+    "Affordable ERP",
+    "Scalable ERP Solutions",
+  ],
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
   viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
@@ -50,12 +72,6 @@ export default async function Productlayout({ children, params }) {
 
     const {
       productList,
-      // inventoryItem,
-      // ReportInventory,
-      // storeList,
-      // vendorList,
-      // PurchaseOrderList,
-      // invoiceList
     } = await res.json();
 
     return (

@@ -55,6 +55,9 @@ export default function SearchResultPage({ result,linkData }) {
             "category",
             "Debt",
             "ContactPerson",
+            "CreditId",
+            "DebitId",
+            "customer"
           ],
         });
 

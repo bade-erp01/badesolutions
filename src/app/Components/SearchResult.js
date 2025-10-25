@@ -24,6 +24,16 @@ const SearchCard = ({ data, module, UserData }) => {
         normalizedModule = "purchase-request";
         break;
 
+      case "debit-note":
+        normalizedModule = "debit-note";
+        setLink(`/${auth}/${Tenant}/${Module}/accounting/debit-note/debit-note/${Encrypt(data._id)}`)
+        break;
+
+      case "credit-note":
+        normalizedModule = "credit-note";
+        setLink(`/${auth}/${Tenant}/${Module}/accounting/credit-note/credit-note/${Encrypt(data._id)}`)
+        break;
+
       case "invoice":
         if (data.billStatus === "Draft") {
           setLink(`/${auth}/${Tenant}/invoice/Forms/invoice/${Encrypt(data._id)}`);
@@ -59,6 +69,9 @@ const SearchCard = ({ data, module, UserData }) => {
     data.Username ||
     data.CustomerCode ||
     data.paymentReferenceNo ||
+    data.CreditId ||
+    data.DebitId ||
+    data.customer ||
     `${data.billStatus}/${data.billReferenceNo}`;
 
   const subtitle =

@@ -12,7 +12,29 @@ import CreditnoteTable from "@/app/Components/CreditnoteTable"
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Automate, Optimize, and Scale Your Business Operations",
-  keywords: [/* ...keywords omitted for brevity... */],
+   keywords: [
+    "Business Automation",
+    "Enterprise Solutions",
+    "B.A.D.E",
+    "AI-powered Business",
+    "Workflow Optimization",
+    "Process Automation",
+    "ERP in Nigeria",
+    "Bernard fidels ogoh",
+    "ERP in Abuja",
+    "ERP in Lagos",
+    "ERP in Port Harcourt",
+    "Locally built ERP",
+    "ERP for SMEs",
+    "ERP for Enterprises",
+    "ERP for Startups",
+    "ERP for Corporates",
+    "AI-powered ERP",
+    "AI-driven Business Solutions",
+    "AI Automation",
+    "Affordable ERP",
+    "Scalable ERP Solutions",
+  ],
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
   viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
@@ -70,7 +92,8 @@ export default async function AccountingPage({ children, params }) {
         <Nav1
           user={userData.user}
           business={userData.business}
-          page={`${moduleList.module} / ${moduleList.id}`}
+          page={`${moduleList.id}`}
+          Module={[{}]}
         />
 
         <div className="flex flex-1 text-white bt-2 max-h-screen">
