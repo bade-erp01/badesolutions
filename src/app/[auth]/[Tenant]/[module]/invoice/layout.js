@@ -74,11 +74,11 @@ export default async function Employeelayout({ children, params }) {
                 user={parsedUser}
               />
 
-              {/* <SalesDumpModal
+              <SalesDumpModal
                 baseUrl={baseUrl}
                 business={userData.business}
                 user={parsedUser}
-              /> */}
+              />
 
               {userData?.user?.c_levelDash && (
                 <SalesDashboard  business={userData.business} baseUrl={baseUrl} />

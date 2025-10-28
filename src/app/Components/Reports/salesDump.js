@@ -4,28 +4,29 @@ import Swal from "sweetalert2";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
-import { plsWait } from "../../../../Functions/Mics";
+import { plsWait,Encrypt } from "../../../../Functions/Mics";
 import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
 
-const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
+const SalesDumpModal = ({business}) => {
   const [salesDatas, setSalesDatas] = useState([]);
-  const [ProductList] = useState(Products || []);
-  const [StoreList] = useState(Stores || []);
+  const [ProductList,setProductList] = useState([]);
+  const [StoreList, setStoreList] = useState([]);
+  const [Vendors, setVendorList] = useState([])
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
     product: "",
   });
 
-  const productOptions = ProductList.map(
-      (product) => `<option value="${product._id}">${product.Name}</option>`
-    ).join("");
+  // const productOptions = ProductList.map(
+  //     (product) => `<option value="${product._id}">${product.Name}</option>`
+  //   ).join("");
 
     //get prooduct name
     const filterProductName = (id) => {
       try {
         const prod = ProductList.find((p) => p._id === id);
-        return prod ? prod.Name : "N/A";
+        return prod.Name || "N/A";
       } catch (error) {
         return "N/A";
       }
@@ -36,7 +37,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
     const filterStoreName = (id) => {
       try {
         const store = StoreList.find((s) => s._id === id);
-        return store ? store.WHName : "N/A";
+        return  store.WHName || "N/A";
       }
       catch (error) {
         return "N/A";
@@ -130,13 +131,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
               <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
               <input type="date" id="endDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
             </div>
-           <div class="sm:col-span-2">
-              <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-              <select id="product" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <option value="">-- Select Product --</option>
-                ${productOptions}
-              </select>
-            </div>
+           
           </div>
         </div>
       `,
@@ -153,7 +148,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
         return {
           startDate: document.getElementById("startDate").value,
           endDate: document.getElementById("endDate").value,
-          product: document.getElementById("product").value,
+          // product: document.getElementById("product").value,
         };
       },
     }).then(async (result) => {
@@ -166,7 +161,7 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${tenantData}`,
+              Authorization: `Bearer ${Encrypt(business.tenantId)}`,
               dbConnect:`Bearer ${business.rustyRoof}`,
             },
           }
@@ -178,6 +173,10 @@ const SalesDumpModal = ({ tenantData,Products ,Stores,Vendors,business}) => {
           return;
         }
         setSalesDatas(data.invoice);
+        setProductList(data.Products)
+        setStoreList(data.Stores)
+        setVendorList(data.Vendors)
+
         Swal.close();
 
         const activeFilters = result.value;
