@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
 import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
 import { plsWait,Encrypt } from "../../../../Functions/Mics";
 import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
+import moment from "moment";
 
 const SalesDumpModal = ({business}) => {
   const [salesDatas, setSalesDatas] = useState([]);
@@ -75,7 +76,7 @@ const SalesDumpModal = ({business}) => {
 
         if (matchesProduct) {
           filteredExport.push({
-           "Inv-No": sale.billReferenceNo,
+           "Ref-No": sale.billReferenceNo,
             Status: sale.billStatus,
             WB_No: sale.WayBillNo || "N/A",
             Store: filterStoreName(sale.whId),
@@ -93,8 +94,12 @@ const SalesDumpModal = ({business}) => {
             Total: order.total,
             "Manuf-Code": order.item.Manufacture_code,
             Vendor: filterVendorName(order.item.Vendor),
+            Promo_Sum: order.promotionData * order.Qty,
+           "PriceList":sale.priceList,
             Ord_Date: sale.startDate,
-            Inv_Date: sale.InvDate || "N/A",
+            Inv_Date: moment(sale.DELIVERYDATE).format('l') || "N/A",
+            Inv_Sub:sale.subTotal,
+            Inv_Total:sale.grandTotal,
             Month: new Date(sale.startDate).toLocaleString("default", { month: "short" }),
             Year: new Date(sale.startDate).getFullYear(),
           });
