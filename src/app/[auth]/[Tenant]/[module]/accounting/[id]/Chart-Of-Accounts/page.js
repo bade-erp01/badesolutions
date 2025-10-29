@@ -4,7 +4,8 @@ import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { Encrypt } from "../../../../../../../../Functions/Mics";
 import { notFound } from "next/navigation";
-import Card from "@/app/Components/Card";
+import Link from "next/link";
+import Image from "next/image"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -49,6 +50,8 @@ export const metadata = {
 export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
+
+  console.log(moduleList)
 
   // check if user has access to crm and cash register
   const AccountingFinder = userData.user.Apps.find((app) => {
@@ -100,11 +103,39 @@ export default async function AccountingPage({ children, params }) {
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[100dvh] overflow-y-auto">
               {/* display sharts of accounts */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
-              {data.sort((a, b) => a.accountCode.localeCompare(b.accountCode))
-                .map((element) => (
-                  <Card key={element._id} data={element} module={"Chart-Of-Accounts"} />
-                ))}
-                </div>
+                {data
+                  .sort((a, b) => a.accountCode.localeCompare(b.accountCode))
+                  .map((data) => (
+                    //   <Card key={element._id} data={element} module={"Chart-Of-Accounts"} />
+                    <Link
+                      key={data._id}
+                      href={`/${moduleList.auth}/${moduleList.Tenant}/${moduleList.module}/${moduleList.module}/${moduleList.id}/${moduleList.id}/${Encrypt(data._id)}`}
+                      title={data.accountName}
+                      className="block w-full h-full text-xs"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
+                        <Image
+                          src={data.image}
+                          width={60}
+                          height={60}
+                          alt={data.accountName || "photo"}
+                          className="rounded-md object-cover w-16 h-16"
+                          priority
+                        />
+
+                        <div className="flex flex-col justify-center w-full">
+                          <p className="text-base font-semibold text-gray-800 truncate">
+                            {data.accountName}
+                          </p>
+                          <small className="text-sm w-fit p-1 rounded text-gray-500 mt-1">
+                            Code: {data.accountCode}
+                          </small>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
             </section>
           </main>
         </div>
