@@ -68,6 +68,8 @@ export default function Page({ data }) {
                 <thead>
                   <tr className="bg-gray-100 text-left">
                     <th className="px-2 py-1">Ref No</th>
+                    <th className="px-2 py-1">Desc</th>
+                    <th className="px-2 py-1">Origin</th>
                     <th className="px-2 py-1">Date</th>
                     <th className="px-2 py-1">Credit</th>
                     <th className="px-2 py-1">Debit</th>
@@ -82,6 +84,8 @@ export default function Page({ data }) {
                           ? `${Data.accountCode}-${tx.reference?.substring(0, 50)}...`
                           : `${Data.accountCode}-${tx.reference}`}
                       </td>
+                      <td className="px-2 py-1">{tx.description}</td>
+                      <td className="px-2 py-1"></td>
                       <td className="px-2 py-1">
                         {moment(tx.Date).format("MMM D, YYYY")}
                       </td>
