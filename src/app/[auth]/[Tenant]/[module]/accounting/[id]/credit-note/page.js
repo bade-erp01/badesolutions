@@ -99,7 +99,7 @@ export default async function AccountingPage({ children, params }) {
         <div className="flex flex-1 text-white bt-2 max-h-screen">
           {/* Sidebar */}
           <aside
-            className="w-72 bg-[#1e1e20] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+            className="w-72 bg-[#1e1e20] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[80dvh] md:block"
             style={{ overflowY: "auto" }}
           >
             {/* <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>
@@ -165,7 +165,7 @@ export default async function AccountingPage({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[80dvh] overflow-y-auto">
              <CreditnoteTable data={data}/>
             </section>
           </main>
