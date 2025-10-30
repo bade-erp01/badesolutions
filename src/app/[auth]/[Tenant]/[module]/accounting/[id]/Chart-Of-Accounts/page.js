@@ -51,8 +51,6 @@ export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
 
-  console.log(moduleList)
-
   // check if user has access to crm and cash register
   const AccountingFinder = userData.user.Apps.find((app) => {
     return app.Name === "Accounting";

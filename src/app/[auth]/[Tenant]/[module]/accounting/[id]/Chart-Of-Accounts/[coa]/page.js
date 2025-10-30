@@ -2,8 +2,9 @@
 import { useEffect,useState } from "react";
 import moment from "moment";
 
-export default function Page({ data }) {
+export default function Page({ data,Store }) {
   const [Data] = useState(data)
+  const [Stores] = useState(Store)
    // for pagintaion
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
@@ -13,16 +14,25 @@ export default function Page({ data }) {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = Data.transactions.slice(indexOfFirstRow, indexOfLastRow);
 
+const getStore = (id) =>{
+  try{
+    const Store = Stores.find(str =>{
+      return str._id === id
+    })
+
+    return Store.WHName || ""
+  }catch(err){
+    return ""
+  }
+}
+
   return (
     <div className="max-w-full  px-4 py-8 md:px-8 md:py-10 bg-white  m-4 animate__animated animate__fadeIn">
       {/* Product Info */}
       <div className="text-center mb-6 space-y-1">
-        <h2 className="text-xl font-bold text-gray-800">{data.accountName}</h2>
+        <h2 className="text-xl font-bold text-gray-800">{data.accountName.toUpperCase()}</h2>
         <p className="text-sm text-gray-500">
           <strong>Code:</strong> {Data.accountCode}
-        </p>
-        <p className="text-sm text-gray-500">
-          <strong>Entries:</strong> {Data.balance}
         </p>
       </div>
 
@@ -67,27 +77,31 @@ export default function Page({ data }) {
               <table className="min-w-full text-sm text-gray-700">
                 <thead>
                   <tr className="bg-gray-100 text-left">
-                    <th className="px-2 py-1">Ref No</th>
-                    <th className="px-2 py-1">Account Type</th>
+                    <th className="px-2 py-1">Account</th>
+                    <th className="px-2 py-1">Type</th>
+                    <th className="px-2 py-1">Code</th>
                     <th className="px-2 py-1">Origin</th>
                     <th className="px-2 py-1">Date</th>
+                    <th className="px-2 py-1">Description</th>
                     <th className="px-2 py-1">Credit</th>
                     <th className="px-2 py-1">Debit</th>
-                    {/* <th className="px-2 py-1">Balance</th> */}
+                    <th className="px-2 py-1">Balance</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {currentRows.map((tx, idx) => (
                     <tr key={idx} title={tx.ReferenceNo}>
-                      <td className="px-2 py-1">
-                        {tx.reference.length > 50
-                          ? `${Data.accountCode}-${tx.reference?.substring(0, 50)}...`
-                          : `${Data.accountCode}-${tx.reference}`}
-                      </td>
+                      <td className="px-2 py-1">{`${tx.account}`}</td>
                       <td className="px-2 py-1">{tx.description}</td>
-                      <td className="px-2 py-1"></td>
+                       <td className="px-2 py-1">{Data.accountCode}</td>
+                      <td className="px-2 py-1">{getStore(tx.WHID)}</td>
                       <td className="px-2 py-1">
                         {moment(tx.Date).format("MMM D, YYYY")}
+                      </td>
+                      <td className="px-2 py-1">
+                        {tx.reference.length > 50
+                          ? `${tx.reference?.substring(0, 50)}...`
+                          : `${tx.reference}`}
                       </td>
                       <td className="px-2 py-1">
                         CR: {tx.type === "credit" ? tx.amount?.toLocaleString() : 0.00}
@@ -95,13 +109,13 @@ export default function Page({ data }) {
                       <td className="px-2 py-1">
                         DR:  {tx.type === "debit" ? tx.amount?.toLocaleString() : 0.00}
                       </td>
-                      {/* <td
+                      <td
                         className={`px-2 py-1 ${
                           tx.Balance < 0 ? "text-green-700" : "text-black"
                         } font-semibold`}
                       >
-                        {tx.Balance?.toLocaleString()}
-                      </td> */}
+                        {tx.Balance?.toLocaleString() || 0.00}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

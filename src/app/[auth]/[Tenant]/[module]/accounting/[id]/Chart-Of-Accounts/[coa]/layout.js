@@ -79,7 +79,7 @@ export default async function AccountingPage({ children, params }) {
         <Nav1
           user={userData.user}
           business={userData.business}
-          page={`${data.accountName}`}
+          page={`${data.COAs.accountName}`}
         />
 
         <div className="flex flex-1 text-white bt-2 max-h-screen">
@@ -99,7 +99,7 @@ export default async function AccountingPage({ children, params }) {
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               {/* display sharts of accounts */}
-              <Page data={data}/>
+              <Page data={data.COAs} Store={data.Store}/>
             </section>
           </main>
         </div>
