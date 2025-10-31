@@ -8,6 +8,10 @@ const FinancialOverview = ({ data }) => {
   
   const [isLoading, setIsLoading] = useState(true); // Suspense state
 
+   useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
   if (!data || typeof data !== 'object') {
     return <p className="text-red-500">No financial data provided.</p>;
   }
@@ -27,10 +31,6 @@ const FinancialOverview = ({ data }) => {
       .filter(([key]) => key !== 'accountCode')
       .map(([_, account]) => account)
   );
-
-  useEffect(()=>{
-    setIsLoading(false)
-  },[])
 
 
   return (
