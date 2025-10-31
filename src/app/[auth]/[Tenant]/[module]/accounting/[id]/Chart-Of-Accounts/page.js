@@ -59,7 +59,6 @@ const FinancialOverview = ({ data }) => {
                             <th className="px-4 py-3 text-left">Description</th>
                             <th className="px-4 py-3 text-left">Account Type</th>
                             <th className="px-4 py-3 text-left">Financial Statement</th>
-                            <th className="px-4 py-3 text-left">Balance</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -69,7 +68,6 @@ const FinancialOverview = ({ data }) => {
                               <td className="px-4 py-2">{account.description}</td>
                               <td className="px-4 py-2">{account.AccountType}</td>
                               <td className="px-4 py-2">{account.reportsTo}</td>
-                              <td className="px-4 py-2">{account.Balance}</td>
                             </tr>
                           ))}
                         </tbody>
