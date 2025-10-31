@@ -41,14 +41,14 @@ export const metadata = {
   author: "Business Automated Dynamic Enterprise [B.A.D.E]",
   robots: "index, follow",
   viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
-  ogTitle: "Store Settings | B.A.D.E ERP Platform",
+  ogTitle: " B.A.D.E ERP Platform",
   ogDescription:
     "Take control of your store operations with B.A.D.E — the smart ERP for Nigerian enterprises.",
   ogImage: "/assets/store-settings-og.png",
   ogUrl: "https://badesolutions.com.ng/storelayout",
   ogType: "website",
   twitterCard: "summary_large_image",
-  twitterTitle: "Store Settings | B.A.D.E ERP Platform",
+  twitterTitle: " B.A.D.E ERP Platform",
   twitterDescription:
     "Manage your stores with ease using B.A.D.E — Nigeria’s AI-powered ERP solution.",
   twitterImage: "/assets/store-settings-og.png",

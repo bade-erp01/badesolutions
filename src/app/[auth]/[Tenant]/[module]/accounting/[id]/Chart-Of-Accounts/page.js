@@ -1,151 +1,86 @@
-import Nav1 from "@/app/Components/Nav1";
-import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import Footer2 from "@/app/Components/Footer2";
-import BackButton from "@/app/Components/BackBotton";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image"
+"use client"
+import { useState, useEffect,Suspense } from "react";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 
-export const metadata = {
-  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  description: "Automate, Optimize, and Scale Your Business Operations",
-  keywords: [
-    "Business Automation",
-    "Enterprise Solutions",
-    "B.A.D.E",
-    "AI-powered Business",
-    "Workflow Optimization",
-    "Process Automation",
-    "ERP in Nigeria",
-    "Bernard fidels ogoh",
-    "ERP in Abuja",
-    "ERP in Lagos",
-    "ERP in Port Harcourt",
-    "Locally built ERP",
-    "ERP for SMEs",
-    "ERP for Enterprises",
-    "ERP for Startups",
-    "ERP for Corporates",
-    "AI-powered ERP",
-    "AI-driven Business Solutions",
-    "AI Automation",
-    "Affordable ERP",
-    "Scalable ERP Solutions",
-  ],
-  author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
-  ogTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  ogDescription: "Streamline your business with AI-driven automation",
-  ogImage: "/assets/bade.png",
-  ogUrl: "https://badesolutions.com.ng",
-  twitterCard: "/assets/bade.png",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription: "Automate and optimize your enterprise",
-  twitterImage: "/assets/bade.png",
-  favicon: "favicon.ico",
+
+
+const FinancialOverview = ({ data }) => {
+  
+  const [isLoading, setIsLoading] = useState(true); // Suspense state
+
+  if (!data || typeof data !== 'object') {
+    return <p className="text-red-500">No financial data provided.</p>;
+  }
+
+
+  const allAccounts = Object.entries(data)
+  .filter((key) => key !== 'accountCode' )
+  .flatMap(([_, category]) =>
+    Object.entries(category)
+      .filter(([key]) => ['Asset', 'Liability', 'Equity', 'Revenue', 'Expense'].includes(key))
+      .map(([_, account]) => account)
+  );
+ 
+  // second flat map
+   const accs = allAccounts.flatMap((category) =>// this one gets displayed
+    Object.entries(category)
+      .filter(([key]) => key !== 'accountCode')
+      .map(([_, account]) => account)
+  );
+
+  useEffect(()=>{
+    setIsLoading(false)
+  },[])
+
+
+  return (
+    <Suspense fallback={ <SuspenenseFallBack pagedata={'Charts of account'}/>}>
+          <div className="text-white text-xs">
+            <div className="mx-auto">
+              {/* Filter Component */}
+              <div className="border border-white/10 bg-gradient-to-br from-[#6c6c6e] to-[#78787a] p-4 shadow-xl">
+                {/* Header */}
+                <div className="border-b pb-4 mb-6">
+                  <h1 className="text-2xl font-bold text-gray-200">Charts of Account</h1>
+                </div>
+              </div>
+    
+              {/* Table Container */}
+              <div className="bg-gray-600 shadow-lg border border-white/10">
+                {isLoading ? ( // Show loading fallback while data is being fetched
+                  <SuspenenseFallBack pagedata={"Charts of Account"}/>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-xs">
+                        <thead className="bg-white/10 text-white uppercase text-xs sticky top-0 z-10">
+                          <tr>
+                            <th className="px-4 py-3 text-left">Code</th>
+                            <th className="px-4 py-3 text-left">Description</th>
+                            <th className="px-4 py-3 text-left">Account Type</th>
+                            <th className="px-4 py-3 text-left">Financial Statement</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {accs.sort((a, b) => a.AccountType.localeCompare(b.AccountType)).map((account, index) => (
+                            <tr key={index} className="border-b hover:bg-gray-500">
+                              <td className="px-4 py-2">{account.code}</td>
+                              <td className="px-4 py-2">{account.description}</td>
+                              <td className="px-4 py-2">{account.AccountType}</td>
+                              <td className="px-4 py-2">{account.reportsTo}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+    
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </Suspense>
+  );
 };
 
-export default async function AccountingPage({ children, params }) {
-  const userData = await fetchUser();
-  const moduleList = await params;
-
-  // check if user has access to crm and cash register
-  const AccountingFinder = userData.user.Apps.find((app) => {
-    return app.Name === "Accounting";
-  });
-
-  if (!AccountingFinder) {
-    return notFound();
-  }
-
-  // fetch all credit payment from all bank account
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/COA`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-  });
-
-  const data = await res.json();
-
-  try {
-    return (
-      <div className="flex flex-col min-h-screen overflow-hidden">
-        <Nav1
-          user={userData.user}
-          business={userData.business}
-          page={`${moduleList.id}`}
-        />
-
-        <div className="flex flex-1 text-white bt-2 max-h-screen">
-          {/* Sidebar */}
-          <aside
-            className="w-72 bg-[#1e1e20] backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[100dvh] md:block"
-            style={{ overflowY: "auto" }}
-          >
-            {/* <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>
-            <hr className="border-gray-100 mb-4" /> */}
-            <nav className="space-y-2">
-              <BackButton />
-            </nav>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[100dvh] overflow-y-auto">
-              {/* display sharts of accounts */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
-                {data
-                  .sort((a, b) => a.accountCode.localeCompare(b.accountCode))
-                  .map((data) => (
-                    //   <Card key={element._id} data={element} module={"Chart-Of-Accounts"} />
-                    <Link
-                      key={data._id}
-                      href={`/${moduleList.auth}/${moduleList.Tenant}/${moduleList.module}/${moduleList.module}/${moduleList.id}/${moduleList.id}/${Encrypt(data._id)}`}
-                      title={data.accountName}
-                      className="block w-full h-full text-xs"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
-                        <Image
-                          src={data.image}
-                          width={60}
-                          height={60}
-                          alt={data.accountName || "photo"}
-                          className="rounded-md object-cover w-16 h-16"
-                          priority
-                        />
-
-                        <div className="flex flex-col justify-center w-full">
-                          <p className="text-base font-semibold text-gray-800 truncate">
-                            {data.accountName}
-                          </p>
-                          <small className="text-sm w-fit p-1 rounded text-gray-500 mt-1">
-                            Code: {data.accountCode}
-                          </small>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-              </div>
-            </section>
-          </main>
-        </div>
-
-        <Footer2 />
-      </div>
-    );
-  } catch (err) {
-    return (
-      <div className="text-black p-6">
-        Failed to load. Please try again later.{err.message}
-      </div>
-    );
-  }
-}
+export default FinancialOverview;
