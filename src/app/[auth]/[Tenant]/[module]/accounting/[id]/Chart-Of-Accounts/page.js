@@ -73,7 +73,6 @@ const FinancialOverview = ({ data }) => {
                         </tbody>
                       </table>
                     </div>
-    
                   </>
                 )}
               </div>
