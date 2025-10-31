@@ -41,7 +41,7 @@ const FinancialOverview = ({ data }) => {
               <div className="border border-white/10 bg-gradient-to-br from-[#6c6c6e] to-[#78787a] p-4 shadow-xl">
                 {/* Header */}
                 <div className="border-b pb-4 mb-6">
-                  <h1 className="text-2xl font-bold text-gray-200">Charts of Account</h1>
+                  <h1 className="text-2xl font-bold text-gray-200">Accounting Entries</h1>
                 </div>
               </div>
     
@@ -59,6 +59,7 @@ const FinancialOverview = ({ data }) => {
                             <th className="px-4 py-3 text-left">Description</th>
                             <th className="px-4 py-3 text-left">Account Type</th>
                             <th className="px-4 py-3 text-left">Financial Statement</th>
+                            <th className="px-4 py-3 text-left">Balance</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -68,6 +69,7 @@ const FinancialOverview = ({ data }) => {
                               <td className="px-4 py-2">{account.description}</td>
                               <td className="px-4 py-2">{account.AccountType}</td>
                               <td className="px-4 py-2">{account.reportsTo}</td>
+                              <td className="px-4 py-2">{account.Balance}</td>
                             </tr>
                           ))}
                         </tbody>
