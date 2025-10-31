@@ -62,7 +62,7 @@ const FinancialOverview = ({ data }) => {
                           </tr>
                         </thead>
                         <tbody>
-                          {accs.sort((a, b) => a.AccountType.localeCompare(b.AccountType)).map((account, index) => (
+                          {accs.sort((a, b) => a.code.localeCompare(b.code)).map((account, index) => (
                             <tr key={index} className="border-b hover:bg-gray-500">
                               <td className="px-4 py-2">{account.code}</td>
                               <td className="px-4 py-2">{account.description}</td>
