@@ -21,7 +21,7 @@ const FinancialOverview = ({ data }) => {
   .filter((key) => key !== 'accountCode' )
   .flatMap(([_, category]) =>
     Object.entries(category)
-      .filter(([key]) => ['Asset', 'Liability', 'Equity', 'Revenue', 'Expense'].includes(key))
+      .filter(([key]) => ['Asset', 'Liability', 'Equity', 'Revenue', 'Expense','Non_current_liabilities','Non_current_assets','Cost_of_sales'].includes(key))
       .map(([_, account]) => account)
   );
  
