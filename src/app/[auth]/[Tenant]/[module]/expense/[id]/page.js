@@ -1,0 +1,167 @@
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+
+export default function Page({ data, initiator, Currentuser}) {
+  const [expense, setExpense] = useState(data.expense);
+  const [user, setUser] = useState(initiator);
+  console.log(expense);
+  return (
+    <>
+      <div className="max-w-full md:px-8 md:py-10 bg-gray-200  animate__animated animate__fadeIn rounded-lg">
+        {/* Product Image */}
+        <div className="w-full flex justify-center mb-6">
+          {expense.image ? (
+            <Image
+              src={expense.image}
+              alt="Product Image"
+              width={100}
+              height={100}
+              quality={75} // Adjust quality for balance between size and clarity
+              priority={false} // Set to true only if this image is above the fold
+              loading="lazy" // Lazy load images not immediately visible
+              placeholder="blur" // Optional: use blur placeholder if available
+              blurDataURL={expense.image || "/placeholder.png"} // Fallback blur image
+              className="rounded-lg object-contain"
+            />
+          ) : (
+            <div className="w-[180px] h-[180px] flex items-center justify-center bg-gray-100 text-gray-500 rounded-lg">
+              No Image Available
+            </div>
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div className="text-center mb-6 space-y-1">
+          <h2 className="text-xl font-bold text-gray-800">
+            {expense.productName}
+          </h2>
+          <p className="text-sm text-gray-500">
+            <strong>Remark:</strong> {expense.remarks || "Not Available"}
+          </p>
+        </div>
+
+        {/* Form */}
+        <form className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* currentQty */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Reference-No:
+              </label>
+              <h3 className="text-gray-700 text-xl font-medium">
+                {expense?.refNo}
+              </h3>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Payee
+              </label>
+              <h5 className="text-gray-700 text-sm font-medium">
+                {" "}
+                {expense.payee}
+              </h5>
+            </div>
+
+            {/* pcs */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Raised:
+              </label>
+              <h5 className="text-gray-700 text-sm font-medium">
+                {user?.firstName} {user?.lastName}
+              </h5>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date:
+              </label>
+              <h5 className="text-gray-700 text-sm font-medium">
+                {expense?.Date}
+              </h5>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Store:
+              </label>
+              <h5 className="text-gray-700 text-sm font-medium">
+                {expense?.WHID.WHName}
+              </h5>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Amount:
+              </label>
+              <h5 className="text-gray-700 text-xl font-medium">
+                {expense?.Amount}
+              </h5>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                payment Date:
+              </label>
+              <h5 className="text-gray-700 text-xl font-medium">
+                {expense?.paymentDate}
+              </h5>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Status:
+              </label>
+              <h5 className="text-gray-700 text-xl font-medium">
+                {expense?.status}
+              </h5>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+        </form>
+
+        <div className="flex flex-wrap gap-4 pt-2">
+          {Currentuser.expenseApprover && expense.status === "Pending" && (
+            <>
+            <span
+            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
+            aria-label="Create Invoice"
+          >
+            <svg data-slot="icon" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
+            </svg>
+            <span className="text-sm font-semibold">Approve Expense</span>
+          </span>
+
+          
+          <span
+            className="flex items-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-red-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 "
+            aria-label="Delete Expense"
+          >
+            <svg data-slot="icon" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+            </svg>
+            <span className="text-sm font-semibold">Delete Expense</span>
+          </span>
+          </>
+        )}
+
+        {Currentuser.expenseApprover && expense.status === "Approved" && (
+            <span
+            className="flex items-center gap-2 bg-red-400 text-white px-5 py-2.5 rounded-lg shadow hover:bg-red-500 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 "
+            aria-label="Reverse Expense"
+          >
+            <svg data-slot="icon" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+            </svg>
+            <span className="text-sm font-semibold">Reverse Expense</span>
+          </span>
+        )}
+        </div>
+      </div>
+    </>
+  );
+}
