@@ -8,7 +8,7 @@ export default function Page({ data, initiator, Currentuser }) {
 
   return (
     <>
-      <div className="max-w-full p-2 md:py-10 bg-gray-200  animate__animated animate__fadeIn rounded-lg">
+      <div className="max-w-full p-2 md:py-10 bg-gray-100  animate__animated animate__fadeIn rounded-lg">
         {/* Product Image */}
         <div className="w-full flex justify-center mb-3">
           {expense.image ? (
