@@ -70,8 +70,6 @@ export default async function page({ params }) {
       </div>
     );
   } catch (err) {
-    return (
-      <p>{err.message}</p>
-    )
+    return <p>{err.message}</p>;
   }
 }

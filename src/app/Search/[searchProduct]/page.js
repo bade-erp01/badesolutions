@@ -104,8 +104,8 @@ export default function SearchResultPage({ result,linkData }) {
         >
           {filteredModules.length > 0 ? (
             filteredModules.map((product) => (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
-                <SearchCard key={product._id} data={product} module={page.searchProduct} UserData={UserData}/>
+              <div key={product._id} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
+                <SearchCard  data={product} module={page.searchProduct} UserData={UserData}/>
               </div>
             ))
           ) : (
