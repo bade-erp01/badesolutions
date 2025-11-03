@@ -57,7 +57,8 @@ export default function SearchResultPage({ result,linkData }) {
             "ContactPerson",
             "CreditId",
             "DebitId",
-            "customer"
+            "customer",
+            'refNo'
           ],
         });
 
@@ -103,7 +104,9 @@ export default function SearchResultPage({ result,linkData }) {
         >
           {filteredModules.length > 0 ? (
             filteredModules.map((product) => (
-              <SearchCard key={product._id} data={product} module={page.searchProduct} UserData={UserData}/>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
+                <SearchCard key={product._id} data={product} module={page.searchProduct} UserData={UserData}/>
+              </div>
             ))
           ) : (
             <div className="col-span-full flex flex-col items-center py-12">

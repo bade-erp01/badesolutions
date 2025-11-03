@@ -22,6 +22,7 @@ const Card = ({ data, module }) => {
     data.CustomerCode ||
     data.paymentReferenceNo ||
     data.accountName ||
+    data.refNo ||
     `${data.billStatus}/${data.billReferenceNo}`;
 
   const subtitle =

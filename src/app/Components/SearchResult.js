@@ -72,6 +72,7 @@ const SearchCard = ({ data, module, UserData }) => {
     data.CreditId ||
     data.DebitId ||
     data.customer ||
+    data.refNo ||
     `${data.billStatus}/${data.billReferenceNo}`;
 
   const subtitle =
