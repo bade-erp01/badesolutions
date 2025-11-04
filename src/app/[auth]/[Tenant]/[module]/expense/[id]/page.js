@@ -135,18 +135,39 @@ export default function Page({ data, initiator, Currentuser }) {
               <label className="block text-sm font-medium text-gray-700">
                 Amount:
               </label>
+              {Currentuser.expenseApprover && expense.status === "Pending" ? (
+              <input
+                type="number"
+                value={expense?.Amount}
+                min={1}
+                step="any"
+                name="Amount"
+                className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+              ):(
               <h5 className="text-gray-700 text-xl font-medium">
                 {expense?.Amount}
               </h5>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 payment Date:
               </label>
+              {Currentuser.expenseApprover && expense.status === "Pending" ? (
+              <input
+                type="date"
+                value={expense?.paymentDate.slice(0, 10)}
+                name="paymentDate"
+                className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+              ):(
               <h5 className="text-gray-700 text-xl font-medium">
                 {expense?.paymentDate}
               </h5>
+              )}
+              
             </div>
 
             <div>

@@ -4,13 +4,14 @@ import moment from "moment";
 import { useState } from "react";
 import { downloadExcel } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable"; 
 
 export default function DebtorsReportModal({ data }) {
   const [debtorsList] = useState(
     (data || []).filter((customer) => customer.Debt > 0)
   );
 
-  // 🔍 Detect and normalize date format
   function normalizeDate(value) {
     if (!value) return null;
     const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
@@ -28,7 +29,6 @@ export default function DebtorsReportModal({ data }) {
       : "Invalid date";
   }
 
-  // 📆 Calculate debt days from last payment
   const calculateDebtDays = (lastPayDate) => {
     if (!lastPayDate) return "N/A";
     const today = moment();
@@ -37,7 +37,6 @@ export default function DebtorsReportModal({ data }) {
     return today.diff(lastPayment, "days");
   };
 
-  // 🧾 Generate table rows
   const generateTableRows = (list) => {
     return list
       .map(
@@ -57,7 +56,6 @@ export default function DebtorsReportModal({ data }) {
       .join("");
   };
 
-  // 📊 Show modal with filters and export
   const showModal = () => {
     Swal.fire({
       title: "Debtors Report",
@@ -65,28 +63,14 @@ export default function DebtorsReportModal({ data }) {
         <div style="margin-bottom: 10px; display: flex; gap: 10px;">
           <div style="flex: 1;">
             <label style="font-size: 12px; font-weight: 600;">Debtors</label><br/>
-            <select id="customerFilter" style="
-              width: 100%;
-              padding: 4px;
-              font-size: 12px;
-              border: 1px solid #cbd5e0;
-              border-radius: 4px;
-            ">
+            <select id="customerFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
-              ${debtorsList
-                .map((cust) => `<option value="${cust._id}">${cust.Username}</option>`)
-                .join("")}
+              ${debtorsList.map((cust) => `<option value="${cust._id}">${cust.Username}</option>`).join("")}
             </select>
           </div>
           <div style="flex: 1;">
             <label style="font-size: 12px; font-weight: 600;">Debt Days</label><br/>
-            <select id="debtDaysFilter" style="
-              width: 100%;
-              padding: 4px;
-              font-size: 12px;
-              border: 1px solid #cbd5e0;
-              border-radius: 4px;
-            ">
+            <select id="debtDaysFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
               <option value="0-30">Current (0–30 days)</option>
               <option value="31-60">31–60 Days</option>
@@ -120,16 +104,11 @@ export default function DebtorsReportModal({ data }) {
           </table>
         </div>
         <div style="margin-top: 12px; text-align: right;">
-          <button id="downloadDebtorsExcel" style="
-            background-color: #2b6cb0;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-size: 13px;
-          ">
+          <button id="downloadDebtorsExcel" style="background-color: #2b6cb0; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px;">
             Download Excel
+          </button>
+          <button id="downloadDebtorsPDF" style="background-color: #e53e3e; color: white; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; margin-left: 10px;">
+            Download PDF
           </button>
         </div>
       `,
@@ -161,8 +140,7 @@ export default function DebtorsReportModal({ data }) {
           const totalDebt = filtered.reduce((sum, cust) => sum + parseFloat(cust.Debt || 0), 0);
           totalDebtCell.textContent = totalDebt.toFixed(2).toLocaleString();
 
-          const button = document.getElementById("downloadDebtorsExcel");
-          button.onclick = () => {
+          document.getElementById("downloadDebtorsExcel").onclick = () => {
             const clean = filtered.map((entry) => ({
               Customer: entry.Username,
               Code: entry.CustomerCode,
@@ -181,12 +159,40 @@ export default function DebtorsReportModal({ data }) {
               excelBtn.click();
             }
           };
+
+          document.getElementById("downloadDebtorsPDF").onclick = () => {
+            const doc = new jsPDF();
+            doc.setFontSize(14);
+            doc.text("Debtors Report", 14, 20);
+
+            const tableData = filtered.map((entry, index) => [
+              index + 1,
+              entry.Username,
+              entry.CustomerCode || "",
+              entry.phone,
+              entry.Debt?.toLocaleString(),
+              entry.creditLimit,
+              normalizeDate(entry.lastPayDate),
+              calculateDebtDays(entry.lastPayDate),
+            ]);
+
+            doc.autoTable({
+              startY: 30,
+              head: [["#", "Customer", "Code", "Phone", "Debt", "Credit Limit", "Last Payment", "Debt Days"]],
+              body: tableData,
+              styles: { fontSize: 10 },
+              theme: "grid",
+            });
+            doc.save("Debtors_Report.pdf");
+          };
         };
 
+        // Attach filter listeners
         document.getElementById("customerFilter").addEventListener("change", applyFilters);
         document.getElementById("debtDaysFilter").addEventListener("change", applyFilters);
 
-        applyFilters(); // Initial render
+        // Initial render
+        applyFilters();
       },
     });
   };
@@ -201,3 +207,4 @@ export default function DebtorsReportModal({ data }) {
     </button>
   );
 }
+
