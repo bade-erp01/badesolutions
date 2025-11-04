@@ -5,12 +5,14 @@ import { useState } from "react";
 import { downloadExcel } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable"; 
+import autoTable from "jspdf-autotable";
 
 export default function DebtorsReportModal({ data }) {
   const [debtorsList] = useState(
     (data || []).filter((customer) => customer.Debt > 0)
   );
+  
+  const doc = new jsPDF();
 
   function normalizeDate(value) {
     if (!value) return null;
@@ -161,7 +163,12 @@ export default function DebtorsReportModal({ data }) {
           };
 
           document.getElementById("downloadDebtorsPDF").onclick = () => {
-            const doc = new jsPDF();
+            
+
+            let jsPDF;
+            if (typeof window !== "undefined") {
+              jsPDF = require("jspdf").jsPDF;
+            }
             doc.setFontSize(14);
             doc.text("Debtors Report", 14, 20);
 
@@ -176,7 +183,7 @@ export default function DebtorsReportModal({ data }) {
               calculateDebtDays(entry.lastPayDate),
             ]);
 
-            doc.autoTable({
+            autoTable(doc,{
               startY: 30,
               head: [["#", "Customer", "Code", "Phone", "Debt", "Credit Limit", "Last Payment", "Debt Days"]],
               body: tableData,
