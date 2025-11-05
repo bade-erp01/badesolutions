@@ -97,7 +97,6 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
       )}
       {serverError && (
         <div className="flex items-center gap-2 bg-red-100 border border-red-300 rounded-lg px-4 py-2 text-red-700">
-          <ExclamationCircleIcon className="h-5 w-5 text-red-600" />
           <span>{serverError}</span>
         </div>
       )}
