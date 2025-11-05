@@ -92,7 +92,6 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
 
       {serverMsg && (
         <div className="flex items-center gap-2 bg-green-100 border border-green-300 rounded-lg px-4 py-2 text-green-700">
-          <CheckCircleIcon className="h-5 w-5 text-green-600" />
           <span>{serverMsg}</span>
         </div>
       )}
