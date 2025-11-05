@@ -97,7 +97,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
       .slice(0, 5);
 
   return (
-   <section className="sm:p-10 mx-auto max-w-6xl rounded bg-gray-100 backdrop-blur-md shadow-xl transition-all duration-700">
+   <section className="sm:p-10 mx-auto max-w-6xl transition-all duration-700">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {[
