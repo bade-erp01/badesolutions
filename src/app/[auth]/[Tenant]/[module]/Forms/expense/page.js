@@ -234,7 +234,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
             onChange={handleChange}
             value={formData.remarks || ""}
             className="mt-2 block w-full  border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50"
-            placeholder="Write a remark or note to approval office."
+            placeholder="Write a remark or note to approval office..."
           ></textarea>
         </div>
       </div>
