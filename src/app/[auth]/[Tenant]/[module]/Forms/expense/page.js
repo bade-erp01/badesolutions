@@ -105,7 +105,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
         {/* Name */}
         <div>
           <label htmlFor="payee" className="block text-sm font-medium text-gray-700">
-           Beneficiary<span className="text-red-500">*</span>
+           Beneficiary <span className="text-red-500">*</span>
           </label>
           <input
             id="payee"

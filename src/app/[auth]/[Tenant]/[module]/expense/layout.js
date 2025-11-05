@@ -5,7 +5,7 @@ import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import {
-  ClipboardDocumentListIcon,
+  TagIcon,
   PlusCircleIcon
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -95,7 +95,20 @@ export default async function ExpenseLayout({ children, params }) {
                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
               >
                 <PlusCircleIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Create Expense</span>
+                <span className="text-xs">New Expense</span>
+              </Link>
+            )}
+
+            {userData?.user?.expenseManager && (
+              <Link
+                href={`/${userData.business.companyName
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
+                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              >
+                <TagIcon className="h-6 w-6 text-gray-100" />
+                <span className="text-xs">Tags</span>
               </Link>
             )}
             </nav>
