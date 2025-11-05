@@ -170,7 +170,7 @@ export default function DebtorsReportModal({ data }) {
               jsPDF = require("jspdf").jsPDF;
             }
             doc.setFontSize(14);
-            doc.text("Debtors Report", 14, 20);
+            doc.text(`Debtors Report as at ${moment().format('YYYY-MM-DD HH:mm:ss')}`, 14, 20);
 
             doc.setFontSize(20);
             doc.text(`Total Debt: ${filtered.filter((c) => c.Debt > 0)
