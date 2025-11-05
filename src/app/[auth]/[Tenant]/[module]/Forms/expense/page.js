@@ -24,7 +24,6 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
     setErrors({ ...errors, [e.target.name]: undefined });
     setServerMsg(null);
     setServerError(null);
-    console.log(formData)
     };
 
      const validateForm = () => {
