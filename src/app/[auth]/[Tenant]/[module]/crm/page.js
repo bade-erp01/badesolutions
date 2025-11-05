@@ -51,7 +51,6 @@ export default async function CustomerListpage({ params }) {
       </div>
     );
   } catch (error) {
-    console.log(error.message);
     return <div>Failed to load customer data.</div>;
   }
 }

@@ -172,7 +172,12 @@ export default function DebtorsReportModal({ data }) {
             doc.setFontSize(14);
             doc.text("Debtors Report", 14, 20);
 
-            const tableData = filtered.map((entry, index) => [
+            doc.setFontSize(20);
+            doc.text(`Total Debt: ${filtered.filter((c) => c.Debt > 0)
+              .reduce((acc, curr) => acc + curr.Debt, 0)
+              .toLocaleString()}}`, 18, 20);
+
+            const tableData = filtered.sort((a, b) => a.Username.localeCompare(b.Username)).map((entry, index) => [
               index + 1,
               entry.Username,
               entry.CustomerCode || "",
