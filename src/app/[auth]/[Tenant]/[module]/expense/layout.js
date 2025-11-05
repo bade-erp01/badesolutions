@@ -4,6 +4,12 @@ import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
+import {
+  ClipboardDocumentListIcon,
+  PlusCircleIcon
+} from "@heroicons/react/24/outline";
+import Link from "next/link";
+import {Encrypt} from "../../../../../../Functions/Mics"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -50,11 +56,11 @@ export default async function ExpenseLayout({ children, params }) {
   const moduleList = await params;
 
   // check if user has access to crm and cash register
-  const AccountingFinder = userData.user.Apps.find((app) => {
+  const ExpenseFinder = userData.user.Apps.find((app) => {
     return app.Name === "Expense";
   });
 
-  if (!AccountingFinder) {
+  if (!ExpenseFinder) {
     return notFound();
   }
 
@@ -76,10 +82,22 @@ export default async function ExpenseLayout({ children, params }) {
             className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
             style={{ overflowY: "auto" }}
           >
-            {/* <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>
-            <hr className="border-gray-100 mb-4" /> */}
+            {/* <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>  */}
             <nav className="space-y-2">
               <BackButton />
+              <hr className="border-gray-100 mb-4" />
+               {userData?.user?.expenseUser && (
+              <Link
+                href={`/${userData.business.companyName
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
+                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              >
+                <PlusCircleIcon className="h-6 w-6 text-gray-100" />
+                <span className="text-xs">Create Expense</span>
+              </Link>
+            )}
             </nav>
           </aside>
 

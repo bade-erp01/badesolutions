@@ -1,10 +1,104 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import {plsWait, ErrorMessage, SuccessToast, Encrypt} from "../../../../../../../Functions/Mics"
+import {useRouter} from "next/navigation"
+import Swal from "sweetalert2";
 
-export default function Page({ data, initiator, Currentuser }) {
+export default function Page({ data, initiator, Currentuser,business,baseUrl }) {
   const [expense, setExpense] = useState(data.expense);
   const [user, setUser] = useState(initiator);
+  const Router = useRouter()
+
+
+ const DeleteExpense = async () => {
+  const confirm = await Swal.fire({
+    title: "Are you sure?",
+    text: "This action will permanently delete the expense.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it",
+    cancelButtonText: "Cancel",
+  });
+
+  if (!confirm.isConfirmed) {
+    Swal.fire("Cancelled", "Expense deletion was aborted.", "info");
+    return;
+  }
+
+  try {
+    plsWait("Submitting delete request...");
+
+    const request = await fetch(`${baseUrl}/api/Expense/${Encrypt(expense._id)}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${business.tenantId}`,
+        dbConnect: `Bearer ${business.rustyRoof}`,
+        access: `${Encrypt(Currentuser._id)}`,
+      },
+    });
+
+    const response = await request.json();
+
+    if (request.ok) {
+      Swal.fire("Deleted!", "Expense has been deleted.", "success");
+      Router.back();
+    } else {
+      throw new Error(response.error);
+    }
+  } catch (err) {
+    ErrorMessage(err.message);
+  }
+ };
+
+
+const ActionBTN = async (action) => {
+  const confirm = await Swal.fire({
+    title: "Are you sure?",
+    text: "This action will Approve expense and register entries into Head and sub accounting Ledgers.",
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonColor: "green",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, Proceed",
+    cancelButtonText: "Cancel",
+  });
+
+  if (!confirm.isConfirmed) {
+    Swal.fire("Cancelled", "Expense deletion was aborted.", "info");
+    return;
+  }
+
+  try {
+    plsWait("Submitting delete request...");
+
+        const request = await fetch(`${baseUrl}/api/Expense/${Encrypt(expense._id)}`, {
+        method: "PUT",
+        body: JSON.stringify(expense), 
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${business.tenantId}`,
+            dbConnect: `Bearer ${business.rustyRoof}`,
+            access: Encrypt(Currentuser._id), 
+        },
+        });
+
+    const response = await request.json();
+
+    if (request.ok) {
+      SuccessToast(response.message)
+      Router.refresh();
+    } else {
+      throw new Error(response.error);
+    }
+  } catch (err) {
+     ErrorMessage(err.message);
+  }
+};
+
 
   return (
     <>
@@ -186,9 +280,10 @@ export default function Page({ data, initiator, Currentuser }) {
         <div className="flex flex-wrap gap-4 pt-2">
           {Currentuser.expenseApprover && expense.status === "Pending" && (
             <>
-              <span
+              <button
+                onClick={()=>ActionBTN("Approved")}
                 className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
-                aria-label="Create Invoice"
+                aria-label="Approve Expense"
               >
                 <svg
                   data-slot="icon"
@@ -207,9 +302,10 @@ export default function Page({ data, initiator, Currentuser }) {
                   ></path>
                 </svg>
                 <span className="text-sm font-semibold">Approve Expense</span>
-              </span>
+              </button>
 
-              <span
+              <button
+                onClick={DeleteExpense}
                 className="flex items-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-red-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 "
                 aria-label="Delete Expense"
               >
@@ -230,12 +326,13 @@ export default function Page({ data, initiator, Currentuser }) {
                   ></path>
                 </svg>
                 <span className="text-sm font-semibold">Delete Expense</span>
-              </span>
+              </button>
             </>
           )}
 
           {Currentuser.expenseApprover && expense.status === "Approved" && (
-            <span
+            <button
+                onClick={()=>ActionBTN("Reverse")}
               className="flex items-center gap-2 bg-red-400 text-white px-5 py-2.5 rounded-lg shadow hover:bg-red-500 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 "
               aria-label="Reverse Expense"
             >
@@ -256,7 +353,7 @@ export default function Page({ data, initiator, Currentuser }) {
                 ></path>
               </svg>
               <span className="text-sm font-semibold">Reverse Expense</span>
-            </span>
+            </button>
           )}
         </div>
       </div>
