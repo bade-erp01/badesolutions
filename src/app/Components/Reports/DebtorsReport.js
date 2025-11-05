@@ -172,19 +172,19 @@ export default function DebtorsReportModal({ data }) {
             doc.setFontSize(14);
             doc.text(`Debtors Report as at ${moment().format('YYYY-MM-DD HH:mm:ss')}`, 14, 20);
 
-            doc.setFontSize(20);
+            doc.setFontSize(18);
             doc.text(`Total Debt: ${filtered.filter((c) => c.Debt > 0)
               .reduce((acc, curr) => acc + curr.Debt, 0)
               .toLocaleString()}`, 14, 28);
 
-            const tableData = filtered.sort((a, b) => a.Username.localeCompare(b.Username)).map((entry, index) => [
+            const tableData = filtered.sort((a, b) => a.Username.trim().localeCompare(b.Username.trim())).map((entry, index) => [
               index + 1,
               entry.Username,
               entry.CustomerCode || "",
               entry.phone,
               entry.Debt?.toLocaleString(),
               entry.creditLimit,
-              normalizeDate(entry.lastPayDate),
+              moment(normalizeDate(entry.lastPayDate) || "").format("DD-MM-YYYY") ,
               calculateDebtDays(entry.lastPayDate),
             ]);
 
