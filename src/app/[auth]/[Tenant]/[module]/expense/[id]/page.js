@@ -5,9 +5,8 @@ import {plsWait, ErrorMessage, SuccessToast, Encrypt} from "../../../../../../..
 import {useRouter} from "next/navigation"
 import Swal from "sweetalert2";
 
-export default function Page({ data, initiator, Currentuser,business,baseUrl }) {
+export default function Page({ data, Currentuser,business,baseUrl }) {
   const [expense, setExpense] = useState(data.expense);
-  const [user, setUser] = useState(initiator);
   const Router = useRouter()
 
 
@@ -102,7 +101,7 @@ const ActionBTN = async (action) => {
 
   return (
     <>
-      <div className="max-w-full p-2 md:py-10 bg-gray-100  animate__animated animate__fadeIn rounded-lg">
+      <div className="max-w-full p-3 m-3 md:py-10 bg-gray-200  animate__animated animate__fadeIn rounded-lg">
         {/* Product Image */}
         <div className="w-full flex justify-center mb-3">
           {expense.image ? (
@@ -131,7 +130,7 @@ const ActionBTN = async (action) => {
           <div className="flex flex-col items-center">
             <div
               className={`w-3 h-3 rounded-full ${
-                expense.status === "Pending" ? "bg-yellow-500" : "bg-gray-300"
+                expense.status === "pending" ? "bg-yellow-500" : "bg-gray-300"
               }`}
             ></div>
             <span className="text-xs mt-1 text-gray-700">Pending</span>
@@ -164,16 +163,6 @@ const ActionBTN = async (action) => {
           </div>
         </div>
 
-        {/* Product Info */}
-        <div className="text-center mb-6 space-y-1">
-          <h2 className="text-xl font-bold text-gray-800">
-            {expense.productName}
-          </h2>
-          <p className="text-sm text-gray-500">
-            <strong>Remark:</strong> {expense.remarks || "Not Available"}
-          </p>
-        </div>
-
         {/* Form */}
         <form className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,16 +189,16 @@ const ActionBTN = async (action) => {
             {/* pcs */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Raised:
+                Raised By:
               </label>
               <h5 className="text-gray-700 text-sm font-medium">
-                {user?.firstName} {user?.lastName}
+                {expense?.initiatorId}
               </h5>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Date:
+                Expense Date:
               </label>
               <h5 className="text-gray-700 text-sm font-medium">
                 {expense?.Date}
@@ -227,9 +216,9 @@ const ActionBTN = async (action) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Amount:
+                Requested Amount:
               </label>
-              {Currentuser.expenseApprover && expense.status === "Pending" ? (
+              {Currentuser.expenseApprover && expense.status === "pending" ? (
               <input
                 type="number"
                 value={expense?.Amount}
@@ -249,10 +238,10 @@ const ActionBTN = async (action) => {
               <label className="block text-sm font-medium text-gray-700">
                 payment Date:
               </label>
-              {Currentuser.expenseApprover && expense.status === "Pending" ? (
+              {Currentuser.expenseApprover && expense.status === "pending" ? (
               <input
                 type="date"
-                value={expense?.paymentDate.slice(0, 10)}
+                value={expense?.paymentDate?.slice(0, 10)}
                 name="paymentDate"
                 className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -266,10 +255,10 @@ const ActionBTN = async (action) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Status:
+                Remarks:
               </label>
-              <h5 className="text-gray-700 text-xl font-medium">
-                {expense?.status}
+              <h5 className="text-gray-700 text-sm font-medium">
+                {expense?.remarks}
               </h5>
             </div>
           </div>
@@ -278,7 +267,7 @@ const ActionBTN = async (action) => {
         </form>
 
         <div className="flex flex-wrap gap-4 pt-2">
-          {Currentuser.expenseApprover && expense.status === "Pending" && (
+          {Currentuser.expenseApprover && expense.status === "pending" && (
             <>
               <button
                 onClick={()=>ActionBTN("Approved")}

@@ -64,7 +64,6 @@ export default async function ExpenseLayout({ children, params }) {
         const data = await res.json();
         
         if(!data.expense) return notFound()
-        const initiator = await User.findById(data.initiatorId).select('+firstName +lastName').lean()
 
-      return <Page data={data} initiator={initiator} baseUrl={baseUrl} Currentuser={userData.user} business={userData.business}/>
+      return <Page data={data} baseUrl={baseUrl} Currentuser={userData.user} business={userData.business}/>
   }

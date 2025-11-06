@@ -7,7 +7,7 @@ import { plsWait, ErrorMessage, SuccessToast, Encrypt } from "../../../../../../
 
 
 
-export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
+export default function Page({StoreList,businessData,userData,ExpenseCatList,baseUrl}) {
     const [serverMsg, setServerMsg] = useState(null);
     const [serverError, setServerError] = useState(null);
     const [formData, setFormData] = useState({
@@ -16,7 +16,8 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-
+    const router = useRouter()
+    const params = useParams()
 
 
     const handleChange = (e) => {
@@ -26,30 +27,30 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
     setServerError(null);
     };
 
-     const validateForm = () => {
-    const newErrors = {};
-    if (!formData.Username || formData.Username.length < 2) {
-      newErrors.Username = "Name is required and must be at least 2 characters.";
-    }
-    if (!formData.phone || !/^\d{10,15}$/.test(formData.phone)) {
-      newErrors.phone = "Telephone is required and must be valid.";
-    }
-    if (!formData.Email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.Email)) {
-      newErrors.Email = "Email is required and must be valid.";
-    }
-    if (formData.Debt && isNaN(formData.Debt)) {
-      newErrors.Debt = "Opening Balance must be a number.";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+//      const validateForm = () => {
+//     const newErrors = {};
+//     if (!formData.Username || formData.Username.length < 2) {
+//       newErrors.Username = "Name is required and must be at least 2 characters.";
+//     }
+//     if (!formData.phone || !/^\d{10,15}$/.test(formData.phone)) {
+//       newErrors.phone = "Telephone is required and must be valid.";
+//     }
+//     if (!formData.Email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.Email)) {
+//       newErrors.Email = "Email is required and must be valid.";
+//     }
+//     if (formData.Debt && isNaN(formData.Debt)) {
+//       newErrors.Debt = "Opening Balance must be a number.";
+//     }
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
 
      const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        // if (!validateForm()) return;
     
         try {
-          plsWait('Submitung customer data...');
+          plsWait('Submitung Expense data...');
           const config = {
             headers: {
               "Content-Type": "application/json",
@@ -61,7 +62,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
           };
     
           const response = await axios.post(
-            `${EXPRESS_PRIVATE_URL}/${businessData.companyName}/Sales/Register-customer`,
+            `${baseUrl}/api/Expense`,
             formData,
             config
           );
@@ -70,13 +71,13 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
           setFormData({});
     
           ///redirect to sigle customer page
-          router.push(`/${params.auth}/${params.Tenant}/${`crm`}/${`crm`}/${response.data.newCustomer }?Modules=${`crm`}`)
+          router.push(`/${params.auth}/${params.Tenant}/${`expense`}/${`expense`}/${response.data.expense }?Modules=${`expense`}`)
           
         } catch (error) {
           ErrorMessage(
             error.response?.data?.message ||
               error.message ||
-              "Failed to create customer. Please try again."
+              "Failed to create expense. Please try again."
           );
         }
       };
@@ -114,7 +115,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
             onChange={handleChange}
             value={formData.payee || ""}
             className={`mt-2 block w-full  border ${
-              errors.Username ? "border-red-400" : "border-gray-300"
+              errors.payee ? "border-red-400" : "border-gray-300"
             } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
             placeholder="Beneficiary Name"
           />
@@ -134,7 +135,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
             onChange={handleChange}
             value={formData.payeebankAccount || ""}
             className={`mt-2 block w-full  border ${
-              errors.phone ? "border-red-400" : "border-gray-300"
+              errors.payeebankAccount ? "border-red-400" : "border-gray-300"
             } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
             placeholder="e.g. 0123456789"
           />
@@ -153,13 +154,31 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList}) {
             onChange={handleChange}
             value={formData.payeeBankName || ""}
             className={`mt-2 block w-full  border ${
-              errors.Email ? "border-red-400" : "border-gray-300"
+              errors.payeeBankName ? "border-red-400" : "border-gray-300"
             } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
             placeholder="Gt Bank..."
           />
           {errors.payeeBankName && <p className="text-red-500 text-xs mt-1">{errors.payeeBankName}</p>}
         </div>
 
+         <div>
+          <label htmlFor="Date" className="block text-sm font-medium text-gray-700">
+            Date <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="Date"
+            name="Date"
+            type="date"
+            onChange={handleChange}
+            value={formData.Date || ""}
+            className={`mt-2 block w-full  border ${
+              errors.Date ? "border-red-400" : "border-gray-300"
+            } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
+            placeholder="Gt Bank..."
+          />
+          {errors.Date && <p className="text-red-500 text-xs mt-1">{errors.Date}</p>}
+        </div>
+        
         {/* Start Balance */}
         <div>
           <label htmlFor="Amount" className="block text-sm font-medium text-gray-700"> 

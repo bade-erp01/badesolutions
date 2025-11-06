@@ -117,7 +117,7 @@ const ExpenseCatList = await ExpenseCat.json();
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               {/* display Charts of accounts */}
-              <Page  StoreList={StoreList} businessData={userData.business} userData={userData.user} ExpenseCatList={ExpenseCatList}/>
+              <Page  StoreList={StoreList} businessData={userData.business} userData={userData.user} ExpenseCatList={ExpenseCatList} baseUrl={baseUrl}/>
             </section>
           </main>
         </div>
