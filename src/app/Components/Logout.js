@@ -40,7 +40,7 @@ export default function Logout({ userData }) {
       onClick={logout}
       disabled={isLoggingOut}
       className={`flex items-center text-xs gap-3 px-4 py-2 w-full mt-2 rounded-md transition-colors ${
-        isLoggingOut ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-700"
+        isLoggingOut ? "bg-gray-400 cursor-not-allowed" : "bg-purple-500 hover:bg-purple-700"
       }`}
       aria-label="Logout"
     >
