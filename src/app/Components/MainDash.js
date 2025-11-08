@@ -411,7 +411,7 @@ export default function MainDash({ userData }) {
               </h3>
               <div className="flex flex-col">
                 <h4 className="text-sm text-gray-500 font-semibold mb-4">
-                  Sales Performance Millestone
+                  Sales Team Kpi Millestone
                 </h4>
 
                 {tenantData.result.map((person, index) => (
