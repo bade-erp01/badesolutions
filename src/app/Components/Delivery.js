@@ -96,7 +96,7 @@ export const showDeliveryModal = (id,user,business) => {
                 SuccessToast("WayBill generated successfully!");
                 window.location.reload(); // A quick workaround to force refresh
             } else {
-                ErrorMessage("Failed to generate WayBill.");
+                ErrorMessage(response.error);
             }
         }).catch(error => {
             ErrorMessage("An error occurred while generating WayBill.");
