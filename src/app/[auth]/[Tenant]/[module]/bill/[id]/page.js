@@ -726,7 +726,7 @@ export default function InvoicePage({
               onClick={() =>
                 showDeliveryModal(
                   Singlebill._id,
-                  Encrypt(userInfo.user._id),
+                  userInfo.user,
                   userInfo.business
                 )
               }

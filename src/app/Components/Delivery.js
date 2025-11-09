@@ -77,12 +77,12 @@ export const showDeliveryModal = (id,user,business) => {
             vehicleNumber: deliveryDetails.plateNumber,
             DeliveryComment: deliveryDetails.deliveryRemarks,
             billId: id,
-            userId: Dencrypt(user),
+            userId: user._id,
             WayBillNo:`WB${Math.floor(Math.random()*12345)}${deliveryDetails.plateNumber.substring(0,3)}`
         };
 
       // Handle backend or navigation here
-      const url = `${EXPRESS_PRIVATE_URL}/api/delivery/${id}/${Dencrypt(user)}`
+      const url = `${EXPRESS_PRIVATE_URL}/api/delivery/${id}/${user.firstName}`
 
         fetch(url, {
             method: 'PATCH',
@@ -96,7 +96,7 @@ export const showDeliveryModal = (id,user,business) => {
                 SuccessToast("WayBill generated successfully!");
                 window.location.reload(); // A quick workaround to force refresh
             } else {
-                ErrorMessage(response.error);
+                ErrorMessage("Failed to generate WayBill.");
             }
         }).catch(error => {
             ErrorMessage("An error occurred while generating WayBill.");
