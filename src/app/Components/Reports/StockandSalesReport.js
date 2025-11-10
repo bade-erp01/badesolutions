@@ -8,7 +8,7 @@ import { Encrypt } from "../../../../Functions/Functions";
 import { plsWait, ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
 import { useState } from "react";
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import autoTable from "jspdf-autotable";
 
 export default function StockandSalesReport({
   baseUrl,
@@ -22,7 +22,9 @@ export default function StockandSalesReport({
   const [InvoiceList, setInvoiceList] = useState([]);
   const [Stores, setStores] = useState([]);
   const [inventoryItem, setInventoryItem] = useState([]);
+   const doc = new jsPDF();
 
+   
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -95,7 +97,7 @@ export default function StockandSalesReport({
   // prodduct Name
   const getSToreProdduct = (id) => {
     const selectedProduct = inventory.find((element) => element._id === id);
-    const MainProdduct = product.find((element) => element._id === selectedProduct.productId);
+    const MainProdduct = product.find((element) => element._id === selectedProduct?.productId);
     return MainProdduct?.Name || "";
   };
 
@@ -334,7 +336,7 @@ export default function StockandSalesReport({
           ">
             ⬇ Download Excel
           </button>
-           <button disabled id="downloadPdfBtn" class="swal2-confirm swal2-styled" style="
+           <button id="downloadPdfBtn" class="swal2-confirm swal2-styled" style="
             background-color: #2b6cb0;
             color: white;
             padding: 6px 12px;
@@ -455,8 +457,8 @@ export default function StockandSalesReport({
             item.Stock
           ]);
 
-          const doc = new jsPDF();
-          doc.autoTable({
+         
+          autoTable(doc,{
             head: [["Product", "Vendor", "Store", "Case [Buy]", "Pcs [Buy]", "Case [Sell]", "Pcs [Sell]", "Case Retured", "Pcs Retured", "Avail. Stock"]],
             body: pdfData,
           });
