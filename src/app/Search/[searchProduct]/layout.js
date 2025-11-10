@@ -1,6 +1,6 @@
 
 import { fetchUser } from '../../../../Functions/useerDataRefresh'
-import {Encrypt,EXPRESS_PRIVATE_URL} from "../../../../Functions/Functions"
+import {Encrypt,Dencrypt} from "../../../../Functions/Functions"
 import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import Link from "next/link"
@@ -66,12 +66,12 @@ export default async function searchLayout({children, params }) {
           <BackButton />
           <hr />
           <nav className="space-y-4  h-[520px] max-h-[600px] overflow-y-auto ">
-           {data.length > 0 && (
+           {/* {Dencrypt(data).length > 0 && (
               <ExcelDownloadBtn
-                data={data}
+                data={Dencrypt(data)}
                 page={`Search result for ${moduleList?.searchProduct || "Unknown Module"}`}
               />
-            )}
+            )} */}
           </nav>
 
           {/* Bottom Section with Settings Link */}
