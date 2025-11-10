@@ -18,7 +18,7 @@ export default function ExcelDownloadBtn({data,page}) {
       quality={100}
       />
       {/* <ArrowDownTrayIcon className="h-6 w-6 text-gray-100" /> */}
-      <small>Export {page}</small>
+      <small className='text-black font-bold'>Export {page}</small>
     </span>
   );
 }
