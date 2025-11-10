@@ -147,7 +147,7 @@ export default function SearchResultPage({ result, linkData }) {
         >
           <ExcelDownloadBtn
             data={filteredModules}
-            page={`result for ${searchTerm}`}
+            page={`Search result for ${searchTerm}`}
           />
         </div>
       )}
