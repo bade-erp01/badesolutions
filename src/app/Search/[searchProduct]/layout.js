@@ -45,7 +45,7 @@ export default async function searchLayout({children, params }) {
   };
 
   // make api request to server to get cached data
-  const url = `${EXPRESS_PRIVATE_URL}/api/search/${moduleList.searchProduct}`;
+  const url = `${process.env.EXPRESS_PRIVATE_URL}/api/search/${moduleList.searchProduct}`;
   // Await axios call directly
   const { data } = await axios.get(url,config);
 
