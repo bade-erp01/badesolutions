@@ -110,7 +110,6 @@ export default function Login({userInfo,businessInfo,url}) {
           .replace(/[^a-z0-9-]/g, "");
 
         const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(data.Newcustomer._id)}`;
-
         // Redirect using Next.js router
         router.push(dashboardUrl);
       } else if (data.error) {
