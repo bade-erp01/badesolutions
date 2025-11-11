@@ -231,29 +231,43 @@ export default function DebtorsReportModal({ data, business, users }) {
           };
 
           // PDF download uses the current filtered list (create new doc each time)
-          document.getElementById("downloadDebtorsPDF").onclick = () => {
+            document.getElementById("downloadDebtorsPDF").onclick = () => {
             // create landscape A4 PDF for better table width
             const doc = new jsPDF("landscape", "pt", "a4");
-            const margin = { top: 60, left: 40, right: 40 };
             const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = { top: 70, left: 40, right: 40, bottom: 40 };
+            const usableWidth = pageWidth - margin.left - margin.right;
+            const centerX = pageWidth / 2;
 
             // header: business name, title, timestamp, optional logo
             doc.setFontSize(16);
             doc.setTextColor("#2c3e50");
             const businessName = business?.companyName || "Business";
-            doc.text(businessName, margin.left, 30);
+            // center business name
+            doc.text(businessName, centerX, 36, { align: "center" });
 
             doc.setFontSize(12);
             doc.setTextColor("#34495e");
-            doc.text(`Debtors Report`, margin.left, 48);
-            doc.setFontSize(10);
-            doc.text(`Generated: ${moment().format("YYYY-MM-DD HH:mm:ss")}`, pageWidth - margin.right - 200, 30);
+            doc.text(`Debtors Report`, centerX, 54, { align: "center" });
 
-            // try to draw logo if provided as data URL
+            doc.setFontSize(10);
+            doc.setTextColor("#6b7280");
+            const genText = `Generated: ${moment().format("YYYY-MM-DD HH:mm:ss")}`;
+            // right aligned timestamp within margins
+            doc.text(genText, pageWidth - margin.right, 30, { align: "right" });
+
+            // try to draw logo if provided as data URL (place it within top-right margin but inside usable area)
             try {
-              if (business?.companyLogo && typeof business.companyLogo === "string" && business.companyLogo.startsWith("data:image")) {
-            // place logo top-right
-            doc.addImage(business.logo, "PNG", pageWidth - margin.right - 60, 8, 50, 30);
+              const logoData = business?.companyLogo;
+              if (logoData && typeof logoData === "string" && logoData.startsWith("data:image")) {
+              const imgTypeMatch = logoData.match(/^data:image\/(png|jpeg|jpg)/i);
+              const imgType = imgTypeMatch ? imgTypeMatch[1].toUpperCase() : "PNG";
+              const logoW = 60;
+              const logoH = 30;
+              const logoX = pageWidth - margin.right - logoW;
+              const logoY = 8;
+              doc.addImage(logoData, imgType, logoX, logoY, logoW, logoH);
               }
             } catch (err) {
               // ignore logo errors
@@ -263,19 +277,19 @@ export default function DebtorsReportModal({ data, business, users }) {
             const tableData = filtered
               .sort((a, b) => a.Username.trim().localeCompare(b.Username.trim()))
               .map((entry, index) => [
-          index + 1,
-          entry.Username,
-          FilterPriceList(entry.priceList),
-          FilterSaLePerson(entry.salesPerson),
-          entry.CustomerCode || "",
-          entry.phone || "",
-          entry.State || "",
-          Number(parseFloat(entry.Debt || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-          Number(entry.creditLimit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-          moment(normalizeDate(entry.lastPayDate) || "").isValid()
-            ? moment(normalizeDate(entry.lastPayDate)).format("DD-MM-YYYY")
-            : "",
-          calculateDebtDays(entry.lastPayDate),
+              index + 1,
+              entry.Username,
+              FilterPriceList(entry.priceList),
+              FilterSaLePerson(entry.salesPerson),
+              entry.CustomerCode || "",
+              entry.phone || "",
+              entry.State || "",
+              Number(parseFloat(entry.Debt || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+              Number(entry.creditLimit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+              moment(normalizeDate(entry.lastPayDate) || "").isValid()
+                ? moment(normalizeDate(entry.lastPayDate)).format("DD-MM-YYYY")
+                : "",
+              calculateDebtDays(entry.lastPayDate),
               ]);
 
             // column headers
@@ -284,60 +298,64 @@ export default function DebtorsReportModal({ data, business, users }) {
             // generate a formatted total string
             const totalDebtFormatted = Number(totalDebt.toFixed(2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-            // draw table with better styling
+            // draw table with better styling and margins so it stays inside page
             autoTable(doc, {
               startY: margin.top,
+              margin: { left: margin.left, right: margin.right, top: margin.top, bottom: margin.bottom },
               head,
               body: tableData,
               styles: {
-          fontSize: 9,
-          cellPadding: 6,
-          overflow: "linebreak",
+              fontSize: 9,
+              cellPadding: 6,
+              overflow: "linebreak",
+              valign: "middle",
               },
               headStyles: {
-          fillColor: [41, 128, 185],
-          textColor: 255,
-          halign: "center",
+              fillColor: [41, 128, 185],
+              textColor: 255,
+              halign: "center",
               },
               alternateRowStyles: { fillColor: [245, 247, 250] },
               columnStyles: {
-          0: { cellWidth: 30, halign: "center" },
-          1: { cellWidth: 160 },
-          2: { cellWidth: 80 },
-          3: { cellWidth: 120 },
-          4: { cellWidth: 60 },
-          5: { cellWidth: 90 },
-          6: { cellWidth: 70 },
-          7: { cellWidth: 80, halign: "right" },
-          8: { cellWidth: 80, halign: "right" },
-          9: { cellWidth: 70, halign: "center" },
-          10: { cellWidth: 50, halign: "center" },
+              0: { cellWidth: 30, halign: "center" },   // #
+              1: { cellWidth: 180 },                     // Customer
+              2: { cellWidth: 80 },                      // PriceList
+              3: { cellWidth: 120 },                     // Rep
+              4: { cellWidth: 60 },                      // Code
+              5: { cellWidth: 90 },                      // Phone
+              6: { cellWidth: 60 },                      // State
+              7: { cellWidth: 80, halign: "right" },     // Debt
+              8: { cellWidth: 80, halign: "right" },     // Credit Limit
+              9: { cellWidth: 80, halign: "center" },    // Last Payment
+              10: { cellWidth: 50, halign: "center" },   // Days
               },
+              // ensure table width does not exceed usable area
+              tableWidth: usableWidth,
               theme: "striped",
               didDrawPage: (dataArg) => {
-          // footer with page number and total debt summary
-          const pageCount = doc.internal.getNumberOfPages();
-          const str = "Page " + pageCount;
-          doc.setFontSize(9);
-          doc.setTextColor("#7f8c8d");
-          doc.text(str, pageWidth - margin.right - 40, doc.internal.pageSize.getHeight() - 10);
+              // footer with page number
+              const pageCount = doc.internal.getNumberOfPages();
+              const pageNumber = dataArg.pageNumber || pageCount;
+              const pageStr = "Page " + pageNumber + " / " + pageCount;
+              doc.setFontSize(9);
+              doc.setTextColor("#7f8c8d");
+              doc.text(pageStr, pageWidth - margin.right, pageHeight - 10, { align: "right" });
 
-          // if last page, place total debt below the table
-          if (dataArg.pageNumber === doc.internal.getNumberOfPages()) {
-            const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : dataArg.cursor?.y || dataArg.startY;
-            const yPos = finalY + 18;
-            doc.setFontSize(11);
-            doc.setTextColor("#2c3e50");
-            doc.text(`Total Debt: ${totalDebtFormatted}`, margin.left, yPos);
-          }
+              // if last page, place total debt below the table (inside margins)
+              const isLastPage = pageNumber === pageCount;
+              if (isLastPage) {
+                const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : dataArg.cursor?.y || dataArg.startY;
+                const yPos = Math.min(finalY + 18, pageHeight - margin.bottom - 10);
+                doc.setFontSize(11);
+                doc.setTextColor("#2c3e50");
+                doc.text(`Total Debt: ${totalDebtFormatted}`, margin.left, yPos);
+              }
               },
-              // limit column widths if needed, keep table within page
-              tableWidth: pageWidth - margin.left - margin.right,
             });
 
             // save PDF
             doc.save(`Debtors_Report_${moment().format("YYYYMMDD_HHmmss")}.pdf`);
-          };
+            };
         };
 
         // Attach filter listeners for all filters so table updates whenever any filter changes
