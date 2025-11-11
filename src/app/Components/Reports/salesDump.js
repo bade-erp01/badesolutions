@@ -4,64 +4,55 @@ import Swal from "sweetalert2";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
-import { plsWait,Encrypt } from "../../../../Functions/Mics";
+import { plsWait, Encrypt } from "../../../../Functions/Mics";
 import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
 import moment from "moment";
 
-const SalesDumpModal = ({business}) => {
+const SalesDumpModal = ({ business }) => {
   const [salesDatas, setSalesDatas] = useState([]);
-  const [ProductList,setProductList] = useState([]);
+  const [ProductList, setProductList] = useState([]);
   const [StoreList, setStoreList] = useState([]);
-  const [Vendors, setVendorList] = useState([])
+  const [Vendors, setVendorList] = useState([]);
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
     product: "",
   });
 
-  // const productOptions = ProductList.map(
-  //     (product) => `<option value="${product._id}">${product.Name}</option>`
-  //   ).join("");
+  // helpers that can operate on provided lists (or fall back to state)
+  const getProductName = (id, products = ProductList) => {
+    try {
+      const prod = products.find((p) => p._id === id);
+      return (prod && prod.Name) || "N/A";
+    } catch (error) {
+      return "N/A";
+    }
+  };
 
-    //get prooduct name
-    const filterProductName = (id) => {
-      try {
-        const prod = ProductList.find((p) => p._id === id);
-        return prod.Name || "N/A";
-      } catch (error) {
-        return "N/A";
-      }
-    };
+  const getStoreName = (id, stores = StoreList) => {
+    try {
+      const store = stores.find((s) => s._id === id);
+      return (store && store.WHName) || "N/A";
+    } catch (error) {
+      return "N/A";
+    }
+  };
 
+  const getVendorName = (id, vendors = Vendors) => {
+    try {
+      const vendor = vendors.find((v) => v._id === id);
+      return vendor ? vendor.Name : "N/A";
+    } catch (error) {
+      return "N/A";
+    }
+  };
 
-    //get store name
-    const filterStoreName = (id) => {
-      try {
-        const store = StoreList.find((s) => s._id === id);
-        return  store.WHName || "N/A";
-      }
-      catch (error) {
-        return "N/A";
-      }
-    };
+  // filterSales can accept explicit arrays so we can preview using fetched data immediately
+  const filterSales = (activeFilters, salesArr = salesDatas, products = ProductList, stores = StoreList, vendors = Vendors) => {
+    if (!salesArr || salesArr.length === 0) return [];
+    const filteredExport = [];
 
-    //get vendor name
-    const filterVendorName = (id) => {
-      try {
-        const vendor = Vendors.find((v) => v._id === id);
-        return vendor ? vendor.Name : "N/A";
-      }catch (error) {
-        return "N/A";
-      }
-    };
-
-
-
-  const filterSales = (activeFilters) => {
-    if (!salesDatas || salesDatas.length === 0) return [];
-    const filteredExport = [];    
-
-    salesDatas.forEach((sale) => {
+    salesArr.forEach((sale) => {
       const saleDate = new Date(sale.startDate);
       const start = activeFilters.startDate ? new Date(activeFilters.startDate) : null;
       const end = activeFilters.endDate ? new Date(activeFilters.endDate) : null;
@@ -69,20 +60,20 @@ const SalesDumpModal = ({business}) => {
       const matchesDate = (!start || saleDate >= start) && (!end || saleDate <= end);
       if (!matchesDate) return;
 
-      sale.orders.forEach((order) => {
+      (sale.orders || []).forEach((order) => {
         const matchesProduct = activeFilters.product
           ? order.item._id?.toString().includes(activeFilters.product.toString())
           : true;
 
         if (matchesProduct) {
           filteredExport.push({
-           "Ref-No": sale.billReferenceNo,
+            "Ref-No": sale.billReferenceNo,
             Status: sale.billStatus,
             WB_No: sale.WayBillNo || "N/A",
-            Store: filterStoreName(sale.whId),
+            Store: getStoreName(sale.whId, stores),
             Invoicer: sale.RaiseBy,
             Customer: sale.customerName,
-            product: filterProductName(order.item._id),
+            product: getProductName(order.item._id, products),
             "Sys-Code": order.item.ACDcode || order.item.ADCcode,
             Trace: order.returnId,
             Batch: order.BatchId,
@@ -93,13 +84,13 @@ const SalesDumpModal = ({business}) => {
             Unit: order.priceListPrice,
             Total: order.total,
             "Manuf-Code": order.item.Manufacture_code,
-            Vendor: filterVendorName(order.item.Vendor),
-            Promo_Sum: order.promotionData * order.Qty,
-           "PriceList":sale.priceList,
+            Vendor: getVendorName(order.item.Vendor, vendors),
+            Promo_Sum: (order.promotionData || 0) * (order.Qty || 0),
+            PriceList: sale.priceList,
             Ord_Date: sale.startDate,
-            Inv_Date: moment(sale.DELIVERYDATE).format('l') || "N/A",
-            Inv_Sub:sale.subTotal,
-            Inv_Total:sale.grandTotal,
+            Inv_Date: moment(sale.DELIVERYDATE).format("l") || "N/A",
+            Inv_Sub: sale.subTotal,
+            Inv_Total: sale.grandTotal,
             Month: new Date(sale.startDate).toLocaleString("default", { month: "short" }),
             Year: new Date(sale.startDate).getFullYear(),
           });
@@ -136,7 +127,6 @@ const SalesDumpModal = ({business}) => {
               <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
               <input type="date" id="endDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
             </div>
-           
           </div>
         </div>
       `,
@@ -153,7 +143,6 @@ const SalesDumpModal = ({business}) => {
         return {
           startDate: document.getElementById("startDate").value,
           endDate: document.getElementById("endDate").value,
-          // product: document.getElementById("product").value,
         };
       },
     }).then(async (result) => {
@@ -167,7 +156,7 @@ const SalesDumpModal = ({business}) => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-              dbConnect:`Bearer ${business.rustyRoof}`,
+              dbConnect: `Bearer ${business.rustyRoof}`,
             },
           }
         );
@@ -177,16 +166,20 @@ const SalesDumpModal = ({business}) => {
           Swal.fire("Error", data.message || "Failed to fetch sales data.", "error");
           return;
         }
+
+        // update state (for later use)...
         setSalesDatas(data.invoice);
-        setProductList(data.Products)
-        setStoreList(data.Stores)
-        setVendorList(data.Vendors)
+        setProductList(data.Products);
+        setStoreList(data.Stores);
+        setVendorList(data.Vendors);
 
         Swal.close();
 
         const activeFilters = result.value;
         setFilters(activeFilters);
-        const previewData = filterSales(activeFilters);
+
+        // Build preview using the fetched data directly (fixes "no data on first load")
+        const previewData = filterSales(activeFilters, data.invoice, data.Products, data.Stores, data.Vendors);
 
         if (previewData.length === 0) {
           Swal.fire("No results found", "Try adjusting your filters.", "info");
@@ -262,8 +255,8 @@ const SalesDumpModal = ({business}) => {
   };
 
   return (
-    <button onClick={openModal} className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full" > 
-    <FolderArrowDownIcon className="h-5 w-5 text-white" /> Export Sales Dump 
+    <button onClick={openModal} className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
+      <FolderArrowDownIcon className="h-5 w-5 text-white" /> Export Sales Dump
     </button>
   );
 };
