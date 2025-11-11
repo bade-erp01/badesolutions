@@ -33,13 +33,55 @@ export default function StockReportModal({ baseUrl, userData }) {
       setVendorList(fetchedData.vendorList || []);
       setProductList(fetchedData.productList || []);
 
+      // build maps from fetched data so we don't rely on React state (which updates async)
+      const prodMap = {};
+      (fetchedData.productList || []).forEach((p) => {
+        if (p && p._id) prodMap[p._id] = p;
+      });
+      const vendorMap = {};
+      (fetchedData.vendorList || []).forEach((v) => {
+        if (v && v._id) vendorMap[v._id] = v;
+      });
+      const storeMap = {};
+      (fetchedData.storeList || []).forEach((s) => {
+        if (s && s._id) storeMap[s._id] = s;
+      });
+
       // use inventory from fetchedData directly to avoid reading stale state
       const inventory = Array.isArray(fetchedData.inventoryItem)
         ? fetchedData.inventoryItem
         : [];
 
+      // local helpers that use the fresh maps
+      const localGetProductName = (id) => {
+        const p = prodMap[id];
+        return p?.Name || "";
+      };
+      const localGetVendor = (id) => {
+        const v = vendorMap[id];
+        return v?.Name || v?.NAME || "";
+      };
+      const localGetStore = (id) => {
+        const s = storeMap[id];
+        return s?.WHName || "";
+      };
+      const localGetProductBuyingPrice = (id) => {
+        const p = prodMap[id];
+        return p?.BuyingPrice || 0;
+      };
+      const localGetValue = (productId, caseQty, pcsQty) => {
+        const product = prodMap[productId];
+        if (!product) return 0;
+        const buyingPrice = Number(product.BuyingPrice) || 0;
+        const pieces = Number(product.Pieces) || 1;
+        const unitPrice = pieces ? buyingPrice / pieces : 0;
+        const pieceCost = (pcsQty || 0) * unitPrice;
+        const caseCost = (caseQty || 0) * buyingPrice;
+        const totalCost = pieceCost + caseCost;
+        return parseFloat(totalCost.toFixed(2));
+      };
+
       // build initial data with products and store products, filter out product with no stock
-      // NOTE: use `inventory` (fresh data) rather than state variable to avoid race conditions
       const initialFilteredData = inventory
         .filter(
           (item) =>
@@ -50,9 +92,9 @@ export default function StockReportModal({ baseUrl, userData }) {
         .map((item) => {
           return {
             productId: item.productId,
-            productName: getProductName(item.productId),
+            productName: localGetProductName(item.productId),
             ADCcode: item.ADCcode || item.ACDcode || "",
-            Vendor: getVendor(item.Vendor),
+            Vendor: localGetVendor(item.Vendor),
             VendorId: item.Vendor, // keep id for filtering
             WHIDS: item.WHIDS,
             currentQty: item.currentQty || 0,
@@ -61,22 +103,27 @@ export default function StockReportModal({ baseUrl, userData }) {
               ? moment(item.LastBatchDate).format("YYYY-MM-DD")
               : "",
             ExpDate: item.ExpDate || "",
-            VendorPrice: getProductBuyingPrice(item.productId),
-            value: getValue(item.productId, item.currentQty, item.pcs),
+            VendorPrice: localGetProductBuyingPrice(item.productId),
+            value: localGetValue(item.productId, item.currentQty, item.pcs),
           };
         });
 
       setFilteredData(initialFilteredData);
-      // pass the freshly prepared rows to the modal to avoid state update race
-      showModal(initialFilteredData);
+      // pass fresh lists and rows to showModal so it uses the fresh fetched data (not stale React state)
+      showModal(initialFilteredData, {
+        stores: fetchedData.storeList || [],
+        vendors: fetchedData.vendorList || [],
+        products: fetchedData.productList || [],
+        prodMap,
+      });
     } catch (error) {
       ErrorMessage(error.message);
     }
   };
 
+  // keep these for other uses (they will use React state if necessary)
   const getVendor = (id) => {
     const selectedCustomer = vendorList.find((cust) => cust._id === id);
-    // support different casing from backend (Name or NAME)
     return selectedCustomer?.Name || selectedCustomer?.NAME || "";
   };
 
@@ -99,60 +146,85 @@ export default function StockReportModal({ baseUrl, userData }) {
     if (!data || !Array.isArray(data.productList)) return 0;
     const product = data.productList.find((prod) => prod._id === productId);
     if (!product) return 0;
-
     const buyingPrice = Number(product.BuyingPrice) || 0;
     const pieces = Number(product.Pieces) || 1;
-
     const unitPrice = pieces ? buyingPrice / pieces : 0;
     const pieceCost = (pcsQty || 0) * unitPrice;
     const caseCost = (caseQty || 0) * buyingPrice;
     const totalCost = pieceCost + caseCost;
-
     return parseFloat(totalCost.toFixed(2));
   };
 
-  const getTotalValue = (rows) => {
-    return rows
-      .reduce((acc, item) => acc + getValue(item.productId, item.currentQty, item.pcs), 0)
-      .toFixed(2);
-  };
+  // showModal accepts rows and fresh lists (so UI renders immediately using fresh data)
+  const showModal = (rowsData = [], lists = {}) => {
+    // lists: { stores, vendors, products, prodMap }
+    const usedStores = Array.isArray(lists.stores) ? lists.stores : stores;
+    const usedVendors = Array.isArray(lists.vendors)
+      ? lists.vendors
+      : vendorList;
+    const usedProducts = Array.isArray(lists.products)
+      ? lists.products
+      : productList;
+    const prodMap = lists.prodMap || {};
 
-  const generateTableRows = (rows) => {
-    const rowsHtml = rows
-      .map(
-        (item, index) => `
-      <tr style="border-bottom: 1px solid #e2e8f0;">
-        <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px;">${getStore(item.WHIDS)}</td>
-        <td style="padding: 4px;">${(item.productName || "").trim()}</td>
-        <td style="padding: 4px;">${item.ADCcode || ""}</td>
-        <td style="padding: 4px;">${item.Vendor}</td>
-        <td style="padding: 4px;">${item.currentQty}</td>
-        <td style="padding: 4px;">${item.pcs}</td>
-        <td style="padding: 4px;">${item.LastBatchDate}</td>
-        <td style="padding: 4px;">${item.ExpDate}</td>
-        <td style="padding: 4px;">${item.VendorPrice}</td>
-        <td style="padding: 4px;">${item.value}</td>
-      </tr>`
-      )
-      .join("");
+    const localGetStore = (id) => {
+      const s = (usedStores || []).find((x) => x._id === id) || (lists.stores && lists.stores.find((x) => x._id === id));
+      return s?.WHName || "";
+    };
+    const localGetProductName = (id) => {
+      const p = (usedProducts || []).find((x) => x._id === id) || prodMap[id];
+      return p?.Name || "";
+    };
+    const localGetVendor = (id) => {
+      const v = (usedVendors || []).find((x) => x._id === id);
+      return v?.Name || v?.NAME || "";
+    };
+    const localGetValue = (item) => {
+      // attempt to use prodMap if available, else fallback to outer getValue
+      const product = prodMap[item.productId] || (data && data.productList && data.productList.find((p) => p._id === item.productId));
+      if (!product) return 0;
+      const buyingPrice = Number(product.BuyingPrice) || 0;
+      const pieces = Number(product.Pieces) || 1;
+      const unitPrice = pieces ? buyingPrice / pieces : 0;
+      const pieceCost = (item.pcs || 0) * unitPrice;
+      const caseCost = (item.currentQty || 0) * buyingPrice;
+      return parseFloat((pieceCost + caseCost).toFixed(2));
+    };
 
-    const totalRow = `
-      <tr style="font-weight: bold; background-color: #f1f5f9;">
-        <td colspan="10" style="padding: 6px; text-align: right;">Total Stock Value</td>
-        <td style="padding: 6px;">${getTotalValue(rows)}</td>
-      </tr>`;
+    const getTotalValueLocal = (rows) =>
+      (rows || [])
+        .reduce((acc, r) => acc + Number(localGetValue(r) || 0), 0)
+        .toFixed(2);
 
-    return rowsHtml + totalRow;
-  };
+    const generateTableRowsLocal = (rows) => {
+      const rowsHtml = rows
+        .map(
+          (item, index) => `
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 4px;">${index + 1}</td>
+          <td style="padding: 4px;">${localGetStore(item.WHIDS)}</td>
+          <td style="padding: 4px;">${(item.productName || localGetProductName(item.productId) || "").trim()}</td>
+          <td style="padding: 4px;">${item.ADCcode || ""}</td>
+          <td style="padding: 4px;">${item.Vendor || localGetVendor(item.VendorId)}</td>
+          <td style="padding: 4px;">${item.currentQty}</td>
+          <td style="padding: 4px;">${item.pcs}</td>
+          <td style="padding: 4px;">${item.LastBatchDate}</td>
+          <td style="padding: 4px;">${item.ExpDate}</td>
+          <td style="padding: 4px;">${item.VendorPrice}</td>
+          <td style="padding: 4px;">${localGetValue(item)}</td>
+        </tr>`
+        )
+        .join("");
 
-  const showModal = (rowsData = filteredData) => {
-    if (!data) {
-      ErrorMessage("Data not loaded. Please try again.");
-      return;
-    }
+      const totalRow = `
+        <tr style="font-weight: bold; background-color: #f1f5f9;">
+          <td colspan="10" style="padding: 6px; text-align: right;">Total Stock Value</td>
+          <td style="padding: 6px;">${getTotalValueLocal(rows)}</td>
+        </tr>`;
 
-    // ensure rowsData is an array
+      return rowsHtml + totalRow;
+    };
+
     const rowsToRender = Array.isArray(rowsData) ? rowsData : [];
 
     const htmlContent = `
@@ -162,21 +234,21 @@ export default function StockReportModal({ baseUrl, userData }) {
           <label style="font-weight: 600; font-size: 12px;">Vendors</label><br/>
           <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
             <option value="">All</option>
-            ${vendorList.map((c) => `<option value="${c._id}">${c.Name || c.NAME || ""}</option>`).join("")}
+            ${(usedVendors || []).map((c) => `<option value="${c._id}">${c.Name || c.NAME || ""}</option>`).join("")}
           </select>
         </div>
         <div>
           <label style="font-weight: 600; font-size: 12px;">Store</label><br/>
           <select id="Store" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
             <option value="">All</option>
-            ${stores.map((b) => `<option value="${b._id}">${b.WHName}</option>`).join("")}
+            ${(usedStores || []).map((b) => `<option value="${b._id}">${b.WHName}</option>`).join("")}
           </select>
         </div>
         <div>
           <label style="font-weight: 600; font-size: 12px;">Product</label><br/>
           <select id="Product" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
             <option value="">All</option>
-            ${productList.sort((a, b) => a.Name.localeCompare(b.Name)).map((b) => `<option value="${b._id}">${b.Name}</option>`).join("")}
+            ${((usedProducts || []).slice()).sort((a, b) => (a.Name || "").localeCompare(b.Name || "")).map((b) => `<option value="${b._id}">${b.Name}</option>`).join("")}
           </select>
         </div>
       </div>
@@ -199,7 +271,7 @@ export default function StockReportModal({ baseUrl, userData }) {
             </tr>
           </thead>
           <tbody id="paymentTableBody">
-            ${generateTableRows(rowsToRender)}
+            ${generateTableRowsLocal(rowsToRender)}
           </tbody>
         </table>
       </div>
@@ -228,7 +300,7 @@ export default function StockReportModal({ baseUrl, userData }) {
       const originalRows = Array.isArray(rowsToRender) ? rowsToRender : [];
 
       const renderTable = (rows) => {
-        tableBody.innerHTML = generateTableRows(rows);
+        tableBody.innerHTML = generateTableRowsLocal(rows);
       };
 
       const filterRows = () => {
@@ -261,16 +333,16 @@ export default function StockReportModal({ baseUrl, userData }) {
           headers.join(","),
           ...rows.map((r) =>
             [
-              `"${getStore(r.WHIDS)}"`,
-              `"${(r.productName || "").replace(/"/g, '""')}"`,
+              `"${localGetStore(r.WHIDS)}"`,
+              `"${(r.productName || localGetProductName(r.productId) || "").replace(/"/g, '""')}"`,
               `"${(r.ADCcode || "").replace(/"/g, '""')}"`,
-              `"${(r.Vendor || "").replace(/"/g, '""')}"`,
+              `"${(r.Vendor || localGetVendor(r.VendorId || r.Vendor) || "").replace(/"/g, '""')}"`,
               r.currentQty,
               r.pcs,
               `"${r.LastBatchDate}"`,
               `"${r.ExpDate}"`,
               r.VendorPrice,
-              r.value,
+              localGetValue(r),
             ].join(",")
           ),
         ].join("\n");
@@ -322,16 +394,15 @@ export default function StockReportModal({ baseUrl, userData }) {
                 </tr>
               </thead>
               <tbody>
-                ${generateTableRows(rows)}
+                ${generateTableRowsLocal(rows)}
               </tbody>
             </table>
-            <p>Total stock value: ${getTotalValue(rows)}</p>
+            <p>Total stock value: ${getTotalValueLocal(rows)}</p>
           </body>
           </html>
         `;
         win.document.write(tableHtml);
         win.document.close();
-        // give it a moment to render then call print
         setTimeout(() => {
           win.print();
         }, 500);
@@ -374,7 +445,6 @@ export default function StockReportModal({ baseUrl, userData }) {
         openPrintWindow(filtered);
       };
 
-      // clear any existing children and append buttons
       if (excelBtnContainer) {
         excelBtnContainer.innerHTML = "";
         excelBtnContainer.appendChild(exportCSVBtn);
