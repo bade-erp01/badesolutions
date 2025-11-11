@@ -69,7 +69,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
     <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
       <Nav1 user={userData.user} business={userData.business} page={`purchase`} Module={filteredPurchases} />
 
-      <div className="flex flex-1 text-white gap-6 p-4">
+      <div className="flex flex-1 text-white gap-6 p-2">
         {/* Sidebar Filters */}
         <aside className="w-full md:w-80 bg-[#111114]/70 backdrop-blur-lg p-4 shadow-lg sticky top-6 self-start h-fit">
           <BackButton />
