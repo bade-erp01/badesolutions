@@ -65,7 +65,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
           <hr className="my-4 border-white/20" />
 
           {/* Filters Section */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold text-white/80">Filter Options</h2>
 
             {/* Status Filter */}
@@ -77,7 +77,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                   setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 rounded-md bg-[#2a2a2e] border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className=" px-3 py-2 rounded-md bg-[#2a2a2e] border border-white/20 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">All</option>
                 <option value="Draft">Draft</option>
