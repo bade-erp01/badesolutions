@@ -24,7 +24,6 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
               "Content-Type": "application/json",
               Authorization: `Bearer ${business.tenantId}`,
               dbConnect: `Bearer ${business.rustyRoof}`,
-              // access: `${Encrypt(userData.user._id)}`,
             },
           });
     
@@ -35,13 +34,14 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
           setCustomersList(fetchedData.customers);
           setStoresList(fetchedData.stores);
           
-          setTimeout(() => {
-            setFilteredData(fetchedData.invoices?.filter(item => {
+          const invoices = fetchedData.invoices?.filter(item => {
               const status = item.billStatus?.toLowerCase();
               return status === "invoice" || status === "cancelled";
-            }));
-            showModal();
-          }, 1000);
+          }) || [];
+
+          // set state and show modal with the fresh invoices (avoid stale state in modal)
+          setFilteredData(invoices);
+          showModal(invoices);
           setLoading(false);
         } catch (error) {
           ErrorMessage(error.message);
@@ -70,29 +70,29 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
         (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px; text-align: left;">${item.billReferenceNo.trim()}</td>
+        <td style="padding: 4px; text-align: left;">${item.billReferenceNo?.trim() || ""}</td>
         <td style="padding: 4px;">${getCustomer(item.customer)}</td>
         <td style="padding: 4px;">${getSTore(item.whId)}</td>
         <td style="padding: 4px;">${getUser(item.invoicerId)}</td>
         <td style="padding: 4px;">${getUser(item.salesPerson)}</td>
         <td style="padding: 4px;">${item.DELIVERYDATE ? moment(item.DELIVERYDATE).format("YYYY-MM-DD") : ''}</td>
-        <td style="padding: 4px;">${item.DriverNumber}</td>
+        <td style="padding: 4px;">${item.DriverNumber || ""}</td>
         <td style="padding: 4px;">
         <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-        ${item.billStatus.toUpperCase()}
+        ${item.billStatus?.toUpperCase() || ""}
         </span>
         </td>
-        <td style="padding: 4px;">${item.DriverName.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.vehicleNumber.toLocaleString()}</td>
+        <td style="padding: 4px;">${item.DriverName?.toLocaleString() || ""}</td>
+        <td style="padding: 4px;">${item.vehicleNumber?.toLocaleString() || ""}</td>
         <td style="padding: 4px;">${item.WayBillNo || ""}</td>
-        <td style="padding: 4px;">${item.shippingFee.toLocaleString()}</td>
+        <td style="padding: 4px;">${item.shippingFee?.toLocaleString() || ""}</td>
       </tr>
     `
       )
       .join("");
   };
 
-  const showModal = () => {
+  const showModal = (initialData = []) => {
     Swal.fire({
       title: "Logistics Report",
       html: `
@@ -163,7 +163,7 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
               </tr>
             </thead>
             <tbody id="paymentTableBody">
-              ${generateTableRows(filteredData)}
+              ${generateTableRows(initialData)}
             </tbody>
           </table>
         </div>
@@ -173,6 +173,8 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
       showConfirmButton: false,
       didOpen: () => {
         const tableBody = document.getElementById("paymentTableBody");
+        // keep original unfiltered dataset here for filtering
+        const originalData = Array.isArray(initialData) ? [...initialData] : [];
 
         const applyFilters = () => {
           const startDate = document.getElementById("startDate").value;
@@ -185,17 +187,17 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
             const start = startDate ? moment(startDate) : null;
             const end = endDate ? moment(endDate) : null;
             setSearchPeriod(`${startDate}-${endDate}`)
- 
-            const filtered = filteredData.filter((item) => {
-            const itemDate = moment(item.startDate);
-        
+
+            const filtered = originalData.filter((item) => {
+            const itemDate = item.DELIVERYDATE ? moment(item.DELIVERYDATE) : null;
+
                 return (
-                    (!start || itemDate.isSameOrAfter(start, "day")) &&
-                    (!end || itemDate.isSameOrBefore(end, "day")) &&
-                    (!Rep || item.salesPerson?.toLowerCase() === Rep.toLowerCase()) &&
+                    (!start || (itemDate && itemDate.isSameOrAfter(start, "day"))) &&
+                    (!end || (itemDate && itemDate.isSameOrBefore(end, "day"))) &&
+                    (!Rep || item.salesPerson === Rep) &&
                     (!Status || item.billStatus?.toLowerCase() === Status.toLowerCase()) &&
-                    (!customer || item.customer?.toLowerCase() === customer.toLowerCase()) &&
-                    (!Store || item.whId?.toLowerCase() === Store.toLowerCase())
+                    (!customer || item.customer === customer) &&
+                    (!Store || item.whId === Store)
                 );
             });
 
@@ -259,16 +261,17 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
           }
         };
 
-        ["startDate", "endDate", "customerFilter", "bankFilter","Rep","Store","Status"].forEach((id) => {
+        // listen to inputs - use only actual element IDs
+        ["startDate", "endDate", "customerFilter", "Rep", "Store", "Status"].forEach((id) => {
           const el = document.getElementById(id);
-                    if (el) {
+          if (el) {
             el.addEventListener("input", applyFilters);
             el.addEventListener("change", applyFilters);
           }
         });
 
-        // Initial render
-        updateTable(filteredData);
+        // Initial render using the passed-in data
+        updateTable(initialData);
       },
     });
   };
