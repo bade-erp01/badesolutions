@@ -51,7 +51,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   );
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+     <div className="flex flex-col max-h-[100dvh] overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
@@ -59,9 +59,8 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
         Module={filteredPurchases}
       />
 
-      <div className="flex flex-1 text-white bt-2">
-        {/* Sidebar */}
-        <aside className="w-80 bg-[#1e1e20]/90 backdrop-blur-md text-white px-6 py-6 shadow-lg transition-all duration-300 h-[520px] max-h-[600px] overflow-y-auto md:block border border-white/10">
+      <div className="flex flex-1 text-white bt-2 max-h-[100dvh]">
+        <aside className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300  max-h-[100dvh] overflow-y-hidden md:block">
           <BackButton />
           <hr className="my-4 border-white/20" />
 
@@ -147,7 +146,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-1 overflow-y-auto h-[500px] max-h-[600px]">
+        <main className="relative w-full max-h-[83vh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {paginatedPurchases.map((element) => (
               <Card
