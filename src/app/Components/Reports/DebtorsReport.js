@@ -204,7 +204,6 @@ export default function DebtorsReportModal({ data, business, users }) {
           tableBody.innerHTML = generateTableRows(filtered);
 
           const totalDebt = filtered.reduce((sum, cust) => sum + parseFloat(cust.Debt || 0), 0);
-          // format to 2 decimals then localize
           totalDebtCell.textContent = Number(totalDebt.toFixed(2)).toLocaleString();
 
           // Excel download uses the current filtered list
@@ -233,44 +232,111 @@ export default function DebtorsReportModal({ data, business, users }) {
 
           // PDF download uses the current filtered list (create new doc each time)
           document.getElementById("downloadDebtorsPDF").onclick = () => {
-            const doc = new jsPDF();
-            doc.setFontSize(14);
-            doc.text(`Debtors Report as at ${moment().format("YYYY-MM-DD HH:mm:ss")}`, 14, 20);
+            // create landscape A4 PDF for better table width
+            const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+            const margin = { top: 60, left: 40, right: 40 };
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            // header: business name, title, timestamp, optional logo
+            doc.setFontSize(16);
+            doc.setTextColor("#2c3e50");
+            const businessName = business?.name || "Business";
+            doc.text(businessName, margin.left, 30);
 
             doc.setFontSize(12);
-            doc.text(
-              `Total Debt: ${filtered
-                .filter((c) => c.Debt > 0)
-                .reduce((acc, curr) => acc + parseFloat(curr.Debt || 0), 0)
-                .toLocaleString()}`,
-              14,
-              28
-            );
+            doc.setTextColor("#34495e");
+            doc.text(`Debtors Report`, margin.left, 48);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${moment().format("YYYY-MM-DD HH:mm:ss")}`, pageWidth - margin.right - 200, 30);
 
+            // try to draw logo if provided as data URL
+            try {
+              if (business?.logo && typeof business.logo === "string" && business.logo.startsWith("data:image")) {
+          // place logo top-right
+          doc.addImage(business.logo, "PNG", pageWidth - margin.right - 60, 8, 50, 30);
+              }
+            } catch (err) {
+              // ignore logo errors
+            }
+
+            // Prepare table data
             const tableData = filtered
               .sort((a, b) => a.Username.trim().localeCompare(b.Username.trim()))
               .map((entry, index) => [
-                index + 1,
-                entry.Username,
-                FilterPriceList(entry.priceList),
-                FilterSaLePerson(entry.salesPerson),
-                entry.CustomerCode || "",
-                entry.phone,
-                entry.State || "",
-                entry.Debt?.toLocaleString(),
-                entry.creditLimit,
-                moment(normalizeDate(entry.lastPayDate) || "").format("DD-MM-YYYY"),
-                calculateDebtDays(entry.lastPayDate),
+          index + 1,
+          entry.Username,
+          FilterPriceList(entry.priceList),
+          FilterSaLePerson(entry.salesPerson),
+          entry.CustomerCode || "",
+          entry.phone || "",
+          entry.State || "",
+          Number(parseFloat(entry.Debt || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          Number(entry.creditLimit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          moment(normalizeDate(entry.lastPayDate) || "").isValid()
+            ? moment(normalizeDate(entry.lastPayDate)).format("DD-MM-YYYY")
+            : "",
+          calculateDebtDays(entry.lastPayDate),
               ]);
 
+            // column headers
+            const head = [["#", "Customer", "PriceList", "Rep", "Code", "Phone", "State", "Debt", "Credit Limit", "Last Payment", "Days"]];
+
+            // generate a formatted total string
+            const totalDebtFormatted = Number(totalDebt.toFixed(2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // draw table with better styling
             autoTable(doc, {
-              startY: 34,
-              head: [["#", "Name", "PriceList","Rep", "Code", "Phone", "State", "Debt", "Limit", "Last Payment", "Days"]],
+              startY: margin.top,
+              head,
               body: tableData,
-              styles: { fontSize: 10 },
-              theme: "grid",
+              styles: {
+          fontSize: 9,
+          cellPadding: 6,
+          overflow: "linebreak",
+              },
+              headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          halign: "center",
+              },
+              alternateRowStyles: { fillColor: [245, 247, 250] },
+              columnStyles: {
+          0: { cellWidth: 30, halign: "center" },
+          1: { cellWidth: 160 },
+          2: { cellWidth: 80 },
+          3: { cellWidth: 120 },
+          4: { cellWidth: 60 },
+          5: { cellWidth: 90 },
+          6: { cellWidth: 70 },
+          7: { cellWidth: 80, halign: "right" },
+          8: { cellWidth: 80, halign: "right" },
+          9: { cellWidth: 70, halign: "center" },
+          10: { cellWidth: 50, halign: "center" },
+              },
+              theme: "striped",
+              didDrawPage: (dataArg) => {
+          // footer with page number and total debt summary
+          const pageCount = doc.internal.getNumberOfPages();
+          const str = "Page " + pageCount;
+          doc.setFontSize(9);
+          doc.setTextColor("#7f8c8d");
+          doc.text(str, pageWidth - margin.right - 40, doc.internal.pageSize.getHeight() - 10);
+
+          // if last page, place total debt below the table
+          if (dataArg.pageNumber === doc.internal.getNumberOfPages()) {
+            const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : dataArg.cursor?.y || dataArg.startY;
+            const yPos = finalY + 18;
+            doc.setFontSize(11);
+            doc.setTextColor("#2c3e50");
+            doc.text(`Total Debt: ${totalDebtFormatted}`, margin.left, yPos);
+          }
+              },
+              // limit column widths if needed, keep table within page
+              tableWidth: pageWidth - margin.left - margin.right,
             });
-            doc.save("Debtors_Report.pdf");
+
+            // save PDF
+            doc.save(`Debtors_Report_${moment().format("YYYYMMDD_HHmmss")}.pdf`);
           };
         };
 
