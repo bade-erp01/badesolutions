@@ -249,11 +249,12 @@ export default function DebtorsReportModal({ data, business, users }) {
 
             doc.setFontSize(12);
             doc.setTextColor("#34495e");
-            doc.text(`Debtors Report`, centerX, 54, { align: "center" });
+            doc.text(`Debtors Report Generated: ${moment().format("YYYY-MM-DD HH:mm:ss")}`, centerX, 54, { align: "center" });
 
             doc.setFontSize(10);
             doc.setTextColor("#6b7280");
-            const genText = `Generated: ${moment().format("YYYY-MM-DD HH:mm:ss")}`;
+            const genText = ``;//write any additional generation info here
+            
             // right aligned timestamp within margins
             doc.text(genText, pageWidth - margin.right, 30, { align: "right" });
 
@@ -264,7 +265,7 @@ export default function DebtorsReportModal({ data, business, users }) {
               const imgTypeMatch = logoData.match(/^data:image\/(png|jpeg|jpg)/i);
               const imgType = imgTypeMatch ? imgTypeMatch[1].toUpperCase() : "PNG";
               const logoW = 60;
-              const logoH = 30;
+              const logoH = 60;
               const logoX = pageWidth - margin.right - logoW;
               const logoY = 8;
               doc.addImage(logoData, imgType, logoX, logoY, logoW, logoH);
