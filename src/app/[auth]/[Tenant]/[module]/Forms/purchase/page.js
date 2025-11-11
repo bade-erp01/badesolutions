@@ -210,15 +210,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
 
         {/* Main content */}
         <main className="flex-1 min-h-[83dvh] p-3">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm text-black mt-1">
-                {filteredPurchases.length} total • Page {currentPage} / {totalPages}
-              </p>
-            </div>
-
-          </div>
-
+        
           {/* Grid of cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedPurchases.length > 0 ? (
@@ -239,7 +231,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
 
           {/* Pagination */}
           <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-white/60">
+            <div className="text-sm text-black">
               Showing {(filteredPurchases.length === 0) ? 0 : (currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredPurchases.length)} of {filteredPurchases.length}
             </div>
 
@@ -253,7 +245,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
               </button>
 
               {/* Simple page numbers */}
-              <div className="hidden sm:flex items-center gap-1 px-2">
+              {/* <div className="hidden sm:flex items-center gap-1 px-2">
                 {Array.from({ length: totalPages }).map((_, i) => {
                   const page = i + 1;
                   return (
@@ -266,7 +258,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                     </button>
                   );
                 })}
-              </div>
+              </div> */}
 
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
