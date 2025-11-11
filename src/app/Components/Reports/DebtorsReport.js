@@ -265,7 +265,7 @@ export default function DebtorsReportModal({ data, business, users }) {
 
             autoTable(doc, {
               startY: 34,
-              head: [["#", "Customer", "PriceList","Rep", "Code", "Phone", "State", "Debt", "Credit Limit", "Last Payment", "Debt Days"]],
+              head: [["#", "Name", "PriceList","Rep", "Code", "Phone", "State", "Debt", "Limit", "Last Payment", "Days"]],
               body: tableData,
               styles: { fontSize: 10 },
               theme: "grid",
