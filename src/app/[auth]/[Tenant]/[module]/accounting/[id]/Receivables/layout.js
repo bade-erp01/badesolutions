@@ -11,6 +11,7 @@ import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
 import { CreditCardIcon,BanknotesIcon } from "@heroicons/react/24/outline";
 import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
 import { notFound } from 'next/navigation';
+import Users from"../../../../../../../../models/Users"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -55,6 +56,10 @@ export const metadata = {
 export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
+
+    const RawUsers = await Users.findByTenant(userData.business.tenantId)
+    const StringedUser = JSON.stringify(RawUsers)
+    const parsedUsers = JSON.parse(StringedUser)
 
    // check if user has access to crm and cash register
   const AccountingFinder = userData.user.Apps.find(app=>{
@@ -174,7 +179,7 @@ export default async function AccountingPage({ children, params }) {
                 </Link>
               )}
                
-              <DebtorsReportModal data={data.Customers} />
+              <DebtorsReportModal users={parsedUsers} business={userData.business} data={data.Customers} />
               <ReceivablesAgingModal data={data.Customers} />
               <CashregisterReport
                 dataArray={data.Payments}
