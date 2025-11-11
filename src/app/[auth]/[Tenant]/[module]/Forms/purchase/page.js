@@ -248,8 +248,6 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                       <div className={`inline-flex items-center gap-2 px-2 py-1 rounded text-xs ${statusColor(element.status)}`}>
                         {element.status || "N/A"}
                       </div>
-
-                      <div className="text-xs text-white/60 mt-3">{new Date(element.recievedDate).toLocaleDateString()}</div>
                     </div>
                   </div>
 
