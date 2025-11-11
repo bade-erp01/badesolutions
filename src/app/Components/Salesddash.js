@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import moment from 'moment';
 import Swal from 'sweetalert2';
-import {CursorArrowRaysIcon } from "@heroicons/react/24/outline";
+import { CursorArrowRaysIcon } from "@heroicons/react/24/outline";
 import withReactContent from 'sweetalert2-react-content';
 import { plsWait, ErrorMessage } from '../../../Functions/Mics';
 import { motion } from 'framer-motion';
@@ -42,40 +42,45 @@ const statusColors = {
 
 const MySwal = withReactContent(Swal);
 
-const DashboardCharts = ({business,baseUrl, triggerButton = true }) => {
+const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
   const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState([]);
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
 
   const fetchData = async () => {
-      try {
-        setLoading(true);
-        plsWait("Loading Report Data...");
-        const res = await fetch(`${baseUrl}/api/Invoice/report`, {
-          method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${business.tenantId}`,
-              dbConnect: `Bearer ${business.rustyRoof}`,
-              // access: `${Encrypt(userData.user._id)}`,
-            },
-          });
-    
-          if (!res.ok) throw new Error("Failed to fetch product data");
-          
-          const fetchedData = await res.json();
-          // assign data
-          setTimeout(() => {
-            setInvoices(fetchedData.invoices);
-            showDashboardModal();
-          }, 1000);
-          setLoading(false);
-        } catch (error) {
-          ErrorMessage(error.message);
-          setLoading(false);
-        } 
-      };
+    try {
+      setLoading(true);
+      plsWait("Loading Report Data...");
+      const res = await fetch(`${baseUrl}/api/Invoice/report`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${business.tenantId}`,
+          dbConnect: `Bearer ${business.rustyRoof}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch product data");
+
+      const fetchedData = await res.json();
+      // set invoices then trigger showing modal (useEffect will open modal after render)
+      setInvoices(fetchedData.invoices || []);
+      setShowModal(true);
+      setLoading(false);
+    } catch (error) {
+      ErrorMessage(error.message);
+      setLoading(false);
+    }
+  };
+
+  // If component is rendered directly (no trigger button), fetch on mount
+  useEffect(() => {
+    if (!triggerButton) {
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     marginByYearStatus,
@@ -234,7 +239,10 @@ const DashboardCharts = ({business,baseUrl, triggerButton = true }) => {
     </motion.div>
   );
 
-  const showDashboardModal = () => {
+  // Open sweetalert modal after render when showModal becomes true (so modalContent uses updated state)
+  useEffect(() => {
+    if (!showModal) return;
+
     MySwal.fire({
       html: modalContent,
       showCloseButton: true,
@@ -246,10 +254,14 @@ const DashboardCharts = ({business,baseUrl, triggerButton = true }) => {
       width: '100vw',
       padding: 0,
       background: 'transparent',
-      didOpen: () => setShowModal(true),
+      didOpen: () => {
+        // modal already opening; no-op
+      },
       willClose: () => setShowModal(false),
     });
-  };
+    // close handler: when user closes, willClose sets showModal false
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal, modalContent]);
 
   return (
     <>
@@ -269,4 +281,3 @@ const DashboardCharts = ({business,baseUrl, triggerButton = true }) => {
 };
 
 export default DashboardCharts;
-
