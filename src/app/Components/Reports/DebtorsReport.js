@@ -318,12 +318,12 @@ export default function DebtorsReportModal({ data, business, users }) {
               alternateRowStyles: { fillColor: [245, 247, 250] },
               columnStyles: {
               0: { cellWidth: 30, halign: "center" },   // #
-              1: { cellWidth: 180 },                     // Customer
-              2: { cellWidth: 80 },                      // PriceList
-              3: { cellWidth: 120 },                     // Rep
-              4: { cellWidth: 60 },                      // Code
-              5: { cellWidth: 90 },                      // Phone
-              6: { cellWidth: 60 },                      // State
+              1: { cellWidth: 100 },                     // Customer
+              2: { cellWidth: 50 },                      // PriceList
+              3: { cellWidth: 100 },                     // Rep
+              4: { cellWidth: 50 },                      // Code
+              5: { cellWidth: 70 },                      // Phone
+              6: { cellWidth: 50 },                      // State
               7: { cellWidth: 80, halign: "right" },     // Debt
               8: { cellWidth: 80, halign: "right" },     // Credit Limit
               9: { cellWidth: 80, halign: "center" },    // Last Payment
@@ -345,7 +345,7 @@ export default function DebtorsReportModal({ data, business, users }) {
               const isLastPage = pageNumber === pageCount;
               if (isLastPage) {
                 const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : dataArg.cursor?.y || dataArg.startY;
-                const yPos = Math.min(finalY + 18, pageHeight - margin.bottom - 10);
+                const yPos = Math.min(finalY + 10, pageHeight - margin.bottom - 5);
                 doc.setFontSize(11);
                 doc.setTextColor("#2c3e50");
                 doc.text(`Total Debt: ${totalDebtFormatted}`, margin.left, yPos);
