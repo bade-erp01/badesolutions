@@ -70,7 +70,7 @@ export default function DebtorsReportModal({ data, business, users }) {
   };
 
   const generateTableRows = (list) => {
-    return list
+    return list.sort((a, b) => a.Username.trim().localeCompare(b.Username.trim()))
       .map(
         (item, index) => `
         <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -99,14 +99,14 @@ export default function DebtorsReportModal({ data, business, users }) {
             <label style="font-size: 12px; font-weight: 600;">Debtors</label><br/>
             <select id="customerFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
-              ${debtorsList.map((cust) => `<option value="${cust._id}">${cust.Username}</option>`).join("")}
+              ${debtorsList.sort((a, b) => a.Username.trim().localeCompare(b.Username.trim())).map((cust) => `<option value="${cust._id}">${cust.Username}</option>`).join("")}
             </select>
           </div>
            <div style="flex: 1;">
             <label style="font-size: 12px; font-weight: 600;">Rep</label><br/>
             <select id="salePersonFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
-              ${users.map((user) => `<option value="${user._id}">${user.firstName} ${user.lastName}</option>`).join("")}
+              ${users.sort((a, b) => a.firstName.trim().localeCompare(b.firstName.trim())).map((user) => `<option value="${user._id}">${user.firstName} ${user.lastName}</option>`).join("")}
             </select>
           </div>
           <div style="flex: 1;">
