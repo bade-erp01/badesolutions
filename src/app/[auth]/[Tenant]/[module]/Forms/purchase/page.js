@@ -66,7 +66,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   };
 
   return (
-    <div className="flex flex-col max-h-[100dvh] overflow-hidden bg-gradient-to-b from-[#07070a] to-[#0e0e11] min-h-screen">
+    <div className="flex flex-col max-h-[100dvh] overflow-hidden min-h-screen">
       <Nav1 user={userData.user} business={userData.business} page={`purchase`} Module={filteredPurchases} />
 
       <div className="flex flex-1 text-white gap-6 p-4">
