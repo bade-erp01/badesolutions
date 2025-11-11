@@ -97,6 +97,7 @@ export default function Login({userInfo,businessInfo,url}) {
 
       if (data.message) {
         dispatch(loginSuccess({ user: data.Newcustomer._id, business: data.Tenant }));
+        // reset the form
         SuccessToast('Login successful')
         plsWait("Login successful, Redirecting...");
 
@@ -116,6 +117,7 @@ export default function Login({userInfo,businessInfo,url}) {
         throw new Error(data.error);
       }
     } catch (error) {
+      setFormData({ email: "", password: "" });
       ErrorMessage(error.message);
       dispatch(loginFailure(error.message));
     }
