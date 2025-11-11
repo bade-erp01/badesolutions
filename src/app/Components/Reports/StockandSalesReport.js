@@ -359,7 +359,7 @@ export default function StockandSalesReport({
                       <td style="padding: 6px; text-align: right;">${item.rStock}</td>
                       <td style="padding: 6px; text-align: right;">${item.rPcs}</td>
                       <td style="padding: 6px; text-align: right;">${item.Stock || ''}</td>
-                      <td style="padding: 6px; text-align: right;">${item.salesVolume || 0}</td>
+                      <td style="padding: 6px; text-align: right;">${item.salesVolume.toLocaleString() || 0}</td>
                     </tr>
                   `;
                 }).join("")}
