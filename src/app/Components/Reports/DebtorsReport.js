@@ -233,14 +233,14 @@ export default function DebtorsReportModal({ data, business, users }) {
           // PDF download uses the current filtered list (create new doc each time)
           document.getElementById("downloadDebtorsPDF").onclick = () => {
             // create landscape A4 PDF for better table width
-            const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+            const doc = new jsPDF("landscape", "pt", "a4");
             const margin = { top: 60, left: 40, right: 40 };
             const pageWidth = doc.internal.pageSize.getWidth();
 
             // header: business name, title, timestamp, optional logo
             doc.setFontSize(16);
             doc.setTextColor("#2c3e50");
-            const businessName = business?.name || "Business";
+            const businessName = business?.companyName || "Business";
             doc.text(businessName, margin.left, 30);
 
             doc.setFontSize(12);
@@ -251,9 +251,9 @@ export default function DebtorsReportModal({ data, business, users }) {
 
             // try to draw logo if provided as data URL
             try {
-              if (business?.logo && typeof business.logo === "string" && business.logo.startsWith("data:image")) {
-          // place logo top-right
-          doc.addImage(business.logo, "PNG", pageWidth - margin.right - 60, 8, 50, 30);
+              if (business?.companyLogo && typeof business.companyLogo === "string" && business.companyLogo.startsWith("data:image")) {
+            // place logo top-right
+            doc.addImage(business.logo, "PNG", pageWidth - margin.right - 60, 8, 50, 30);
               }
             } catch (err) {
               // ignore logo errors
