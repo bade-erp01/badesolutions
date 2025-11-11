@@ -18,7 +18,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   const [endDate, setEndDate] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const itemsPerPage = 19;
 
   const getVendorNameById = (id) => {
     const vendor = Vendors.find((v) => v._id === id);
