@@ -400,7 +400,7 @@ export default function StockandSalesReport({
             "Returned Case": item.rStock,
             "Returned Pcs": item.rPcs,
             "Current Stock": item.Stock,
-            "Sales Volume": 0
+            "Sales Volume": item.salesVolume.toLocaleString() || 0
           }));
 
           downloadExcel(excelData, "Stock_and_Sales_Report");
@@ -428,7 +428,7 @@ export default function StockandSalesReport({
             item.rStock,
             item.rPcs,
             item.Stock,
-            `${item.Sold || 0} Cases, ${item.pcs || 0} Pcs`
+            item.salesVolume.toLocaleString() || 0
           ]);
 
           const doc = new jsPDF();
