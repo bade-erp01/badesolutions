@@ -3,6 +3,7 @@ import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import DebtorsReportModal from "@/app/Components/Reports/DebtorsReport";
 import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
+import Users from"../../../../../../models/Users"
 import Link from "next/link";
 import { Encrypt } from '../../../../../../Functions/Mics';
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
@@ -20,6 +21,9 @@ import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
 
 export default async function crmLayout({ children, params }) {
   const userData = await fetchUser(); // Fetch user data
+  const RawUsers = await Users.findByTenant(userData.business.tenantId)
+  const StringedUser = JSON.stringify(RawUsers)
+  const parsedUsers = JSON.parse(StringedUser)
 
   let customerList = [];
 
@@ -107,7 +111,7 @@ export default async function crmLayout({ children, params }) {
               </>
             )}
 
-            <DebtorsReportModal data={customerList} />
+            <DebtorsReportModal users={parsedUsers} business={userData.business} data={customerList} />
             <ReceivablesAgingModal data={customerList} />
           </nav>
         </aside>
