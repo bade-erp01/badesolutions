@@ -222,7 +222,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                   />
               ))
             ) : (
-              <div className="col-span-full py-12 text-center text-white/60">
+              <div className="col-span-full py-12 text-center text-black">
                 <div className="text-lg font-medium mb-2">No purchase requests found</div>
                 <div className="text-sm">Try clearing filters or changing the date range.</div>
               </div>
