@@ -246,7 +246,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-sm text-white/60">Ref</div>
-                      <div className="text-sm text-white/60 mt-2">{element.description || "No description"}</div>
+                      <div className="text-sm text-white/60 mt-2">{element.billReferenceNo}</div>
                     </div>
 
                     <div className="text-right">
