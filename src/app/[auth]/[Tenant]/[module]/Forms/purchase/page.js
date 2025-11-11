@@ -66,7 +66,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   };
 
   return (
-    <div className="flex flex-col max-h-[100dvh] overflow-hidden min-h-screen">
+    <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
       <Nav1 user={userData.user} business={userData.business} page={`purchase`} Module={filteredPurchases} />
 
       <div className="flex flex-1 text-white gap-6 p-4">
@@ -209,7 +209,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 min-h-[60vh] p-3">
+        <main className="flex-1 min-h-[83dvh] p-3">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm text-black mt-1">
@@ -217,21 +217,6 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setStatusFilter("");
-                  setVendorFilter("");
-                  setStartDate("");
-                  setEndDate("");
-                  setSearchQuery("");
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 rounded text-black hover:bg-grey-800"
-              >
-                Reset
-              </button>
-            </div>
           </div>
 
           {/* Grid of cards */}
