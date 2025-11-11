@@ -18,7 +18,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   const [endDate, setEndDate] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
+  const itemsPerPage = 15;
 
   const getVendorNameById = (id) => {
     const vendor = Vendors.find((v) => v._id === id);
@@ -66,7 +66,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
   };
 
   return (
-    <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
+    <div className="flex flex-col max-h-[83dvh] overflow-hidden">
       <Nav1 user={userData.user} business={userData.business} page={`purchase`} Module={filteredPurchases} />
 
       <div className="flex flex-1 text-white gap-6 p-4">
