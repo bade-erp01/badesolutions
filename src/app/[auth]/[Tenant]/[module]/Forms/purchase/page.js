@@ -89,7 +89,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
           </div>
 
           {/* Search */}
-          <label className="block mb-3">
+          {/* <label className="block mb-3">
             <div className="text-sm text-white/70 mb-1">Search</div>
             <div className="relative">
               <input
@@ -108,7 +108,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                 </button>
               )}
             </div>
-          </label>
+          </label> */}
 
           {/* Status */}
           <label className="block mb-3">
