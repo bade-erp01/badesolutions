@@ -212,8 +212,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
         <main className="flex-1 min-h-[60vh] p-3">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-semibold">Purchase Requests</h1>
-              <p className="text-sm text-white/60 mt-1">
+              <p className="text-sm text-black mt-1">
                 {filteredPurchases.length} total • Page {currentPage} / {totalPages}
               </p>
             </div>
@@ -228,7 +227,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                   setSearchQuery("");
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 rounded bg-white/5 hover:bg-white/8"
+                className="px-3 py-2 rounded text-black hover:bg-grey-800"
               >
                 Reset
               </button>
