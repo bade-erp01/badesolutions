@@ -71,7 +71,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
 
       <div className="flex flex-1 text-white gap-6 p-4">
         {/* Sidebar Filters */}
-        <aside className="w-full md:w-80 bg-[#111114]/70 backdrop-blur-lg p-4 rounded-xl shadow-lg sticky top-6 self-start h-fit">
+        <aside className="w-full md:w-80 bg-[#111114]/70 backdrop-blur-lg p-4 shadow-lg sticky top-6 self-start h-fit">
           <BackButton />
           <hr className="my-4 border-white/10" />
 
@@ -243,11 +243,7 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
                   className="bg-[#0b0b0d]/70 border border-white/5 rounded-xl p-3 hover:shadow-xl transition-shadow"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-sm text-white/60">Ref</div>
-                      <div className="text-sm text-white/60 mt-2">{element.billReferenceNo}</div>
-                    </div>
-
+                  
                     <div className="text-right">
                       <div className={`inline-flex items-center gap-2 px-2 py-1 rounded text-xs ${statusColor(element.status)}`}>
                         {element.status || "N/A"}
