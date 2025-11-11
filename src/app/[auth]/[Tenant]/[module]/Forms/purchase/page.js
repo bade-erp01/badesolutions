@@ -238,31 +238,11 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedPurchases.length > 0 ? (
               paginatedPurchases.map((element) => (
-                <div
+                 <Card
                   key={element._id}
-                  className="bg-[#0b0b0d]/70 border border-white/5 rounded-xl p-3 hover:shadow-xl transition-shadow"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                  
-                    <div className="text-right">
-                      <div className={`inline-flex items-center gap-2 px-2 py-1 rounded text-xs ${statusColor(element.status)}`}>
-                        {element.status || "N/A"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="text-sm text-white/80">{getVendorNameById(element.Vendor) || "Unknown Vendor"}</div>
-                    <div className="text-sm text-white/60">{element.total ? `₦${Number(element.total).toLocaleString()}` : ""}</div>
-                  </div>
-
-                  <div className="mt-4 flex items-center gap-2">
-                    <Card
-                      data={{ ...element, vendorName: getVendorNameById(element.Vendor) }}
-                      module={`purchase-request`}
-                    />
-                  </div>
-                </div>
+                  data={element}
+                  module={`purchase-request`}
+                  />
               ))
             ) : (
               <div className="col-span-full py-12 text-center text-white/60">
