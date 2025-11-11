@@ -2,97 +2,99 @@
 import Swal from "sweetalert2";
 import moment from "moment";
 import { useState } from "react";
-import {downloadExcel,pricelistSetter} from "../../../../Functions/Functions"
+import { downloadExcel, pricelistSetter } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
-import {plsWait,ErrorMessage} from "../../../../Functions/Mics"
+import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 
-export default function SalesRportModal({user, business,baseUrl }) {
+export default function SalesRportModal({ user, business, baseUrl }) {
   const [StoresList, setStoresList] = useState([]);
   const [customersList, setCustomersList] = useState([]);
   const [usersList] = useState(user);
-  const [searchPeriod, setSearchPeriod] = useState('')
+  const [searchPeriod, setSearchPeriod] = useState("");
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  
+
   const fetchData = async () => {
     try {
       setLoading(true);
       plsWait("Loading Report Data...");
       const res = await fetch(`${baseUrl}/api/Invoice/report`, {
         method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${business.tenantId}`,
-            dbConnect: `Bearer ${business.rustyRoof}`,
-            // access: `${Encrypt(userData.user._id)}`,
-          },
-        });
-  
-        if (!res.ok) throw new Error("Failed to fetch product data");
-        
-        const fetchedData = await res.json();
-        // assign data
-        setCustomersList(fetchedData.customers);
-        setStoresList(fetchedData.stores);
-        setFilteredData(fetchedData.invoices?.filter(item => item.billStatus?.toLowerCase() !== "draft"));
-        setTimeout(() => {
-          showModal();
-        }, 1000);
-        setLoading(false);
-      } catch (error) {
-        ErrorMessage(error.message);
-        setLoading(false);
-      } 
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${business.tenantId}`,
+          dbConnect: `Bearer ${business.rustyRoof}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch product data");
+
+      const fetchedData = await res.json();
+      // assign data
+      setCustomersList(fetchedData.customers);
+      setStoresList(fetchedData.stores);
+      const invoicesFiltered = fetchedData.invoices?.filter(
+        (item) => item.billStatus?.toLowerCase() !== "draft"
+      ) || [];
+      setFilteredData(invoicesFiltered);
+
+      // Pass the actual fetched lists/data into showModal so the modal renders immediately
+      setTimeout(() => {
+        showModal(invoicesFiltered, fetchedData.customers || [], fetchedData.stores || [], usersList);
+      }, 100);
+      setLoading(false);
+    } catch (error) {
+      ErrorMessage(error.message);
+      setLoading(false);
+    }
+  };
+
+  const showModal = (initialInvoices = [], customers = [], stores = [], users = []) => {
+    // local helpers that use the provided lists (avoids stale closure over state)
+    const getCustomer = (id) => {
+      const selectedCustomer = customers.find((cust) => cust._id === id);
+      return selectedCustomer?.Username || "";
     };
-    
 
-  const getCustomer = (id) => {
-    const selectedCustomer = customersList.find((cust) => cust._id === id);
-    return selectedCustomer?.Username || "";
-  };
+    const getSTore = (id) => {
+      const selectedStore = stores.find((s) => s._id === id);
+      return selectedStore?.WHName || "";
+    };
 
-  const getSTore = (id) => {
-    const selectedBank = StoresList.find((bank) => bank._id === id);
-    return selectedBank?.WHName || "";
-  };
+    const getUser = (id) => {
+      const selectedUser = users.find((u) => u._id === id);
+      return selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : "";
+    };
 
-//   getsales person
-  const getUser = (id) => {
-    const selectedBank = usersList.find((bank) => bank._id === id);
-    return `${selectedBank?.firstName} ${selectedBank?.lastName}` || "";
-  };
-
-  const generateTableRows = (data) => {
-    return data
-      .map(
-        (item, index) => `
+    const generateTableRows = (data) =>
+      (data || [])
+        .map(
+          (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px; text-align: left;">${item.billReferenceNo.trim()}</td>
-        <td style="padding: 4px;">${item.invoicelocation.trim()}</td>
+        <td style="padding: 4px; text-align: left;">${(item.billReferenceNo || "").trim()}</td>
+        <td style="padding: 4px;">${(item.invoicelocation || "").trim()}</td>
         <td style="padding: 4px;">${getCustomer(item.customer)}</td>
         <td style="padding: 4px;">${getSTore(item.whId)}</td>
         <td style="padding: 4px;">${getUser(item.invoicerId)}</td>
         <td style="padding: 4px;">${getUser(item.salesPerson)}</td>
         <td style="padding: 4px;">${moment(item.startDate).format("YYYY-MM-DD")}</td>
-        <td style="padding: 4px;">${item.DELIVERYDATE ? moment(item.DELIVERYDATE).format("YYYY-MM-DD") : ''}</td>
+        <td style="padding: 4px;">${item.DELIVERYDATE ? moment(item.DELIVERYDATE).format("YYYY-MM-DD") : ""}</td>
         <td style="padding: 4px;">
-        <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-        ${item.billStatus.toUpperCase()}
-        </span>
+          <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
+            ${item.billStatus?.toUpperCase() || ""}
+          </span>
         </td>
-        <td style="padding: 4px;">${pricelistSetter(item.priceList,business)}</td>
-        <td style="padding: 4px;">${item.taxRate.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.discount.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.subTotal.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.grandTotal.toLocaleString()}</td>
+        <td style="padding: 4px;">${pricelistSetter(item.priceList, business)}</td>
+        <td style="padding: 4px;">${(item.taxRate ?? 0).toLocaleString()}</td>
+        <td style="padding: 4px;">${(item.discount ?? 0).toLocaleString()}</td>
+        <td style="padding: 4px;">${(item.subTotal ?? 0).toLocaleString()}</td>
+        <td style="padding: 4px;">${(item.grandTotal ?? 0).toLocaleString()}</td>
       </tr>
     `
-      )
-      .join("");
-  };
+        )
+        .join("");
 
-  const showModal = () => {
     Swal.fire({
       title: "Sales Report",
       html: `
@@ -127,7 +129,8 @@ export default function SalesRportModal({user, business,baseUrl }) {
             <label style="font-weight: 600; font-size: 12px;">Customer</label><br/>
             <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${customersList.sort((a, b) => a.Username.localeCompare(b.Username))
+              ${customers
+                .sort((a, b) => a.Username?.localeCompare(b.Username || "") || 0)
                 .map((c) => `<option value="${c._id}">${c.Username}</option>`)
                 .join("")}
             </select>
@@ -136,20 +139,15 @@ export default function SalesRportModal({user, business,baseUrl }) {
             <label style="font-weight: 600; font-size: 12px;">Store</label><br/>
             <select id="Store" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${StoresList.map(
-                (b) => `<option value="${b._id}">${b.WHName}</option>`
-              ).join("")}
+              ${stores.map((b) => `<option value="${b._id}">${b.WHName}</option>`).join("")}
             </select>
           </div>
           <div>
             <label style="font-weight: 600; font-size: 12px;">Rep</label><br/>
             <select id="Rep" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              ${usersList
-                .map(
-                  (b) =>
-                    `<option value="${b._id}">${b.firstName} ${b.lastName}</option>`
-                )
+              ${users
+                .map((b) => `<option value="${b._id}">${b.firstName} ${b.lastName}</option>`)
                 .join("")}
             </select>
           </div>
@@ -190,7 +188,7 @@ export default function SalesRportModal({user, business,baseUrl }) {
               </tr>
             </thead>
             <tbody id="paymentTableBody">
-              ${generateTableRows(filteredData)}
+              ${generateTableRows(initialInvoices)}
             </tbody>
           </table>
         </div>
@@ -200,6 +198,7 @@ export default function SalesRportModal({user, business,baseUrl }) {
       showConfirmButton: false,
       didOpen: () => {
         const tableBody = document.getElementById("paymentTableBody");
+        let currentData = initialInvoices.slice();
 
         const applyFilters = () => {
           const startDate = document.getElementById("startDate").value;
@@ -209,13 +208,13 @@ export default function SalesRportModal({user, business,baseUrl }) {
           const Rep = document.getElementById("Rep").value;
           const Store = document.getElementById("Store").value;
           const Status = document.getElementById("Status").value;
-          const PriceList = document.getElementById("PriceList").value
+          const PriceList = document.getElementById("PriceList").value;
 
           const start = startDate ? moment(startDate) : null;
           const end = endDate ? moment(endDate) : null;
           setSearchPeriod(`${startDate}-${endDate}`);
 
-          const filtered = filteredData.filter((item) => {
+          const filtered = initialInvoices.filter((item) => {
             const itemDate = moment(item.startDate);
             const othersMatch =
               !Others ||
@@ -226,16 +225,15 @@ export default function SalesRportModal({user, business,baseUrl }) {
               (!start || itemDate.isSameOrAfter(start, "day")) &&
               (!end || itemDate.isSameOrBefore(end, "day")) &&
               othersMatch &&
-              (!Rep || item.salesPerson?.toLowerCase() === (Rep.toLowerCase())) &&
-              (!Status ||
-                item.billStatus?.toLowerCase() === Status.toLowerCase()) &&
-              (!customer ||
-                item.customer === customer) &&
-              (!Store || item.whId === Store)&&
-              (!PriceList || item.priceList?.toLowerCase() === PriceList.toLowerCase())
+              (!Rep || (item.salesPerson || "").toLowerCase() === Rep.toLowerCase()) &&
+              (!Status || (item.billStatus || "").toLowerCase() === Status.toLowerCase()) &&
+              (!customer || item.customer === customer) &&
+              (!Store || item.whId === Store) &&
+              (!PriceList || (item.priceList || "").toLowerCase() === PriceList.toLowerCase())
             );
           });
 
+          currentData = filtered;
           updateTable(filtered);
         };
 
@@ -278,21 +276,16 @@ export default function SalesRportModal({user, business,baseUrl }) {
                     Customer: getCustomer(entry.customer),
                     Rep: getUser(entry.salesPerson),
                     status: entry.billStatus,
-                    "Pricelist":pricelistSetter(entry.priceList,business),
+                    Pricelist: pricelistSetter(entry.priceList, business),
                     "Ord Date": entry.startDate,
-                    "Inv Date": entry.DELIVERYDATE
-                      ? moment(entry.DELIVERYDATE).format("YYYY-MM-DD")
-                      : "",
+                    "Inv Date": entry.DELIVERYDATE ? moment(entry.DELIVERYDATE).format("YYYY-MM-DD") : "",
                     VAT: entry.taxRate,
                     "Dis Allowed": entry.discount,
                     "Sub Total": entry.subTotal,
                     Grand: entry.grandTotal,
                   });
                 });
-                const excelBtn = downloadExcel(
-                  clean,
-                  `${searchPeriod} Sales Report`
-                );
+                const excelBtn = downloadExcel(clean, `${searchPeriod} Sales Report`);
                 if (excelBtn instanceof HTMLElement) {
                   excelBtn.click();
                 }
@@ -311,7 +304,7 @@ export default function SalesRportModal({user, business,baseUrl }) {
           "Store",
           "Status",
           "Others",
-          "PriceList"
+          "PriceList",
         ].forEach((id) => {
           const el = document.getElementById(id);
           if (el) {
@@ -320,8 +313,8 @@ export default function SalesRportModal({user, business,baseUrl }) {
           }
         });
 
-        // Initial render
-        updateTable(filteredData);
+        // Initial render (uses passed-in invoices so it shows immediately)
+        updateTable(currentData);
       },
     });
   };
