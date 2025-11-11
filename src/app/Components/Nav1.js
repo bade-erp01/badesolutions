@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import "animate.css";
-import { Squares2X2Icon } from "@heroicons/react/24/outline";
+import { Squares2X2Icon,MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Encrypt } from "../../../Functions/Functions";
@@ -170,12 +170,7 @@ export default function Nav1({ page, Module, user, business }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   <button type="submit" className="text-blue-600 px-2">
-                    <Image
-                      src="https://img.icons8.com/ios-filled/50/google-web-search.png"
-                      width={`25`}
-                      height={`25`}
-                      alt="search"
-                    />
+                    <MagnifyingGlassIcon className="h-5 w-5 text-white/50" />
                   </button>
                 </form>
               ) : null
