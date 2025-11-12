@@ -165,7 +165,7 @@ export default function Nav1({ page, Module, user, business }) {
                 >
                   <input
                     type="search"
-                    className="outline-none px-2 w-40 lg:w-60 "
+                     className="w-full pl-10 pr-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder={`Search ${page} ...🪄✨`}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
