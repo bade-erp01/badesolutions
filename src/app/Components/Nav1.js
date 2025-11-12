@@ -170,7 +170,7 @@ export default function Nav1({ page, Module, user, business }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   <button type="submit" className="text-blue-600 px-2">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-white/50" />
+                    <MagnifyingGlassIcon className="h-5 w-5 text-black" />
                   </button>
                 </form>
               ) : null
