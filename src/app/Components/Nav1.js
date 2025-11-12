@@ -160,13 +160,13 @@ export default function Nav1({ page, Module, user, business }) {
               Module?.length > 0 ? (
                 <form
                   onSubmit={handleSearch}
-                  title={`Search through ${page} collection ...🪄✨`}
+                  title={`Search through ${page} collection ...`}
                   className="md:flex items-center bg-white rounded-md px-3 py-1 shadow shadow-gray-300"
                 >
                   <input
                     type="search"
-                     className="w-full pl-10 pr-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder={`Search ${page} ...🪄✨`}
+                    className="outline-none px-2 w-40 lg:w-60 "
+                    placeholder={`Search ${page} ...`}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   <button type="submit" className="text-blue-600 px-2">
