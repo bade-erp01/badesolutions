@@ -169,7 +169,7 @@ export default function Nav1({ page, Module, user, business }) {
                     placeholder={`Search ${page} ...`}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
-                  <button type="submit" className="bg-grey-200 px-2">
+                  <button type="submit" className=" px-2 p-1 rounded-sm hover:bg-purple-400 transition">
                     <MagnifyingGlassIcon className="h-5 w-5 text-black" />
                   </button>
                 </form>
