@@ -11,6 +11,7 @@ import StockandSalesReport from "@/app/Components/Reports/StockandSalesReport";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -72,6 +73,8 @@ export default async function Productlayout({ children, params }) {
 
     const {
       productList,
+      vendorList,
+      storeList
     } = await res.json();
 
     return (
@@ -114,6 +117,8 @@ export default async function Productlayout({ children, params }) {
                 baseUrl={baseUrl}
                 userData={userData}
               />
+
+              <PurchaseDumpModal  business={userData.business} EXPRESS_PRIVATE_URL={baseUrl}  Products={productList} storesData={storeList} vendorsData={vendorList} />
 
               {userData?.user?.isAdmin && (
                 <BulkUploader tenantId={userData} collectionName="product" />
