@@ -136,11 +136,11 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <input type="date" id="startDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
+                    <input type="date" required id="startDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
                 </div>
                 <div>
                     <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                    <input type="date" id="endDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
+                    <input type="date" required id="endDate" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md" />
                 </div>
                 </div>
                 <div>
