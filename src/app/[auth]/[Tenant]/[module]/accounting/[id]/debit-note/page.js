@@ -165,7 +165,7 @@ export default async function AccountingPage({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[82.5dvh] overflow-y-auto">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[82dvh] overflow-y-auto">
              <DebitnoteTable data={data}/>
             </section>
           </main>
