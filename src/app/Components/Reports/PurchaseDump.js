@@ -116,7 +116,7 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
     const openModal = async () => {
         const productOptionsHtml = [
             `<option value="">-- All Products --</option>`,
-            ...(ProductList || []).map((p) => `<option value="${p._id}">${p.Name }</option>`),
+            ...(ProductList || []).sort((a, b) => a.Name.trim().localeCompare(b.Name.trim())).map((p) => `<option value="${p._id}">${p.Name }</option>`),
         ].join("");
 
         const storeOptionsHtml = [
