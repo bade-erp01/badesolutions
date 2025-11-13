@@ -62,6 +62,7 @@ export default async function layout({children}) {
     //  get vendor list
     const VendorList = data.VendorList
     const purchaseList = data.purcghaseList
+    const Store = data.Store
 
-  return <Storelayout purchaseList={purchaseList} userData={userData} VendorList={VendorList}/>
+  return <Storelayout purchaseList={purchaseList} userData={userData} VendorList={VendorList} Store={Store}/>
 }

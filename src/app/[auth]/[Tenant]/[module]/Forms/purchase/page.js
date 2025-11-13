@@ -7,11 +7,13 @@ import Card from "@/app/Components/Card";
 import { FunnelIcon, BackwardIcon, ForwardIcon, MagnifyingGlassIcon, XMarkIcon, ArrowPathIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
+import PurchaseReportModal from "@/app/Components/Reports/PurchaseReport";
 
-export default function Storelayout({ purchaseList, userData, VendorList }) {
+export default function Storelayout({ purchaseList, userData, VendorList,Store }) {
   const Params = useParams();
   const [purchaselist] = useState(purchaseList || []);
   const [Vendors] = useState(VendorList || []);
+  const [Stores] = useState(Store || []);
   const [statusFilter, setStatusFilter] = useState("");
   const [vendorFilter, setVendorFilter] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -187,9 +189,10 @@ export default function Storelayout({ purchaseList, userData, VendorList }) {
           </div>
 
           {/* Export button */}
-          {userData?.user?.isAdmin && filteredPurchases.length > 0 && (
+          {userData?.user?.isAdmin && paginatedPurchases.length > 0 && (
             <div className="pt-2">
-              <ExcelDownloadBtn data={filteredPurchases} page={Params.module} />
+              {/* <ExcelDownloadBtn data={paginatedPurchases} page={Params.module} /> */}
+              <PurchaseReportModal data={purchaseList} Vendors={Vendors} Stores={Stores}/>
             </div>
           )}
 
