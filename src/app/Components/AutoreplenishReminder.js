@@ -3,9 +3,11 @@ import React, { useState } from 'react'
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Encrypt } from '../../../Functions/Functions';
 import{ErrorMessage,SuccessToast,plsWait,} from "../../../Functions/Mics"
+import {useRouter} from 'next/navigation'
  
 export default function ReplenishFeature({storeProduct,business,user,baseUrl}) {
     const [isReplenishing] = useState(storeProduct.autoReplenishment)
+    const router = useRouter();
 
     const showModal = async () => {
         // Show your modal here using swal, display a form with 2 inputs: Replenish Level and Replenish Quantity
@@ -13,8 +15,8 @@ export default function ReplenishFeature({storeProduct,business,user,baseUrl}) {
         // On success, set isReplenishing to true
         let replenishLevel = prompt(`Enter Min stock Level (case quantity) for ${storeProduct.productName}  [MONITOR]:`, `${storeProduct.replenishMin || 0}`);
         let replenishQuantity = prompt(`Enter Replenish Quantity (case quantity) for ${storeProduct.productName} [REPLENISH]:`, `${storeProduct.replenishQty || 0}`);
-        if (replenishLevel === 0 || replenishQuantity === 0) {
-            alert('Replenish Level and Quantity must be greater than 0');
+        if (replenishLevel === '' || replenishQuantity === '') {
+            alert('Replenish Level and Quantity cannot be empty.');
             return;
         }
 
@@ -36,12 +38,14 @@ export default function ReplenishFeature({storeProduct,business,user,baseUrl}) {
               .then((response) => {
                 if (response.ok) {
                   SuccessToast(response.message || "Auto-replenishment activated successfully");
+                  router.refresh();
                 } else {
                   throw new Error("Failed to activate auto-replenishment");
                 }
               })
               .catch((error) => {
                 ErrorMessage(error.message);
+                router.refresh();
               });
         }
     }
