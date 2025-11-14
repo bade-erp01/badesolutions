@@ -1107,7 +1107,9 @@ export default function SingleProductpage({
                           Quantity in store
                         </th>
                         <th className="border border-gray-300 px-2 py-1">Download</th>
-                        <th className="border border-gray-300 px-2 py-1">Monitor</th>
+                        {userInfo?.isAdmin && (
+                          <th className="border border-gray-300 px-2 py-1">Monitor</th>
+                        )}
                         </tr>
                       </thead>
                       <tbody>
@@ -1151,9 +1153,10 @@ export default function SingleProductpage({
                               }`}
                             />
                           </td>
+                         {userInfo?.isAdmin && ( 
                           <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
                             <AutoreplenishReminder storeProduct={product} business={businessInfo} user={userInfo} baseUrl={EXPRESS_PRIVATE_URL}/>
-                          </td>
+                          </td>)}
                           </tr>
                         ))
                         )}
