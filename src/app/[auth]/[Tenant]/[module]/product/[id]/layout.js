@@ -57,7 +57,7 @@ export default async function layout({ params, children }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const decoy = await params;
 
-  const res = await fetch(`${baseUrl}/api/Product/${Dencrypt(decoy.id)}`, {
+  const res = await fetch(`${baseUrl}/api/Product/${decoy.id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

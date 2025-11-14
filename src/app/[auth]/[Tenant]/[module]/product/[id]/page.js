@@ -27,6 +27,7 @@ import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
 import { useState } from "react";
 import CreateFocButton from "@/app/Components/CreatefocButton";
 import DeleteButton from "@/app/Components/DeleteProduct"
+import AutoreplenishReminder from "@/app/Components/AutoreplenishReminder";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Image from "next/image";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
@@ -1091,71 +1092,72 @@ export default function SingleProductpage({
                 />
               </div>
               {/* store product  */}
-              <table className="w-full text-left text-xs text-black border border-gray-300">
-                <caption className="text-start font-bold text-sm text-gray-600">
-                  {data.Name} In Store Inventory
-                </caption>
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-300 px-2 py-1">#</th>
-                    <th className="border border-gray-300 px-2 py-1">Store</th>
-                    <th className="border border-gray-300 px-2 py-1">
-                      Product
-                    </th>
-                    <th className="border border-gray-300 px-2 py-1">
-                      Quantity in store
-                    </th>
-                    <th className="border border-gray-300 px-2 py-1"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {StoreProduct?.map((log, index) =>
-                    log.products.map((product, pIndex) => (
-                      <tr
-                        key={`${index}-${pIndex}`}
-                        className="border border-gray-300"
-                      >
-                        <td className="border border-gray-300 px-2 py-1">
-                          {index + 1}
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          <Link
+                      <table className="w-full text-left text-xs text-black border border-gray-300">
+                      <caption className="text-start font-bold text-sm text-gray-600">
+                        {data.Name} In Store Inventory
+                      </caption>
+                      <thead className="bg-gray-100">
+                        <tr>
+                        <th className="border border-gray-300 px-2 py-1">#</th>
+                        <th className="border border-gray-300 px-2 py-1">Store</th>
+                        <th className="border border-gray-300 px-2 py-1">
+                          Product
+                        </th>
+                        <th className="border border-gray-300 px-2 py-1">
+                          Quantity in store
+                        </th>
+                        <th className="border border-gray-300 px-2 py-1">Download</th>
+                        <th className="border border-gray-300 px-2 py-1">Monitor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {StoreProduct?.map((log, index) =>
+                        log.products.map((product, pIndex) => (
+                          <tr
+                          key={`${index}-${pIndex}`}
+                          className="border border-gray-300"
+                          >
+                          <td className="border border-gray-300 px-2 py-1">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1">
+                            <Link
                             className="text-blue-600 hover:underline visited:text-purple-600"
                             href={`/${navigation.auth}/${navigation.Tenant
                               }/inventory/inventory/${Encrypt(
-                                product._id
+                              product._id
                               )}?Modules=inventory`}
-                          >
+                            >
                             {log.warehouseName}
-                          </Link>
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          {product.productName}
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          Case:{product.currentQty}, Pcs:{product.pcs}
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1 w-40 text-white">
-                          <ExcelDownloadBtn
+                            </Link>
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1">
+                            {product.productName}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1">
+                            Case:{product.currentQty}, Pcs:{product.pcs}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
+                            <ExcelDownloadBtn
                             data={[
                               {
-                                Store: log.warehouseName,
-                                Product: product.productName,
-                                Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
+                              Store: log.warehouseName,
+                              Product: product.productName,
+                              Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
                               },
                             ]}
                             page={`${log.warehouseName.substring(0, 4) || "store"
                               }-${product.productName.substring(0, 4) || "product"
                               }`}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-                {/* <tfoot className="p-2">
-                  <p className={`text-black font-semibold`}>Refresh table to get updated values </p>
-                </tfoot> */}
+                            />
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
+                            <AutoreplenishReminder storeProduct={product} business={businessInfo} user={userInfo} baseUrl={EXPRESS_PRIVATE_URL}/>
+                          </td>
+                          </tr>
+                        ))
+                        )}
+                      </tbody>
               </table>
 
               {/* Price change */}
