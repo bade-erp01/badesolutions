@@ -3,11 +3,10 @@ import React, { useState } from 'react'
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Encrypt } from '../../../Functions/Functions';
 import{ErrorMessage,SuccessToast,plsWait,} from "../../../Functions/Mics"
-import {useRouter} from 'next/navigation'
  
 export default function ReplenishFeature({storeProduct,business,user,baseUrl}) {
     const [isReplenishing] = useState(storeProduct.autoReplenishment)
-    const router = useRouter();
+
 
     const showModal = async () => {
         // Show your modal here using swal, display a form with 2 inputs: Replenish Level and Replenish Quantity
@@ -38,14 +37,14 @@ export default function ReplenishFeature({storeProduct,business,user,baseUrl}) {
               .then((response) => {
                 if (response.ok) {
                   SuccessToast(response.message || "Auto-replenishment activated successfully");
-                  router.refresh();
+                  location.reload();
                 } else {
                   throw new Error("Failed to activate auto-replenishment");
                 }
               })
               .catch((error) => {
                 ErrorMessage(error.message);
-                router.refresh();
+                location.reload();
               });
         }
     }
