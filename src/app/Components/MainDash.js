@@ -28,6 +28,9 @@ export default function MainDash({ userData }) {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  // for monitored products
+  const [monitoredCurrentPage, setMonitoredCurrentPage] = useState(1);
+  const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
 
   const truncate = (str, length = 20) =>
@@ -43,7 +46,7 @@ export default function MainDash({ userData }) {
     );
   }, [tenantData]);
 
-  // 🧠 Memoized paginated invoices
+  // 🧠 Memoized paginated invoices MonitoredProduct
   const paginatedInvoices = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return sortedInvoices.slice(start, start + itemsPerPage);
@@ -63,6 +66,37 @@ export default function MainDash({ userData }) {
       }
     },
     [totalPages]
+  );
+
+  // 🧠 Memoized paginated MonitoredProduct
+  // 🧠 Memoized sorted monitored products
+  const sortedMonitoredProducts = useMemo(() => {
+    return tenantData?.monitoredProducts?.sort(
+      (a, b) => a.productName.localeCompare(b.productName)
+    ) || [];
+  }, [tenantData]);
+
+  // 🧠 Memoized paginated MonitoredProduct
+  const paginatedMonitoredProduct = useMemo(() => {
+    const start = (monitoredCurrentPage - 1) * monitoredItemsPerPage;
+    return sortedMonitoredProducts.slice(start, start + monitoredItemsPerPage);
+  }, [sortedMonitoredProducts, monitoredCurrentPage]);
+
+  const totalMonitoredProductPages = useMemo(() => {
+    return Math.ceil(sortedMonitoredProducts.length / monitoredItemsPerPage);
+  }, [sortedMonitoredProducts]);
+
+
+  // ⏱ Debounced page change
+  const handleMonitoredProductPageChange = useCallback(
+    (page) => {
+      if (page >= 1 && page <= totalMonitoredProductPages) {
+        setTimeout(() => {
+          setMonitoredCurrentPage(page);
+        }, 300); // 300ms debounce
+      }
+    },
+    [totalMonitoredProductPages]
   );
 
   useEffect(() => {
@@ -402,9 +436,90 @@ export default function MainDash({ userData }) {
                   </button>
                 </div>
               </div>
-            </section>
+              
+            {/* Monitored Products */}
+              <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg text-gray-500 font-semibold">
+                    Monitored Products
+                  </h3>
+                </div>
 
-            {/* Quick stats / chart placeholder */}
+                <div className="overflow-y-hidden max-h-96">
+                  <table className="w-full text-left text-sm">
+                    <thead className="text-xs text-gray-500 border-b">
+                      <tr>
+                        <th className="py-3 border-r">S/N</th>
+                        <th className="p-3">Product Name</th>
+                        <th className="py-3">Available Case</th>
+                        <th className="py-3">Replenish Level</th>
+                        <th className="py-3">Re-Order Amount</th>
+                        <th className="py-3">Action</th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="text-gray-700">
+                      {paginatedMonitoredProduct.length > 0 ? (
+                        paginatedMonitoredProduct.map((product, index) => (
+                          <tr
+                            key={index}
+                            className="border-b animate__animated animate__fadeInRight text-xs"
+                          >
+                            <td className="py-3 border-r">
+                              {(monitoredCurrentPage - 1) * monitoredItemsPerPage + index + 1}
+                            </td>
+                            <td className="p-3 font-semibold text-blue-700">{product.productName}</td>
+                            <td className="py-3">{product.currentQty}</td>
+                            <td className="py-3">{product.replenishMin}</td>
+                            <td className="py-3">{product.replenishQty}</td>
+                            <td className="py-3">
+                              <button className="text-indigo-600 hover:underline">re order</button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="py-6 text-center text-gray-500 text-sm">
+                            No monitored products found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+                  <button
+                    onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage - 1)}
+                    disabled={monitoredCurrentPage === 1}
+                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+                  {Array.from({ length: totalMonitoredProductPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleMonitoredProductPageChange(i + 1)}
+                      className={`px-3 py-1 rounded border ${
+                        monitoredCurrentPage === i + 1
+                          ? "bg-indigo-600 text-white"
+                          : "border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage + 1)}
+                    disabled={monitoredCurrentPage === totalMonitoredProductPages}
+                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </section>
             <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
               <h3 className="text-lg text-gray-500 font-semibold mb-4">
                 🗿 Quick Stats Widget
