@@ -71,7 +71,7 @@ export default function MainDash({ userData }) {
   // 🧠 Memoized paginated MonitoredProduct
   // 🧠 Memoized sorted monitored products
   const sortedMonitoredProducts = useMemo(() => {
-    return tenantData?.monitoredProducts?.sort(
+    return tenantData?.MonitoredProduct?.sort(
       (a, b) => a.productName.localeCompare(b.productName)
     ) || [];
   }, [tenantData]);
