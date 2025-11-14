@@ -16,7 +16,7 @@ import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { ScaleIcon, InboxArrowDownIcon } from "@heroicons/react/24/outline";
+import { ScaleIcon, InboxArrowDownIcon,ShoppingCartIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
@@ -451,10 +451,10 @@ export default function MainDash({ userData }) {
                       <tr>
                         <th className="py-3 border-r">S/N</th>
                         <th className="p-3">Product Name</th>
-                        <th className="py-3">Available Case</th>
-                        <th className="py-3">Replenish Level</th>
-                        <th className="py-3">Re-Order Amount</th>
-                        <th className="py-3">Action</th>
+                        <th className="py-3">InStock</th>
+                        <th className="py-3">Monitor</th>
+                        <th className="py-3">Re-Order</th>
+                        <th className="py-3"></th>
                       </tr>
                     </thead>
 
@@ -468,12 +468,22 @@ export default function MainDash({ userData }) {
                             <td className="py-3 border-r">
                               {(monitoredCurrentPage - 1) * monitoredItemsPerPage + index + 1}
                             </td>
-                            <td className="p-3 font-semibold text-blue-700">{product.productName}</td>
+                            <td className="p-3 font-semibold text-blue-700">
+                              <Link href={`/${
+                                  userData.business.companyName
+                                }/${Encrypt(
+                                  userData.user._id
+                                )}/product/product/${Encrypt(product._id)}?Modules=product`} >
+                                {product.productName}
+                              </Link>
+                            </td>
                             <td className="py-3">{product.currentQty}</td>
                             <td className="py-3">{product.replenishMin}</td>
                             <td className="py-3">{product.replenishQty}</td>
-                            <td className="py-3">
-                              <button className="text-indigo-600 hover:underline">re order</button>
+                            <td className="py-3" title="Raise purchase order">
+                              <button className="text-black hover:underline">
+                                <ShoppingCartIcon className="h-5 w-5 inline-block mr-1" />
+                              </button>
                             </td>
                           </tr>
                         ))
