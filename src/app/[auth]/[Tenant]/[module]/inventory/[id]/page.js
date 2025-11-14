@@ -138,16 +138,12 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
 
             {/* Replenish section */}
             {formData.replenishMin > 0 &&(
-             <div  className="text-sm text-black bg-green-100 border border-green-300 rounded-md px-4 py-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Stock Level Monitoring on Case Min set to
-              </label>
+             <div  className={`text-sm text-black ${formData.replenishMin < formData.currentQty ? "bg-green-100" : "bg-red-100"} border border-green-300 rounded-md px-4 py-2`}>
               <h2 className="inline-block px-3 py-1 text-sm font-semibold text-black ">
-                {formData.replenishMin}
+                {formData.replenishMin < formData.currentQty ? `✅ Stock above Replenish Min (${formData.replenishMin})` : `⚠️  Stock Level has depleted beyond Monitoring, Case: (${formData.replenishMin})`}
               </h2>
             </div>
             )}
-            
 
             {/* isActivated */}
             <div className="col-span-2 flex items-center pt-2">
