@@ -1,107 +1,148 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import {plsWait, ErrorMessage, SuccessToast, Encrypt} from "../../../../../../../Functions/Mics"
-import {useRouter} from "next/navigation"
+import {
+  plsWait,
+  ErrorMessage,
+  SuccessToast,
+  Encrypt,
+} from "../../../../../../../Functions/Mics";
+import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 
-export default function Page({ data, Currentuser,business,baseUrl }) {
-  const [expense, setExpense] = useState(data.expense);
-  const Router = useRouter()
-
-
- const DeleteExpense = async () => {
-  const confirm = await Swal.fire({
-    title: "Are you sure?",
-    text: "This action will permanently delete the expense.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it",
-    cancelButtonText: "Cancel",
+export default function Page({ data, Currentuser, business, baseUrl }) {
+  const [expense] = useState(data.expense);
+  const Router = useRouter();
+  const [AccountList] = useState(data.Accounts || []);
+  const [formData, setFormData] = useState({
+    BankAccount: "",
+    Amount: expense.Amount || "",
+    paymentDate: expense.paymentDate?.slice(0, 10) || "",
+    status: "",
+    Accountant: `${Currentuser.firstName} ${Currentuser.lastName}`
   });
 
-  if (!confirm.isConfirmed) {
-    Swal.fire("Cancelled", "Expense deletion was aborted.", "info");
-    return;
-  }
+  // getBankAccount
+  const getBankAccount = (accountId) => {
+    try {
+      const account = AccountList.find((acc) => acc._id === accountId);
+      return account ? account.NAME : "N/A";
+    } catch (err) {
+      return "N/A";
+    }
+  };
 
-  try {
-    plsWait("Submitting delete request...");
-
-    const request = await fetch(`${baseUrl}/api/Expense/${Encrypt(expense._id)}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${business.tenantId}`,
-        dbConnect: `Bearer ${business.rustyRoof}`,
-        access: `${Encrypt(Currentuser._id)}`,
-      },
+  const DeleteExpense = async () => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will permanently delete the expense.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
     });
 
-    const response = await request.json();
-
-    if (request.ok) {
-      Swal.fire("Deleted!", "Expense has been deleted.", "success");
-      Router.back();
-    } else {
-      throw new Error(response.error);
+    if (!confirm.isConfirmed) {
+      Swal.fire("Cancelled", "Expense deletion was aborted.", "info");
+      return;
     }
-  } catch (err) {
-    ErrorMessage(err.message);
-  }
- };
 
+    try {
+      plsWait("Submitting delete request...");
 
-const ActionBTN = async (action) => {
-  const confirm = await Swal.fire({
-    title: "Are you sure?",
-    text: "This action will Approve expense and register entries into Head and sub accounting Ledgers.",
-    icon: "info",
-    showCancelButton: true,
-    confirmButtonColor: "green",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, Proceed",
-    cancelButtonText: "Cancel",
-  });
-
-  if (!confirm.isConfirmed) {
-    Swal.fire("Cancelled", "Expense deletion was aborted.", "info");
-    return;
-  }
-
-  try {
-    plsWait("Submitting delete request...");
-
-        const request = await fetch(`${baseUrl}/api/Expense/${Encrypt(expense._id)}`, {
-        method: "PUT",
-        body: JSON.stringify(expense), 
-        headers: {
+      const request = await fetch(
+        `${baseUrl}/api/Expense/${Encrypt(expense._id)}`,
+        {
+          method: "DELETE",
+          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${business.tenantId}`,
             dbConnect: `Bearer ${business.rustyRoof}`,
-            access: Encrypt(Currentuser._id), 
-        },
-        });
+            access: `${Encrypt(Currentuser._id)}`,
+          },
+        }
+      );
 
-    const response = await request.json();
+      const response = await request.json();
 
-    if (request.ok) {
-      SuccessToast(response.message)
-      Router.refresh();
-    } else {
-      throw new Error(response.error);
+      if (request.ok) {
+        Swal.fire("Deleted!", "Expense has been deleted.", "success");
+        Router.back();
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (err) {
+      ErrorMessage(err.message);
     }
-  } catch (err) {
-     ErrorMessage(err.message);
-  }
-};
+  };
 
+
+// Action Button Handler
+  const ActionBTN = async (action) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: `This action will set Expense as ${action} and register entries into Head and sub accounting Ledgers.`,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "green",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Proceed",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!confirm.isConfirmed) {
+      return;
+    }
+
+    try {
+      setFormData({ ...formData, status: action });
+      console.log(formData)
+      
+      // validate user input and ensure all fields are filled
+      if (
+        !formData.Amount ||
+        !formData.paymentDate ||
+        !formData.status ||
+        !formData.BankAccount
+      ) {
+        ErrorMessage("Validation Error,Please fill in all fields.");
+        return;
+      }
+      
+      plsWait(`Submitting ${action} request...`);
+
+      const request = await fetch(
+        `${baseUrl}/api/Expense/${Encrypt(expense._id)}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${business.tenantId}`,
+            dbConnect: `Bearer ${business.rustyRoof}`,
+            access: Encrypt(Currentuser._id),
+          },
+        }
+      );
+
+      const response = await request.json();
+
+      if (request.ok) {
+        SuccessToast(response.message);
+        Router.refresh();
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (err) {
+      ErrorMessage(err.message);
+    }
+  };
 
   return (
     <>
-      <div className="max-w-full p-3 m-3 md:py-10 bg-gray-200  animate__animated animate__fadeIn rounded-lg">
+      <div className="max-w-full p-3 m-3 md:py-10 bg-white shadow-md animate__animated animate__fadeIn rounded-lg">
         {/* Product Image */}
         <div className="w-full flex justify-center mb-3">
           {expense.image ? (
@@ -198,7 +239,7 @@ const ActionBTN = async (action) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Expense Date:
+                Request Date:
               </label>
               <h5 className="text-gray-700 text-sm font-medium">
                 {expense?.Date}
@@ -219,18 +260,23 @@ const ActionBTN = async (action) => {
                 Requested Amount:
               </label>
               {Currentuser.expenseApprover && expense.status === "pending" ? (
-              <input
-                type="number"
-                value={expense?.Amount}
-                min={1}
-                step="any"
-                name="Amount"
-                className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                <input
+                  type="number"
+                  value={formData?.Amount}
+                  min={1}
+                  step="any"
+                  name="Amount"
+                  required
+                  onChange={(e) =>
+                    setFormData({ ...formData, Amount: e.target.value })
+                  }
+                  placeholder="Modify amount paid here"
+                  className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
-              ):(
-              <h5 className="text-gray-700 text-xl font-medium">
-                {expense?.Amount}
-              </h5>
+              ) : (
+                <h5 className="text-gray-700 text-sm font-medium">
+                  {expense?.Amount}
+                </h5>
               )}
             </div>
 
@@ -239,18 +285,51 @@ const ActionBTN = async (action) => {
                 payment Date:
               </label>
               {Currentuser.expenseApprover && expense.status === "pending" ? (
-              <input
-                type="date"
-                value={expense?.paymentDate?.slice(0, 10)}
-                name="paymentDate"
-                className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                <input
+                  type="date"
+                  value={formData.paymentDate}
+                  name="paymentDate"
+                  onChange={(e) =>
+                    setFormData({ ...formData, paymentDate: e.target.value })
+                  }
+                  className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
-              ):(
-              <h5 className="text-gray-700 text-xl font-medium">
-                {expense?.paymentDate}
-              </h5>
+              ) : (
+                <h5 className="text-gray-700 text-sm font-medium">
+                  {expense?.paymentDate}
+                </h5>
               )}
-              
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Expense Account:
+              </label>
+              {Currentuser.expenseApprover && expense.status === "pending" ? (
+                <select
+                  id="BankAccount"
+                  name="BankAccount"
+                  required
+                  onChange={(e) =>
+                    setFormData({ ...formData, BankAccount: e.target.value })
+                  }
+                  value={formData.BankAccount}
+                  className="bg-white px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                >
+                  <option disabled value="">
+                    Choose...
+                  </option>
+                  {AccountList.map((acc) => (
+                    <option key={acc._id} value={acc._id}>
+                      {acc.NAME}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <h5 className="text-gray-700 text-sm font-medium">
+                  {expense?.BankAccount?.NAME}
+                </h5>
+              )}
             </div>
 
             <div>
@@ -270,7 +349,7 @@ const ActionBTN = async (action) => {
           {Currentuser.expenseApprover && expense.status === "pending" && (
             <>
               <button
-                onClick={()=>ActionBTN("Approved")}
+                onClick={() => ActionBTN("Approved")}
                 className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-label="Approve Expense"
               >
@@ -321,7 +400,7 @@ const ActionBTN = async (action) => {
 
           {Currentuser.expenseApprover && expense.status === "Approved" && (
             <button
-                onClick={()=>ActionBTN("Reverse")}
+              onClick={() => ActionBTN("Reverse")}
               className="flex items-center gap-2 bg-red-400 text-white px-5 py-2.5 rounded-lg shadow hover:bg-red-500 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 "
               aria-label="Reverse Expense"
             >

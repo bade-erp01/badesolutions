@@ -76,7 +76,7 @@ export default async function ExpenseLayout({ children, params }) {
           Module={[{}]}
         />
 
-        <div className="flex flex-1 text-white bt-2 max-h-screen">
+        <div className="flex flex-1 text-white bt-2 overflow-hidden">
           {/* Sidebar */}
           <aside
             className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
@@ -116,7 +116,7 @@ export default async function ExpenseLayout({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative z-10 max-h-[83dvh] overflow-y-auto">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative z-10 max-h-[82dvh] overflow-y-auto">
               {/* display Charts of accounts */}
               {children}
             </section>
