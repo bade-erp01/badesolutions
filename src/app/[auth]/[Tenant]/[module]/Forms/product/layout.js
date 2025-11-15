@@ -4,8 +4,7 @@ import Nav1 from '@/app/Components/Nav1'
 import Footer2 from '@/app/Components/Footer2'
 import {fetchUser} from '../../../../../../../Functions/useerDataRefresh'
 import {Encrypt} from "../../../../../../../Functions/Functions"
-import Link from "next/link";
-import Image from "next/image";
+import BackButton from "@/app/Components/BackBotton";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -84,52 +83,20 @@ export default async function Productlayout({ children, params }) {
       >
         {/* Sidebar (collapsible on mobile) */}
         <aside
-          className={`w-70  bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block`}
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
+         className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
+          style={{ overflowY: "auto" }}
         >
          <h2 className="text-lg text-white font-bold mb-4">New Product</h2>
           <hr />
           <nav className="space-y-4 ">
-            {userData?.user?.isAdmin && (
-              <Link
-                href={`/auth/Apps`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <Image
-                  src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
-                  width={24}
-                  height={24}
-                  alt="Settings"
-                />
-                <small>App Store</small>
-              </Link>
-            )}
+           <BackButton />
           </nav>
 
-          {/* Bottom Section with Settings Link */}
-          <div className="absolute bottom-4 left-4">
-            {userData?.user?.isAdmin && (
-              <Link
-                href={`/${userData?.business?.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/SetUp`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <Image
-                  src="https://img.icons8.com/3d-fluency/94/gear--v1.png"
-                  width={24}
-                  height={24}
-                  alt="Settings"
-                />
-                <span>Settings</span>
-              </Link>
-            )}
-          </div>
+          
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6 relative z-10 h-[500px] overflow-y-auto">
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
             {/* {children} */}
              <ProductForm userData={userData.user} businessData={userData.business} VendorList={VendorList}/>
           </section>

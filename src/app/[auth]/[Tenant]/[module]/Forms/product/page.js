@@ -1,5 +1,5 @@
 "use client";
-import BackButton from "@/app/Components/BackBotton";
+
 import {
   PhotoIcon,
   UserCircleIcon,
@@ -51,8 +51,9 @@ export default function ProductForm({ userData, businessData, VendorList }) {
   const config = {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-      "X-Requested-With": "XMLHttpRequest",
+      Authorization: `Bearer ${businessData.tenantId}`,
+      dbConnect: `Bearer ${businessData.rustyRoof}`,
+      access: `${Encrypt(userData._id)}`,
     },
   };
 
@@ -81,7 +82,6 @@ export default function ProductForm({ userData, businessData, VendorList }) {
   return (
     <>
       <div className="m-5 p-4 shadow-2xl border-lg border-2-black bg-white">
-        <BackButton />
         <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
           <div className="border-b bg- border-gray-900/10 pb-12">
             <h2 className="text-base/7 font-semibold text-gray-900">
