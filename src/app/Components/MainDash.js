@@ -445,7 +445,8 @@ export default function MainDash({ userData }) {
                   </h3>
                 </div>
 
-                <div className="overflow-y-hidden max-h-96">
+                {paginatedMonitoredProduct.length > 0 && (
+                  <div className="overflow-y-hidden max-h-96">
                   <table className="w-full text-left text-sm">
                     <thead className="text-xs text-gray-500 border-b">
                       <tr>
@@ -496,7 +497,7 @@ export default function MainDash({ userData }) {
                       )}
                     </tbody>
                   </table>
-                </div>
+                </div>)}
 
                 {/* Pagination Controls */}
                 <div className="flex justify-center items-center gap-2 mt-4 text-sm">
