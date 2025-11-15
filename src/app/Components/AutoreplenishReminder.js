@@ -36,10 +36,10 @@ export default function ReplenishFeature({storeProduct,business,user,baseUrl}) {
             })
               .then((response) => {
                 if (response.ok) {
-                  SuccessToast(response.message || "Auto-replenishment activated successfully");
+                  SuccessToast(response.message || "Auto-replenishment actioned successfully");
                   location.reload();
                 } else {
-                  throw new Error("Failed to activate auto-replenishment");
+                  throw new Error("Failed to action auto-replenishment");
                 }
               })
               .catch((error) => {
