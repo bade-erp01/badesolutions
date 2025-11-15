@@ -682,7 +682,7 @@ export default function InvoicePage({
             title={`Send via Mail ${Singlebill.billStatus}`}
             onClick={async () => {
               plsWait("Sending Mail");
-              const api = `${EXPRESS_PRIVATE_URL}/api/sendmail/${Singlebill._id}/${userInfo.user.firstName}`;
+              const api = `${EXPRESS_PRIVATE_URL}/api/sendmail/${Encrypt(Singlebill._id)}/${userInfo.user.firstName}`;
 
               const request = await fetch(api, {
                 method: "GET",
@@ -750,7 +750,7 @@ export default function InvoicePage({
           )}
 
           {/* duplicate */}
-            {userInfo.business.subscriptionplan === "Standard" && userInfo.user.raiseInvoice && Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
+            {userInfo.business.subscriptionplan === "Standard" && userInfo.user.raiseInvoice && !Singlebill.reBilled && Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
               <button
               title={`Re-Bill ${Singlebill.billReferenceNo}`}
               onClick={Rebill}
