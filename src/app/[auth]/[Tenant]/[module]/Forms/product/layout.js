@@ -54,13 +54,15 @@ export const metadata = {
 export default async function Productlayout({ children, params }) {
   // const module = await params;
   const userData = await fetchUser();
-   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/vendors`, {
+   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const res = await fetch(`${baseUrl}/api/Vendors`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${ Encrypt(userData.business.tenantId)}`
-    },
+         "Content-Type": "application/json",
+         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+         dbConnect: `Bearer ${userData.business.rustyRoof}`,
+         access: `${Encrypt(userData.user._id)}`,
+       },
      // cache: 'no-store', // Ensures fresh data on every request
     next: {
       revalidate: 60 ,// revalidate every 60 seconds
@@ -98,7 +100,7 @@ export default async function Productlayout({ children, params }) {
         <main className="flex-1 ">
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
             {/* {children} */}
-             <ProductForm userData={userData.user} businessData={userData.business} VendorList={VendorList}/>
+             <ProductForm EXPRESS_PRIVATE_URL={baseUrl} userData={userData.user} businessData={userData.business} VendorList={VendorList}/>
           </section>
         </main>
       </div>

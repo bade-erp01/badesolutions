@@ -11,11 +11,11 @@ import {
   SuccessToast,
   ErrorMessage,
 } from "../../../../../../../Functions/Mics";
-import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
+import { Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export default function ProductForm({ userData, businessData, VendorList }) {
+export default function ProductForm({ userData, businessData, VendorList,EXPRESS_PRIVATE_URL }) {
   const [user] = useState(userData);
   const [business] = useState(businessData);
   const router = useRouter();
@@ -63,7 +63,7 @@ export default function ProductForm({ userData, businessData, VendorList }) {
     try {
       plsWait("Creating Product...⌛");
 
-      const url = `${EXPRESS_PRIVATE_URL}/${business.companyName}/Product/Create-new`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Product/Create-new`;
 
       const { data } = await axios.post(url, formData, config);
 
@@ -347,7 +347,7 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                     id="VAT"
                     name="VAT"
                     onChange={handleChange}
-                    type="text"
+                    type="number"
                     step="any"
                     autoComplete="address-level2"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -360,13 +360,13 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist1"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist 1
+                 {business.priceList1}
                 </label>
                 <div className="mt-2">
                   <input
                     id="Pricelist1"
                     name="Pricelist1"
-                    type="text"
+                    type="number"
                     step="any"
                     onChange={handleChange}
                     autoComplete="Pricelist-level1"
@@ -380,14 +380,14 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist2"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist2
+                   {business.priceList2}
                 </label>
                 <div className="mt-2">
                   <input
                     onChange={handleChange}
                     id="Pricelist2"
                     name="Pricelist2"
-                    type="text"
+                    type="number"
                     step="any"
                     autoComplete="Pricelist2-code"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -402,14 +402,14 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist3"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist3
+                   {business.priceList3}
                 </label>
                 <div className="mt-2">
                   <input
                     id="Pricelist3"
                     name="Pricelist3"
                     onChange={handleChange}
-                    type="text"
+                    type="number"
                     step="any"
                     autoComplete="Pricelist-level2"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -422,13 +422,13 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist4"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist4
+                  {business.priceList4}
                 </label>
                 <div className="mt-2">
                   <input
                     id="Pricelist4"
                     name="Pricelist4"
-                    type="text"
+                    type="number"
                     step="any"
                     onChange={handleChange}
                     autoComplete="Pricelist1-level1"
@@ -442,14 +442,14 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist5"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist5
+                  {business.priceList5}
                 </label>
                 <div className="mt-2">
                   <input
                     onChange={handleChange}
                     id="Pricelist5"
                     name="Pricelist5"
-                    type="text"
+                    type="number"
                     step="any"
                     autoComplete="Pricelist1-code"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -462,7 +462,7 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist6"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist6
+                  {business.priceList6}
                 </label>
                 <div className="mt-2">
                   <input
@@ -470,7 +470,7 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                     name="Pricelist6"
                     step="any"
                     onChange={handleChange}
-                    type="text"
+                    type="number"
                     autoComplete="Pricelist1-level2"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
@@ -482,13 +482,13 @@ export default function ProductForm({ userData, businessData, VendorList }) {
                   htmlFor="Pricelist7"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Pricelist7
+                  {business.priceList7}
                 </label>
                 <div className="mt-2">
                   <input
                     id="Pricelist7"
                     name="Pricelist7"
-                    type="text"
+                    type="number"
                     step="any"
                     onChange={handleChange}
                     autoComplete="Pricelist1-level1"
