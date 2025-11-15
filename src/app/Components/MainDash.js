@@ -438,15 +438,15 @@ export default function MainDash({ userData }) {
               </div>
               
             {/* Monitored Products */}
-              <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
+              {paginatedMonitoredProduct.length > 0 ? (
+                <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg text-gray-500 font-semibold">
                     Monitored Products
                   </h3>
                 </div>
 
-                {paginatedMonitoredProduct.length > 0 ? (
-                  <div className="overflow-y-hidden max-h-96">
+                <div className="overflow-y-hidden max-h-96">
                   <table className="w-full text-left text-sm">
                     <thead className="text-xs text-gray-500 border-b">
                       <tr>
@@ -498,9 +498,6 @@ export default function MainDash({ userData }) {
                     </tbody>
                   </table>
                 </div>
-                ):(
-                  ""
-                )}
 
                 {/* Pagination Controls */}
                 <div className="flex justify-center items-center gap-2 mt-4 text-sm">
@@ -533,6 +530,7 @@ export default function MainDash({ userData }) {
                   </button>
                 </div>
               </div>
+            ):""}
             </section>
             <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
               <h3 className="text-lg text-gray-500 font-semibold mb-4">
