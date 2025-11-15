@@ -473,7 +473,7 @@ export default function MainDash({ userData }) {
                                   userData.business.companyName
                                 }/${Encrypt(
                                   userData.user._id
-                                )}/product/product/${Encrypt(product._id)}?Modules=product`} >
+                                )}/product/product/${Encrypt(product.productId)}?Modules=product`} >
                                 {product.productName}
                               </Link>
                             </td>
