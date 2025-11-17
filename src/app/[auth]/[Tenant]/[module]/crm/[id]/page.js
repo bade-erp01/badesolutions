@@ -748,7 +748,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               : "text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2"
             }`}
         >
-         Balance: {cust.Debt.toLocaleString()}
+         Balance: {cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
         </span>
       </div>
 
@@ -1456,10 +1456,14 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                             {moment(tx.Date).format("MMM D, YYYY")}
                           </td>
                           <td className="px-2 py-1">
-                            CR: {tx.CreditAmount?.toLocaleString()}
+                             <span className={`inline-block px-2 py-0.5  text-black ${tx.CreditAmount > 0 ? " text-xs rounded-full bg-green-500/30" : ""}`}>
+                              CR: {tx.CreditAmount?.toLocaleString()}
+                            </span>
                           </td>
                           <td className="px-2 py-1">
+                            <span className={`inline-block px-2 py-0.5  text-black ${tx.DebitAmount > 0 ? " text-xs rounded-full bg-red-500/30" : ""}`}>
                             DR: {tx.DebitAmount?.toLocaleString()}
+                            </span>
                           </td>
                           <td
                             className={`px-2 py-1 ${tx.Balance < 0 ? "text-green-700" : "text-black"
