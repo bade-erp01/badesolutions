@@ -40,7 +40,7 @@ export default function Page({ data }) {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Receivables</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Account Receivables</h1>
         <p className="text-gray-600">Showing {payments.length} most recent payments</p>
       </div>
 
@@ -50,7 +50,7 @@ export default function Page({ data }) {
           <table className="w-full table-auto divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
-                {["Ref No", "Customer", "Accountant", "Type", "Status", "Date", "Bank", "CR"].map((header) => (
+                {["Ref No", "Customer", "Accountant", "Type", "Status", "Date", "Bank", "Amount"].map((header) => (
                   <th key={header} className="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                     {header}
                   </th>
