@@ -308,12 +308,11 @@ export default function DraftPurchasePage({
 
       plsWait("Updating Request for Purchase");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/VendorBillPost?po=${Singlebill._id}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/VendorBillPost?po=${Singlebill._id}&user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
 
       const response = await fetch(url, {
         method: "PATCH",
         body: JSON.stringify({
-          // ...Singlebill,
           status: status,
         }),
          headers: {

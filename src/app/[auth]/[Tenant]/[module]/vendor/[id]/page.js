@@ -1,20 +1,20 @@
 "use client";
 import Swal from 'sweetalert2';
 import {useRouter} from "next/navigation";
-import {ClipboardIcon,} from "@heroicons/react/24/outline";
+import {ClipboardIcon,PrinterIcon,BanknotesIcon} from "@heroicons/react/24/outline";
 import { plsWait, ErrorMessage,SuccessToast } from "../../../../../../../Functions/Mics";
 import axios from "axios";
 import moment from "moment";
 import { useEffect } from 'react';
 import Plotly from 'plotly.js-dist-min';
-import { Encrypt, DecryptBAckend,EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
+import { Encrypt,Dencrypt,EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
 import {driver} from "driver.js";
 import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
 import {useState} from 'react'
 import Image from "next/image"
 
 
-export default function SingleVendorpage({userInfo,Backdata,wh}) {
+export default function SingleVendorpage({AccountingFinder,userInfo,Backdata,wh,baseUrl,banks,Locations}) {
   const [user] = useState(userInfo);
   const [data] = useState(Backdata);
   const router = useRouter()
@@ -80,7 +80,7 @@ const RFP = async () => {
     if (result.isConfirmed) {
       plsWait('setting things up... please wait')
       //send  post request to server
-      const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/purchase/request`,{
+      const request = await fetch(`${baseUrl}/api/purchase/request`,{
         method:'POST',
         body:JSON.stringify( result.value),
         headers
@@ -114,7 +114,7 @@ const RFP = async () => {
     try {
       e.preventDefault()
       plsWait('Updating ...')
-     const { data } = await axios.patch(`${EXPRESS_PRIVATE_URL}/${userInfo.business.companyName}/vendor/update/${Encrypt(Backdata._id)}`,formData,{headers})
+     const { data } = await axios.patch(`${baseUrl}/${userInfo.business.companyName}/vendor/update/${Encrypt(Backdata._id)}`,formData,{headers})
 
      if (data && data.message) {
        SuccessToast(data.message);
@@ -129,9 +129,147 @@ const RFP = async () => {
   }
 
 
+  // post payment for vendor
+  async function postPayment(customerId) {
+    const { value: formValues } = await Swal.fire({
+      title: 'Register Payment',
+      html: `
+        <style>
+          .swal2-input, .swal2-select {
+            padding: .75rem 1rem;
+            border: 1px solid #D1D5DB;
+            border-radius: .375rem;
+            font-size: 1rem;
+            box-shadow: none;
+            transition: border-color .2s, box-shadow .2s;
+            width: 60%;
+            margin-top: .5rem;
+          }
+          .swal2-input:focus, .swal2-select:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            outline: none;
+          }
+        </style>
+  
+        <div className="w-full p-1 justify-center overflow-hidden">
+          <input
+            id="swal-amount"
+            type="number"
+            min="1"
+            class="swal2-input"
+            placeholder="Amount (₦)"
+          />
+          <input
+            id="swal-date"
+            type="date"
+            class="swal2-input"
+            placeholder="Payment Date"
+          />
+          <input
+            id="swal-ref"
+            type="text"
+            class="swal2-input"
+            placeholder="Reference"
+          />
+          <select id="swal-method" class="swal2-select">
+            <option value="" disabled selected>Select Payment Journal</option>
+            ${banks.map(bank => `<option value="${Encrypt(bank._id)}">${bank.NAME}</option>`).join('')}
+          </select>
+          <select id="swal-location" class="swal2-select">
+            <option value="" disabled selected>Select Location</option>
+            ${Locations.map(location => `<option value="${Encrypt(location._id)}">${location.name}</option>`).join('')}
+          </select>
+        </div>
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Submit',
+      preConfirm: () => {
+        const amount = document.getElementById('swal-amount').value;
+        const date = document.getElementById('swal-date').value;
+        const refInput = document.getElementById('swal-ref');
+        let reference = refInput.value;
+        const type = document.getElementById('swal-method').value;
+        const location = document.getElementById('swal-location').value;
+
+        if (!amount || !date || !type || !reference) {
+          Swal.showValidationMessage('Amount, Date, Bank Journal, and Reference are required');
+          return false;
+        }
+  
+        // Auto-generate reference if type is Cash and reference is empty
+        // if (type === 'Cash' && !reference) {
+        //   const timestamp = Date.now();
+        //   reference = `Cash-${timestamp}`;
+        //   refInput.value = reference; // Update the input field visually
+        // }
+  
+        if (!reference) {
+          Swal.showValidationMessage('Reference is required');
+          return false;
+        }
+  
+        return { amount, date, reference, type, location  };
+      },
+      showClass: {
+        popup: 'animate__animated animate__fadeInUp animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutDown animate__faster'
+      }
+    });
+  
+    if (!formValues) return; // User cancelled
+  
+    Swal.fire({
+      title: 'Registering Vendor payment…',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+  
+    try {
+      const response = await fetch(`${baseUrl}/api/Payable/Payment`, {
+        method: 'POST',
+        body: JSON.stringify({
+          vendor: Dencrypt(customerId),
+          Amount: formValues.amount,
+          PaymentDate: formValues.date,
+          billReferenceNo: `VND-PYMT-${formValues.reference}`,
+          bankAccount: Dencrypt(formValues.type),
+          location: formValues.location !== "" ? Dencrypt(formValues.location):"",
+          AccountatntId: `${userInfo.user.firstName} ${userInfo.user.lastName}`,
+        }),
+        headers,
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || 'Payment failed');
+      }
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Payment Registered and pending approval',
+        html: `
+          <p><strong>Amount:</strong> ₦${formValues.amount}</p>
+          <p><strong>Date:</strong> ${formValues.date}</p>
+          <p><strong>Reference:</strong> ${formValues.reference}</p>
+        `,
+        confirmButtonText: 'OK'
+      });
+  
+      window.location.href = `/${userInfo.business.companyName.trim()}/${Encrypt(userInfo.user._id)}/accounting/accounting/vendorsPayment/vendorsPayment/${data.data}`;
+    } catch (err) {
+      ErrorMessage(err.message || 'Something went wrong. Please try again.')
+    }
+  }
+
+
   return (
     <>
-      <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
+      <div className=" p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
         <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h4 className="text-xl font-bold text-gray-800">
@@ -140,7 +278,7 @@ const RFP = async () => {
             <span
               className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200`}
             >
-            Balance: {Backdata.Balance}
+            Balance: {Backdata.Balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </span>
           </div>
           <div className="flex flex-wrap gap-8 items-center py-4">
@@ -167,6 +305,19 @@ const RFP = async () => {
               Request for Purchase
             </span>
             )}
+
+            {AccountingFinder && !formData.block_vendor && userInfo.user.postVendorPayment &&(
+              <span onClick={() => postPayment(Encrypt(formData._id))}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
+              <BanknotesIcon className="h-6 w-6 text-gray-100" />
+              Pay Supplier
+            </span>
+            )}
+
+            {/* <span onClick={RFP}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
+              <PrinterIcon className="h-6 w-6 text-gray-100" />
+              Generate Report
+            </span> */}
+
           </div>
 
           {/* Sales Insight */}

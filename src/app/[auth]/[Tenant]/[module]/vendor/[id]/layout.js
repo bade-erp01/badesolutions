@@ -49,7 +49,8 @@ export default async function SingleVendorPagelayout({ params }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const Params = await params;
 
-  const res = await fetch(`${baseUrl}/api/Vendor/${Params.id}`, {
+  const [res,Acc] = await Promise.all([
+    await fetch(`${baseUrl}/api/Vendor/${Params.id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -59,9 +60,30 @@ export default async function SingleVendorPagelayout({ params }) {
     },
     // Optional: Add caching headers if needed
     next: { revalidate: 120 }, // Revalidate every 2 minutes
-  });
+  }),
 
-  if (!res.ok) {
+  // get all bank  accounts
+  await fetch(`${baseUrl}/api/Bank/Accounts`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+      dbConnect:`Bearer ${userData.business.rustyRoof}`,
+      access:`${Encrypt(userData.user._id)}`
+    },
+    // Optional: Add caching headers if needed
+    next: { revalidate: 120 }, // Revalidate every 2 minutes
+  })
+
+  
+  ])
+
+  // check if business has Accounting module enabled
+const AccountingFinder = userData.business.modules.find(app=>{
+    return app.Name === "Accounting"
+  })
+
+  if (!res.ok || !Acc.ok) {
     // Handle error gracefully
     return (
       <div className="text-center text-red-500">
@@ -71,10 +93,11 @@ export default async function SingleVendorPagelayout({ params }) {
   }
 
   const req = await res.json();
+  const Accs = await Acc.json();
 
   return (
     <div>
-      <SingleVendorpage Backdata={req.vendor} wh={req.WH} userInfo={userData} />
+      <SingleVendorpage AccountingFinder={AccountingFinder} banks={Accs} Backdata={req.vendor} Locations={req.Locations} wh={req.WH} userInfo={userData} baseUrl={baseUrl} />
     </div>
   );
 }

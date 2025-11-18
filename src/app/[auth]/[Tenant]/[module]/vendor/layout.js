@@ -76,14 +76,13 @@ export default async function layout({children,params}) {
               <div className="flex flex-1 text-white bt-2">
                 {/* Sidebar (collapsible on mobile) */}
                 <aside
-                   className={` bg-[#1e1e20]/80 backdrop-blur-lg
-                  text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block`}
-              style={{ maxHeight: "600px", overflowY: "scroll" }}
+                   className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
+                   style={{ overflowY: "auto" }}
                 >
                  <BackButton />
                   <hr />
                   <nav className="space-y-4">
-                    {/* <Link
+                    <Link
                       href={`/${userData.business?.companyName
                         .toLowerCase()
                         .replace(/\s+/g, "-")
@@ -99,7 +98,7 @@ export default async function layout({children,params}) {
                         alt="Settings"
                       />
                       <small>New Vendor</small>
-                    </Link> */}
+                    </Link>
 
                     {userData.user.raiseLpo || (userData.user.allowInternalTransfers && (
                     <Link
@@ -127,7 +126,7 @@ export default async function layout({children,params}) {
                 </aside>{" "}
                 {/* Main Content Area */}
                 <main className="flex-1 ">
-                  <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg  relative z-10 h-[500px] overflow-y-auto">
+                  <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[82dvh] overflow-y-auto">
                      {children}
                   </section>
                 </main>
