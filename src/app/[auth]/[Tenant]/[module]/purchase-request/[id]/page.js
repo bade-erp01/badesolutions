@@ -481,7 +481,7 @@ export default function DraftPurchasePage({
           {bill.status.toLowerCase() !== "draft" && (
             <button
               title={`Download and Print ${Singlebill.status}`}
-              className=" group inline-flex items-center rounded-lg justify-center gap-3 px-6 py-3 bg-white text-gray-800 font-semibold border hover:text-orange-700 transition duration-200 ease-in-out text-xs"
+              className=" group inline-flex items-center rounded-lg justify-center gap-3 px-6 py-3 bg-gray-600 text-white font-semibold border transition duration-200 ease-in-out text-xs"
             >
               <span>Print</span>
               <PrinterIcon className="h-5 w-5 text-white" />
