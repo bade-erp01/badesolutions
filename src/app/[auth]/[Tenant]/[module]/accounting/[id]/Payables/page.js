@@ -117,7 +117,7 @@ export default function Page({ baseUrl, userData,VendorList,BanksList }) {
                             </Link>
                           </td>
                           <td className="px-4 py-2 truncate">{filteredVendors(bill.vendor)}</td>
-                            <td className="px-4 py-2 truncate">{bill.AccountatntId}</td>
+                          <td className="px-4 py-2 truncate">{bill.AccountatntId}</td>
                           <td className="px-4 py-2 truncate">{moment(bill.PaymentDate).format("YYYY-MM-DD")}</td>
                           <td className="px-4 py-2 truncate">
                           <span

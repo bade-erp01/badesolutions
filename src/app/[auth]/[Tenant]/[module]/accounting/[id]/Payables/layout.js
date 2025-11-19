@@ -6,10 +6,8 @@ import {Encrypt} from "../../../../../../../../Functions/Mics"
 import Page from "./page"
 import Link from "next/link"
 import Image from "next/image"
-import DebtorsReportModal from "@/app/Components/Reports/DebtorsReport";
-import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
 import { CreditCardIcon,BanknotesIcon } from "@heroicons/react/24/outline";
-import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
+import PayableRegister from "@/app/Components/Reports/PayableRegister";
 import { notFound } from 'next/navigation';
 
 export const metadata = {
@@ -168,13 +166,12 @@ export default async function AccountingPage({ children, params }) {
                 </Link>
               )}
                
-              {/* <DebtorsReportModal users={parsedUsers} business={userData.business} data={data.Customers} /> */}
-              {/* <ReceivablesAgingModal data={data.Customers} /> */}
-              {/* <CashregisterReport
-                dataArray={data.Payments}
-                banks={data.Accounts}
-                customers={data.Customers}
-              /> */}
+              <PayableRegister
+                banks={BanksList}
+                customers={VendorList}
+                userData={userData}
+                baseUrl={baseUrl}
+              />
             </nav>
           </aside>
 
