@@ -441,7 +441,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       doc.text(`Period: ${startDate} to ${endDate}`, 20, 35);
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
-      doc.text(`Current Balance: ${cust.Debt.toFixed(2).toLocaleString()}`, 20, 42);
+      doc.text(`Current Balance: ${cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 20, 42);
 
       // 🖼️ Logo
       doc.addImage(imageDataURL, "PNG", 150, 10, 35, 35);
@@ -452,9 +452,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         i + 1,
         tx.ReferenceNo.toUpperCase(),
         `${moment(new Date(tx.Date)).format("YYYY-MM-DD")}`,
-        `${tx.CreditAmount.toFixed(2).toLocaleString()}`,
-        `${tx.DebitAmount.toFixed(2).toLocaleString()}`,
-        `${tx.Balance.toFixed(2).toLocaleString()}`,
+        `${tx.CreditAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${tx.DebitAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${tx.Balance?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
       ]);
 
       // ➕ Add final "Current Balance" row
