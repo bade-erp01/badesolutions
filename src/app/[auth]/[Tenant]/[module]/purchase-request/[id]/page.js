@@ -412,7 +412,7 @@ export default function DraftPurchasePage({
               <button
                 onClick={() => updateRFP("Pending")}
                     title="Process this draft to order"
-                    className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-green-600 text-white font-semibold hover:shadow-xl hover:bg-green-500 transition duration-200 ease-in-out text-xs"
+                    className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-white font-semibold hover:shadow-xl  transition duration-200 ease-in-out text-xs"
                   >
                     <KeyIcon className="h-6 w-6 text-white" />
                     <span>Lock Request</span>
@@ -423,7 +423,7 @@ export default function DraftPurchasePage({
                   {user.raiseLpo &&
                   Singlebill.status.toLowerCase() === "draft" && (
                       <div>
-                        <button className="inline-flex items-center justify-center bg-indigo-300  border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl hover:bg-indigo-400 transition duration-200 ease-in-out text-xs" onClick={uploadLPOFile}>
+                        <button className="inline-flex items-center justify-center bg-gray-600  border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl  transition duration-200 ease-in-out text-xs" onClick={uploadLPOFile}>
                           upload Attachement 
                           <PaperClipIcon className="h-6 w-6 text-white`" />
                         </button>
@@ -435,7 +435,7 @@ export default function DraftPurchasePage({
                   <button
                   onClick={() => updateRFP("Draft")}
                   title="Set this purchase request back to draft"
-                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-md hover:shadow-lg hover:from-green-500 hover:to-blue-400 transition-all duration-200 ease-in-out"
+                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gray-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
                   >
                  <PencilIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200 text-xs" />
                   <span>Set to Draft</span>
@@ -446,7 +446,7 @@ export default function DraftPurchasePage({
                   <button
                   onClick={() => updateRFP("approved")}
                   title="Approve this purchase request"
-                   className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-orange-600 to-orange-500 text-white font-medium shadow-md hover:shadow-lg hover:from-purple-500 hover:to-orange-400 transition-all duration-200 ease-in-out"
+                   className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gray-600 text-white font-medium shadow-md hover:shadow-lg  transition-all duration-200 ease-in-out"
                   >
                  <CheckBadgeIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200 text-xs" />
                   <span>Approve</span>

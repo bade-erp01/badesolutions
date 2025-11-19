@@ -529,25 +529,7 @@ const RFP = async () => {
           
           </div>
 
-          <div className="border-b border-gray-900/10 pb-12">
-            
-            <div className="col-span-full">
-              
-              {/* Activity Log */}
-              <div className="mt-10">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                  Transaction Log
-                </h3>
-                <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md p-4 bg-gray-50 text-sm text-gray-700 space-y-2">
-                  {formData.HistoricalPrice?.map((log, index) => (
-                    <p key={index}>• {log.message}</p>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-6 flex items-center justify-end gap-x-6">
-               
-                {user.user.editVendor && (
+         {user.user.editVendor && (
                   <button
                     type="submit"
                     className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus-visible:outline-indigo-600 transition"
@@ -555,9 +537,6 @@ const RFP = async () => {
                     Update {formData.Name}
                   </button>
                 )}
-              </div>
-            </div>
-          </div>
         </form>
       </div>
     </>
