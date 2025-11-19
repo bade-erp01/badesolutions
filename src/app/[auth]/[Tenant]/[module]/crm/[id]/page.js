@@ -463,7 +463,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         "Current Balance",
         "", // Empty CR
         "", // Empty DR
-        `${cust.Debt.toFixed(2).toLocaleString()}`,
+        `${cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
       ]);
 
       // 📋 Table with page footer and styled final row
