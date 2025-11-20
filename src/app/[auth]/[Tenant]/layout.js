@@ -1,4 +1,4 @@
-import dbConnect from "../../../../lib/mongoose";
+import CookiesPolicyAlert from "@/app/Components/Cookies";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
 import { redirect } from "next/navigation";
 import moment from "moment";
@@ -41,5 +41,8 @@ export default async function Layout({ children }) {
     return <RenewSubscription business={businessInfo}/>;
   }
 
-  return <div style={{ overflowY: "hidden" }}>{children}</div>;
+  return <div style={{ overflowY: "hidden" }}>
+     <CookiesPolicyAlert />
+    {children}
+    </div>;
 }
