@@ -168,7 +168,7 @@ export default async function AccountingPage({ params }) {
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               <Suspense fallback={<SuspenenseFallBack  pagedata={`${navTitle}`}/>}>
-                <Page data={SinglePayable?.data} userInfo={userData}/>
+                <Page data={SinglePayable?.data} userInfo={userData} baseUrl={baseUrl}/>
               </Suspense>
             </section>
           </main>

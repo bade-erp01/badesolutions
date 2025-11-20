@@ -1,12 +1,59 @@
 "use client"
 
 import React from 'react'
-import {Dencrypt} from "../../../../../../../../../Functions/Functions"
+import {Dencrypt,Encrypt} from "../../../../../../../../../Functions/Functions"
 import Image from "next/image"
 import moment from "moment"
+import {SuccessToast,ErrorMessage,plsWait} from "../../../../../../../../../Functions/Mics"
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import { useRouter } from "next/navigation";
 
-export default function Page({ data,userInfo}) {
+export default function Page({ data,userInfo,baseUrl}) {
   const payment = Dencrypt(data)
+  const router = useRouter()
+
+  const paymentAction = async (action) => {
+    const result = await Swal.fire({
+      title: `Confirm to set Payment status to ${action}?`,
+      text: "Proceeding with this action will also reflect on the Bank journal entry and Vendors's Transaction Ledger!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Proceed!",
+    });
+  
+    if (!result.isConfirmed) return;
+  
+    try {
+      plsWait('Processing...')
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      const res = await fetch(
+        `${baseUrl}/api/Payable/update/${Encrypt(payment._id)}`,
+        {
+          method: "PATCH",
+          headers: { 
+              "Content-Type": "application/json",
+               dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+               access:`${Encrypt(userInfo.user._id)}`,
+               Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+          },
+          body: JSON.stringify({action,user:`${userInfo.user.firstName} ${userInfo.user.lastName}` }),
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.message) {
+        SuccessToast(data.message);
+        location.reload(); // using router.reload() from next/router for SPA
+      } else {
+        throw new Error(data.error || "Unknown error occurred");
+      }
+    } catch (error) {
+      ErrorMessage(error.message);
+    }
+  };
   
   return (
     <section className="  p-6 md:p-10 bg-white shadow-md rounded-xl animate__animated animate__fadeIn">
@@ -43,26 +90,26 @@ export default function Page({ data,userInfo}) {
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <button
                 type="submit"
-                onClick={()=>paymentAction(`${payment._id}`,`posted`)}
+                onClick={()=>paymentAction(`posted`)}
                 className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-6 rounded-md transition duration-200"
               >
                 Confirm Payment Entry
               </button>
               <button
                 type="submit"
-                onClick={()=>paymentAction(`${payment._id}`,`Reject`)}
+                onClick={()=>paymentAction(`Reject`)}
                 className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-md transition duration-200"
               >
-                Cancel Payment Entry
+                Delete Payment Entry
               </button>
             </div>
           )}
           {/* reverse payment */}
-          {payment.status === 'posted' && userInfo?.user?.isAccountant && (
+          {payment.ledgerStatus === 'posted' && userInfo?.user?.isAccountant && (
             <div className='flex flex-col md:flex-row gap-4 justify-center'>
             <button
                 type="submit"
-                onClick={()=>paymentAction(`${payment._id}`,`Reversed`)}
+                onClick={()=>paymentAction(`Reversed`)}
                className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md transition duration-200"
               >
                Reverse Payment
