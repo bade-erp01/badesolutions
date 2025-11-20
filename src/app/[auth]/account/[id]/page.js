@@ -260,13 +260,12 @@ export default function BusinessDatas({ data, userInfo }) {
             Add user
           </Link>
 
-          <TermsAndConditionsLink BusinessPlan={formData.subscriptionplan} />
 
           {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
             <span
-              className="inline-flex items-center gap-2 bg-amber-300 text-black px-5 py-2.5 rounded-md shadow-md hover:bg-amber-500 transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-              role="button"
-              tabIndex={0}
+            className="inline-flex items-center gap-2 bg-amber-300 text-black px-5 py-2.5 rounded-md shadow-md hover:bg-amber-500 transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+            role="button"
+            tabIndex={0}
             >
               <svg
                 className="w-5 h-5"
@@ -284,6 +283,7 @@ export default function BusinessDatas({ data, userInfo }) {
               Upgrade Plan
             </span>
           )}
+          <TermsAndConditionsLink BusinessPlan={formData.subscriptionplan} />
         </div>
       </Section>
 
