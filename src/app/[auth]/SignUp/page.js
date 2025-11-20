@@ -7,6 +7,7 @@ import Image from "next/image";
 import Nav1 from "@/app/Components/Nav1";
 import Footer1 from "@/app/Components/Footer1";
 import Link from "next/link"
+import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 
 export default function SignUpPage() {
   const params = useSearchParams();
@@ -119,18 +120,8 @@ export default function SignUpPage() {
                   </p>
                 </div>
               )}
-
-              <p className="text-sm text-gray-500">
-                By signing up, you agree to our{" "}
-                <Link href="/Terms" className="text-blue-600 underline">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/Privacy" className="text-blue-600 underline">
-                  Privacy Policy
-                </Link>
-                .
-              </p>
+              
+                <TermsAndConditionsLink BusinessPlan={formData.plan}/>
 
               {formData.NumberOfUsers > 0 && (
                 <>

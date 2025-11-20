@@ -1,5 +1,5 @@
 "use client";
-import Card from "@/app/Components/Card";
+import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import Image from "next/image";
 import { PhotoIcon, } from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
@@ -259,6 +259,8 @@ export default function BusinessDatas({ data, userInfo }) {
             </svg>
             Add user
           </Link>
+
+          <TermsAndConditionsLink BusinessPlan={formData.subscriptionplan} />
 
           {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
             <span
