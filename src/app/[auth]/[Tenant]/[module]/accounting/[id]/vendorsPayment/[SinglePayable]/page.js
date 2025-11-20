@@ -6,11 +6,53 @@ import Image from "next/image"
 import moment from "moment"
 import {SuccessToast,ErrorMessage,plsWait} from "../../../../../../../../../Functions/Mics"
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation"
+
 
 export default function Page({ data,userInfo,baseUrl}) {
   const payment = Dencrypt(data)
-  const router = useRouter()
+  const router = useRouter();
+  // delete
+const Delete = async () => {
+
+  const result = await Swal.fire({
+    title: "Are you sure you want to delete?",
+    text: "This action is irreversible",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, Proceed!",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    plsWait("deleting...");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    const res = await fetch(`${baseUrl}/api/Payable/${Encrypt(payment._id)}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+        access: `${Encrypt(userInfo.user._id)}`,
+        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (data.message) {
+      SuccessToast(data.message);
+      router.back(); // ✅ SPA-friendly refresh
+    } else {
+      throw new Error(data.error || "Unknown error occurred");
+    }
+  } catch (error) {
+    ErrorMessage(error.message);
+  }
+}
 
   const paymentAction = async (action) => {
     const result = await Swal.fire({
@@ -97,7 +139,7 @@ export default function Page({ data,userInfo,baseUrl}) {
               </button>
               <button
                 type="submit"
-                onClick={()=>paymentAction(`Reject`)}
+                onClick={Delete}
                 className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-md transition duration-200"
               >
                 Delete Payment Entry
