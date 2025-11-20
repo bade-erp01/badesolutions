@@ -5,7 +5,7 @@ import Image from "next/image"
 import moment from "moment";
 import { Encrypt } from "../../../../Functions/Functions";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
-import { CpuChipIcon } from "@heroicons/react/24/outline";
+import TermsAndConditionsLink from "@/app/Components/TermsAndCondition"
 import Logout from "@/app/Components/Logout";
 import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
@@ -107,6 +107,7 @@ export default async function TenantPage({ params }) {
             )}
 
             <Logout />
+            <TermsAndConditionsLink BusinessPlan={userData.business.subscriptionplan}/>
           </nav>
         </aside>
 
