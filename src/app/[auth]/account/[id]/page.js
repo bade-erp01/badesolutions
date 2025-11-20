@@ -1,5 +1,5 @@
 "use client";
-import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
+
 import Image from "next/image";
 import { PhotoIcon, } from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
@@ -283,7 +283,7 @@ export default function BusinessDatas({ data, userInfo }) {
               Upgrade Plan
             </span>
           )}
-          <TermsAndConditionsLink BusinessPlan={formData.subscriptionplan} />
+          
         </div>
       </Section>
 

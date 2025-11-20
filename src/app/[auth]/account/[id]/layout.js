@@ -1,6 +1,7 @@
 import BusinessDatas from './page';
 import { fetchUser } from '../../../../../Functions/useerDataRefresh';
-import dbConnect from "../../../../../lib/mongoose"
+import {Dencrypt} from "../../../../../Functions/Functions"
+import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import Link from "next/link"
@@ -13,7 +14,7 @@ export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
 
-  const RawBusiness = await Business.findById(moduleList.id).select("-payStackApiKey").lean();
+  const RawBusiness = await Business.findById(Dencrypt(moduleList.id)).select("-payStackApiKey").lean();
   const parsedBusiness = JSON.parse(JSON.stringify(RawBusiness));
   const business = JSON.parse(JSON.stringify(parsedBusiness));
 
@@ -61,6 +62,8 @@ export default async function SetUpLayout({children, params }) {
                     <small>App Store</small>
                   </Link>
                 )}
+
+                <TermsAndConditionsLink BusinessPlan={business.subscriptionplan} />
               </nav>
     
               

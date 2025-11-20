@@ -92,7 +92,7 @@ export default async function TenantPage({ params }) {
                 </Link>
 
                 <Link
-                  href={`/${companySlug}/account/${userData?.business?._id}`}
+                  href={`/${companySlug}/account/${Encrypt(userData?.business?._id)}`}
                   className="flex items-center gap-3 p-3 rounded-md bg-gray-400 hover:bg-gray-700 transition"
                 >
                   <Image
