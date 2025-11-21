@@ -53,6 +53,7 @@ ChartJS.register(
 export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   const router = useParams();
   const navigation = useRouter();
+  const [States] = useState(data.AllStates || [])
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setisOpen2] = useState(false)
   const [isOpen3, setisOpen3] = useState(false)
@@ -1018,28 +1019,50 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                 value={formData.country}
                 onChange={handleChange}
               />
-              <Input
+              {/* <Input
                 label="State"
                 name="State"
                 value={formData.State}
                 onChange={handleChange}
-              />
+              /> */}
+              <div className="w-full">
+                <label
+                  htmlFor="State"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Select a State
+                </label>
+                <select
+                  id="state"
+                  name="State"
+                  value={formData.State || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                >
+                  <option value="">-- Choose a State --</option>
+                  {States.map((state, index) => (
+                    <option key={index} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <Input
                 label="Address"
                 name="billingAddress"
                 value={formData.billingAddress}
                 onChange={handleChange}
               />
-               <Input
+              <Input
                 label="Region"
                 name="Region"
                 value={formData.Region}
                 onChange={handleChange}
               />
-            </Grid>
-          </Section>
+              </Grid>
+              </Section>
 
-          {/* Financials */}
+              {/* Financials */}
           <Section
             title="Financials"
             subtitle="(Manage credit, debt, and payment settings)"
