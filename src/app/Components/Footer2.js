@@ -14,9 +14,9 @@ export default function Footer2() {
           📢 You can request a customized business email that reflects your brand identity.{" "}
         </span>
         {" "} |  {" "}
-        <span className="text-xs md:text-base text-gray-200">
-         {" "} A recent security patch update has been successfully completed.  
-          We appreciate your understanding, as these updates are essential for protecting your information.
+        <span className="text-xs md:text-base text-gray-200 animate__animated animate-pulse">
+          {" "} A Security patch update was successfully applied.  
+          We appreciate your understanding — these updates were necessary to keep your data safe.
         </span>
       </Marquee>
     </footer>
