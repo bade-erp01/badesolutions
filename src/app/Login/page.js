@@ -7,12 +7,12 @@ import Footer1 from "../Components/Footer1";
 import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 import { loginSuccess, loginFailure } from "../../../lib/User";
 import { useDispatch, useSelector } from "react-redux";
-import {Encrypt,EXPRESS_PRIVATE_URL} from "../../../Functions/Functions"
+import {Encrypt,Dencrypt} from "../../../Functions/Functions"
 import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
 // import ReCAPTCHA from "react-google-recaptcha";
 
-export default function Login({userInfo,businessInfo,url}) {
+export default function Login({userInfo,businessInfo,url,SessionId}) {
   const dispatch = useDispatch();
   // const recaptchaRef = useRef();
   // const userInfo = useSelector((state) => state.user.userInfo);
@@ -96,7 +96,7 @@ export default function Login({userInfo,businessInfo,url}) {
       const data = await response.json();
 
       if (data.message) {
-        dispatch(loginSuccess({ user: data.Newcustomer._id, business: data.Tenant }));
+        dispatch(loginSuccess({ user: Dencrypt(data.Newcustomer), business: data.Tenant, SessionId:data.SessionId}));
         // reset the form
         SuccessToast('Login successful')
         plsWait("Login successful, Redirecting...");
@@ -132,7 +132,7 @@ export default function Login({userInfo,businessInfo,url}) {
       <div className="min-h-screen flex items-center justify-center  p-4" >
         <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
           {/* Login Card */}
-         {!userInfo || !businessInfo ?( <div className="bg-white/80 backdrop-blur-md rounded-md shadow-xl p-8 w-[340px] max-w-full flex flex-col gap-6">
+         {!SessionId || SessionId !== userInfo?.SessionId || !userInfo || !businessInfo ?( <div className="bg-white/80 backdrop-blur-md rounded-md shadow-xl p-8 w-[340px] max-w-full flex flex-col gap-6">
             <div className="flex justify-between items-center mb-2">
               <Link href="/" className="font-bold text-xl text-gray-900">
                 <Image

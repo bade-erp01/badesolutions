@@ -16,6 +16,7 @@ const fetchUser = async () => {
     const cookieStore = await cookies();
     const userToken = cookieStore.get("userInfo")?.value;
     const businessToken = cookieStore.get("businessInfo")?.value;
+    const StoredSession = cookieStore.get("SessionId")?.value;
     
     if (!userToken || !businessToken) {
       //redirect to login page
@@ -23,16 +24,17 @@ const fetchUser = async () => {
     }
     
     // Decode JWT Tokens
-    let decodedUser, decodedBusiness;
+    let decodedUser, decodedBusiness,decodedSessionId;
     try {
       decodedUser = jwt.verify(userToken, SECRET_KEY);
       decodedBusiness = jwt.verify(businessToken, SECRET_KEY);
+      decodedSessionId = jwt.verify(StoredSession,SECRET_KEY)
       
     } catch (error) {
       return { error: "Invalid session tokens, please log in again." };
     }
     
-    await dbConnect(); // Ensure database connection
+    await dbConnect("BadeAdmin"); // Ensure database connection
     // Fetch user & business details
     const rawUserInfo = await User.findById(decodedUser.data)
       .select("-password -__v -createdAt -updatedAt -opsCode")
@@ -53,6 +55,7 @@ const fetchUser = async () => {
     return {
       user: JSON.parse(JSON.stringify(rawUserInfo)),
       business: JSON.parse(JSON.stringify(rawBusinessInfo)),
+      SessionId: decodedSessionId
     };
   } catch (err) {
     return { error: "An unexpected error occurred, please try again later." };

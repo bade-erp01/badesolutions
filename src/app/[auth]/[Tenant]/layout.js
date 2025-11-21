@@ -26,8 +26,9 @@ export default async function Layout({ children }) {
   const userData = await fetchUser();
   const userInfo = userData?.user;
   const businessInfo = userData?.business;
+  const SessionId = userData?.SessionId.data
 
-  if (!userInfo || !businessInfo || userInfo.status !== "active") {
+  if (!userInfo || !businessInfo || !SessionId || userInfo.status !== "active" || SessionId !== userInfo.SessionId) {
     redirect("/Login");
   }
 

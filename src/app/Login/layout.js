@@ -27,8 +27,9 @@ export default async function layout({ children,params }) {
     const userInfo = userData.user;
     const businessInfo = userData.business; 
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+    const SessionId = userData?.SessionId?.data;
 
   return <>
-        < Login userInfo={userInfo} businessInfo={businessInfo} url={baseUrl}/>
+        < Login userInfo={userInfo} businessInfo={businessInfo} url={baseUrl} SessionId={SessionId}/>
         </>;
 }
