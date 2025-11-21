@@ -280,36 +280,36 @@ export default function MainDash({ userData }) {
                 </div>
               </div>
             </div>
-            {tenantData.yearlysales.length > 0 ? (
-              <div className="bg-white p-5 rounded-lg shadow-md animate__animated animate__flipInY">
+
+            <div className="bg-white p-5 rounded-lg shadow-md animate__animated animate__flipInY">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm text-gray-500">Avg Sales</h3>
-                    <p className="text-sm text-gray-800 font-semibold mt-1">
+                    <h3 className="text-sm text-gray-500">Purchase</h3>
+                    <p className="text-2xl text-gray-500 font-bold mt-1">
                       {userData.business.currency?.currency.Symbol}
-                      {Math.round(
-                        tenantData.yearlysales.reduce(
-                          (acc, curr) => acc + (curr.grandTotal || 0),
-                          0
-                        ) / tenantData.yearlysales.length
-                      ).toLocaleString() || 0}
+                      {tenantData?.PO?.reduce((sum, item) => {
+                          const val = Number(item?.grandTotal) || 0; // ensure it's a number
+                          return sum + val;
+                      }, 0).toLocaleString()}
+
                     </p>
                   </div>
                   <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
                     <ScaleIcon className="h-6 w-6 text-gray-900" />
                   </div>
                 </div>
-              </div>
-            ) : (
-              ""
-            )}
+            </div>
 
             <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm text-gray-500">Pending Expenses</h3>
-                  <p className="text-2xl text-gray-600 font-bold mt-1">
-                    {tenantData.Expenses?.length || 0}
+                  <h3 className="text-sm text-gray-500">Expenses</h3>
+                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                    {userData.business.currency?.currency.Symbol}
+                    {tenantData.Expenses?.reduce((sum, item) => {
+                          const val = Number(item?.Amount) || 0; // ensure it's a number
+                          return sum + val;
+                      }, 0).toLocaleString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
