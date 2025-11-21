@@ -276,7 +276,7 @@ export default function MainDash({ userData }) {
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-gray-500 text-white shadow-md">
-                  💰
+                💰
                 </div>
               </div>
             </div>
