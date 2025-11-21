@@ -588,7 +588,7 @@ export default function MainDash({ userData }) {
 
                 <div className="mt-6 border-t-2">
                   <h4 className="text-lg text-gray-500 font-semibold mb-4">
-                    📆 Todays Payments
+                    💵 Todays Payments
                   </h4>
                   <ul
                     className="list-disc list-inside space-y-2 text-sm text-gray-700  overflow-y-auto max-h-80"
