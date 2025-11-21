@@ -15,13 +15,8 @@ export default function Footer2() {
         </span>
         {" "} |  {" "}
         <span className="text-xs md:text-base text-gray-200">
-          🌍This Space is available for advert, grab this special offer to reach other B.A.D.E users.{" "}
-          <Link
-            href="/contact-sales"
-            className="text-indigo-400 underline hover:text-indigo-300 ml-2"
-          >
-            Contact Sales
-          </Link>
+          A recent security patch update has been successfully completed.  
+          We appreciate your understanding, as these updates are essential for protecting your information.
         </span>
       </Marquee>
     </footer>
