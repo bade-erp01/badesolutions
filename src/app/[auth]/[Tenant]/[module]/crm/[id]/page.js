@@ -464,7 +464,6 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         "Current Balance",
         "", // Empty CR
         "", // Empty DR
-        "",
         `${cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
       ]);
 
@@ -1019,34 +1018,14 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                 value={formData.country}
                 onChange={handleChange}
               />
-              {/* <Input
+              
+             <Select
                 label="State"
-                name="State"
-                value={formData.State}
+                name="state"
+                value={formData.state}
                 onChange={handleChange}
-              /> */}
-              <div className="w-full">
-                <label
-                  htmlFor="State"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Select a State
-                </label>
-                <select
-                  id="state"
-                  name="State"
-                  value={formData.State || ""}
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  <option value="">-- Choose a State --</option>
-                  {States.map((state, index) => (
-                    <option key={index} value={state}>
-                      {state}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                options={States}
+              />
               <Input
                 label="Address"
                 name="billingAddress"
@@ -1792,6 +1771,45 @@ function Input({
     </div>
   );
 }
+
+
+function Select({
+  label,
+  name,
+  value,
+  onChange,
+  options = [],
+  disabled = false,
+  readonly = false,
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={name}
+        className="block text-sm font-medium text-gray-700"
+      >
+        {label}
+      </label>
+      <select
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        readOnly={readonly}
+        className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <option value={value}>-- {value} --</option>
+        {options.map((opt, index) => (
+          <option key={index} value={opt.value || opt}>
+            {opt.label || opt}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 
 function Checkbox({ label, name, checked, onChange }) {
   return (
