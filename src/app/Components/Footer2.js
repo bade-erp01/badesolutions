@@ -15,7 +15,7 @@ export default function Footer2() {
         </span>
         {" "} |  {" "}
         <span className="text-xs md:text-base text-gray-200">
-          A recent security patch update has been successfully completed.  
+         {" "} A recent security patch update has been successfully completed.  
           We appreciate your understanding, as these updates are essential for protecting your information.
         </span>
       </Marquee>
