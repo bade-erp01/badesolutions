@@ -556,9 +556,9 @@ export default function MainDash({ userData }) {
                       </span>
                     </div>
 
-                    <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-1">
+                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
                       <div
-                        className="h-full bg-green-500 transition-all duration-300"
+                        className="h-full bg-green-400 transition-all duration-300"
                         style={{
                           width: `${Math.min(
                             Math.round(person.percentage),
@@ -642,7 +642,7 @@ export default function MainDash({ userData }) {
                     {tenantData.debtorsArray.map((debtor) => (
                       <span
                         key={debtor._id}
-                        className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                        className="mx-1 text-black bg-gray-200 px-2 py-1 rounded"
                       >
                         {debtor.Username} owes{" "}
                         {userData.business.currency?.currency.Symbol}
