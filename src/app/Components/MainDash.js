@@ -642,7 +642,7 @@ export default function MainDash({ userData }) {
                     {tenantData.debtorsArray.map((debtor) => (
                       <span
                         key={debtor._id}
-                        className="mx-1 text-black bg-gray-200 px-2 py-1 rounded"
+                        className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
                       >
                         {debtor.Username} owes{" "}
                         {userData.business.currency?.currency.Symbol}
