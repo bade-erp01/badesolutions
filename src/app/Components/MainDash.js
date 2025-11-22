@@ -634,7 +634,7 @@ export default function MainDash({ userData }) {
                   <Marquee
                     gradient={false}
                     speed={30}
-                    className="w-full bg-gray-600 py-2"
+                    className="w-full bg-gray-100/50 py-2"
                   >
                     <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
                       ⚠️ Debtors:
