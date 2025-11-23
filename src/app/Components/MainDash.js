@@ -556,7 +556,7 @@ export default function MainDash({ userData }) {
                       </span>
                     </div>
 
-                    <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden mb-1">
+                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
                       <div
                         className="h-full bg-green-400 transition-all duration-300"
                         style={{
