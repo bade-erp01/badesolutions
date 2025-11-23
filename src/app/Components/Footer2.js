@@ -14,9 +14,14 @@ export default function Footer2() {
           📢 You can request a customized business email that reflects your brand identity.{" "}
         </span>
         {" "} |  {" "}
-        <span className="text-xs md:text-base text-gray-200 animate__animated animate-pulse">
-          {" "} A Security patch update was successfully applied.  
-          We appreciate your understanding — these updates were necessary to keep your data safe.
+        <span className="text-xs md:text-base text-gray-200">
+          🌍This Space is available for advert, grab this special offer to reach other B.A.D.E users.{" "}
+          <Link
+            href="/contact-sales"
+            className="text-indigo-400 underline hover:text-indigo-300 ml-2"
+          >
+            Contact Sales
+          </Link>
         </span>
       </Marquee>
     </footer>
