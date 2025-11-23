@@ -312,7 +312,7 @@ export default function MainDash({ userData }) {
                       }, 0).toLocaleString()}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-red-100 text-white px-4 py-2 rounded shadow-sm">
+                <div className="flex items-center gap-2 bg-gray-300 text-white px-4 py-2 rounded shadow-sm">
                   <WalletIcon className="h-6 w-6 text-gray-900" />
                 </div>
               </div>
