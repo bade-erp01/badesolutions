@@ -304,7 +304,7 @@ export default function MainDash({ userData }) {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm text-gray-500">Expenses</h3>
-                  <p className="text-2xl text-red-500 font-bold mt-1">
+                  <p className="text-2xl text-gray-500 font-bold mt-1">
                     {userData.business.currency?.currency.Symbol}
                     {tenantData.Expenses?.reduce((sum, item) => {
                           const val = Number(item?.Amount) || 0; // ensure it's a number
