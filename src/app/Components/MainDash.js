@@ -276,7 +276,7 @@ export default function MainDash({ userData }) {
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-Violet-100 text-white shadow-md">
-                  <BanknotesIcon className="h-6 w-6 text-Violet-500" />
+                  <BanknotesIcon className="h-6 w-6 text-gray-500" />
                 </div>
               </div>
             </div>
