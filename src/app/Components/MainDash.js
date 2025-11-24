@@ -16,7 +16,7 @@ import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { ShoppingBagIcon, ArrowTrendingDownIcon,ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { ShoppingBagIcon, ArrowTrendingDownIcon,ShoppingCartIcon ,ArrowTrendingUpIcon,BanknotesIcon} from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
@@ -260,8 +260,8 @@ export default function MainDash({ userData }) {
                     Auto Updates every 1 minutes
                   </p>
                 </div>
-                <div className="p-3 rounded-full bg-green-700 text-white text-xl shadow-md">
-                  📈
+                <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
+                  <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
                 </div>
               </div>
             </div>
@@ -275,8 +275,8 @@ export default function MainDash({ userData }) {
                     {tenantData.Revenue?.toLocaleString()}
                   </p>
                 </div>
-                <div className="p-3 rounded-full bg-gray-500 text-white shadow-md">
-                💰
+                <div className="p-3 rounded-full bg-gray-100 text-white shadow-md">
+                  <BanknotesIcon className="h-6 w-6 text-gray-900" />
                 </div>
               </div>
             </div>
