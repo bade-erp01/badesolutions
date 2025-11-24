@@ -275,7 +275,7 @@ export default function MainDash({ userData }) {
                     {tenantData.Revenue?.toLocaleString()}
                   </p>
                 </div>
-                <div className="p-3 rounded-full bg-gray-100 text-white shadow-md">
+                <div className="p-3 rounded-full bg-orange-100 text-white shadow-md">
                   <BanknotesIcon className="h-6 w-6 text-gray-900" />
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function MainDash({ userData }) {
 
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-300 text-white px-4 py-2 rounded shadow-sm">
+                  <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
                     <ShoppingBagIcon className="h-6 w-6 text-gray-900" />
                   </div>
                 </div>
@@ -304,7 +304,7 @@ export default function MainDash({ userData }) {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm text-gray-500">Expenses</h3>
-                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                  <p className="text-2xl text-red-800 font-bold mt-1">
                     {userData.business.currency?.currency.Symbol}
                     {tenantData.Expenses?.reduce((sum, item) => {
                           const val = Number(item?.Amount) || 0; // ensure it's a number
