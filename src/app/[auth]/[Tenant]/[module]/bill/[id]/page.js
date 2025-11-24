@@ -646,7 +646,7 @@ export default function InvoicePage({
               {Singlebill.customer?.Username?.toUpperCase()}
             </h3>
             <p>
-                {Singlebill.customer.billingAddress}
+                {Singlebill.customer?.billingAddress?.slice(0,30)}
             </p>
             <p>
               <span className="mr-1">📞</span>
