@@ -34,7 +34,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
     ADCcode: "",
     color: "",
     Description: "",
-    Sellable: false,
+    Sellable: true,
     Ecom_sale: false,
     Manufacturer: "",
     VAT: 0,
@@ -51,7 +51,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
   const config = {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${businessData.tenantId}`,
+      Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
       dbConnect: `Bearer ${businessData.rustyRoof}`,
       access: `${Encrypt(userData._id)}`,
     },
@@ -163,6 +163,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                     required
                     id="BuyingPrice"
                     name="BuyingPrice"
+                     defaultValue={formData.BuyingPrice || 0}
                     type="number"
                     step="any"
                     onChange={handleChange}
@@ -223,6 +224,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                     id="Pieces"
                     required
                     name="Pieces"
+                     defaultValue={formData.Pieces || 0}
                     onChange={handleChange}
                     type="number"
                     autoComplete="Pieces-level2"
@@ -347,6 +349,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                     id="VAT"
                     name="VAT"
                     onChange={handleChange}
+                     defaultValue={formData.VAT || 0}
                     type="number"
                     step="any"
                     autoComplete="address-level2"
@@ -365,6 +368,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                 <div className="mt-2">
                   <input
                     id="Pricelist1"
+                     defaultValue={formData.Pricelist1 || 0}
                     name="Pricelist1"
                     type="number"
                     step="any"
@@ -386,6 +390,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                   <input
                     onChange={handleChange}
                     id="Pricelist2"
+                    defaultValue={formData.Pricelist2 || 0}
                     name="Pricelist2"
                     type="number"
                     step="any"
@@ -408,6 +413,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                   <input
                     id="Pricelist3"
                     name="Pricelist3"
+                     defaultValue={formData.Pricelist3 || 0}
                     onChange={handleChange}
                     type="number"
                     step="any"
@@ -429,6 +435,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                     id="Pricelist4"
                     name="Pricelist4"
                     type="number"
+                     defaultValue={formData.Pricelist4 || 0}
                     step="any"
                     onChange={handleChange}
                     autoComplete="Pricelist1-level1"
@@ -449,6 +456,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                     onChange={handleChange}
                     id="Pricelist5"
                     name="Pricelist5"
+                     defaultValue={formData.Pricelist5 || 0}
                     type="number"
                     step="any"
                     autoComplete="Pricelist1-code"
@@ -467,6 +475,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                 <div className="mt-2">
                   <input
                     id="Pricelist6"
+                     defaultValue={formData.Pricelist6 || 0}
                     name="Pricelist6"
                     step="any"
                     onChange={handleChange}
@@ -487,6 +496,7 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                 <div className="mt-2">
                   <input
                     id="Pricelist7"
+                     defaultValue={formData.Pricelist7 || 0}
                     name="Pricelist7"
                     type="number"
                     step="any"
