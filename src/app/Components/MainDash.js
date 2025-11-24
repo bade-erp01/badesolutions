@@ -270,7 +270,7 @@ export default function MainDash({ userData }) {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm text-gray-500">Revenue</h3>
-                  <p className="text-2xl text-[#a684ff] font-bold mt-1">
+                  <p className="text-2xl text-gray-500 font-bold mt-1">
                     {userData.business.currency?.currency.Symbol}
                     {tenantData.Revenue?.toLocaleString()}
                   </p>
