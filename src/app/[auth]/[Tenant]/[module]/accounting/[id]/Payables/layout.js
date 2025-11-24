@@ -9,6 +9,7 @@ import Image from "next/image"
 import { CreditCardIcon,BanknotesIcon } from "@heroicons/react/24/outline";
 import PayableRegister from "@/app/Components/Reports/PayableRegister";
 import { notFound } from 'next/navigation';
+import SharePdfMinimal from "@/app/Components/ShareViaBluthoot";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -125,7 +126,7 @@ export default async function AccountingPage({ children, params }) {
                 {(userData.user.creditOfficer || userData.user.isAccountant)  && (
                  <>
                   <Link
-                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/credit-note/credit-note`}
+                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-CreditNote/Vendor-CreditNote`}
                   title={"Credit Notes"}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                   >
@@ -172,6 +173,8 @@ export default async function AccountingPage({ children, params }) {
                 userData={userData}
                 baseUrl={baseUrl}
               />
+
+              {/* <SharePdfMinimal/> */}
             </nav>
           </aside>
 
