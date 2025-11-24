@@ -33,7 +33,7 @@ export default async function CustomerListpage({ params }) {
       <div className=" ">
         {/* Dashboard */}
         {userData.user.c_levelDash && (
-          <div className="bg-[#71717b] backdrop-blur-md shadow-xl transition-all duration-700 mb-5">
+          <div className="bg-[#1e1e20]/70 backdrop-blur-md shadow-xl transition-all duration-700 mb-5">
             <CustomerCategoryPieChart customersList={customerListWithImages} />
           </div>
         )}
