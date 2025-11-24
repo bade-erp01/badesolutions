@@ -16,7 +16,7 @@ import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { ArrowTrendingDownIcon,ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { ShoppingBagIcon, ArrowTrendingDownIcon,ShoppingCartIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
 
@@ -295,7 +295,7 @@ export default function MainDash({ userData }) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-300 text-white px-4 py-2 rounded shadow-sm">
-                    <ArrowTrendingDownIcon className="h-6 w-6 text-gray-900" />
+                    <ShoppingBagIcon className="h-6 w-6 text-gray-900" />
                   </div>
                 </div>
             </div>
@@ -313,7 +313,7 @@ export default function MainDash({ userData }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-300 text-white px-4 py-2 rounded shadow-sm">
-                  <ArrowTrendingDownIcon className="h-6 w-6 text-gray-900" />
+                  <ArrowTrendingDownIcon className="h-6 w-6 text-red-900" />
                 </div>
               </div>
             </div>
