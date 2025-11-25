@@ -24,7 +24,7 @@ async function termsAndConditions(payload) {
   const { value: accept } = await Swal.fire({
     title: "Terms and Conditions",
     html: `
-      <p>Please read our <a href="/terms_condition.html" target="_blank" class="text-blue-600 underline">Terms & Conditions</a> for ${payload.plan} plan before proceeding.</p>
+      <p> By signing up, you agree to our Terms and conditions for ${payload.plan} plan.</p>
     `,
     input: "checkbox",
     inputValue: 0,
@@ -209,7 +209,7 @@ const downloadExcel = (data, page) => {
 
     // Dynamically extract column headers excluding "image" and "_id"
     const workSheetColumnsNames = Object.keys(data[0]).filter(
-      (key) => key !== "image" && key !== "_id" && key !== "password" && key !== "opsCode" && key !=='TextToSpeech' && key !=='firstTimeOnboard' && key !=='firstTimeOnboard' && key !== "Equiptment" && key !== 'BirthdayMailsent' && key !== "AnnivaryMailsent" && key !== "isAdmin" && key !== "tenantId" && key !== "Apps" && key !== "createdAt" && key !== "updatedAt" && key !== "Conversations" && key !== "isDev" && key !== "Attachments" && key !== '__v' && key!=="QrCode" && key!=="HistoricalPrice" && key!=="ActivityLog" && key !== "FOCID" && key !== "CopyID" && key !== "comments" && key !== 'customerId' && key !== 'cr' && key !== 'dr'&& key  !== "customer" && key !== "invoicerId" && key !=='salesPerson' && key !=="whId" && key !=="productId" && key !=="Vendor" && key !== "WHIDS"
+      (key) => key !== "image" && key !== "_id" && key !== "password" && key !== "opsCode" && key !=='TextToSpeech' && key !=='firstTimeOnboard' && key !=='firstTimeOnboard' && key !== "Equiptment" && key !== 'BirthdayMailsent' && key !== "AnnivaryMailsent" && key !== "isAdmin" && key !== "tenantId" && key !== "Apps" && key !== "createdAt" && key !== "updatedAt" && key !== "Conversations" && key !== "isDev" && key !== "Attachments" && key !== '__v' && key!=="QrCode" && key!=="HistoricalPrice" && key!=="ActivityLog" && key !== "FOCID" && key !== "CopyID" && key !== "comments" && key !== 'customerId' && key !== 'cr' && key !== 'dr'&& key  !== "customer" && key !== "invoicerId" && key !=='salesPerson' && key !=="whId" && key !=="productId" && key !=="Vendor" && key !== "WHIDS" && key !== "WHID" && key !== "Attachment" && key !== "ActivitiyLog" && key !== "isAservice" && key !== "Van_Price"  && key !=="Market_Price" && key !== "WareHouse_Price"
     );
 
     // Convert data to worksheet format dynamically
@@ -239,11 +239,7 @@ const downloadExcel = (data, page) => {
       timerProgressBar: true,
     });
   } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error.message || "Error generating report",
-    });
+    ErrorMessage(error.message || "Error generating report")
   }
 };
 
@@ -774,12 +770,7 @@ async function GenerateSummary(customerId) {
      downloadExcel(downloadeData,`${start}-${end} Report`)
 
   } catch (err) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: err.message,
-      confirmButtonText: 'Close'
-    });
+    ErrorMessage(err.message)
   }
 }
 
