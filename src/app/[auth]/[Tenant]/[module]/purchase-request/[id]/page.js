@@ -150,9 +150,8 @@ export default function DraftPurchasePage({
 
 
     const cleanedProducts = await productList.find((product) => {
-        return product.item.ACDcode === productId;
+        return product.item.ACDcode === productId || product.item.ADCcode === productId;
       });
-
     try {
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/VendorProduct/lpo?product=${cleanedProducts.storeId}&po=${bill._id}`,
