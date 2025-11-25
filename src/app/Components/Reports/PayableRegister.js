@@ -204,13 +204,14 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
                     "Ref":entry.paymentReferenceNo || entry.billReferenceNo,
                     "Accountant":entry.Accountant || entry.AccountatntId,
                     "Vendor":getCustomer(entry.vendor),
-                    "status":entry.status,
+                    "status":entry.ledgerStatus,
                     "Date":entry.PaymentDate,
-                    "Gateway":entry.type,
-                    "Amount": (entry.crAmount > 0 ? entry.crAmount : entry.drAmount) || entry.Amount || 0
+                    "cr":entry.cr ? entry.Amount : 0,
+                    "dr":entry.dr ? entry.Amount : 0,
+                    "Bal": entry.Balance
                   })
                 })
-                const excelBtn = downloadExcel( clean,"Paymnt Register");
+                const excelBtn = downloadExcel( clean,"Payable Transactions");
                 if (excelBtn instanceof HTMLElement) {
                   excelBtn.click();
                 }
