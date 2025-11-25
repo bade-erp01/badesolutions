@@ -6,13 +6,12 @@ import {downloadExcel,Dencrypt} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import {plsWait,ErrorMessage,SuccessToast, Encrypt} from "../../../../Functions/Mics"
 
-export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
+export default function PayableRegister({ customers,userData ,baseUrl}) {
 
   const [data,setData] = useState([]);
   const [filteredData, setFilteredData] = useState(
       data.filter(item => item.status?.toLowerCase() !== "pending")
     );
-  const [bankList] = useState(banks || []);
   const [customersList] = useState(customers || []);
 
 
@@ -47,10 +46,6 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
     return selectedCustomer?.Name || "";
   };
 
-  const getBankAccount = (id) => {
-    const selectedBank = bankList.find((bank) => bank._id === id);
-    return selectedBank?.bankName || "";
-  };
 
   const generateTableRows = (data) => {
     return data
@@ -61,7 +56,6 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
         <td style="padding: 4px; text-align: left;">${item.billReferenceNo.trim()}</td>
         <td style="padding: 4px;">${getCustomer(item.vendor)}</td>
         <td style="padding: 4px;">${item?.status?.toUpperCase()}</td>
-        <td style="padding: 4px;">${getBankAccount(item.bankAccount)}</td>
         <td style="padding: 4px;">${item.AccountatntId}</td>
         <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
         <td style="padding: 4px;">
@@ -112,15 +106,6 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
                 .join("")}
             </select>
           </div>
-          <div>
-            <label style="font-weight: 600; font-size: 12px;">Bank</label><br/>
-            <select id="bankFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
-              <option value="">All</option>
-              ${bankList
-                .map((b) => `<option value="${b._id}">${b.bankName}</option>`)
-                .join("")}
-            </select>
-          </div>
         </div>
         <div id="excelBtnContainer" style="margin-bottom: 10px;"></div>
         <div style="overflow-x: auto; max-height: 280px;">
@@ -131,7 +116,6 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
                 <th style="padding: 4px;">Ref</th>
                 <th style="padding: 4px;">Vendor</th>
                 <th style="padding: 4px;">Trace</th>
-                <th style="padding: 4px;">Bank</th>
                 <th style="padding: 4px;">Accountant</th>
                 <th style="padding: 4px;">Date</th>
                 <th style="padding: 4px;">Status</th>
@@ -157,7 +141,6 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
           const endDate = document.getElementById("endDate").value;
           const type = document.getElementById("typeFilter").value;
           const customer = document.getElementById("customerFilter").value;
-          const bank = document.getElementById("bankFilter").value;
 
           const filtered = data.filter((item) => {
             const itemDate = moment(item.PaymentDate);
@@ -171,10 +154,8 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
               !type || item.status?.toLowerCase() === type.toLowerCase();
             const customerMatch =
               !customer || item.vendor?.toLowerCase() === customer.toLowerCase();
-            const bankMatch =
-              !bank || item.bankAccount?.toLowerCase() === bank.toLowerCase();
-
-            return dateMatch && typeMatch && customerMatch && bankMatch;
+           
+            return dateMatch && typeMatch && customerMatch ;
           });
 
           setFilteredData(filtered);
@@ -218,7 +199,6 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
                     "Vendor":getCustomer(entry.customer),
                     "status":entry.status,
                     "Date":entry.PaymentDate,
-                    "Journal":getBankAccount(entry.bankAccount),
                     "Gateway":entry.type,
                     "Amount":entry.crAmount > 0 ? entry.crAmount : entry.drAmount
                   })
@@ -233,7 +213,7 @@ export default function PayableRegister({ banks, customers,userData ,baseUrl}) {
           }
         };
 
-        ["startDate", "endDate", "typeFilter", "customerFilter", "bankFilter"].forEach((id) => {
+        ["startDate", "endDate", "typeFilter", "customerFilter", ].forEach((id) => {
           const el = document.getElementById(id);
                     if (el) {
             el.addEventListener("input", applyFilters);

@@ -32,12 +32,12 @@ const VendorCreditNoteModal = ({
             )
             .join("");
 
-        const BankOptions = BankAccounts
-            .map(
-                (c) =>
-                    `<option value="${c._id}" class="py-2 px-3">${c.NAME}</option>`
-            )
-            .join("");
+        // const BankOptions = BankAccounts
+        //     .map(
+        //         (c) =>
+        //             `<option value="${c._id}" class="py-2 px-3">${c.NAME}</option>`
+        //     )
+        //     .join("");
 
         MySwal.fire({
             title:
@@ -57,12 +57,6 @@ const VendorCreditNoteModal = ({
                         <input type="text" id="customerSearch" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm mb-2 transition" placeholder="Search vendors" oninput="filterCustomers(this.value)" />
                         <select id="customerDropdown" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition">
                             ${customerOptions}
-                        </select>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-xs font-semibold text-gray-700 mb-1">Credit Account</label>
-                        <select id="bankDropdown" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition">
-                            ${BankOptions}
                         </select>
                     </div>
                     <div class="flex flex-col">
@@ -101,14 +95,14 @@ const VendorCreditNoteModal = ({
                 const Total = document.getElementById("creditAmount").value;
                 const reference = document.getElementById("creditRemarks").value;
                 const customerId = document.getElementById("customerDropdown").value;
-                const bankID = document.getElementById("bankDropdown").value;
+                // const bankID = document.getElementById("bankDropdown").value;
 
-                if (!Date || !Total || !customerId || !reference || !bankID) {
+                if (!Date || !Total || !customerId || !reference ) {
                     Swal.showValidationMessage("Please fill in all required fields");
                     return false;
                 }
 
-                return { Date, Total, reference, VendorId:customerId, bankID };
+                return { Date, Total, reference, VendorId:customerId };
             },
             confirmButtonText: "Create",
             showCancelButton: true,
@@ -141,7 +135,7 @@ const VendorCreditNoteModal = ({
                         buttonsStyling: false,
                     });
                     Router.push(
-                        `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/credit-note/credit-note/${Encrypt(
+                        `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/Vendor-CreditNote/Vendor-CreditNote/${Encrypt(
                             response.data
                         )}`
                     );
