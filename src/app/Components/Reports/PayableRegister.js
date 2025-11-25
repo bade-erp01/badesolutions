@@ -9,9 +9,8 @@ import {plsWait,ErrorMessage,SuccessToast, Encrypt} from "../../../../Functions/
 export default function PayableRegister({ customers,userData ,baseUrl}) {
 
   const [data,setData] = useState([]);
-  const [filteredData, setFilteredData] = useState(
-      data.filter(item => item.status?.toLowerCase() !== "pending")
-    );
+  // initialize to empty array (don't rely on `data` at init)
+  const [filteredData, setFilteredData] = useState([]);
   const [customersList] = useState(customers || []);
 
 
@@ -31,10 +30,13 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
         if (!res.ok) throw new Error("Failed to fetch product data");
   
         const fetchedData = await res.json();
-        // assign data
-        setData(Dencrypt(fetchedData.Transactions) || [])
-        // Pass the actual fetched lists/data into showModal so the modal renders immediately
-        showModal(data)
+        // decrypt/assign data
+        const transactions = Dencrypt(fetchedData.Transactions) || [];
+        setData(transactions);
+        // set initial filtered data (remove pending items as original intent)
+        setFilteredData(transactions.filter(item => item.status?.toLowerCase() !== "pending"));
+        // Pass the actual fetched lists/data into showModal so the modal renders immediately with data
+        showModal(transactions)
       } catch (error) {
         ErrorMessage(error.message);
       }
@@ -53,18 +55,18 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
         (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px; text-align: left;">${item.billReferenceNo.trim()}</td>
+        <td style="padding: 4px; text-align: left;">${(item.billReferenceNo || item.paymentReferenceNo || "").toString().trim()}</td>
         <td style="padding: 4px;">${getCustomer(item.vendor)}</td>
         <td style="padding: 4px;">${item?.status?.toUpperCase()}</td>
-        <td style="padding: 4px;">${item.AccountatntId}</td>
+        <td style="padding: 4px;">${item.AccountatntId || item.Accountant || ""}</td>
         <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
         <td style="padding: 4px;">
         <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-        ${item.ledgerStatus?.toUpperCase()}
+        ${item.ledgerStatus?.toUpperCase() || ""}
         </span>
         </td>
-        <td style="padding: 4px;">${item.cr ? item.Amount.toLocaleString(): 0.00}</td>
-        <td style="padding: 4px;">${item.dr ? item.Amount.toLocaleString(): 0.00}</td>
+        <td style="padding: 4px;">${item.cr ? (item.Amount || item.crAmount || 0).toLocaleString(): (0).toLocaleString()}</td>
+        <td style="padding: 4px;">${item.dr ? (item.Amount || item.drAmount || 0).toLocaleString(): (0).toLocaleString()}</td>
         <td style="padding: 4px;">${item?.Balance || 0.00}</td>
       </tr>
     `
@@ -72,7 +74,12 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
       .join("");
   };
 
-  const showModal = (filteredData) => {
+  // showModal now accepts the source data (transactions) to avoid relying on async state update
+  const showModal = (sourceData) => {
+    const baseData = (sourceData || data) || [];
+    // apply original "not pending" filter for initial render
+    const initialFiltered = baseData.filter(item => item.status?.toLowerCase() !== "pending");
+
     Swal.fire({
       title: "Payable Transactions",
       html: `
@@ -125,7 +132,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
               </tr>
             </thead>
             <tbody id="paymentTableBody">
-              ${generateTableRows(filteredData)}
+              ${generateTableRows(initialFiltered)}
             </tbody>
           </table>
         </div>
@@ -142,7 +149,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
           const type = document.getElementById("typeFilter").value;
           const customer = document.getElementById("customerFilter").value;
 
-          const filtered = data.filter((item) => {
+          const filtered = (baseData || []).filter((item) => {
             const itemDate = moment(item.PaymentDate);
             const start = startDate ? moment(startDate) : null;
             const end = endDate ? moment(endDate) : null;
@@ -194,13 +201,13 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
                 const clean = []
                 filtered.forEach(entry =>{
                   clean.push({
-                    "Ref":entry.paymentReferenceNo,
-                    "Accountant":entry.Accountant,
-                    "Vendor":getCustomer(entry.customer),
+                    "Ref":entry.paymentReferenceNo || entry.billReferenceNo,
+                    "Accountant":entry.Accountant || entry.AccountatntId,
+                    "Vendor":getCustomer(entry.vendor),
                     "status":entry.status,
                     "Date":entry.PaymentDate,
                     "Gateway":entry.type,
-                    "Amount":entry.crAmount > 0 ? entry.crAmount : entry.drAmount
+                    "Amount": (entry.crAmount > 0 ? entry.crAmount : entry.drAmount) || entry.Amount || 0
                   })
                 })
                 const excelBtn = downloadExcel( clean,"Paymnt Register");
@@ -221,8 +228,8 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
           }
         });
 
-        // Initial render
-        updateTable(filteredData);
+        // Initial render using computed initialFiltered
+        updateTable(initialFiltered);
       },
     });
   };
