@@ -77,7 +77,7 @@ export default function Page({ baseUrl, userData, VendorList, BanksList }) {
             <h1 className="text-2xl font-bold text-gray-800">Account Payables</h1>
           </div>
           <p className="text-gray-600">
-            Showing page {currentPage} of {totalPages} ({totalInvoices} invoices)
+            Showing page {currentPage} of {totalPages} ({totalInvoices})
           </p>
         </div>
 
