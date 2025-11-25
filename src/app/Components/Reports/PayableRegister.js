@@ -206,8 +206,8 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
                     "Vendor":getCustomer(entry.vendor),
                     "status":entry.ledgerStatus,
                     "Date":moment(entry.PaymentDate).format('YYYY-MM-DD'),
-                    "cr":`${entry.cr ? (item.Amount || item.crAmount || 0).toLocaleString(): (0).toLocaleString()}`,
-                    "dr":`${entry.dr ? (item.Amount || item.crAmount || 0).toLocaleString(): (0).toLocaleString()}`,
+                    "cr":`${entry.cr ? (entry.Amount || entry.crAmount || 0).toLocaleString(): (0).toLocaleString()}`,
+                    "dr":`${entry.dr ? (entry.Amount || entry.crAmount || 0).toLocaleString(): (0).toLocaleString()}`,
                     "Bal": entry.Balance
                   })
                 })
