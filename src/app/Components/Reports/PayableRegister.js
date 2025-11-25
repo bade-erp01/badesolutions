@@ -205,7 +205,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
                     "Accountant":entry.Accountant || entry.AccountatntId,
                     "Vendor":getCustomer(entry.vendor),
                     "status":entry.ledgerStatus,
-                    "Date":entry.PaymentDate,
+                    "Date":moment(entry.PaymentDate).format('YYYY-MM-DD'),
                     "cr":entry.cr ? entry.Amount : 0,
                     "dr":entry.dr ? entry.Amount : 0,
                     "Bal": entry.Balance
