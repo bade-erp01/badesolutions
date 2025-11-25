@@ -223,7 +223,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
 
         ["startDate", "endDate", "typeFilter", "customerFilter", ].forEach((id) => {
           const el = document.getElementById(id);
-                    if (el) {
+          if (el) {
             el.addEventListener("input", applyFilters);
             el.addEventListener("change", applyFilters);
           }
