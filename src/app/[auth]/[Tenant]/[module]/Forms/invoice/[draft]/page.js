@@ -291,7 +291,7 @@ const generatePdf = async (business, customer, bill) => {
     }
   } catch (error) {
     Swal.close();
-    console.error("Error generating PDF:", error);
+    console.error("Error generating PDF:");
   }
 };
 
@@ -303,7 +303,7 @@ const generatePdf = async (business, customer, bill) => {
       plsWait("Adding product...");
       // find the product and return the id
       const cleanedProducts = await products.find((product) => {
-        return product.item.ACDcode === productId;
+        return product.item.ACDcode === productId ||  product.item.ADCcode === productId;
       });
 
      if(!cleanedProducts){

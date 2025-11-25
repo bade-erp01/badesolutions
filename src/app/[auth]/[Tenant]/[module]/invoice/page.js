@@ -51,7 +51,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
         setTotalInvoices(data.totalInvoices);
         setCurrentPage(data.currentPage);
       } catch (error) {
-        console.error("Error fetching bills:", error);
+        // console.error("Error fetching bills:", error);
       } finally {
         setIsLoading(false); // Set loading to false after fetching
       }
