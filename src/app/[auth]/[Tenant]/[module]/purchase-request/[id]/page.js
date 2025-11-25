@@ -148,9 +148,8 @@ export default function DraftPurchasePage({
   const handleProductSelection = async (productId) => {
     plsWait("Adding product to list");
 
-
     const cleanedProducts = await productList.find((product) => {
-        return product.item.ACDcode === productId || product.item.ADCcode === productId;
+        return product?.item?.ACDcode === productId || product?.item?.ADCcode === productId;
       });
     try {
       const res = await fetch(
