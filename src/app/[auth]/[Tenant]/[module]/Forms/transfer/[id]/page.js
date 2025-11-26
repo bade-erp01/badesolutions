@@ -147,13 +147,14 @@ export default function TransferPage({
 
   const handleProductSelection = async (productId) => {
     plsWait("Adding product to list");
-
+    
     const cleanedProducts = await productList.find((product) => {
-        return product?.item?.ACDcode === productId || product?.item?.ADCcode === productId;
-      });
+      return product?.ACDcode === productId || product?.ADCcode === productId;
+    });
+
     try {
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/VendorProduct/lpo?product=${cleanedProducts.storeId}&po=${bill._id}`,
+        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(Singlebill._id)}?product=${Encrypt(cleanedProducts._id)}&to=${Encrypt(Singlebill.to)}`,
         {
           method: "PUT",
           headers: {
@@ -755,7 +756,7 @@ export default function TransferPage({
                       href={`/${Business.companyName}/${Encrypt(user._id)}/product/product/${Encrypt(bill.item.productId)}`}
                       className="hover:underline"
                     >
-                      {bill.item.productName}
+                      {bill.item.Name}
                     </Link>
                   </td>
                   <td className="px-4 py-2 text-center">
@@ -821,34 +822,10 @@ export default function TransferPage({
                     </td>
                   )}
                   <td className="px-4 py-2 text-center">
-                    {Singlebill.status.toLowerCase() === "draft" ? (
-                      <input
-                      type="text"
-                      defaultValue={bill.BatchNo}
-                      className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                      onBlur={(e) => {
-                        const val = e.target.value.trim(); // Optional: remove leading/trailing spaces
-                        handleQtyChange(val, bill._id, "BatchNo");
-                      }}
-                    />
-                    ) : (
-                      bill.BatchNo
-                    )}
+                     {bill.BatchNo || "N/A"}
                   </td>
                   <td className="px-4 py-2 text-center">
-                    {Singlebill.status.toLowerCase() === "draft" ? (
-                     <input
-                      type="date"
-                      defaultValue={bill.ExpDate}
-                      className="w-30 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 texxt-xs"
-                      onBlur={(e) => {
-                        const val = e.target.value;
-                        handleQtyChange(val, bill._id, "ExpDate");
-                      }}
-                    />
-                    ) : (
-                      bill.ExpDate
-                    )}
+                    {bill.ExpDate || "N/A"}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.buyingPrice}
