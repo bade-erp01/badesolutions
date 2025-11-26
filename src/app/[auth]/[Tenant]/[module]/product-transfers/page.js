@@ -183,7 +183,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedPurchases.length > 0 ? (
               paginatedPurchases.map((element) => (
-                  <Link href={`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${`${Encrypt(element._id)}`}`} title={element.billReferenceNo} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
+                  <Link key={element._id} href={`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${`${Encrypt(element._id)}`}`} title={element.billReferenceNo} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
                        <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
                          <Image
                            src={`/preview.png`}
