@@ -1,6 +1,9 @@
 import TransferPage from "./page"
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import { Encrypt,Dencrypt } from "../../../../../../../../Functions/Functions";
+import Nav1 from "@/app/Components/Nav1"
+import BackButton from "@/app/Components/BackBotton"
+import Footer2 from "@/app/Components/Footer2";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -75,5 +78,51 @@ export default async function Productlayout({ children, params }) {
     const Transfer = Dencrypt(data.Transfer);
     const productsList = Dencrypt(data.products);
 
-   return <TransferPage bill={Transfer} products={productsList} Business={userData.business} user={userData.user} EXPRESS_PRIVATE_URL={baseUrl}/>;
-}
+    return (
+     <div className="flex flex-col">
+       {/* Navigation Bar */}
+       <Nav1
+        user={userData.user}
+        business={userData.business}
+        page={`${Transfer.billReferenceNo?.toUpperCase() }`}
+       />
+   
+       {/* Main Content Area */}
+       <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
+        {/* Aside (Left Sidebar) */}
+        <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-hidden">
+         <BackButton />
+         <hr className="my-4 border-gray-700" />
+         <nav className="flex-grow">
+           <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+           
+            <ul className="divide-y divide-gray-700">
+             {Transfer.ActivityLog?.map((log, index) => {
+               return (
+                <li key={index} className="py-3 px-4 text-xs">
+                 <div className="flex justify-between items-center">
+                   <span>{log.logMsg}</span>
+                 </div>
+                 <hr className="border-gray-500" />
+                </li>
+               );
+             }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}
+            </ul>
+           </div>
+         </nav>
+        </aside>
+   
+        {/* Main Content (Right Side) */}
+        <main className="flex-1 overflow-hidden">
+         <section className=" flex-2 max-w-screen-xl h-[83vh] overflow-y-scroll">
+          <TransferPage bill={Transfer} products={productsList} Business={userData.business} user={userData.user} EXPRESS_PRIVATE_URL={baseUrl}/>;
+         </section>
+        </main>
+       </div>
+   
+       {/* Footer */}
+       <Footer2 />
+     </div>
+    );
+  }
+  

@@ -4,10 +4,7 @@ import { mutate } from "swr"; // make sure this is imported
 import { useState, useEffect, Suspense} from "react";
 import QRCode from "qrcode";
 import Swal from "sweetalert2";
-import Nav1 from "@/app/Components/Nav1";
-import BackButton from "@/app/Components/BackBotton";
 import Image from "next/image";
-import Footer2 from "@/app/Components/Footer2";
 import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
 import {
   totalInWords,
@@ -535,17 +532,9 @@ const generatePdf = async (business, customer, bill) => {
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
-      <Nav1
-        user={userInfo.user}
-        business={userInfo.business}
-        page={`${Singlebill.billStatus.toUpperCase()} / ${
-          Singlebill.billReferenceNo
-        } /${Singlebill.invoicelocation}`}
-      />
       <div className="max-w-5xl mx-auto px-6 py-10 bg-white shadow-2xl text-xs m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
-          <BackButton />
           <span
             className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
               isCancelled
@@ -654,9 +643,9 @@ const generatePdf = async (business, customer, bill) => {
             <button
               title={`Download and Print ${Singlebill.billStatus}`}
               onClick={() => generatePdf(Business, Singlebill.customer, bill)}
-              className="inline-flex items-center justify-center px-3 py-3 rounded-lg  text-white font-semibold hover:shadow-xl hover:bg-blue-100 transition duration-200 ease-in-out"
+              className="inline-flex items-center justify-center px-3 py-3 rounded-lg  text-white font-semibold bg-black transition duration-200 ease-in-out"
             >
-              <PrinterIcon className="h-6 w-6 text-gray-500" />
+              <PrinterIcon className="h-6 w-6 text-gray-100" />
               {/* <span>Print Quotation</span> */}
             </button>
           )}
@@ -1009,7 +998,6 @@ const generatePdf = async (business, customer, bill) => {
             )}
         </div>
       </div>
-      <Footer2 />
     </Suspense>
   );
 }

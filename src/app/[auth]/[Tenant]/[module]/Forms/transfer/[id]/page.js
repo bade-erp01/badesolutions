@@ -1,7 +1,6 @@
 "use client";
 import { React, useState ,useRef} from "react";
 import Swal from "sweetalert2";
-import BackButton from "@/app/Components/BackBotton";
 import Image from "next/image";
 import moment from "moment";
 import jsPDF from "jspdf";
@@ -32,118 +31,7 @@ export default function TransferPage({
   const [cust] = useState(customer);
   const [productList] = useState(products);
   Swal.close();
-  const router = useRouter();
-
-  // upload docs
-      const processAndUploadFile = async (file) => {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            try {
-              const img = new window.Image();
-              img.onload = async () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxWidth = 800;
-                const maxHeight = 600;
-                let { width, height } = img;
-
-                if (width > height) {
-                  if (width > maxWidth) {
-                    height *= maxWidth / width;
-                    width = maxWidth;
-                  }
-                } else {
-                  if (height > maxHeight) {
-                    width *= maxHeight / height;
-                    height = maxHeight;
-                  }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                const resizedImage = canvas.toDataURL('image/jpeg', 0.7);
-
-                const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/attachement?po=${Encrypt(bill._id)}`, {
-                  method: "POST",
-                  body: JSON.stringify({ image: resizedImage }),
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-                    dbConnect: `Bearer ${Business.rustyRoof}`,
-                    access: `${Encrypt(user._id)}`,
-                  },
-                });
-
-                const response = await request.json();
-                resolve({ success: !!response.message });
-              };
-              img.src = e.target.result;
-            } catch (error) {
-              resolve({ success: false });
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-
-        const uploadLPOFile = async () => {
-          try {
-            const { value: files } = await Swal.fire({
-              title: "Select Files",
-              input: "file",
-              inputAttributes: {
-                accept: "image/*", // Accept only image types
-                "aria-label": "Upload your Files",
-                multiple: "multiple",
-              },
-              preConfirm: (fileInput) => {
-                const maxSize = 1024 * 1024; // 1MB
-                const files = fileInput instanceof FileList ? Array.from(fileInput) : [];
-
-                for (const file of files) {
-                  if (file.size > maxSize) {
-                    Swal.showValidationMessage(`File "${file.name}" exceeds 1MB limit.`);
-                    return false;
-                  }
-                  if (file.type === "application/pdf") {
-                    Swal.showValidationMessage(`PDF files are not allowed: "${file.name}".`);
-                    return false;
-                  }
-                }
-
-                return files;
-              },
-            });
-            if (files && files.length > 0) {
-              plsWait("Uploading...");
-              const uploadPromises = Array.from(files).map((file) =>
-                processAndUploadFile(file)
-              );
-
-              const results = await Promise.all(uploadPromises);
-
-              const successfulUploads = results.filter(
-                (result) => result.success
-              ).length;
-              const failedUploads = results.filter(
-                (result) => !result.success
-              ).length;
-
-              Swal.fire({
-                title: "Upload Results",
-                html: `Successfully uploaded ${successfulUploads} file(s).<br>Failed to upload ${failedUploads} file(s).`,
-                icon: successfulUploads > 0 ? "success" : "warning",
-              });
-            }
-          } catch (error) {
-            ErrorMessage("Error uploading file:", error);
-          }
-        };
-  
+  const router = useRouter(); 
 
   const handleProductSelection = async (productId) => {
     plsWait("Adding product to list");
@@ -184,9 +72,9 @@ export default function TransferPage({
     try {
       plsWait("Removing product from cart");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLinePo?po=${
-        bill._id
-      }&items=${encodeURIComponent(id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransfer/${
+        Encrypt(bill._id)
+      }?items=${encodeURIComponent(Encrypt(id))}`;
 
       const response = await fetch(url, {
         method: "DELETE",
@@ -590,7 +478,6 @@ export default function TransferPage({
       <div className="max-w-5xl mx-auto px-6 py-10 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
-          <BackButton />
           <span
             className={`text-shadow-black text-purple-300 px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border `}
           >
@@ -644,17 +531,6 @@ export default function TransferPage({
                     <KeyIcon className="h-6 w-6 text-white" />
                     <span>Lock Request</span>
                   </button>
-                  )}
-
-                {/* for file upload */}
-                  {user.raiseLpo &&
-                  Singlebill.status.toLowerCase() === "draft" && (
-                      <div>
-                        <button className="inline-flex items-center justify-center bg-gray-600  border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl  transition duration-200 ease-in-out text-xs" onClick={uploadLPOFile}>
-                          upload Attachement 
-                          <PaperClipIcon className="h-6 w-6 text-white`" />
-                        </button>
-                      </div>
                   )}
 
 
@@ -753,7 +629,7 @@ export default function TransferPage({
                 >
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center text-xs">
                     <Link
-                      href={`/${Business.companyName}/${Encrypt(user._id)}/product/product/${Encrypt(bill.item.productId)}`}
+                      href={`/${Business.companyName}/${Encrypt(user._id)}/product/product/${Encrypt(bill.item._id)}`}
                       className="hover:underline"
                     >
                       {bill.item.Name}

@@ -157,7 +157,6 @@ export default async function page({ params }) {
                   <span className="text-xs">{StoreFinder.Name}</span>
                 </Link>
               )}
-               
               
             </nav>
           </aside>
