@@ -34,8 +34,9 @@ export default async function StoreLayout2({ params }) {
            <Nav1
             user={userData.user}
             business={userData.business}
-            page={`${"Draft"}`}
-           />
+            page={`${data.Inv.billStatus === "Draft" 
+            ? "Draft" : data.Inv.billStatus.toUpperCase()} / ${data.Inv.billReferenceNo} / ${data.Inv.invoicelocation}`}/>
+
        
            {/* Main Content Area */}
            <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
