@@ -586,7 +586,7 @@ export default function DraftPurchasePage({
 
   return (
     <>
-      <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden animate__animated animate__fadeIn invoicecontainer border border-gray-200">
+      <div className="max-w-5xl mx-auto px-6 py-10 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
           <BackButton />
