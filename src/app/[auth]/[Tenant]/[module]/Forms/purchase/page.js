@@ -71,9 +71,9 @@ export default function Storelayout({ purchaseList, userData, VendorList,Store }
     <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
       <Nav1 user={userData.user} business={userData.business} page={`purchase`} Module={filteredPurchases} />
 
-      <div className="flex flex-1 text-white gap-6 p-2">
+      <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
         {/* Sidebar Filters */}
-        <aside className="w-full md:w-80 bg-[#111114]/70 backdrop-blur-lg p-4 shadow-lg sticky top-6 self-start h-fit">
+        <aside className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block ">
           <BackButton />
           <hr className="my-4 border-white/10" />
 
@@ -89,28 +89,6 @@ export default function Storelayout({ purchaseList, userData, VendorList,Store }
               Clear
             </button>
           </div>
-
-          {/* Search */}
-          {/* <label className="block mb-3">
-            <div className="text-sm text-white/70 mb-1">Search</div>
-            <div className="relative">
-              <input
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search vendor, ref, description..."
-                className="w-full pl-10 pr-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <MagnifyingGlassIcon className="h-5 w-5 text-white/50 absolute left-3 top-2.5" />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery("")} className="absolute right-2 top-2.5">
-                  <XMarkIcon className="h-5 w-5 text-white/60" />
-                </button>
-              )}
-            </div>
-          </label> */}
 
           {/* Status */}
           <label className="block mb-3">
@@ -191,28 +169,13 @@ export default function Storelayout({ purchaseList, userData, VendorList,Store }
           {/* Export button */}
           {userData?.user?.isAdmin && paginatedPurchases.length > 0 && (
             <div className="pt-2">
-              {/* <ExcelDownloadBtn data={paginatedPurchases} page={Params.module} /> */}
               <PurchaseReportModal data={purchaseList} Vendors={Vendors} Stores={Stores}/>
             </div>
           )}
-
-          {/* Summary */}
-          <div className="mt-4 pt-4 border-t border-white/5 text-sm">
-            <div className="flex justify-between text-white/80">
-              <span>Results</span>
-              <strong>{filteredPurchases.length}</strong>
-            </div>
-            <div className="flex justify-between text-white/80 mt-2">
-              <span>Showing</span>
-              <strong>
-                {(paginatedPurchases.length === 0 && filteredPurchases.length > 0) ? `${(currentPage - 1) * itemsPerPage + 1} - ${Math.min(currentPage * itemsPerPage, filteredPurchases.length)}` : `${paginatedPurchases.length}`}
-              </strong>
-            </div>
-          </div>
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 min-h-[83dvh] p-3">
+         <main className="flex-1 min-h-[80dvh] p-3">
         
           {/* Grid of cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -246,23 +209,6 @@ export default function Storelayout({ purchaseList, userData, VendorList,Store }
               >
                 <BackwardIcon className="h-4 w-4 inline" /> Prev
               </button>
-
-              {/* Simple page numbers */}
-              {/* <div className="hidden sm:flex items-center gap-1 px-2">
-                {Array.from({ length: totalPages }).map((_, i) => {
-                  const page = i + 1;
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-1 rounded ${page === currentPage ? "bg-indigo-600" : "bg-white/5"}`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
-              </div> */}
-
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
