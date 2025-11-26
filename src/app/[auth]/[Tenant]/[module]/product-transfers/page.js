@@ -3,14 +3,18 @@ import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import ProductTransfer from "@/app/Components/ProductTransfer"
 import BackButton from "@/app/Components/BackBotton";
-import Card from "@/app/Components/Card";
-import { FunnelIcon, BackwardIcon, ForwardIcon, MagnifyingGlassIcon, XMarkIcon, ArrowPathIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import Link from "next/link"
+import Image from "next/image"
+import { FunnelIcon, BackwardIcon, ForwardIcon, ArrowPathIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
+import {Encrypt} from "../../../../../../Functions/Functions"
 
 export default function TransferPage({ purchaseList, userData, VendorList,Store,baseUrl }) {
   const Params = useParams();
   const [purchaselist] = useState(purchaseList || []);
+  const truncate = (str, length = 20) =>
+    str && str.length > length ? str.substring(0, length) + "..." : str;
   const [Vendors] = useState(VendorList || []);
   const [Stores] = useState(Store || []);
   const [statusFilter, setStatusFilter] = useState("");
@@ -75,10 +79,9 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
        <aside className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block ">
           <BackButton />
           <hr className=" border-white/10" />
-          {userData?.user?.isAdmin && paginatedPurchases.length > 0 && (
+          {userData?.user?.isAdmin && (
             <div className="pt-2">
-             
-              <ProductTransfer Store={Stores} userDate={userData} baseUrl={baseUrl}/>
+              <ProductTransfer Store={Stores} userData={userData} baseUrl={baseUrl}/>
             </div>
           )}
           <br/>
@@ -180,11 +183,23 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedPurchases.length > 0 ? (
               paginatedPurchases.map((element) => (
-                 <Card
-                  key={element._id}
-                  data={element}
-                  module={`purchase-request`}
-                  />
+                  <Link href={`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${`${Encrypt(element._id)}`}`} title={element.billReferenceNo} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
+                       <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
+                         <Image
+                           src={`/preview.png`}
+                           width={60}
+                           height={60}
+                           alt={"photo"}
+                           className="rounded-md object-cover w-16 h-16"
+                           quality={100}
+                           priority={true}
+                         />
+                         <div className="flex flex-col justify-center w-full">
+                           <p className=" font-semibold text-gray-800 truncate text-xs">{truncate(element.billReferenceNo)}</p>
+                           <small className="text-gray-500 mt-1 text-xs">{truncate(element.status)}</small>
+                         </div>
+                       </div>
+                     </Link>
               ))
             ) : (
               <div className="col-span-full py-12 text-center text-black">

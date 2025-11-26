@@ -2,19 +2,21 @@
 import React from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/src/sweetalert2.scss";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import {Encrypt} from "../../../Functions/Functions"
-import {ErrorMessage,SuccessToast,plsWait} from "../../../Functions/Mics"
+import {ErrorMessage,plsWait} from "../../../Functions/Mics"
 import {useRouter} from "next/navigation"
+import {useParams} from "next/navigation"
 
 export default function ProductTransfer({Store,userData,baseUrl}) {
     const router = useRouter()
+    const Params = useParams()
     const getStore = (id) =>{
         const WH = Store.find(str =>{
             return str._id === id
         })
         return WH?.WHName || "N/A"
     }
+
     const openTransferModal = async () => {
         const options = (Store || []).map(s => `<option value="${s._id}">${s.WHName}</option>`).join("");
 
@@ -127,10 +129,11 @@ export default function ProductTransfer({Store,userData,baseUrl}) {
 
                 },
             })
+            const response = await request.json()
 
             if (request.ok){
               // redirect to Form page
-              router.push(``)
+              router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${response.data}`)
             }else{
               ErrorMessage('Something went wrong')
             }
@@ -143,8 +146,7 @@ export default function ProductTransfer({Store,userData,baseUrl}) {
             <button onClick={openTransferModal}
             className="flex items-center gap-3 bg-gray-300 text-black/70 p-3 rounded-md hover:bg-gray-700 transition hover:text-gray-100 text-sm w-full"
             >
-              <PlusCircleIcon className="h-4 w-4 text-gray-100" />
-              <span className="">Start New Product Transfer</span>
+              <span className="font-semibold">Start New Product Transfer</span>
             </button>
         </div>
     );
