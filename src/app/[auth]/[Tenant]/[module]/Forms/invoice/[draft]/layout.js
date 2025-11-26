@@ -35,7 +35,7 @@ export default async function StoreLayout2({ params }) {
             user={userData.user}
             business={userData.business}
             page={`${data.Inv.billStatus === "Draft" 
-            ? "Draft" : data.Inv.billStatus.toUpperCase()} / ${data.Inv.billReferenceNo} / ${data.Inv.invoicelocation}`}/>
+            ? "Draft" : data.Inv.billStatus.slice(0,3).toUpperCase()} / ${data.Inv.billReferenceNo} / ${data.Inv.invoicelocation}`}/>
 
        
            {/* Main Content Area */}
