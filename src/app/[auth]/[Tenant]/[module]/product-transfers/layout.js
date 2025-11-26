@@ -1,3 +1,7 @@
+import TransferPage from "./page"
+import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
+import { Encrypt,Dencrypt } from "../../../../../../Functions/Functions";
+
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description:
@@ -42,6 +46,45 @@ export const metadata = {
   favicon: "favicon.ico",
 };
 
+
 export default async function Productlayout({ children, params }) {
-  return <>{children}</>;
+  const moduleList = await params;
+  const userData = await fetchUser();
+
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+    const [res,stores] = await Promise.all([
+      fetch(`${baseUrl}/api/Transfers`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+
+      },
+    }),
+
+    // get all store
+    fetch(`${baseUrl}/api/Stores`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userData.business.tenantId}`,
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+
+      },
+    })
+
+    ])
+  
+    if (!res.ok) {
+      return (
+        <p className="font-semibold text-lg-center text-center text-red-500">Something went wrong</p>
+      ); 
+    }
+  
+    const data = await res.json();
+    const TransfersList = Dencrypt(data.TransferList)
+    const StoreList = await stores.json()
+
+   return <TransferPage purchaseList={TransfersList} userData={userData} Store={StoreList} baseUrl={baseUrl}/>;
 }

@@ -1,126 +1,223 @@
+"use client";
 import Nav1 from "@/app/Components/Nav1";
-import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Link from "next/link";
 import Footer2 from "@/app/Components/Footer2";
-import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { Encrypt } from "../../../../../../Functions/Functions";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
-import { storeProduct, WHouse } from "../../../../../../models/Stores";
-import ProductTransfer from "../../../../../../models/ProductTransfers";
-import TransferTable from "@/app/Components/TableTransfer";
+import ProductTransfer from "@/app/Components/ProductTransfer"
 import BackButton from "@/app/Components/BackBotton";
-import dbConnect from "../../../../../../lib/mongoose"
+import Card from "@/app/Components/Card";
+import { FunnelIcon, BackwardIcon, ForwardIcon, MagnifyingGlassIcon, XMarkIcon, ArrowPathIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { useState, useMemo } from "react";
+import { useParams } from "next/navigation";
 
-export const metadata = {
-  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  description:
-    "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
-  keywords: [
-    "Business Automation",
-    "Enterprise Solutions",
-    "B.A.D.E",
-    "AI-powered Business",
-    "Workflow Optimization",
-    "Process Automation",
-    "ERP in Nigeria",
-    "Bernard fidels ogoh",
-    "ERP in Abuja",
-    "ERP in Lagos",
-    "ERP in Port Harcourt",
-    "Locally built ERP",
-    "ERP for SMEs",
-    "ERP for Enterprises",
-    "ERP for Startups",
-    "ERP for Corporates",
-    "AI-powered ERP",
-    "AI-driven Business Solutions",
-    "AI Automation",
-    "Affordable ERP",
-    "Scalable ERP Solutions",
-  ],
-  author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
-  ogTitle:
-    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
-  ogDescription:
-    "Streamline your business with AI-driven automation, real-time insights, and scalability",
-  ogImage: "/assets/bade.png", // Preview image when shared on social media
-  ogUrl: "https://badesolutions.com.ng",
-  twitterCard: "/assets/bade.png",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription:
-    "Automate and optimize your enterprise with cutting-edge business solutions",
-  twitterImage: "/assets/bade.png",
-  favicon: "favicon.ico",
-};
+export default function TransferPage({ purchaseList, userData, VendorList,Store,baseUrl }) {
+  const Params = useParams();
+  const [purchaselist] = useState(purchaseList || []);
+  const [Vendors] = useState(VendorList || []);
+  const [Stores] = useState(Store || []);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [vendorFilter, setVendorFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 19;
 
-export default async function TransferPage({ params }) {
-  const moduleList = await params;
-  const userData = await fetchUser();
-  await dbConnect(userData.business.rustyRoof)
-  const StoreLists = await WHouse.findByTenant(userData.business.tenantId).lean();
-  const TransfersList = await ProductTransfer.findByTenant(
-    userData.business.tenantId
-  ).sort({_id:-1}).lean();
+  const getVendorNameById = (id) => {
+    const vendor = Vendors.find((v) => v._id === id);
+    return vendor?.Name || "";
+  };
 
-//   /string the TransfersList to remove unwanted fields and reduce data size
-  const TransfersListStr = JSON.stringify(TransfersList);
-  const StoreListsStr = JSON.stringify(StoreLists);
+  const statusColor = (status) => {
+    if (!status) return "bg-gray-500";
+    const s = status.toLowerCase();
+    if (s.includes("draft")) return "bg-yellow-500 text-black";
+    if (s.includes("approved")) return "bg-green-500";
+    if (s.includes("rejected")) return "bg-red-500";
+    if (s.includes("posted") || s.includes("warehouse") || s.includes("inventory")) return "bg-indigo-500";
+    return "bg-gray-500";
+  };
+
+  const filteredPurchases = useMemo(() => {
+    const list = purchaselist || [];
+    return list.filter((item) => {
+      const vendorName = item.to || item.from;
+      const statusMatch = !statusFilter || (item.status || "").toLowerCase() === statusFilter.toLowerCase();
+      const vendorMatch = !vendorFilter || vendorName.toLowerCase() === vendorFilter.toLowerCase();
+      const searchMatch =
+        !searchQuery ||
+        (item?.reference || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item?.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        vendorName.toLowerCase().includes(searchQuery.toLowerCase());
+      const startMatch = !startDate || new Date(item.recievedDate) >= new Date(startDate);
+      const endMatch = !endDate || new Date(item.recievedDate) <= new Date(endDate);
+
+      return statusMatch && vendorMatch && searchMatch && startMatch && endMatch;
+    });
+  }, [statusFilter, vendorFilter, startDate, endDate, searchQuery, purchaselist, Vendors]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredPurchases.length / itemsPerPage));
+  const paginatedPurchases = filteredPurchases.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const clearFilters = () => {
+    setStatusFilter("");
+    setVendorFilter("");
+    setStartDate("");
+    setEndDate("");
+    setSearchQuery("");
+    setCurrentPage(1);
+  };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
-      <Nav1
-        user={userData.user}
-        business={userData.business}
-        page={`Transfered Products`}
-      />
+    <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
+      <Nav1 user={userData.user} business={userData.business} page={`Product Transfer`} Module={filteredPurchases} />
 
-      <div className="flex flex-1 text-white bt-2">
-        {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className={`w-70  bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 overflow-none h-h-[520px] max-h-[600px] md:block`}
-          style={{ maxHeight: "600px", overflowY: "auto" }}
-        >
-          <h2 className="text-lg text-white font-bold mb-4">
-            Product Transfers
-          </h2>
-          <hr />
-          <nav className="space-y-4 ">
-            {userData?.user?.createProduct && (
-              <Link
-                href={`/${userData.business?.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                  userData?.user._id
-                )}/Module/Forms/${moduleList.module.toLowerCase()}`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <PlusCircleIcon className="h-4 w-4 text-gray-100" />
-                <span className="text-xs">New Transfer</span>
-              </Link>
-            )}
+      <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
+        {/* Sidebar Filters */}
+       <aside className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block ">
+          <BackButton />
+          <hr className=" border-white/10" />
+          {userData?.user?.isAdmin && paginatedPurchases.length > 0 && (
+            <div className="pt-2">
+             
+              <ProductTransfer Store={Stores} userDate={userData} baseUrl={baseUrl}/>
+            </div>
+          )}
+          <br/>
+          <div className="flex items-center gap-2 mb-4">
+            <FunnelIcon className="h-5 w-5 text-white/60" />
+            <h2 className="text-lg font-semibold text-white/90">Filters</h2>
+            <button
+              onClick={clearFilters}
+              className="ml-auto flex items-center gap-1 text-sm bg-white/5 hover:bg-white/8 px-3 py-1 rounded"
+              title="Clear filters"
+            >
+              <ArrowPathIcon className="h-4 w-4 text-white/60" />
+              Clear
+            </button>
+          </div>
 
-            <ExcelDownloadBtn
-              data={JSON.stringify(TransfersList)}
-              page="Transfered Products"
-            />
-            <BackButton />
-          </nav> 
-        </aside>{" "}
-        {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 h-[520px] overflow-y-auto">
-            {/* show each  transfer */}
-            {TransfersList.length > 0 ? (
-                <TransferTable TransfersLists={TransfersListStr} StoreList={StoreListsStr} Business={userData.business} User={userData.user}/>
+          {/* Status */}
+          <label className="block mb-3">
+            <div className="text-sm text-white/70 mb-1">Status</div>
+            <div className="flex flex-wrap gap-2">
+              {["", "Draft", "approved", "Rejected", "POSTED TO WAREHOUSE"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => {
+                    setStatusFilter(s);
+                    setCurrentPage(1);
+                  }}
+                  className={`text-sm px-3 py-1 rounded-full border ${statusFilter === s ? "border-indigo-400 bg-indigo-600/30" : "border-white/8"} ${
+                    s === "" ? "opacity-80" : ""
+                  }`}
+                >
+                  {s === "" ? "All" : s}
+                </button>
+              ))}
+            </div>
+          </label>
+
+         
+          <label className="block mb-3">
+            <div className="text-sm text-white/70 mb-1">Store</div>
+            <select
+              value={vendorFilter}
+              onChange={(e) => {
+                setVendorFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All stores</option>
+              {Stores.map((v) => (
+                <option key={v._id} value={v.WHName}>
+                  {v.WHName}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {/* Date range */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <div className="text-sm text-white/70 mb-1 flex items-center gap-1">
+                <CalendarDaysIcon className="h-4 w-4 text-white/60" />
+                <span>Start</span>
+              </div>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none"
+              />
+            </div>
+
+            <div>
+              <div className="text-sm text-white/70 mb-1 flex items-center gap-1">
+                <CalendarDaysIcon className="h-4 w-4 text-white/60 rotate-180" />
+                <span>End</span>
+              </div>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none"
+              />
+            </div>
+          </div>
+
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 min-h-[80dvh] p-3">
+        
+          {/* Grid of cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {paginatedPurchases.length > 0 ? (
+              paginatedPurchases.map((element) => (
+                 <Card
+                  key={element._id}
+                  data={element}
+                  module={`purchase-request`}
+                  />
+              ))
             ) : (
-              <p className="text-gray-300 text-center mt-20">
-                No transfers found.
-              </p>
+              <div className="col-span-full py-12 text-center text-black">
+                <div className="text-lg font-medium mb-2">No purchase requests found</div>
+                <div className="text-sm">Try clearing filters or changing the date range.</div>
+              </div>
             )}
-          </section>
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6 flex items-center justify-between">
+            <div className="text-sm text-black">
+              Showing {(filteredPurchases.length === 0) ? 0 : (currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredPurchases.length)} of {filteredPurchases.length}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded bg-black/60 disabled:opacity-40"
+              >
+                <BackwardIcon className="h-4 w-4 inline" /> Prev
+              </button>
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded bg-black/60 disabled:opacity-40"
+              >
+                Next <ForwardIcon className="h-4 w-4 inline" />
+              </button>
+            </div>
+          </div>
         </main>
       </div>
       <Footer2 />
