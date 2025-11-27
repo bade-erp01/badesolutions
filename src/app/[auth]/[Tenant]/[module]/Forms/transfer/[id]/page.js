@@ -858,31 +858,13 @@ export default function TransferPage({
           <div className="max-w-md">
             <h4 className="font-semibold text-gray-700 mb-2">Attention ⚠️</h4>
             <p className="text-sm text-red-600 mb-4">
-              Please ensure to verify all entries. Once this transfer is process, it is inreversable.</p>
-            {/* display all attachements here  */}
-            <div className="space-y-2">
-              {Singlebill.Attachment?.map((file, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition">
-                <PaperClipIcon className="h-5 w-5 text-gray-500" />
-                <Link
-                  href={file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 font-medium hover:underline"
-                >
-                  Attachment {index + 1}
-                </Link>
-              </div>
-              ))}
-          </div>
+              Please ensure to verify all entries. Once this transfer is processed, it's inreversable.</p>
           </div>
           <div className="text-right">
             <h4 className="font-semibold text-gray-700 mb-2"> {Singlebill.billReferenceNo}</h4>
             <p className="text-sm font-medium text-gray-800">
              
             </p>
-            {/* Optional signature */}
-            {/* <Image src="/QRBADE.png" width={150} height={150} alt="QR Code Signature" /> */}
           </div>
         </div>
 
