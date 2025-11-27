@@ -148,11 +148,11 @@ export default function TransferPage({
 
   const handleQtyChange = async (newQty, lineId, field) => {
     try {
-      // plsWait('updating...');
+      plsWait('updating...');
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/updateLinePo/?po=${encodeURIComponent(
-        bill._id
-      )}&${field}=${newQty}&lineId=${encodeURIComponent(
+      const url = `${EXPRESS_PRIVATE_URL}/api/Virtual/Product/TransferForm/${encodeURIComponent(
+        Encrypt(Singlebill._id)
+      )}?${field}=${newQty}&lineId=${encodeURIComponent(
         lineId
       )}&update=${field}`;
 
@@ -176,6 +176,8 @@ export default function TransferPage({
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
+      router.refresh();
+      location.reload(); 
     }
   };
 
@@ -660,7 +662,7 @@ export default function TransferPage({
                         if(val !==""){
                         handleQtyChange(
                           isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                          bill._id,
+                          Encrypt(bill._id),
                           "Qty"
                         );
                       }
@@ -681,7 +683,7 @@ export default function TransferPage({
                         if(val !==""){
                           handleQtyChange(
                             isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                            bill._id,
+                            Encrypt(bill._id),
                             "Pcs"
                           );
                         }
