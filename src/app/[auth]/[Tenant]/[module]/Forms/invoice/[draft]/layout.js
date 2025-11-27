@@ -34,7 +34,7 @@ export default async function StoreLayout2({ params }) {
            <Nav1
             user={userData.user}
             business={userData.business}
-            page={`${data.Inv.billStatus === "Draft" 
+            page={`${data.Inv.billStatus.toLowerCase() === "draft" 
             ? "Draft" : data.Inv.billStatus.slice(0,3).toUpperCase()} / ${data.Inv.billReferenceNo} / ${data.Inv.invoicelocation}`}/>
 
        
