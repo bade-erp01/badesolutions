@@ -797,29 +797,6 @@ export default function TransferPage({
                 </strong>
               </div>
               <div className="flex justify-between">
-                <span>Discount Recieved:</span>
-                {Singlebill.status === "Draft" ? (
-                 <input
-                  type="number"
-                  defaultValue={Singlebill.discount || 0}
-                  className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                  onBlur={(e) => {
-                    const val = parseFloat(e.target.value);
-                    setsingleBill({
-                      ...Singlebill,
-                      discount: isNaN(val) || val < 0 ? 0 : val,
-                    });
-                  }}
-                />
-                ) : (
-                  <strong>
-                    {Business.currency?.currency.Symbol}
-                    {Singlebill.discount.toFixed(2)}
-                  </strong>
-                )}
-              </div>
-
-              <div className="flex justify-between">
                 <span>Shipping & Offloading Fee:</span>
                 {Singlebill.status === "Draft" ? (
                   <input
