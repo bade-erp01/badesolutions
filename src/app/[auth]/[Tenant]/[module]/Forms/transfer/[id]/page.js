@@ -626,6 +626,7 @@ export default function TransferPage({
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-orange-50 transition"
+                  title={bill.item.Name}
                 >
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center text-xs">
                     <Link
