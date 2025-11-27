@@ -91,11 +91,6 @@ export default function Page({ data,userData,baseurl }) {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-600">Credit Account</label>
-            <p className="mt-1 text-gray-800">{data?.bankID?.bankName}</p>
-          </div>
-
-          <div>
             <label className="text-sm font-medium text-gray-600">Raised By</label>
             <p className="mt-1 text-gray-800">{data?.raisedBy}</p>
           </div>

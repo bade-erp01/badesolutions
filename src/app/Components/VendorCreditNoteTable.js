@@ -5,12 +5,36 @@ import Link from "next/link"
 import {useParams} from "next/navigation"
 import {Encrypt} from "../../../Functions/Mics"
 
-export default function VendorCreditnoteTable({ data }) {
-  const [creditNotes, setCreditNotes] = useState(data.VendorMemos);
+export default function VendorCreditnoteTable({ data,vendorsList }) {
+  const [creditNotes, setCreditNotes] = useState(data?.VendorMemos || data);
   const [filteredNotes, setFilteredNotes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const notesPerPage = 10;
   const Path = useParams()
+
+  const link = (id)=>{
+    try{
+      if(Path.id === "Vendor-DebitNote"){
+        return `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/Vendor-DebitNote/Vendor-DebitNote/${Encrypt(id)}`
+      }else{
+        return `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/Vendor-CreditNote/Vendor-CreditNote/${Encrypt(id)}`
+      }
+    }catch(err){
+
+    }
+  }
+
+  const findVendor = (id)=>{
+    try{
+      const vendorName = vendorsList.find(vendor =>{
+        return vendor._id === id
+      })
+
+      return vendorName.Name || "N/A"
+    }catch(err){
+      return "N/A"
+    }
+  }
 
   useEffect(() => {
     setFilteredNotes(creditNotes);
@@ -26,8 +50,8 @@ export default function VendorCreditnoteTable({ data }) {
     <div className="w-full max-w-7xl mx-auto px-4 py-3 bg-gray-300">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-black mb-2"> Vendor Credit Notes</h1>
-        <p className="text-gray-600">Manage and track your credit notes issued from vendors</p>
+        <h1 className="text-2xl font-bold text-black mb-2">{Path.id}</h1>
+        <p className="text-gray-600">Manage and track your {Path.id} issued.</p>
       </div>
 
 
@@ -53,7 +77,7 @@ export default function VendorCreditnoteTable({ data }) {
                       <svg className="w-12 h-12 mb-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <p className="text-lg">No credit notes found</p>
+                      <p className="text-lg">No {Path.id} found</p>
                     </div>
                   </td>
                 </tr>
@@ -61,11 +85,11 @@ export default function VendorCreditnoteTable({ data }) {
                 filteredNotes.slice(startIndex, endIndex).map((note, index) => (
                   <tr key={index} className="hover:bg-gray-700/50 transition-colors duration-200 text-xs">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link href={`/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/${Path.id}/${Path.id}/${Encrypt(note._id)}`} className='text-blue-300'>
-                      {note.CreditId}
+                      <Link href={link(note?._id)} className='text-blue-300'>
+                      {note?.CreditId || note?.DebitId}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{note.Vendor}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{findVendor(note.VendorId)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{note.raisedBy}</td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium">
                       {Number(note.Total).toLocaleString()}

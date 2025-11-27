@@ -64,7 +64,7 @@ export default function TransferPage({
         throw new Error(data.error); // Replace with your custom serverError
       }
     } catch (error) {
-      ErrorMessage(error);
+      ErrorMessage(error.message);
     }
   };
 

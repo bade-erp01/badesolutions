@@ -135,7 +135,7 @@ export default async function AccountingPage({ children, params }) {
                  </Link>
                  
                   <Link
-                   href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/debit-note/debit-note`}
+                   href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-DebitNote/Vendor-DebitNote`}
                    title={"Debit Notes"}
                    className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                  >

@@ -72,7 +72,7 @@ export default async function page({ params }) {
 
   // fetch all credit payment from all bank account 
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const [vendors,Banks,VendorCrN] = await Promise.all([
+    const [vendors,VendorCrN] = await Promise.all([
         fetch(`${baseUrl}/api/Vendors`, {
       method: "GET",
       headers: {
@@ -84,20 +84,8 @@ export default async function page({ params }) {
       next: { revalidate: 120 }, // Revalidate every 2 minutes
     }),
 
-    //  get all banks  
-     fetch(`${baseUrl}/api/Bank/Accounts`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
-        access: `${Encrypt(userData.user._id)}`,
-      },
-      next: { revalidate: 120 }, // Revalidate every 2 minutes
-    }),
-
     // get vendor memo
-     fetch(`${baseUrl}/api/VendorCredit?`, {
+     fetch(`${baseUrl}/api/VendorCredit`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -110,7 +98,6 @@ export default async function page({ params }) {
 
     ])
     
-    const BankList = await Banks.json();
     const vendorsList = await vendors.json();
     const VendorCrNs = await VendorCrN.json();
 
@@ -134,7 +121,7 @@ export default async function page({ params }) {
             <hr className="border-gray-100 mb-4" />
             <nav className="space-y-2">
 
-              <VendorCreditNoteModal customersList={vendorsList} baseUrl={baseUrl} userData={userData} BankAccounts={BankList}/>
+              <VendorCreditNoteModal customersList={vendorsList} baseUrl={baseUrl} userData={userData}/>
              
               {StoreFinder && (
                 <Link
@@ -166,7 +153,7 @@ export default async function page({ params }) {
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
              {/* table showing vendor creditnote */}
              {VendorCrNs.VendorMemos.length > 0 ? (
-                <VendorCreditnoteTable data={VendorCrNs}/>
+                <VendorCreditnoteTable data={VendorCrNs} vendorsList={vendorsList}/>
             ) : (
               <p className="text-gray-500">No data to display</p>
             )}
