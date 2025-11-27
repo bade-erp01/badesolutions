@@ -787,7 +787,7 @@ export default function TransferPage({
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
           <div className="bg-gradient-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
             <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
-              Summary
+              Transfer Summary
             </h3>
             <div className="space-y-2 text-gray-700">
               <div className="flex justify-between">
@@ -856,9 +856,9 @@ export default function TransferPage({
         {/* Signature & T&C */}
         <div className="mt-12 flex flex-col md:flex-row justify-between items-start gap-10">
           <div className="max-w-md">
-            <h4 className="font-semibold text-gray-700 mb-2">Attachement</h4>
-            <p className="text-sm text-gray-600 mb-4">
-              Please ensure all documents are attached before finalizing the purchase request.</p>
+            <h4 className="font-semibold text-gray-700 mb-2">Attention ⚠️</h4>
+            <p className="text-sm text-red-600 mb-4">
+              Please ensure to verify all entries. Once this transfer is process, it is inreversable.</p>
             {/* display all attachements here  */}
             <div className="space-y-2">
               {Singlebill.Attachment?.map((file, index) => (
