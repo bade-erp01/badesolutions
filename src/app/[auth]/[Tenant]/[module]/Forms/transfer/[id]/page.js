@@ -39,10 +39,10 @@ export default function TransferPage({
     const cleanedProducts = await productList.find((product) => {
       return product?.ACDcode === productId || product?.ADCcode === productId;
     });
-
+    console.log(cleanedProducts)
     try {
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(Singlebill._id)}?product=${Encrypt(cleanedProducts._id)}&to=${Encrypt(Singlebill.to)}`,
+        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(Singlebill._id)}?product=${Encrypt(cleanedProducts._id)}`,
         {
           method: "PUT",
           headers: {
