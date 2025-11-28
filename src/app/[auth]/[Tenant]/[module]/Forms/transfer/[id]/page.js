@@ -808,10 +808,11 @@ export default function TransferPage({
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                     onBlur={(e) => {
                       const val = parseFloat(e.target.value);
-                      setsingleBill({
-                        ...Singlebill,
-                        shippingFee: isNaN(val) || val < 0 ? 0 : val,
-                      });
+                      handleQtyChange(
+                          isNaN(val) || val < 0 ? 0 : val, // sanitized value
+                          "",
+                          "ShipingFee"
+                        );
                     }}
                   />
                 ) : (
@@ -829,11 +830,17 @@ export default function TransferPage({
                     defaultValue={Singlebill.Remarks || ""}
                     onBlur={(e) => {
                       const val = e.target.value.trim(); // Optional: remove extra spaces
-                      setsingleBill({ ...Singlebill, Remarks: val });
+                      handleQtyChange(
+                          val, // sanitized value
+                          "",
+                          "Remarks"
+                        );
                     }}
                   />
                 ) : (
-                 ""
+                <p>
+                 {Singlebill.Remarks || ""}
+                </p>
                 )}
               </div>
               <div className="flex justify-between text-lg font-bold mt-4 border-t pt-2">
