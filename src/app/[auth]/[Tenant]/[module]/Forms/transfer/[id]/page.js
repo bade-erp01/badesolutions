@@ -655,7 +655,9 @@ export default function TransferPage({
                   <td className="px-4 py-2 text-center">
                     {Singlebill.status.toLowerCase() === "draft" ? (
                      <input
-                      defaultValue={bill.Qty}
+                      type="number"
+                      step="any"
+                      defaultValue={bill.Qty || 0}
                       className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
                       onBlur={(e) => {
                         const val = parseFloat(e.target.value);
@@ -677,6 +679,8 @@ export default function TransferPage({
                   {Singlebill.status.toLowerCase() === "draft" ? (
                      <input
                       defaultValue={bill.pcs || 0}
+                      type="number"
+                      step="any"
                       className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
                       onBlur={(e) => {
                         const val = parseFloat(e.target.value);
