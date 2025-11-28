@@ -60,6 +60,8 @@ export default function SearchResultPage({ result, linkData }) {
             "DebitId",
             "customer",
             "refNo",
+            "transferedDate",
+            "recievedDate"
           ],
         });
 

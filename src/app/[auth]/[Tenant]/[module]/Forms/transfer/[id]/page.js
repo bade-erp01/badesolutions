@@ -263,214 +263,201 @@ export default function TransferPage({
     // 📄 Full PDF generator
     const generatePdf = async ({business = Business, bill = Singlebill}) => {
       try {
-        plsWait("Setting things up, Ensure your printer is connected ⌛...");
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-  
-        const doc = new jsPDF();
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const margin = 10;
-        let currentY = margin;
-  
-        // 🖼️ Logo
-        if (business.companyLogo) {
-          try {
-            const logo = await loadImageAsDataURL(business.companyLogo);
-            doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-          } catch (err) {
-            console.warn("Logo failed to load");
-          }
+      plsWait("Setting things up, Ensure your printer is connected ⌛...");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      let currentY = margin;
+    
+      // 🖼️ Logo
+      if (business.companyLogo) {
+        try {
+        const logo = await loadImageAsDataURL(business.companyLogo);
+        doc.addImage(logo, "JPEG", 10, 12, 30, 30);
+        } catch (err) {
+        console.warn("Logo failed to load");
         }
-  
-        doc.setFontSize(16).setFont("helvetica", "bold");
-        doc.text(business.companyName || "", pageWidth - 10, 12, {
-          align: "right",
-        });
-  
-        doc.setFontSize(8).setTextColor(0, 0, 0);
-        doc.text(
-          `${business.shopAddress || ""}, ${business.companyState || ""}, ${
-            business.companyCity || ""
-          }`,
-          pageWidth - 10,
-          20,
-          { align: "right" }
-        );
-        doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-        doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
-          align: "right",
-        });
-  
-        currentY = 50;
-  
-        // 🚚 Customer Info + 🔳 QR Code in same row
-        doc.setFontSize(17).setTextColor(0, 0, 0).setFont("helvetica", "bold");
-        doc.text(
-          `${
-            bill.billReferenceNo
-          }`,
-          10,
-          currentY
-        );
+      }
+    
+      // Header: Company name (KEEP BOLD)
+      doc.setFontSize(16).setFont("helvetica", "bold");
+      doc.text(business.companyName || "", pageWidth - 10, 12, {
+        align: "right",
+      });
+    
+      // Rest of document should be NORMAL font (no bold)
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.text(
+        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
+        pageWidth - 10,
+        20,
+        { align: "right" }
+      );
+      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
+      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
+        align: "right",
+      });
+    
+      currentY = 50;
+    
+      // Title (KEEP BOLD)
+      doc.setFont("helvetica", "bold").setFontSize(17).setTextColor(0, 0, 0);
+      doc.text(`Product Transfer`, 10, currentY);
+      // Switch back to normal for everything else
+      doc.setFont("helvetica", "normal");
+      currentY += 10;
+    
+      // Left Column: Customer Info
+      doc.setFontSize(13).setTextColor(0, 0, 0);
+      doc.text(`${bill.billReferenceNo}`, 10, currentY);
+      doc.setFontSize(8);
+      doc.text(`Source:${Singlebill.from.WHName?.toUpperCase()}`, 10, currentY + 6);
+      doc.text(`Destination: ${Singlebill.to.WHName?.toUpperCase() || ""}`, 10, currentY + 12);
+    
+      currentY += 2;
+    
+      // 🧾 Bill Metadata
+      autoTable(doc, {
+        startY: currentY,
+        tableWidth: 80,
+        margin: { left: pageWidth - 90 },
+        head: [],
+        body: [
+        ["Transfer Date:", moment(bill.transferedDate).format("YYYY-MM-DD") || ""],
+        ["Receieve Date:", moment(bill.recievedDate).format("YYYY-MM-DD") || ""],
+        ["Status:", bill.status],
+        ],
+        theme: "plain",
+        styles: { fontSize: 9, cellPadding: 1, fontStyle: "normal" },
+        columnStyles: {
+        0: { halign: "right" },
+        1: { halign: "right" },
+        },
+      });
+      currentY = doc.lastAutoTable.finalY + 10;
+    
+      // 📊 Invoice Table (all normal)
+      autoTable(doc, {
+        startY: currentY,
+        head: [
+        [
+          "#",
+          "Product",
+          "Code",
+          "Batch",
+          "Trace",
+          "Expiry Date",
+          "Price",
+          "Case",
+          "Pcs",
+          "Total",
+        ],
+        ],
+        body: bill.orders.map((ord, i) => [
+        i + 1,
+        `${ord.item?.Name}`,
+        ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
+        ord.BatchNo || "N/A",
+        ord.Status || "",
+        ord.ExpDate || "N/A",
+        ord.VendorPrice?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || 0,
+        ord.Qty || 0,
+        ord.pcsReq || 0,
+        ord.total?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || 0,
+        ]),
+        theme: "grid",
+        styles: { fontSize: 9, fontStyle: "normal" },
+        headStyles: { fontStyle: "normal" },
+      });
+      currentY = doc.lastAutoTable.finalY + 10;
+    
+      // 💰 Summary Table
+      autoTable(doc, {
+        startY: currentY,
+        tableWidth: 76,
+        margin: { left: pageWidth - 90 },
+        head: [["Subtotal", "Logistics", "Total Due"]],
+        body: [
+        [
+          bill.subTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
+          bill.shippingFee?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
+          bill.grandTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"
+        ],
+        ],
+        theme: "grid",
+        styles: { fontSize: 9, cellPadding: 1, fontStyle: "normal" },
+        headStyles: { fontStyle: "normal" },
+        columnStyles: {
+        0: { halign: "right" },
+        1: { halign: "right" },
+        },
+      });
+      currentY = doc.lastAutoTable.finalY + 10;
+    
+      // ✍️ Signatures & Words (normal)
+      doc.setFontSize(10).setFont("helvetica", "normal");
+      doc.text(
+        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
+        margin,
+        currentY
+      );
+      currentY += 10;
+      doc.text(`Remarks:${bill.Remarks}`, margin, currentY);
+      currentY += 10;
+      doc.text(
+        `Approved By:`,
+        margin,
+        currentY
+      );
+      currentY += 10;
+      doc.text(
+        `${Singlebill.from.WHName} Sign & Date: `,
+        margin,
+        currentY
+      );
+      currentY += 10;
+      if (business.invoicePolicy) {
+        doc.text(`${Singlebill.to.WHName} Sign & Date: `, margin, currentY);
         currentY += 10;
-  
-        // Left Column: Customer Info
-        doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-        doc.text(`${bill.Vendor.Name?.toUpperCase() || ""}`, 10, currentY);
-        doc.setFontSize(8).setTextColor(0, 0, 0);
-        doc.text(`${bill.Vendor?.Address || "N/A"}`, 10, currentY + 6);
-        doc.text(`${bill.Vendor?.vendor_tel || "N/A"}`, 10, currentY + 12);
-  
-        // Right Column: QR Code
-        // try {
-        //   const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-        //   doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
-        // } catch (err) {
-        //   console.warn("QR code failed to generate");
-        // }
-  
-        currentY += 2;
-  
-        // 🧾 Bill Metadata
-        autoTable(doc, {
-          startY: currentY,
-          tableWidth: 80,
-          margin: { left: pageWidth - 90 },
-          head: [],
-          body: [
-            ["Store:", Whouse.WHName || ""],
-            [
-              "Receieve Date:",
-              moment(bill.recievedDate).format("YYYY-MM-DD") || "",
-            ],
-            [
-              "Status:",
-             bill.status,
-            ],
-          ],
-          theme: "plain",
-          styles: { fontSize: 9, cellPadding: 1 },
-          columnStyles: {
-            0: { fontStyle: "bold", halign: "right" },
-            1: { halign: "right" },
-          },
-        });
-        currentY = doc.lastAutoTable.finalY + 10;
-  
-        // 📊 Invoice Table
-        autoTable(doc, {
-          startY: currentY,
-          head: [
-            [
-              "#",
-              "Product",
-              "Code",
-              "Batch",
-              "Expiry Date",
-              "Price",
-              "Case",
-              "Pcs",
-              "Total",
-            ],
-          ],
-          body: bill.orders.map((ord, i) => [
-            i + 1,
-            `${ord.item?.productName}`,
-            ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-            ord.BatchNo || "N/A",
-            ord.ExpDate || "N/A",
-            ord.VendorPrice?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || 0,
-            ord.Qty || 0 ,
-            ord.pcsReq || 0,
-            ord.total?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || 0,
-          ]),
-          theme: "grid",
-          styles: { fontSize: 9 },
-        });
-        currentY = doc.lastAutoTable.finalY + 10;
-  
-        // 💰 Summary Table
-        autoTable(doc, {
-          startY: currentY,
-          tableWidth: 76,
-          margin: { left: pageWidth - 90 },
-          head: [["Subtotal", "Logistics", "Total Due"]],
-          body: [
-            [
-    bill.subTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
-    bill.shippingFee?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
-    bill.grandTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"
-  ],
-          ],
-          theme: "grid",
-          styles: { fontSize: 9, cellPadding: 1 },
-          columnStyles: {
-            0: { fontStyle: "bold", halign: "right" },
-            1: { halign: "right" },
-          },
-        });
-        currentY = doc.lastAutoTable.finalY + 10;
-  
-        // ✍️ Signatures
-        doc.setFontSize(10);
+      }
+    
+      // 📎 Footer
+      doc.setFontSize(9).setFont("helvetica", "normal");
+      doc.text(`Generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
+    
+      // 📄 Page Numbers
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
         doc.text(
-          `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
-          margin,
-          currentY
+        `Page ${i} of ${totalPages}`,
+        pageWidth - 20,
+        pageHeight - 10,
+        { align: "right" }
         );
-        currentY += 10;
-        doc.text(`Remarks:${bill.Remarks}`, margin, currentY);
-        // currentY += 10;
-        // doc.text(
-        //   `${business.companyName.toLowerCase()} _______________________________`,
-        //   margin,
-        //   currentY
-        // );
-        // currentY += 10;
-        // doc.text(
-        //   "Suppliers Sign & Date _______________________________",
-        //   margin,
-        //   currentY
-        // );
-        // currentY += 10;
-        // if (business.invoicePolicy) {
-        //   doc.text(business.invoicePolicy, margin, currentY);
-        //   currentY += 10;
-        // }
-  
-        // 📎 Footer
-        // doc.setFontSize(9);
-        // doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
-  
-        // 📄 Page Numbers
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-          doc.setPage(i);
-          doc.text(
-            `Page ${i} of ${totalPages}`,
-            pageWidth - 20,
-            pageHeight - 10,
-            { align: "right" }
-          );
-        }
-  
-        // 🖨️ Preview or Save
-        const blob = doc.output("blob");
-        const url = URL.createObjectURL(blob);
-        const win = window.open(url, "_blank");
-  
-        if (win) {
-          win.onload = () => {
-            Swal.close();
-            win.print();
-          };
-        } else {
-          doc.save(`${bill.customerName || "Purchase"}.pdf`);
-          Swal.close();
-        }
-      } catch (error) {
+      }
+    
+      // 🖨️ Preview or Save
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, "_blank");
+    
+      if (win) {
+        win.onload = () => {
         Swal.close();
-        console.error("Error generating PDF:", error);
+        win.print();
+        };
+      } else {
+        doc.save(`${bill.customerName || "Purchase"}.pdf`);
+        Swal.close();
+      }
+      } catch (error) {
+      Swal.close();
+      console.error("Error generating PDF:", error);
       }
     };
   

@@ -34,6 +34,11 @@ const SearchCard = ({ data, module, UserData }) => {
         setLink(`/${auth}/${Tenant}/${Module}/accounting/credit-note/credit-note/${Encrypt(data._id)}`)
         break;
 
+      case "transfers":
+        normalizedModule = "transfers";
+        setLink(`/${auth}/${Tenant}/transfer/Forms/transfer/${Encrypt(data._id)}`);
+        break;
+
       case "invoice":
         if (data.billStatus === "Draft") {
           setLink(`/${auth}/${Tenant}/invoice/Forms/invoice/${Encrypt(data._id)}`);

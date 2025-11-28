@@ -72,7 +72,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
 
   return (
     <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
-      <Nav1 user={userData.user} business={userData.business} page={`Product Transfer`} Module={filteredPurchases} />
+      <Nav1 user={userData.user} business={userData.business} page={`transfers`} Module={filteredPurchases} />
 
       <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
         {/* Sidebar Filters */}
