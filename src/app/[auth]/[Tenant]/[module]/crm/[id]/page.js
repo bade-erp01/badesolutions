@@ -442,7 +442,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       doc.text(`Period: ${startDate} to ${endDate}`, 20, 35);
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
-      doc.text(`Current Balance: ${cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 20, 42);
+      doc.text(`Current Balance: ${cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 20, 42);
 
       // 🖼️ Logo
       doc.addImage(imageDataURL, "PNG", 150, 10, 35, 35);
@@ -453,8 +453,8 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         i + 1,
         tx.ReferenceNo.toUpperCase(),
         `${moment(new Date(tx.Date)).format("YYYY-MM-DD")}`,
-        `${tx.CreditAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        `${tx.DebitAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${tx.CreditAmount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${tx.DebitAmount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
         `${tx.Balance?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
       ]);
 
@@ -464,7 +464,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         "Current Balance",
         "", // Empty CR
         "", // Empty DR
-        `${cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
       ]);
 
       // 📋 Table with page footer and styled final row
@@ -749,7 +749,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               : "text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2"
             }`}
         >
-         Balance: {cust.Debt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+         Balance: {cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
         </span>
       </div>
 
