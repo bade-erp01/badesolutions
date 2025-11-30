@@ -88,7 +88,7 @@ export default async function Employeelayout({ children, params }) {
         </aside>
 
         <main className="flex-1">
-          <section className="relative w-full max-h-[83vh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
+          <section className="relative w-full max-h-[83dvh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
               <InvoiceLandingPage baseUrl={baseUrl} userData={userData} />
           </section>
         </main>
