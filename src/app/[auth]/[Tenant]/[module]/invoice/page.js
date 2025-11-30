@@ -62,18 +62,17 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
       <div className="text-white text-xs">
         <div className="mx-auto">
           {/* Filter Component */}
-          <div className="border border-white/10 bg-gray-100 p-4 shadow-xl">
+          <div className="border border-white/10 bg-gray-200 p-4 shadow-xl">
             <div className="border-b pb-4 mb-6">
               <h1 className="text-2xl font-bold text-gray-600">Invoice Management</h1>
             </div>
           </div>
 
           {/* Table Container */}
-          <div className="bg-gray-600 shadow-lg border border-white/10">
             {isLoading ? (
               <SuspenenseFallBack pagedata={"Invoice List"} />
             ) : billList.length > 0 ? (
-              <>
+              <div className="bg-gray-600 shadow-lg border border-white/10">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-xs">
                     <thead className="bg-white/10 text-white uppercase text-xs sticky top-0 z-10">
@@ -101,7 +100,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                             <td className="px-4 py-3 border-t border-white/10">
                               <Link
                                 href={url}
-                                className="text-indigo-400 hover:text-indigo-300 underline font-medium font-bold"
+                                className="text-indigo-400 hover:text-indigo-300 underline font-bold"
                               >
                                 {bill?.billReferenceNo && bill?.invoicelocation
                                   ? `${bill.billReferenceNo}/${bill.invoicelocation}`
@@ -158,11 +157,10 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                     </button>
                   </div>
                 </div>
-              </>
+              </div>
             ) : (
-              <div className="p-4 text-center text-white/70">No invoices found</div>
+              <div className="p-4 text-center text-black font-bold">No invoices found</div>
             )}
-          </div>
         </div>
       </div>
     </Suspense>
