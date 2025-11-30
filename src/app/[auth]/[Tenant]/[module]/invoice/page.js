@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
-import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import axios from "axios";
 
@@ -159,8 +158,6 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                     </button>
                   </div>
                 </div>
-
-                <ExcelDownloadBtn data={billList} page={"Invoice"} />
               </>
             ) : (
               <div className="p-4 text-center text-white/70">No invoices found</div>
