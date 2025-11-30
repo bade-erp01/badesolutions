@@ -75,11 +75,11 @@ const FinancialOverview = ({ data }) => {
                       <th className="px-4 py-3 text-left">Code</th>
                       <th className="px-4 py-3 text-center">Description</th>
                       <th className="px-4 py-3 text-center">Account Type</th>
-                      <th className="px-4 py-3 text-center">
+                      {/* <th className="px-4 py-3 text-center">
                         Financial Statement
-                      </th>
+                      </th> */}
                       <th>
-                        gL Bal
+                        GL Bal
                       </th>
                     </tr>
                   </thead>
@@ -115,12 +115,13 @@ const FinancialOverview = ({ data }) => {
                                     <span className="w-1/4">
                                       {account.AccountType}
                                     </span>
-                                    <span className="w-1/4">
+                                    {/* <span className="w-1/4">
                                       {account.reportsTo}
-                                    </span>
+                                    </span> */}
                                     <span className="w-1/4">
                                       {account?.Balance?.toLocaleString() || 0.00}
                                     </span>
+                                    <span></span>
                                   </div>
                                   <span className="text-gray-500 group-open:rotate-180 transition-transform duration-300">
                                     ▼
