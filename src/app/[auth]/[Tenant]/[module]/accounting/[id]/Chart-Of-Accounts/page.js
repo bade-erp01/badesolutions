@@ -78,6 +78,9 @@ const FinancialOverview = ({ data }) => {
                       <th className="px-4 py-3 text-center">
                         Financial Statement
                       </th>
+                      <th>
+                        gL Bal
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y bg-grey-600">
@@ -114,6 +117,9 @@ const FinancialOverview = ({ data }) => {
                                     </span>
                                     <span className="w-1/4">
                                       {account.reportsTo}
+                                    </span>
+                                    <span className="w-1/4">
+                                      {account?.Balance?.toLocaleString() || 0.00}
                                     </span>
                                   </div>
                                   <span className="text-gray-500 group-open:rotate-180 transition-transform duration-300">
