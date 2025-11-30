@@ -81,6 +81,7 @@ const FinancialOverview = ({ data }) => {
                       <th>
                         GL Bal
                       </th>
+                      <th> </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y bg-grey-600">
