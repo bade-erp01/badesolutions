@@ -64,7 +64,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
           {/* Filter Component */}
           <div className="border border-white/10 bg-gray-200 p-4 shadow-sm">
             <div className="border-b pb-4 mb-6">
-              <h1 className="text-2xl font-bold text-gray-600">Invoice Management</h1>
+              <h1 className="text-2xl font-bold text-gray-600">Sales </h1>
             </div>
           </div>
 
