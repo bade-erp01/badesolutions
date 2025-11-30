@@ -49,7 +49,7 @@ export default async function Employeelayout({ children, params }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   return (
-    <div className="flex flex-col max-h-[100dvh] overflow-hidden">
+    <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
@@ -57,8 +57,10 @@ export default async function Employeelayout({ children, params }) {
         Module={[{}]}
       />
 
-      <div className="flex flex-1 text-white bt-2 max-h-[100dvh]">
-        <aside className="bg-[#1e1e20]/80 backdrop-blur-lg text-white px-4 py-6 transition-all duration-300  max-h-[100dvh] overflow-y-hidden md:block">
+      <div className="flex flex-1 text-white bt-2 ">
+        <aside  className={`bg-[#1e1e20]/80 backdrop-blur-lg
+          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
+          style={{ overflowY: "auto" }}>
           <BackButton />
           <hr />
           <nav className="space-y-4">
@@ -88,7 +90,7 @@ export default async function Employeelayout({ children, params }) {
         </aside>
 
         <main className="flex-1">
-          <section className="relative w-full max-h-[83dvh] flex-grow overflow-x-hidden shadow-inner backdrop-blur-md bg-[#0e0e11]/5 p-1 rounded-xl">
+         <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
               <InvoiceLandingPage baseUrl={baseUrl} userData={userData} />
           </section>
         </main>
