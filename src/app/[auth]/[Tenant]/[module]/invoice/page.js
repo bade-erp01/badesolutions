@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
-import { FunnelIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import React, { Suspense } from "react";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import axios from "axios";
 
@@ -18,7 +16,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   const [totalPages, setTotalPages] = useState(1);
   const [billList, setBillList] = useState([]);
   const [totalInvoices, setTotalInvoices] = useState(0);
-  const [isLoading, setIsLoading] = useState(true); // Suspense state
+  const [isLoading, setIsLoading] = useState(true);
 
   const params = useParams();
   const itemsPerPage = 20;
@@ -26,7 +24,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   // Fetch bills from API
   useEffect(() => {
     const fetchBills = async () => {
-      setIsLoading(true); // Set loading to true before fetching
+      setIsLoading(true);
       try {
         const query = new URLSearchParams({
           page: currentPage,
@@ -36,7 +34,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
           endDate,
         }).toString();
 
-        const response = await axios.get(`${baseUrl}/api/Invoice?page=${currentPage}`, {
+        const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
           headers: {
             "Content-Type": "application/json",
             dbConnect: `Bearer ${userData.business.rustyRoof}`,
@@ -51,9 +49,9 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
         setTotalInvoices(data.totalInvoices);
         setCurrentPage(data.currentPage);
       } catch (error) {
-        // console.error("Error fetching bills:", error);
+
       } finally {
-        setIsLoading(false); // Set loading to false after fetching
+        setIsLoading(false);
       }
     };
 
@@ -61,22 +59,21 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   }, [currentPage, searchRef, startDate, endDate]);
 
   return (
-    <Suspense fallback={ <SuspenenseFallBack pagedata={'Invoice List'}/>}>
+    <Suspense fallback={<SuspenenseFallBack pagedata={"Invoice List"} />}>
       <div className="text-white text-xs">
         <div className="mx-auto">
           {/* Filter Component */}
-          <div className="border border-white/10 bg-gradient-to-br from-[#1a1a1f] to-[#111114] p-4 shadow-xl">
-            {/* Header */}
+          <div className="border border-white/10 bg-gray-100 p-4 shadow-xl">
             <div className="border-b pb-4 mb-6">
-              <h1 className="text-2xl font-bold text-gray-200">Invoice Management</h1>
+              <h1 className="text-2xl font-bold text-gray-600">Invoice Management</h1>
             </div>
           </div>
 
           {/* Table Container */}
           <div className="bg-gray-600 shadow-lg border border-white/10">
-            {isLoading ? ( // Show loading fallback while data is being fetched
-              <SuspenenseFallBack pagedata={'Invoice List'}/>
-            ) : (
+            {isLoading ? (
+              <SuspenenseFallBack pagedata={"Invoice List"} />
+            ) : billList.length > 0 ? (
               <>
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-xs">
@@ -98,7 +95,10 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                             : `/${params.auth}/${params.Tenant}/bill/bill/${Encrypt(bill._id)}`;
 
                         return (
-                          <tr key={bill._id} className="hover:bg-white/5 transition text-xs text-white">
+                          <tr
+                            key={bill._id}
+                            className="hover:bg-white/5 transition text-xs text-white"
+                          >
                             <td className="px-4 py-3 border-t border-white/10">
                               <Link
                                 href={url}
@@ -117,11 +117,11 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                                 className={`inline-block px-2 py-0.5 text-xs rounded-full ${
                                   bill.billStatus === "Invoice"
                                     ? "bg-green-500/30 text-green-300"
-                                : bill.billStatus === "Order"
-                                ? "bg-yellow-500/30 text-yellow-200"
-                                : bill.billStatus === "Cancelled"
-                                ? "bg-red-500/30 text-red-300"
-                                : "bg-gray-500/30 text-gray-300"
+                                    : bill.billStatus === "Order"
+                                    ? "bg-yellow-500/30 text-yellow-200"
+                                    : bill.billStatus === "Cancelled"
+                                    ? "bg-red-500/30 text-red-300"
+                                    : "bg-gray-500/30 text-gray-300"
                                 }`}
                               >
                                 {bill.billStatus}
@@ -162,6 +162,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
 
                 <ExcelDownloadBtn data={billList} page={"Invoice"} />
               </>
+            ) : (
+              <div className="p-4 text-center text-white/70">No invoices found</div>
             )}
           </div>
         </div>
