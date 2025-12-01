@@ -13,15 +13,15 @@ export default function Footer2() {
         <span className="text-xs md:text-base text-gray-200">
           📢 You can request a customized business email that reflects your brand identity.{" "}
         </span>
-        {" "} |  {" "}
-        <span className="text-xs md:text-base text-gray-200">
-          “Season’s Greetings from all of us @B.A.D.E. Thank you for your support this year. Wishing you continued success and happiness in the year ahead.”{" "}
-          {/* <Link
+        <Link
             href="/contact-sales"
             className="text-indigo-400 underline hover:text-indigo-300 ml-2"
           >
             Contact Sales
-          </Link> */}
+          </Link>
+        {" "} |  {" "}
+        <span className="text-xs md:text-base text-gray-200">
+          “Season’s Greetings from all of us @B.A.D.E. Thank you for your support this year. Wishing you continued success and happiness in the year ahead.”{" "}
         </span>
       </Marquee>
     </footer>
