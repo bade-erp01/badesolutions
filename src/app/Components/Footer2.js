@@ -15,13 +15,13 @@ export default function Footer2() {
         </span>
         {" "} |  {" "}
         <span className="text-xs md:text-base text-gray-200">
-          🌍This Space is available for advert, grab this special offer to reach other B.A.D.E users.{" "}
-          <Link
+          “Season’s Greetings from all of us @B.A.D.E. Thank you for your support this year. Wishing you continued success and happiness in the year ahead.”{" "}
+          {/* <Link
             href="/contact-sales"
             className="text-indigo-400 underline hover:text-indigo-300 ml-2"
           >
             Contact Sales
-          </Link>
+          </Link> */}
         </span>
       </Marquee>
     </footer>
