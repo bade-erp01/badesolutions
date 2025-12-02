@@ -163,7 +163,7 @@ const FinancialOverview = ({ data }) => {
                                                 >
                                                   <td>
                                                     
-                                                    {entry.date.$date}
+                                                    {entry.date}
                                                   </td>
                                                   <td>{entry.amount}</td>
                                                   <td className="capitalize">
