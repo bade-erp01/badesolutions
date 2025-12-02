@@ -122,7 +122,6 @@ const FinancialOverview = ({ data }) => {
                                     <span className="w-1/4">
                                       {account?.Balance?.toLocaleString() || 0.00}
                                     </span>
-                                    <span></span>
                                   </div>
                                   <span className="text-gray-500 group-open:rotate-180 transition-transform duration-300">
                                     ▼
