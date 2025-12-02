@@ -163,7 +163,7 @@ const FinancialOverview = ({ data }) => {
                                                 >
                                                   <td>
                                                     {moment(
-                                                      entry.date.$date
+                                                      entry.date.date
                                                     ).format("l")}
                                                   </td>
                                                   <td>{entry.amount}</td>
