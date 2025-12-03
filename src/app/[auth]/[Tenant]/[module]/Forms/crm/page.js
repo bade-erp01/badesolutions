@@ -64,7 +64,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
           dbConnect: `Bearer ${businessData.rustyRoof}`,
-          "X-Requested-With": "XMLHttpRequest",
+          // "X-Requested-With": "XMLHttpRequest",
           access: `${Encrypt(userData._id)}`,
         },
       };
