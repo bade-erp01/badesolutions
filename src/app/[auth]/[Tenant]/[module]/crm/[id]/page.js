@@ -61,6 +61,10 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   const [BalanceData, setBalanceData] = useState({
     Debt: Number(cust.Debt),
   });
+  const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
+
+  console.log(cust)
+
   const [formData, setFormData] = useState({
     bankJournal: "",
     ...cust,
@@ -1106,18 +1110,63 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
               {cust.isVerified && (
                 <>
-                  <Input
-                    label="Credit Limit"
-                    name="creditLimit"
-                    type="number"
-                    value={formData.creditLimit}
-                    onChange={handleChange}
-                  />
+
+                {userInfo.user.isAdmin ? (
+                <div className="mb-2 ">
+                  <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                    <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                      Credit Limit
+                    </label>
+                    <input
+                      type="number"
+                      step={`any`}
+                      min={0}
+                      defaultValue={formData.creditLimit?.toLocaleString()}
+                      onBlur={(e) => {
+                      const raw = e.target.value.replace(/,/g, "").trim();
+                      let parsed = parseFloat(raw) || 0;
+
+                      // Ensure non-negative
+                      if (e.target.value < 0) {
+                       alert("Not allowed")
+                       return e.target.value = 0
+                      }
+
+                      setcreditLimit((prev) => ({
+                        ...prev,
+                        creditLimit: parsed,
+                      }));
+                    }}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+                    />
+
+                    <span
+                      onClick={() => UpdateCustomerBalance(creditLimit)}
+                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-red-400 hover:bg-red-600 transition-colors duration-200 shadow-md cursor-pointer"
+                    >
+                      Update credit Limit
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-2">
+                    <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                      Credit Limit
+                    </label>
+
+                    <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                      {formData.creditLimit?.toLocaleString()}
+                    </div>
+                  </div>
+                </>
+              )}
+
                   <Input
                     label="Credit Rating"
                     name="creditRating"
                     type="number"
-                    value={formData.creditRating}
+                    value={formData.creditRating || 0}
                     min={0}
                     max={5}
                     onChange={handleChange}
