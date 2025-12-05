@@ -1110,7 +1110,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               {cust.isVerified && (
                 <>
 
-                {userInfo.user.isAdmin ? (
+                {userInfo.user.EditCreditLimit ? (
                 <div className="mb-2 ">
                   <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
                     <label className="block text-sm font-semibold text-gray-700 tracking-wide">
@@ -1760,7 +1760,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
             <CustomerSales Sales={Sales} customerName={cust.Username} />
           </Section>
         </div>
-        </div>
+      </div>
 
       {userInfo.user.editCustomer && (
         <div className="pt-4">
