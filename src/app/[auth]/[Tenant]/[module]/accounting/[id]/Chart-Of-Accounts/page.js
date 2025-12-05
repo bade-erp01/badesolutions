@@ -113,7 +113,7 @@ const FinancialOverview = ({ data }) => {
                                     <span className="w-1/4 truncate">
                                       {account.description}
                                     </span>
-                                    <span className="w-1/4">
+                                    <span className="w-1/4 italic">
                                       {account.AccountType}
                                     </span>
                                     {/* <span className="w-1/4">
