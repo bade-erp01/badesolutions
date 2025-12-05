@@ -63,7 +63,6 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   });
   const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
 
-  console.log(cust)
 
   const [formData, setFormData] = useState({
     bankJournal: "",
@@ -185,7 +184,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   }
 
   // update customer balance
-  const UpdateCustomerBalance = async (value) => {
+  const UpdateCustomerBalance = async (value,field) => {
     try {
       const result = await Swal.fire({
         title:
@@ -223,7 +222,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       plsWait("Please wait...This should only take a bit.");
 
       const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(userInfo.user._id)}/${cust._id}`,
+        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(userInfo.user._id)}/${Encrypt(cust._id)}/${field}`,
         {
           method: "PATCH",
           headers: {
@@ -231,7 +230,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
             dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
             access: `${Encrypt(userInfo.user._id)}`,
           },
-          body: JSON.stringify({ id: cust._id, Debt: value }),
+          body: JSON.stringify({ id: Encrypt(cust._id), Debt: value, creditLimit: value}),
         }
       );
 
@@ -1080,7 +1079,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                     />
 
                     <span
-                      onClick={() => UpdateCustomerBalance(BalanceData.Debt)}
+                      onClick={() => UpdateCustomerBalance(BalanceData.Debt,"Debt")}
                       className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-red-600 hover:bg-red-800 transition-colors duration-200 shadow-md cursor-pointer"
                     >
                       Update Balance
@@ -1121,14 +1120,14 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                       type="number"
                       step={`any`}
                       min={0}
-                      defaultValue={formData.creditLimit?.toLocaleString()}
+                      defaultValue={formData.creditLimit}
                       onBlur={(e) => {
                       const raw = e.target.value.replace(/,/g, "").trim();
                       let parsed = parseFloat(raw) || 0;
 
                       // Ensure non-negative
                       if (e.target.value < 0) {
-                       alert("Not allowed")
+                       ErrorMessage("Value less than 0 is not allowed")
                        return e.target.value = 0
                       }
 
@@ -1141,8 +1140,8 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                     />
 
                     <span
-                      onClick={() => UpdateCustomerBalance(creditLimit)}
-                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-red-400 hover:bg-red-600 transition-colors duration-200 shadow-md cursor-pointer"
+                      onClick={() => UpdateCustomerBalance(creditLimit,"creditLimit")}
+                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-black hover:bg-gray-600 transition-colors duration-200 shadow-md cursor-pointer"
                     >
                       Update credit Limit
                     </span>
