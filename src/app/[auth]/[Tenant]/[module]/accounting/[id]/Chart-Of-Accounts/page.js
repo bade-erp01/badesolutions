@@ -165,7 +165,7 @@ const FinancialOverview = ({ data }) => {
                                                     {moment(entry.date).format("l")}
                                                   </td>
                                                   <td>{entry.amount}</td>
-                                                  <td className="capitalize">
+                                                  <td className="capitalize italic">
                                                     {entry.type}
                                                   </td>
                                                   <td>{entry.description}</td>
