@@ -98,14 +98,13 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
 
     try {
       setFormData({ ...formData, status: action });
-      console.log(formData)
       
       // validate user input and ensure all fields are filled
       if (
-        !formData.Amount ||
-        !formData.paymentDate ||
-        !formData.status ||
-        !formData.BankAccount
+        action === "Approved" && !formData.Amount ||
+        action === "Approved" && !formData.paymentDate ||
+        action === "Approved" && !formData.status ||
+        action === "Approved" && !formData.BankAccount
       ) {
         ErrorMessage("Validation Error,Please fill in all fields.");
         return;
@@ -120,7 +119,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
           body: JSON.stringify(formData),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${business.tenantId}`,
+            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             dbConnect: `Bearer ${business.rustyRoof}`,
             access: Encrypt(Currentuser._id),
           },
@@ -132,11 +131,14 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
       if (request.ok) {
         SuccessToast(response.message);
         Router.refresh();
+        location.reload();
       } else {
         throw new Error(response.error);
       }
     } catch (err) {
       ErrorMessage(err.message);
+      Router.refresh();
+      location.reload();
     }
   };
 
@@ -197,10 +199,10 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
           <div className="flex flex-col items-center">
             <div
               className={`w-3 h-3 rounded-full ${
-                expense.status === "Cancelled" ? "bg-red-600" : "bg-gray-300"
+                expense.status === "Reversed" ? "bg-red-600" : "bg-gray-300"
               }`}
             ></div>
-            <span className="text-xs mt-1 text-gray-700">Cancelled</span>
+            <span className="text-xs mt-1 text-gray-700">Reversed</span>
           </div>
         </div>
 
@@ -400,7 +402,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
 
           {Currentuser.expenseApprover && expense.status === "Approved" && (
             <button
-              onClick={() => ActionBTN("Reverse")}
+              onClick={() => ActionBTN("Reversed")}
               className="flex items-center gap-2 bg-red-400 text-white px-5 py-2.5 rounded-lg shadow hover:bg-red-500 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 "
               aria-label="Reverse Expense"
             >
