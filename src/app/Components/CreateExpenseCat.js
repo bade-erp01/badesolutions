@@ -2,7 +2,7 @@
 import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { TagIcon } from "@heroicons/react/24/outline";
+import { SquaresPlusIcon } from "@heroicons/react/24/outline";
 import { Encrypt,Dencrypt } from "../../../Functions/Functions";
 import {ErrorMessage,SuccessToast,plsWait,} from "../../../Functions/Mics"
 import { useRouter } from "next/navigation";
@@ -89,10 +89,10 @@ const ExpenseCategoryModal = ({ baseUrl,userData }) => {
   return (
     <button
       onClick={openModal}
-     className="flex items-center bg-gray-500 gap-3 p-3 rounded-md hover:bg-gray-700 transition w-full mt-2"
+      className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
-      <TagIcon className="h-6 w-6 text-white" />
-      <span className="text-sm">Create Expense Tag</span>
+      <SquaresPlusIcon className="h-4 w-4 text-white" />
+      Create Tag
     </button>
   );
 };

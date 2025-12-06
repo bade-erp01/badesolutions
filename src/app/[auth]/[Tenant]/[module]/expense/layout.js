@@ -7,6 +7,7 @@ import { TagIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import ExpenseCategoryModal from "@/app/Components/CreateExpenseCat";
+import ExpenseCategoriesModal from "@/app/Components/expensecateTable"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -112,64 +113,16 @@ export default async function ExpenseLayout({ children, params }) {
                 </Link>
               )}
 
-              {/* show all expense group/tags */}
-              <div className="bg-blue-50 p-2 text-xs rounded-sm">
-                <p className="text-amber-700 font-semibold">Expense Tags</p>
-                {catList.map((tag) => (
-                  // <p className="italic text-xs text-gray-600" >
-                  //   * {tag.NAME}
-                  // </p>
+              {userData?.user?.expenseManager && (
+                  <>
+                  {/* show tags  */}
+                  <ExpenseCategoriesModal data={catList} baseUrl={baseUrl} userData={userData} />
 
-                  <div className="flex gap-1" key={tag._id}>
-                    {userData?.user?.expenseManager && (
-                    <div className="flex h-6 shrink-0 items-center">
-                      <div className="group grid size-4 grid-cols-1">
-                        <input
-                          checked={tag.status || false}
-                          // onChange={handleChange}
-                          id="requestLeave"
-                          name="requestLeave"
-                          type="checkbox"
-                          aria-describedby="requestLeave-description"
-                          className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                        />
-                        <svg
-                          fill="none"
-                          viewBox="0 0 14 14"
-                          className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                        >
-                          <path
-                            d="M3 8L6 11L11 3.5"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="opacity-0 group-has-checked:opacity-100"
-                          />
-                          <path
-                            d="M3 7H11"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="opacity-0 group-has-indeterminate:opacity-100"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    )}
-                    <div className="text-sm/6 pr-1">
-                      <label
-                        htmlFor="requestLeave"
-                        className="font-medium text-gray-900"
-                      >
-                        {tag.NAME}
-                      </label>
-                    </div>
-                  </div>
-                ))}
-                {userData?.user?.expenseManager && (
+                  {/* create tags */}
                   <ExpenseCategoryModal baseUrl={baseUrl} userData={userData} />
-                )}
-              </div>
+                  </>
+              )}
+
             </nav>
           </aside>
 

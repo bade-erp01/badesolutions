@@ -1,0 +1,121 @@
+"use client";
+import Swal from "sweetalert2";
+import { TagIcon } from "@heroicons/react/24/outline";
+import { Encrypt, Dencrypt } from "../../../Functions/Functions";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+export default function ExpenseCategoriesModal({
+  data,
+  baseUrl,
+  userData,
+}) {
+  const Router = useRouter();
+  const [categories,setCategories] = useState(data || [])
+
+
+
+  const showModal = () => {
+    Swal.fire({
+      title: "Expense Tags",
+      html: `
+        <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+          <thead style="background-color: #edf2f7;">
+            <tr>
+              <th style="padding: 6px; text-align: left;">Name</th>
+              <th style="padding: 6px text-align: center;">Grouped as</th>
+              <th style="padding: 6px; text-align: right;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${categories
+              .map(
+                (cat, i) => `
+              <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 6px; text-align: left;">${cat.NAME}</td>
+                <td style="padding: 6px; text-align: center;">${
+                  cat.type
+                } expense</td>
+                <td style="padding: 6px; text-align: right;">
+                  <input 
+                    type="checkbox" 
+                    id="status-${i}" 
+                    data-id="${cat._id?.$oid || cat._id}" 
+                    ${cat.status ? "checked" : ""} 
+                    class="form-checkbox h-4 w-4 text-blue-600"
+                  />
+                </td>
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `,
+      width: "50%",
+      showConfirmButton: true,
+      confirmButtonText: "Close",
+      didOpen: () => {
+        // Attach event listeners to each checkbox
+        categories.forEach((cat, i) => {
+          const checkbox = document.getElementById(`status-${i}`);
+          if (checkbox) {
+            checkbox.addEventListener("change", async (e) => {
+              const newStatus = e.target.checked;
+              const categoryId = e.target.getAttribute("data-id");
+
+              try {
+                // Example API request — adjust URL & payload to your backend
+                const res = await fetch(
+                  `${baseUrl}/api/expenseCategory/update/${Encrypt(
+                    categoryId
+                  )}`,
+                  {
+                    method: "PATCH",
+                    body: JSON.stringify({ status: newStatus }),
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${Encrypt(
+                        userData.business.tenantId
+                      )}`,
+                      dbConnect: `Bearer ${userData.business.rustyRoof}`,
+                      access: Encrypt(userData.business.rustyRoof),
+                    },
+                  }
+                );
+
+                const response = await res.json()
+                
+                if (!res.ok) {
+                    throw new Error(response.error || "Something went wrong");
+                }
+                
+                Swal.showValidationMessage(
+                  `Status for "${cat.NAME}" updated successfully`
+                );
+                setCategories(Dencrypt(response.data))
+                Router.refresh();
+              } catch (err) {
+                Swal.showValidationMessage(
+                  `Error updating "${cat.NAME}": ${err.message}`
+                );
+                // revert checkbox if failed
+                e.target.checked = !newStatus;
+              }
+            });
+          }
+        });
+      },
+    });
+  };
+
+  return (
+    <button
+      onClick={showModal}
+      className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
+    >
+      <TagIcon className="w-4 h-4 inline-block" />
+      Expense Tags
+    </button>
+  );
+}
