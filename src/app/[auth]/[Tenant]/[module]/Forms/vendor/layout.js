@@ -48,44 +48,12 @@ export const metadata = {
 
 export default async function ExpenseLayout({ children, params }) {
   const userData = await fetchUser();
-
-   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-
-const [storeRes, ExpenseCat] = await Promise.all([
-  fetch(`${baseUrl}/api/Stores`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
-    },
-    next: {
-      revalidate: 120,
-    },
-  }),
-  fetch(`${baseUrl}/api/ExpenseCat`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
-    },
-    next: {
-      revalidate: 120,
-    },
-  }),
-]);
-
-const StoreList = await storeRes.json();
-const ExpenseCatList = await ExpenseCat.json();
-
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   // check if user has access to crm and cash register
-  const ExpenseFinder = userData.user.Apps.find((app) => {
-    return app.Name === "Expense";
-  });
+  const userAccess = userData.user.createVendor
 
-  if (!ExpenseFinder) {
+  if (!userAccess) {
     return notFound();
   }
 
@@ -117,7 +85,7 @@ const ExpenseCatList = await ExpenseCat.json();
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               {/* display Charts of accounts */}
-              <Page  StoreList={StoreList} businessData={userData.business} userData={userData.user} ExpenseCatList={ExpenseCatList} baseUrl={baseUrl}/>
+              <Page  userInfo={userData} baseUrl={baseUrl}/>
             </section>
           </main>
         </div>
