@@ -228,6 +228,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList,bas
             id="category"
             name="category"
             onChange={handleChange}
+            required
             value={formData.category || ""}
             className="mt-2 block w-full  border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50"
           >

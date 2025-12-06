@@ -70,9 +70,9 @@ const [storeRes, ExpenseCat] = await Promise.all([
       Authorization: `Bearer ${userData.business.tenantId}`,
       dbConnect: `Bearer ${userData.business.rustyRoof}`,
     },
-    next: {
-      revalidate: 120,
-    },
+    // next: {
+    //   revalidate: 120,
+    // },
   }),
 ]);
 
