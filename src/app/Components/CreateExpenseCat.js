@@ -3,43 +3,85 @@ import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { TagIcon } from "@heroicons/react/24/outline";
+import { Encrypt,Dencrypt } from "../../../Functions/Functions";
+import {ErrorMessage,SuccessToast,plsWait,} from "../../../Functions/Mics"
+import { useRouter } from "next/navigation";
 
 const MySwal = withReactContent(Swal);
 
-const ExpenseCategoryModal = ({ onCreate }) => {
+const ExpenseCategoryModal = ({ baseUrl,userData }) => {
+  const Router = useRouter()
   const openModal = () => {
     MySwal.fire({
       title: "Create Expense Tag",
-      input: "text",
-      inputPlaceholder: "Enter tag name",
+      html: `
+         <input 
+        id="tagName" 
+        class="swal2-input w-48 px-2 py-1 text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+        placeholder="Enter tag name" 
+        />
+        <div class="flex justify-around mt-3 text-sm">
+        <label class="flex items-center gap-2">
+            <input type="radio" name="expenseType" value="Direct" checked />
+            <span class="font-medium">Direct Expense</span>
+        </label>
+        <label class="flex items-center gap-2">
+            <input type="radio" name="expenseType" value="Indirect" />
+            <span class="font-medium">Indirect Expense</span>
+        </label>
+        </div>
+      `,
+      focusConfirm: false,
       showCancelButton: true,
       confirmButtonText: "Create",
       cancelButtonText: "Cancel",
-      icon: "info", // options: success, error, warning, info, question
-      background: "#f9f9f9", // light background
-      color: "#333", // text color
-      confirmButtonColor: "#4CAF50", // green confirm button
-      cancelButtonColor: "#d33", // red cancel button
-      customClass: {
-        title: "swal-title",
-        input: "swal-input",
-        confirmButton: "swal-confirm",
-        cancelButton: "swal-cancel",
-      },
-      inputValidator: (value) => {
-        if (!value) {
-          return "You need to enter a tag name!";
+      icon: "info",
+      background: "#ffffff",
+      color: "#333",
+      confirmButtonColor: "#4CAF50",
+      cancelButtonColor: "#d33",
+      preConfirm: () => {
+        const tagInput = document.getElementById("tagName");
+        const tagName = tagInput ? tagInput.value.trim() : "";
+        const selected = document.querySelector('input[name="expenseType"]:checked');
+        const expenseType = selected ? selected.value : "";
+
+        if (!tagName) {
+          Swal.showValidationMessage("You need to enter a tag name!");
+          return false;
         }
+        if (!expenseType) {
+          Swal.showValidationMessage("You need to select an expense type!");
+          return false;
+        }
+
+        return { tagName, expenseType };
       },
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed && result.value) {
-        onCreate(result.value);
-        MySwal.fire({
-          title: "✅ Success",
-          text: `Tag "${result.value}" created!`,
-          icon: "success",
-          confirmButtonColor: "#4CAF50",
-        });
+        plsWait("Please wait.")
+        const { tagName, expenseType } = result.value;
+        // send request to server
+        const request = await fetch(`${baseUrl}/api/expense/Category/create`,{
+            method:"POST",
+            body:JSON.stringify({NAME:tagName,type:expenseType}),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+                dbConnect: `Bearer ${userData.business.rustyRoof}`,
+                access: Encrypt(userData.business.rustyRoof),
+            }
+        })
+        
+        const response = await request.json()
+
+        if(request.ok){
+          SuccessToast(response.message)
+          Router.refresh()
+        }else{
+          ErrorMessage(response.error)
+          Router.refresh()
+        }
       }
     });
   };
@@ -47,10 +89,10 @@ const ExpenseCategoryModal = ({ onCreate }) => {
   return (
     <button
       onClick={openModal}
-      className="flex items-center bg-gray-500 gap-3 p-3 rounded-md hover:bg-gray-700 transition w-full mt-2"
+     className="flex items-center bg-gray-500 gap-3 p-3 rounded-md hover:bg-gray-700 transition w-full mt-2"
     >
-     <TagIcon className="h-6 w-6 text-gray-100" />
-     <span className="text-xs">Create expense Tags</span>
+      <TagIcon className="h-6 w-6 text-white" />
+      <span className="text-sm">Create Expense Tag</span>
     </button>
   );
 };
