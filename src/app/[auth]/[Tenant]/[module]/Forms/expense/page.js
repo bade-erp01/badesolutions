@@ -223,7 +223,7 @@ export default function Page({StoreList,businessData,userData,ExpenseCatList,bas
 
         {/* Account Manager */}
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">Expense Category</label>
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700">Expense Tags</label>
           <select
             id="category"
             name="category"

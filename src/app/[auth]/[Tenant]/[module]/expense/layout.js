@@ -1,15 +1,12 @@
-
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
-import {
-  TagIcon,
-  PlusCircleIcon
-} from "@heroicons/react/24/outline";
+import { TagIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import {Encrypt} from "../../../../../../Functions/Mics"
+import { Encrypt } from "../../../../../../Functions/Mics";
+import ExpenseCategoryModal from "@/app/Components/CreateExpenseCat";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -54,7 +51,7 @@ export const metadata = {
 export default async function ExpenseLayout({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
-
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   // check if user has access to crm and cash register
   const ExpenseFinder = userData.user.Apps.find((app) => {
     return app.Name === "Expense";
@@ -64,7 +61,21 @@ export default async function ExpenseLayout({ children, params }) {
     return notFound();
   }
 
-  
+  const [cat] = await Promise.all([
+    fetch(`${baseUrl}/api/ExpenseCat`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userData.business.tenantId}`,
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+      },
+      next: {
+        revalidate: 120,
+      },
+    }),
+  ]);
+
+  const catList = await cat.json();
 
   try {
     return (
@@ -86,31 +97,34 @@ export default async function ExpenseLayout({ children, params }) {
             <nav className="space-y-2">
               <BackButton />
               <hr className="border-gray-100 mb-4" />
-               {userData?.user?.expenseUser && (
-              <Link
-                href={`/${userData.business.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <PlusCircleIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">New Expense</span>
-              </Link>
-            )}
+              {userData?.user?.expenseUser && (
+                <Link
+                  href={`/${userData.business.companyName
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                    userData.user._id
+                  )}/Module/Forms/${moduleList.module.toLowerCase()}`}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <PlusCircleIcon className="h-6 w-6 text-gray-100" />
+                  <span className="text-xs">New Expense</span>
+                </Link>
+              )}
 
-            {userData?.user?.expenseManager && (
-              <Link
-                href={`/${userData.business.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
-                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-              >
-                <TagIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Tags</span>
-              </Link>
-            )}
+              {/* show all expense group/tags */}
+              <div className="bg-blue-50 p-2 text-xs rounded-sm">
+                <p className="text-amber-700 font-semibold">Expense Tags</p>
+                  {catList.map((tag) => (
+                <p className="italic text-xs text-gray-600" key={tag._id}>
+                  * {tag.NAME}
+                </p>
+              ))}
+              {userData?.user?.expenseManager && (
+                <ExpenseCategoryModal />
+              )}
+              </div>
+
             </nav>
           </aside>
 
@@ -134,4 +148,3 @@ export default async function ExpenseLayout({ children, params }) {
     );
   }
 }
-

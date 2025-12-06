@@ -392,7 +392,6 @@ const RFP = async () => {
                 <div className="mt-2">
                   <input
                     value={formData.email}
-                    required
                     id="email"
                     name="email"
                     type="email"
@@ -434,7 +433,6 @@ const RFP = async () => {
                   <input
                     value={formData.Address}
                     id="Address"
-                    required
                     name="Address"
                     onChange={handleChange}
                     type="text"

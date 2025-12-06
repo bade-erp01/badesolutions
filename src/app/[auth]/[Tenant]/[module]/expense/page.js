@@ -49,17 +49,22 @@ export default async function page({ params }) {
 
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/ExpenseList?page=1&limit=5`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-  });
+  const [res] = await Promise.all([
+    fetch(`${baseUrl}/api/ExpenseList?page=1&limit=5`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userData.business.tenantId}`,
+        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+        access: `${Encrypt(userData.user._id)}`,
+      },
+    }),
+
+  ])
+  
 
   const data = await res.json();
+  
 
   try {
     return (
