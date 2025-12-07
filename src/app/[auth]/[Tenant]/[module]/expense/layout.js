@@ -70,9 +70,9 @@ export default async function ExpenseLayout({ children, params }) {
         Authorization: `Bearer ${userData.business.tenantId}`,
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
       },
-      // next: {
-      //   revalidate: 120,
-      // },
+      next: {
+        revalidate: 120,
+      },
     }),
   ]);
 
@@ -141,7 +141,7 @@ export default async function ExpenseLayout({ children, params }) {
   } catch (err) {
     return (
       <div className="text-black p-6">
-        Failed to load. Please try again later.{err.message}
+        Failed to load. Please try again later.
       </div>
     );
   }

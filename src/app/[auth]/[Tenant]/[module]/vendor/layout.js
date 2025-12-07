@@ -4,7 +4,7 @@ import {Encrypt} from "../../../../../../Functions/Functions"
 import Nav1 from "@/app/Components/Nav1";
 import Link from "next/link";
 import Image from "next/image";
-import {  UserGroupIcon,ShoppingCartIcon,ClipboardDocumentCheckIcon  } from "@heroicons/react/24/outline";
+import {  PlusCircleIcon,ShoppingCartIcon,ClipboardDocumentCheckIcon  } from "@heroicons/react/24/outline";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
@@ -91,12 +91,7 @@ export default async function layout({children,params}) {
                       )}/Module/Forms/${Module.module.toLowerCase()}`}
                       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                     >
-                      <Image
-                        src="https://img.icons8.com/plasticine/100/create-new.png"
-                        width={24}
-                        height={24}
-                        alt="Settings"
-                      />
+                       <PlusCircleIcon className="h-6 w-6 text-gray-100" />
                       <small>New Vendor</small>
                     </Link>
 
