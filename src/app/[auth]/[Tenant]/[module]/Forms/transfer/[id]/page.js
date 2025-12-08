@@ -39,7 +39,7 @@ export default function TransferPage({
     const cleanedProducts = await productList.find((product) => {
       return product?.ACDcode === productId || product?.ADCcode === productId;
     });
-    console.log(cleanedProducts)
+   
     try {
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(Singlebill._id)}?product=${Encrypt(cleanedProducts._id)}`,
@@ -278,7 +278,7 @@ export default function TransferPage({
         const logo = await loadImageAsDataURL(business.companyLogo);
         doc.addImage(logo, "JPEG", 10, 12, 30, 30);
         } catch (err) {
-        console.warn("Logo failed to load");
+        // console.warn("Logo failed to load");
         }
       }
     
@@ -457,7 +457,7 @@ export default function TransferPage({
       }
       } catch (error) {
       Swal.close();
-      console.error("Error generating PDF:", error);
+      // console.error("Error generating PDF:", error);
       }
     };
   
@@ -675,22 +675,25 @@ export default function TransferPage({
                   {Business.subscriptionplan === "Standard" ?(
                   <td>
                   {Singlebill.status.toLowerCase() === "draft" ? (
-                     <input
-                      defaultValue={bill.pcs || 0}
-                      type="number"
-                      step="any"
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
-                      onBlur={(e) => {
-                        const val = parseFloat(e.target.value);
-                        if(val !==""){
-                          handleQtyChange(
-                            isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                            Encrypt(bill._id),
-                            "Pcs"
-                          );
-                        }
-                      }}
-                    />
+                    //  <input
+                    //   defaultValue={bill.pcs || 0}
+                    //   type="number"
+                    //   step="any"
+                    //   className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
+                    //   onBlur={(e) => {
+                    //     const val = parseFloat(e.target.value);
+                    //     if(val !==""){
+                    //       handleQtyChange(
+                    //         isNaN(val) || val < 0 ? 0 : val, // sanitized value
+                    //         Encrypt(bill._id),
+                    //         "Pcs"
+                    //       );
+                    //     }
+                    //   }}
+                    // />
+                    <td className="px-4 py-2 text-center text-xs">
+                        {bill.pcs || 0}
+                    </td> // placeholder till i figure transfer deductions
                     ) : (
                       <td className="px-4 py-2 text-center text-xs">
                         {bill.pcs || 0}
