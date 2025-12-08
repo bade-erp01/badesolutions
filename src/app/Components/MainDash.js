@@ -19,6 +19,7 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { ShoppingBagIcon, ArrowTrendingDownIcon,ShoppingCartIcon ,ArrowTrendingUpIcon,BanknotesIcon} from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
+import PendingPaymentReminder from "@/app/Components/RemindPendingPayments"
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -113,7 +114,6 @@ export default function MainDash({ userData }) {
         return;
       }
 
-      // console.log("▶️ Fetching tenant data...");
       try {
         const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Report`, {
           headers: {
@@ -660,10 +660,18 @@ export default function MainDash({ userData }) {
             © <span id="year">{moment().format("YYYY")}</span> Business
             Automated Dynamic Enterprise — All rights reserved.
           </footer>
+
+          {/* pending payment reminder */}
+          {tenantData.PendingPaymenet.length < 1 && userData.user.postPayment && (
+            <PendingPaymentReminder 
+              data={tenantData.PendingPayment} 
+              business={userData.business} 
+            />
+          )}
         </div>
       ) : (
         <main className="flex-1">
-          <section className="w-full max-w-screen-xl mx-auto p-6 h-[500px] overflow-y-auto bg-gradient-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
+          <section className="w-full max-w-7xl mx-auto p-6 h-[500px] overflow-y-auto bg-linear-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
             {/* Birthday Marquee */}
             <div className="mt-6">
               <div className="w-full text-center">
