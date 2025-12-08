@@ -83,6 +83,7 @@ const SalesDumpModal = ({ business }) => {
             Vat: order.vat || 0,
             Unit: order.priceListPrice,
             Total: order.total,
+            FOC:order.item.isAservice,
             "Manuf-Code": order.item.Manufacture_code,
             Vendor: getVendorName(order.item.Vendor, vendors),
             Promo_Sum: (order.promotionData || 0) * (order.Qty || 0),
@@ -101,12 +102,23 @@ const SalesDumpModal = ({ business }) => {
     return filteredExport;
   };
 
-  const handleExport = (filteredData) => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const handleExport = (filteredData) => {
+    // First sheet
+    const worksheet1 = XLSX.utils.json_to_sheet(filteredData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "SalesDump");
+    XLSX.utils.book_append_sheet(workbook, worksheet1, "SalesDump");
 
-    const filename = `Sales Dump [${filters.startDate || "start"} - ${filters.endDate || "end"}].xlsx`;
+    const otherData = filteredData?.filter(line => line.FOC === true);
+    
+    // Second sheet (example: FOC COUNT)
+    const worksheet2 = XLSX.utils.json_to_sheet(otherData);
+    XLSX.utils.book_append_sheet(workbook, worksheet2, "FOC-Issued");
+    
+
+    // Filename
+    const filename = `Sales-Dump & FOC-Issued [${filters.startDate || "start"} - ${filters.endDate || "end"}].xlsx`;
+
+    // Write and save
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, filename);
