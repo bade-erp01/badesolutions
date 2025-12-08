@@ -285,14 +285,8 @@ export default function MainDash({ userData }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm text-gray-500">Purchase</h3>
-                    <p className="text-2xl text-gray-500 font-bold mt-1">
-                      {userData.business.currency?.currency.Symbol}
-                      {tenantData?.PO?.reduce((sum, item) => {
-                          const val = Number(item?.grandTotal) || 0; // ensure it's a number
-                          return sum + val;
-                      }, 0).toLocaleString()}
-
-                    </p>
+                    {/* purchase value */}
+                      <PurchaseOrderTotal  tenantData={tenantData} userData={userData}/>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
                     <ShoppingBagIcon className="h-6 w-6 text-gray-900" />
@@ -684,3 +678,30 @@ export default function MainDash({ userData }) {
     </>
   );
 }
+
+
+
+const formatNumberShort = (num) => {
+  if (num >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(2) + " B"; // billions
+  } else if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(2) + " M"; // millions
+  } else if (num >= 1_000) {
+    return (num / 1_000).toFixed(2) + " K"; // thousands
+  }
+  return num.toString();
+};
+
+const PurchaseOrderTotal = ({ tenantData, userData }) => {
+  const total = tenantData?.PO?.reduce((sum, item) => {
+    const val = Number(item?.grandTotal) || 0;
+    return sum + val;
+  }, 0);
+
+  return (
+    <p className="text-2xl text-gray-500 font-bold mt-1">
+      {userData.business.currency?.currency.Symbol}
+      {formatNumberShort(total)}
+    </p>
+  );
+};
