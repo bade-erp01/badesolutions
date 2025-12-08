@@ -664,7 +664,7 @@ export default function MainDash({ userData }) {
           {/* pending payment reminder */}
           {tenantData.PendingPaymenet.length > 0 && userData.user.postPayment && (
             <PendingPaymentReminder 
-              data={tenantData.PendingPayment} 
+              data={tenantData.PendingPaymenet} 
               business={userData.business} 
             />
           )}
