@@ -26,7 +26,7 @@ const PendingPaymentReminder = ( {data, business }) => {
                     style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #b22222;" />
                 <div style="text-align: left; line-height: 1.5;">
                 <strong style="font-size: 16px; color: #b22222; text-transform: uppercase;">
-                    ⚠️ Pending Payment Alert
+                    ⚠️ Payment Alert
                 </strong><br/>
                 <span style="font-size: 15px; color: #000; font-weight: 600;">
                     You have <strong style="color:#d32f2f;">${pendingPayments.length}</strong> payment(s) awaiting approval.

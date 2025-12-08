@@ -14,7 +14,7 @@ import {
 } from "../../../../../../../Functions/Mics";
 import axios from "axios";
 import moment from "moment";
-import { useEffect,Suspense } from "react";
+import { useEffect, Suspense } from "react";
 import Plotly from "plotly.js-dist-min";
 import {
   Encrypt,
@@ -26,7 +26,7 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
 import { useState } from "react";
 import CreateFocButton from "@/app/Components/CreatefocButton";
-import DeleteButton from "@/app/Components/DeleteProduct"
+import DeleteButton from "@/app/Components/DeleteProduct";
 import AutoreplenishReminder from "@/app/Components/AutoreplenishReminder";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Image from "next/image";
@@ -46,8 +46,9 @@ export default function SingleProductpage({
   const router = useRouter();
   const [isOpen3, setIsOpen3] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const link = `/${navigation.auth}/${navigation.Tenant
-    }/product/product/${Encrypt(Backdata.CopyID)}?Modules=product`;
+  const link = `/${navigation.auth}/${
+    navigation.Tenant
+  }/product/product/${Encrypt(Backdata.CopyID)}?Modules=product`;
   const [BuyingPrice, setBuyingPrice] = useState({
     BuyingPrice: Number(Backdata.BuyingPrice) || 0,
   });
@@ -186,9 +187,7 @@ export default function SingleProductpage({
       e.preventDefault();
       plsWait("Updating Product...");
       const { data } = await axios.patch(
-        `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(
-          Backdata._id
-        )}/edit`,
+        `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
         formData,
         { headers }
       );
@@ -288,8 +287,9 @@ export default function SingleProductpage({
                 Product Information
               </h2>
               <svg
-                className={`w-5 h-5 transform transition-transform duration-300 ${isOpen3 ? "rotate-180" : ""
-                  }`}
+                className={`w-5 h-5 transform transition-transform duration-300 ${
+                  isOpen3 ? "rotate-180" : ""
+                }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -303,8 +303,9 @@ export default function SingleProductpage({
               </svg>
             </span>
             <div
-              className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen3 ? "block" : "hidden"
-                }`}
+              className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                isOpen3 ? "block" : "hidden"
+              }`}
             >
               <div className="border-b bg- border-gray-900/10 pb-12">
                 <p className="mt-1 text-sm/6 text-gray-600">
@@ -450,7 +451,7 @@ export default function SingleProductpage({
                     </div>
                   </div>
 
-                   <div className="sm:col-span-2">
+                  <div className="sm:col-span-2">
                     <label
                       htmlFor="Manufacture_code"
                       className="block text-sm/6 font-medium text-gray-900"
@@ -655,20 +656,21 @@ export default function SingleProductpage({
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                       />
                     </div>
-                      <label
-                        htmlFor="VatpriceList1"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                      >
-                        <input
+                    <label
+                      htmlFor="VatpriceList1"
+                      className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                    >
+                      <input
                         checked={formData.VatpriceList1 || false}
                         onChange={handleChange}
                         id="VatpriceList1"
                         name="VatpriceList1"
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList1}?
-                      </label>
+                      />{" "}
+                      Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                      {businessInfo.priceList1}?
+                    </label>
                   </div>
                   <div className="sm:col-span-2">
                     <label
@@ -690,19 +692,20 @@ export default function SingleProductpage({
                       />
                     </div>
                     <label
-                        htmlFor="VatpriceList2"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                      >
-                        <input
+                      htmlFor="VatpriceList2"
+                      className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                    >
+                      <input
                         checked={formData.VatpriceList2 || false}
                         onChange={handleChange}
                         id="VatpriceList2"
                         name="VatpriceList2"
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList2}?
-                      </label>
+                      />{" "}
+                      Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                      {businessInfo.priceList2}?
+                    </label>
                   </div>
 
                   {businessInfo.subscriptionplan === "Standard" && (
@@ -727,19 +730,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                        htmlFor="VatpriceList3"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                      >
-                        <input
-                        checked={formData.VatpriceList3 || false}
-                        onChange={handleChange}
-                        id="VatpriceList3"
-                        name="VatpriceList3"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList3}?
-                      </label>
+                          htmlFor="VatpriceList3"
+                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                        >
+                          <input
+                            checked={formData.VatpriceList3 || false}
+                            onChange={handleChange}
+                            id="VatpriceList3"
+                            name="VatpriceList3"
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                          />{" "}
+                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                          {businessInfo.priceList3}?
+                        </label>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -762,19 +766,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                        htmlFor="VatpriceList4"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                      >
-                        <input
-                        checked={formData.VatpriceList4 || false}
-                        onChange={handleChange}
-                        id="VatpriceList4"
-                        name="VatpriceList4"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList4}?
-                      </label>
+                          htmlFor="VatpriceList4"
+                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                        >
+                          <input
+                            checked={formData.VatpriceList4 || false}
+                            onChange={handleChange}
+                            id="VatpriceList4"
+                            name="VatpriceList4"
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                          />{" "}
+                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                          {businessInfo.priceList4}?
+                        </label>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -797,19 +802,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                        htmlFor="VatpriceList5"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                      >
-                        <input
-                        checked={formData.VatpriceList5 || false}
-                        onChange={handleChange}
-                        id="VatpriceList5"
-                        name="VatpriceList5"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList5}?
-                      </label>
+                          htmlFor="VatpriceList5"
+                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                        >
+                          <input
+                            checked={formData.VatpriceList5 || false}
+                            onChange={handleChange}
+                            id="VatpriceList5"
+                            name="VatpriceList5"
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                          />{" "}
+                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                          {businessInfo.priceList5}?
+                        </label>
                       </div>
 
                       <div className="sm:col-span-2 sm:col-start-1">
@@ -832,19 +838,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                        htmlFor="VatpriceList6"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                      >
-                        <input
-                        checked={formData.VatpriceList6 || false}
-                        onChange={handleChange}
-                        id="VatpriceList6"
-                        name="VatpriceList6"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList6}?
-                      </label>
+                          htmlFor="VatpriceList6"
+                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                        >
+                          <input
+                            checked={formData.VatpriceList6 || false}
+                            onChange={handleChange}
+                            id="VatpriceList6"
+                            name="VatpriceList6"
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                          />{" "}
+                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                          {businessInfo.priceList6}?
+                        </label>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -867,19 +874,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                        htmlFor="VatpriceList7"
-                        className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                          htmlFor="VatpriceList7"
+                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
                         >
-                        <input
-                          checked={formData.VatpriceList7 || false}
-                          onChange={handleChange}
-                          id="VatpriceList7"
-                          name="VatpriceList7"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />
-                        {" "}Apply {data.VAT.$numberDecimal}% Vat on {businessInfo.priceList7}?
-                      </label>
+                          <input
+                            checked={formData.VatpriceList7 || false}
+                            onChange={handleChange}
+                            id="VatpriceList7"
+                            name="VatpriceList7"
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
+                          />{" "}
+                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
+                          {businessInfo.priceList7}?
+                        </label>
                       </div>
                     </>
                   )}
@@ -897,8 +905,9 @@ export default function SingleProductpage({
                   Promo Section
                 </h2>
                 <svg
-                  className={`w-5 h-5 transform transition-transform duration-300 ${isOpen ? "rotate-180" : ""
-                    }`}
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -912,18 +921,22 @@ export default function SingleProductpage({
                 </svg>
               </span>
               <div
-                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen ? "block" : "hidden"
-                  }`}
+                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                  isOpen ? "block" : "hidden"
+                }`}
               >
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                   {/* promo section */}
                   <div className="sm:col-span-2">
+                    {/* Label for Promo */}
                     <label
                       htmlFor="Pricelist1Promo"
                       className="block text-sm/6 font-medium text-gray-900"
                     >
                       {businessInfo.priceList1} Promo
                     </label>
+
+                    {/* Promo input */}
                     <div className="mt-2">
                       <input
                         value={formData.Pricelist1Promo}
@@ -933,18 +946,47 @@ export default function SingleProductpage({
                         step="any"
                         onChange={handleChange}
                         autoComplete="Pricelist1-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
+                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
+                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+
+                    {/* End Date label */}
+                    <label
+                      htmlFor="endDate"
+                      className="block text-sm/6 font-medium text-gray-900 mt-4"
+                    >
+                      {businessInfo.priceList1} Promo End Date
+                    </label>
+
+                    {/* End Date input */}
+                    <div className="mt-2">
+                      <input
+                        value={formData.endDate}
+                        id="endDate"
+                        name="endDate"
+                        type="date"
+                        onChange={handleChange}
+                        autoComplete="end-date"
+                        min={new Date().toISOString().split("T")[0]}
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
+                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
+                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       />
                     </div>
                   </div>
 
                   <div className="sm:col-span-2">
+                    {/* Label for Pricelist2 Promo */}
                     <label
                       htmlFor="Pricelist2Promo"
                       className="block text-sm/6 font-medium text-gray-900"
                     >
                       {businessInfo.priceList2} Promo
                     </label>
+
+                    {/* Promo input */}
                     <div className="mt-2">
                       <input
                         value={formData.Pricelist2Promo}
@@ -952,9 +994,36 @@ export default function SingleProductpage({
                         name="Pricelist2Promo"
                         type="number"
                         step="any"
+                        min={0}
                         onChange={handleChange}
-                        autoComplete="Pricelist1-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        autoComplete="Pricelist2Promo"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
+                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
+                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+
+                    {/* End Date label */}
+                    <label
+                      htmlFor="Pricelist2PromoEndDate"
+                      className="block text-sm/6 font-medium text-gray-900 mt-4"
+                    >
+                     {businessInfo.priceList2} Promo End Date
+                    </label>
+
+                    {/* End Date input */}
+                    <div className="mt-2">
+                      <input
+                        value={formData.Pricelist2PromoEndDate}
+                        id="Pricelist2PromoEndDate"
+                        name="Pricelist2PromoEndDate"
+                        type="date"
+                        onChange={handleChange}
+                        min={new Date().toISOString().split("T")[0]}
+                        autoComplete="Pricelist2PromoEndDate"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
+                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
+                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       />
                     </div>
                   </div>
@@ -970,14 +1039,37 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist3Promo}
+                            value={formData.Pricelist3Promo || 0}
                             id="Pricelist3Promo"
                             name="Pricelist3Promo"
                             type="number"
                             step="any"
+                            min={0}
                             onChange={handleChange}
                             autoComplete="Pricelist3Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                        <label
+                          htmlFor="Pricelist3PromoEndDate"
+                          className="block text-sm/6 font-medium text-gray-900 mt-4"
+                        >
+                         {businessInfo.priceList3} Promo End Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist3PromoEndDate}
+                            id="Pricelist3PromoEndDate"
+                            name="Pricelist3PromoEndDate"
+                            type="date"
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={handleChange}
+                            autoComplete="Pricelist3PromoEndDate"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
                       </div>
@@ -991,14 +1083,37 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist4Promo}
+                            value={formData.Pricelist4Promo || 0}
                             id="Pricelist4Promo"
                             name="Pricelist4Promo"
                             type="number"
                             step="any"
+                            min={0}
                             onChange={handleChange}
                             autoComplete="Pricelist4Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                        <label
+                          htmlFor="Pricelist4PromoEndDate"
+                          className="block text-sm/6 font-medium text-gray-900 mt-4"
+                        >
+                         {businessInfo.priceList4} Promo End Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist4PromoEndDate || 0}
+                            id="Pricelist4PromoEndDate"
+                            name="Pricelist4PromoEndDate"
+                            type="date"
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={handleChange}
+                            autoComplete="Pricelist4PromoEndDate"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
                       </div>
@@ -1012,14 +1127,37 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist5Promo}
+                            value={formData.Pricelist5Promo || 0}
                             id="Pricelist5Promo"
                             name="Pricelist5Promo"
                             type="number"
                             step="any"
+                            min={0}
                             onChange={handleChange}
                             autoComplete="Pricelist5Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                        <label
+                          htmlFor="Pricelist5PromoEndDate"
+                          className="block text-sm/6 font-medium text-gray-900 mt-4"
+                        >
+                         {businessInfo.priceList5} Promo End Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist5PromoEndDate}
+                            id="Pricelist5PromoEndDate"
+                            name="Pricelist5PromoEndDate"
+                            type="date"
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={handleChange}
+                            autoComplete="Pricelist5PromoEndDate"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
                       </div>
@@ -1033,14 +1171,37 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist6Promo}
+                            value={formData.Pricelist6Promo || 0}
                             id="Pricelist6Promo"
                             name="Pricelist6Promo"
                             type="number"
                             step="any"
+                            min={0}
                             onChange={handleChange}
                             autoComplete="Pricelist6Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                        <label
+                          htmlFor="Pricelist6PromoEndDate"
+                          className="block text-sm/6 font-medium text-gray-900 mt-4"
+                        >
+                          {businessInfo.priceList6} Promo End Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist6PromoEndDate}
+                            id="Pricelist6PromoEndDate"
+                            name="Pricelist6PromoEndDate"
+                            type="date"
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={handleChange}
+                            autoComplete="Pricelist6PromoEndDate"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
                       </div>
@@ -1054,14 +1215,37 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist7Promo}
+                            value={formData.Pricelist7Promo || 0 }
                             id="Pricelist7Promo"
                             name="Pricelist7Promo"
                             type="number"
                             step="any"
+                            min={0}
                             onChange={handleChange}
                             autoComplete="Pricelist7Promo-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          />
+                        </div>
+                        <label
+                          htmlFor="Pricelist7PromoEndDate"
+                          className="block text-sm/6 font-medium text-gray-900 mt-4"
+                        >
+                         {businessInfo.priceList7} Promo End Date
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            value={formData.Pricelist7PromoEndDate}
+                            id="Pricelist7PromoEndDate"
+                            name="Pricelist7PromoEndDate"
+                            type="date"
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={handleChange}
+                            autoComplete="Pricelist7PromoEndDate"
+                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
+                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
+                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                           />
                         </div>
                       </div>
@@ -1092,75 +1276,88 @@ export default function SingleProductpage({
                 />
               </div>
               {/* store product  */}
-                      <table className="w-full text-left text-xs text-black border border-gray-300">
-                      <caption className="text-start font-bold text-sm text-gray-600">
-                        {data.Name} In Store Inventory
-                      </caption>
-                      <thead className="bg-gray-100">
-                        <tr>
-                        <th className="border border-gray-300 px-2 py-1">#</th>
-                        <th className="border border-gray-300 px-2 py-1">Store</th>
-                        <th className="border border-gray-300 px-2 py-1">
-                          Product
-                        </th>
-                        <th className="border border-gray-300 px-2 py-1">
-                          Quantity in store
-                        </th>
-                        <th className="border border-gray-300 px-2 py-1">Download</th>
-                        {userInfo?.isAdmin && (
-                          <th className="border border-gray-300 px-2 py-1">Monitor</th>
-                        )}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {StoreProduct?.map((log, index) =>
-                        log.products.map((product, pIndex) => (
-                          <tr
-                          key={`${index}-${pIndex}`}
-                          className="border border-gray-300"
-                          >
-                          <td className="border border-gray-300 px-2 py-1">
-                            {index + 1}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1">
-                            <Link
+              <table className="w-full text-left text-xs text-black border border-gray-300">
+                <caption className="text-start font-bold text-sm text-gray-600">
+                  {data.Name} In Store Inventory
+                </caption>
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="border border-gray-300 px-2 py-1">#</th>
+                    <th className="border border-gray-300 px-2 py-1">Store</th>
+                    <th className="border border-gray-300 px-2 py-1">
+                      Product
+                    </th>
+                    <th className="border border-gray-300 px-2 py-1">
+                      Quantity in store
+                    </th>
+                    <th className="border border-gray-300 px-2 py-1">
+                      Download
+                    </th>
+                    {userInfo?.isAdmin && (
+                      <th className="border border-gray-300 px-2 py-1">
+                        Monitor
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {StoreProduct?.map((log, index) =>
+                    log.products.map((product, pIndex) => (
+                      <tr
+                        key={`${index}-${pIndex}`}
+                        className="border border-gray-300"
+                      >
+                        <td className="border border-gray-300 px-2 py-1">
+                          {index + 1}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          <Link
                             className="text-blue-600 hover:underline visited:text-purple-600"
-                            href={`/${navigation.auth}/${navigation.Tenant
-                              }/inventory/inventory/${Encrypt(
+                            href={`/${navigation.auth}/${
+                              navigation.Tenant
+                            }/inventory/inventory/${Encrypt(
                               product._id
-                              )}?Modules=inventory`}
-                            >
+                            )}?Modules=inventory`}
+                          >
                             {log.warehouseName}
-                            </Link>
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1">
-                            {product.productName}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1">
-                            Case:{product.currentQty}, Pcs:{product.pcs}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
-                            <ExcelDownloadBtn
+                          </Link>
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          {product.productName}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          Case:{product.currentQty}, Pcs:{product.pcs}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
+                          <ExcelDownloadBtn
                             data={[
                               {
-                              Store: log.warehouseName,
-                              Product: product.productName,
-                              Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
+                                Store: log.warehouseName,
+                                Product: product.productName,
+                                Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
                               },
                             ]}
-                            page={`${log.warehouseName.substring(0, 4) || "store"
-                              }-${product.productName.substring(0, 4) || "product"
-                              }`}
+                            page={`${
+                              log.warehouseName.substring(0, 4) || "store"
+                            }-${
+                              product.productName.substring(0, 4) || "product"
+                            }`}
+                          />
+                        </td>
+                        {userInfo?.isAdmin && (
+                          <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
+                            <AutoreplenishReminder
+                              storeProduct={product}
+                              business={businessInfo}
+                              user={userInfo}
+                              baseUrl={EXPRESS_PRIVATE_URL}
                             />
                           </td>
-                         {userInfo?.isAdmin && ( 
-                          <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
-                            <AutoreplenishReminder storeProduct={product} business={businessInfo} user={userInfo} baseUrl={EXPRESS_PRIVATE_URL}/>
-                          </td>)}
-                          </tr>
-                        ))
                         )}
-                      </tbody>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
               </table>
 
               {/* Price change */}
@@ -1209,16 +1406,16 @@ export default function SingleProductpage({
                     />
                   )}
 
-                {
-                  user.isAdmin &&
+                {user.isAdmin &&
                   !Backdata.FOCID &&
-                  !Backdata.isAservice && 
-                  Backdata.TotalSale < 1 &&(
-                  <DeleteButton 
-                  productId={Backdata._id}
-                  business={businessInfo}
-                  user={user}/>
-                )}
+                  !Backdata.isAservice &&
+                  Backdata.TotalSale < 1 && (
+                    <DeleteButton
+                      productId={Backdata._id}
+                      business={businessInfo}
+                      user={user}
+                    />
+                  )}
 
                 {user.editProduct && (
                   <button
@@ -1337,8 +1534,9 @@ function ProductChart({ productId, productName, umo, business, user }) {
       const NDyArray = monthlySalesArray.map((item) => item.sold);
       const totalSales = NDyArray.reduce((sum, val) => sum + val, 0).toFixed(1);
 
-      const chartTitle = `estimated net sales of ${business.currency?.currency?.Symbol
-        }${totalSales} for ${moment().format("YYYY")}`;
+      const chartTitle = `estimated net sales of ${
+        business.currency?.currency?.Symbol
+      }${totalSales} for ${moment().format("YYYY")}`;
       const chartColor = business?.Color || "#1e2939";
 
       const dataPlot = [
@@ -1366,28 +1564,28 @@ function ProductChart({ productId, productName, umo, business, user }) {
           <div className="text-red-500 text-lg font-semibold">{errormssg}</div>
         </div>
       ) : // No error: show loading spinner or chart
-        loading ? (
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
-          </div>
-        ) : (
-          <div id="code">
-            <h5 className="text-lg font-semibold text-gray-700 mb-1">
-              📈 Month-on-Month Sales Insight for {productName},{tottalSales}
-              <br />
-              <hr />
-              <br />
-              <i className="text-gray-500 text-sm">
-                Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
-              </i>
-            </h5>
-            <div
-              id="myPlot"
-              className=""
-              style={{ width: "100%", height: "400px" }}
-            />
-          </div>
-        )}
+      loading ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
+        </div>
+      ) : (
+        <div id="code">
+          <h5 className="text-lg font-semibold text-gray-700 mb-1">
+            📈 Month-on-Month Sales Insight for {productName},{tottalSales}
+            <br />
+            <hr />
+            <br />
+            <i className="text-gray-500 text-sm">
+              Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
+            </i>
+          </h5>
+          <div
+            id="myPlot"
+            className=""
+            style={{ width: "100%", height: "400px" }}
+          />
+        </div>
+      )}
     </>
   );
 }
