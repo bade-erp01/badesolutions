@@ -132,7 +132,7 @@ export default function SingleProductpage({
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-    "X-Requested-With": "XMLHttpRequest",
+    // "X-Requested-With": "XMLHttpRequest",
     dbConnect: `Bearer ${businessInfo.rustyRoof}`,
     access: `${Encrypt(userInfo._id)}`,
   });
