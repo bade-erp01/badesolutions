@@ -20,20 +20,24 @@ const PendingPaymentReminder = ({ data, business }) => {
         },
         background: "#f9f9f9", // ✅ softer background color
         html: `
-          <div style="display: flex; align-items: center;">
-            <img src="${business?.companyLogo || ""}" 
-                 alt="Company Logo" 
-                 style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;" />
-            <div style="text-align: left;">
-              <strong style="font-size: 14px; color: #b22222;">
-                PENDING PAYMENT
-              </strong><br/>
-              <span style="font-size: 14px; color: #000;">
-                ⚠️ You have <strong>${pendingPayments.length}</strong> pending payment(s).
-              </span>
+            <div style="display: flex; align-items: center;">
+                <img src="${business?.companyLogo || ""}" 
+                    alt="Company Logo" 
+                    style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #b22222;" />
+                <div style="text-align: left; line-height: 1.5;">
+                <strong style="font-size: 16px; color: #b22222; text-transform: uppercase;">
+                    ⚠️ Pending Payment Alert
+                </strong><br/>
+                <span style="font-size: 15px; color: #000; font-weight: 600;">
+                    You have <strong style="color:#d32f2f;">${pendingPayments.length}</strong> payment(s) awaiting approval.
+                </span><br/>
+                <span style="font-size: 14px; color: #444;">
+                    👉 Kindly visit your <strong style="color:#b22222;">Cash Register</strong> to update payment status 
+                    and customer ledger <strong style="color:#b22222;">immediately</strong>.
+                </span>
+                </div>
             </div>
-          </div>
-        `,
+            `,
       });
   }, [pendingPayments, business]);
 
