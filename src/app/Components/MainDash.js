@@ -253,8 +253,8 @@ export default function MainDash({ userData }) {
                 <div>
                   <h3 className="text-sm text-gray-500">Today&lsquo;s Sales</h3>
                   <p className="text-2xl text-green-600 font-bold mt-1">
-                    {userData.business.currency?.currency.Symbol}
-                    {tenantData.TodaySale?.toLocaleString()}
+                    {/* total sales */}
+                    <TodaySaleTotal tenantData={tenantData} userData={userData}/>
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     Auto Updates every 1 minutes
@@ -271,8 +271,7 @@ export default function MainDash({ userData }) {
                 <div>
                   <h3 className="text-sm text-gray-500">Revenue</h3>
                   <p className="text-2xl text-gray-500 font-bold mt-1">
-                    {userData.business.currency?.currency.Symbol}
-                    {tenantData.Revenue?.toLocaleString()}
+                    <TodaySRevenueTotal tenantData={tenantData} userData={userData}/>
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-[#ddd6ff] text-white shadow-md">
@@ -299,11 +298,7 @@ export default function MainDash({ userData }) {
                 <div>
                   <h3 className="text-sm text-gray-500">Expenses</h3>
                   <p className="text-2xl text-red-500 font-bold mt-1">
-                    {userData.business.currency?.currency.Symbol}
-                    {tenantData.Expenses?.reduce((sum, item) => {
-                          const val = Number(item?.Amount) || 0; // ensure it's a number
-                          return sum + val;
-                      }, 0).toLocaleString()}
+                      <ExpenseTotal tenantData={tenantData} userData={userData}/>
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
@@ -695,6 +690,44 @@ const formatNumberShort = (num) => {
 const PurchaseOrderTotal = ({ tenantData, userData }) => {
   const total = tenantData?.PO?.reduce((sum, item) => {
     const val = Number(item?.grandTotal) || 0;
+    return sum + val;
+  }, 0);
+
+  return (
+    <p className="text-2xl text-gray-500 font-bold mt-1">
+      {userData.business.currency?.currency.Symbol}
+      {formatNumberShort(total)}
+    </p>
+  );
+};
+
+
+const TodaySaleTotal = ({ tenantData, userData }) => {
+  const total = tenantData?.TodaySale;
+
+  return (
+    <p className="text-2xl text-gray-500 font-bold mt-1">
+      {userData.business.currency?.currency.Symbol}
+      {formatNumberShort(total)}
+    </p>
+  );
+};
+
+
+const TodaySRevenueTotal = ({ tenantData, userData }) => {
+  const total = tenantData?.Revenue;
+
+  return (
+    <p className="text-2xl text-gray-500 font-bold mt-1">
+      {userData.business.currency?.currency.Symbol}
+      {formatNumberShort(total)}
+    </p>
+  );
+};
+
+const ExpenseTotal = ({ tenantData, userData }) => {
+  const total = tenantData?.Expenses?.reduce((sum, item) => {
+    const val = Number(item?.Amount) || 0; // ensure it's a number
     return sum + val;
   }, 0);
 
