@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 // Ensure Animate.css is imported globally: import 'animate.css';
 
-const PendingPaymentReminder = ({ data, business }) => {
+const PendingPaymentReminder = ( data, business ) => {
   const MySwal = withReactContent(Swal);
   const [pendingPayments] = useState(data || []);
 
