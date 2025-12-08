@@ -115,13 +115,13 @@ async function StoreLayoutContent({ params }) {
      <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-hidden">
       <BackButton />
       <hr className="my-4 border-gray-700" />
-      <nav className="flex-grow">
+      <nav className="grow">
         <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
         
          <ul className="divide-y divide-gray-700">
           {Inv.ActivityLog?.map((log, index) => {
             return (
-             <li key={index} className="py-3 px-4 text-xs">
+             <li key={index} className="py-3 px-4 text-xs text-italic">
               <div className="flex justify-between items-center">
                 <span>{log.logMsg}</span>
               </div>
