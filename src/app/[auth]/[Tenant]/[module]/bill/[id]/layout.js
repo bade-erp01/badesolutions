@@ -123,7 +123,7 @@ async function StoreLayoutContent({ params }) {
             return (
              <li key={index} className="py-3 px-4 text-xs text-italic">
               <div className="flex justify-between items-center">
-                <span>{log.logMsg}</span>
+                <span className="text-italic">{log.logMsg}</span>
               </div>
               <hr className="border-gray-500" />
              </li>
