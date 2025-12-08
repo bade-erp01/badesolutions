@@ -1112,7 +1112,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
                 {userInfo.user.EditCreditLimit ? (
                 <div className="mb-2 ">
-                  <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                  <div className="max-w-md mx-auto p-6 bg-linear-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
                     <label className="block text-sm font-semibold text-gray-700 tracking-wide">
                       Credit Limit
                     </label>
