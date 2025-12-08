@@ -963,7 +963,7 @@ export default function SingleProductpage({
                     {/* End Date input */}
                     <div className="mt-2">
                       <input
-                        value={formData.endDate}
+                        value={formData.Pricelist1Promo}
                         id="endDate"
                         name="endDate"
                         type="date"
