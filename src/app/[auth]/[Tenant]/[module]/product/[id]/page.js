@@ -139,6 +139,7 @@ export default function SingleProductpage({
 
   const [formData, setFormData] = useState({ ...data });
 
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -954,7 +955,7 @@ export default function SingleProductpage({
 
                     {/* End Date label */}
                     <label
-                      htmlFor="endDate"
+                      htmlFor="Pricelist1PromoDate"
                       className="block text-sm/6 font-medium text-gray-900 mt-4"
                     >
                       {businessInfo.priceList1} Promo End Date
@@ -963,12 +964,12 @@ export default function SingleProductpage({
                     {/* End Date input */}
                     <div className="mt-2">
                       <input
-                        value={formData.Pricelist1Promo}
-                        id="endDate"
-                        name="endDate"
+                        value={formData.Pricelist1PromoDate}
+                        id="Pricelist1PromoDate"
+                        name="Pricelist1PromoDate"
                         type="date"
                         onChange={handleChange}
-                        autoComplete="end-date"
+                        autoComplete="Pricelist1PromoDate"
                         min={new Date().toISOString().split("T")[0]}
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
                  outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
@@ -1005,7 +1006,7 @@ export default function SingleProductpage({
 
                     {/* End Date label */}
                     <label
-                      htmlFor="Pricelist2PromoEndDate"
+                      htmlFor="Pricelist2PromoDate"
                       className="block text-sm/6 font-medium text-gray-900 mt-4"
                     >
                      {businessInfo.priceList2} Promo End Date
@@ -1014,13 +1015,13 @@ export default function SingleProductpage({
                     {/* End Date input */}
                     <div className="mt-2">
                       <input
-                        value={formData.Pricelist2PromoEndDate}
-                        id="Pricelist2PromoEndDate"
-                        name="Pricelist2PromoEndDate"
+                        value={formData.Pricelist2PromoDate}
+                        id="Pricelist2PromoDate"
+                        name="Pricelist2PromoDate"
                         type="date"
                         onChange={handleChange}
                         min={new Date().toISOString().split("T")[0]}
-                        autoComplete="Pricelist2PromoEndDate"
+                        autoComplete="Pricelist2PromoDate"
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
                  outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
                  focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -1053,20 +1054,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                          htmlFor="Pricelist3PromoEndDate"
+                          htmlFor="Pricelist3PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
                          {businessInfo.priceList3} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist3PromoEndDate}
-                            id="Pricelist3PromoEndDate"
-                            name="Pricelist3PromoEndDate"
+                            value={formData.Pricelist3PromoDate}
+                            id="Pricelist3PromoDate"
+                            name="Pricelist3PromoDate"
                             type="date"
                             min={new Date().toISOString().split("T")[0]}
                             onChange={handleChange}
-                            autoComplete="Pricelist3PromoEndDate"
+                            autoComplete="Pricelist3PromoDate"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
                  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
                  focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -1097,20 +1098,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                          htmlFor="Pricelist4PromoEndDate"
+                          htmlFor="Pricelist4PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
                          {businessInfo.priceList4} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist4PromoEndDate || 0}
-                            id="Pricelist4PromoEndDate"
-                            name="Pricelist4PromoEndDate"
+                            value={formData.Pricelist4PromoDate }
+                            id="Pricelist4PromoDate"
+                            name="Pricelist4PromoDate"
                             type="date"
                             min={new Date().toISOString().split("T")[0]}
                             onChange={handleChange}
-                            autoComplete="Pricelist4PromoEndDate"
+                            autoComplete="Pricelist4PromoDate"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
                  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
                  focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -1141,20 +1142,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                          htmlFor="Pricelist5PromoEndDate"
+                          htmlFor="Pricelist5PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
                          {businessInfo.priceList5} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist5PromoEndDate}
-                            id="Pricelist5PromoEndDate"
-                            name="Pricelist5PromoEndDate"
+                            value={formData.Pricelist5PromoDate}
+                            id="Pricelist5PromoDate"
+                            name="Pricelist5PromoDate"
                             type="date"
                             min={new Date().toISOString().split("T")[0]}
                             onChange={handleChange}
-                            autoComplete="Pricelist5PromoEndDate"
+                            autoComplete="Pricelist5PromoDate"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
                  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
                  focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -1185,20 +1186,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                          htmlFor="Pricelist6PromoEndDate"
+                          htmlFor="Pricelist6PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
                           {businessInfo.priceList6} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist6PromoEndDate}
-                            id="Pricelist6PromoEndDate"
-                            name="Pricelist6PromoEndDate"
+                            value={formData.Pricelist6PromoDate}
+                            id="Pricelist6PromoDate"
+                            name="Pricelist6PromoDate"
                             type="date"
                             min={new Date().toISOString().split("T")[0]}
                             onChange={handleChange}
-                            autoComplete="Pricelist6PromoEndDate"
+                            autoComplete="Pricelist6PromoDate"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
                  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
                  focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -1229,20 +1230,20 @@ export default function SingleProductpage({
                           />
                         </div>
                         <label
-                          htmlFor="Pricelist7PromoEndDate"
+                          htmlFor="Pricelist7PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
                          {businessInfo.priceList7} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist7PromoEndDate}
-                            id="Pricelist7PromoEndDate"
-                            name="Pricelist7PromoEndDate"
+                            value={formData.Pricelist7PromoDate}
+                            id="Pricelist7PromoDate"
+                            name="Pricelist7PromoDate"
                             type="date"
                             min={new Date().toISOString().split("T")[0]}
                             onChange={handleChange}
-                            autoComplete="Pricelist7PromoEndDate"
+                            autoComplete="Pricelist7PromoDate"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
                  -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
                  focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
