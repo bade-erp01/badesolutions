@@ -42,37 +42,18 @@ export const metadata = {
   favicon: "favicon.ico",
 };
 
-export default async function page({ params }) {
-  const userData = await fetchUser();
-  const moduleList = await params;
-
-  // fetch all credit payment from all bank account
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const [Assets] = await Promise.all([
-    fetch(`${baseUrl}/api/Assets`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
-      },
-      next: {
-        revalidate: 120,
-      },
-    }),
-  ]);
-
-  const data = await Assets.json();
+export default async function page({data,params}) {
+  const moduleList = await params
 
   try {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
-        {Dencrypt(data) && Dencrypt(data).length > 0 ? (
-          Dencrypt(data).expenses.map((element) => (
+        {data && data.length > 0 ? (
+          data.map((element) => (
             <Card key={element._id} data={element} module={moduleList.module} />
           ))
         ) : (
-          <p className="text-center text-gray-500 col-span-full">
+          <p className="text-center text-gray-500 col-span-full italic">
             No assets to display
           </p>
         )}
