@@ -320,7 +320,7 @@ export default function SingleVendorpage({
               type="submit"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus-visible:outline-indigo-600 transition"
             >
-              Create New ${formData.Name ? formData.Name : "Asset" }
+              Create New {formData.Name ? formData.Name : "Asset" }
             </button>
             </>
           )}
