@@ -88,6 +88,7 @@ const SalesDumpModal = ({ business }) => {
             Vendor: getVendorName(order.item.Vendor, vendors),
             Promo_Sum: (order.promotionData || 0) * (order.Qty || 0),
             PriceList: sale.priceList,
+            "Dis Allowed":order.discount,
             Ord_Date: sale.startDate,
             Inv_Date: moment(sale.DELIVERYDATE).format("l") || "N/A",
             Inv_Sub: sale.subTotal,
@@ -102,27 +103,57 @@ const SalesDumpModal = ({ business }) => {
     return filteredExport;
   };
 
-    const handleExport = (filteredData) => {
-    // First sheet
-    const worksheet1 = XLSX.utils.json_to_sheet(filteredData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet1, "SalesDump");
+  const handleExport = (filteredData) => {
+  const workbook = XLSX.utils.book_new();
 
-    const otherData = filteredData?.filter(line => line.FOC === true);
-    
-    // Second sheet (example: FOC COUNT)
-    const worksheet2 = XLSX.utils.json_to_sheet(otherData);
-    XLSX.utils.book_append_sheet(workbook, worksheet2, "FOC-Issued");
-    
+  // Helper to add a sheet with a styled header
+  const addSheetWithHeader = (data, sheetName) => {
+    // Convert JSON to sheet
+    const ws = XLSX.utils.json_to_sheet(data);
 
-    // Filename
-    const filename = `Sales-Dump & FOC-Issued [${filters.startDate || "start"} - ${filters.endDate || "end"}].xlsx`;
+    // Insert header row at the top
+    XLSX.utils.sheet_add_aoa(ws, [[sheetName]], { origin: "A1" });
 
-    // Write and save
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, filename);
+    // Merge cells across the first row
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    ws["!merges"] = ws["!merges"] || [];
+    ws["!merges"].push({
+      s: { r: 0, c: 0 }, // start cell (row 0, col 0)
+      e: { r: 0, c: range.e.c }, // end cell (row 0, last column)
+    });
+
+    // Apply style (requires xlsx-style or ExcelJS)
+    ws["A1"].s = {
+      font: { bold: true, sz: 16 }, // sz = font size
+      alignment: { horizontal: "center", vertical: "center" },
+    };
+
+    XLSX.utils.book_append_sheet(workbook, ws, sheetName);
   };
+
+  // First sheet: Sales
+  const salesDumpData = filteredData?.filter(
+    line => line.Status === "Invoice" || line.Status === "Order"
+  );
+  addSheetWithHeader(salesDumpData, "SalesDump");
+
+  // Second sheet: FOC Issued
+  const focData = filteredData?.filter(line => line.FOC === true);
+  addSheetWithHeader(focData, "FOC-Issued");
+
+  // Third sheet: Returns
+  const returnsData = filteredData?.filter(line => line.Status === "Cancelled");
+  addSheetWithHeader(returnsData, "Returns");
+
+  // Filename
+  const filename = `Sales-Dump,FOC-Issued & Returns [${filters.startDate || "start"} - ${filters.endDate || "end"}].xlsx`;
+
+  // Write and save
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+  saveAs(blob, filename);
+};
+
 
   const openModal = () => {
     Swal.fire({
