@@ -964,7 +964,7 @@ export default function SingleProductpage({
                     {/* End Date input */}
                     <div className="mt-2">
                       <input
-                        value={formData.Pricelist1PromoDate}
+                        value={moment(formData.Pricelist1PromoDate).format('YYYY-MM-DD')}
                         id="Pricelist1PromoDate"
                         name="Pricelist1PromoDate"
                         type="date"
@@ -1061,7 +1061,7 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist3PromoDate}
+                            value={moment(formData.Pricelist3PromoDate).format('YYYY-MM-DD')}
                             id="Pricelist3PromoDate"
                             name="Pricelist3PromoDate"
                             type="date"
@@ -1105,7 +1105,7 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist4PromoDate }
+                            value={moment(formData.Pricelist4PromoDate).format('YYYY-MM-DD') }
                             id="Pricelist4PromoDate"
                             name="Pricelist4PromoDate"
                             type="date"
@@ -1149,7 +1149,7 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist5PromoDate}
+                            value={moment(formData.Pricelist5PromoDate).format('YYYY-MM-DD')}
                             id="Pricelist5PromoDate"
                             name="Pricelist5PromoDate"
                             type="date"
@@ -1193,7 +1193,7 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist6PromoDate}
+                            value={moment(formData.Pricelist6PromoDate).format('YYYY-MM-DD')}
                             id="Pricelist6PromoDate"
                             name="Pricelist6PromoDate"
                             type="date"
@@ -1237,7 +1237,7 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist7PromoDate}
+                            value={moment(formData.Pricelist7PromoDate).format('YYYY-MM-DD')}
                             id="Pricelist7PromoDate"
                             name="Pricelist7PromoDate"
                             type="date"

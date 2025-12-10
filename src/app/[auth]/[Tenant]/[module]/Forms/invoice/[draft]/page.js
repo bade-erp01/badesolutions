@@ -583,7 +583,7 @@ const generatePdf = async (business, customer, bill) => {
             </h3>
             <p>
               <span className="mr-1">📌</span>
-                {Singlebill.customer.billingAddress}
+                {Singlebill.customer.billingAddress?.slice(0,30)}
             </p>
             <p>
               <span className="mr-1">✉️</span>
