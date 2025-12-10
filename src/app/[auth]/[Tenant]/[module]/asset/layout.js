@@ -76,7 +76,6 @@ export default async function AssetLayout({ children, params }) {
   ]);
 
   const assetList = await Assets.json();
- 
 
   try {
     return (
@@ -112,8 +111,8 @@ export default async function AssetLayout({ children, params }) {
                 </Link>
               )}
 
-              {Dencrypt(assetList).length > 0 && userData?.user?.AssetManager && (      
-                  <ExcelDownloadBtn data={Dencrypt(assetList)} page="Asset List"/>
+              {Dencrypt(assetList.Asset).length > 0 && userData?.user?.AssetManager && (      
+                  <ExcelDownloadBtn data={Dencrypt(assetList.Asset)} page="Asset List"/>
               )}
 
             </nav>
