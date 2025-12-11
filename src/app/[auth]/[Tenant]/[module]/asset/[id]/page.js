@@ -405,7 +405,9 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                   htmlFor="usefulYear"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Years of usefulness [In months]
+                  Years of usefulness [This value should be calculated in months]
+                  <br/>
+                  multiply 2yrs * 12Months = {2*12}Months
                 </label>
                 <div className="mt-2">
                    {!DecryptedAsset.runDepreciation  ? (

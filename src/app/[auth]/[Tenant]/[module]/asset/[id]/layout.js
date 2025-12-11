@@ -133,8 +133,8 @@ export default async function layout({params}) {
 
                           <li  className="py-3 px-4 text-xs text-italic">
                             <div className="flex justify-between items-center">
-                              <span className="text-italic">Depreciation Rate: 0
-                                {/* {DecryptedAsset?.depreciationRate?.$numberDecimal || 0} */}
+                              <span className="text-italic">Depreciation Rate:
+                                {DecryptedAsset?.depreciationRate?.$numberDecimal || 0}
                                 </span>
                             </div>
                             <hr className="border-gray-500" />
