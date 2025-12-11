@@ -2,13 +2,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import {plsWait,ErrorMessage,SuccessToast} from "../../../../../../../Functions/Mics";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
-export default function Page({ DecryptedAsset, StoreList,userInfo,users }) {
+
+export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl }) {
   const [Stores] = useState(StoreList);
   const [formData,setFormData] = useState(DecryptedAsset || {});
   const [user] = useState(userInfo);
   const [usersList] = useState(users || [])
-
+  const router = useRouter();
 
    const [headers] = useState({
       "Content-Type": "application/json",
@@ -30,8 +34,8 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users }) {
       try {
         e.preventDefault();
         plsWait("Please wait...");
-        const { data } = await axios.pactch(
-          `${baseUrl}/api//assets/${formData._id}`,
+        const { data } = await axios.patch(
+          `${baseUrl}/api/asset/${Encrypt(formData._id)}`,
           formData,
           { headers }
         );
