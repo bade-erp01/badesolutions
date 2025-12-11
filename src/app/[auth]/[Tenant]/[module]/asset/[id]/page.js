@@ -3,10 +3,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
 
-export default function Page({ DecryptedAsset, StoreList,userInfo }) {
+export default function Page({ DecryptedAsset, StoreList,userInfo,users }) {
   const [Stores] = useState(StoreList);
   const [formData,setFormData] = useState(DecryptedAsset || {});
   const [user] = useState(userInfo);
+  const [usersList] = useState(users || [])
 
 
    const [headers] = useState({
@@ -29,8 +30,8 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
       try {
         e.preventDefault();
         plsWait("Please wait...");
-        const { data } = await axios.post(
-          `${baseUrl}/api/createAsset`,
+        const { data } = await axios.pactch(
+          `${baseUrl}/api//assets/${formData._id}`,
           formData,
           { headers }
         );
@@ -38,7 +39,7 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
         if (data && data.data) {
           SuccessToast("Asset List updated...");
           setFormData({})
-          router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/vendor/${data.data}`);
+          router.refresh();
         } else {
           throw new Error(data.error);
         }
@@ -69,9 +70,7 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
                 <Image
                   height={40}
                   width={40}
-                  src={
-                    "https://img.icons8.com/stickers/100/decentralized-network.png"
-                  }
+                  src={formData.image || "https://img.icons8.com/stickers/100/decentralized-network.png"}
                   alt="Avatar"
                   quality={100}
                   priority={true}
@@ -115,7 +114,7 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
 
               <div className="sm:col-span-2">
                 <label
-                  htmlFor="Categories"
+                  htmlFor="Location"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
                   Location of use
@@ -148,30 +147,29 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
               {/*Assigned staff  */}
               <div className="sm:col-span-2">
                 <label
-                  htmlFor="Categories"
+                  htmlFor="AssignedTo"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
                   Assigned To
                 </label>
                 <div className="mt-2">
                   <select
-                    id="Location"
-                    name="Location"
+                    id="AssignedTo"
+                    name="AssignedTo"
                     onChange={handleChange}
-                    required
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   >
                     <option
-                      value= {formData.AssignedTo?.firstName}
+                      value= {formData.AssignedTo?._id}
                       disabled
                       selected
                       className="text-gray-400"
                     >
                        {formData.AssignedTo?.firstName}  {formData.AssignedTo?.lastName}
                     </option>
-                    {Stores.map((store, index) => (
-                      <option key={index} value={store._id}>
-                        {store.WHName}
+                    {usersList.map((user, index) => (
+                      <option key={index} value={user._id}>
+                        {user.firstName}  {user.lastName}
                       </option>
                     ))}
                   </select>
@@ -182,15 +180,15 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
               {/* Change status */}
               <div className="sm:col-span-2">
                 <label
-                  htmlFor="Categories"
+                  htmlFor="status"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
                   Status
                 </label>
                 <div className="mt-2">
                   <select
-                    id="Location"
-                    name="Location"
+                    id="status"
+                    name="status"
                     onChange={handleChange}
                     required
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -208,6 +206,18 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
                       className="text-gray-400"
                     >
                       Running
+                    </option>
+                    <option
+                      value="Sold"
+                      className="text-gray-400"
+                    >
+                      Sold
+                    </option>
+                    <option
+                      value="Disposed"
+                      className="text-gray-400"
+                    >
+                      Disposed
                     </option>
                   </select>
                 </div>
@@ -258,6 +268,33 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
                     min={0}
                     onChange={handleChange}
                     autoComplete="PurchasedValue"
+                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="depreciationRate"
+                  className="block text-sm/6 font-medium text-gray-900"
+                >
+                  Depreciation Rate
+                </label>
+                <div className="mt-2">
+                  <input
+                    // value={formData.depreciationRate.$numberDecimal || 0}
+                    value={0}
+                    id="depreciationRate"
+                    name="depreciationRate"
+                    required
+                    placeholder={`Enter a Purchase value for ${
+                      formData.Name ? formData.Name : "Asset"
+                    }`}
+                    type="number"
+                    step={`any`}
+                    min={0}
+                    onChange={handleChange}
+                    autoComplete="depreciationRate"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
                 </div>
@@ -377,14 +414,47 @@ export default function Page({ DecryptedAsset, StoreList,userInfo }) {
                   />
                 </div>
               </div>
+              {/* check box to activate depreciation */}
+              <div className="sm:col-span-2">
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition">
+                  <input
+                    type="checkbox"
+                    name="runDepreciation"
+                    checked={formData.runDepreciation || false}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  />
+                  <span className="text-sm font-semibold text-gray-800">
+                    Activate Depreciation
+                  </span>
+                </label>
+              </div>
+
+              <div className="col-span-full">
+              <label
+                htmlFor="description"
+                className="block text-sm/6 font-medium text-gray-900"
+              >
+                Write Something Simple and Consise about this Asset
+              </label>
+              <div className="">
+                <textarea
+                  id="description"
+                  onChange={handleChange}
+                  name="description"
+                  className="w-full h-32 p-3 text-black border border-dashed border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="Enter your text here..."
+                >{formData.description}</textarea>
+              </div>
+              </div>
+
             </div>
           </div>
 
           {user.user.AssetManager && (
             <>
               <small className="text-black italic">
-                A unique id will be generated for{" "}
-                {formData.Name ? formData.Name : "Asset"}{" "}
+               Depreciation runs on the 28th of every month.
               </small>{" "}
               <br />
               <button

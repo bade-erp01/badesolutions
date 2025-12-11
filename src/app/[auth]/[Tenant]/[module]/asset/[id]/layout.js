@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
+import Users from "../../../../../../../models/Users"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -62,6 +63,10 @@ export default async function layout({params}) {
       if (!AssetFinder) {
         return notFound();
       }
+
+      const users = await Users.findByTenant(userData.business.tenantId)
+      const StringedUsers = JSON.stringify(users)
+      const ParsedUser = JSON.parse(StringedUsers)
     
       const [Assets,Stores] = await Promise.all([
         fetch(`${baseUrl}/api/asset/${moduleList.id}`, {
@@ -113,14 +118,60 @@ export default async function layout({params}) {
                   <nav className="space-y-2">
                     <BackButton />
                     <hr className="border-gray-100 mb-4" />
-                
+                      {/* display some fileds here */}
+                      <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+        
+                      <ul className="divide-y divide-gray-700">
+                          <li  className="py-3 px-4 text-xs text-italic">
+                            <div className="flex justify-between items-center">
+                              <span className="text-italic">Residual Value: 
+                                {DecryptedAsset.ResidualValue.$numberDecimal}
+                                </span>
+                            </div>
+                            <hr className="border-gray-500" />
+                          </li>
+
+                          <li  className="py-3 px-4 text-xs text-italic">
+                            <div className="flex justify-between items-center">
+                              <span className="text-italic">Depreciation Rate: 0
+                                {/* {DecryptedAsset?.depreciationRate?.$numberDecimal || 0} */}
+                                </span>
+                            </div>
+                            <hr className="border-gray-500" />
+                          </li>
+
+
+                          <li  className="py-3 px-4 text-xs text-italic">
+                            <div className="flex justify-between items-center">
+                              <span className="text-italic">Asset Depreciation: {" "} 
+                                {DecryptedAsset.runDepreciation ? "Active" : "Inactive"}
+                                </span>
+                            </div>
+                            <hr className="border-gray-500" />
+                          </li>
+
+                          <li  className="py-3 px-4 text-xs text-italic">
+                            <div className="flex justify-between items-center">
+                              <span className="text-italic">Depreciation Type: {DecryptedAsset.DepreciationType}</span>
+                            </div>
+                            <hr className="border-gray-500" />
+                          </li>
+
+                          <li  className="py-3 px-4 text-xs text-italic">
+                            <div className="flex justify-between items-center">
+                              <span className="text-italic">Depreciation Count: {DecryptedAsset.CycleCount}</span>
+                            </div>
+                            <hr className="border-gray-500" />
+                          </li>
+                      </ul>
+                      </div>
                   </nav>
                 </aside>
       
                 {/* Main Content */}
                 <main className="flex-1">
                   <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative z-10 max-h-[82dvh] overflow-y-auto">
-                     <Page DecryptedAsset={DecryptedAsset} StoreList={StoreList} userInfo={userData}/>
+                     <Page DecryptedAsset={DecryptedAsset} StoreList={StoreList} userInfo={userData} users={ParsedUser}/>
                   </section>
                 </main>
               </div>
