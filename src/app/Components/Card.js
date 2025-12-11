@@ -40,7 +40,7 @@ const Card = ({ data, module }) => {
 
   return (
     <Link href={linkHref} title={title} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
-      <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
+      <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-20 w-full h-full">
         <Image
           src={imageSrc}
           width={60}

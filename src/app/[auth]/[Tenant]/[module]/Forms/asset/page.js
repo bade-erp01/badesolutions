@@ -1,5 +1,4 @@
 "use client";
-import Swal from "sweetalert2";
 import { useRouter, useParams } from "next/navigation";
 import {
   plsWait,
@@ -14,7 +13,7 @@ import {
 import { useState } from "react";
 import Image from "next/image";
 
-export default function SingleVendorpage({
+export default function Page({
   userInfo,
   baseUrl,
   StoresList
@@ -44,15 +43,15 @@ export default function SingleVendorpage({
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      plsWait("Onboarding new supplier please wait...");
+      plsWait("Onboarding new Asset please wait...");
       const { data } = await axios.post(
-        `${baseUrl}/api/Vendor/New`,
+        `${baseUrl}/api/createAsset`,
         formData,
         { headers }
       );
 
       if (data && data.data) {
-        SuccessToast("New supplier added to list ");
+        SuccessToast("Asset List updated...");
         setFormData({})
         router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/vendor/${data.data}`);
       } else {
@@ -170,6 +169,7 @@ export default function SingleVendorpage({
                     value={formData.SerialNumber}
                     id="SerialNumber"
                     name="SerialNumber"
+                    required
                     type="text"
                     placeholder={`Enter a serial number for ${formData.Name ? formData.Name : "Asset" }`}
                     onChange={handleChange}
@@ -188,9 +188,10 @@ export default function SingleVendorpage({
                 </label>
                 <div className="mt-2">
                   <input
-                    value={formData.PurchasedValue}
+                    value={formData.PurchasedValue || 0}
                     id="PurchasedValue"
                     name="PurchasedValue"
+                    required
                     placeholder={`Enter a Purchase value for ${formData.Name ? formData.Name : "Asset" }`}
                     type="number"
                     step={`any`}
@@ -211,7 +212,7 @@ export default function SingleVendorpage({
                 </label>
                 <div className="mt-2">
                   <input
-                    value={formData.Address}
+                    value={formData.PurchsedDate}
                     id="PurchsedDate"
                     name="PurchsedDate"
                     onChange={handleChange}
@@ -231,7 +232,7 @@ export default function SingleVendorpage({
                 </label>
                 <div className="mt-2">
                   <input
-                    value={formData.Account_num}
+                    value={formData.CurrentValue}
                     id="CurrentValue"
                     name="CurrentValue"
                     type="number"
@@ -275,7 +276,7 @@ export default function SingleVendorpage({
                 </label>
                 <div className="mt-2">
                   <input
-                    value={formData.Bank_name}
+                    value={formData.usefulYear}
                     id="usefulYear"
                     name="usefulYear"
                     onChange={handleChange}
@@ -297,7 +298,7 @@ export default function SingleVendorpage({
                 </label>
                 <div className="mt-2">
                   <input
-                    value={formData.Bank_name}
+                    value={formData.vendor}
                     id="vendor"
                     name="vendor"
                     placeholder={`Enter a name of vendor / supplier for ${formData.Name ? formData.Name : "Asset" }`}
