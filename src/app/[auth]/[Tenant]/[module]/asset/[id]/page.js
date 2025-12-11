@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
 
-export default function page({ DecryptedAsset, StoreList,userInfo }) {
+export default function Page({ DecryptedAsset, StoreList,userInfo }) {
   const [Stores] = useState(StoreList);
   const [formData,setFormData] = useState(DecryptedAsset || {});
   const [user] = useState(userInfo);
