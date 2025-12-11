@@ -190,6 +190,7 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                   Status
                 </label>
                 <div className="mt-2">
+                   {!DecryptedAsset.runDepreciation  ? (
                   <select
                     id="status"
                     name="status"
@@ -224,6 +225,14 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                       Disposed
                     </option>
                   </select>
+                   ):(
+                    // show a dive that looks like an input but is disabled
+                    <div
+                    className="block w-full rounded-md bg-gray-100 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm/6"
+                  >
+                    {DecryptedAsset?.status}
+                  </div>
+                  )}
                 </div>
               </div>
 
@@ -285,7 +294,8 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                   Depreciation Rate
                 </label>
                 <div className="mt-2">
-                  <input
+                  {!DecryptedAsset.runDepreciation  ? (
+                    <input
                     // value={formData.depreciationRate.$numberDecimal || 0}
                     value={0}
                     id="depreciationRate"
@@ -301,6 +311,15 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                     autoComplete="depreciationRate"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
+                  ):(
+                    // show a dive that looks like an input but is disabled
+                    <div
+                    className="block w-full rounded-md bg-gray-100 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm/6"
+                  >
+                    {DecryptedAsset?.depreciationRate?.$numberDecimal || 0}
+                  </div>
+                  )}
+                  
                 </div>
               </div>
 
@@ -332,6 +351,7 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                   Currently Valued at
                 </label>
                 <div className="mt-2">
+                   {!DecryptedAsset.runDepreciation  ? (
                   <input
                     value={formData.CurrentValue}
                     id="CurrentValue"
@@ -346,6 +366,14 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                     autoComplete="CurrentValue"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
+                  ):(
+                    // show a dive that looks like an input but is disabled
+                    <div
+                    className="block w-full rounded-md bg-gray-100 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm/6"
+                  >
+                    {DecryptedAsset?.CurrentValue || 0}
+                  </div>
+                  )}
                 </div>
               </div>
 
@@ -377,9 +405,10 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                   htmlFor="usefulYear"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Years of usefulness
+                  Years of usefulness [In months]
                 </label>
                 <div className="mt-2">
+                   {!DecryptedAsset.runDepreciation  ? (
                   <input
                     value={formData.usefulYear}
                     id="usefulYear"
@@ -393,6 +422,14 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                     autoComplete="usefulYear"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
+                   ):(
+                    // show a dive that looks like an input but is disabled
+                    <div
+                    className="block w-full rounded-md bg-gray-100 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm/6"
+                  >
+                    {DecryptedAsset?.usefulYear }
+                  </div>
+                  )}
                 </div>
               </div>
 
