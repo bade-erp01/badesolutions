@@ -13,36 +13,35 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
   const [user] = useState(userInfo);
   const [usersList] = useState(users || [])
   const router = useRouter();
-
-   const [headers] = useState({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-      access: `${Encrypt(userInfo.user._id)}`,
-    });
-
-  const handleChange = (e) => {
-      const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-          ...prev,
-          [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-   
   
-    const handleSubmit = async (e) => {
-      try {
-        e.preventDefault();
-        plsWait("Please wait...");
+  const [headers] = useState({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+    dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+    access: `${Encrypt(userInfo.user._id)}`,
+  });
+  
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+  
+  
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      plsWait("Please wait...");
         const { data } = await axios.patch(
-          `${baseUrl}/api/asset/${Encrypt(formData._id)}`,
+          `${baseUrl}/api/update/asset/${Encrypt(DecryptedAsset._id)}`,
           formData,
           { headers }
         );
   
-        if (data && data.data) {
-          SuccessToast("Asset List updated...");
-          setFormData({})
+        if (data && data.message) {
+          SuccessToast("Asset updated...");
           router.refresh();
         } else {
           throw new Error(data.error);
@@ -296,8 +295,7 @@ export default function Page({ DecryptedAsset, StoreList,userInfo,users,baseUrl 
                 <div className="mt-2">
                   {!DecryptedAsset.runDepreciation  ? (
                     <input
-                    // value={formData.depreciationRate.$numberDecimal || 0}
-                    value={0}
+                    value={formData.depreciationRate.$numberDecimal || 0}
                     id="depreciationRate"
                     name="depreciationRate"
                     required
