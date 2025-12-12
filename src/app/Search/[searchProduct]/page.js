@@ -35,6 +35,7 @@ export default function SearchResultPage({ result, linkData }) {
             "phone",
             "status",
             "ADCcode",
+            "ACDcode",
             "billStatus",
             "crAmount",
             "Accountant",
@@ -61,7 +62,14 @@ export default function SearchResultPage({ result, linkData }) {
             "customer",
             "refNo",
             "transferedDate",
-            "recievedDate"
+            "recievedDate",
+            "ResidualValue",
+            "AssetCode",
+            "SerialNumber",
+            "status",
+            "SerialNumber",
+            "Category",
+            
           ],
         });
 
