@@ -124,7 +124,7 @@ export default async function layout({params}) {
                       <ul className="divide-y divide-gray-700">
                           <li  className="py-3 px-4 text-xs text-italic">
                             <div className="flex justify-between items-center">
-                              <span className="text-italic">Residual Value: 
+                              <span className="text-italic">Write off Value: 
                                 {DecryptedAsset.ResidualValue.$numberDecimal}
                                 </span>
                             </div>
