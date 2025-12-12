@@ -90,12 +90,12 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({formData:Encrypt(formData)}),
       });
 
       const data = await response.json();
 
-      if (data.message) {
+      if (response.ok && data.Newcustomer) {
         dispatch(loginSuccess({ user: Dencrypt(data.Newcustomer), business: data.Tenant, SessionId:data.SessionId}));
         // reset the form
         SuccessToast('Login successful')
