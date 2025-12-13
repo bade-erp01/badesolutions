@@ -6,7 +6,8 @@ import Card from "@/app/Components/Card";
 import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { Encrypt } from "../../../../../../Functions/Functions";
-import {ChartPieIcon,  UserGroupIcon,ShoppingCartIcon,ClipboardDocumentCheckIcon,PlusCircleIcon } from "@heroicons/react/24/outline";
+import {ChartPieIcon, ShoppingBagIcon, UserGroupIcon,ShoppingCartIcon,ClipboardDocumentCheckIcon,PlusCircleIcon } from "@heroicons/react/24/outline";
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -152,7 +153,7 @@ export default async function storelayout({ children, params }) {
                   )}/purchase/Forms/purchase`}
                   className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
-                  <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
+                  <ShoppingBagIcon className="h-6 w-6 text-gray-100" />
                  <span className="text-xs">Purchase Order</span>
                 </Link>
 
