@@ -39,7 +39,7 @@ export default function Tenanterror({ error }) {
           </h1>
           <div className="bg-gray-50 rounded p-4 mb-6">
             <p className="text-sm font-mono text-gray-600">
-              {error.message}
+             Sorry, We couldn’t complete your request. Please refresh the page or contact support if it continues.
             </p>
           </div>
           
