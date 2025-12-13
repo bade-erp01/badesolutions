@@ -102,7 +102,7 @@ export default async function storelayout({ children, params }) {
               className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
             >
               <PlusCircleIcon className="h-6 w-6 text-gray-100"/>
-              <small>New Store</small>
+              <span className="text-xs">New Store</span>
             </Link>
           )}
           
@@ -121,7 +121,7 @@ export default async function storelayout({ children, params }) {
                     aria-hidden="true"
                     className="h-6 w-6 text-gray-100"
                   />
-                  <small>Vendors Management</small>
+                  <span className="text-xs">Vendors Management</span>
                 </Link>
             </>
           )}
@@ -135,11 +135,25 @@ export default async function storelayout({ children, params }) {
                     .replace(/\s+/g, "-")
                     .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                     userData?.user._id
+                  )}/Transit/Forms/Transit`}
+                  className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
+                  <span className="text-xs">Purchase Request</span>
+                </Link>
+
+
+                <Link
+                  href={`/${userData.business?.companyName
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                    userData?.user._id
                   )}/purchase/Forms/purchase`}
                   className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
-                  <small>Purchase Requests</small>
+                 <span className="text-xs">Purchase Order</span>
                 </Link>
 
                 <Link
@@ -152,7 +166,7 @@ export default async function storelayout({ children, params }) {
                   className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <ClipboardDocumentCheckIcon className="h-6 w-6 text-gray-100" />
-                  <small>Product Transfer Request</small>
+                  <span className="text-xs">Product Transfer</span>
                 </Link>
             </>
           )}
