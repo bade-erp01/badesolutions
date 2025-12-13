@@ -410,17 +410,30 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
           )}
 
           {/* Submit Section */}
+          <div>
           {user.user.AssetManager && DecryptedAsset.status === "Running" && (
             <div className="border-t pt-6 flex flex-col gap-3">
               <p className="text-xs text-gray-600 italic">📅 Depreciation runs on the 1st of every month</p>
               <button
                 type="submit"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-indigo-600 text-xs text-white font-semibold shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition"
+                className="px-6 py-2.5 rounded-lg bg-indigo-600 text-xs text-white font-semibold shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition"
               >
                 Save Changes
               </button>
             </div>
           )}
+
+          {user.user.AssetManager && DecryptedAsset.status !== "Running" && DecryptedAsset.AcivityLog.length === 0 && (
+            <div className="border-t pt-6 flex flex-row gap-3">
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-lg bg-red-600 text-xs text-white font-semibold shadow-md hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition"
+              >
+                Delete Asset
+              </button>
+            </div>
+           )} 
+          </div>
         </form>
       </div>
     </div>
