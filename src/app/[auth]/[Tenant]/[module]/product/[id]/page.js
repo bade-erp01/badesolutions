@@ -223,10 +223,12 @@ export default function SingleProductpage({
           <div className="flex flex-wrap gap-8 items-center py-4">
             {/* Avatar */}
             <div className="flex items-center space-x-6">
-              <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
+              <div  onClick={() => {
+                    uploadFiles(Encrypt(data._id), "product");
+                  }} className="w-28 h-28 rounded overflow-hidden flex items-center justify-center">
                 <Image
-                  height={60}
-                  width={60}
+                  height={70}
+                  width={70}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
                   className="w-full h-full object-cover"
@@ -235,17 +237,7 @@ export default function SingleProductpage({
                   quality={100}
                 />
               </div>
-              <div>
-                <span
-                  onClick={() => {
-                    uploadFiles(Encrypt(data._id), "product");
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition"
-                >
-                  <PhotoIcon className="h-5 w-5" />
-                  <span className="text-sm font-medium">Upload</span>
-                </span>
-              </div>
+              
             </div>
 
             {/* Divider */}
@@ -1276,7 +1268,8 @@ export default function SingleProductpage({
                   placeholder="Enter your text here..."
                 />
               </div>
-              {/* store product  */}
+              {/* only show table if storeProduct is more than 0 */}
+              {storeProducts.length > 0 && (
               <table className="w-full text-left text-xs text-black border border-gray-300">
                 <caption className="text-start font-bold text-sm text-gray-600">
                   {data.Name} In Store Inventory
@@ -1301,7 +1294,7 @@ export default function SingleProductpage({
                     )}
                   </tr>
                 </thead>
-                <tbody>
+                  <tbody>
                   {StoreProduct?.map((log, index) =>
                     log.products.map((product, pIndex) => (
                       <tr
@@ -1360,6 +1353,7 @@ export default function SingleProductpage({
                   )}
                 </tbody>
               </table>
+                )}
 
               {/* Price change */}
               <div className="mt-10">
@@ -1421,7 +1415,7 @@ export default function SingleProductpage({
                 {user.editProduct && (
                   <button
                     type="submit"
-                    className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus-visible:outline-indigo-600 transition"
+                    className="rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-gray-500 focus-visible:outline-gray-600 transition"
                   >
                     Update {formData.Name}
                   </button>

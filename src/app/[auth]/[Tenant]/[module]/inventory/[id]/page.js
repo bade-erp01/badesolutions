@@ -66,7 +66,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
             {storeProduct.productName}
         </h2>
         {/* Product Image */}
-        <div className="w-full flex justify-center mb-6">
+        <div className="w-full flex justify-center ">
           <Image
               src={storeProduct.image || "/preview.png"}
               alt="Product Image"

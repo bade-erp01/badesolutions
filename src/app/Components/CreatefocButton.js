@@ -32,7 +32,7 @@ const CreateFocButton =  ({ productId, business,user }) => {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${business.tenantId}`,
-            'X-Requested-With': 'XMLHttpRequest',
+            // 'X-Requested-With': 'XMLHttpRequest',
             dbconnect: `Bearer ${business.rustyRoof}`,
             access: `${Encrypt(user._id)}`
           }
@@ -55,7 +55,7 @@ const CreateFocButton =  ({ productId, business,user }) => {
   };
 
   return (
-    <span title='Create Free od charge copy for this product' aria-label='Foc' onClick={CreateFoc} className="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700">
+    <span title='Create Free od charge copy for this product' aria-label='Foc' onClick={CreateFoc} className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
       Create FOC Product
     </span>
   );
