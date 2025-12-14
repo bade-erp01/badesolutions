@@ -112,7 +112,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
           <label className="block mb-3">
             <div className="text-sm text-white/70 mb-1">Status</div>
             <div className="flex flex-wrap gap-2">
-              {["", "Draft", "approved", "Rejected", "POSTED TO WAREHOUSE"].map((s) => (
+              {[ "Draft", "Pending", "Converted"].map((s) => (
                 <button
                   key={s}
                   onClick={() => {
