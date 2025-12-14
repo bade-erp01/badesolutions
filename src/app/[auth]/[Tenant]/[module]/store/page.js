@@ -107,7 +107,7 @@ export default async function storelayout({ children, params }) {
             </Link>
           )}
           
-          
+
           {(userData?.user?.raiseLpo || userData?.user?.editVendor) && (
             <>
                 <Link
@@ -137,7 +137,7 @@ export default async function storelayout({ children, params }) {
                     .replace(/\s+/g, "-")
                     .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                     userData?.user._id
-                  )}/Transit/Forms/Transit`}
+                  )}/transit/transit`}
                   className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
