@@ -1268,6 +1268,7 @@ export default function SingleProductpage({
                   placeholder="Enter your text here..."
                 />
               </div>
+              
               {/* only show table if storeProduct is more than 0 */}
               {StoreProduct.length > 0 && (
               <table className="w-full text-left text-xs text-black border border-gray-300">
