@@ -231,13 +231,12 @@ export default function SingleProductpage({
                   width={70}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover shadow-lg"
                   loading="eager"
                   priority={true}
                   quality={100}
                 />
               </div>
-              
               
             </div>
 
