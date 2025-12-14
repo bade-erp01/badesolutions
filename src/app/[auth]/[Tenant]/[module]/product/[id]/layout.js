@@ -94,6 +94,7 @@ export default async function layout({ params, children }) {
           <h2 className="text-lg font-bold mb-4">Product Management</h2>
           <hr />
           <nav className="space-y-4">
+            <BackButton/>
             {userInfo?.user?.createProduct && (
               <Link
                 href={`/${userInfo.business.companyName
@@ -108,7 +109,6 @@ export default async function layout({ params, children }) {
                 <span className="text-xs">New Product</span>
               </Link>
             )}
-            <BackButton/>
           </nav>
         </aside>
 
