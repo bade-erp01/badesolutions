@@ -213,9 +213,9 @@ export default function SingleProductpage({
               {data.Name.charAt(0).toUpperCase() + data.Name.slice(1)}&apos;
             </h4>
             <span
-              className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200`}
+              className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-gray-700 border-indigo-200`}
             >
-              Total sold: {data.TotalSale}
+              {formData.ADCcode || formData.ACDcode}
             </span>
           </div>
 
@@ -1268,7 +1268,7 @@ export default function SingleProductpage({
                   placeholder="Enter your text here..."
                 />
               </div>
-              
+
               {/* only show table if storeProduct is more than 0 */}
               {StoreProduct.length > 0 && (
               <table className="w-full text-left text-xs text-black border border-gray-300">
