@@ -79,23 +79,21 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
           <BackButton />
           <hr className=" border-white/10" />
           {/* link to vendors */}
-           {userData?.user?.allowInternalTransfers || userData?.user?.raiseLpo &&(
-             <Link
-                  href={`/${userData.business?.companyName
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")
-                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                    userData?.user._id
-                  )}/vendor/vendor`}
-                  className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <UserGroupIcon
-                    aria-hidden="true"
-                    className="h-6 w-6 text-gray-100"
-                  />
-                  <span className="text-xs">Vendors Management</span>
-                </Link>
-           )}
+           {(userData?.user?.allowInternalTransfers || userData?.user?.raiseLpo) && (
+            <Link
+                href={`/${userData.business?.companyName
+                ?.toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData?.user?._id)}/vendor/vendor`}
+                className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+            >
+                <UserGroupIcon
+                aria-hidden="true"
+                className="h-6 w-6 text-gray-100"
+                />
+                <span className="text-xs">Vendors Management</span>
+            </Link>
+            )}
           <br/>
           <div className="flex items-center gap-2 mb-4">
             <FunnelIcon className="h-5 w-5 text-white/60" />
