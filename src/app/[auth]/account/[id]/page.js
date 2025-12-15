@@ -106,7 +106,7 @@ export default function BusinessDatas({ data, userInfo }) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${userInfo.business.tenantId}`,
-      "X-Requested-With": "XMLHttpRequest",
+      // "X-Requested-With": "XMLHttpRequest",
       dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
     },
   };

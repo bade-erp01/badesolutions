@@ -4,6 +4,7 @@ import {
   CalculatorIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import {totalInWords} from "../../../Functions/Functions"
 import Image from "next/image";
 import { useRef, useState } from "react";
 import {
@@ -30,7 +31,7 @@ ChartJS.register(
   Title
 );
 
-function CustomerCategoryPieChart({ customersList, invoiceList }) {
+function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
   const pieRef = useRef(null);
   const [customers] = useState(customersList || []);
   const [invoice] = useState(invoiceList || []);
@@ -99,6 +100,11 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
   return (
    <section className="sm:p-10 mx-auto max-w-6xl transition-all duration-700">
       {/* Summary Cards */}
+      <div className="text-right">
+        <span className="text-xs text-gray-900 tracking-tight mb-1">
+           Total Debt: {totalInWords(customers.filter((c) => c.Debt > 0).reduce((acc, curr) => acc + curr.Debt, 0), userData.business.currency?.currency )}
+        </span>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {[
           {
@@ -115,7 +121,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList }) {
           },
           {
             title: "Total Debt",
-            value: `₦${customers
+            value: `${userData.business.currency?.currency.Symbol}${customers
               .filter((c) => c.Debt > 0)
               .reduce((acc, curr) => acc + curr.Debt, 0)
               .toLocaleString()}`,

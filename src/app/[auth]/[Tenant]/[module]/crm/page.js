@@ -34,7 +34,7 @@ export default async function CustomerListpage({ params }) {
         {/* Dashboard */}
         {userData.user.c_levelDash && (
           <div className="shadow-xl bg-white/60 backdrop-blur-md transition-all duration-700 mb-5">
-            <CustomerCategoryPieChart customersList={customerListWithImages} />
+            <CustomerCategoryPieChart customersList={customerListWithImages} userData={userData} />
           </div>
         )}
 
