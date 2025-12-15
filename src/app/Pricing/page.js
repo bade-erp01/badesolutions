@@ -88,10 +88,14 @@ export default function Pricing() {
                         </button>
                         <ul className="text-sm text-gray-300 mt-4 space-y-2">
                             <li>Trained Business AI Model</li>
-                            <li>Email support</li>
                             <li>Private Cloud Backup</li>
                             <li>Api Support for Financial / Reporting Tools</li>
                             <li>Request Customized module</li>
+                            <li>5G Wifi router (Aitel,MTN,Glo)</li>
+                            <li>Google S.E.O</li>
+                            <li>Dedicated storage Bucket</li>
+                            <li>Basic Deployment Support</li>
+                            <li>1 Customized Business Email</li>
                         </ul>
                     </div>
                     {/* Pro Plan */}
