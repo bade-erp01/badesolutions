@@ -125,7 +125,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
               .filter((c) => c.Debt > 0)
               .reduce((acc, curr) => acc + curr.Debt, 0)
               .toLocaleString()}`,
-            icon: < CalculatorIcon className="h-6 w-6 text-red-500" />,
+            icon: < CalculatorIcon className="h-6 w-6 text-gray-300" />,
             bg: "bg-[#09090b]",
             textColor: "text-red-400",
           },
@@ -304,7 +304,7 @@ function summarizeCustomerInvoices(customers, invoices) {
             <div style="text-align:center;">
               <strong>${customer.username}</strong><br/>
               <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:30px;height:auto;border-radius:4px;margin-top:4px;" />
-              <div style="margin-top:6px;">Debt: ₦${customer.totalAmount.toLocaleString()}</div>
+              <div style="margin-top:6px;">Debt: ${userData.business.currency?.currency.Symbol}${customer.totalAmount.toLocaleString()}</div>
             </div>
           `;
 
