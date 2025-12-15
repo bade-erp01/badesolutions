@@ -16,7 +16,7 @@ export async function generateMetadata() {
 
   return {
     title: `${businessInfo.companyName} | Business Automation & AI Solutions`,
-    description: `Discover how ${businessInfo.companyName} helps enterprises automate workflows, optimize processes, and scale operations with AI-powered business solutions.`,
+    description: `Discover how Business Automated Dynamic Enterprise helps enterprises automate workflows, optimize processes, and scale operations with AI-powered business solutions.`,
     keywords: [
       businessInfo.companyName,
       "Business Automation",
@@ -53,7 +53,7 @@ export async function generateMetadata() {
       card: "summary_large_image",
       title: `${businessInfo.companyName} | AI Business Automation`,
       description: "Automate, optimize, and scale your enterprise with cutting-edge AI business solutions.",
-      images: ["/assets/bade.png"],
+      images: [`${businessInfo.companyLogo}`],
       creator: "@YourTwitterHandle", // optional if you have one
     },
     favicon: "/favicon.ico",
