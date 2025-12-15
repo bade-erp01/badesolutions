@@ -99,7 +99,7 @@ export const showDeliveryModal = (id, user, business) => {
           'Content-Type': 'application/json',
           dbConnect: `Bearer ${business.rustyRoof}`,
           Authorization: `Bearer ${business.tenantId}`,
-          access: `${Dencrypt(user._id)}`,
+          // access: `${Dencrypt(user._id)}`,
         },
         body: JSON.stringify(deliveryData)
       }).then(response => {
