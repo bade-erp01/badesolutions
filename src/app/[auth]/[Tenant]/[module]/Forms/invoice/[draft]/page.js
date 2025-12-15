@@ -544,84 +544,89 @@ const generatePdf = async (business, customer, bill) => {
           >
             {Singlebill.billStatus}
           </span>
+          <div className="text-right">
+            <span className="text-xs text-gray-900 tracking-tight mb-1">
+              Created at: {moment(Singlebill.createdAt).format("dddd DD MMMM YYYY [at] HH:mm")}
+            </span>
+            </div>
         </div>
 
         {/* Company + Customer Info */}
-        <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
-          <div className="flex items-start gap-6 w-full md:w-auto">
-            <Image
-              src={userInfo.business.companyLogo}
-              width={90}
-              height={90}
-              alt="logo"
-            />
-            <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                {userInfo.business.companyName}
+          <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
+            <div className="flex items-start gap-6 w-full md:w-auto">
+              <Image
+                src={userInfo.business.companyLogo}
+                width={90}
+                height={90}
+                alt="logo"
+              />
+              <div className="text-sm text-gray-700 space-y-1">
+                <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            {userInfo.business.companyName}
+                </h3>
+                <p className="text-gray-500">{userInfo.business.email}</p>
+                <p className="text-gray-500">{userInfo.business.Tel}</p>
+                <p className="text-gray-500">{userInfo.business.Address}</p>
+                <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
+                <h2
+            className={`mt-3 font-bold text-base ${
+              isCancelled ? "text-red-600" : "text-gray-800"
+            }`}
+                >
+            {Singlebill.billStatus.toUpperCase()} /{" "}
+            {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
+                </h2>
+                <h2 className=" mb-2 text-lg font-bold text-indigo-700 tracking-wide">
+            {Singlebill.WayBillNo}
+                </h2>
+              </div>
+            </div>
+
+            <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
+              <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+                {Singlebill.customerName?.toUpperCase()}
               </h3>
-              <p className="text-gray-500">{userInfo.business.email}</p>
-              <p className="text-gray-500">{userInfo.business.Tel}</p>
-              <p className="text-gray-500">{userInfo.business.Address}</p>
-              <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
-              <h2
-                className={`mt-3 font-bold text-base ${
-                  isCancelled ? "text-red-600" : "text-gray-800"
-                }`}
-              >
-                {Singlebill.billStatus.toUpperCase()} /{" "}
-                {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
-              </h2>
-              <h2 className=" mb-2 text-lg font-bold text-indigo-700 tracking-wide">
-                {Singlebill.WayBillNo}
-              </h2>
+              <p>
+                <span className="mr-1">📌</span>
+            {Singlebill.customer.billingAddress?.slice(0,30) || "N/A"}
+              </p>
+              <p>
+                <span className="mr-1">✉️</span>
+                <a
+            href={`mailto:${Singlebill.customer.Email}`}
+            className="hover:underline text-indigo-700"
+                >
+            {Singlebill.customer.Email || "N/A"}
+                </a>
+              </p>
+              <p>
+                <span className="mr-1">🗓️</span>
+                {moment(Singlebill.startDate).format("YYYY-MM-DD")}
+              </p>
             </div>
           </div>
 
-          <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
-            <h3 className="text-xl font-bold text-gray-900 tracking-tight">
-              {Singlebill.customerName?.toUpperCase()}
-            </h3>
-            <p>
-              <span className="mr-1">📌</span>
-                {Singlebill.customer.billingAddress?.slice(0,30)}
-            </p>
-            <p>
-              <span className="mr-1">✉️</span>
-              <a
-                href={`mailto:${Singlebill.customer.Email}`}
-                className="hover:underline text-indigo-700"
-              >
-                {Singlebill.customer.Email}
-              </a>
-            </p>
-            <p>
-              <span className="mr-1">🗓️</span>
-              {new Date(Singlebill.startDate).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-          {/* CheckOut Button */}
-          <div className="flex justify-evenly items-center gap-4">
-           {(
-              (!userInfo.business.InvoiceRestriction &&
-                user._id === Singlebill.invoicerId &&
-                user.raiseInvoice &&
-                Singlebill.billStatus.toLowerCase() === "draft") ||
-              (userInfo.business.InvoiceRestriction &&
-                user._id === Singlebill.invoicerId &&
-                user.raiseInvoice &&
-                Singlebill.billStatus.toLowerCase() === "draft" &&
-                isOlderThan24Hours)
-            ) && (
-              <button
-                title="Process this draft to order"
-                onClick={processInvoice}
-                className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-green-300 text-white font-semibold hover:shadow-xl hover:bg-green-500 transition duration-200 ease-in-out"
-              >
-                <ShoppingCartIcon className="h-6 w-6 text-gray-500" />
-                <span className="text-gray-500">CheckOut Draft</span>
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+            {/* CheckOut Button */}
+                  <div className="flex justify-evenly items-center gap-4">
+                   {(
+                    (!userInfo.business.InvoiceRestriction &&
+                    user._id === Singlebill.invoicerId &&
+                    user.raiseInvoice &&
+                    Singlebill.billStatus.toLowerCase() === "draft") ||
+                    (userInfo.business.InvoiceRestriction &&
+                    user._id === Singlebill.invoicerId &&
+                    user.raiseInvoice &&
+                    Singlebill.billStatus.toLowerCase() === "draft" &&
+                    isOlderThan24Hours)
+                  ) && (
+                    <button
+                    title="Process this draft to order"
+                    onClick={processInvoice}
+                    className="px-5 py-1.5 rounded-sm font-semibold text-base tracking-wide shadow-lg border bg-green-100 text-gray-900 border-green-300 inline-flex items-center justify-center hover:bg-green-200 hover:shadow-xl hover:border-green-400 transition duration-200 ease-in-out"
+                    >
+                    <ShoppingCartIcon className="h-4 w-4 text-gray-900" />
+                <span className="text-gray-500">CheckOut </span>
               </button>
             )}          
 
