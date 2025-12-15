@@ -55,7 +55,7 @@ const CreateFocButton =  ({ productId, business,user }) => {
   };
 
   return (
-    <span title='Create Free od charge copy for this product' aria-label='Foc' onClick={CreateFoc} className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+    <span title='Create Free of charge copy for this product' aria-label='Foc' onClick={CreateFoc} className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700">
       Create FOC Product
     </span>
   );

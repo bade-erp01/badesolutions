@@ -36,13 +36,20 @@ const ScheduledActivity = ({ Sales,customerName }) => {
   );
 
   const exportToCSV = () => {
-    const headers = ['INV No', 'Status', 'Date', 'Total'];
-    const rows = filteredSales.map((inv) => [
+    const headers = ['INV No', 'Status', 'Date', 'Customer', 'Product', 'Qty', 'Pcs', 'Price', 'Total'];
+    const rows = filteredSales.flatMap((inv) =>
+      inv.orders?.map((order) => [
       inv.billReferenceNo,
       inv.billStatus,
       moment(inv.startDate).format('YYYY-MM-DD'),
-      inv.grandTotal
-    ]);
+      inv.customerName,
+      order.item.Name,
+      order.Qty,
+      order.pcsReq,
+      order.priceListPrice,
+      order.total
+      ]) || []
+    );
 
     const csvContent =
       [headers, ...rows]
@@ -50,7 +57,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
         .join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, `${customerName}.csv`);
+    saveAs(blob, `${customerName} dump.csv`);
   };
 
   return (
@@ -60,7 +67,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <input
           type="search"
-          placeholder="Search INV No or Customer"
+          placeholder="Search INV No"
           className="px-3 py-2 border rounded w-full"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -96,7 +103,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
            <React.Fragment key={idx}>
               <details className="bg-white rounded-lg shadow overflow-x-auto text-xs">
                 <summary className="px-2 py-2 cursor-pointer hover:bg-gray-50 ">
-                    {inv.billReferenceNo} - [{moment(inv.startDate).format('MMM D, YYYY')}] - {inv.grandTotal.toLocaleString()}
+                   {inv.billStatus.toUpperCase().slice(0, 3)}/{inv.billReferenceNo} - [{moment(inv.startDate).format('MMM D, YYYY')}] - {inv.grandTotal.toLocaleString()}
                 </summary>
                 <tr>
                   <td colSpan="4" className="px-4 py-2 bg-gray-50">
@@ -139,9 +146,9 @@ const ScheduledActivity = ({ Sales,customerName }) => {
         </span>
         <span
           onClick={exportToCSV}
-          className="ml-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+          className="ml-4 px-4 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
         >
-          Export CSV
+          Export dump CSV
         </span>
       </div>
     </section>
