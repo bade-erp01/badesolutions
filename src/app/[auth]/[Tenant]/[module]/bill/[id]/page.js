@@ -608,6 +608,11 @@ export default function InvoicePage({
           >
             {Singlebill.billStatus}
           </span>
+           <div className="text-right">
+              <span className="text-xs text-gray-900 tracking-tight mb-1">
+                  Created on: {moment(Singlebill.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
+              </span>
+            </div>
         </div>
 
         {/* Company + Customer Info */}
