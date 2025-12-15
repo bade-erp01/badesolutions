@@ -20,10 +20,10 @@ import axios from "axios"
 import moment from "moment";
 import { useRouter, useParams } from "next/navigation";
 import {
-  AtSymbolIcon,
   ArrowPathRoundedSquareIcon,
   PrinterIcon,
   ArrowUturnLeftIcon,
+  TruckIcon
 } from "@heroicons/react/24/solid";
 
 export default function InvoicePage({
@@ -682,43 +682,15 @@ export default function InvoicePage({
 
         {/* Print Button */}
         <div className="flex justify-end mb-6">
-          {/* send bill via mail */}
-          <button
-            title={`Send via Mail ${Singlebill.billStatus}`}
-            onClick={async () => {
-              plsWait("Sending Mail");
-              const api = `${EXPRESS_PRIVATE_URL}/api/sendmail/${Encrypt(Singlebill._id)}/${userInfo.user.firstName}`;
-
-              const request = await fetch(api, {
-                method: "GET",
-                headers: {
-                  "content-type": "application/json",
-                  dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-                  access: `${Encrypt(userInfo.user._id)}`,
-                },
-              });
-              const response = await request.json();
-
-              if (response.message) {
-                SuccessToast(response.message);
-                Router.refresh();
-              }
-              if (response.error) ErrorMessage(response.error);
-            }} // Replace with your email sending function
-            className="mr-1 group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-50 to-white text-gray-800 font-semibold border border-blue-200 hover:shadow-lg hover:border-blue-400 hover:text-blue-700 transition duration-200 ease-in-out"
-          >
-            <AtSymbolIcon className="w-7 h-7 text-gray-400" />
-            <span>Mail {Singlebill.billStatus}</span>
-          </button>
-
+         
           {Singlebill.billStatus?.toUpperCase() !== "CANCELLED" &&
             userInfo.user.cancelInvoice && (
               <button
                 title={`Cancel and return SKU in ${Singlebill.billStatus}`}
                 onClick={() => cancelSales(Singlebill._id)}
-                className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-red-500 transition duration-200 ease-in-out mr-2 hover:bg-red-600 text-white font-semibold border border-red-400 hover:shadow-lg"
+                className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-red-500 transition duration-200 ease-in-out mr-2 hover:bg-red-600 text-white font-semibold border border-red-400 hover:shadow-lg"
               >
-                < ArrowUturnLeftIcon className="w-7 h-7 text-white" />
+                < ArrowUturnLeftIcon className="w-5 h-5 text-white" />
                 <span>
                   Cancel {Singlebill.billStatus}/{Singlebill.billReferenceNo}
                 </span>
@@ -727,7 +699,7 @@ export default function InvoicePage({
 
           {Singlebill.billStatus?.toUpperCase() === "ORDER" && (
             <button
-              title={`Cancel and return SKU in ${Singlebill.billStatus}`}
+              title={`Convert ${Singlebill.billStatus} to Invoice and Generate WayBill`}
               onClick={() =>
                 showDeliveryModal(
                   Singlebill._id,
@@ -735,8 +707,9 @@ export default function InvoicePage({
                   userInfo.business
                 )
               }
-              className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-blue-500 transition duration-200 ease-in-out mr-2 hover:bg-blue-600 text-white font-semibold border border-blue-400 hover:shadow-lg"
+               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
             >
+               <TruckIcon className="w-5 h-5 text-gray-100" />
               <span>Generate WayBill</span>
             </button>
           )}
@@ -747,9 +720,9 @@ export default function InvoicePage({
               onClick={() => {
                 printWayBill(userInfo.business, Singlebill.customer, Singlebill);
               }}
-              className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-blue-200 transition duration-200 ease-in-out mr-2 hover:bg-blue-600 text-white font-semibold border border-blue-400 hover:shadow-lg"
+               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
             >
-              <PrinterIcon className="w-7 h-7 text-gray-700" />
+              <PrinterIcon className="w-5 h-5 text-gray-100" />
               <span>Print WB/{Singlebill.WayBillNo}</span>
             </button>
           )}
@@ -759,9 +732,9 @@ export default function InvoicePage({
               <button
               title={`Re-Bill ${Singlebill.billReferenceNo}`}
               onClick={Rebill}
-              className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-green-200 transition duration-200 ease-in-out mr-2 hover:bg-green-600 font-semibold"
+              className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-green-200 transition duration-200 ease-in-out mr-2 hover:bg-green-600 font-semibold"
             >
-              <ArrowPathRoundedSquareIcon className="w-7 h-7 text-gray-700" />
+              <ArrowPathRoundedSquareIcon className="w-5 h-5 text-gray-700" />
               <span>Recycle</span>
             </button> 
            )}
@@ -769,9 +742,9 @@ export default function InvoicePage({
           <button
             title={`Download and Print ${Singlebill.billStatus}`}
             onClick={() => generatePdf(userInfo.business, Singlebill.customer, Singlebill)}
-            className="group inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-orange-50 to-white text-gray-800 font-semibold border border-orange-200 hover:shadow-lg hover:border-orange-400 hover:text-orange-700 transition duration-200 ease-in-out"
+            className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
           >
-            <PrinterIcon className="w-7 h-7 text-gray-700" />
+            <PrinterIcon className="w-5 h-5 text-gray-100" />
             <span>Print {Singlebill.billStatus}</span>
           </button>
         </div>

@@ -7,6 +7,7 @@ import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import Footer2 from "@/app/Components/Footer2";
+import MailAndWhatsapp from "@/app/Components/MailAndWhatsapp";
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -131,6 +132,10 @@ async function StoreLayoutContent({ params }) {
           }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}
          </ul>
         </div>
+        <span className="text-xs">Send Options</span>
+        <br />
+        <hr/>
+        <MailAndWhatsapp baseUrl={process.env.EXPRESS_PRIVATE_URL} billId={Inv._id} firstName={userInfo.user.firstName} userId={userInfo.user._id} businessToken={userInfo.business.rustyRoof} />
       </nav>
      </aside>
 
