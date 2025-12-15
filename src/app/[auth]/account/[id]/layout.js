@@ -10,6 +10,57 @@ import Footer2 from '@/app/Components/Footer2';
 import Business from "../../../../../models/Business";
 import { notFound } from 'next/navigation';
 
+export async function generateMetadata() {
+  const userData = await fetchUser();
+  const businessInfo = userData.business;
+
+  return {
+    title: `${businessInfo.companyName} | Business Automation & AI Solutions`,
+    description: `Discover how ${businessInfo.companyName} helps enterprises automate workflows, optimize processes, and scale operations with AI-powered business solutions.`,
+    keywords: [
+      businessInfo.companyName,
+      "Business Automation",
+      "Enterprise Solutions",
+      "AI-powered Business",
+      "Workflow Optimization",
+      "Process Automation",
+      "Digital Transformation",
+      "Business Scalability",
+      "AI Business Tools",
+      "Operational Efficiency",
+    ],
+    author: businessInfo.companyName,
+    robots: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+    viewport: "width=device-width, initial-scale=1",
+    themeColor: "#f4a8ff",
+    openGraph: {
+      title: `${businessInfo.companyName} | Next-Level Business Automation`,
+      description: `Streamline your enterprise with AI-driven automation, real-time insights, and scalable solutions.`,
+      url: "https://badesolutions.com.ng",
+      siteName: businessInfo.companyName,
+      type: "website",
+      locale: "en_US",
+      images: [
+        {
+          url: "/assets/bade.png",
+          width: 1200,
+          height: 630,
+          alt: `${businessInfo.companyName} Logo`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${businessInfo.companyName} | AI Business Automation`,
+      description: "Automate, optimize, and scale your enterprise with cutting-edge AI business solutions.",
+      images: ["/assets/bade.png"],
+      creator: "@YourTwitterHandle", // optional if you have one
+    },
+    favicon: "/favicon.ico",
+  };
+}
+
+
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
