@@ -42,7 +42,7 @@ export async function generateMetadata() {
       locale: "en_US",
       images: [
         {
-          url: "/assets/bade.png",
+          url: `${businessInfo.companyLogo}`,
           width: 1200,
           height: 630,
           alt: `${businessInfo.companyName} Logo`,
