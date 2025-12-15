@@ -748,11 +748,11 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         </h4>
         <span
           className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${cust.Debt < 0
-              ? "text-sm text-yellow-700 bg-purple-300 border border-purple-600 rounded-md px-4 py-2"
-              : "text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2"
+              ? "text-md text-gray-700 bg-purple-100 border border-purple-600 rounded-full px-4 py-2"
+              : "text-md text-red-700 bg-yellow-100 border border-red-300 rounded-full px-4 py-2"
             }`}
         >
-         Balance: {cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+          {cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
         </span>
       </div>
 
