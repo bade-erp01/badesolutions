@@ -108,7 +108,7 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
           .toLowerCase()
           .replace(/\s+/g, "-")
           .replace(/[^a-z0-9-]/g, "");
-
+console.log("here")
         const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(data.Newcustomer._id)}`;
         // Redirect using Next.js router
         router.push(dashboardUrl);
