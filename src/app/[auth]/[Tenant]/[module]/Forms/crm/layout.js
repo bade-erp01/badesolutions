@@ -35,7 +35,9 @@ export const metadata = {
 export default async function crmLayout({ params }) {
   const userData = await fetchUser();
   const moduleParams = params;
-  const salesperson = await EMPLOYEES.findByTenant(userData.business.tenantId).lean();
+  const Stringedsalesperson = await EMPLOYEES.findByTenant(userData.business.tenantId).select("firstName lastName _id ").lean();
+  const paresedSalesperson = JSON.parse(JSON.stringify(Stringedsalesperson));
+
 
   return (
     <div className="flex flex-col h-screen">
@@ -57,8 +59,8 @@ export default async function crmLayout({ params }) {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6">
-            <NewCustomerForm userData={userData} businessData={userData.business} salesperson={salesperson} />
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-1">
+            <NewCustomerForm userData={userData} businessData={userData.business} salesperson={paresedSalesperson} />
           </section>
         </main>
       </div>

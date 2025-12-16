@@ -98,7 +98,7 @@ export default async function Productlayout({ children, params }) {
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg relative z-10 max-h-[83dvh] overflow-y-auto">
             {/* {children} */}
              <ProductForm EXPRESS_PRIVATE_URL={baseUrl} userData={userData.user} businessData={userData.business} VendorList={VendorList}/>
           </section>

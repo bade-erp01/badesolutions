@@ -47,7 +47,6 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Use a single config object for axios
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -69,8 +68,8 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
       if (data.Message) {
         SuccessToast(data.Message);
-        setFormData({}); // Clear form safely
-        router.refresh(); // Refresh UI
+        setFormData({});
+        router.refresh();
       } else {
         throw new Error(data.error || "Unexpected error occurred.");
       }
@@ -79,470 +78,241 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
     }
   };
 
-  return (
-    <>
-      <div className="m-5 p-4 shadow-2xl border-lg border-2-black bg-white">
-        <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
-          <div className="border-b bg- border-gray-900/10 pb-12">
-            <h2 className="text-base/7 font-semibold text-gray-900">
-              Product Information
-            </h2>
-            <p className="mt-1 text-sm/6 text-gray-600">
-              Ensure to provide correct Information.
-            </p>
+  const inputClass = "block w-full rounded-md bg-white px-2.5 py-1 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 transition-colors";
+  const labelClass = "block text-xs font-semibold text-gray-700 mb-1.5";
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="Name"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Name
-                </label>
-                <div className="mt-2">
+  return (
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <form className="space-y-0" onSubmit={handleSubmit}>
+          {/* Header Section */}
+          <div className="bg-gray-700 px-8 py-6">
+            <h2 className="text-2xl font-bold text-white">Create Product</h2>
+            <p className="text-indigo-100 text-sm mt-1">Ensure to provide correct information for your product</p>
+          </div>
+
+          {/* Form Content */}
+          <div className="px-8 py-8">
+            {/* Basic Information Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Product Information</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Name */}
+                <div>
+                  <label htmlFor="Name" className={labelClass}>Product Name</label>
                   <input
                     id="Name"
                     name="Name"
                     type="text"
                     required
                     onChange={handleChange}
-                    autoComplete="Name-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="e.g., Product Name"
                   />
                 </div>
-              </div>
 
-              {/* <div className="sm:col-span-3">
-                <label
-                  htmlFor="product_code"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Product Code
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="product_code"
-                    required
-                    name="product_code"
-                    type="text"
-                    onChange={handleChange}
-                    autoComplete="family-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div> */}
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="category"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Product category
-                </label>
-                <div className="mt-2">
+                {/* Category */}
+                <div>
+                  <label htmlFor="category" className={labelClass}>Category</label>
                   <input
                     id="category"
                     name="category"
                     type="text"
                     onChange={handleChange}
-                    autoComplete="category-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="e.g., Electronics"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="BuyingPrice"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Vendor Price
-                </label>
-                <div className="mt-2">
+                {/* Buying Price */}
+                <div>
+                  <label htmlFor="BuyingPrice" className={labelClass}>Vendor Price</label>
                   <input
                     required
                     id="BuyingPrice"
                     name="BuyingPrice"
-                     defaultValue={formData.BuyingPrice || 0}
+                    defaultValue={formData.BuyingPrice || 0}
                     type="number"
                     step="any"
                     onChange={handleChange}
-                    autoComplete="address-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="0.00"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Manufacturer"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Manufacturer
-                </label>
-                <div className="mt-2">
+                {/* Manufacturer */}
+                <div>
+                  <label htmlFor="Manufacturer" className={labelClass}>Manufacturer</label>
                   <input
                     id="Manufacturer"
                     name="Manufacturer"
                     type="text"
                     onChange={handleChange}
-                    autoComplete="postal-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="Manufacturer name"
                   />
                 </div>
-              </div>
 
-              {/* <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Rolls"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Rolls in a Carton
-                </label>
-                <div className="mt-2">
-                  <input
-                    required
-                    id="Rolls"
-                    name="Rolls"
-                     onChange={handleChange}
-                    type="number"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div> */}
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Pieces"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Pieces in a Carton
-                </label>
-                <div className="mt-2">
+                {/* Pieces */}
+                <div>
+                  <label htmlFor="Pieces" className={labelClass}>Pieces in Carton</label>
                   <input
                     id="Pieces"
                     required
                     name="Pieces"
-                     defaultValue={formData.Pieces || 0}
+                    defaultValue={formData.Pieces || 0}
                     onChange={handleChange}
                     type="number"
-                    autoComplete="Pieces-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="0"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Vendor"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Vendor
-                </label>
-                <div className="mt-2">
+                {/* Vendor */}
+                <div>
+                  <label htmlFor="Vendor" className={labelClass}>Vendor</label>
                   <select
                     id="Vendor"
                     name="Vendor"
                     required
                     onChange={handleChange}
-                    autoComplete="stateOfOrigin"
-                    className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
                   >
-                    <option> Choose...</option>
+                    <option value="">Select Vendor...</option>
                     {VendorList.map((vendor) => (
                       <option value={vendor._id} key={vendor._id}>
                         {vendor.Name}
                       </option>
                     ))}
                   </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                  />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="UMO"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Unit of Measure
-                </label>
-                <div className="mt-2">
+                {/* Unit of Measure */}
+                <div>
+                  <label htmlFor="UMO" className={labelClass}>Unit of Measure</label>
                   <input
                     id="UMO"
                     name="UMO"
                     type="text"
                     onChange={handleChange}
-                    autoComplete="workTelephone"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="e.g., pcs, kg"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="color"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Color
-                </label>
-                <div className="mt-2">
+                {/* Color */}
+                <div>
+                  <label htmlFor="color" className={labelClass}>Color</label>
                   <input
                     id="color"
                     name="color"
                     onChange={handleChange}
                     type="color"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Sellable"
-                  className="block text-sm font-medium text-gray-900"
-                >
-                  I want to Sell this product on BADE ERP?
-                </label>
-                <div className="mt-2 flex items-center gap-3">
-                  <input
-                    onChange={handleChange}
-                    id="Sellable"
-                    name="Sellable"
-                    type="checkbox"
-                    className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Ecom_sale"
-                  className="block text-sm font-medium text-gray-900"
-                >
-                  I want to Sell this product on BADE E-commerce?
-                </label>
-                <div className="mt-2 flex items-center gap-3">
-                  <input
-                    onChange={handleChange}
-                    id="Ecom_sale"
-                    name="Ecom_sale"
-                    type="checkbox"
-                    className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="VAT"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  VAT
-                </label>
-                <div className="mt-2">
+                {/* VAT */}
+                <div>
+                  <label htmlFor="VAT" className={labelClass}>VAT (%)</label>
                   <input
                     id="VAT"
                     name="VAT"
                     onChange={handleChange}
-                     defaultValue={formData.VAT || 0}
+                    defaultValue={formData.VAT || 0}
                     type="number"
                     step="any"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className={inputClass}
+                    placeholder="0"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist1"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                 {business.priceList1}
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Pricelist1"
-                     defaultValue={formData.Pricelist1 || 0}
-                    name="Pricelist1"
-                    type="number"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
+                {/* Sellable Checkbox */}
+                <div className="flex items-end pb-1">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      onChange={handleChange}
+                      id="Sellable"
+                      name="Sellable"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-xs font-medium text-gray-700">Sell on ERP</span>
+                  </label>
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist2"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                   {business.priceList2}
-                </label>
-                <div className="mt-2">
-                  <input
-                    onChange={handleChange}
-                    id="Pricelist2"
-                    defaultValue={formData.Pricelist2 || 0}
-                    name="Pricelist2"
-                    type="number"
-                    step="any"
-                    autoComplete="Pricelist2-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
+                {/* E-commerce Checkbox */}
+                <div className="flex items-end pb-1">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      onChange={handleChange}
+                      id="Ecom_sale"
+                      name="Ecom_sale"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-xs font-medium text-gray-700">Sell on E-commerce</span>
+                  </label>
                 </div>
               </div>
-
-               {businessData.subscriptionplan === "Standard" && (
-                <>
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Pricelist3"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                   {business.priceList3}
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Pricelist3"
-                    name="Pricelist3"
-                     defaultValue={formData.Pricelist3 || 0}
-                    onChange={handleChange}
-                    type="number"
-                    step="any"
-                    autoComplete="Pricelist-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist4"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {business.priceList4}
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Pricelist4"
-                    name="Pricelist4"
-                    type="number"
-                     defaultValue={formData.Pricelist4 || 0}
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist5"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {business.priceList5}
-                </label>
-                <div className="mt-2">
-                  <input
-                    onChange={handleChange}
-                    id="Pricelist5"
-                    name="Pricelist5"
-                     defaultValue={formData.Pricelist5 || 0}
-                    type="number"
-                    step="any"
-                    autoComplete="Pricelist1-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Pricelist6"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {business.priceList6}
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Pricelist6"
-                     defaultValue={formData.Pricelist6 || 0}
-                    name="Pricelist6"
-                    step="any"
-                    onChange={handleChange}
-                    type="number"
-                    autoComplete="Pricelist1-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="Pricelist7"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  {business.priceList7}
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Pricelist7"
-                     defaultValue={formData.Pricelist7 || 0}
-                    name="Pricelist7"
-                    type="number"
-                    step="any"
-                    onChange={handleChange}
-                    autoComplete="Pricelist1-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-              </>
-              )}
             </div>
-          </div>
 
-          <div className="border-b border-gray-900/10 pb-12">
-            <h5> Write a description.</h5>
-            <div className="col-span-full">
-              <label
-                htmlFor="Description"
-                className="block text-sm/6 font-medium text-gray-900"
-              >
-                Write Something Simple and Consise about this product
-              </label>
-              <div className="">
+            {/* Price Lists Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Price Lists</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                  businessData.subscriptionplan === "Standard" || num <= 2 ? (
+                    <div key={num}>
+                      <label htmlFor={`Pricelist${num}`} className={labelClass}>
+                        {business[`priceList${num}`]} price
+                      </label>
+                      <input
+                        id={`Pricelist${num}`}
+                        name={`Pricelist${num}`}
+                        type="number"
+                        step="any"
+                        defaultValue={formData[`Pricelist${num}`] || 0}
+                        onChange={handleChange}
+                        className={inputClass}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  ) : null
+                ))}
+              </div>
+            </div>
+
+            {/* Description Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Description</h3>
+              <div>
+                <label htmlFor="Description" className={labelClass}>Product Description</label>
                 <textarea
                   id="Description"
                   onChange={handleChange}
                   name="Description"
-                  className="w-full h-32 p-3 border border-dashed border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="Enter your text here..."
-                ></textarea>
+                  className="w-full text-black h-24 p-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-colors resize-none"
+                  placeholder="Write a simple and concise description about this product..."
+                />
               </div>
-              <div className="mt-6 flex items-center justify-end gap-x-6">
-                {user.createProduct && (
-                  <button
-                    type="submit"
-                    className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-green-500 focus-visible:outline-indigo-600 transition"
-                  >
-                    Create new Product
-                  </button>
-                )}
-              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+              {user.createProduct && (
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors shadow-md"
+                >
+                  Create Product
+                </button>
+              )}
             </div>
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 }
