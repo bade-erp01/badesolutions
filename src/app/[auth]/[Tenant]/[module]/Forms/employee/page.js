@@ -12,13 +12,12 @@ import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 
-
-
 export default function NewEmployeeForm({userData}) {
   const states = NaijaStates.states();
   const [Formtext,setFormText] = useState('')
   const [formData, setFormData] = useState({});
   const router = useRouter();
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -31,7 +30,7 @@ export default function NewEmployeeForm({userData}) {
     e.preventDefault();
     plsWait('Please wait... Do not refresh this page')
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/UsersApi`, {
+      const response = await fetch(`/api/UsersApi`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,15 +44,12 @@ export default function NewEmployeeForm({userData}) {
       throw new Error(result.error);
       }else{
         SuccessToast(result.message)
-        // reset the form
         setFormData({});
         router.refresh();
-        // redirect to employee list page
         setTimeout(() => {
           router.push(`/${userData.business.companyName}/${Encrypt(userData.business.tenantId)}/employee/employee/${result.user}?Modules=employee`);
         }, 2000);
       }
-      //reset the form
       setFormData({});
       e.target.reset();
     } catch (error) {
@@ -61,282 +57,275 @@ export default function NewEmployeeForm({userData}) {
     }
   };
 
-  
-  // Calculate the total amount based on the plan and number of users
-  function handlePurchaseLicenses(formData) {
-  Swal.fire({
-    title: "Enter number of Licenses",
-    input: "number",
-    inputAttributes: {
-      min: 1,
-      step: 1,
-      autocapitalize: "off"
-    },
-    showCancelButton: true,
-    confirmButtonText: "Calculate",
-    showLoaderOnConfirm: true,
-    preConfirm: (inputValue) => {
-      const numberOfUsers = parseInt(inputValue);
-      if (isNaN(numberOfUsers) || numberOfUsers < 1) {
-        Swal.showValidationMessage("Number of users must be at least 1");
-        return false;
-      }
-
-      const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
-      const vat = baseAmount * numberOfUsers * 0.075;
-      const total = (baseAmount * numberOfUsers + vat) * 12;
-
-      return {
-        numberOfUsers,
-        baseAmount,
-        vat,
-        total
-      };
-    },
-    allowOutsideClick: () => !Swal.isLoading()
-  }).then((result) => {
-    if (result.isConfirmed && result.value) {
-      const { numberOfUsers, baseAmount, vat, total } = result.value;
-
-      Swal.fire({
-        icon: "info",
-        title: "Total Payment",
-        html: `
-          <p><strong>Licenses:</strong> ${numberOfUsers}</p>
-          <p><strong>Base Amount:</strong> ₦${baseAmount.toLocaleString()}</p>
-          <p><strong>VAT (7.5%):</strong> ₦${vat.toLocaleString()}</p>
-          <hr>
-          <p><strong>Total for 12 months:</strong> ₦${total.toLocaleString()}</p>
-        `,
-        showCancelButton: true,
-        confirmButtonText: "Proceed to Payment"
-      }).then((paymentResult) => {
-        if (paymentResult.isConfirmed) {
-          plsWait('Processing...')
-          fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-               Authorization: `Bearer ${Encrypt(userData.business._id)}`,
-            },
-            body: JSON.stringify({
-              numberOfUsers,
-              plan: formData.plan,
-              totalAmount: total
-            })
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error("Payment request failed");
-            }
-            return response.json();
-          })
-          .then(data => {
-            router.push(data.data)
-            SuccessToast("Redirecting...!");
-          })
-          .catch(error => {
-            ErrorMessage(error.message);
-          });
+  const handlePurchaseLicenses = (formData) => {
+    Swal.fire({
+      title: "Purchase User Licenses",
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-4">How many licenses would you like to purchase?</p>
+          <input 
+            id="licenseInput" 
+            type="number" 
+            min="1" 
+            step="1" 
+            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+            placeholder="Enter number of licenses"
+          />
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Calculate Price",
+      confirmButtonColor: "#4f46e5",
+      cancelButtonColor: "#6b7280",
+      preConfirm: () => {
+        const inputValue = document.getElementById("licenseInput").value;
+        const numberOfUsers = parseInt(inputValue);
+        if (isNaN(numberOfUsers) || numberOfUsers < 1) {
+          Swal.showValidationMessage("Please enter a valid number (minimum 1)");
+          return false;
         }
-      });
-    }
-  });
-}
-
- 
-
+        const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
+        const vat = baseAmount * numberOfUsers * 0.075;
+        const total = (baseAmount * numberOfUsers + vat) * 12;
+        return { numberOfUsers, baseAmount, vat, total };
+      },
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        const { numberOfUsers, baseAmount, vat, total } = result.value;
+        Swal.fire({
+          icon: "info",
+          title: "Payment Summary",
+          html: `
+            <div class="text-left bg-gray-50 p-6 rounded-lg">
+              <div class="space-y-4">
+                <div class="flex justify-between border-b pb-2">
+                  <span class="text-gray-600">Number of Licenses:</span>
+                  <span class="font-semibold text-gray-900">${numberOfUsers}</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                  <span class="text-gray-600">Base Amount (per license):</span>
+                  <span class="font-semibold text-gray-900">₦${baseAmount.toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                  <span class="text-gray-600">Subtotal:</span>
+                  <span class="font-semibold text-gray-900">₦${(baseAmount * numberOfUsers).toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between pb-4">
+                  <span class="text-gray-600">VAT (7.5%):</span>
+                  <span class="font-semibold text-orange-600">₦${vat.toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between bg-indigo-50 p-3 rounded border border-indigo-200">
+                  <span class="font-bold text-indigo-900">Total (12 months):</span>
+                  <span class="font-bold text-indigo-600 text-lg">₦${total.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: "Proceed to Payment",
+          confirmButtonColor: "#059669",
+          cancelButtonColor: "#6b7280",
+        }).then((paymentResult) => {
+          if (paymentResult.isConfirmed) {
+            plsWait("Processing payment...");
+            fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Encrypt(userData.business._id)}`,
+              },
+              body: JSON.stringify({
+                numberOfUsers,
+                plan: formData.plan,
+                totalAmount: total,
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) throw new Error("Payment request failed");
+                return response.json();
+              })
+              .then((data) => {
+                router.push(data.data);
+                SuccessToast("Redirecting to payment...");
+              })
+              .catch((error) => ErrorMessage(error.message));
+          }
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     const numberOfUsers = parseInt(1);
     const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
     const vat = baseAmount * numberOfUsers * 0.075;
-    const total = (baseAmount * numberOfUsers + vat) * 12; // Assuming the total is for a year
+    const total = (baseAmount * numberOfUsers + vat) * 12;
     setFormText(total);
   }, [formData.plan]);
 
-
-
   return (
-    <>
-      <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2">
-        <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
-            <h2 className="text-base/7 font-semibold text-gray-900">
-              New User Profile
-            </h2>
-          <div className="border-b bg- border-gray-900/10 pb-12">
+    <div className="min-h-screen bg-gray-100">
+      <div className=" mx-auto">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-gray-700 px-8 py-8">
+            <h1 className="text-3xl font-bold text- mb-2">New User Profile</h1>
+            <p className="text-indigo-100">Add a new employee to your organization</p>
+          </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="first-name"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  First Name
-                </label>
-                <div className="mt-2">
+          <form className="space-y-8 p-8" onSubmit={handleSubmit}>
+            {/* Personal Information Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <UserCircleIcon className="w-5 h-5 mr-3 text-indigo-600" />
+                Personal Information
+              </h2>
+              
+              <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                <div className="sm:col-span-3">
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                    First Name *
+                  </label>
                   <input
                     id="firstName"
                     required
                     name="firstName"
                     type="text"
                     onChange={handleChange}
-                    autoComplete="given-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    placeholder="John"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-3">
-                <label
-                  htmlFor="last-name"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Last Name
-                </label>
-                <div className="mt-2">
+                <div className="sm:col-span-3">
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name *
+                  </label>
                   <input
                     id="lastName"
                     required
                     name="lastName"
                     type="text"
                     onChange={handleChange}
-                    autoComplete="family-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    placeholder="Doe"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="city"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Email
-                </label>
-                <div className="mt-2">
+                <div className="sm:col-span-3">
+                  <label htmlFor="Email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
                   <input
                     id="Email"
                     required
                     name="Email"
                     type="email"
                     onChange={handleChange}
-                    autoComplete="Email-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    placeholder="john@example.com"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="region"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Date of Birth
-                </label>
-                <div className="mt-2">
+                <div className="sm:col-span-3">
+                  <label htmlFor="DOB" className="block text-sm font-medium text-gray-700 mb-2">
+                    Date of Birth *
+                  </label>
                   <input
                     id="DOB"
                     required
                     name="DOB"
                     type="date"
                     onChange={handleChange}
-                    autoComplete="address-level1"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="postal-code"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Telephone
-                </label>
-                <div className="mt-2">
+                <div className="sm:col-span-3">
+                  <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-2">
+                    Telephone *
+                  </label>
                   <input
                     id="telephone"
                     name="telephone"
                     type="tel"
                     required
                     onChange={handleChange}
-                    autoComplete="postal-code"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    placeholder="+234 XXX XXX XXXX"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
-              </div>
 
-              <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="Country"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Country
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="Country"
-                    name="Country"
-                    type="text"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="region"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  State / Province
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="stateOfOrigin"
-                    name="stateOfOrigin"
-                    type="text"
-                    onChange={handleChange}
-                    className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="workTelephone"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Work Line
-                </label>
-                <div className="mt-2">
+                <div className="sm:col-span-3">
+                  <label htmlFor="workTelephone" className="block text-sm font-medium text-gray-700 mb-2">
+                    Work Line
+                  </label>
                   <input
                     id="workTelephone"
                     name="workTelephone"
                     type="tel"
                     onChange={handleChange}
-                    autoComplete="workTelephone"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                    placeholder="+234 XXX XXX XXXX"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
               </div>
             </div>
-          </div>
 
-         <div className="mt-6 flex items-center justify-end gap-x-6">
-           <button type="submit" className="bg-green-500 rounded-md px-3 py-2 mt-3 text-sm font-semibold text-white hover:bg-green-700 transition">Register New user</button>
+            {/* Location Information Section */}
+            <div className="border-t pt-8">
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">Location Information</h2>
+              
+              <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                <div className="sm:col-span-2">
+                  <label htmlFor="Country" className="block text-sm font-medium text-gray-700 mb-2">
+                    Country
+                  </label>
+                  <input
+                    id="Country"
+                    name="Country"
+                    type="text"
+                    placeholder="Nigeria"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                  />
+                </div>
 
-         <span
-          onClick={handlePurchaseLicenses}
-          className="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 mt-3 text-sm font-semibold rounded shadow-md cursor-pointer transition duration-200 ease-in-out inline-block"
-        >
-          Purchase User Licenses
-        </span>
+                <div className="sm:col-span-2">
+                  <label htmlFor="stateOfOrigin" className="block text-sm font-medium text-gray-700 mb-2">
+                    State / Province
+                  </label>
+                  <input
+                    id="stateOfOrigin"
+                    name="stateOfOrigin"
+                    type="text"
+                    onChange={handleChange}
+                    placeholder="Lagos"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                  />
+                </div>
+              </div>
+            </div>
 
-         </div>
-        </form>
+            {/* Action Buttons */}
+            <div className="border-t pt-8 flex flex-col sm:flex-row gap-4 justify-end">
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-lg font-semibold transition duration-200 shadow-md hover:shadow-lg"
+              >
+                Register New User
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handlePurchaseLicenses(formData)}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-3 rounded-lg font-semibold transition duration-200 shadow-md hover:shadow-lg"
+              >
+                Purchase User Licenses
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
