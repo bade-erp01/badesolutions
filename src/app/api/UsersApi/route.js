@@ -5,6 +5,7 @@ import Business from "../../../../models/Business";
 import { formatMongooseError } from "../../../../Functions/Functions";
 import { Encrypt } from "../../../../Functions/Mics";
 import { NextResponse } from 'next/server';
+import * as yup from 'yup';
 
 
 // Replace direct MongoDB client usage with Mongoose models
@@ -31,7 +32,7 @@ export async function GET(request) {
     const token = authHeader.split(" ")[1];
     const dbtoken = dbHeader.split(" ")[1];
     // Ensure Mongoose connection is established
-    await dbConnect(dbtoken);
+    await dbConnect();
     const employees = await Users.findByTenant(token);
     return new NextResponse(JSON.stringify(employees), {
       status: 200,
@@ -55,7 +56,6 @@ export async function GET(request) {
 // Update other methods (POST, PUT, PATCH, DELETE) similarly to use Mongoose models instead of raw MongoDB client.
 export async function POST(request) {
   try {
-    await dbConnect();
     const body = await request.json();
     const authHeader = request.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -64,31 +64,52 @@ export async function POST(request) {
         headers: { "Content-Type": "application/json" },
       });
     }
-
+    
     const token = authHeader.split(" ")[1];
     if (!mongoose.Types.ObjectId.isValid(token)) {
-      return new Response(JSON.stringify({ error: "Invalid tenant ID." }), {
+      return new Response(JSON.stringify({ error: "Something went wrong." }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
-
-    // check if the bussiness has a pending license
-    const checkLicense = await Business.findOne({ tenantId: token });
-    if (!checkLicense.isActive || checkLicense.Pendinglicense < 1) {
+    
+    
+    // Example: using a simple manual validation here
+    if (!body.Email || !body.telephone || !body.firstName || !body.lastName) {
       return new Response(
-        JSON.stringify({ error: "No unused licenses are available." }),
+        JSON.stringify({ error: "Missing required fields." }),
         {
-          status: 403,
+          status: 400,
           headers: { "Content-Type": "application/json" },
         }
       );
     }
-
+    
+    // validate user input fields usin joi or yup or any other validation library for sql injection and xss attack
+    const userValidationSchema = yup.object().shape({
+      Email: yup.string().email('Invalid email').required('Email is required'),
+      telephone: yup.string().matches(/^[0-9\s\-\+\(\)]+$/, 'Invalid phone number').required('Phone is required'),
+      firstName: yup.string().min(2, 'Name too short').max(100, 'Name too long').required('First name is required'),
+      lastName: yup.string().min(2, 'Name too short').max(100, 'Name too long').required('Last name is required'),
+    });
+    
+    try {
+      await userValidationSchema.validate(body, { abortEarly: false });
+    } catch (validationError) {
+      return new Response(
+        JSON.stringify({ error: validationError.errors.join(', ') }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    await dbConnect();
     // check email and phone number with data base
     const existingUser = await Users.findOne({
       $or: [{ Email: body.Email }, { telephone: body.telephone }],
-    });
+    }).lean();
 
     if (existingUser) {
       return new Response(
@@ -102,23 +123,6 @@ export async function POST(request) {
 
     // Create a new user for the tenant
     const newUser = await Users.createForTenant(token, body);
-
-    // calculate the subscription fee
-    const numberOfUsers = parseInt(1);
-    const baseAmount = checkLicense.subscriptionplan === "Basic" ? 1500 : 4000;
-    const vat = baseAmount * numberOfUsers * 0.075;
-    const total = (baseAmount * numberOfUsers + vat) * 12;
-
-    // decrease the pending licience
-    await Business.updateOne(
-      { _id: checkLicense._id },
-      {
-        $inc: {
-          Pendinglicense: -1,
-          SubcriptionAmount: Number(total),
-        },
-      }
-    );
 
     // You can now use `token` for further authentication/authorization logic
     return new Response(

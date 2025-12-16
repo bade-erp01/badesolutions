@@ -166,7 +166,7 @@ export default function NewEmployeeForm({userData}) {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white shadow-lg overflow-hidden">
           {/* Header */}
           <div className="bg-gray-700 px-6 py-6">
             <h1 className="text-2xl font-bold text-white mb-1">New User Profile</h1>
@@ -307,7 +307,7 @@ export default function NewEmployeeForm({userData}) {
             </div>
 
             {/* Action Buttons */}
-            <div className="border-t pt-6 flex flex-col sm:flex-row gap-3 justify-end">
+            <div className="border-t border-dotted mb-6 mt-6 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
               <button
                 type="submit"
                 className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-200 shadow-md hover:shadow-lg"
