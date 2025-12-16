@@ -1,16 +1,6 @@
 "use client"
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
 
 export default function Page({ message, error }) {
-    const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleContinue = () => {
-        setIsLoading(true);
-        router.push('/auth/login');
-    };
 
     return (
         <div className="min-h-screen bg-gray-300 flex items-center justify-center relative overflow-hidden">
