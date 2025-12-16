@@ -170,7 +170,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
 
             {/* Start Balance */}
             <div>
-              <label htmlFor="Debt" className="block text-sm font-semibold text-gray-700 mb-2">Start Balance</label>
+              <label htmlFor="Debt" className="block text-sm font-semibold text-gray-700 mb-2">Start Balance <i><small className="text-red-600">[Nagative values signifies that your business owes the customer.]</small></i></label>
               <input
                 id="Debt"
                 name="Debt"
