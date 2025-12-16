@@ -8,12 +8,12 @@ async function UserActivationMail(doc) {
 
     // Generate activation token
     const token = jwt.sign(
-      { id: doc._id, email: doc.Email },
-      process.env.EMAILTOKEN,
+      { id: doc._id},
+      process.env.TenantToken,
       { expiresIn: "2h" }
     );
 
-    const activationLink = `https://badesolutions.com.ng/auth/Account_Activation/${token}`;
+    const activationLink = `https://badesolutions.com.ng/auth/User_Activation/${token}`;
 
     const config = {
       host: "smtp.zoho.com",
