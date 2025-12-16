@@ -85,6 +85,7 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     plsWait("Verifying Credentials. Please wait...");
 
     try {
+      console.log(formData)
       const response = await fetch(`${url}/api/v1/Login`, {
         method: "POST",
         headers: {
@@ -104,11 +105,8 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
         // Reset the form
         setFormData({ email: "", password: "" }); // or setFormData(initialState)
 
-        const sanitizedCompanyName = data.Tenant
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "");
-console.log("here")
+        const sanitizedCompanyName = data.Tenant.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+
         const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(data.Newcustomer._id)}`;
         // Redirect using Next.js router
         router.push(dashboardUrl);
