@@ -85,7 +85,6 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     plsWait("Verifying Credentials. Please wait...");
 
     try {
-      console.log(formData)
       const response = await fetch(`${url}/api/v1/Login`, {
         method: "POST",
         headers: {
