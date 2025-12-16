@@ -90,7 +90,9 @@ Email:{
  required:[true,'Provide an valid email address'],
  lowercase: true,
  unique:[true,'This email is already registered.'],
- validate:[isEmail,'please enter a valid Email']
+ validate:[isEmail,'please enter a valid Email'],
+ match: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/,
+ trim: true,
 },
 telephone:{
 type:String,
@@ -144,9 +146,6 @@ StartDate:{type:String},
 EndDate:{type:String},
 stateOfOrigin:String,
 staffId:{type:String},
-role:{
-type:String
-},
 Manager:{
 type:Object,
 },
@@ -165,14 +164,14 @@ select:false
 image:{
   type:String,
   default:'/person.png',
-  required:true
+  // required:true
 },
 Leave:{
 type:Array,
 },
 password:{
   type:String,
- minlength: 8, // Longer passwords are more secure
+  minlength: 8, // Longer passwords are more secure
   match: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
   select:false
 },
@@ -400,6 +399,10 @@ isDev:{
   type:Boolean,
   default:false
 },
+EditCreditLimit:{
+  type:Boolean,
+  default:false
+},
 tenantId: {
     type: mongoose.Types.ObjectId,
     ref: 'Business',
@@ -409,9 +412,13 @@ tenantId: {
 },
 Apps:[AppPermissions],
 Conversations:[chatSchema],
-Attachments:[AttachedSchema]
+Attachments:[AttachedSchema],
+SessionId:{
+  type: mongoose.Types.ObjectId, // store JSON response payload
+  index: true
+}
 
-},{timestamps:true})
+},{timestamps:true},{ strict: true })
 
 
 // Middleware to enforce tenant scoping and unique constraints
@@ -464,6 +471,14 @@ EmployeSchema.statics.findByTenant = function (tenantId, filter = {}) {
 EmployeSchema.statics.createForTenant = function (tenantId, businessData) {
   return this.create({ ...businessData, tenantId });
 };
+
+// Transform JSON output
+// EmployeSchema.set("toJSON", {
+//   transform: (_doc, ret) => {
+//     delete ret.password ,ret.opsCode;
+//     return ret;
+//   }
+// });
 
 const  EMPLOYEES = mongoose.models.EMPLOYEES || mongoose.model("EMPLOYEES", EmployeSchema);
 
