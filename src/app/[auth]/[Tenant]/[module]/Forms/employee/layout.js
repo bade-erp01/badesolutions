@@ -38,22 +38,6 @@ export default async function SetUpLayout({children, params }) {
                 >
                   <h3>Next Renual Fee: ₦{userData.business.SubcriptionAmount.toLocaleString()}</h3>
                 </Link>
-    
-      
-                {userData?.user?.isAdmin && (
-                  <Link
-                    href={`/auth/Apps`}
-                    className="flex items-center gap-3 p-3 bg-amber-600 rounded-md hover:bg-gray-700 transition"
-                  >
-                    <Image
-                      src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
-                      width={24}
-                      height={24}
-                      alt="Settings"
-                    />
-                    <small>App Store</small>
-                  </Link>
-                )}
               </nav>
     
               
@@ -69,14 +53,3 @@ export default async function SetUpLayout({children, params }) {
         </div>
   );
 }
-
-// export default async function EmployeeFormlayout() {
-//     const userData = await fetchUser();
-//   return (
-//     <>
-//    <Nav1  user={userData.user} business={userData.business} page={'Employee Form'} />
-//     
-//     <Footer2 />
-//     </>
-//   )
-// }

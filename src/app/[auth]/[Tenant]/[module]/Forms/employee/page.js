@@ -165,25 +165,25 @@ export default function NewEmployeeForm({userData}) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className=" mx-auto">
+      <div className="mx-auto">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-gray-700 px-8 py-8">
-            <h1 className="text-3xl font-bold text- mb-2">New User Profile</h1>
-            <p className="text-indigo-100">Add a new employee to your organization</p>
+          <div className="bg-gray-700 px-6 py-6">
+            <h1 className="text-2xl font-bold text-white mb-1">New User Profile</h1>
+            <p className="text-indigo-100 text-sm">Add a new employee to your organization</p>
           </div>
 
-          <form className="space-y-8 p-8" onSubmit={handleSubmit}>
+          <form className="space-y-6 p-6" onSubmit={handleSubmit}>
             {/* Personal Information Section */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                <UserCircleIcon className="w-5 h-5 mr-3 text-indigo-600" />
+              <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
+                <UserCircleIcon className="w-4 h-4 mr-2 text-indigo-600" />
                 Personal Information
               </h2>
               
-              <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-6">
                 <div className="sm:col-span-3">
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="firstName" className="block text-xs font-medium text-gray-700 mb-1">
                     First Name *
                   </label>
                   <input
@@ -193,12 +193,12 @@ export default function NewEmployeeForm({userData}) {
                     type="text"
                     onChange={handleChange}
                     placeholder="John"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="lastName" className="block text-xs font-medium text-gray-700 mb-1">
                     Last Name *
                   </label>
                   <input
@@ -208,12 +208,12 @@ export default function NewEmployeeForm({userData}) {
                     type="text"
                     onChange={handleChange}
                     placeholder="Doe"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label htmlFor="Email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="Email" className="block text-xs font-medium text-gray-700 mb-1">
                     Email Address *
                   </label>
                   <input
@@ -223,12 +223,12 @@ export default function NewEmployeeForm({userData}) {
                     type="email"
                     onChange={handleChange}
                     placeholder="john@example.com"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label htmlFor="DOB" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="DOB" className="block text-xs font-medium text-gray-700 mb-1">
                     Date of Birth *
                   </label>
                   <input
@@ -237,12 +237,12 @@ export default function NewEmployeeForm({userData}) {
                     name="DOB"
                     type="date"
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="telephone" className="block text-xs font-medium text-gray-700 mb-1">
                     Telephone *
                   </label>
                   <input
@@ -252,12 +252,12 @@ export default function NewEmployeeForm({userData}) {
                     required
                     onChange={handleChange}
                     placeholder="+234 XXX XXX XXXX"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label htmlFor="workTelephone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="workTelephone" className="block text-xs font-medium text-gray-700 mb-1">
                     Work Line
                   </label>
                   <input
@@ -266,19 +266,19 @@ export default function NewEmployeeForm({userData}) {
                     type="tel"
                     onChange={handleChange}
                     placeholder="+234 XXX XXX XXXX"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
               </div>
             </div>
 
             {/* Location Information Section */}
-            <div className="border-t pt-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Location Information</h2>
+            <div className="border-t pt-6">
+              <h2 className="text-base font-semibold text-gray-900 mb-4">Location Information</h2>
               
-              <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-6">
                 <div className="sm:col-span-2">
-                  <label htmlFor="Country" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="Country" className="block text-xs font-medium text-gray-700 mb-1">
                     Country
                   </label>
                   <input
@@ -286,12 +286,12 @@ export default function NewEmployeeForm({userData}) {
                     name="Country"
                     type="text"
                     placeholder="Nigeria"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label htmlFor="stateOfOrigin" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="stateOfOrigin" className="block text-xs font-medium text-gray-700 mb-1">
                     State / Province
                   </label>
                   <input
@@ -300,17 +300,17 @@ export default function NewEmployeeForm({userData}) {
                     type="text"
                     onChange={handleChange}
                     placeholder="Lagos"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
                   />
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="border-t pt-8 flex flex-col sm:flex-row gap-4 justify-end">
+            <div className="border-t pt-6 flex flex-col sm:flex-row gap-3 justify-end">
               <button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-lg font-semibold transition duration-200 shadow-md hover:shadow-lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-200 shadow-md hover:shadow-lg"
               >
                 Register New User
               </button>
@@ -318,7 +318,7 @@ export default function NewEmployeeForm({userData}) {
               <button
                 type="button"
                 onClick={() => handlePurchaseLicenses(formData)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-3 rounded-lg font-semibold transition duration-200 shadow-md hover:shadow-lg"
+                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-200 shadow-md hover:shadow-lg"
               >
                 Purchase User Licenses
               </button>
