@@ -58,6 +58,15 @@ export default async function layout({ params }) {
 
   const data = await res.json();
   if (res.ok) {
+    // send request to server to send reset password mail
+    await fetch(`${baseUrl}/api/v1/Reset_Password/${data.email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+
+    
     return (
       <div>
         <Page message={data.message} />
