@@ -196,9 +196,9 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
                   <Link key={element._id} href={`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${`${Encrypt(element._id)}`}`} title={element.billReferenceNo} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
                        <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
                          <Image
-                           src={`/preview.png`}
-                           width={60}
-                           height={60}
+                           src={element.image || `/preview.png`}
+                           width={50}
+                           height={50}
                            alt={"photo"}
                            className="rounded-md object-cover w-16 h-16"
                            quality={100}

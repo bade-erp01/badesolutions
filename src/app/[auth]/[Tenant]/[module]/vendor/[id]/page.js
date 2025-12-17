@@ -1,7 +1,7 @@
 "use client";
 import Swal from 'sweetalert2';
 import {useRouter} from "next/navigation";
-import {ClipboardIcon,PrinterIcon,BanknotesIcon} from "@heroicons/react/24/outline";
+import {ShoppingCartIcon,ShoppingBagIcon,BanknotesIcon} from "@heroicons/react/24/outline";
 import { plsWait, ErrorMessage,SuccessToast } from "../../../../../../../Functions/Mics";
 import axios from "axios";
 import moment from "moment";
@@ -33,7 +33,7 @@ export default function SingleVendorpage({AccountingFinder,userInfo,Backdata,wh,
 
 const RFP = async () => {
   Swal.fire({
-    title: '<strong class="text-xl font-semibold">📦 New Purchase Request </strong>',
+    title: '<strong class="text-xl font-semibold">📦 New Purchase Order </strong>',
     html: `
       <div class="space-y-4 text-left">
         <div>
@@ -81,6 +81,71 @@ const RFP = async () => {
       plsWait('setting things up... please wait')
       //send  post request to server
       const request = await fetch(`${baseUrl}/api/purchase/request`,{
+        method:'POST',
+        body:JSON.stringify( result.value),
+        headers
+      })
+
+      const res = await request.json()
+
+      if(res.newPurchase){
+        router.push(`/${userInfo.business.companyName}/${userInfo.user._id}/Module/purchase-request/${res.newPurchase}`)
+      }else{
+        ErrorMessage(res.error)
+      }
+    }
+  });
+};
+
+
+// create purchase request
+const purchaseRequest = async () => {
+  Swal.fire({
+    title: '<strong class="text-xl font-semibold">📃 New Purchase Request </strong>',
+    html: `
+      <div class="space-y-4 text-left">
+        <div>
+          <label for="warehouse" class="block font-medium mb-1">Store</label>
+          <select id="warehouse" class=" w-full border rounded px-3 py-2">
+            <option value="">Select a warehouse</option>
+             ${wh.map(
+            (wh) => `<option value="${wh._id}">${wh.WHName}</option>`
+          ).join('')}
+          </select>
+        </div>
+        <div>
+          <label for="receivedDate" class="block font-medium mb-1">Shipment Date</label>
+          <input type="date" id="receivedDate" class="w-full border rounded px-3 py-2">
+        </div>
+        
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: '<span class="font-semibold">Submit</span>',
+    cancelButtonText: '<span class="text-gray-300">Cancel</span>',
+    customClass: {
+      popup: 'max-w-md p-6 rounded-lg',
+      confirmButton: 'bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700',
+      cancelButton: 'bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300'
+    },
+    preConfirm: () => {
+      const warehouse = document.getElementById('warehouse').value.trim();
+      const recievedDate = document.getElementById('receivedDate').value.trim();
+      // const refNo = document.getElementById('refNo').value.trim();
+      const vendor = data._id;
+
+      if (!warehouse || !recievedDate || !vendor) {
+        Swal.showValidationMessage('⚠️ All fields must be filled out.');
+        return false;
+      }
+
+      return { warehouse, recievedDate ,vendor};
+    }
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      plsWait('setting things up... please wait')
+      //send  post request to server
+      const request = await fetch(`${baseUrl}/api/Transit`,{
         method:'POST',
         body:JSON.stringify( result.value),
         headers
@@ -278,7 +343,7 @@ const RFP = async () => {
             <span
               className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200`}
             >
-            Balance: {Backdata.Balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            {Backdata.Balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </span>
           </div>
           <div className="flex flex-wrap gap-8 items-center py-4">
@@ -300,10 +365,17 @@ const RFP = async () => {
             {/* Divider */}
             <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
             {!formData.block_vendor && userInfo.user.raiseLpo && (
-            <span onClick={RFP}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
-              <ClipboardIcon className="h-6 w-6 text-gray-100" />
-              Request for Purchase
-            </span>
+              <>
+                <span onClick={RFP}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
+                  <ShoppingBagIcon className="h-6 w-6 text-gray-100" />
+                  New Purchase Order               
+                </span>
+
+                <span onClick={purchaseRequest}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
+                  <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
+                   New Purchase Request
+                </span>
+              </>
             )}
 
             {AccountingFinder && !formData.block_vendor && userInfo.user.postVendorPayment &&(
