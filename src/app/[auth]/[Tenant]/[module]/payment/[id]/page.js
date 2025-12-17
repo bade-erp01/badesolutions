@@ -82,7 +82,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
               </div>
               <div className="text-white flex-1">
                 <h1 className="text-2xl font-bold mb-1">{cust?.Username.toUpperCase() || 'Customer'}</h1>
-                <p className="text-gray-300 text-sm">Payment Details</p>
+                <p className="text-gray-300 text-sm italic">Payment Created on: {moment(payment.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}</p>
               </div>
             </div>
             <div className={`${getStatusBadge(payment.status)} shadow-md`}>
@@ -167,7 +167,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
             </div>
           )}
 
-          
+          <p className="text-gray-600 text-sm italic">Last edited on: {moment(payment.updatedAt).format("dddd DD MMMM YYYY [at] hh:mm A")}</p>
         </div>
       </div>
     </section>
