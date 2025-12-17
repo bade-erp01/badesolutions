@@ -66,7 +66,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
 
   return (
     <section className="min-h-screen ">
-      <div className=" mx-auto bg-white border border-gray-200 shadow-sm">
+      <div className=" mx-auto bg-gray-50 border border-gray-200 shadow-sm">
         {/* Header Card */}
         <div className="bg-white overflow-hidden mb-4 border border-gray-100">
           <div className="bg-linear-to-r from-gray-800 to-gray-700  md:p-8 flex flex-col md:flex-row items-center justify-between">
@@ -91,7 +91,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
           </div>
 
           {/* Reference Info */}
-          <div className="px-6 md:px-8 py-6 border-b border-gray-200 bg-gray-50 p-2">
+          <div className="px-6 md:px-8 py-6 border-b border-gray-200 p-2">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Collection Reference</p>
