@@ -113,19 +113,19 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2 p-3">
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Amount</label>
-              <input type="text" value={payment?.crAmount || ''} readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
+              <input type="text" value={payment?.crAmount || payment?.drAmount } disabled readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
             </div>
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Payment Date</label>
-              <input type="text" value={payment?.PaymentDate || ''} readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
+              <input type="text" value={payment?.PaymentDate || ''} disabled readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
             </div>
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Registered By</label>
-              <input type="text" value={payment?.Accountant || ''} readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
+              <input type="text" value={payment?.Accountant || ''} disabled readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
             </div>
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Payment Gateway</label>
-              <input type="text" value={payment?.type || ''} readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
+              <input type="text" value={payment?.type || ''} disabled readOnly className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 font-semibold" />
             </div>
           </div>
 
