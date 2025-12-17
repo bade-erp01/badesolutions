@@ -742,10 +742,15 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       className="max-w-full p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8 text-xs"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h4 className="text-xl font-bold text-gray-800">
+        <div>
+          <h4 className="text-xl font-bold text-gray-800">
           {cust.Username.charAt(0).toUpperCase() + cust.Username.slice(1)}
           &apos;s profile
         </h4>
+        <br/>
+        <span className="text-sm text-gray-600 italic">Registration Date: {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}</span>
+        
+        </div>
         <span
           className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${cust.Debt < 0
               ? "text-md text-green-700 bg-green-100 border border-green-600 rounded-full px-4 py-2"
@@ -1772,6 +1777,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           </button>
         </div>
       )}
+      <span className="text-sm text-gray-600 italic">Last updated: {moment(cust.updatedAt).format("dddd DD MMMM YYYY [at] hh:mm A")}</span>
     </form>
   );
 }
