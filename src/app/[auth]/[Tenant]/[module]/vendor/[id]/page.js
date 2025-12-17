@@ -101,11 +101,11 @@ const RFP = async () => {
 // create purchase request
 const purchaseRequest = async () => {
   Swal.fire({
-    title: '<strong class="text-xl font-semibold">📃 New Purchase Request </strong>',
+    title: '<strong class="text-xl font-semibold">📃 New G.I.T Request </strong>',
     html: `
       <div class="space-y-4 text-left">
         <div>
-          <label for="warehouse" class="block font-medium mb-1">Store</label>
+          <label for="warehouse" class="block font-medium mb-1">Inbound Store</label>
           <select id="warehouse" class=" w-full border rounded px-3 py-2">
             <option value="">Select a warehouse</option>
              ${wh.map(
@@ -373,7 +373,7 @@ const purchaseRequest = async () => {
 
                 <span onClick={purchaseRequest}  className="bg-gray-500 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"> 
                   <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
-                   New Purchase Request
+                   New G.I.T Request
                 </span>
               </>
             )}

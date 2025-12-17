@@ -141,7 +141,7 @@ export default async function storelayout({ children, params }) {
                   className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
-                  <span className="text-xs">Purchase Request</span>
+                  <span className="text-xs">Goods in Transit</span>
                 </Link>
 
 
