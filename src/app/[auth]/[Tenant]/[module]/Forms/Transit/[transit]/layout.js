@@ -4,6 +4,7 @@ import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
 import BackButton from "@/app/Components/BackBotton";
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
+import { notFound } from "next/navigation";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -63,6 +64,10 @@ export default async function layout({ children, params }) {
         access: `${Encrypt(userData.user._id)}`,
       },
     });
+
+    if(!res.ok){
+        return notFound()
+    }
 
     const data = await res.json();
     const DecryptedData = Dencrypt(data.transit);
