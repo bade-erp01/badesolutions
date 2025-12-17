@@ -71,7 +71,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
 
   return (
     <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
-      <Nav1 user={userData.user} business={userData.business} page={`Transit`} Module={filteredPurchases} />
+      <Nav1 user={userData.user} business={userData.business} page={`Transits`} Module={filteredPurchases} />
 
       <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
         {/* Sidebar Filters */}
@@ -193,7 +193,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedPurchases.length > 0 ? (
               paginatedPurchases.map((element) => (
-                  <Link key={element._id} href={`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${`${Encrypt(element._id)}`}`} title={element.billReferenceNo} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
+                  <Link key={element._id} href={`/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/Transit/${`${Encrypt(element._id)}`}`} title={element.billReferenceNo} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
                        <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
                          <Image
                            src={element.image || `/preview.png`}

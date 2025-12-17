@@ -117,7 +117,10 @@ const purchaseRequest = async () => {
           <label for="receivedDate" class="block font-medium mb-1">Shipment Date</label>
           <input type="date" id="receivedDate" class="w-full border rounded px-3 py-2">
         </div>
-        
+        <div>
+          <label for="refNo" class="block font-medium mb-1">Ref No</label>
+          <input type="text" id="refNo" class=" w-full border rounded px-3 py-2" placeholder="Enter reference number">
+        </div>
       </div>
     `,
     showCancelButton: true,
@@ -131,15 +134,15 @@ const purchaseRequest = async () => {
     preConfirm: () => {
       const warehouse = document.getElementById('warehouse').value.trim();
       const recievedDate = document.getElementById('receivedDate').value.trim();
-      // const refNo = document.getElementById('refNo').value.trim();
+      const refNo = document.getElementById('refNo').value.trim();
       const vendor = data._id;
 
-      if (!warehouse || !recievedDate || !vendor) {
+      if (!warehouse || !recievedDate || !vendor || !refNo) {
         Swal.showValidationMessage('⚠️ All fields must be filled out.');
         return false;
       }
 
-      return { warehouse, recievedDate ,vendor};
+      return { warehouse, recievedDate ,vendor,refNo};
     }
   }).then(async (result) => {
     if (result.isConfirmed) {
@@ -154,7 +157,7 @@ const purchaseRequest = async () => {
       const res = await request.json()
 
       if(res.newPurchase){
-        router.push(`/${userInfo.business.companyName}/${userInfo.user._id}/Module/purchase-request/${res.newPurchase}`)
+        router.push(`/${userInfo.business.companyName}/${userInfo.user._id}/Module/Forms/Transit/${res.newPurchase}`)
       }else{
         ErrorMessage(res.error)
       }
