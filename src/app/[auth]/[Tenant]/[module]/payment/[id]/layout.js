@@ -5,6 +5,7 @@ import SinglePymentpage from "./page";
 import Nav1 from "@/app/Components/Nav1"
 import BackButton from "@/app/Components/BackBotton"
 import Footer2 from "@/app/Components/Footer2"
+import PaymentReceipt from "@/app/Components/PrintReciept";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -84,11 +85,13 @@ export default async function paymentlayout({ params }) {
          >
            <BackButton />
            <hr />
-           
+           {(data.Payment.status === 'posted' && (userData?.user?.isAccountant || userData?.user?.postPayment)) && (
+              <PaymentReceipt business={userData.business} payment={data.Payment} cust={data.Customers?.Username.toUpperCase()} />
+          )}
          </aside>{" "}
          {/* Main Content Area */}
          <main className="flex-1 ">
-           <section className="w-full max-w-screen-xl flex flex-col gap-6 rounded p-2 relative z-10 max-h-[83dvh] overflow-y-auto">
+           <section className="w-full max-w-7xl flex flex-col gap-6 rounded p-2 relative z-10 max-h-[83dvh] overflow-y-auto">
             <SinglePymentpage
               userInfo={userData}
               payment={data.Payment}
