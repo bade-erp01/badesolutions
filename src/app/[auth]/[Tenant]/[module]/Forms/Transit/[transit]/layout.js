@@ -90,16 +90,34 @@ export default async function layout({ children, params }) {
             <nav className="space-y-4">
               <BackButton />
               <hr />
+              <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+        
+         <ul className="divide-y divide-gray-700">
+          {DecryptedData.ActivityLog?.map((log, index) => {
+            return (
+             <li key={index} className="py-3 px-4 text-xs text-italic">
+              <div className="flex justify-between items-center">
+                <span className="text-italic">{log.logMsg}</span>
+              </div>
+              <hr className="border-gray-500" />
+             </li>
+            );
+          }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}
+         </ul>
+        </div>
             </nav>
           </aside>
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
+           <section className=" flex-2 max-w-screen-xl h-[83vh] overflow-y-scroll">
               <TransitPage
                 DecryptedData={DecryptedData}
                 userData={userData}
-                DecryptedProducts={DecryptedProducts}
+                products={DecryptedProducts}
+                EXPRESS_PRIVATE_URL={baseUrl}  
+                Business={userData.business}
+                user={userData.user}
               />
             </section>
           </main>
