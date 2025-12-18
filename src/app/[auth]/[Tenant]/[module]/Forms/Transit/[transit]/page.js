@@ -103,51 +103,51 @@ export default function TransitPage({
     }
   };
 
-  const DeleteDraftPo = async (id, userId) => {
-    try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      });
+  // const DeleteDraftPo = async (id, userId) => {
+  //   try {
+  //     const result = await Swal.fire({
+  //       title: "Are you sure?",
+  //       text: "You won't be able to revert this!",
+  //       icon: "warning",
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#3085d6",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Yes, delete it!",
+  //     });
 
-      if (!result.isConfirmed) {
-        return;
-      }
+  //     if (!result.isConfirmed) {
+  //       return;
+  //     }
 
-      plsWait("Deleteing Transfer...");
+  //     plsWait("Deleteing Transfer...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/DraftTranfer/${encodeURIComponent(
-        Encrypt(id)
-      )}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          dbConnect: `Bearer ${Business.rustyRoof}`,
-          access: `${Encrypt(user._id)}`,
-        },
-      });
+  //     const url = `${EXPRESS_PRIVATE_URL}/api/DraftTranfer/${encodeURIComponent(
+  //       Encrypt(id)
+  //     )}`;
+  //     const response = await fetch(url, {
+  //       method: "DELETE",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+  //         dbConnect: `Bearer ${Business.rustyRoof}`,
+  //         access: `${Encrypt(user._id)}`,
+  //       },
+  //     });
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (data.message) {
-        SuccessToast(data.message);
-        setTimeout(() => {
-          router.back();
-        }, 2000);
-      } else {
-        throw new Error(data.error || "Something went wrong");
-      }
-    } catch (error) {
-      ErrorMessage(error.message || "Network error");
-    }
-  };
+  //     if (data.message) {
+  //       SuccessToast(data.message);
+  //       setTimeout(() => {
+  //         router.back();
+  //       }, 2000);
+  //     } else {
+  //       throw new Error(data.error || "Something went wrong");
+  //     }
+  //   } catch (error) {
+  //     ErrorMessage(error.message || "Network error");
+  //   }
+  // };
 
   const handleQtyChange = async (newQty, lineId, field) => {
     try {
@@ -556,7 +556,7 @@ export default function TransitPage({
                 </button>
               )}
 
-            {user.raiseLpo && Singlebill.status.toLowerCase() === "draft" && (
+            {/* {user.raiseLpo && Singlebill.status.toLowerCase() === "draft" && (
               <button
                 title="Delete this draft"
                 onClick={() => DeleteDraftPo(Singlebill._id)}
@@ -565,7 +565,7 @@ export default function TransitPage({
                 <TrashIcon className="h-5 w-5 text-white" />
                 <span  className="text-xs">Delete</span>
               </button>
-            )}
+            )} */}
           </div>
 
           {/* Print Button */}
