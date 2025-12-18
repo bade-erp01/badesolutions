@@ -30,7 +30,6 @@ export default function TransitPage({
   EXPRESS_PRIVATE_URL,
 }) {
   const [Singlebill] = useState(DecryptedData);
-  const [cust] = useState(DecryptedData.Vendor);
   const [productList] = useState(products);
   Swal.close();
   const router = useRouter();
@@ -44,7 +43,7 @@ export default function TransitPage({
 
     try {
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(
+        `${EXPRESS_PRIVATE_URL}/api/TransitOrderProductAdd/${Encrypt(
           Singlebill._id
         )}?product=${Encrypt(cleanedProducts._id)}`,
         {
@@ -76,8 +75,8 @@ export default function TransitPage({
     try {
       plsWait("Removing product from cart");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransfer/${Encrypt(
-        bill._id
+      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransit/${Encrypt(
+        Singlebill._id
       )}?items=${encodeURIComponent(Encrypt(id))}`;
 
       const response = await fetch(url, {
@@ -154,11 +153,7 @@ export default function TransitPage({
     try {
       plsWait("updating...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Virtual/Product/TransferForm/${encodeURIComponent(
-        Encrypt(Singlebill._id)
-      )}?${field}=${newQty}&lineId=${encodeURIComponent(
-        lineId
-      )}&update=${field}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/transitLine/${encodeURIComponent(Encrypt(Singlebill._id))}?${field}=${newQty}&lineId=${encodeURIComponent(lineId)}&update=${field}`;
 
       const response = await fetch(url, {
         method: "PATCH",
@@ -204,7 +199,7 @@ export default function TransitPage({
 
       plsWait("Updating Request for Purchase");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Transfer/${Encrypt(
+      const url = `${EXPRESS_PRIVATE_URL}/api/Transit/status/${Encrypt(
         Singlebill._id
       )}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
 
@@ -314,7 +309,7 @@ export default function TransitPage({
 
       // Title (KEEP BOLD)
       doc.setFont("helvetica", "bold").setFontSize(17).setTextColor(0, 0, 0);
-      doc.text(`Product Transfer`, 10, currentY);
+      doc.text(`Goods in Transit`, 10, currentY);
       // Switch back to normal for everything else
       doc.setFont("helvetica", "normal");
       currentY += 10;
@@ -370,9 +365,6 @@ export default function TransitPage({
             "#",
             "Product",
             "Code",
-            "Batch",
-            "Trace",
-            "Expiry Date",
             "Price",
             "Case",
             "Pcs",
@@ -381,11 +373,8 @@ export default function TransitPage({
         ],
         body: bill.orders.map((ord, i) => [
           i + 1,
-          `${ord.item?.Name}`,
+          `${ord.item?.productName}`,
           ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-          ord.BatchNo || "N/A",
-          ord.Status || "",
-          ord.ExpDate || "N/A",
           ord.VendorPrice?.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
@@ -408,14 +397,10 @@ export default function TransitPage({
         startY: currentY,
         tableWidth: 76,
         margin: { left: pageWidth - 90 },
-        head: [["Subtotal", "Logistics", "Total Due"]],
+        head: [["Subtotal",  "Total Due"]],
         body: [
           [
             bill.subTotal?.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) || "0.00",
-            bill.shippingFee?.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             }) || "0.00",
@@ -445,15 +430,9 @@ export default function TransitPage({
       currentY += 10;
       doc.text(`Remarks:${bill.Remarks}`, margin, currentY);
       currentY += 10;
-      doc.text(`Approved By:`, margin, currentY);
+      doc.text(`Sign & Date: `, margin, currentY);
       currentY += 10;
-      doc.text(`${new Date(Singlebill.recievedDate).toLocaleDateString()} Sign & Date: `, margin, currentY);
-      currentY += 10;
-      if (business.invoicePolicy) {
-        doc.text(`${Singlebill.WHID.WHName} Sign & Date: `, margin, currentY);
-        currentY += 10;
-      }
-
+     
       // 📎 Footer
       doc.setFontSize(9).setFont("helvetica", "normal");
       doc.text(
@@ -554,7 +533,7 @@ export default function TransitPage({
             )}
 
             {user.allowInternalTransfers &&
-              Singlebill.status.toLowerCase() === "Pending" && (
+              Singlebill.status.toLowerCase() === "pending" && (
                 <button
                   onClick={() => updateRFP("Draft")}
                   title="Set this purchase request back to draft"
@@ -611,12 +590,9 @@ export default function TransitPage({
                 {[
                   "Product",
                   "Photo",
-                  "Trace",
                   "Code",
                   "Case",
                   "Pcs",
-                  "Batch",
-                  "eXPIRY DATE",
                   "Price",
                   `Total (${Business.currency?.currency.Symbol})`,
                   " ",
@@ -635,16 +611,16 @@ export default function TransitPage({
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-orange-50 transition"
-                  title={bill.item.Name}
+                  title={bill.item.productName}
                 >
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center text-xs">
                     <Link
                       href={`/${Business.companyName}/${Encrypt(
                         user._id
-                      )}/product/product/${Encrypt(bill.item._id)}`}
+                      )}/product/product/${Encrypt(bill.item.productId)}`}
                       className="hover:underline"
                     >
-                      {bill.item.Name}
+                      {bill.item.productName}
                     </Link>
                   </td>
                   <td className="px-4 py-2 text-center">
@@ -658,7 +634,6 @@ export default function TransitPage({
                       className="rounded-md "
                     />
                   </td>
-                  <td className="px-4 py-2 text-center">{bill.Status}</td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill?.item?.ADCcode || bill?.item?.ACDcode}
                   </td>
@@ -687,25 +662,22 @@ export default function TransitPage({
                   {Business.subscriptionplan === "Standard" ? (
                     <td>
                       {Singlebill.status.toLowerCase() === "draft" ? (
-                        //  <input
-                        //   defaultValue={bill.pcs || 0}
-                        //   type="number"
-                        //   step="any"
-                        //   className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
-                        //   onBlur={(e) => {
-                        //     const val = parseFloat(e.target.value);
-                        //     if(val !==""){
-                        //       handleQtyChange(
-                        //         isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                        //         Encrypt(bill._id),
-                        //         "Pcs"
-                        //       );
-                        //     }
-                        //   }}
-                        // />
-                        <td className="px-4 py-2 text-center text-xs">
-                          {bill.pcs || 0}
-                        </td> // placeholder till i figure transfer deductions
+                         <input
+                          defaultValue={bill.pcs || 0}
+                          type="number"
+                          step="any"
+                          className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if(val !==""){
+                              handleQtyChange(
+                                isNaN(val) || val < 0 ? 0 : val, // sanitized value
+                                Encrypt(bill._id),
+                                "Pcs"
+                              );
+                            }
+                          }}
+                        />
                       ) : (
                         <td className="px-4 py-2 text-center text-xs">
                           {bill.pcs || 0}
@@ -715,12 +687,6 @@ export default function TransitPage({
                   ) : (
                     <td className="px-4 py-2 text-center text-xs">0</td>
                   )}
-                  <td className="px-4 py-2 text-center">
-                    {bill.BatchNo || "N/A"}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {bill.ExpDate || "N/A"}
-                  </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.buyingPrice}
                   </td>
@@ -763,8 +729,7 @@ export default function TransitPage({
                     key={product._id}
                     value={product?.ADCcode || product?.ACDcode}
                   >
-                    {product?.productName} - [C:{product.currentQty}, P:
-                    {product.pcs} ]
+                    {product?.productName}
                   </option>
                 ))}
               </select>
@@ -797,8 +762,7 @@ export default function TransitPage({
                     key={product._id}
                     value={product?.ACDcode || product?.ADCcode}
                   >
-                    {product?.productName} - [C:{product.currentQty}, P:
-                    {product.pcs} ]
+                    {product?.productName}
                   </option>
                 ))}
               </datalist>
@@ -819,29 +783,6 @@ export default function TransitPage({
                   {Business.currency?.currency.Symbol}
                   {Singlebill.subTotal.toFixed(2)}
                 </strong>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping & Offloading Fee:</span>
-                {Singlebill.status === "Draft" ? (
-                  <input
-                    type="number"
-                    defaultValue={Singlebill.shippingFee || 0}
-                    className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    onBlur={(e) => {
-                      const val = parseFloat(e.target.value);
-                      handleQtyChange(
-                        isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                        "",
-                        "ShipingFee"
-                      );
-                    }}
-                  />
-                ) : (
-                  <strong>
-                    {Business.currency?.currency.Symbol}
-                    {Singlebill.shippingFee.toFixed(2)}
-                  </strong>
-                )}
               </div>
               <div className="flex justify-between">
                 <span>Remark:</span>
@@ -878,24 +819,6 @@ export default function TransitPage({
             <p className="italic text-base text-orange-700">
               {totalInWords(Singlebill.grandTotal, Business.currency?.currency)}
             </p>
-          </div>
-        </div>
-
-        {/* Signature & T&C */}
-        <div className="mt-12 flex flex-col md:flex-row justify-between items-start gap-10">
-          <div className="max-w-md">
-            <h4 className="font-semibold text-gray-700 mb-2">Attention ⚠️</h4>
-            <p className="text-sm text-red-600 mb-4">
-              Please ensure to verify all entries. Once this transfer is
-              processed, it's inreversable.
-            </p>
-          </div>
-          <div className="text-right">
-            <h4 className="font-semibold text-gray-700 mb-2">
-              {" "}
-              {Singlebill.billReferenceNo}
-            </h4>
-            <p className="text-sm font-medium text-gray-800"></p>
           </div>
         </div>
 
