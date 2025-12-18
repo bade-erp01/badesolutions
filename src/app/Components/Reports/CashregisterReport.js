@@ -12,7 +12,19 @@ export default function PaymentTableModal({ dataArray, banks, customers }) {
       data.filter(item => item.status?.toLowerCase() !== "pending")
     );
   const [bankList] = useState(banks || []);
-  const [customersList] = useState( (customers || []).sort((a, b) => {return a.username.trim().localeCompare(b.username); }) );
+  const [customersList] = useState(
+    (customers || [])
+      // first normalize usernames: trim + lowercase for sorting
+      .map(c => ({
+        ...c,
+        username: c.username?.trim() || ""   // permanently trimmed
+      }))
+      .sort((a, b) => {
+        const nameA = a.username.toLowerCase();
+        const nameB = b.username.toLowerCase();
+        return nameA.localeCompare(nameB);
+      })
+  );
 
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
