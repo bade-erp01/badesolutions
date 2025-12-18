@@ -12,7 +12,7 @@ export default function PaymentTableModal({ dataArray, banks, customers }) {
       data.filter(item => item.status?.toLowerCase() !== "pending")
     );
   const [bankList] = useState(banks || []);
-  const [customersList] = useState(customers.sort((a, b) => a.Username.localeCompare(b.Username.trim())));
+  const [customersList] = useState(customers.sort((a, b) => a.Username.trim().localeCompare(b.Username.trim())));
 
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
