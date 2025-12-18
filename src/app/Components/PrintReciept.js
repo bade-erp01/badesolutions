@@ -70,7 +70,7 @@ const PaymentReceipt = ({business,payment,cust}) => {
   return (
   <button
       onClick={generatePDF}
-      className="w-full bg-gray-300 hover:bg-gray-400 text-black font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+      className="w-full bg-gray-300 hover:bg-gray-400 text-black font-semibold py-3 px-6 rounded-lg transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-xs"
     >
       <PrinterIcon className="w-5 h-5" />
       Download Payment Receipt
