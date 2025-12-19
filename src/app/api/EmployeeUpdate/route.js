@@ -91,15 +91,15 @@ try {
     // Ensure database connection is established (already done above)
     const body = await request.json();
     const { id, ...updateData } = body;
-    await dbConnect();
-
+    
     if (!id || !updateData) {
       return new Response(
         JSON.stringify({ error: "Missing required query parameters." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
+    await dbConnect();
+    
       const employee = await Users.findById(id);
       if (!employee) {
         throw new Error("Employee not found");
@@ -139,7 +139,7 @@ try {
                 Name: accessTo.Name,
                 url: accessTo.url,
                 icon: accessTo.icon,
-                Description: accessTo.description,
+                Description: accessTo.description || accessTo.Description,
                 _id: accessTo._id,
               },
             },
