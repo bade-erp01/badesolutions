@@ -112,18 +112,6 @@ export default async function storelayout({ children, params }) {
                   <small>Purchase Order</small>
                 </Link>
 
-                <Link
-                  href={`/${userData.business?.companyName
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")
-                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                    userData?.user._id
-                  )}/Module/Forms/transfer`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <ClipboardDocumentCheckIcon className="h-6 w-6 text-gray-100" />
-                  <small>Product Transfers</small>
-                </Link>
               </>
             )}
             {/* store settings */}
