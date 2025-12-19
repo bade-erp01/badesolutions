@@ -75,26 +75,33 @@ function Encrypt(arg) {
 }
 
 function formatMongooseError(err) {
-  if (err.name === 'ValidationError') {
-    const messages = [];
-
-    for (const field in err.errors) {
-      const message = err.errors[field].message
-        .replace(/^[^:]+validation failed: /i, '')
-        .replace(/Path\s`[^`]+`\s/, '')
-        .trim();
-      messages.push(`${field}: ${message}`);
-    }
-
-    return `Validation failed: ${messages.join(', ')}`;
+   // Case 1: Validation errors (e.g. required fields, regex mismatch)
+  if (err.name === "ValidationError") {
+    return "Validation failed: One or more inputs are invalid.";
   }
 
+  // Case 2: Duplicate key error (MongoDB error code 11000)
   if (err.code === 11000) {
-    const dupField = Object.keys(err.keyPattern)[0];
-    return `Duplicate error: The value for "${dupField}" already exists.`;
+    return "Duplicate error: A record with this value already exists.";
   }
 
-  return `Error: Something went wrong`;
+  // Case 3: CastError (invalid ObjectId or wrong type)
+  if (err.name === "CastError") {
+    return "Invalid input: Provided value is not in the correct format.";
+  }
+
+  // Case 4: MongoNetworkError (connection issues)
+  if (err.name === "MongoNetworkError") {
+    return "Connection error. Please try again later.";
+  }
+
+  // Case 5: Timeout or server selection error
+  if (err.message && err.message.includes("timed out")) {
+    return "Request timed out. Please retry.";
+  }
+
+  // Fallback for other errors
+  return "An unexpected error occurred. Please try again.";
 }
 
 
