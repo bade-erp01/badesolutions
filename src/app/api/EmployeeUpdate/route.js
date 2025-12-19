@@ -98,7 +98,7 @@ try {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-    await dbConnect(Encrypt("BadeAdmin"));
+    await dbConnect("BadeAdmin");
     
       const employee = await Users.findById(id);
       if (!employee) {
@@ -159,7 +159,7 @@ try {
       // Optionally capture the error audit log if captureAuditLog is available
       // captureAuditLog && captureAuditLog(error.message, request.url, "PUT");
       return new Response(
-        JSON.stringify({ error: error.message }),
+        JSON.stringify({ error: formatMongooseError(error) }),
         { status: 403, headers: { "Content-Type": "application/json" } }
       );
     }

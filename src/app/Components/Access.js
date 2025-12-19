@@ -1,15 +1,14 @@
-"use client"
-import { UpdateEmployeeData, } from "../../../Functions/Functions";
-import {useState, useEffect} from 'react'
-import {useRouter} from 'next/navigation'
+"use client";
+import { UpdateEmployeeData } from "../../../Functions/Functions";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics";
-import {Encrypt} from "../../../Functions/Functions"
+import { Encrypt } from "../../../Functions/Functions";
 
-export default function AccessControl({userInfo,businessInfo,data }) {
- const [businessModules] = useState([...businessInfo.modules])
-  const [formData, setFormData] = useState({...data});
-  const router = useRouter()
-
+export default function AccessControl({ userInfo, businessInfo, data }) {
+  const [businessModules] = useState([...businessInfo.modules]);
+  const [formData, setFormData] = useState({ ...data });
+  const router = useRouter();
 
   const UpdateEmployeeModules = async (id, object) => {
     try {
@@ -21,9 +20,9 @@ export default function AccessControl({userInfo,businessInfo,data }) {
       const response = await fetch("/api/EmployeeUpdate", {
         method: "PUT",
         body,
-        headers:{
-          dbConnect:`Bearer ${businessInfo.rustyRoof}`,
-          access:`${Encrypt(formData._id)}`
+        headers: {
+          dbConnect: `Bearer ${businessInfo.rustyRoof}`,
+          access: `${Encrypt(formData._id)}`,
         },
         timeout: 10000, // ✅ 10s timeout for better error handling
       });
@@ -31,7 +30,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
 
       if (req.message) {
         SuccessToast(req.message);
-        router.refresh()
+        router.refresh();
       } else {
         throw new Error(req.error);
       }
@@ -40,41 +39,37 @@ export default function AccessControl({userInfo,businessInfo,data }) {
     }
   };
 
- 
-  const handleChange = (e) =>{
-     const { name, value, type, checked } = e.target;
-     setFormData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
 
-      UpdateEmployeeData(formData._id,e.target.name,e.target.checked)
-  }
+    UpdateEmployeeData(formData._id, e.target.name, e.target.checked);
+  };
 
-  
-  const handleChange2 = (e) => {
-  const { name, value, type, checked } = e.target;
+  const handleChange2 = async (e) => {
+    const { name, value, type, checked } = e.target;
 
-  // Update form data state
-  setFormData((prev) => ({
-    ...prev,
-    [name]: type === "checkbox" ? checked : value,
-  }));
+    // Update form data state
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
 
-  // Find the selected module by name
-  const selectedAppName = name;
-  const selectedModule = businessModules.find(
-    (mod) => mod.Name === selectedAppName
-  );
+    // Find the selected module by name
+    const selectedAppName = name;
+    const selectedModule = businessModules.find(
+      (mod) => mod.Name === selectedAppName
+    );
 
-  // Call update function if module is found
-  if (selectedModule) {
-    UpdateEmployeeModules(formData._id, selectedModule);
-  }
-};
-
-
-
+    // Call update function if module is found
+    if (selectedModule) {
+      await UpdateEmployeeModules(formData._id, selectedModule);
+      router.refresh();
+    }
+  };
 
   return (
     <form>
@@ -260,7 +255,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.editProduct || false}
-                   onChange={handleChange}
+                  onChange={handleChange}
                   id="editProduct"
                   name="editProduct"
                   type="checkbox"
@@ -343,7 +338,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.raiseInvoice || false}
-                   onChange={handleChange}
+                  onChange={handleChange}
                   id="raiseInvoice"
                   name="raiseInvoice"
                   type="checkbox"
@@ -426,7 +421,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.creditOfficer || false}
-                   onChange={handleChange}
+                  onChange={handleChange}
                   id="creditOfficer"
                   name="creditOfficer"
                   type="checkbox"
@@ -469,7 +464,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.AssetManager || false}
-                   onChange={handleChange}
+                  onChange={handleChange}
                   id="AssetManager"
                   name="AssetManager"
                   type="checkbox"
@@ -727,7 +722,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.postPayment || false}
-                 onChange={handleChange}
+                  onChange={handleChange}
                   id="postPayment"
                   name="postPayment"
                   type="checkbox"
@@ -813,7 +808,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.notifyPriceChange || false}
-                 onChange={handleChange}
+                  onChange={handleChange}
                   id="notifyPriceChange"
                   name="notifyPriceChange"
                   type="checkbox"
@@ -1028,7 +1023,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.AppraisalUser || false}
-                 onChange={handleChange}
+                  onChange={handleChange}
                   id="AppraisalUser"
                   name="AppraisalUser"
                   type="checkbox"
@@ -1158,7 +1153,7 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               <div className="group grid size-4 grid-cols-1">
                 <input
                   checked={formData.approveLeave || false}
-                 onChange={handleChange}
+                  onChange={handleChange}
                   id="approveLeave"
                   name="approveLeave"
                   type="checkbox"
@@ -1240,7 +1235,6 @@ export default function AccessControl({userInfo,businessInfo,data }) {
               </label>
             </div>
           </div>
-
         </div>
       </fieldset>
       {/* moduar acces */}
@@ -1253,59 +1247,60 @@ export default function AccessControl({userInfo,businessInfo,data }) {
           <div className="mt-6 space-y-6 flex col-span-4 flex-wrap">
             {/*  show business installed modules */}
             {businessInfo?.modules && Array.isArray(businessInfo.modules) ? (
-  businessInfo.modules.map((app, index) => {
-    const isChecked = formData.Apps?.some(a => a.Name === app.Name);
+              businessInfo.modules.map((app, index) => {
+                const isChecked = formData.Apps?.some(
+                  (a) => a.Name === app.Name
+                );
 
-    return (
-      <div key={index} className="flex gap-3">
-        <div className="flex h-6 shrink-0 items-center">
-          <div className="group grid size-4 grid-cols-1">
-            <input
-              id={`${app.Name}-${index}`}
-              checked={isChecked || false}
-              onChange={handleChange2}
-              name={app.Name}
-              type="checkbox"
-              title={`${app.Name}`}
-              className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-            />
-            <svg
-              fill="none"
-              viewBox="0 0 14 14"
-              className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-            >
-              <path
-                d="M3 8L6 11L11 3.5"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="opacity-0 group-has-checked:opacity-100"
-              />
-              <path
-                d="M3 7H11"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="opacity-0 group-has-indeterminate:opacity-100"
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="text-sm/6 pr-1">
-          <label
-            htmlFor={`${app.Name}-${index}`}
-            className="font-medium text-gray-900"
-          >
-            {app?.Name || ""}
-          </label>
-        </div>
-      </div>
-    );
-  })
-) : (
-  <p>No business apps available.</p>
-)}
-
+                return (
+                  <div key={index} className="flex gap-3">
+                    <div className="flex h-6 shrink-0 items-center">
+                      <div className="group grid size-4 grid-cols-1">
+                        <input
+                          id={`${app.Name}-${index}`}
+                          checked={isChecked || false}
+                          onChange={handleChange2}
+                          name={app.Name}
+                          type="checkbox"
+                          title={`${app.Name}`}
+                          className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                        />
+                        <svg
+                          fill="none"
+                          viewBox="0 0 14 14"
+                          className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
+                        >
+                          <path
+                            d="M3 8L6 11L11 3.5"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="opacity-0 group-has-checked:opacity-100"
+                          />
+                          <path
+                            d="M3 7H11"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="opacity-0 group-has-indeterminate:opacity-100"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="text-sm/6 pr-1">
+                      <label
+                        htmlFor={`${app.Name}-${index}`}
+                        className="font-medium text-gray-900"
+                      >
+                        {app?.Name || ""}
+                      </label>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p>No business apps available.</p>
+            )}
           </div>
         </fieldset>
       </div>
