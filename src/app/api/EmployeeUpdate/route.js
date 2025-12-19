@@ -2,7 +2,7 @@ import dbConnect from "../../../../lib/mongoose";
 import Users from "../../../../models/Users";
 import business from "../../../../models/Business";
 import { ObjectId } from "mongodb";
-import { formatMongooseError } from "../../../../Functions/Functions";
+import { formatMongooseError,Encrypt } from "../../../../Functions/Functions";
 
 // Ensure Mongoose connection is established
 
@@ -98,7 +98,7 @@ try {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-    await dbConnect();
+    await dbConnect(Encrypt("BadeAdmin"));
     
       const employee = await Users.findById(id);
       if (!employee) {
