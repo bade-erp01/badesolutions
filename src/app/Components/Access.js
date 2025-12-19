@@ -66,8 +66,8 @@ export default function AccessControl({ userInfo, businessInfo, data }) {
 
     // Call update function if module is found
     if (selectedModule) {
-      await UpdateEmployeeModules(formData._id, selectedModule);
-      router.refresh();
+      UpdateEmployeeModules(formData._id, selectedModule);
+      
     }
   };
 
