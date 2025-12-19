@@ -47,7 +47,7 @@ export default async function StoreLayout({ params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
+            <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               <SingleStoreProductpage
                 userInfo={userInfo}
                 storeProduct={StoreProd}

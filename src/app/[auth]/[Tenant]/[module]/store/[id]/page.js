@@ -1,10 +1,11 @@
 import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import Card from "@/app/Components/Card"
+import Card from "@/app/Components/Card";
 import Link from "next/link";
 import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
+import StoreChart from "@/app/Components/StoreChart";
 import { Encrypt } from "../../../../../../../Functions/Functions";
 import {
   ChartPieIcon,
@@ -111,13 +112,12 @@ export default async function storelayout({ children, params }) {
                   <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
                   <small>Purchase Order</small>
                 </Link>
-
               </>
             )}
             {/* store settings */}
             <Link
               href={`/${userData.business.companyName}/${Params.Tenant}/${Params.module}/store/${Params.id}/store-settings`}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition duration-200 not-visited:bg-purple-500/20`}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition duration-200 `}
             >
               <WrenchScrewdriverIcon className="h-6 w-6 text-gray-100" />
               <span className="text-sm font-medium">Store Settings</span>
@@ -132,11 +132,20 @@ export default async function storelayout({ children, params }) {
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg  relative z-10 overflow-y-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 max-h-[80dvh]">
+        <main className="flex-1">
+          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg relative z-10 max-h-[83dvh] overflow-y-hidden ">
+            <div className=" overflow-y-auto">
+            {/* Chart: only show if user has c_levelDash */}
+            {userData?.user?.c_levelDash && (
+              <div className="m-3">
+                <StoreChart productsList={data.products} />
+              </div>
+            )}
+
+            {/* Product Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 p-1">
               {data.products
-                .sort((a, b) => a.productName.localeCompare(b.productName))
+                ?.sort((a, b) => a.productName.localeCompare(b.productName))
                 .map((element) => (
                   <Card
                     key={element._id}
@@ -145,6 +154,7 @@ export default async function storelayout({ children, params }) {
                     className="shadow-lg rounded-lg bg-white hover:shadow-xl transition-shadow duration-300"
                   />
                 ))}
+              </div>
             </div>
           </section>
         </main>
