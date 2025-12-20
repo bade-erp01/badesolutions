@@ -92,10 +92,6 @@ const SalesDumpModal = ({ business }) => {
             Store: getStoreName(sale.whId, stores),
             Invoicer: sale.RaiseBy,
             Customer: sale.customerName,
-            State:"",
-            Region:"",
-            Rep:"",
-            Machandizer:"",
             product: getProductName(order.item._id, products),
             "Sys-Code": order.item.ACDcode || order.item.ADCcode,
             Trace: order.returnId,
@@ -109,15 +105,16 @@ const SalesDumpModal = ({ business }) => {
             FOC:order.item.isAservice,
             "Manuf-Code": order.item.Manufacture_code,
             Vendor: getVendorName(order.item.Vendor, vendors),
-            Promo_Sum: (order.promotionData || 0) * (order.Qty || 0),
+            Promo: order.promotionData,
+            "Promo Total": (order.promotionData || 0) * (order.Qty || 0),
             PriceList: PriceList(sale.priceList),
             "Dis Allowed":sale.discount,
             Ord_Date: sale.startDate,
             Inv_Date: moment(sale.DELIVERYDATE).format("l") || "N/A",
             Inv_Sub: sale.subTotal,
             Inv_Total: sale.grandTotal,
-            Month: new Date(sale.startDate).toLocaleString("default", { month: "short" }),
-            Year: new Date(sale.startDate).getFullYear(),
+            Month : moment(inv.startDate).format("MMM"), // short month (e.g. "Dec") const
+            Year : moment(inv.startDate).format("YYYY") // full year (e.g. "2025")
           });
         }
       });

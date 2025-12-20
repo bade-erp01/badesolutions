@@ -4,19 +4,45 @@ import { saveAs } from 'file-saver';
 
 const ITEMS_PER_PAGE = 10;
 
-const ScheduledActivity = ({ Sales,customerName }) => {
+const ScheduledActivity = ({ Sales,customer,business,Rep }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+
+  const PriceList = (customersPriceList) => {
+      const normalizedKey = customersPriceList?.toLowerCase();
+
+      const priceMap = {
+        pricelist1: business.priceList1,
+        pricelist2: business.priceList2,
+        pricelist3: business.priceList3,
+        pricelist4: business.priceList4,
+        pricelist5: business.priceList5,
+        pricelist6: business.priceList6,
+        pricelist7: business.priceList7,
+      };
+
+      return priceMap[normalizedKey] || null;
+    };
+
+    // find sale person and manager
+    const SaleRep = (id) => {
+      const salesRep = Rep.find(person => person._id === id);
+      return salesRep?.firstName && salesRep?.lastName
+        ? `${salesRep.firstName} ${salesRep.lastName}`
+        : "N/A";
+    };
+
+
   // Filtered and searched data
   const filteredSales = useMemo(() => {
     return Sales.filter((inv) => {
       const matchesSearch =
         inv.billReferenceNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inv.customerName?.toLowerCase().includes(searchTerm.toLowerCase());
+        inv.customer.Username?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = statusFilter ? inv.billStatus === statusFilter : true;
 
@@ -36,18 +62,36 @@ const ScheduledActivity = ({ Sales,customerName }) => {
   );
 
   const exportToCSV = () => {
-    const headers = ['INV No', 'Status', 'Date', 'Customer', 'Product', 'Qty', 'Pcs', 'Price', 'Total'];
+    const headers = ['Ref No', 'Status', 'Date', 'Customer',"State","Region",'Address',"Rep","Manager","Machadizer", 'Product','Sys-Code','Promo','Promo Total','FOC','Trace','Batch','Category', 'Qty', 'Pcs','Vat',"Dis Allowed","PriceList", 'Price', 'Total','Month','Year'];
     const rows = filteredSales.flatMap((inv) =>
       inv.orders?.map((order) => [
       inv.billReferenceNo,
       inv.billStatus,
       moment(inv.startDate).format('YYYY-MM-DD'),
-      inv.customerName,
+      customer.Username,
+      customer.State,
+      customer.Region,
+      customer.billingAddress || customer.street,
+      SaleRep(inv.salesPerson),
+      SaleRep(customer.Manager),
+      customer.Merchandiser,
       order.item.Name,
+      order.item.ACDcode || order.item.ADCcode,
+      order.promotionData,
+      (order.promotionData || 0) * (order.Qty || 0),
+      order.item.isAservice,
+      order.returnId,
+      order.BatchId,
+      order.item.category,
       order.Qty,
       order.pcsReq,
+      order.vat || 0,
+      inv.discount,
+      PriceList(inv.priceList),
       order.priceListPrice,
-      order.total
+      order.total,
+      moment(inv.startDate).format("MMM"), // short month (e.g. "Dec") const
+      moment(inv.startDate).format("YYYY") 
       ]) || []
     );
 
@@ -57,7 +101,7 @@ const ScheduledActivity = ({ Sales,customerName }) => {
         .join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, `${customerName} dump.csv`);
+    saveAs(blob, `${customer.Username} dump.csv`);
   };
 
   return (

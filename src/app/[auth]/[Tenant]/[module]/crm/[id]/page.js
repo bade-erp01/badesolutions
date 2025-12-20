@@ -1753,7 +1753,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
             }`}
         >
           <Section title="">
-            <CustomerSales Sales={Sales} customerName={cust.Username} />
+            <CustomerSales Sales={Sales} customer={cust} business={userInfo.business} Rep={salesPerson}/>
           </Section>
         </div>
       </div>
