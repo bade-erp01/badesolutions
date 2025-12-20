@@ -18,9 +18,14 @@ export const metadata = {
 };
 import ModulesPage from './page'
 import { fetchUser } from '../../../../Functions/useerDataRefresh';
+import { notFound } from 'next/navigation';
 
 export default async function Appslayout({children}) {
    const userInfo = await fetchUser();
+
+   if(userInfo.business..subscriptionplan !== "Standard") return notFound()
+
+    
   return <>
   {/* {children} */}
   <ModulesPage userInfo ={userInfo} />
