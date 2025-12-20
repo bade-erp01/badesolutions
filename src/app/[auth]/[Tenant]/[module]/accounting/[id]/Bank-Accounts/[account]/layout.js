@@ -3,6 +3,7 @@ import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh
 import { Encrypt,Dencrypt } from "../../../../../../../../../Functions/Functions";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
+import BankStatement from "@/app/Components/Reports/BankStatement"
 import { notFound } from "next/navigation";
 import Page from "./page"
 import moment from "moment";
@@ -94,6 +95,8 @@ export default async function paymentlayout({ children, params }) {
              <span  className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
              Updated: {moment(data.account.updatedAt).fromNow()}
             </span>
+
+            <BankStatement  dataArray={data.Entries} bank={data.account}/>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
