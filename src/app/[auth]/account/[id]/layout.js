@@ -99,7 +99,7 @@ export default async function SetUpLayout({children, params }) {
                 </Link>
     
       
-                {userData?.user?.isAdmin && (
+                {userData?.user?.isAdmin && userData.business.subscriptionplan === "Standard" &&  (
                   <Link
                     href={`/auth/Apps`}
                     className="flex items-center gap-3 p-3 bg-amber-600 rounded-md hover:bg-gray-700 transition  text-xs"
