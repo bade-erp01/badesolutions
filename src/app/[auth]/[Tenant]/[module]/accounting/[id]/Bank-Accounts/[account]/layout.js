@@ -5,6 +5,7 @@ import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import Page from "./page"
+import moment from "moment";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
