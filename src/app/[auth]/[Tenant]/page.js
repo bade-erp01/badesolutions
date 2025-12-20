@@ -76,8 +76,7 @@ export default async function TenantPage({ params }) {
               ))}
             </div>
 
-            {userData?.user?.isAdmin && (
-              <>
+            {userData?.user?.isAdmin && userData.business.subscriptionplan === "Standard" && (
                 <Link
                   href={`/auth/Apps`}
                   className="flex items-center gap-3 p-3 rounded-md bg-gray-400 hover:bg-gray-700 transition"
@@ -90,7 +89,9 @@ export default async function TenantPage({ params }) {
                   />
                   <span className="text-sm">App Store</span>
                 </Link>
+              )}
 
+              {userData?.user?.isAdmin && (
                 <Link
                   href={`/${companySlug}/account/${Encrypt(userData?.business?._id)}`}
                   className="flex items-center gap-3 p-3 rounded-md bg-gray-400 hover:bg-gray-700 transition"
@@ -103,8 +104,8 @@ export default async function TenantPage({ params }) {
                   />
                   <span className="text-sm">Business Settings</span>
                 </Link>
-              </>
-            )}
+            
+              )}
 
             <Logout />
             <TermsAndConditionsLink BusinessPlan={userData.business.subscriptionplan}/>
