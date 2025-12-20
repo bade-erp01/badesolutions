@@ -26,13 +26,13 @@ const SalesDumpModal = ({ business }) => {
       const normalizedKey = customersPriceList?.toLowerCase();
 
       const priceMap = {
-        pricelist1: business.Pricelist1,
-        pricelist2: business.Pricelist2,
-        pricelist3: business.Pricelist3,
-        pricelist4: business.Pricelist4,
-        pricelist5: business.Pricelist5,
-        pricelist6: business.Pricelist6,
-        pricelist7: business.Pricelist7,
+        pricelist1: business.priceList1,
+        pricelist2: business.priceList2,
+        pricelist3: business.priceList3,
+        pricelist4: business.priceList4,
+        pricelist5: business.priceList5,
+        pricelist6: business.priceList6,
+        pricelist7: business.priceList7,
       };
 
       return priceMap[normalizedKey] || null;
