@@ -111,7 +111,7 @@ const SalesDumpModal = ({ business }) => {
             Vendor: getVendorName(order.item.Vendor, vendors),
             Promo_Sum: (order.promotionData || 0) * (order.Qty || 0),
             PriceList: PriceList(sale.priceList),
-            "Dis Allowed":order.discount,
+            "Dis Allowed":sale.discount,
             Ord_Date: sale.startDate,
             Inv_Date: moment(sale.DELIVERYDATE).format("l") || "N/A",
             Inv_Sub: sale.subTotal,
