@@ -21,6 +21,24 @@ const SalesDumpModal = ({ business }) => {
   });
 
   // helpers that can operate on provided lists (or fall back to state)
+
+  const PriceList = (customersPriceList) => {
+      const normalizedKey = customersPriceList?.toLowerCase();
+
+      const priceMap = {
+        pricelist1: business.Pricelist1,
+        pricelist2: business.Pricelist2,
+        pricelist3: business.Pricelist3,
+        pricelist4: business.Pricelist4,
+        pricelist5: business.Pricelist5,
+        pricelist6: business.Pricelist6,
+        pricelist7: business.Pricelist7,
+      };
+
+      return priceMap[normalizedKey] || null;
+    };
+
+
   const getProductName = (id, products = ProductList) => {
     try {
       const prod = products.find((p) => p._id === id);
@@ -92,7 +110,7 @@ const SalesDumpModal = ({ business }) => {
             "Manuf-Code": order.item.Manufacture_code,
             Vendor: getVendorName(order.item.Vendor, vendors),
             Promo_Sum: (order.promotionData || 0) * (order.Qty || 0),
-            PriceList: sale.priceList,
+            PriceList: PriceList(sale.priceList),
             "Dis Allowed":order.discount,
             Ord_Date: sale.startDate,
             Inv_Date: moment(sale.DELIVERYDATE).format("l") || "N/A",
