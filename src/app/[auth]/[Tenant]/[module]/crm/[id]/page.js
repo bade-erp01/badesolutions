@@ -1281,30 +1281,21 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                   ))}
                 </select>
               </div>
-              {/* Vat on customer invoices */}
-              {/* {userInfo.business.subscriptionplan === "Standard" && (
-              <Input
-                label="VAT Percentage (%)"
-                name="vatPercentage"
-                type="number"
-                min={0}
-                step="any"
-                onChange={handleChange}
-                value={formData?.vatPercentage?.$numberDecimal || 0}
-              />
-              )} */}
+             
             </Grid>
           </Section>
 
           {/* Status Flags */}
           <Section title="Status Flags">
             <Grid columns={3}>
-              <Checkbox
-                label="Subscribed to Newsfeed"
-                name="NewsFeedSubscription"
-                checked={formData.NewsFeedSubscription}
-                onChange={handleChange}
-              />
+               {cust.Email  && (
+                <Checkbox
+                  label="Send quarterly transaction statement"
+                  name="NewsFeedSubscription"
+                  checked={formData.NewsFeedSubscription}
+                  onChange={handleChange}
+                />
+              )}
               <Checkbox
                 label="Verified"
                 name="isVerified"
