@@ -61,6 +61,7 @@ export default async function Productlayout({ children, params }) {
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
 
       },
+      next: { revalidate: 60 } // cache for 1 minutes
     }),
 
     // get all store
@@ -72,6 +73,7 @@ export default async function Productlayout({ children, params }) {
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
 
       },
+       next: { revalidate: 60 } // cache for 1 minutes
     })
 
     ])

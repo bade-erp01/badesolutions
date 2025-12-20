@@ -42,6 +42,7 @@ export default async function crmLayout({ children, params }) {
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         Authorization: `Bearer ${userData.business.tenantId}`,
       },
+      next: { revalidate: 60 } // cache for 1 minutes
     });
 
     customerList = res.data; // ✅ Fix: axios returns data in `res.data`, not `res.json()`

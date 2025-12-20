@@ -62,6 +62,7 @@ export default async function paymentlayout({ children, params }) {
       dbConnect: `Bearer ${userData.business.rustyRoof}`,
       access: `${Encrypt(userData.user._id)}`,
     },
+     next: { revalidate: 60 } // cache for 1 minutes
   });
 
   const data = await res.json()
@@ -94,7 +95,7 @@ export default async function paymentlayout({ children, params }) {
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
+          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
            <PaymentListpage Payments={data.Payments} bank={data.Accounts} Customers={data.Customers} userInfo={userData}/>
           </section>
         </main>

@@ -66,7 +66,8 @@ export default async function Productlayout({ children, params }) {
         Authorization: `Bearer ${userData.business.tenantId}`,
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         access: `${Encrypt(userData.user._id)}`
-      }
+      },
+      next: { revalidate: 60 } // cache for 1 minutes
     });
 
     if (!res.ok) throw new Error("Failed to fetch product data");

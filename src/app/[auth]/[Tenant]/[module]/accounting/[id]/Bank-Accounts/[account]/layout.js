@@ -62,7 +62,7 @@ export default async function paymentlayout({ children, params }) {
       dbConnect: `Bearer ${userData.business.rustyRoof}`,
       access: `${Encrypt(userData.user._id)}`,
     },
-    next: { revalidate: 120 } // cache for 2 minutes
+    next: { revalidate: 60 } // cache for 1 minutes
   });
 
   const data = await res.json();
