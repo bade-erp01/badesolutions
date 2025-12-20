@@ -87,6 +87,9 @@ export default async function paymentlayout({ children, params }) {
           <hr />
           <nav className="space-y-4">
             {/* Sidebar content can go here */}
+            <span  className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
+             Current Bal: {data.account.Balance.toLocaleString()}
+            </span>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
