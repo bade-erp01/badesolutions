@@ -13,6 +13,7 @@ const SalesDumpModal = ({ business }) => {
   const [ProductList, setProductList] = useState([]);
   const [StoreList, setStoreList] = useState([]);
   const [Vendors, setVendorList] = useState([]);
+  
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
@@ -73,6 +74,10 @@ const SalesDumpModal = ({ business }) => {
             Store: getStoreName(sale.whId, stores),
             Invoicer: sale.RaiseBy,
             Customer: sale.customerName,
+            State:"",
+            Region:"",
+            Rep:"",
+            Machandizer:"",
             product: getProductName(order.item._id, products),
             "Sys-Code": order.item.ACDcode || order.item.ADCcode,
             Trace: order.returnId,

@@ -90,6 +90,9 @@ export default async function paymentlayout({ children, params }) {
             <span  className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
              Current Bal: {data.account.Balance.toLocaleString()}
             </span>
+             <span  className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
+             Updated: {moment(data.account.createdAt).fromNow()}
+            </span>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
