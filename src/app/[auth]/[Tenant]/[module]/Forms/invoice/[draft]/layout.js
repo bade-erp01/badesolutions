@@ -18,7 +18,8 @@ export default async function StoreLayout2({ params }) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${userData.business.tenantId}`,
         dbConnect:`Bearer ${userData.business.rustyRoof}`,
-      }
+      },
+      next: { revalidate: 120 } // cache for 2 minutes
     });
 
     const data = await res.data;
