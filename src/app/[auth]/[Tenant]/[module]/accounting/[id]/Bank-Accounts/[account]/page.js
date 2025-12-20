@@ -27,7 +27,7 @@ export default function Page({ data }) {
       {/* Table */}
       <div className="bg-black rounded-lg shadow-md overflow-hidden">
         <div className="overflow-hidden w-full">
-          <table className="w-full table-auto divide-y divide-gray-200 text-sm">
+          <table className="w-full table-auto divide-y divide-gray-200 text-xs">
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
                 {["Desc", "Ref", "Status", "Date","Dr","Cr", "Bal."].map((header) => (
