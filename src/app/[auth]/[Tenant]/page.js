@@ -114,7 +114,7 @@ export default async function TenantPage({ params }) {
 
         {/* Main Content */}
         <main
-          className="flex-2 max-w-screen-xl h-[83vh] overflow-y-scroll p-6 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300"
+          className="flex-2 max-w-7xl h-[83vh] overflow-y-scroll p-6 bg-linear-to-br from-gray-200 via-gray-100 to-gray-300"
           style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent' }}
         >
           <section className=" " >

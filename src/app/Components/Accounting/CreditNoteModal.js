@@ -52,8 +52,12 @@ const CreditNoteModal = ({ customersList, baseUrl, userData,BankAccounts }) => {
           </div>
 
            <div class="flex flex-col">
-            <label class="text-left text-xs font-medium text-gray-700 mb-1">Credit Account</label>
+            <label class="text-left text-xs font-medium text-gray-700 mb-1">Credit Account <i class="text-red-600">
+              Choose this option only to log confirmed transactions — not estimates or drafts.
+              </i>
+            </label>
             <select id="bankDropdown" class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
+              <option value="" >Choose...</option>
               ${BankOptions}
             </select>
           </div>
@@ -93,26 +97,26 @@ const CreditNoteModal = ({ customersList, baseUrl, userData,BankAccounts }) => {
         const customerId = document.getElementById("customerDropdown").value;
         const bankID = document.getElementById("bankDropdown").value;
 
-        if (!Date || !Total || !customerId || !reference || !bankID) {
+        if (!Date || !Total || !customerId || !reference ) {
           Swal.showValidationMessage("Please fill in all required fields");
           return false;
         }
 
-        return { Date, Total, reference, customerId, bankID };
+        return { Date, Total, reference, customerId, bankID: bankID || null };
       },
       confirmButtonText: "Create",
       showCancelButton: true,
       cancelButtonText: "Cancel",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        plsWait("Working on things..please wait.");
+        plsWait("Working on things...please wait.");
         //  send this to your API here
         const request = await fetch(`${baseUrl}/api/Credit/new`, {
           method: "POST",
           body: JSON.stringify(result.value),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userData.business.tenantId}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             dbConnect: `Bearer ${userData.business.rustyRoof}`,
             access: `Bearer ${Encrypt(userData.user._id)}`,
           },
