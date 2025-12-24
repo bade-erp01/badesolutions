@@ -53,7 +53,7 @@ const CreditNoteModal = ({ customersList, baseUrl, userData,BankAccounts }) => {
 
            <div class="flex flex-col">
             <label class="text-left text-xs font-medium text-gray-700 mb-1">Credit Account <i class="text-red-600">
-              Please choose this option only if a real refund has taken place — either physical or digital.
+              Please choose this option only if a real credit refund has taken place — either physical or digital.
             </i>
             </label>
             <select id="bankDropdown" class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">

@@ -53,8 +53,12 @@ const DebitNoteModal = ({ customersList, baseUrl, userData,Accounts }) => {
           </div>
 
           <div class="flex flex-col">
-            <label class="text-left text-xs font-medium text-gray-700 mb-1">Debit Account</label>
-            <select id="bankDropdown" required class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
+           <label class="text-left text-xs font-medium text-gray-700 mb-1">Debit Account <i class="text-red-600">
+              Please choose this option only if a real debit refund has taken place — either physical or digital.
+            </i>
+            </label>
+            <select id="bankDropdown" class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
+              <option value="" >Choose...</option>
               ${accountOptions}
             </select>
           </div>
@@ -94,12 +98,12 @@ const DebitNoteModal = ({ customersList, baseUrl, userData,Accounts }) => {
         const customerId = document.getElementById("customerDropdown").value;
         const bankID = document.getElementById("bankDropdown").value;
 
-        if (!Date || !Total || !customerId || !reference || !bankID) {
+        if (!Date || !Total || !customerId || !reference ) {
           Swal.showValidationMessage("Please fill in all required fields");
           return false;
         }
 
-        return { Date, Total, reference, customerId, bankID };
+        return { Date, Total, reference, customerId, bankID: bankID || null };
       },
       confirmButtonText: "Create",
       showCancelButton: true,
@@ -113,7 +117,7 @@ const DebitNoteModal = ({ customersList, baseUrl, userData,Accounts }) => {
           body: JSON.stringify(result.value),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userData.business.tenantId}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             dbConnect: `Bearer ${userData.business.rustyRoof}`,
             access: `Bearer ${Encrypt(userData.user._id)}`,
           },
