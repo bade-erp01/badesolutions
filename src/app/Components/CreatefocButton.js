@@ -2,7 +2,7 @@
 
 import Swal from 'sweetalert2';
 import axios from 'axios';
-import { Encrypt, plsWait } from '../../../Functions/Mics';
+import { Encrypt, plsWait, ErrorMessage, SuccessToast, } from '../../../Functions/Mics';
 import {EXPRESS_PRIVATE_URL} from "../../../Functions/Functions"
 import {useState} from "react"
 import {useRouter} from 'next/navigation'
@@ -14,7 +14,7 @@ const CreateFocButton =  ({ productId, business,user }) => {
     try {
       const result = await Swal.fire({
         title: 'Are you sure?',
-        text: 'Do you want to create FCO for this product?',
+        text: 'Do you want to create FOC for this product?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes, create it!',
@@ -38,17 +38,18 @@ const CreateFocButton =  ({ productId, business,user }) => {
       );
 
         if(data.message){
-            Swal.fire('Created!', 'FCO has been successfully created.', 'success');
+           SuccessToast(data.message)
             navigation.refresh()
         }else{
             throw new Error(data.error)
         }
 
       } else {
-        Swal.fire('Cancelled', 'FCO creation was cancelled.', 'info');
+       ErrorMessage('FOC creation was cancelled.', 'info');
       }
     } catch (err) {
-      Swal.fire('Error', 'Something went wrong while creating FCO.', 'error');
+      ErrorMessage(err.message)
+      navigation.refresh()
     }
   };
 
