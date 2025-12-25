@@ -205,10 +205,10 @@ export default function SingleEmployeeView({
     const diffMinutes = now.diff(lastSeenTime, "minutes");
 
     if (lastSeen === "Online") {
-      return `Currently Logged in`;
+      return `Not Logged in`;
       // Active within the last 5 minutes
     } else if (diffMinutes < 1440) {
-      return `Last seen ${lastSeenTime.fromNow()}`; // Shows relative time
+      return `Last login ${lastSeenTime.fromNow()}`; // Shows relative time
     } else {
       return "Offline"; // Inactive for more than a day
     }
@@ -365,7 +365,7 @@ export default function SingleEmployeeView({
             </h4>
             <span
               className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
-                data.lastSeen !== "Online"
+                data.lastSeen === ""
                   ? "bg-red-50 text-red-600 border-red-200"
                   : "bg-green-50 text-green-700 border-green-200"
               }`}
