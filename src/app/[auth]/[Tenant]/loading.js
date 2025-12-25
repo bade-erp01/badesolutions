@@ -22,7 +22,7 @@ export default function Loading() {
         {/* Main Content */}
         <main className="flex-1 p-4 overflow-y-auto">
           <section className="w-full max-w-7xl mx-auto animate-pulse space-y-6">
-            <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+            {/* <div className="h-6 bg-gray-300 rounded w-3/4"></div>
             <div className="h-4 bg-gray-300 rounded w-1/2"></div>
             <div className="h-48 bg-gray-300 rounded w-full"></div>
             <div className="space-y-3">
@@ -34,7 +34,10 @@ export default function Loading() {
               <div className="h-4 bg-gray-300 rounded w-full"></div>
               <div className="h-4 bg-gray-300 rounded w-5/6"></div>
             </div>
-            <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div>
+            <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div> */}
+             <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-black"></div>
+            </div>
           </section>
         </main>
       </div>
