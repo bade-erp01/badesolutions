@@ -35,7 +35,7 @@ export default function Loading() {
               <div className="h-4 bg-gray-300 rounded w-5/6"></div>
             </div>
             <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div> */}
-             <div className="flex items-center justify-center min-h-screen">
+             <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-black"></div>
             </div>
           </section>
