@@ -198,21 +198,30 @@ export default function SingleEmployeeView({
     }
   };
 
-  const getStatus = (lastSeen) => {
-    const now = moment();
-    const lastSeenTime = moment(lastSeen);
+const getStatus = (lastSeen) => {
+  // If lastSeen is explicitly "Online"
+  if (lastSeen === "Online") {
+    return "Not Logged in";
+  }
 
-    const diffMinutes = now.diff(lastSeenTime, "minutes");
+  const lastSeenTime = moment(lastSeen, moment.ISO_8601, true);
 
-    if (lastSeen === "Online") {
-      return `Not Logged in`;
-      // Active within the last 5 minutes
-    } else if (diffMinutes < 1440) {
-      return `Last login ${lastSeenTime.fromNow()}`; // Shows relative time
-    } else {
-      return "Offline"; // Inactive for more than a day
-    }
-  };
+  // Validate date
+  if (!lastSeenTime.isValid()) {
+    return "Unknown status";
+  }
+
+  const diffMinutes = moment().diff(lastSeenTime, "minutes");
+
+  if (diffMinutes <= 5) {
+    return "Online"; // Active within the last 5 minutes
+  } else if (diffMinutes < 1440) {
+    return `Last login ${lastSeenTime.fromNow()}`; // Shows relative time (e.g., "3 hours ago")
+  } else {
+    return "Offline"; // Inactive for more than a day
+  }
+};
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
