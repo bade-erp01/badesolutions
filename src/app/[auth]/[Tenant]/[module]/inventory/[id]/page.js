@@ -41,7 +41,6 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`, // Replace with your actual token
-            dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
             access:`${Encrypt(userInfo.user._id)}`
           },
         }

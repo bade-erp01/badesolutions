@@ -16,8 +16,7 @@ export default async function StoreLayout({ params }) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userInfo.business.tenantId}`,
-        dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
         access: `${Encrypt(userInfo.user._id)}`,
       },
     });

@@ -51,7 +51,6 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
-      dbConnect: `Bearer ${businessData.rustyRoof}`,
       access: `${Encrypt(userData._id)}`,
     },
   };

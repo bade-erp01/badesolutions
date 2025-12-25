@@ -118,7 +118,7 @@ export default function MainDash({ userData }) {
         const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Report`, {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
+            access:`${Encrypt(userData?.user._id)}`,
           },
         });
 

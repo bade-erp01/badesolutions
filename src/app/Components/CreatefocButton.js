@@ -31,9 +31,7 @@ const CreateFocButton =  ({ productId, business,user }) => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${business.tenantId}`,
-            // 'X-Requested-With': 'XMLHttpRequest',
-            dbconnect: `Bearer ${business.rustyRoof}`,
+            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             access: `${Encrypt(user._id)}`
           }
         }

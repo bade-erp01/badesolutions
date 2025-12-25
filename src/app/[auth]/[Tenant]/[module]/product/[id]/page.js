@@ -132,8 +132,6 @@ export default function SingleProductpage({
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-    // "X-Requested-With": "XMLHttpRequest",
-    dbConnect: `Bearer ${businessInfo.rustyRoof}`,
     access: `${Encrypt(userInfo._id)}`,
   });
 
@@ -159,7 +157,7 @@ export default function SingleProductpage({
       }
 
       const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/${Backdata._id}/BuyingPrice_change`,
+        `${EXPRESS_PRIVATE_URL}/api/${Encrypt(Backdata._id)}/BuyingPrice_change`,
         {
           method: "PATCH",
           headers: headers, // Use the state-defined headers
