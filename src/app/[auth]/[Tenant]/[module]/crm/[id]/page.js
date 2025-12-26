@@ -1455,7 +1455,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">
-            View Ledger Entries.
+            Account Ledger.
           </h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${isOpen2 ? "rotate-180" : ""
@@ -1618,12 +1618,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                 <table className="min-w-full text-sm text-gray-700">
                   <thead>
                     <tr className="bg-gray-100 text-left">
-                      <th className="px-2 py-1">Created By</th>
-                      <th className="px-2 py-1">Activity</th>
-                      <th className="px-2 py-1">Assigned To</th>
-                      <th className="px-2 py-1">Date & Time</th>
-                      <th className="px-2 py-1">Notes</th>
-                      <th className="px-2 py-1"></th>
+                      <th className="px-2 py-1">Pending</th>
+                      <th className="px-2 py-1">In progress</th>
+                      <th className="px-2 py-1">Completed</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -1642,76 +1639,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                               : "Unassigned";
                           })()}
                         </td>
-                        <td className="px-2 py-1">
-                          {moment(activity.datetime).format("MMM D, YYYY h:mm A")}
-                        </td>
-                        <td className="px-2 py-1">{activity.notes}</td>
-                        <td className="px-2 py-1 flex gap-3 items-center">
-                          <button
-                            aria-label="Mark as Done"
-                            title="Mark as Done"
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </button>
-
-                          {/* Delete button */}
-                          <button
-                            aria-label="Delete"
-                            title="Delete"
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-
-                          {/* Remind Me button */}
-                          <button
-                            aria-label="Remind Me"
-                            title="Remind Me"
-                            className="text-green-600 hover:text-green-800"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 8v4l3 3M12 6a9 9 0 100 18 9 9 0 000-18z"
-                              />
-                            </svg>
-                          </button>
-                        </td>
+                        
                       </tr>
                     ))}
                   </tbody>
