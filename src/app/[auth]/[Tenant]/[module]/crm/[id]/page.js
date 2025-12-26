@@ -1680,78 +1680,76 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           <Section title="">
             <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
               {cust && cust.ActivityLog?.length > 0 ? (
-                <table className="min-w-full text-sm text-gray-700">
-                  <thead>
-                    <tr className="bg-gray-100 text-center">
-                      <th className="px-2 py-1">Pending</th>
-                      <th className="px-2 py-1">In progress</th>
-                      <th className="px-2 py-1">Completed</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {cust.ActivityLog?.map((activity, idx) => (
-                      <tr key={idx}>
-                        <td colSpan="4" className="px-4 py-2 bg-gray-50 text-xs" draggable="true"  
-                          onDragStart={(e) => {
-                          e.dataTransfer.setData("activityId", activity._id);
-                        }}>
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div
-                              className="border p-2 rounded hover:border-green-300 hover:bg-white text-xs"
-                            >
-                              <p className="text-gray-800">
-                                <strong>Title: {activity.activity}</strong>{" "}
-                              </p>
-                              <h4 className="font-semibold mb-2">
-                                {activity.raisedBy}
-                              </h4>
-                              <h4 className="font-semibold mb-2">
-                                Assigned to:{" "}
-                                {(() => {
-                                  const assignedId = Dencrypt(
-                                    activity.assignTo
-                                  );
-                                  const employee = salesPerson.find(
-                                    (emp) => emp._id === assignedId
-                                  );
-                                  return employee
-                                    ? `${employee.firstName} ${employee.lastName}`
-                                    : "Unassigned";
-                                })()}
-                              </h4>
-                              <h4 className="font-semibold mb-2">
-                                {moment(activity.datetime).fromNow()}
-                              </h4>
-                              <div class="flex justify-between">
-                                 <button
-                                  aria-label="Move to next"
-                                  title="Move to next"
-                                  className="text-red-600 p-2 bg-gray-200 hover:bg-gray-300 rounded-sm"
-                                >
-                                 <ArrowLongRightIcon className="h-5 w-5 text-black" />
-                                </button>
-                                <button
-                                  aria-label="undo"
-                                  title="undo"
-                                  className="text-red-600 p-2 bg-gray-200 hover:bg-gray-300 rounded-sm"
-                                >
-                                 <ArrowUturnLeftIcon className="h-5 w-5 text-black" />
-                                </button>
-                                <button
-                                  aria-label="Delete"
-                                  title="Delete"
-                                  className="text-red-600 p-2 bg-gray-200 hover:bg-gray-300 rounded-sm"
-                                >
-                                 <TrashIcon className="h-5 w-5 text-red-400" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+               <table className="min-w-full text-sm text-gray-700">
+  <thead>
+    <tr className="bg-gray-100 text-center">
+      <th className="px-2 py-1">Pending</th>
+      <th className="px-2 py-1">In progress</th>
+      <th className="px-2 py-1">Completed</th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-gray-200">
+    <tr>
+      {/* Pending */}
+      <td className="align-top">
+        {cust.ActivityLog?.filter(entry => entry.Status === "Pending").map((activity, idx) => (
+          <div key={idx} className="max-w-xs mx-auto px-2 py-2 bg-gray-50 text-xs border rounded mb-2 shadow-sm">
+            <p className="text-gray-800 font-semibold truncate">Title: {activity.activity}</p>
+            <p className="text-gray-600 text-[11px]">Raised by: {activity.raisedBy}</p>
+            <p className="text-gray-600 text-[11px]">
+              Assigned:{" "}
+              {(() => {
+                const assignedId = Dencrypt(activity.assignTo);
+                const employee = salesPerson.find(emp => emp._id === assignedId);
+                return employee ? `${employee.firstName} ${employee.lastName}` : "Unassigned";
+              })()}
+            </p>
+            <p className="text-gray-500 text-[11px]">{moment(activity.datetime).fromNow()}</p>
+          </div>
+        ))}
+      </td>
+
+      {/* In progress */}
+      <td className="align-top">
+        {cust.ActivityLog?.filter(entry => entry.Status === "In progress").map((activity, idx) => (
+          <div key={idx} className="max-w-xs mx-auto px-2 py-2 bg-yellow-50 text-xs border rounded mb-2 shadow-sm">
+            <p className="text-gray-800 font-semibold truncate">Title: {activity.activity}</p>
+            <p className="text-gray-600 text-[11px]">Raised by: {activity.raisedBy}</p>
+            <p className="text-gray-600 text-[11px]">
+              Assigned:{" "}
+              {(() => {
+                const assignedId = Dencrypt(activity.assignTo);
+                const employee = salesPerson.find(emp => emp._id === assignedId);
+                return employee ? `${employee.firstName} ${employee.lastName}` : "Unassigned";
+              })()}
+            </p>
+            <p className="text-gray-500 text-[11px]">{moment(activity.datetime).fromNow()}</p>
+          </div>
+        ))}
+      </td>
+
+      {/* Completed */}
+      <td className="align-top">
+        {cust.ActivityLog?.filter(entry => entry.Status === "Completed").map((activity, idx) => (
+          <div key={idx} className="max-w-xs mx-auto px-2 py-2 bg-green-50 text-xs border rounded mb-2 shadow-sm">
+            <p className="text-gray-800 font-semibold truncate">Title: {activity.activity}</p>
+            <p className="text-gray-600 text-[11px]">Raised by: {activity.raisedBy}</p>
+            <p className="text-gray-600 text-[11px]">
+              Assigned:{" "}
+              {(() => {
+                const assignedId = Dencrypt(activity.assignTo);
+                const employee = salesPerson.find(emp => emp._id === assignedId);
+                return employee ? `${employee.firstName} ${employee.lastName}` : "Unassigned";
+              })()}
+            </p>
+            <p className="text-gray-500 text-[11px]">{moment(activity.datetime).fromNow()}</p>
+          </div>
+        ))}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
               ) : (
                 <p className="text-gray-500 italic">
                   No activities logged yet.
