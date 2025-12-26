@@ -1731,7 +1731,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">
-           Sales Transactions
+           Sales Pipeline
           </h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${isOpen4 ? "rotate-180" : ""
