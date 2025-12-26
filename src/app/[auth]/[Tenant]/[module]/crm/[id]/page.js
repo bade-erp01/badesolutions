@@ -20,7 +20,7 @@ import {
   PrinterIcon,
   CalendarDaysIcon,
   BanknotesIcon,
-  ArrowUturnRightIcon,ArrowUturnLeftIcon,TrashIcon
+  ArrowLongRightIcon,ArrowUturnLeftIcon,TrashIcon
 } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
@@ -1698,9 +1698,9 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div
                               key={idx}
-                              className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
+                              className="border p-2 rounded hover:border-green-300 hover:bg-white text-xs"
                             >
-                              <p className="text-purple-800">
+                              <p className="text-gray-800">
                                 <strong>Title: {activity.activity}</strong>{" "}
                               </p>
                               <h4 className="font-semibold mb-2">
@@ -1725,23 +1725,23 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                               </h4>
                               <div class="flex justify-between">
                                  <button
-                                  aria-label="Delete"
-                                  title="Delete"
-                                  className="text-red-600 "
+                                  aria-label="Move to next"
+                                  title="Move to next"
+                                  className="text-red-600 p-2 bg-gray-200 hover:bg-gray-300 rounded-sm"
                                 >
-                                 <ArrowUturnRightIcon className="h-5 w-5 text-black" />
+                                 <ArrowLongRightIcon className="h-5 w-5 text-black" />
                                 </button>
                                 <button
-                                  aria-label="Delete"
-                                  title="Delete"
-                                  className="text-red-600 "
+                                  aria-label="undo"
+                                  title="undo"
+                                  className="text-red-600 p-2 bg-gray-200 hover:bg-gray-300 rounded-sm"
                                 >
                                  <ArrowUturnLeftIcon className="h-5 w-5 text-black" />
                                 </button>
                                 <button
                                   aria-label="Delete"
                                   title="Delete"
-                                  className="text-red-600 "
+                                  className="text-red-600 p-2 bg-gray-200 hover:bg-gray-300 rounded-sm"
                                 >
                                  <TrashIcon className="h-5 w-5 text-red-400" />
                                 </button>
