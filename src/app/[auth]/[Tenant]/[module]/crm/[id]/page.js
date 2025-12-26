@@ -1540,7 +1540,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                         <th className="px-2 py-1">Balance</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-200 text-xs">
                       {currentRows.map((tx, idx) => (
                         <tr key={idx} title={tx.ReferenceNo}>
                           <td className="px-2 py-1">
@@ -1576,7 +1576,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                           <td
                             className={`px-2 py-1 ${
                               tx.Balance < 0 ? "text-green-700" : "text-black"
-                            } font-semibold`}
+                            } font-bold text-sm`}
                           >
                             {tx.Balance?.toLocaleString()}
                           </td>
@@ -1691,7 +1691,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   <tbody className="divide-y divide-gray-200">
                     {cust.ActivityLog?.map((activity, idx) => (
                       <tr>
-                        <td colSpan="4" className="px-4 py-2 bg-gray-50" draggable="true"  
+                        <td colSpan="4" className="px-4 py-2 bg-gray-50 text-xs" draggable="true"  
                           onDragStart={(e) => {
                           e.dataTransfer.setData("activityId", activity._id);
                         }}>
