@@ -1,10 +1,11 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { Encrypt,Dencrypt } from "../../../../../../../../Functions/Functions";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import Page from "./page"
 import EquityForm from "@/app/Components/Accounting/EquityForm"
+import {notFound} from "next/navigation"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -54,18 +55,24 @@ export default async function paymentlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  // const res = await fetch(`${baseUrl}/api/cashRegister`, {
-  //   method: "GET",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${userData.business.tenantId}`,
-  //     dbConnect: `Bearer ${userData.business.rustyRoof}`,
-  //     access: `${Encrypt(userData.user._id)}`,
-  //   },
-  //    next: { revalidate: 60 } // cache for 1 minutes
-  // });
+  const res = await fetch(`${baseUrl}/api/Equity`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+      access: `${Encrypt(userData.user._id)}`,
+    },
+     next: { revalidate: 60 } // cache for 1 minutes
+  });
 
-  // const data = await res.json()
+  const data = await res.json()
+
+  // decrypt the data 
+  const DecryptedData = Dencrypt(data);
+
+  if(!DecryptedData || !res.ok){
+    return notFound()
+  }
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -86,26 +93,39 @@ export default async function paymentlayout({ children, params }) {
           <hr />
           <nav className="space-y-4">
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Capital: 0
+              Owners Capital:{" "}
+              {DecryptedData.ownersCapital.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
               Net Profit/Loss: 0
             </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Retained Earnings: 0
+              Retained Earnings: {DecryptedData.retainedEarnings.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             </span>
-             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
+            <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
               Total {moduleList.id}: 0
             </span>
 
-            <hr/>
+            <hr />
             <EquityForm />
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
-            <Page data={[]}/>
+            <Page data={Dencrypt(data)} />
           </section>
         </main>
       </div>

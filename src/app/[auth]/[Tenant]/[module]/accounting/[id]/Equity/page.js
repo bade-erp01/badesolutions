@@ -3,11 +3,9 @@ import React, { useState } from 'react';
 
 export default function Page({ data }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 50;
 
-  const payments = data?.Entries?.slice(0, 350) || [];
-
-  const Account = data?.account || [];
+  const payments = data?.journals?.slice(0, 1050) || [];
 
   const totalPages = Math.ceil(payments.length / itemsPerPage);
   const paginatedPayments = payments?.slice(
