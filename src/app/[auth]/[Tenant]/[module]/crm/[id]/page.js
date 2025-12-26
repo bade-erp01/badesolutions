@@ -1690,14 +1690,13 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {cust.ActivityLog?.map((activity, idx) => (
-                      <tr>
+                      <tr key={idx}>
                         <td colSpan="4" className="px-4 py-2 bg-gray-50 text-xs" draggable="true"  
                           onDragStart={(e) => {
                           e.dataTransfer.setData("activityId", activity._id);
                         }}>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div
-                              key={idx}
                               className="border p-2 rounded hover:border-green-300 hover:bg-white text-xs"
                             >
                               <p className="text-gray-800">
