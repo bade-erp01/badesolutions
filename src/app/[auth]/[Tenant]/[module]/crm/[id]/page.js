@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import Image from "next/image";
-import CustomerSales from "@/app/Components/CustomerSales"
+import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
 import {
   postPayment,
@@ -20,6 +20,7 @@ import {
   PrinterIcon,
   CalendarDaysIcon,
   BanknotesIcon,
+  ArrowUturnRightIcon,ArrowUturnLeftIcon,TrashIcon
 } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
@@ -50,19 +51,18 @@ ChartJS.register(
   Legend
 );
 
-export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
+export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
   const navigation = useRouter();
-  const [States] = useState(data.AllStates || [])
+  const [States] = useState(data.AllStates || []);
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpen2, setisOpen2] = useState(false)
-  const [isOpen3, setisOpen3] = useState(false)
-  const [isOpen4, setisOpen4] = useState(false)
+  const [isOpen2, setisOpen2] = useState(false);
+  const [isOpen3, setisOpen3] = useState(false);
+  const [isOpen4, setisOpen4] = useState(false);
   const [BalanceData, setBalanceData] = useState({
     Debt: Number(cust.Debt),
   });
   const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
-
 
   const [formData, setFormData] = useState({
     bankJournal: "",
@@ -70,7 +70,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   });
   const [preview, setPreview] = useState(cust.Image);
   const [attachment, setAttachment] = useState(null);
-  const Sales = data.Bills || []
+  const Sales = data.Bills || [];
 
   // for pagintaion
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +80,6 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = data.transcations.slice(indexOfFirstRow, indexOfLastRow);
-
 
   // for tts
   function getCustomerSummary(customer) {
@@ -97,10 +96,10 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
     const formattedDate = lastPayDate
       ? new Date(lastPayDate).toLocaleDateString("en-NG", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
       : "No payment recorded";
 
     let advice = "";
@@ -184,7 +183,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
   }
 
   // update customer balance
-  const UpdateCustomerBalance = async (value,field) => {
+  const UpdateCustomerBalance = async (value, field) => {
     try {
       const result = await Swal.fire({
         title:
@@ -222,7 +221,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       plsWait("Please wait...This should only take a bit.");
 
       const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(userInfo.user._id)}/${Encrypt(cust._id)}/${field}`,
+        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
+          userInfo.user._id
+        )}/${Encrypt(cust._id)}/${field}`,
         {
           method: "PATCH",
           headers: {
@@ -230,7 +231,11 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
             dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
             access: `${Encrypt(userInfo.user._id)}`,
           },
-          body: JSON.stringify({ id: Encrypt(cust._id), Debt: value, creditLimit: value}),
+          body: JSON.stringify({
+            id: Encrypt(cust._id),
+            Debt: value,
+            creditLimit: value,
+          }),
         }
       );
 
@@ -254,7 +259,8 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
   const scheduleActivity = async () => {
     MySwal.fire({
-      title: '<span class="text-xl font-semibold text-gray-800">Schedule an Activity</span>',
+      title:
+        '<span class="text-xl font-semibold text-gray-800">Schedule an Activity</span>',
       html: `
       <div class="flex flex-col gap-4 text-left text-gray-700">
         <label for="swal-select1" class="text-sm font-medium">Activity</label>
@@ -273,11 +279,11 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         <select id="swal-assign" class="swal2-input bg-gray-100 border border-gray-300 rounded-md px-3 py-2">
           <option value="" disabled selected>Select assignee</option>
           ${salesPerson
-          .map(
-            (employee) =>
-              `<option value="${employee._id}">${employee.firstName} ${employee.lastName}</option>`
-          )
-          .join("")}
+            .map(
+              (employee) =>
+                `<option value="${employee._id}">${employee.firstName} ${employee.lastName}</option>`
+            )
+            .join("")}
         </select>
 
         <label for="swal-input3" class="text-sm font-medium">Date & Time</label>
@@ -314,25 +320,28 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
     }).then((result) => {
       if (result.isConfirmed) {
         // 💾 Push to database or trigger backend logic
-        axios.put(`${EXPRESS_PRIVATE_URL}/api/Activity_Schedula/${Encrypt(cust._id)}`,
-          {
-            ...result.value,
-            customerId: Encrypt(cust._id),
-            tenantId: Encrypt(userInfo.business.tenantId),
-            raisedBy: `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-              dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-              access: `${Encrypt(userInfo.user._id)}`,
+        axios
+          .put(
+            `${EXPRESS_PRIVATE_URL}/api/Activity_Schedula/${Encrypt(cust._id)}`,
+            {
+              ...result.value,
+              customerId: Encrypt(cust._id),
+              tenantId: Encrypt(userInfo.business.tenantId),
+              raisedBy: `${userInfo.user.firstName} ${userInfo.user.lastName}`,
             },
-          }
-        ).then((data) => {
-          SuccessToast(data.data.message);
-          navigation.refresh();
-        })
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+                dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+                access: `${Encrypt(userInfo.user._id)}`,
+              },
+            }
+          )
+          .then((data) => {
+            SuccessToast(data.data.message);
+            navigation.refresh();
+          })
           .catch((error) => {
             ErrorMessage("Failed to schedule activity.");
           });
@@ -445,7 +454,14 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       doc.text(`Period: ${startDate} to ${endDate}`, 20, 35);
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
-      doc.text(`Current Balance: ${cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 20, 42);
+      doc.text(
+        `Current Balance: ${cust.Debt?.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        20,
+        42
+      );
 
       // 🖼️ Logo
       doc.addImage(imageDataURL, "PNG", 150, 10, 35, 35);
@@ -456,9 +472,18 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         i + 1,
         tx.ReferenceNo.toUpperCase(),
         `${moment(new Date(tx.Date)).format("YYYY-MM-DD")}`,
-        `${tx.CreditAmount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        `${tx.DebitAmount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        `${tx.Balance?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${tx.CreditAmount?.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        `${tx.DebitAmount?.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+        `${tx.Balance?.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
       ]);
 
       // ➕ Add final "Current Balance" row
@@ -467,7 +492,10 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         "Current Balance",
         "", // Empty CR
         "", // Empty DR
-        `${cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        `${cust.Debt?.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
       ]);
 
       // 📋 Table with page footer and styled final row
@@ -559,15 +587,15 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
     // Sum all grandTotal for this month
     const total = Array.isArray(data.SandS)
       ? data.SandS.reduce((sum, item) => {
-        const dateStr = item.createdAt || item.startDate;
-        if (dateStr) {
-          const d = new Date(dateStr);
-          if (d.getMonth() + 1 === monthNum) {
-            return sum + (item.grandTotal || 0);
+          const dateStr = item.createdAt || item.startDate;
+          if (dateStr) {
+            const d = new Date(dateStr);
+            if (d.getMonth() + 1 === monthNum) {
+              return sum + (item.grandTotal || 0);
+            }
           }
-        }
-        return sum;
-      }, 0)
+          return sum;
+        }, 0)
       : 0;
     return { month: monthLabel, amount: total };
   });
@@ -679,7 +707,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
     try {
       plsWait("Submitting customer update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(cust._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
+        cust._id
+      )}`;
       // Await axios call directly
       const { data } = await axios.patch(url, formData, config);
 
@@ -701,7 +731,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
 
     try {
       // Use destructuring for required IDs
-      const  user  = userInfo;
+      const user = userInfo;
 
       // Avoid unnecessary template literals
       const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${user.user._id}`;
@@ -709,7 +739,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       // Await axios call directly
       const { data } = await axios.post(
         url,
-        { customer: cust._id, whId:cust.location },
+        { customer: cust._id, whId: cust.location },
         config
       );
 
@@ -719,7 +749,8 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
         // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
         navigation.push(
-          `/${router.auth}/${router.Tenant}/${router.module
+          `/${router.auth}/${router.Tenant}/${
+            router.module
           }/Forms/invoice/${Encrypt(data.result)}`
         );
       } else {
@@ -744,20 +775,26 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h4 className="text-xl font-bold text-gray-800">
-          {cust.Username.charAt(0).toUpperCase() + cust.Username.slice(1)}
-          &apos;s profile
-        </h4>
-        <br/>
-        <span className="text-sm text-gray-600 italic">Registration Date: {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}</span>
-        
+            {cust.Username.charAt(0).toUpperCase() + cust.Username.slice(1)}
+            &apos;s profile
+          </h4>
+          <br />
+          <span className="text-sm text-gray-600 italic">
+            Registration Date:{" "}
+            {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
+          </span>
         </div>
         <span
-          className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${cust.Debt < 0
+          className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
+            cust.Debt < 0
               ? "text-md text-green-700 bg-green-100 border border-green-600 rounded-full px-4 py-2"
               : "text-md text-red-700 bg-red-100 border border-red-300 rounded-full px-4 py-2"
-            }`}
+          }`}
         >
-          {cust.Debt?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+          {cust.Debt?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </span>
       </div>
 
@@ -919,12 +956,11 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">
-            Form Actions
-          </h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">Form</h2>
           <svg
-            className={`w-5 h-5 transform transition-transform duration-300 ${isOpen ? "rotate-180" : ""
-              }`}
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isOpen ? "rotate-180" : ""
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -938,513 +974,524 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen ? "block" : "hidden"
-            }`}
+          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+            isOpen ? "block" : "hidden"
+          }`}
         >
           <div className="bg-gray-50 p-3">
-          {/* Identity */}
-          <Section title="Identity">
-            <Grid>
-              <Input
-                label="Name"
-                name="Username"
-                value={formData.Username}
-                onChange={handleChange}
-              />
-              <Input
-                label="Customer Code"
-                name="CustomerCode"
-                value={formData.CustomerCode}
-                onChange={handleChange}
-                disabled
-                readonly
-              />
-              <Input
-                label="Tax Identification Number"
-                name="TIN"
-                value={formData.TIN}
-                onChange={handleChange}
-              />
-              <Input
-                label="Industry"
-                name="industryType"
-                value={formData.industryType}
-                onChange={handleChange}
-              />
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Customer Type
-                </label>
-                <select
-                  name="customerType"
-                  value={formData.customerType || ""}
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  <option value={cust.customerType}>
-                    {cust.customerType || "Choose..."}
-                  </option>
-                  <option value="Business">Business</option>
-                  <option value="Individual">Individual</option>
-                </select>
-              </div>
-            </Grid>
-          </Section>
-
-          {/* Contact Info */}
-          <Section title="Contact Info">
-            <Grid>
-              <Input
-                label="Email"
-                name="Email"
-                type="email"
-                value={formData.Email}
-                onChange={handleChange}
-              />
-              <Input
-                label="Phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-              <Input
-                label="Contact Person"
-                name="contactPerson"
-                type="text"
-                value={formData.contactPerson}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Section>
-
-          {/* Location */}
-          <Section title="Location">
-            <Grid columns={3}>
-              <Input
-                label="Country"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-              />
-              
-             <Select
-                label="State"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                options={States}
-              />
-              <Input
-                label="Address"
-                name="billingAddress"
-                value={formData.billingAddress}
-                onChange={handleChange}
-              />
-              <Input
-                label="Region"
-                name="Region"
-                value={formData.Region}
-                onChange={handleChange}
-              />
-              </Grid>
-              </Section>
-
-              {/* Financials */}
-          <Section
-            title="Financials"
-            subtitle="(Manage credit, debt, and payment settings)"
-          >
-            <Grid columns={3}>
-              {userInfo.user.isAdmin ? (
-                <div className="mb-2 ">
-                  <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
-                    <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                      {cust.lastPayDate &&
-                        cust.Debt > 0 &&
-                        moment(cust.lastPayDate).isValid()
-                        ? `🕒 Debt incurred: ${moment().diff(
-                          moment(cust.lastPayDate),
-                          "days"
-                        )} day(s) ago`
-                        : "✅ Not in Debt"}
-                    </label>
-                    <input
-                      type="number"
-                      step={`any`}
-                      value={BalanceData.Debt}
-                      onChange={(e) => {
-                        const raw = e.target.value.replace(/,/g, "");
-                        const parsed = parseFloat(raw) || 0;
-                        setBalanceData((prev) => ({
-                          ...prev,
-                          Debt: parsed,
-                        }));
-                      }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
-                    />
-
-                    <span
-                      onClick={() => UpdateCustomerBalance(BalanceData.Debt,"Debt")}
-                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-red-600 hover:bg-red-800 transition-colors duration-200 shadow-md cursor-pointer"
-                    >
-                      Update Balance
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="mb-2">
-                    <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                      {cust.lastPayDate &&
-                        cust.Debt > 0 &&
-                        moment(cust.lastPayDate).isValid()
-                        ? `🕒 Debt incurred: ${moment().diff(
-                          moment(cust.lastPayDate),
-                          "days"
-                        )} day(s) ago`
-                        : "✅ Not in Debt"}
-                    </label>
-
-                    <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
-                      {formData.Debt?.toLocaleString()}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {cust.isVerified && (
-                <>
-
-                {userInfo.user.EditCreditLimit ? (
-                <div className="mb-2 ">
-                  <div className="max-w-md mx-auto p-6 bg-linear-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
-                    <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                      Credit Limit
-                    </label>
-                    <input
-                      type="number"
-                      step={`any`}
-                      min={0}
-                      defaultValue={formData.creditLimit}
-                      onBlur={(e) => {
-                      const raw = e.target.value.replace(/,/g, "").trim();
-                      let parsed = parseFloat(raw) || 0;
-
-                      // Ensure non-negative
-                      if (e.target.value < 0) {
-                       ErrorMessage("Value less than 0 is not allowed")
-                       return e.target.value = 0
-                      }
-
-                      setcreditLimit((prev) => ({
-                        ...prev,
-                        creditLimit: parsed,
-                      }));
-                    }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
-                    />
-
-                    <span
-                      onClick={() => UpdateCustomerBalance(creditLimit,"creditLimit")}
-                      className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-black hover:bg-gray-600 transition-colors duration-200 shadow-md cursor-pointer"
-                    >
-                      Update credit Limit
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="mb-2">
-                    <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                      Credit Limit
-                    </label>
-
-                    <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
-                      {formData.creditLimit?.toLocaleString()}
-                    </div>
-                  </div>
-                </>
-              )}
-
-                  <Input
-                    label="Credit Rating"
-                    name="creditRating"
-                    type="number"
-                    value={formData.creditRating || 0}
-                    min={0}
-                    max={5}
-                    onChange={handleChange}
-                  />
-                </>
-              )}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  PriceList
-                </label>
-                <select
-                  required
-                  name="priceList"
-                  value={formData.priceList || ""}
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  {/* Default option from customer */}
-                  <option value={cust.priceList}>
-                    {pricelistSetter(cust.priceList, userInfo.business)}
-                  </option>
-
-                  {/* Dynamic options based on subscription plan */}
-                  {userInfo.business.subscriptionplan === "Basic" ? (
-                    <>
-                      <option value="Pricelist1" title={`Basic Tier`}>
-                        {userInfo.business.priceList1}
-                      </option>
-                      <option value="Pricelist2" title={`Basic Tier`}>
-                        {userInfo.business.priceList2}
-                      </option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="Pricelist1" title={`Standard Tier`}>
-                        {userInfo.business.priceList1}
-                      </option>
-                      <option value="Pricelist2" title={`Standard Tier`}>
-                        {userInfo.business.priceList2}
-                      </option>
-                      <option value="Pricelist3" title={`Standard Tier`}>
-                        {userInfo.business.priceList3}
-                      </option>
-                      <option value="Pricelist4" title={`Standard Tier`}>
-                        {userInfo.business.priceList4}
-                      </option>
-                      <option value="Pricelist5" title={`Standard Tier`}>
-                        {userInfo.business.priceList5}
-                      </option>
-                      <option value="Pricelist6" title={`Standard Tier`}>
-                        {userInfo.business.priceList6}
-                      </option>
-                      <option value="Pricelist7" title={`Standard Tier`}>
-                        {userInfo.business.priceList7}
-                      </option>
-                    </>
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {" "}
-                  Payment Terms
-                </label>
-                <select
-                  name="paymentTerms"
-                  value={formData.paymentTerms || ""}
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  <option value={cust.paymentTerms}>
-                    {cust.paymentTerms || "Select one"}
-                  </option>
-                  <option value="Cash on Delivery">Cash on Delivery </option>
-                  <option value="Credit customer">Credit customer</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Journal
-                </label>
-                <select
-                  required
-                  name="BankJournal"
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  {(() => {
-                    const bankJournal = data.Accounts.find(
-                      (person) => person._id === cust.BankJournal
-                    );
-
-                    if (bankJournal) {
-                      return (
-                        <option defaultValue={bankJournal._id}>
-                          {bankJournal.NAME} [CURRENT]
-                        </option>
-                      );
-                    } else {
-                      return <option value="">Select one</option>;
-                    }
-                  })()}
-
-                  {data.Accounts.map((num) => (
-                    <option key={num} value={num._id}>
-                      {num.NAME}
-                    </option>
-                  ))}
-                </select>
-              </div>
-             
-            </Grid>
-          </Section>
-
-          {/* Status Flags */}
-          <Section title="Status Flags">
-            <Grid columns={3}>
-               {cust.Email  && (
-                <Checkbox
-                  label="Send quarterly transaction statement"
-                  name="NewsFeedSubscription"
-                  checked={formData.NewsFeedSubscription}
+            {/* Identity */}
+            <Section title="Identity">
+              <Grid>
+                <Input
+                  label="Name"
+                  name="Username"
+                  value={formData.Username}
                   onChange={handleChange}
                 />
-              )}
-              <Checkbox
-                label="Verified"
-                name="isVerified"
-                checked={formData.isVerified}
-                onChange={handleChange}
-              />
-              <Checkbox
-                label={formData.blocked ? "Unblock Customer" : "Block Customer"}
-                name="blocked"
-                checked={formData.blocked}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Section>
-
-          {/* Services */}
-          <Section title="🛎 Services">
-            <Grid columns={2}>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Sales Person
-                </label>
-                <select
-                  name="salesPerson"
-                  required
-                  value={formData.salesPerson || ""}
+                <Input
+                  label="Customer Code"
+                  name="CustomerCode"
+                  value={formData.CustomerCode}
                   onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  {/* Show the current sales person as the first option if available */}
-                  {(() => {
-                    const salespers = salesPerson.find(
-                      (person) => person._id === cust.salesPerson
-                    );
-                    if (salespers) {
-                      return (
-                        <option value={salespers._id}>
-                          {salespers.firstName} {salespers.lastName || "Select one"}
-                        </option>
-                      );
-                    } else {
-                      return <option value="">Select one</option>;
-                    }
-                  })()}
+                  disabled
+                  readonly
+                />
+                <Input
+                  label="Tax Identification Number"
+                  name="TIN"
+                  value={formData.TIN}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Industry"
+                  name="industryType"
+                  value={formData.industryType}
+                  onChange={handleChange}
+                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Customer Type
+                  </label>
+                  <select
+                    name="customerType"
+                    value={formData.customerType || ""}
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    <option value={cust.customerType}>
+                      {cust.customerType || "Choose..."}
+                    </option>
+                    <option value="Business">Business</option>
+                    <option value="Individual">Individual</option>
+                  </select>
+                </div>
+              </Grid>
+            </Section>
 
-                  {/* List all employees except the current sales person to avoid duplicate */}
-                  {salesPerson
-                    .filter((num) => num._id !== cust.salesPerson)
-                    .map((num) => (
-                      <option key={num._id} value={num._id}>
-                        {num.firstName} {num.lastName}
+            {/* Contact Info */}
+            <Section title="Contact Info">
+              <Grid>
+                <Input
+                  label="Email"
+                  name="Email"
+                  type="email"
+                  value={formData.Email}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Contact Person"
+                  name="contactPerson"
+                  type="text"
+                  value={formData.contactPerson}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Section>
+
+            {/* Location */}
+            <Section title="Location">
+              <Grid columns={3}>
+                <Input
+                  label="Country"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                />
+
+                <Select
+                  label="State"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  options={States}
+                />
+                <Input
+                  label="Address"
+                  name="billingAddress"
+                  value={formData.billingAddress}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Region"
+                  name="Region"
+                  value={formData.Region}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Section>
+
+            {/* Financials */}
+            <Section
+              title="Financials"
+              subtitle="(Manage credit, debt, and payment settings)"
+            >
+              <Grid columns={3}>
+                {userInfo.user.isAdmin ? (
+                  <div className="mb-2 ">
+                    <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                      <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                        {cust.lastPayDate &&
+                        cust.Debt > 0 &&
+                        moment(cust.lastPayDate).isValid()
+                          ? `🕒 Debt incurred: ${moment().diff(
+                              moment(cust.lastPayDate),
+                              "days"
+                            )} day(s) ago`
+                          : "✅ Not in Debt"}
+                      </label>
+                      <input
+                        type="number"
+                        step={`any`}
+                        value={BalanceData.Debt}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/,/g, "");
+                          const parsed = parseFloat(raw) || 0;
+                          setBalanceData((prev) => ({
+                            ...prev,
+                            Debt: parsed,
+                          }));
+                        }}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+                      />
+
+                      <span
+                        onClick={() =>
+                          UpdateCustomerBalance(BalanceData.Debt, "Debt")
+                        }
+                        className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-red-600 hover:bg-red-800 transition-colors duration-200 shadow-md cursor-pointer"
+                      >
+                        Update Balance
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-2">
+                      <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                        {cust.lastPayDate &&
+                        cust.Debt > 0 &&
+                        moment(cust.lastPayDate).isValid()
+                          ? `🕒 Debt incurred: ${moment().diff(
+                              moment(cust.lastPayDate),
+                              "days"
+                            )} day(s) ago`
+                          : "✅ Not in Debt"}
+                      </label>
+
+                      <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                        {formData.Debt?.toLocaleString()}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {cust.isVerified && (
+                  <>
+                    {userInfo.user.EditCreditLimit ? (
+                      <div className="mb-2 ">
+                        <div className="max-w-md mx-auto p-6 bg-linear-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                          <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                            Credit Limit
+                          </label>
+                          <input
+                            type="number"
+                            step={`any`}
+                            min={0}
+                            defaultValue={formData.creditLimit}
+                            onBlur={(e) => {
+                              const raw = e.target.value
+                                .replace(/,/g, "")
+                                .trim();
+                              let parsed = parseFloat(raw) || 0;
+
+                              // Ensure non-negative
+                              if (e.target.value < 0) {
+                                ErrorMessage(
+                                  "Value less than 0 is not allowed"
+                                );
+                                return (e.target.value = 0);
+                              }
+
+                              setcreditLimit((prev) => ({
+                                ...prev,
+                                creditLimit: parsed,
+                              }));
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-900 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+                          />
+
+                          <span
+                            onClick={() =>
+                              UpdateCustomerBalance(creditLimit, "creditLimit")
+                            }
+                            className="mt-5 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-black hover:bg-gray-600 transition-colors duration-200 shadow-md cursor-pointer"
+                          >
+                            Update credit Limit
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mb-2">
+                          <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                            Credit Limit
+                          </label>
+
+                          <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                            {formData.creditLimit?.toLocaleString()}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <Input
+                      label="Credit Rating"
+                      name="creditRating"
+                      type="number"
+                      value={formData.creditRating || 0}
+                      min={0}
+                      max={5}
+                      onChange={handleChange}
+                    />
+                  </>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    PriceList
+                  </label>
+                  <select
+                    required
+                    name="priceList"
+                    value={formData.priceList || ""}
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    {/* Default option from customer */}
+                    <option value={cust.priceList}>
+                      {pricelistSetter(cust.priceList, userInfo.business)}
+                    </option>
+
+                    {/* Dynamic options based on subscription plan */}
+                    {userInfo.business.subscriptionplan === "Basic" ? (
+                      <>
+                        <option value="Pricelist1" title={`Basic Tier`}>
+                          {userInfo.business.priceList1}
+                        </option>
+                        <option value="Pricelist2" title={`Basic Tier`}>
+                          {userInfo.business.priceList2}
+                        </option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="Pricelist1" title={`Standard Tier`}>
+                          {userInfo.business.priceList1}
+                        </option>
+                        <option value="Pricelist2" title={`Standard Tier`}>
+                          {userInfo.business.priceList2}
+                        </option>
+                        <option value="Pricelist3" title={`Standard Tier`}>
+                          {userInfo.business.priceList3}
+                        </option>
+                        <option value="Pricelist4" title={`Standard Tier`}>
+                          {userInfo.business.priceList4}
+                        </option>
+                        <option value="Pricelist5" title={`Standard Tier`}>
+                          {userInfo.business.priceList5}
+                        </option>
+                        <option value="Pricelist6" title={`Standard Tier`}>
+                          {userInfo.business.priceList6}
+                        </option>
+                        <option value="Pricelist7" title={`Standard Tier`}>
+                          {userInfo.business.priceList7}
+                        </option>
+                      </>
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {" "}
+                    Payment Terms
+                  </label>
+                  <select
+                    name="paymentTerms"
+                    value={formData.paymentTerms || ""}
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    <option value={cust.paymentTerms}>
+                      {cust.paymentTerms || "Select one"}
+                    </option>
+                    <option value="Cash on Delivery">Cash on Delivery </option>
+                    <option value="Credit customer">Credit customer</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Journal
+                  </label>
+                  <select
+                    required
+                    name="BankJournal"
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    {(() => {
+                      const bankJournal = data.Accounts.find(
+                        (person) => person._id === cust.BankJournal
+                      );
+
+                      if (bankJournal) {
+                        return (
+                          <option defaultValue={bankJournal._id}>
+                            {bankJournal.NAME} [CURRENT]
+                          </option>
+                        );
+                      } else {
+                        return <option value="">Select one</option>;
+                      }
+                    })()}
+
+                    {data.Accounts.map((num) => (
+                      <option key={num} value={num._id}>
+                        {num.NAME}
                       </option>
                     ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Manager
-                </label>
-                <select
-                  name="accountManager"
-                  value={formData.accountManager || ""}
+                  </select>
+                </div>
+              </Grid>
+            </Section>
+
+            {/* Status Flags */}
+            <Section title="Status Flags">
+              <Grid columns={3}>
+                {cust.Email && (
+                  <Checkbox
+                    label="Send quarterly transaction statement"
+                    name="NewsFeedSubscription"
+                    checked={formData.NewsFeedSubscription}
+                    onChange={handleChange}
+                  />
+                )}
+                <Checkbox
+                  label="Verified"
+                  name="isVerified"
+                  checked={formData.isVerified}
                   onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  {/* Show the current sales person as the first option if available */}
-                  {(() => {
-                    const Manager = salesPerson.find(
-                      (person) => person._id === cust.accountManager
-                    );
-                    if (Manager) {
-                      return (
-                        <option value={Manager._id}>
-                          {Manager.firstName} {Manager.lastName || "Select one"}
-                        </option>
+                />
+                <Checkbox
+                  label={
+                    formData.blocked ? "Unblock Customer" : "Block Customer"
+                  }
+                  name="blocked"
+                  checked={formData.blocked}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Section>
+
+            {/* Services */}
+            <Section title="🛎 Services">
+              <Grid columns={2}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Sales Person
+                  </label>
+                  <select
+                    name="salesPerson"
+                    required
+                    value={formData.salesPerson || ""}
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    {/* Show the current sales person as the first option if available */}
+                    {(() => {
+                      const salespers = salesPerson.find(
+                        (person) => person._id === cust.salesPerson
                       );
-                    } else {
-                      return <option value="">Select one</option>;
-                    }
-                  })()}
+                      if (salespers) {
+                        return (
+                          <option value={salespers._id}>
+                            {salespers.firstName}{" "}
+                            {salespers.lastName || "Select one"}
+                          </option>
+                        );
+                      } else {
+                        return <option value="">Select one</option>;
+                      }
+                    })()}
 
-                  {/* List all employees except the current sales person to avoid duplicate */}
-                  {salesPerson
-                    .filter((num) => num._id !== cust.accountManager)
-                    .map((num) => (
-                      <option key={num._id} value={num._id}>
-                        {num.firstName} {num.lastName}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Service Warehouse
-                </label>
-                <select
-                  name="location"
-                  value={formData.location || ""}
-                  required
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  {/* Show the current sales person as the first option if available */}
-                  {(() => {
-                    const location = data.wh.find(
-                      (location) => location._id === cust.location
-                    );
-                    if (location) {
-                      return (
-                        <option value={location._id}>
-                          {location.WHName || "Select one"}
+                    {/* List all employees except the current sales person to avoid duplicate */}
+                    {salesPerson
+                      .filter((num) => num._id !== cust.salesPerson)
+                      .map((num) => (
+                        <option key={num._id} value={num._id}>
+                          {num.firstName} {num.lastName}
                         </option>
+                      ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Manager
+                  </label>
+                  <select
+                    name="accountManager"
+                    value={formData.accountManager || ""}
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    {/* Show the current sales person as the first option if available */}
+                    {(() => {
+                      const Manager = salesPerson.find(
+                        (person) => person._id === cust.accountManager
                       );
-                    } else {
-                      return <option value="">Select one</option>;
-                    }
-                  })()}
+                      if (Manager) {
+                        return (
+                          <option value={Manager._id}>
+                            {Manager.firstName}{" "}
+                            {Manager.lastName || "Select one"}
+                          </option>
+                        );
+                      } else {
+                        return <option value="">Select one</option>;
+                      }
+                    })()}
 
-                  {/* List all employees except the current sales person to avoid duplicate */}
-                  {data.wh
-                    .filter((num) => num._id !== cust.location)
-                    .map((num) => (
-                      <option key={num._id} value={num._id}>
-                        {num.WHName}
-                      </option>
-                    ))}
-                </select>
-              </div>
+                    {/* List all employees except the current sales person to avoid duplicate */}
+                    {salesPerson
+                      .filter((num) => num._id !== cust.accountManager)
+                      .map((num) => (
+                        <option key={num._id} value={num._id}>
+                          {num.firstName} {num.lastName}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Service Warehouse
+                  </label>
+                  <select
+                    name="location"
+                    value={formData.location || ""}
+                    required
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    {/* Show the current sales person as the first option if available */}
+                    {(() => {
+                      const location = data.wh.find(
+                        (location) => location._id === cust.location
+                      );
+                      if (location) {
+                        return (
+                          <option value={location._id}>
+                            {location.WHName || "Select one"}
+                          </option>
+                        );
+                      } else {
+                        return <option value="">Select one</option>;
+                      }
+                    })()}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  preferred Shipping Method
-                </label>
-                <select
-                  name="preferredShippingMethod"
-                  value={formData.preferredShippingMethod || ""}
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-                >
-                  <option value={cust.preferredShippingMethod}>
-                    {cust.preferredShippingMethod || "Select one"}
-                  </option>
-                  <option value="Air">Air</option>
-                  <option value="Sea">Sea</option>
-                  <option value="Land">Land</option>
-                </select>
-              </div>
-            </Grid>
-          </Section>
+                    {/* List all employees except the current sales person to avoid duplicate */}
+                    {data.wh
+                      .filter((num) => num._id !== cust.location)
+                      .map((num) => (
+                        <option key={num._id} value={num._id}>
+                          {num.WHName}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    preferred Shipping Method
+                  </label>
+                  <select
+                    name="preferredShippingMethod"
+                    value={formData.preferredShippingMethod || ""}
+                    onChange={handleChange}
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                  >
+                    <option value={cust.preferredShippingMethod}>
+                      {cust.preferredShippingMethod || "Select one"}
+                    </option>
+                    <option value="Air">Air</option>
+                    <option value="Sea">Sea</option>
+                    <option value="Land">Land</option>
+                  </select>
+                </div>
+              </Grid>
+            </Section>
           </div>
         </div>
       </div>
@@ -1455,11 +1502,12 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">
-            Account Ledger.
+            Ledger
           </h2>
           <svg
-            className={`w-5 h-5 transform transition-transform duration-300 ${isOpen2 ? "rotate-180" : ""
-              }`}
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isOpen2 ? "rotate-180" : ""
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -1473,8 +1521,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen2 ? "block" : "hidden"
-            }`}
+          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+            isOpen2 ? "block" : "hidden"
+          }`}
         >
           {/* Recent Transactions */}
           <Section title="">
@@ -1503,18 +1552,31 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                             {moment(tx.Date).format("MMM D, YYYY")}
                           </td>
                           <td className="px-2 py-1">
-                             <span className={`inline-block px-2 py-0.5  text-black ${tx.CreditAmount > 0 ? " text-xs rounded-full bg-green-500/30" : ""}`}>
+                            <span
+                              className={`inline-block px-2 py-0.5  text-black ${
+                                tx.CreditAmount > 0
+                                  ? " text-xs rounded-full bg-green-500/30"
+                                  : ""
+                              }`}
+                            >
                               CR: {tx.CreditAmount?.toLocaleString()}
                             </span>
                           </td>
                           <td className="px-2 py-1">
-                            <span className={`inline-block px-2 py-0.5  text-black ${tx.DebitAmount > 0 ? " text-xs rounded-full bg-red-500/30" : ""}`}>
-                            DR: {tx.DebitAmount?.toLocaleString()}
+                            <span
+                              className={`inline-block px-2 py-0.5  text-black ${
+                                tx.DebitAmount > 0
+                                  ? " text-xs rounded-full bg-red-500/30"
+                                  : ""
+                              }`}
+                            >
+                              DR: {tx.DebitAmount?.toLocaleString()}
                             </span>
                           </td>
                           <td
-                            className={`px-2 py-1 ${tx.Balance < 0 ? "text-green-700" : "text-black"
-                              } font-semibold`}
+                            className={`px-2 py-1 ${
+                              tx.Balance < 0 ? "text-green-700" : "text-black"
+                            } font-semibold`}
                           >
                             {tx.Balance?.toLocaleString()}
                           </td>
@@ -1525,13 +1587,13 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                       <div className="space-y-2 mt-2">
                         {cust.Debt < 0 ? (
                           <p className="text-sm text-yellow-700 bg-purple-300 border border-purple-600 rounded-md px-4 py-2">
-                            💡 Kindly Note that {userInfo.business.companyName} owes{" "}
-                            {cust.Username} <strong>{cust.Debt}</strong>.
+                            💡 Kindly Note that {userInfo.business.companyName}{" "}
+                            owes {cust.Username} <strong>{cust.Debt}</strong>.
                           </p>
                         ) : (
                           <p className="text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2">
-                            ⚠️ Kindly Note that {cust.Username} owes your Business{" "}
-                            <strong>{cust.Debt}</strong>.
+                            ⚠️ Kindly Note that {cust.Username} owes your
+                            Business <strong>{cust.Debt}</strong>.
                           </p>
                         )}
                       </div>
@@ -1541,7 +1603,10 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                         <td colSpan="5" className="px-2 py-1 text-white">
                           <ExcelDownloadBtn
                             data={data.transcations}
-                            page={`${cust.Username.substring(0, 8)} transaction`}
+                            page={`${cust.Username.substring(
+                              0,
+                              8
+                            )} transaction`}
                           />
                         </td>
                       </tr>
@@ -1589,12 +1654,11 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           onClick={() => setisOpen3(!isOpen3)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">
-          Task Logs
-          </h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">Crm tools</h2>
           <svg
-            className={`w-5 h-5 transform transition-transform duration-300 ${isOpen3 ? "rotate-180" : ""
-              }`}
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isOpen3 ? "rotate-180" : ""
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -1608,8 +1672,9 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen3 ? "block" : "hidden"
-            }`}
+          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+            isOpen3 ? "block" : "hidden"
+          }`}
         >
           {/* Activity Log */}
           <Section title="">
@@ -1617,7 +1682,7 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
               {cust && cust.ActivityLog?.length > 0 ? (
                 <table className="min-w-full text-sm text-gray-700">
                   <thead>
-                    <tr className="bg-gray-100 text-left">
+                    <tr className="bg-gray-100 text-center">
                       <th className="px-2 py-1">Pending</th>
                       <th className="px-2 py-1">In progress</th>
                       <th className="px-2 py-1">Completed</th>
@@ -1625,27 +1690,73 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {cust.ActivityLog?.map((activity, idx) => (
-                      <tr key={idx}>
-                        <td className="px-2 py-1">{activity.raisedBy}</td>
-                        <td className="px-2 py-1">{activity.activity}</td>
-                        <td className="px-2 py-1">
-                          {(() => {
-                            const assignedId = Dencrypt(activity.assignTo);
-                            const employee = salesPerson.find(
-                              (emp) => emp._id === assignedId
-                            );
-                            return employee
-                              ? `${employee.firstName} ${employee.lastName}`
-                              : "Unassigned";
-                          })()}
+                      <tr>
+                        <td colSpan="4" className="px-4 py-2 bg-gray-50" draggable="true"  
+                          onDragStart={(e) => {
+                          e.dataTransfer.setData("activityId", activity._id);
+                        }}>
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div
+                              key={idx}
+                              className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
+                            >
+                              <p className="text-purple-800">
+                                <strong>Title: {activity.activity}</strong>{" "}
+                              </p>
+                              <h4 className="font-semibold mb-2">
+                                {activity.raisedBy}
+                              </h4>
+                              <h4 className="font-semibold mb-2">
+                                Assigned to:{" "}
+                                {(() => {
+                                  const assignedId = Dencrypt(
+                                    activity.assignTo
+                                  );
+                                  const employee = salesPerson.find(
+                                    (emp) => emp._id === assignedId
+                                  );
+                                  return employee
+                                    ? `${employee.firstName} ${employee.lastName}`
+                                    : "Unassigned";
+                                })()}
+                              </h4>
+                              <h4 className="font-semibold mb-2">
+                                {moment(activity.datetime).fromNow()}
+                              </h4>
+                              <div class="flex justify-between">
+                                 <button
+                                  aria-label="Delete"
+                                  title="Delete"
+                                  className="text-red-600 "
+                                >
+                                 <ArrowUturnRightIcon className="h-5 w-5 text-black" />
+                                </button>
+                                <button
+                                  aria-label="Delete"
+                                  title="Delete"
+                                  className="text-red-600 "
+                                >
+                                 <ArrowUturnLeftIcon className="h-5 w-5 text-black" />
+                                </button>
+                                <button
+                                  aria-label="Delete"
+                                  title="Delete"
+                                  className="text-red-600 "
+                                >
+                                 <TrashIcon className="h-5 w-5 text-red-400" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </td>
-                        
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p className="text-gray-500 italic">No activities logged yet.</p>
+                <p className="text-gray-500 italic">
+                  No activities logged yet.
+                </p>
               )}
             </div>
           </Section>
@@ -1653,17 +1764,18 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
       </div>
 
       {/* table for invoices */}
-       <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden">
         <span
           onClick={() => setisOpen4(!isOpen4)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">
-           Sales Pipeline
+            Sales Pipeline
           </h2>
           <svg
-            className={`w-5 h-5 transform transition-transform duration-300 ${isOpen4 ? "rotate-180" : ""
-              }`}
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isOpen4 ? "rotate-180" : ""
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -1677,11 +1789,17 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${isOpen4 ? "block" : "hidden"
-            }`}
+          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+            isOpen4 ? "block" : "hidden"
+          }`}
         >
           <Section title="">
-            <CustomerSales Sales={Sales} customer={cust} business={userInfo.business} Rep={salesPerson}/>
+            <CustomerSales
+              Sales={Sales}
+              customer={cust}
+              business={userInfo.business}
+              Rep={salesPerson}
+            />
           </Section>
         </div>
       </div>
@@ -1696,7 +1814,10 @@ export default function CustomerForm({ userInfo, data, cust,salesPerson }) {
           </button>
         </div>
       )}
-      <span className="text-sm text-gray-600 italic">Last updated: {moment(cust.updatedAt).format("dddd DD MMMM YYYY [at] hh:mm A")}</span>
+      <span className="text-sm text-gray-600 italic">
+        Last updated:{" "}
+        {moment(cust.updatedAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
+      </span>
     </form>
   );
 }
@@ -1745,7 +1866,6 @@ function Input({
   );
 }
 
-
 function Select({
   label,
   name,
@@ -1757,10 +1877,7 @@ function Select({
 }) {
   return (
     <div>
-      <label
-        htmlFor={name}
-        className="block text-sm font-medium text-gray-700"
-      >
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
         {label}
       </label>
       <select
@@ -1782,7 +1899,6 @@ function Select({
     </div>
   );
 }
-
 
 function Checkbox({ label, name, checked, onChange }) {
   return (
