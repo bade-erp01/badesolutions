@@ -146,16 +146,20 @@ export default function MainDash({ userData }) {
       }, INACTIVITY_LIMIT);
     };
 
+    // ensure on user with cleveldashboard acess can call the api
+    if(userData.user.c_levelDash){
     // Initial fetch
     fetchTenantData();
     resetInactivityTimer();
 
     // Set interval for periodic fetch
     intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
+    
+    }
 
     // Tab visibility
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
+      if (document.visibilityState === "visible" && userData.user.c_levelDash) {
         // console.log("👁️ Tab became visible");
         fetchTenantData();
       }
@@ -164,7 +168,7 @@ export default function MainDash({ userData }) {
     // Network status
     const handleOnline = () => {
       SuccessToast("🌐 Back online");
-      fetchTenantData();
+      if(userData.user.c_levelDash) fetchTenantData();
     };
 
     const handleOffline = () => {
