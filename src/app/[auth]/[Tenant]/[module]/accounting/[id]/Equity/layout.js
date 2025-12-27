@@ -70,7 +70,7 @@ export default async function paymentlayout({ children, params }) {
   // decrypt the data 
   const DecryptedData = Dencrypt(data);
 
-  if(!DecryptedData || !res.ok){
+  if(!DecryptedData.Eqt || !res.ok){
     return notFound()
   }
 
@@ -94,7 +94,7 @@ export default async function paymentlayout({ children, params }) {
           <nav className="space-y-4">
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
               Owners Capital:{" "}
-              {DecryptedData.ownersCapital.$numberDecimal.toLocaleString(
+              {DecryptedData.Eqt.ownersCapital.$numberDecimal.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
@@ -106,7 +106,7 @@ export default async function paymentlayout({ children, params }) {
               Net Profit/Loss: 0
             </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Retained Earnings: {DecryptedData.retainedEarnings.$numberDecimal.toLocaleString(
+              Retained Earnings: {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
@@ -119,13 +119,13 @@ export default async function paymentlayout({ children, params }) {
             </span>
 
             <hr />
-            <EquityForm />
+            <EquityForm EXPRESS_PRIVATE_URL={baseUrl} user={userData.user}  Accounts={DecryptedData.account}/>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
-            <Page data={Dencrypt(data)} />
+            <Page data={DecryptedData.Eqt} />
           </section>
         </main>
       </div>

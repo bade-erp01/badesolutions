@@ -1,5 +1,5 @@
-"use client"
-import React, { useState } from 'react';
+"use client";
+import React, { useState } from "react";
 
 export default function Page({ data }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -13,43 +13,68 @@ export default function Page({ data }) {
     currentPage * itemsPerPage
   );
 
- 
   return (
     <div className="min-h-screen shadow-md">
       {/* Header */}
-      <div className="mb-6 bg-gray-600 p-5">
+      <div className="mb-6 bg-gray-600 p-3">
         <h1 className="text-2xl font-bold text-gray-100 mb-2">Equity Table</h1>
-        <span className="italic text-blue-100 text-xs">Equity in business is the net worth of a company—what owners or shareholders truly possess after debts are cleared. It’s both a measure of financial strength and a foundation for growth..
+        <span className="italic text-blue-100 text-xs">
+          Equity in business is the net worth of a company—what owners or
+          shareholders truly possess after debts are cleared. It’s both a
+          measure of financial strength and a foundation for growth..
         </span>
       </div>
 
       {/* Table */}
-      <div className="rounded-lg overflow-hidden p-6">
+      <div className="rounded-lg overflow-hidden p-1 border-1">
         <div className="overflow-hidden w-full bg-black">
           <table className="w-full table-auto divide-y divide-gray-200 text-xs">
-            <thead className="bg-gray-100 sticky top-0 z-10">
+            <thead className="bg-gray-600 sticky top-0 z-10">
               <tr>
-                {[ "Ref", "Desc", "Status", "Date","Dr","Cr", "EQT.Bal"].map((header) => (
-                  <th key={header} className="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
-                    {header}
-                  </th>
-                ))}
+                {[ "Desc", "Type", "Date", "Transaction", "Amount",""].map(
+                  (header) => (
+                    <th
+                      key={header}
+                      className="px-4 py-3 text-left font-medium  text-white uppercase tracking-wider"
+                    >
+                      {header}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
-            <tbody className="bg-gray-600 divide-y divide-gray-200">
+            <tbody className="bg-gray-400 divide-y divide-gray-200">
               {paginatedPayments.map((item) => (
-                <tr key={item._id} className="hover:bg-gray-700/50 transition-colors">
-                  <td className="px-4 py-2 truncate">{item.paymentReferenceNo}</td>
-                  <td className="px-4 py-2 truncate">{item.collectionRef}</td>
-                  <td className="px-4 py-2">
+                <tr
+                  key={item._id}
+                  className="hover:bg-gray-700/50 transition-colors"
+                >
+                  <td className="px-4 py-2 truncate">
+                    {item?.description?.slice(0, 12)}
+                  </td>
+                  <td className="px-4 py-2 truncate">
                     <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {item.status}
+                      {item.accountType}
                     </span>
                   </td>
-                  <td className="px-4 py-2 truncate">{new Date(item.PaymentDate).toLocaleDateString()}</td>
-                  <td className="px-4 py-2 font-medium">{item.drAmount.toLocaleString()}</td>
-                  <td className="px-4 py-2 font-medium">{item.crAmount.toLocaleString()}</td>
-                  <td className="px-4 py-2 font-medium">{item.previousBalance.toLocaleString()}</td>
+                  <td className="px-4 py-2 truncate">
+                    {new Date(item.date).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-2 font-medium">
+                    {item.debitCredit}
+                  </td>
+                  <td className="px-4 py-2 font-medium">
+                    {item.amount?.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
+                  </td>
+                   <td className="px-4 py-2 font-medium">
+                    
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -67,7 +92,9 @@ export default function Page({ data }) {
               Previous
             </button>
             <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className="ml-3 px-4 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50"
             >
@@ -76,7 +103,8 @@ export default function Page({ data }) {
           </div>
           <div className="hidden sm:flex sm:items-center sm:justify-between w-full">
             <p className="text-sm text-gray-700">
-              Page <span className="font-medium">{currentPage}</span> of <span className="font-medium">{totalPages}</span>
+              Page <span className="font-medium">{currentPage}</span> of{" "}
+              <span className="font-medium">{totalPages}</span>
             </p>
             <div className="flex space-x-2">
               {[...Array(totalPages)].map((_, i) => (
@@ -85,8 +113,8 @@ export default function Page({ data }) {
                   onClick={() => setCurrentPage(i + 1)}
                   className={`px-4 py-2 border rounded-md text-sm ${
                     currentPage === i + 1
-                      ? 'bg-indigo-50 border-indigo-500 text-indigo-600'
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                      ? "bg-indigo-50 border-indigo-500 text-indigo-600"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   {i + 1}
