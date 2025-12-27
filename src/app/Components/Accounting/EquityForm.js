@@ -4,6 +4,11 @@ import React from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import {Encrypt} from "../../../../Functions/Functions"
+import {
+  plsWait,
+  ErrorMessage,
+  SuccessToast,
+} from "../../../../Functions/Mics";
 
 export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
   const Router = useRouter();
@@ -52,9 +57,9 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
         const date = document.getElementById("swal-date").value;
         const description = document.getElementById("swal-desc").value;
         const accountType = document.getElementById("swal-accountType").value;
-        const bankDropdown = DOCUMENT.getElementById("bankDropdown").value
+        const bankDropdown = document.getElementById("bankDropdown").value;
 
-        if (!amount || !date || !accountType || bankDropdown) {
+        if (!amount || !date || !accountType || !bankDropdown || !description) {
           Swal.showValidationMessage(
             "All fields are required"
           );
@@ -102,7 +107,7 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
           debitCredit: formValues.debitCredit, // auto-computed
           date: formValues.date,
           description: formValues.description,
-          raisedBy: user,
+          raisedBy: `${user.firstName} ${user.lastName}`,
           bank:formValues.bankDropdown
         }),
       });
@@ -110,20 +115,11 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Something went wrong");
 
-      Swal.fire({
-        icon: "success",
-        title: "Journal Entry Registered",
-        html: `
-        <p><strong>Amount:</strong> ₦${formValues.amount}</p>
-        <p><strong>Date:</strong> ${formValues.date}</p>
-        <p><strong>Account:</strong> ${formValues.accountType}</p>
-        <p><strong>Description:</strong> ${formValues.description}</p>
-      `,
-      });
-
+      SuccessToast(data.message)
       Router.refresh();
     } catch (err) {
-      Swal.fire({ icon: "error", title: "Error", text: err.message });
+       ErrorMessage(err.message);
+       Router.refresh();
     }
   }
   return (

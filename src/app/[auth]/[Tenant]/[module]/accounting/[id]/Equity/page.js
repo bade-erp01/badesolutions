@@ -31,7 +31,7 @@ export default function Page({ data }) {
           <table className="w-full table-auto divide-y divide-gray-200 text-xs">
             <thead className="bg-gray-600 sticky top-0 z-10">
               <tr>
-                {[ "Desc", "Type", "Date", "Transaction", "Amount",""].map(
+                {[ "Desc", "Type","Status","Raised-By", "Date", "Transaction", "Amount",""].map(
                   (header) => (
                     <th
                       key={header}
@@ -56,6 +56,12 @@ export default function Page({ data }) {
                     <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                       {item.accountType}
                     </span>
+                  </td>
+                  <td className="px-4 py-2 truncate">
+                    {item?.status}
+                  </td>
+                  <td className="px-4 py-2 truncate">
+                    {item?.raisedBy}
                   </td>
                   <td className="px-4 py-2 truncate">
                     {new Date(item.date).toLocaleDateString()}
