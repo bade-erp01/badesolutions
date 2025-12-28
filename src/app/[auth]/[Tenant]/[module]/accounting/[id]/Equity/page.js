@@ -134,7 +134,7 @@ export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
                     <span title="Confirm Entry and update balance"  onClick={()=> actionButton('Posted',item._id)} className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-green-200 text-black cursor-pointer">
                       Post
                     </span>
-                     <span title="Delete Entry" onClick={()=> actionButton('delete',item._id)} className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-red-600 text-black cursor-pointer">
+                     <span title="Delete Entry" onClick={()=> actionButton('delete',item._id)} className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-red-600 text-white cursor-pointer">
                       Delete
                     </span>
                     </>
