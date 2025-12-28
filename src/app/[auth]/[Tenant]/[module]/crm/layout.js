@@ -39,8 +39,8 @@ export default async function crmLayout({ children, params }) {
     const res = await axios.get(`${baseUrl}/api/crm`, {
       headers: {
         'Content-Type': 'application/json',
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
-        Authorization: `Bearer ${userData.business.tenantId}`,
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
       },
       next: { revalidate: 60 } // cache for 1 minutes
     });
@@ -49,7 +49,7 @@ export default async function crmLayout({ children, params }) {
   } catch (error) {
     return (
       <div className="text-red-500 p-6">
-        Failed to load CRM layout. Please try again later.
+        Failed to load. Please try again later.
       </div>
     );
   }

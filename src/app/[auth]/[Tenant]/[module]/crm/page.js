@@ -2,21 +2,21 @@ import CustomerCategoryPieChart from "@/app/Components/CustomerCategory";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Card from "@/app/Components/Card";
 import axios from "axios";
+import { Encrypt } from '../../../../../../Functions/Functions';
 
 export default async function CustomerListpage({ params }) {
+  const userData = await fetchUser();
   try {
-    let userData;
     let customerListWithImages = [];
     const moduleParams = await params;
     try {
-      userData = await fetchUser();
       const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
       const res = await axios.get(`${baseUrl}/api/crm`, {
         headers: {
           "Content-Type": "application/json",
-          dbConnect: `Bearer ${userData.business.rustyRoof}`,
-          Authorization: `Bearer ${userData.business.tenantId}`,
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: `${Encrypt(userData.user._id)}`,
         },
       });
 
@@ -51,6 +51,7 @@ export default async function CustomerListpage({ params }) {
       </div>
     );
   } catch (error) {
-    return <div>Failed to load customer data.</div>;
+    
+    return <div className="text-black">Failed to load customer data.</div>;
   }
 }

@@ -228,7 +228,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
           },
           body: JSON.stringify({
@@ -319,6 +319,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       },
     }).then((result) => {
       if (result.isConfirmed) {
+        plsWait("")
         // 💾 Push to database or trigger backend logic
         axios
           .put(
@@ -333,7 +334,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-                dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
                 access: `${Encrypt(userInfo.user._id)}`,
               },
             }
@@ -420,8 +420,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userInfo.business.tenantId}`, // Replace with actual token
-            dbConnect: `Bearer ${userInfo.business.rustyRoof}`, // Replace with actual DB token
+            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+            access: `${Encrypt(userInfo.user._id)}`, 
           },
           cache: "no-store", // Optional: disables caching for fresh data
         }
@@ -569,8 +569,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const config = {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userInfo.business.tenantId}`,
-      dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
       access: `${Encrypt(userInfo.user._id)}`,
     },
   };
@@ -734,7 +733,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       const user = userInfo;
 
       // Avoid unnecessary template literals
-      const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${user.user._id}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${Encrypt(user.user._id)}`;
 
       // Await axios call directly
       const { data } = await axios.post(
