@@ -102,9 +102,17 @@ export default async function paymentlayout({ children, params }) {
                 }
               )}
             </span>
-            <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Net Profit/Loss: 0
+             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
+              Drawings:{" "}
+              {DecryptedData.Eqt.drawings.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             </span>
+            
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
               Retained Earnings: {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
                 undefined,
@@ -114,8 +122,11 @@ export default async function paymentlayout({ children, params }) {
                 }
               )}
             </span>
+            <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
+              Net Profit/Loss: 0
+            </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
-              Total {moduleList.id}: 0
+              {moduleList.id}: 0
             </span>
 
             <hr />
@@ -125,7 +136,7 @@ export default async function paymentlayout({ children, params }) {
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
-            <Page data={DecryptedData.Eqt} />
+            <Page data={DecryptedData.Eqt} EXPRESS_PRIVATE_URL={baseUrl} userData={userData}/>
           </section>
         </main>
       </div>
