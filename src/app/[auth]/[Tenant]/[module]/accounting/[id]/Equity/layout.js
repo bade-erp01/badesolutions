@@ -114,7 +114,7 @@ export default async function paymentlayout({ children, params }) {
             </span>
             
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Retained Earnings: {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
+              Retained Earnings:{" "} {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
@@ -122,11 +122,26 @@ export default async function paymentlayout({ children, params }) {
                 }
               )}
             </span>
-            <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Net Profit/Loss: 0
-            </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
-              {moduleList.id}: 0
+              {moduleList.id} Total:{" "} {DecryptedData.Eqt.ownersCapital.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              ) + DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              ) - DecryptedData.Eqt.drawings.$numberDecimal.toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             </span>
 
             <hr />

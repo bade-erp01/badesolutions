@@ -22,7 +22,7 @@ export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
       try {
         const result = await Swal.fire({
           title: 'Do you want to proceed?',
-          text: `proceeding with this action will update Equity value.`,
+          text: ``,
           icon: 'question',
           showCancelButton: true,
           confirmButtonText: 'OK',
@@ -143,7 +143,7 @@ export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
                     
                     {item.status === "Posted" && (
                       <span title="Cancel entry"  onClick={()=> actionButton('Reversed',item._id)} className="px-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-gray-700 text-white cursor-pointer">
-                      Cancel
+                      Reverse
                       </span>
                     )}
                    
