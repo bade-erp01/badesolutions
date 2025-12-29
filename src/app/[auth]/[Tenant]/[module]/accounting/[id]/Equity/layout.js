@@ -74,6 +74,11 @@ export default async function paymentlayout({ children, params }) {
     return notFound()
   }
 
+  const ownersCapital = Number(DecryptedData.Eqt.ownersCapital.$numberDecimal); 
+  const retainedEarnings = Number(DecryptedData.Eqt.retainedEarnings.$numberDecimal); 
+  const drawings = Number(DecryptedData.Eqt.drawings.$numberDecimal); const totalEquity = ownersCapital + retainedEarnings - drawings;
+  const formattedEquity = totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2, });
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
@@ -123,25 +128,7 @@ export default async function paymentlayout({ children, params }) {
               )}
             </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
-              {moduleList.id} Total:{" "} {DecryptedData.Eqt.ownersCapital.$numberDecimal.toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              ) + DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              ) - DecryptedData.Eqt.drawings.$numberDecimal.toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              )}
+              {moduleList.id} Total:{" "} {formattedEquity}
             </span>
 
             <hr />
