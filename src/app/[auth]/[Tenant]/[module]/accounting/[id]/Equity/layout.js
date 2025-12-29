@@ -128,7 +128,7 @@ export default async function paymentlayout({ children, params }) {
               )}
             </span>
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
-              {moduleList.id} Total:{" "} {formattedEquity}
+              {moduleList.id}:{" "} {formattedEquity}
             </span>
 
             <hr />
