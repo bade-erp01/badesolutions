@@ -99,7 +99,7 @@ export default async function paymentlayout({ children, params }) {
           <nav className="space-y-4">
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
               Owners Capital:{" "}
-              {DecryptedData.Eqt.ownersCapital.$numberDecimal.toLocaleString(
+              {ownersCapital.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
@@ -109,7 +109,7 @@ export default async function paymentlayout({ children, params }) {
             </span>
              <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
               Drawings:{" "}
-              {DecryptedData.Eqt.drawings.$numberDecimal.toLocaleString(
+              {drawings.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
@@ -119,7 +119,7 @@ export default async function paymentlayout({ children, params }) {
             </span>
             
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Earnings:{" "} {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
+              Earnings:{" "} {retainedEarnings.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
