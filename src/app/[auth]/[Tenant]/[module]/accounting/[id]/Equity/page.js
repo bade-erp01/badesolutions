@@ -1,11 +1,16 @@
 "use client";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import React, { useState } from "react";
-import {useRouter} from "next/navigation";
-import { plsWait,ErrorMessage,SuccessToast, Encrypt } from '../../../../../../../../Functions/Mics';
+import { useRouter } from "next/navigation";
+import {
+  plsWait,
+  ErrorMessage,
+  SuccessToast,
+  Encrypt,
+} from "../../../../../../../../Functions/Mics";
 
-export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
-  const Router = useRouter()
+export default function Page({ data, EXPRESS_PRIVATE_URL, userData }) {
+  const Router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
 
@@ -17,51 +22,50 @@ export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
     currentPage * itemsPerPage
   );
 
+  const actionButton = async (action, id) => {
+    try {
+      const result = await Swal.fire({
+        title: "Do you want to proceed?",
+        text: ``,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "OK",
+        cancelButtonText: "Cancel",
+      });
 
-    const actionButton = async (action,id) => {
-      try {
-        const result = await Swal.fire({
-          title: 'Do you want to proceed?',
-          text: ``,
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel'
-        });
-
-        if (result.isConfirmed) {
-          // Perform PATCH request if user clicks OK
-          plsWait("Updating...")
-          const response = await fetch(
-            `${EXPRESS_PRIVATE_URL}/api/Equity/journal/${Encrypt(id)}`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-                access: `${Encrypt(userData.user._id)}`,
-              },
-              body: JSON.stringify({ status:action }),
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error('Failed to update');
+      if (result.isConfirmed) {
+        // Perform PATCH request if user clicks OK
+        plsWait("Updating...");
+        const response = await fetch(
+          `${EXPRESS_PRIVATE_URL}/api/Equity/journal/${Encrypt(id)}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              access: `${Encrypt(userData.user._id)}`,
+            },
+            body: JSON.stringify({ status: action }),
           }
+        );
 
-          const data = await response.json();
-
-          // show server message 
-          SuccessToast(data.message)
-          // refresh page
-          Router.refresh()
+        if (!response.ok) {
+          throw new Error("Failed to update");
         }
-      } catch (err) {
-      //  show error message 
-      ErrorMessage(err.message)
-      Router.refresh()
+
+        const data = await response.json();
+
+        // show server message
+        SuccessToast(data.message);
+        // refresh page
+        Router.refresh();
       }
-    };
+    } catch (err) {
+      //  show error message
+      ErrorMessage(err.message);
+      Router.refresh();
+    }
+  };
 
   return (
     <div className="min-h-screen shadow-md">
@@ -81,16 +85,23 @@ export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
           <table className="w-full table-auto divide-y divide-gray-200 text-xs">
             <thead className="bg-gray-600 sticky top-0 z-10">
               <tr>
-                {[ "Desc", "Type","Status","Raised-By", "Date", "Transaction", "Amount",""].map(
-                  (header) => (
-                    <th
-                      key={header}
-                      className="px-4 py-3 text-left font-medium  text-white uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  )
-                )}
+                {[
+                  "Desc",
+                  "Type",
+                  "Status",
+                  "Raised-By",
+                  "Date",
+                  "Transaction",
+                  "Amount",
+                  "",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="px-4 py-3 text-left font-medium  text-white uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="bg-gray-400 divide-y divide-gray-200">
@@ -107,46 +118,47 @@ export default function Page({ data ,EXPRESS_PRIVATE_URL,userData}) {
                       {item.accountType}
                     </span>
                   </td>
-                  <td className="px-4 py-2 truncate">
-                    {item?.status}
-                  </td>
-                  <td className="px-4 py-2 truncate">
-                    {item?.raisedBy}
-                  </td>
+                  <td className="px-4 py-2 truncate">{item?.status}</td>
+                  <td className="px-4 py-2 truncate">{item?.raisedBy}</td>
                   <td className="px-4 py-2 truncate">
                     {new Date(item.date).toLocaleDateString()}
                   </td>
+                  <td className="px-4 py-2 font-medium">{item.debitCredit}</td>
                   <td className="px-4 py-2 font-medium">
-                    {item.debitCredit}
+                    {item.amount?.$numberDecimal.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </td>
-                  <td className="px-4 py-2 font-medium">
-                    {item.amount?.$numberDecimal.toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              )}
-                  </td>
-                   <td className="px-4 py-2 font-medium gap-2">
+                  <td className="px-4 py-2 font-medium gap-2">
                     {item.status === "Pending" && (
-                       <>
-                    <span title="Confirm Entry and update balance"  onClick={()=> actionButton('Posted',item._id)} className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-green-200 text-black cursor-pointer">
-                      Post
-                    </span>
-                     <span title="Delete Entry" onClick={()=> actionButton('delete',item._id)} className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-red-600 text-white cursor-pointer">
-                      Delete
-                    </span>
-                    </>
-
+                      <>
+                        <span
+                          title="Confirm Entry and update balance"
+                          onClick={() => actionButton("Posted", item._id)}
+                          className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-green-200 text-black cursor-pointer"
+                        >
+                          Post
+                        </span>
+                        <span
+                          title="Delete Entry"
+                          onClick={() => actionButton("delete", item._id)}
+                          className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-red-600 text-white cursor-pointer"
+                        >
+                          Delete
+                        </span>
+                      </>
                     )}
-                    
+
                     {item.status === "Posted" && (
-                      <span title="Cancel entry"  onClick={()=> actionButton('Reversed',item._id)} className="px-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-gray-700 text-white cursor-pointer">
-                      Reverse
+                      <span
+                        title="Cancel entry"
+                        onClick={() => actionButton("Reversed", item._id)}
+                        className="px-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-gray-700 text-white cursor-pointer"
+                      >
+                        Reverse
                       </span>
                     )}
-                   
                   </td>
                 </tr>
               ))}
