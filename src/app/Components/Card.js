@@ -46,7 +46,7 @@ const Card = ({ data, module }) => {
           width={60}
           height={60}
           alt={truncate(title) || "photo"}
-          className="rounded-md object-cover w-16 h-16"
+          className="rounded-md object-cover w-16 h-16 drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]"
           quality={100}
           priority={true}
         />

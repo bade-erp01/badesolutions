@@ -229,7 +229,7 @@ export default function SingleProductpage({
                   width={70}
                   src={data.image || "/preview.png"}
                   alt="Avatar"
-                  className="w-full h-full object-cover shadow-lg drop-shadow-2xl"
+                  className="w-full h-full object-cover shadow-lg drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]"
                   loading="eager"
                   priority={true}
                   quality={100}

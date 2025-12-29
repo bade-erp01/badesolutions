@@ -45,7 +45,7 @@ export default function Home() {
           backgroundImage: 'url("/josh-calabrese-Ca8r0PSWg9Q-unsplash.jpg")',
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "grayscale(30%)",
+          filter: "grayscale(40%)",
           zIndex: -2,
         }}
       >
@@ -67,7 +67,7 @@ export default function Home() {
               </span>
             </h1>
             <p
-              className="mt-2 text-sm text-pretty text-grey-400 sm:text-xl/8 
+              className="mt-2 text-sm font-bold text-pretty text-grey-400 sm:text-xl/8 
               bg-white/20 backdrop-blur-xs rounded-xl px-6 py-4 border border-white/20 shadow-lg"
             >
               Streamline Your Success with 🚀 AI-powered automation, seamless
@@ -92,14 +92,14 @@ export default function Home() {
         </div>
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+          // className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
         >
           <div
-            style={{
-              clipPath:
-                "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-            }}
-            className="relative left-[calc(50%+3rem)] aspect-1155/678 w-144.5 -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-288.75"
+            // style={{
+            //   clipPath:
+            //     "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+            // }}
+            // className="relative left-[calc(50%+3rem)] aspect-1155/678 w-144.5 -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-288.75"
           />
         </div>
       </div>
@@ -121,14 +121,14 @@ export default function Home() {
       <section className="w-full max-w-5xl mx-auto py-8 md:py-12 px-4 md:px-0">
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-[calc(30%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(30%-30rem)]"
+          // className="absolute inset-x-0 top-[calc(30%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(30%-30rem)]"
         >
           <div
-            style={{
-              clipPath:
-                "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-            }}
-            className="relative left-[calc(50%+3rem)] aspect-1155/678 w-144.5 -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-288.75"
+            // style={{
+            //   clipPath:
+            //     "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+            // }}
+            className="relative"
           />
         </div>
 
@@ -142,43 +142,43 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition">
             <Image
-              src="/window.svg"
+              src="/handshake,partnership, collaboration, teamwork, success, Vector illustration.jpg"
               alt="Track time"
-              width={64}
-              height={64}
+              width={300}
+              height={300}
               className="mb-4"
             />
-            <h3 className="text-lg font-semibold mb-2">Sales</h3>
+            <h3 className="text-lg font-semibold mb-2">Team collaboration</h3>
             <p className="text-gray-500 mb-2">
-              Create your projects and start tracking sales immediately
+              Empower teamwork by connecting members and streamlining collaboration across projects.
             </p>
             <span className="text-2xl text-gray-400">→</span>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition ">
             <Image
-              src="/globe.svg"
+              src="/Light switch (2).jpg"
               alt="Performance"
-              width={64}
-              height={64}
+              width={250}
+              height={250}
               className="mb-4"
             />
-            <h3 className="text-lg font-semibold mb-2">Performance</h3>
+            <h3 className="text-lg font-semibold mb-2">Access Controls</h3>
             <p className="text-gray-500 mb-2">
-              Manage your time on your tasks and increase your efficiency
+              Control who can view, edit, or manage resources by setting clear access permissions.
             </p>
             <span className="text-2xl text-gray-400">→</span>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition">
             <Image
-              src="https://img.icons8.com/external-icongeek26-glyph-icongeek26/64/external-report-virus-icongeek26-glyph-icongeek26.png"
+              src="/Gaming Keyboard Coloring Page Â€“ Cute Character Style - Print For Free From Our Website.jpg"
               alt="Reports"
-              width={64}
-              height={64}
+              width={200}
+              height={200}
               className="mb-4"
             />
-            <h3 className="text-lg font-semibold mb-2">Reports</h3>
+            <h3 className="text-lg font-semibold mb-2">Accessibility</h3>
             <p className="text-gray-500 mb-2">
-              Generate and export reports of your separate projects
+              Stay productive by reaching your business data globally, no matter where you are.
             </p>
             <span className="text-2xl text-gray-400">→</span>
           </div>
@@ -218,7 +218,7 @@ export default function Home() {
             </p>
             <div className="w-full rounded-lg overflow-hidden ">
               <Image
-                src="/Never Give Up - James Min.jpg" // Update path if needed
+                src="/NeverGiveUp-JamesMin.webp" // Update path if needed
                 alt="Dashboard Interface"
                 width={300}
                 height={300}
@@ -279,7 +279,7 @@ export default function Home() {
             </p>
             <div className="w-full rounded-lg overflow-hidden ">
               <Image
-                src="/3D_Graphic_Design_Illustration_for_Marketing_Analytics_Software-removebg-preview.png" // Update path if needed
+                src="/3D_Graphic_Design_Illustration_for_Marketing_Analytics_Software-removebg-preview.webp" // Update path if needed
                 alt="Dashboard Interface"
                 width={300}
                 height={300}
