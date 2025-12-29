@@ -40,7 +40,7 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
         <select id="swal-accountType" class="swal2-select" required>
           <option value="" disabled selected>Choose account type...</option>
           <option value="ownersCapital">Owners Capital</option>
-          <option value="retainedEarnings">Retained Earnings</option>
+          <option value="retainedEarnings">Earnings</option>
           <option value="drawings">Drawings</option>
         </select>
          <select id="bankDropdown" required class="swal2-select">
