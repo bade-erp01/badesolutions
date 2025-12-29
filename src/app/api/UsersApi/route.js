@@ -32,7 +32,7 @@ export async function GET(request) {
     const token = authHeader.split(" ")[1];
     const dbtoken = dbHeader.split(" ")[1];
     // Ensure Mongoose connection is established
-    await dbConnect();
+    await dbConnect("BadeAdmin");
     const employees = await Users.findByTenant(token);
     return new NextResponse(JSON.stringify(employees), {
       status: 200,
@@ -105,7 +105,7 @@ export async function POST(request) {
       );
     }
     
-    await dbConnect();
+    await dbConnect("BadeAdmin");
     // check email and phone number with data base
     const existingUser = await Users.findOne({
       $or: [{ Email: body.Email }, { telephone: body.telephone }],
