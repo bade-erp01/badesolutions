@@ -119,7 +119,7 @@ export default async function paymentlayout({ children, params }) {
             </span>
             
             <span className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-              Retained Earnings:{" "} {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
+              Earnings:{" "} {DecryptedData.Eqt.retainedEarnings.$numberDecimal.toLocaleString(
                 undefined,
                 {
                   minimumFractionDigits: 2,
