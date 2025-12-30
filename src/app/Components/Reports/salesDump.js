@@ -113,8 +113,8 @@ const SalesDumpModal = ({ business }) => {
             Inv_Date: moment(sale.DELIVERYDATE).format("l") || "N/A",
             Inv_Sub: sale.subTotal,
             Inv_Total: sale.grandTotal,
-            Month : moment(inv.startDate).format("MMM"), // short month (e.g. "Dec") const
-            Year : moment(inv.startDate).format("YYYY") // full year (e.g. "2025")
+            Month : moment(sale.startDate).format("MMM"), // short month (e.g. "Dec") const
+            Year : moment(sale.startDate).format("YYYY") // full year (e.g. "2025")
           });
         }
       });
