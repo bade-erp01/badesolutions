@@ -132,7 +132,7 @@ export default async function paymentlayout({ children, params }) {
             </span>
 
             <hr />
-            <EquityForm EXPRESS_PRIVATE_URL={baseUrl} user={userData.user}  Accounts={DecryptedData.account}/>
+            <EquityForm EXPRESS_PRIVATE_URL={baseUrl} user={userData.user}  Accounts={DecryptedData.account} VendorsList={DecryptedData.vendors}/>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}

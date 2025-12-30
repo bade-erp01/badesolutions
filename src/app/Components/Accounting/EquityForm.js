@@ -10,7 +10,7 @@ import {
   SuccessToast,
 } from "../../../../Functions/Mics";
 
-export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
+export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts,VendorsList} ) {
   const Router = useRouter();
 
   async function EquityFormFunc() {
@@ -19,8 +19,12 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
       .map((c) => `<option value="${c._id}">${c.NAME}</option>`)
       .join("");
 
+    const vendorOptions = VendorsList
+        .map((c) => `<option value="${c._id}">${c.Name}</option>`)
+        .join("");
+
     const { value: formValues } = await Swal.fire({
-      title: "Journal Entry Form",
+      title: "New Journal Entry",
       html: `
       <style>
         .swal2-input, .swal2-select {
@@ -40,12 +44,17 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
         <select id="swal-accountType" class="swal2-select" required>
           <option value="" disabled selected>Choose account type...</option>
           <option value="ownersCapital">Owners Capital</option>
-          <option value="retainedEarnings">Other Income</option>
+          <option value="retainedEarnings">Earnings</option>
+          <option value="OtherIncome">Other Income</option>
           <option value="drawings">Drawings</option>
         </select>
          <select id="bankDropdown" required class="swal2-select">
           <option value="" >Choose Bank...</option>
           ${BankOptions}
+        </select>
+        <select id="vendor" required class="swal2-select">
+          <option value="" >Choose vendor...</option>
+          ${vendorOptions}
         </select>
       </div>
     `,
@@ -58,6 +67,7 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
         const description = document.getElementById("swal-desc").value;
         const accountType = document.getElementById("swal-accountType").value;
         const bankDropdown = document.getElementById("bankDropdown").value;
+        const vendor = document.getElementById("vendor").value;
 
         if (!amount || !date || !accountType || !bankDropdown || !description) {
           Swal.showValidationMessage(
@@ -73,6 +83,7 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
           case "retainedEarnings":
           case "shareCapital":
           case "reserves":
+          case "OtherIncome":
             debitCredit = "credit"; // equity increases with credit
             break;
           case "drawings":
@@ -82,7 +93,7 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
             debitCredit = "credit";
         }
 
-        return { amount, date, description, accountType, debitCredit,bankDropdown };
+        return { amount, date, description, accountType, debitCredit,bankDropdown ,vendor: vendor ?? null};
       },
     });
 
@@ -108,7 +119,8 @@ export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts} ) {
           date: formValues.date,
           description: formValues.description,
           raisedBy: `${user.firstName} ${user.lastName}`,
-          bank:formValues.bankDropdown
+          bank:formValues.bankDropdown,
+          vendor:formValues.vendor ?? null
         }),
       });
 

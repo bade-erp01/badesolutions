@@ -97,10 +97,11 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
             <label style="font-weight: 600; font-size: 12px;">Trace</label><br/>
             <select id="typeFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              <option value="Payment">Payment</option>
-              <option value="Purchase">Purchase</option>
               <option value="CN">Credit Note</option>
               <option value="DN">Debit Note</option>
+              <option value="Equity">Equity</option>
+              <option value="Payment">Payment</option>
+              <option value="Purchase">Purchase</option>
               <option value="Reversed">Reversed</option>
             </select>
           </div>
