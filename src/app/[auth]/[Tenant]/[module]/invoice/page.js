@@ -72,10 +72,10 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
             {isLoading ? (
               <SuspenenseFallBack pagedata={"Invoice List"} />
             ) : billList.length > 0 ? (
-              <div className="bg-gray-600 shadow-lg border border-white/10">
+              <div className="bg-white rounded p-3 shadow-md animate__animated animate__fadeInUp animate__faster">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-xs">
-                    <thead className="bg-white/10 text-white uppercase text-xs sticky top-0 z-10">
+                    <thead className="bg-gray-100 text-gray-900 uppercase text-xs sticky top-0 z-10">
                       <tr>
                         <th className="px-4 py-3 text-left">Ref No</th>
                         <th className="px-4 py-3 text-left">Customer</th>
@@ -95,7 +95,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                         return (
                           <tr
                             key={bill._id}
-                            className="hover:bg-white/5 transition text-xs text-white"
+                            className="transition text-xs text-gray-400 hover:bg-gray-300 hover:text-black"
                           >
                             <td className="px-4 py-3 border-t border-white/10">
                               <Link
@@ -107,25 +107,25 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                                   : "View Draft"}
                               </Link>
                             </td>
-                            <td className="px-4 py-3 border-t border-white/10">{bill.customerName}</td>
+                            <td className="px-4 py-3 border-t border-white/10 italic font-semibold">{bill.customerName}</td>
                             <td className="px-4 py-3 border-t border-white/10">{bill.startDate}</td>
                             <td className="px-4 py-3 border-t border-white/10">{bill.RaiseBy}</td>
                             <td className="px-4 py-3 border-t border-white/10">
                               <span
-                                className={`inline-block px-2 py-0.5 text-xs rounded-full ${
+                                className={`inline-block px-2 py-0.5 text-xs rounded-full text-gray-600 ${
                                   bill.billStatus === "Invoice"
-                                    ? "bg-green-500/30 text-green-300"
+                                    ? "bg-green-500/30"
                                     : bill.billStatus === "Order"
-                                    ? "bg-yellow-500/30 text-yellow-200"
+                                    ? "bg-yellow-500/30"
                                     : bill.billStatus === "Cancelled"
-                                    ? "bg-red-500/30 text-red-300"
-                                    : "bg-gray-500/30 text-gray-300"
+                                    ? "bg-red-500/30"
+                                    : "bg-gray-500/30 "
                                 }`}
                               >
                                 {bill.billStatus}
                               </span>
                             </td>
-                            <td className="px-4 py-3 border-t border-white/10 text-right">
+                            <td className="px-4 py-3 border-t border-white/10 text-right font-bold">
                               ₦{bill.grandTotal.toLocaleString()}
                             </td>
                           </tr>

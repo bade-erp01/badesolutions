@@ -90,7 +90,7 @@ export default async function Employeelayout({ children, params }) {
         </aside>
 
         <main className="flex-1">
-         <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
+         <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
               <InvoiceLandingPage baseUrl={baseUrl} userData={userData} />
           </section>
         </main>
