@@ -1,4 +1,5 @@
 import React from "react";
+import {Link} from "next/navigation"
 
 export default function ProfitAndLossSheet(Data) {
   return (
