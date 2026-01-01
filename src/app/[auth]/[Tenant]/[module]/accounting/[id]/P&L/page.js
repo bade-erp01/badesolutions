@@ -27,19 +27,11 @@ export default function ProfitAndLossSheet({ data }) {
                   <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                     SALES
                   </summary>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                    {/* {data.orders?.map((order, idx) => ( */}
-                    <div
-                      // key={idx}
-                      className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
-                    >
-                      <p className="text-purple-800">
-                        <strong>Product:</strong> Example Product
-                      </p>
-                      <h4 className="font-semibold mb-2">Total: $100</h4>
-                    </div>
-                    {/* ))} */}
-                  </div>
+                  {/* <div className="flex flex-col gap-4 mt-2">
+                   <p className="italic"> -Dis. Allowed --- [₦0.00]</p>
+                   <p className="italic"> -Cost of Goods Sold (COGS) --- [₦0.00]</p>
+                   <p className="italic"> -Credit Memo [Mapped to Invoice] --- [₦0.00]</p>
+                  </div> */}
                 </details>
               </td>
               <td className="py-3">$100</td>
@@ -51,18 +43,10 @@ export default function ProfitAndLossSheet({ data }) {
                   <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                     NET SALES [A]
                   </summary>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                    {/* {data.orders?.map((order, idx) => ( */}
-                    <div
-                      // key={idx}
-                      className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
-                    >
-                      <p className="text-purple-800">
-                        <strong>Product:</strong> Example Product
-                      </p>
-                      <h4 className="font-semibold mb-2">Total: $100</h4>
-                    </div>
-                    {/* ))} */}
+                  <div className="flex flex-col gap-4 mt-2">
+                   <p className="italic"> -Dis. Allowed --- [₦0.00]</p>
+                   <p className="italic"> -Cost of Goods Sold (COGS) --- [₦0.00]</p>
+                   <p className="italic"> -Credit Memo [Mapped to Invoice] --- [₦0.00]</p>
                   </div>
                 </details>
               </td>
@@ -75,18 +59,8 @@ export default function ProfitAndLossSheet({ data }) {
                   <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                     DIRECT EXPENSE [B]
                   </summary>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                    {/* {data.orders?.map((order, idx) => ( */}
-                    <div
-                      // key={idx}
-                      className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
-                    >
-                      <p className="text-purple-800">
-                        <strong>Product:</strong> Example Product
-                      </p>
-                      <h4 className="font-semibold mb-2">Total: $100</h4>
-                    </div>
-                    {/* ))} */}
+                  <div className="flex flex-col gap-4 mt-2">
+                    {/* show list of rxpense category */}
                   </div>
                 </details>
               </td>
@@ -99,18 +73,8 @@ export default function ProfitAndLossSheet({ data }) {
                   <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                     GROSS PROFIT [C]
                   </summary>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                    {/* {data.orders?.map((order, idx) => ( */}
-                    <div
-                      // key={idx}
-                      className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
-                    >
-                      <p className="text-purple-800">
-                        <strong>Product:</strong> Example Product
-                      </p>
-                      <h4 className="font-semibold mb-2">Total: $100</h4>
-                    </div>
-                    {/* ))} */}
+                  <div className="flex flex-col gap-4 mt-2">
+                   <p className="font-bold "> [A - B] </p>
                   </div>
                 </details>
               </td>
@@ -124,18 +88,9 @@ export default function ProfitAndLossSheet({ data }) {
                   <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                     INDIRECT EXPENSE [D]
                   </summary>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                    {/* {data.orders?.map((order, idx) => ( */}
-                    <div
-                      // key={idx}
-                      className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
-                    >
-                      <p className="text-purple-800">
-                        <strong>Product:</strong> Example Product
-                      </p>
-                      <h4 className="font-semibold mb-2">Total: $100</h4>
-                    </div>
-                    {/* ))} */}
+                   <div className="flex flex-col gap-4 mt-2">
+                    {/* lit of indirect expense */}
+                   {/* <p className="italic"> -Dis. Allowed --- [₦0.00]</p> */}
                   </div>
                 </details>
               </td>
@@ -149,18 +104,8 @@ export default function ProfitAndLossSheet({ data }) {
                   <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                      OPERATING INCOME
                   </summary>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                    {/* {data.orders?.map((order, idx) => ( */}
-                    <div
-                      // key={idx}
-                      className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs"
-                    >
-                      <p className="text-purple-800">
-                        <strong>Product:</strong> Example Product
-                      </p>
-                      <h4 className="font-semibold mb-2">Total: $100</h4>
-                    </div>
-                    {/* ))} */}
+                  <div className="flex flex-col gap-4 mt-2">
+                   <p className="font-bold"> [C - D]</p>
                   </div>
                 </details>
               </td>
