@@ -1,10 +1,10 @@
-import Nav1 from "@/app/Components/Nav1";
+import React from 'react'
+import Page from "./page"
+import { notFound } from "next/navigation";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt,Dencrypt } from "../../../../../../../../Functions/Functions";
-import Footer2 from "@/app/Components/Footer2";
-import BackButton from "@/app/Components/BackBotton";
-import ProfitAndLossSheet from "./page"
-import {notFound} from "next/navigation"
+import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
+
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -50,59 +50,30 @@ export const metadata = {
   facicon: "/favicon",
 };
 
-export default async function paymentlayout({ children, params }) {
+export default async function layout({params}) {
   const moduleList = await params;
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-//   const res = await fetch(`${baseUrl}/api/Equity`, {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-//       access: `${Encrypt(userData.user._id)}`,
-//     },
-//      next: { revalidate: 60 } // cache for 1 minutes
-//   });
+  //   const res = await fetch(`${baseUrl}/api/Generate/profitandLoss?startDate=${}&endDate=${}`, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+  //       access: `${Encrypt(userData.user._id)}`,
+  //     },
+  //      next: { revalidate: 60 } // cache for 1 minutes
+  //   });
 
-//   const data = await res.json()
+  //   const data = await res.json()
 
-//   // decrypt the data 
-//   const DecryptedData = Dencrypt(data);
+  //   // decrypt the data
+  //   const DecryptedData = Dencrypt(data);
 
-//   if(!DecryptedData.Eqt || !res.ok){
-//     return notFound()
-//   }
+  //   if(!DecryptedData.Eqt || !res.ok){
+  //     return notFound()
+  //   }
 
- 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
-      <Nav1
-        user={userData.user}
-        business={userData.business}
-        page={`Profit & Loss`}
-      />
-
-      <div className="flex flex-1 text-white bt-2 ">
-        {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
-          style={{ overflowY: "auto" }}
-        >
-          <BackButton />
-          <hr />
-          <nav className="space-y-4">
-            {/* show modal button */}
-          </nav>
-        </aside>{" "}
-        {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
-            <ProfitAndLossSheet data={[]}/>
-          </section>
-        </main>
-      </div>
-      <Footer2 />
-    </div>
-  );
+    <Page userData={userData} initialData={[]}/>
+  )
 }
