@@ -78,6 +78,6 @@ export default async function layout({params}) {
     // }
 
   return (
-    <Page userData={userData} initialData={data}/>
+    <Page userData={userData} Data={data} EXPRESS_PRIVATE_URL={baseUrl}/>
   )
 }

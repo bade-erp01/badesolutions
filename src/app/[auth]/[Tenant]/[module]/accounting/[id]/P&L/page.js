@@ -5,9 +5,13 @@ import BackButton from "@/app/Components/BackBotton";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import {useState} from "react"
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import {ErrorMessage,SuccessToast,} from "../../../../../../../../Functions/Mics"
+import { Encrypt,} from "../../../../../../../../Functions/Mics"
 
-export default function Page({initialData,userData}) {
- 
+export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
+ const [initialData,setInitialData] = useState(Data)
+
+
   async function GeneratePNLSummary() {
     const { value: formValues } = await Swal.fire({
       title: "Generate income Statement",
@@ -39,13 +43,13 @@ export default function Page({initialData,userData}) {
     try {
       const { startDate, endDate } = formValues;
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/customerReport/${customerId}?Start=${startDate}&End=${endDate}`,
+        `${EXPRESS_PRIVATE_URL}/api/Generate/profitandLoss?startDate=${startDate}&endDate=${endDate}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
           },
           cache: "no-store", // Optional: disables caching for fresh data
         }
@@ -53,12 +57,11 @@ export default function Page({initialData,userData}) {
 
       const TransactionResult = await res.json();
 
-      if (!res.ok || TransactionResult.length < 1) {
-        throw new Error(data.error || "No transactions found.");
+      if (!res.ok) {
+        throw new Error(Transaction.error || "No transactions found.");
       }
-
-      Swal.close();
-      SuccessToast("Your report has been saved.");
+      setInitialData(TransactionResult)
+      SuccessToast("Income statement updated.");
     } catch (err) {
       ErrorMessage(err.message);
     }
@@ -95,7 +98,7 @@ export default function Page({initialData,userData}) {
             <div className="bg-white rounded p-6 m-3 shadow-md animate__animated animate__fadeInUp animate__faster">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg text-gray-500 font-semibold">
-                  Income Statement
+                  Income Statement for {userData.business.CompanyName}
                 </h3>
               </div>
 
