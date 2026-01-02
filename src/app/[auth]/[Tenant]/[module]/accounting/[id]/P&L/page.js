@@ -98,7 +98,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
             <div className="bg-white rounded p-6 m-3 shadow-md animate__animated animate__fadeInUp animate__faster">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg text-gray-500 font-semibold">
-                  Income Statement for {userData.business.CompanyName}
+                  Income Statement for {userData.business.companyName.toLowerCase()}
                 </h3>
               </div>
 
