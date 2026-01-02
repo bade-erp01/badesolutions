@@ -119,6 +119,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                                     ? "bg-yellow-500/30"
                                     : bill.billStatus === "Cancelled"
                                     ? "bg-red-500/30"
+                                    : bill.billStatus === "Processing"
+                                    ? "bg-purple-500/30 text-white"
                                     : "bg-gray-500/30 "
                                 }`}
                               >
