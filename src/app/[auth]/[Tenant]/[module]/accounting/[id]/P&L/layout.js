@@ -3,6 +3,7 @@ import Page from "./page"
 import { notFound } from "next/navigation";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
+import moment from "moment"
 
 
 
@@ -51,29 +52,32 @@ export const metadata = {
 };
 
 export default async function layout({params}) {
-  const moduleList = await params;
   const userData = await fetchUser();
+  // First day of current month 
+  const firstDay = moment().startOf("month").format("YYYY-MM-DD"); 
+  // Last day of current month
+  const lastDay = moment().endOf("month").format("YYYY-MM-DD");
+  
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  //   const res = await fetch(`${baseUrl}/api/Generate/profitandLoss?startDate=${}&endDate=${}`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-  //       access: `${Encrypt(userData.user._id)}`,
-  //     },
-  //      next: { revalidate: 60 } // cache for 1 minutes
-  //   });
+    const res = await fetch(`${baseUrl}/api/Generate/profitandLoss?startDate=${firstDay}&endDate=${lastDay}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
+      },
+       next: { revalidate: 60 } // cache for 1 minutes
+    });
 
-  //   const data = await res.json()
+    const data = await res.json()
 
-  //   // decrypt the data
-  //   const DecryptedData = Dencrypt(data);
+    // decrypt the data
 
-  //   if(!DecryptedData.Eqt || !res.ok){
-  //     return notFound()
-  //   }
+    // if(!DecryptedData.pnl || !res.ok){
+    //   return notFound()
+    // }
 
   return (
-    <Page userData={userData} initialData={[]}/>
+    <Page userData={userData} initialData={data}/>
   )
 }

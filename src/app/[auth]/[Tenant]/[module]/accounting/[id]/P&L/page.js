@@ -116,14 +116,17 @@ export default function Page({initialData,userData}) {
                           <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
                             SALES
                           </summary>
-                          {/* <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic"> -Dis. Allowed --- [₦0.00]</p>
-                            <p className="italic"> -Cost of Goods Sold (COGS) --- [₦0.00]</p>
-                            <p className="italic"> -Credit Memo [Mapped to Invoice] --- [₦0.00]</p>
-                            </div> */}
+                          <div className="flex flex-col gap-4 mt-2">
+                            {/* show list of rxpense category */}
+                            <p>All category</p>
+                          </div>
                         </details>
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.totalInvoiceSale.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    </td>
                     </tr>
 
                     <tr>
@@ -133,19 +136,15 @@ export default function Page({initialData,userData}) {
                             NET SALES [A]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic"> -Dis. Allowed --- [₦0.00]</p>
+                            <p className="italic"> - Dis. Allowed --- [₦0.00]</p>
                             <p className="italic">
                               {" "}
-                              -Cost of Goods Sold (COGS) --- [₦0.00]
-                            </p>
-                            <p className="italic">
-                              {" "}
-                              -Credit Memo [Mapped to Invoice] --- [₦0.00]
+                              - Cost of Goods Sold (COGS) --- [₦0.00]
                             </p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
                     </tr>
 
                     <tr>
@@ -156,10 +155,17 @@ export default function Page({initialData,userData}) {
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* show list of rxpense category */}
+                            {initialData.directExpenseCat.map((cat,idx) =>(
+                              <p className="itaclic " key={idx}> {cat.NAME} </p>
+                            ))}
                           </div>
                         </details>
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.directExpenses.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    </td>
                     </tr>
 
                     <tr>
@@ -173,7 +179,7 @@ export default function Page({initialData,userData}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
                     </tr>
 
                     <tr>
@@ -184,11 +190,17 @@ export default function Page({initialData,userData}) {
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* lit of indirect expense */}
-                            {/* <p className="italic"> -Dis. Allowed --- [₦0.00]</p> */}
+                            {initialData.indirectExpenseCat.map((cat,idx) =>(
+                              <p className="itaclic" key={idx}> {cat.NAME} </p>
+                            ))}
                           </div>
                         </details>
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.Indirectexpense.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    </td>
                     </tr>
 
                     <tr>
@@ -202,7 +214,7 @@ export default function Page({initialData,userData}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
                     </tr>
 
                     <tr>
@@ -213,21 +225,25 @@ export default function Page({initialData,userData}) {
                       <td className="cursor-pointer hover:bg-gray-50 font-bold ">
                         Net Income before Taxes
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
                     </tr>
 
                     <tr>
                       <td className="cursor-pointer hover:bg-gray-50 font-bold ">
                         Taxes
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.Taxes.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    </td>
                     </tr>
 
                     <tr>
                       <td className="cursor-pointer hover:bg-gray-50 font-bold ">
                         Net Income
                       </td>
-                      <td className="py-3">$100</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
                     </tr>
                   </tbody>
                 </table>
