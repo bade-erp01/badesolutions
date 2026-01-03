@@ -221,9 +221,9 @@ export default function Nav1({ page, Module, user, business }) {
                     aria-expanded="true"
                     aria-haspopup="true"
                   >
-                    {user?.image ? (
+                    {user?.image && (
                       <Image
-                        src={user.image}
+                        src={user.image || "/person.png"}
                         className="drop-shadow-sm border-2 rounded-full object-cover"
                         // loading="lazy"
                         priority={true}
@@ -231,18 +231,7 @@ export default function Nav1({ page, Module, user, business }) {
                         width={25}
                         height={25}
                         alt="user image"
-                      />
-                    ) : (
-                      <Image
-                        src="/person.png"
-                        loading="lazy"
-                        alt="user image"
-                        priority={false}
-                        quality={100}
-                        height={25}
-                        width={25}
-                        className=" rounded-full object-cover"
-                      />
+                      /> 
                     )}
                   </button>
 

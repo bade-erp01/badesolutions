@@ -1,43 +1,65 @@
 import Footer2 from "@/app/Components/Footer2";
 import Nav1 from "@/app/Components/Nav1";
 import Link from "next/link";
-import Image from "next/image"
+import Image from "next/image";
 import moment from "moment";
 import { Encrypt } from "../../../../Functions/Functions";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
-import TermsAndConditionsLink from "@/app/Components/TermsAndCondition"
+import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import Logout from "@/app/Components/Logout";
 import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
-import BirthdayGreetings from "@/app/Components/BithdayToast"
+import BirthdayGreetings from "@/app/Components/BithdayToast";
 
 export default async function TenantPage({ params }) {
   const userData = await fetchUser();
 
-  const languages = ['es', 'en', 'de', 'fr'];
+  const languages = ["es", "en", "de", "fr"];
 
   const getRandomLanguage = () =>
     languages[Math.floor(Math.random() * languages.length)];
 
-  const getLocalizedGreeting = (name = 'Guest', lang = getRandomLanguage()) => {
+  const getLocalizedGreeting = (name = "Guest", lang = getRandomLanguage()) => {
     const hour = moment().hour();
     const timeOfDay =
       hour >= 5 && hour < 12
-        ? 'morning'
+        ? "morning"
         : hour >= 12 && hour < 17
-        ? 'afternoon'
+        ? "afternoon"
         : hour >= 17 && hour < 22
-        ? 'evening'
-        : 'generic';
+        ? "evening"
+        : "generic";
 
     const greetings = {
-      en: { morning: '🌅 Good morning', afternoon: '☀️ Good afternoon', evening: '🌇 Good evening', generic: '👋 Hello' },
-      fr: { morning: '🌅 Bonjour', afternoon: '☀️ Bon après-midi', evening: '🌇 Bonsoir', generic: '👋 Salut' },
-      es: { morning: '🌅 Buenos días', afternoon: '☀️ Buenas tardes', evening: '🌇 Buenas noches', generic: '👋 Hola' },
-      de: { morning: '🌅 Guten Morgen', afternoon: '☀️ Guten Tag', evening: '🌇 Guten Abend', generic: '👋 Hallo' },
+      en: {
+        morning: "Good morning",
+        afternoon: "Good afternoon",
+        evening: "Good evening",
+        generic: "Hello",
+      },
+      fr: {
+        morning: "Bonjour",
+        afternoon: "Bon après-midi",
+        evening: "Bonsoir",
+        generic: "Salut",
+      },
+      es: {
+        morning: "Buenos días",
+        afternoon: "Buenas tardes",
+        evening: "Buenas noches",
+        generic: "Hola",
+      },
+      de: {
+        morning: "Guten Morgen",
+        afternoon: "Guten Tag",
+        evening: "Guten Abend",
+        generic: "Hallo",
+      },
     };
 
-    return `${greetings[lang]?.[timeOfDay] || greetings.en[timeOfDay]}, ${name}.`;
+    return `${
+      greetings[lang]?.[timeOfDay] || greetings.en[timeOfDay]
+    }, ${name}.`;
   };
 
   const companySlug = userData?.business?.companyName
@@ -55,28 +77,46 @@ export default async function TenantPage({ params }) {
 
       <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
         {/* Sidebar */}
-        <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-y-hidden" >
+        <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-y-hidden">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-sm font-bold">Application Pane</h2>
           </div>
           <hr className="border-gray-600 mb-4" />
 
           <nav className="space-y-4">
-            <div className=" bg-grey-100 max-h-[40vh] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#d9d1daff transparent' }}>
+            <div
+              className=" bg-grey-100 max-h-[40vh] overflow-y-auto"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#d9d1daff transparent",
+              }}
+            >
               {userData?.user?.Apps.map((app, index) => (
                 <Link
                   key={index}
-                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${app.url.toLowerCase().replace(/\s+/g, "")}/${app.url.toLowerCase().replace(/\s+/g, "")}`}
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${app.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${app.url
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
                   title={app.Description || ""}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
-                  <Image src={app.icon || "https://img.icons8.com/deco/48/open-box.png"} width={24} height={24} alt={app.Name} />
+                  <Image
+                    src={
+                      app.icon || "https://img.icons8.com/deco/48/open-box.png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={app.Name}
+                  />
                   <span className="text-xs">{app.Name}</span>
                 </Link>
               ))}
             </div>
 
-            {userData?.user?.isAdmin && userData.business.subscriptionplan === "Standard" && (
+            {userData?.user?.isAdmin &&
+              userData.business.subscriptionplan === "Standard" && (
                 <Link
                   href={`/auth/Apps`}
                   className="flex items-center gap-3 p-3 rounded-md bg-gray-400 hover:bg-gray-700 transition"
@@ -91,39 +131,55 @@ export default async function TenantPage({ params }) {
                 </Link>
               )}
 
-              {userData?.user?.isAdmin && (
-                <Link
-                  href={`/${companySlug}/account/${Encrypt(userData?.business?._id)}`}
-                  className="flex items-center gap-3 p-3 rounded-md bg-gray-400 hover:bg-gray-700 transition"
-                >
-                  <Image
-                    src="https://img.icons8.com/3d-fluency/94/gear--v1.png"
-                    width={24}
-                    height={24}
-                    alt="Settings"
-                  />
-                  <span className="text-sm">Business Settings</span>
-                </Link>
-            
-              )}
+            {userData?.user?.isAdmin && (
+              <Link
+                href={`/${companySlug}/account/${Encrypt(
+                  userData?.business?._id
+                )}`}
+                className="flex items-center gap-3 p-3 rounded-md bg-gray-400 hover:bg-gray-700 transition"
+              >
+                <Image
+                  src="https://img.icons8.com/3d-fluency/94/gear--v1.png"
+                  width={24}
+                  height={24}
+                  alt="Settings"
+                />
+                <span className="text-sm">Business Settings</span>
+              </Link>
+            )}
 
             <Logout />
-            <TermsAndConditionsLink BusinessPlan={userData.business.subscriptionplan}/>
+            <TermsAndConditionsLink
+              BusinessPlan={userData.business.subscriptionplan}
+            />
           </nav>
         </aside>
 
         {/* Main Content */}
         <main
           className="flex-2 max-w-7xl h-[83vh] overflow-y-scroll p-6 bg-linear-to-br from-gray-200 via-gray-100 to-gray-300"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: '#453d46ff transparent' }}
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "#453d46ff transparent",
+          }}
         >
-          <section className=" " >
+          <section className=" ">
             <header className="mb-2">
-              <h2 className="text-xl font-bold text-gray-900">
+              <div className="text-xl font-bold text-gray-900">
+                <Image
+                  src={user.image || "/person.png"}
+                  className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
+                  // loading="lazy"
+                  priority={true}
+                  quality={100}
+                  width={25}
+                  height={25}
+                  alt="user image"
+                />
                 {getLocalizedGreeting(userData.user.firstName)}
-              </h2>
+              </div>
               <p className="text-sm text-gray-600 mt-1">
-              {`It's ${moment().format('dddd, Do MMMM YYYY')}`}
+                {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
               </p>
             </header>
 
@@ -132,7 +188,7 @@ export default async function TenantPage({ params }) {
         </main>
       </div>
       <SubscriptionReminder Business={userData.business} />
-      <BirthdayGreetings Business={userData.business} user={userData.user}/>
+      <BirthdayGreetings Business={userData.business} user={userData.user} />
       <Footer2 />
     </div>
   );
