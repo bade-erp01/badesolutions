@@ -683,7 +683,7 @@ export default function InvoicePage({
         {/* Print Button */}
         <div className="flex justify-end mb-6">
          
-          {Singlebill.billStatus?.toUpperCase() !== "CANCELLED" &&
+         {(Singlebill.billStatus?.toUpperCase() !== "CANCELLED" && Singlebill.billStatus?.toUpperCase() !== "PROCESSING") &&
             userInfo.user.cancelInvoice && (
               <button
                 title={`Cancel and return SKU in ${Singlebill.billStatus}`}
@@ -739,7 +739,8 @@ export default function InvoicePage({
             </button> 
            )}
 
-          <button
+           {Singlebill.billStatus?.toUpperCase() !== "PROCESSING" &&(
+            <button
             title={`Download and Print ${Singlebill.billStatus}`}
             onClick={() => generatePdf(userInfo.business, Singlebill.customer, Singlebill)}
             className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
@@ -747,6 +748,8 @@ export default function InvoicePage({
             <PrinterIcon className="w-5 h-5 text-gray-100" />
             <span>Print {Singlebill.billStatus}</span>
           </button>
+           )}
+          
         </div>
 
         {/* Product Table */}
