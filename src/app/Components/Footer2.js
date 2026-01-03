@@ -15,7 +15,7 @@ export default function Footer2() {
         </span> 
         {" "} |  {" "}
         <span className="text-xs md:text-base text-gray-200">
-          📢 Promote businesses within the BADE ecosystem by giving them visibility to other active users.{" "}
+          📢 Promote your businesses within the BADE ecosystem by giving them visibility to other active users.{" "}
         </span>
         {" "} |  {" "}
        <span>Whatsapp Support on +234 704 4889 034</span>
