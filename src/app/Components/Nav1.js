@@ -224,7 +224,7 @@ export default function Nav1({ page, Module, user, business }) {
                     {user?.image && (
                       <Image
                         src={user.image || "/person.png"}
-                        className="drop-shadow-sm border-2 rounded-full object-cover"
+                        className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
                         // loading="lazy"
                         priority={true}
                         quality={100}
