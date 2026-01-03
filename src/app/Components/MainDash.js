@@ -47,7 +47,7 @@ export default function MainDash({ userData }) {
     );
   }, [tenantData]);
 
-  // 🧠 Memoized paginated invoices MonitoredProduct
+  // Memoized paginated invoices MonitoredProduct
   const paginatedInvoices = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return sortedInvoices.slice(start, start + itemsPerPage);
@@ -69,15 +69,15 @@ export default function MainDash({ userData }) {
     [totalPages]
   );
 
-  // 🧠 Memoized paginated MonitoredProduct
-  // 🧠 Memoized sorted monitored products
+  // Memoized paginated MonitoredProduct
+  // Memoized sorted monitored products
   const sortedMonitoredProducts = useMemo(() => {
     return tenantData?.MonitoredProduct?.sort(
       (a, b) => a.productName.localeCompare(b.productName)
     ) || [];
   }, [tenantData]);
 
-  // 🧠 Memoized paginated MonitoredProduct
+  //  Memoized paginated MonitoredProduct
   const paginatedMonitoredProduct = useMemo(() => {
     const start = (monitoredCurrentPage - 1) * monitoredItemsPerPage;
     return sortedMonitoredProducts.slice(start, start + monitoredItemsPerPage);

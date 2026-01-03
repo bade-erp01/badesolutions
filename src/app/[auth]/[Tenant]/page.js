@@ -167,7 +167,7 @@ export default async function TenantPage({ params }) {
             <header className="mb-2">
               <div className="text-xl font-bold text-gray-900">
                 <Image
-                  src={user.image || "/person.png"}
+                  src={userData.user.image || "/person.png"}
                   className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
                   // loading="lazy"
                   priority={true}
