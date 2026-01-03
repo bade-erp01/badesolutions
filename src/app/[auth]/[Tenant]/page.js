@@ -165,7 +165,7 @@ export default async function TenantPage({ params }) {
         >
           <section className=" ">
             <header className="mb-2">
-              <div className="text-xl font-bold text-gray-900">
+              <div className="flex items-center space-x-2" >
                 <Image
                   src={userData.user.image || "/person.png"}
                   className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
@@ -176,7 +176,9 @@ export default async function TenantPage({ params }) {
                   height={25}
                   alt="user image"
                 />
+               <h2 className="text-xl font-bold text-gray-900">
                 {getLocalizedGreeting(userData.user.firstName)}
+                </h2>
               </div>
               <p className="text-sm text-gray-600 mt-1">
                 {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
