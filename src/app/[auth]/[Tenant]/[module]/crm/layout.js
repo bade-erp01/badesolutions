@@ -42,7 +42,7 @@ export default async function crmLayout({ children, params }) {
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         access: `${Encrypt(userData.user._id)}`,
       },
-      next: { revalidate: 60 } // cache for 1 minutes
+      next: { revalidate: 120 } // cache for 2 minutes
     });
 
     customerList = res.data; // ✅ Fix: axios returns data in `res.data`, not `res.json()`
