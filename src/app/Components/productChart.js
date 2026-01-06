@@ -204,7 +204,7 @@ const ProductSalesChart = ({ productsList }) => {
             <p className="text-xs text-gray-600">{bestSeller.ADCcode}</p>
             <p className="text-xs text-gray-600 mt-1">
               <strong>Description:</strong>{" "}
-              {bestSeller.description || "No description available."}
+              {bestSeller.description || bestSeller.Description || "No description available."}
             </p>
           </div>
         </div>
