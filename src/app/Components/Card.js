@@ -14,7 +14,7 @@ const Card = ({ data, module }) => {
   const title =
     data.Name ||
     data.firstName ||
-    data.Description ||
+    // data.Description ||
     data.WHName ||
     data.productName ||
     data.billReferenceNo ||
