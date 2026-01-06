@@ -66,7 +66,6 @@ const SearchCard = ({ data, module, UserData }) => {
 
   const title =
     data.firstName ||
-    data.Description ||
     data.Name ||
     data.WHName ||
     data.productName ||
@@ -78,6 +77,7 @@ const SearchCard = ({ data, module, UserData }) => {
     data.DebitId ||
     data.customer ||
     data.refNo ||
+    data.Description ||
     `${data.billStatus}/${data.billReferenceNo}`;
 
   const subtitle =
