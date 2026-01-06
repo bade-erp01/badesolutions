@@ -137,7 +137,8 @@ export default async function Productlayout({ children, params }) {
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
-                  {productList.sort((a, b) => a.Name.localeCompare(b.Name)).map(element => (
+                  {productList.sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
+                  .map(element => (
                     <Card key={element._id} data={element} module={'product'} />
                   ))}
                 </div>
