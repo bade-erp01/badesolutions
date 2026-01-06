@@ -201,10 +201,10 @@ const ProductSalesChart = ({ productsList }) => {
               </div>
             </div>
             <h5 className="text-sm font-bold text-gray-900">{bestSeller.Name}</h5>
-            <p className="text-xs text-gray-600">{bestSeller.ADCcode || bestSeller.ACDcode}</p>
+            <p className="text-xs text-gray-600">{bestSeller?.ADCcode || bestSeller?.ACDcode || ""}</p>
             <p className="text-xs text-gray-600 mt-1">
               <strong>Description:</strong>{" "}
-              {bestSeller.description || bestSeller.Description || "No description available."}
+              {bestSeller?.description || bestSeller?.Description || "No description available."}
             </p>
           </div>
         </div>
