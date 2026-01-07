@@ -133,9 +133,13 @@ async function StoreLayoutContent({ params }) {
          </ul>
         </div>
         <br />
-        <span className="text-xs mt-2">Share via</span>
         <hr/>
+        <span className="text-xs mt-2">Share via</span>
         <MailAndWhatsapp baseUrl={process.env.EXPRESS_PRIVATE_URL} billId={Inv._id} firstName={userInfo.user.firstName} userId={userInfo.user._id} businessToken={userInfo.business.rustyRoof} />
+        <hr/>
+        <br />
+        <span className="text-xs mt-2">Total Payment Recorded</span>
+        <h5 className="text-green-400 font-semibold ">{userInfo.business.currency?.currency.Symbol}{Inv.paymentMethod || 0}</h5>
       </nav>
      </aside>
 
