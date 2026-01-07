@@ -282,7 +282,7 @@ export default function TextToSpeechTrigger({ text }) {
     <span
       onClick={speakText}
       className="inline-flex items-center gap-1 cursor-pointer  hover:text-black transition"
-      title="Bug-Ant Assist"
+      title="Read aloud to me"
     >
       <MegaphoneIcon  className="h-5 w-5 text-black hover:text-black hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
     </span>

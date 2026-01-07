@@ -7,6 +7,7 @@ import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import Image from "next/image";
 import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
+import InvoicePaymentForm from "@/app/Components/PaymentWithInv"
 import {
   postPayment,
   // GenerateSummary,
@@ -19,7 +20,7 @@ import { Line } from "react-chartjs-2";
 import {
   PrinterIcon,
   CalendarDaysIcon,
-  BanknotesIcon,
+  WalletIcon,
   ArrowLongRightIcon,ArrowUturnLeftIcon,TrashIcon
 } from "@heroicons/react/24/outline";
 import {
@@ -42,6 +43,7 @@ import moment from "moment";
 import { useRouter } from "next/navigation";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { useEffect } from "react";
+import  AgingReportDownloader from "@/app/Components/Reports/SingleAging"
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -133,18 +135,9 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     return `
      Customer Profile: ${Username}
 
-     Available Actions:
-    - Update customer details  
-    - Create invoices  
-    - Print account statements  
-    - Schedule activities  
-    - View sales trends  
-    - Review ledger activities  
-    - Register payments  
-
      Account Summary:
-    - Current Balance: ₦${totalDebt?.toLocaleString()}
-    - Last Payment Date: ${formattedDate}
+    - Current Balance: ₦${totalDebt?.toLocaleString()}.
+    - Last Payment Date: ${formattedDate},
 
     Strategic Insight:
     ${advice}
@@ -897,7 +890,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     d="M9 14h6m-6-4h6M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="text-sm font-semibold">Create Invoice</span>
+                <span className="text-xs">Create Invoice</span>
               </span>
             )}
 
@@ -907,35 +900,64 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             aria-label="Print Statement"
           >
             <PrinterIcon className="h-5 w-5 text-white" />
-            <span className="text-sm font-semibold">Print Statement</span>
+            <span className="text-xs">Print Statement</span>
           </span>
 
-          <span
+          {/* <span
             onClick={() => scheduleActivity(Encrypt(cust._id))}
             className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="Schedule Activity"
           >
             <CalendarDaysIcon className="h-5 w-5 text-white" />
             <span className="text-sm font-semibold">Schedule Activity</span>
-          </span>
+          </span> */}
+
 
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
+            <>
             <span
               onClick={() =>
-                postPayment(
-                  Encrypt(cust._id),
-                  `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-                  config
-                )
-              }
-              className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  postPayment(
+                    Encrypt(cust._id),
+                    `${userInfo.user.firstName} ${userInfo.user.lastName}`,
+                    config
+                  )}
+              className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
               aria-label="Register Payment"
             >
-              <BanknotesIcon className="h-5 w-5 text-white" />
-              <span className="text-sm font-semibold">Register Payment</span>
+              <WalletIcon className="h-5 w-5 text-white" />
+              <span className="text-xs">Register Down Payment</span>
             </span>
+
+             {userInfo.business.subscriptionplan === "Standard" && (
+               <InvoicePaymentForm
+                customerId={Encrypt(cust._id)}
+                user={`${userInfo.user.firstName} ${userInfo.user.lastName}`}
+                config={config}
+                invoices={Sales.filter(
+                  inv => inv.billStatus !== "Cancelled" && inv.paymentMethod < inv.grandTotal
+                )}
+                baseUrl={EXPRESS_PRIVATE_URL}
+              />
+             )}
+            </>
           )}
 
+           {userInfo.business.subscriptionplan === "Standard" && (
+              <AgingReportDownloader  
+                customer={cust} 
+                invoices={Sales} 
+                payments={data.transcations} 
+                Rep={() => {
+                  const salespers = salesPerson.find(
+                    (person) => person._id === cust.salesPerson
+                  );
+                  return salespers 
+                    ? `${salespers.firstName} ${salespers.lastName || ""}` 
+                    : "Unknown";
+                }} 
+              />
+            )}
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
         </div>
       </Section>
