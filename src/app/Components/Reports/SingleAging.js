@@ -29,9 +29,12 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
           entry.billStatus !== "Cancelled"
       );
 
-      const customerPayments = payments.filter(
-        (payment) =>
-          payment.cr === true 
+      const customerPayments = invoices.filter(
+        (entry) =>
+          entry.customer.toString() === customer._id.toString() &&
+          entry.billStatus !== "Draft" &&
+          entry.billStatus !== "Cancelled" &&
+          entry.paymentMethod > 0
       );
 
       const agingData = {
@@ -41,7 +44,7 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
       };
 
       let remainingPayment = customerPayments.reduce(
-        (total, payment) => total + payment.CreditAmount,
+        (total, payment) => total + payment.paymentMethod,
         0
       );
 
@@ -52,9 +55,9 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
         const invoiceTotal = periodInvoices.reduce((total, inv) => total + inv.grandTotal, 0);
 
         const periodPayments = customerPayments.filter((payment) =>
-          moment(payment.Date).isBetween(period.start, period.end, null, "[]")
+          moment(payment.startDate).isBetween(period.start, period.end, null, "[]")
         );
-        const paymentTotal = periodPayments.reduce((total, pay) => total + pay.CreditAmount, 0);
+        const paymentTotal = periodPayments.reduce((total, pay) => total + pay.paymentMethod, 0);
 
         let periodTotal = invoiceTotal - paymentTotal;
 
@@ -88,7 +91,7 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
       className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
     >
       <FaDownload />
-      <span className="text-xs">+ 120 Days Aging Report</span>
+      <span className="text-xs">+120 Days Aging Report</span>
     </div>
   );
 };

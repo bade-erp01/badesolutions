@@ -17,6 +17,7 @@ export default async function CustomerListpage({ params }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
           access: `${Encrypt(userData.user._id)}`,
+          next: { revalidate: 120 }
         },
       });
 
