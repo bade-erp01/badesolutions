@@ -81,7 +81,7 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
       });
       saveAs(data, "120+ Aging Report.xlsx");
     } catch (error) {
-      console.error("Error generating report:", error.message);
+    //   console.error("Error generating report:", error.message);
     }
   };
 
