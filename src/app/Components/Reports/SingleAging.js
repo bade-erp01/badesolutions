@@ -11,13 +11,13 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
   const handleDownload = async () => {
     try {
       // Define aging periods
-      const periods = [
-        { name: "1-30 days", start: moment().startOf("month"), end: moment().endOf("month") },
-        { name: "31-60 days", start: moment().subtract(1, "months").startOf("month"), end: moment().subtract(1, "months").endOf("month") },
-        { name: "61-90 days", start: moment().subtract(2, "months").startOf("month"), end: moment().subtract(2, "months").endOf("month") },
-        { name: "91-120 days", start: moment().subtract(3, "months").startOf("month"), end: moment().subtract(3, "months").endOf("month") },
-        { name: "> 121 days", start: moment("2023-01-01"), end: moment().subtract(4, "months").endOf("month") },
-      ];
+     const periods = [
+      { name: "1-30 days", start: moment().subtract(30, "days"), end: moment() },
+      { name: "31-60 days", start: moment().subtract(60, "days"), end: moment().subtract(31, "days") },
+      { name: "61-90 days", start: moment().subtract(90, "days"), end: moment().subtract(61, "days") },
+      { name: "91-120 days", start: moment().subtract(120, "days"), end: moment().subtract(91, "days") },
+      { name: "> 121 days", start: moment("1900-01-01"), end: moment().subtract(121, "days") },
+    ];
 
       const aging = [];
 
@@ -61,14 +61,16 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
 
         let periodTotal = invoiceTotal - paymentTotal;
 
-        if (periodTotal < 1 && remainingPayment > 0) {
-          const paymentToSubtract = Math.min(remainingPayment, periodTotal);
-          periodTotal -= paymentToSubtract;
-          remainingPayment -= paymentToSubtract;
+       //Apply remaining payments only if there's a positive balance 
+       if (periodTotal > 0 && remainingPayment > 0) {
+         const paymentToSubtract = Math.min(remainingPayment, periodTotal); periodTotal -= paymentToSubtract; remainingPayment -= paymentToSubtract; 
         }
 
         agingData[period.name] = periodTotal;
       });
+
+      // Strict matching: payments only reduce invoices in the same bucket
+      //  let periodTotal = invoiceTotal - paymentTotal;
 
       aging.push(agingData);
 
