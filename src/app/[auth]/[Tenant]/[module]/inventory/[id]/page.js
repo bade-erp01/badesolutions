@@ -78,10 +78,10 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
         {/* Product Info */}
         <div className="text-center mb-6 space-y-1">
           
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-gray-500">
             <strong>Category:</strong> {storeProduct.category}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-gray-500">
             <strong>Last Batch Date:</strong>{" "}
             {storeProduct.LastBatchDate || "Not Available"}
           </p>
@@ -100,7 +100,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
                 name="currentQty"
                 value={formData.currentQty}
                 onChange={handleChange}
-                className="mt-1 text-black block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50"
+                className="mt-1 text-black text-xs block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50"
               />
             </div>
           
@@ -114,7 +114,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
                 name="pcs"
                 value={formData.pcs}
                 onChange={handleChange}
-                className="mt-1 text-black block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50"
+                className="mt-1 text-black text-xs block w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50"
               />
             </div>
 
@@ -145,7 +145,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
           {/* Submit Button */}
           {userInfo?.user?.isAdmin && !formData?.FOCProId && (
           <div className="space-y-2">
-            <p className="text-sm text-yellow-700 bg-yellow-100 border border-yellow-300 rounded-md px-4 py-2">
+            <p className="text-xs text-yellow-700 bg-yellow-100 border border-yellow-300 rounded-md px-4 py-2">
               ⚠️ Ensure this product is <strong>not being billed</strong> when the update is performed.
             </p>
             <button
@@ -169,7 +169,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
                   <div className="absolute -left-3 top-1 w-3 h-3 bg-gray-500 rounded-full border-1 border-black"></div>
 
                   {/* Content */}
-                  <div className="text-sm text-gray-700">
+                  <div className="text-xs text-gray-700">
                     <p className="font-medium">{" "} {log.message}</p>
                     {log.timestamp && (
                       <p className="text-xs text-gray-500 mt-1">

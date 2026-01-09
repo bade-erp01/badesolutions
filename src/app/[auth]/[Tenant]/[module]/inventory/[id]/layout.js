@@ -37,10 +37,41 @@ export default async function StoreLayout({ params }) {
             className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
             style={{ overflowY: "auto" }}
           >
-            <h2 className="text-lg font-bold mb-4">Product Management</h2>
+            <BackButton />
             <hr />
             <nav className="space-y-4">
-              <BackButton />
+              <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+                <ul className="divide-y divide-gray-700">
+                  <li className="py-3 px-4 text-xs text-italic">
+                    <div className="flex justify-between items-center">
+                      <span className="text-italic">
+                        Exp Date: {StoreProd.ExpDate}
+                      </span>
+                    </div>
+                    <hr className="border-gray-500" />
+                  </li>
+
+                  <li className="py-3 px-4 text-xs text-italic">
+                    <div className="flex justify-between items-center">
+                      <span className="text-italic">
+                        Last purch. Date: {StoreProd.LastBatchDate}
+                      </span>
+                    </div>
+                    <hr className="border-gray-500" />
+                  </li>
+
+                   <li className="py-3 px-4 text-xs text-italic">
+                    <div className="flex justify-between items-center">
+                      <span className="text-italic">
+                        Current Batch: {StoreProd.BatchNo}
+                      </span>
+                    </div>
+                    <hr className="border-gray-500" />
+                  </li>
+
+
+                </ul>
+              </div>
             </nav>
           </aside>
 
@@ -59,10 +90,6 @@ export default async function StoreLayout({ params }) {
       </div>
     );
   } catch (err) {
-    return (
-      <p className="text-black">
-        Error Loading data. Try again later
-      </p>
-    );
+    return <p className="text-black">Error Loading data. Try again later</p>;
   }
 }
