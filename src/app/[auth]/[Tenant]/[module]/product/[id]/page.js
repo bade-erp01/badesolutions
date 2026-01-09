@@ -50,7 +50,7 @@ export default function SingleProductpage({
     navigation.Tenant
   }/product/product/${Encrypt(Backdata.CopyID)}?Modules=product`;
   const [BuyingPrice, setBuyingPrice] = useState({
-    BuyingPrice: Number(Backdata?.BuyingPrice) || Number(Backdata?.Buyivendor_PricengPrice) || 0,
+    BuyingPrice: Number(Backdata?.BuyingPrice) || Number(Backdata?.vendor_Price) || 0,
   });
 
   useProductEditTour(Backdata.Name); // for driver
