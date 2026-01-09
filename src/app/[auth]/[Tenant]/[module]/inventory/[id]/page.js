@@ -61,7 +61,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
   return (
     <>
       <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
-        <h2 className="text-xl font-bold text-gray-800">
+        <h2 className="text-sm  font-bold text-gray-800">
             {storeProduct.productName}
         </h2>
         {/* Product Image */}
