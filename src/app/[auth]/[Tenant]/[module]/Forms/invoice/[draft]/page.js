@@ -714,7 +714,7 @@ const generatePdf = async (business, customer, bill) => {
                     />
                   </td>
                   {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
-                  <td className="px-4 py-2 text-center text-xs">{bill.item.ACDcode}</td>
+                  <td className="px-4 py-2 text-center text-xs">{bill.item.ACDcode || bill.item.ADCcode}</td>
                   <td className="px-4 py-2 text-center text-xs">
                     {user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "draft" ? (
                      <input

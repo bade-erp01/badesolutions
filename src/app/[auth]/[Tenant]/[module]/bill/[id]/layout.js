@@ -139,7 +139,7 @@ async function StoreLayoutContent({ params }) {
         <br />
         <hr/>
         <span className="text-xs mt-2">Total Payment Recorded</span>
-        <h5 className="text-green-400 font-semibold text-lg">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
+        <h5 className="text-gray-400 font-semibold text-lg">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
       </nav>
      </aside>
 

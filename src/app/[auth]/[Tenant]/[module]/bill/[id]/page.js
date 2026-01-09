@@ -1,15 +1,18 @@
 "use client";
+
+import { mutate } from "swr"; // make sure this is imported
 import QRCode from "qrcode";
 import { showDeliveryModal } from "@/app/Components/Delivery";
 import { React, useState } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
 import {
+  Encrypt,
+  Dencrypt,
   totalInWords,
   EXPRESS_PRIVATE_URL,
 } from "../../../../../../../Functions/Functions";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
   plsWait,
@@ -23,6 +26,7 @@ import {
   ArrowPathRoundedSquareIcon,
   PrinterIcon,
   ArrowUturnLeftIcon,
+  AdjustmentsVerticalIcon,
   TruckIcon
 } from "@heroicons/react/24/solid";
 
@@ -34,7 +38,7 @@ export default function InvoicePage({
   const Router = useRouter();
   const path = useParams();
   const [cust] = useState(customerList);
-  const [Singlebill] = useState(SinglebillItem);
+  const [Singlebill,setSinglebill] = useState(SinglebillItem);
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
 
   // 🛠️ Safe image loader as Data URL
@@ -290,6 +294,50 @@ export default function InvoicePage({
       },
     };
 
+    // recall and adjust values on inv line item
+      const handleQtyChange = async (
+         lineId,
+        value,
+        toUpdate,
+        billId,
+        storeId,
+        companyName
+      ) => {
+        try {
+          plsWait('Updating cart...');
+    
+          const url = `${EXPRESS_PRIVATE_URL}/api/Recalled/Cart/Update?user=${Encrypt(
+            userInfo.user._id
+          )}`;
+    
+          const response = await fetch(url, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization:`Bearer ${Encrypt(userInfo.business.tenantId)}`,
+              access:`${Encrypt(userInfo.user._id)}`
+            },
+            body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
+          });
+    
+          const data = await response.json();
+    
+          if (data.message) {
+            SuccessToast(data.message);
+    
+            // ✅ Revalidate the invoice data (instead of reload)
+            setSinglebill(Dencrypt(data.Updatedinvoice))
+            mutate(`/api/storeApi/invoice/${billId}`);
+            Router.refresh();
+          } else {
+            throw new Error(data.error || "An unknown error occurred.");
+          }
+        } catch (err) {
+          ErrorMessage(err.message);
+          Router.refresh();
+        }
+      };
+
   // rebill a canceled invoice to return items
   const Rebill = async () => {
     plsWait(
@@ -534,10 +582,10 @@ export default function InvoicePage({
     }
   };
 
-  const cancelSales = async (orderId) => {
+  const cancelSales = async (orderId,option) => {
     const confirmed = await Swal.fire({
-      title: "Cancel Order?",
-      text: "Are you sure you want to cancel this order?",
+      title: "Confirm Action?",
+      text: "Are you sure you want to proceed with this action?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, Proceed",
@@ -562,11 +610,11 @@ export default function InvoicePage({
     }
 
     try {
-      plsWait("Processing cancellation Request...");
+      plsWait("Processing Request...");
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/SingleReturn/${Encrypt(
           orderId
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}`,
+        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}&option=${option}`,
         {
           method: "PATCH",
           headers: {
@@ -582,13 +630,20 @@ export default function InvoicePage({
 
       if (res.ok) {
         SuccessToast(result.message);
-          Router.refresh();
+        
+        if(result.Updatedinvoice){
+          setSinglebill(Dencrypt(result.Updatedinvoice))
+           Router.refresh()
+        }
+
+        Router.refresh()
+        
       } else {
-        throw new Error(result.error || "Cancellation failed");
+        throw new Error(result.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(
-        err.message || "An error occurred while cancelling the order."
+        err.message || "An error occurred while processing request."
       );
       Router.refresh();
     }
@@ -625,7 +680,7 @@ export default function InvoicePage({
               alt="logo"
             />
             <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">
+              <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
                 {userInfo.business.companyName}
               </h3>
               <p className="text-gray-500">{userInfo.business.email}</p>
@@ -683,9 +738,10 @@ export default function InvoicePage({
         {/* Print Button */}
         <div className="flex justify-end mb-6">
          
-         {(Singlebill.billStatus?.toUpperCase() !== "CANCELLED" && Singlebill.billStatus?.toUpperCase() !== "PROCESSING") &&
+         {(Singlebill.billStatus?.toUpperCase() !== "CANCELLED" && Singlebill.billStatus?.toUpperCase() !== "PROCESSING" && Singlebill.billStatus?.toUpperCase() !== "RECALLED" ) &&
             userInfo.user.cancelInvoice && (
-              <button
+              <>
+                <button
                 title={`Cancel and return SKU in ${Singlebill.billStatus}`}
                 onClick={() => cancelSales(Singlebill._id)}
                 className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-red-500 transition duration-200 ease-in-out mr-2 hover:bg-red-600 text-white font-semibold border border-red-400 hover:shadow-lg"
@@ -695,6 +751,20 @@ export default function InvoicePage({
                   Cancel {Singlebill.billStatus}/{Singlebill.billReferenceNo}
                 </span>
               </button>
+
+              {userInfo.user.cancelInvoice && userInfo.business.subscriptionplan === "Standard" && (
+                <button
+                title={`Return line item(s) in ${Singlebill.billStatus}`}
+                onClick={() => cancelSales(Singlebill._id,"Recalled")}
+                 className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
+              >
+                < AdjustmentsVerticalIcon className="w-5 h-5 text-white" />
+                <span>
+                  Adjust {Singlebill.billStatus} cart
+                </span>
+              </button>
+              )}
+              </>
             )}
 
           {Singlebill.billStatus?.toUpperCase() === "ORDER" && (
@@ -765,6 +835,8 @@ export default function InvoicePage({
                   "Code",
                   "Case",
                   "Pcs",
+                  "RTC",
+                  "RTP",
                   "Price",
                   "Promo",
                   "VAT",
@@ -809,6 +881,56 @@ export default function InvoicePage({
                   <td className="px-4 py-2 text-center text-xs">{bill.Qty}</td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.pcsReq || 0}
+                  </td>
+                  <td className="px-4 py-2 text-center text-xs" title="Returned Case">
+                    {userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "recalled" ? (
+                     <input
+                      type="number"
+                      defaultValue={bill.RCRT || 0}
+                      min={0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) return
+                        if (val < 0) val = 0;
+                        handleQtyChange(
+                          bill._id,
+                          val,
+                          "Qty",
+                          Singlebill._id,
+                          bill.storeProductId,
+                          userInfo.business.companyName
+                        );
+                      }}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
+                    />
+                    ) : (
+                      bill.RCRT
+                    )}
+                  </td>
+                  <td className="px-4 py-2 text-center text-xs" title="Returned Pcs">
+                    {userInfo.business.allowSkuSplitting && userInfo.user._id === Singlebill.invoicerId &&
+                    Singlebill.billStatus.toLowerCase() === "recalled" ? (
+                      <input
+                        type="number"
+                        defaultValue={bill.RPCS || 0}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                        onBlur={(e) => {
+                          let val = e.target.value;
+                          if (val < 0) return
+                          if (val < 0) val = 0;
+                          handleQtyChange(
+                            bill._id, // lineId
+                            val, // new value
+                            "pcs", // toUpdate
+                            Singlebill._id, // billId
+                            bill.storeProductId, // storeId
+                            userInfo.business.companyName // companyName
+                          );
+                        }}
+                      />
+                    ) : (
+                      bill.RPCS || 0
+                    )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency.currency.Symbol}
