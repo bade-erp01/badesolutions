@@ -11,12 +11,11 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import RenewButton from "@/app/Components/Renew"
 import {
-  Encrypt,
   ErrorMessage,
   plsWait,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import {EXPRESS_PRIVATE_URL} from "../../../../../Functions/Functions"
+import {EXPRESS_PRIVATE_URL,Encrypt,Dencrypt} from "../../../../../Functions/Functions"
 
 export default function BusinessDatas({ data, userInfo }) {
   const navigation = useRouter();
@@ -122,7 +121,7 @@ export default function BusinessDatas({ data, userInfo }) {
 
       if (data && data.message) {
         SuccessToast(data.message);
-        setFormData(data.data);
+        setFormData(Dencrypt(data.data));
         navigation.refresh();
       } else {
         throw new Error("Something went wrong");

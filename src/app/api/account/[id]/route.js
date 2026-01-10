@@ -41,13 +41,13 @@ export async function PATCH(request,{params}) {
       throw new Error('Account update failed. Contact Support.')
     }
     
-    const updatedBusiness = await Business.findByIdAndUpdate(biz._id, body, { new: true });
-    return new Response(JSON.stringify({data:updatedBusiness, message:'Updated successfully'}), {
+    const updatedBusiness = await Business.findByIdAndUpdate(biz._id, body, { new: true, lean:true });
+    return new Response(JSON.stringify({data:Encrypt(updatedBusiness), message:'Updated successfully'}), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Update failed" }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
