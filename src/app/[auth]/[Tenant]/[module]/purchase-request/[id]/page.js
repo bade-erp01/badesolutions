@@ -906,7 +906,7 @@ export default function DraftPurchasePage({
               <select
                 onBlur={(e) => handleProductSelection(e.target.value)}
                 id="productDropdown"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
+                className="w-full text-black px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
               >
                 <option value={""}>Choose...</option>
                 {productList.map((product) => (
