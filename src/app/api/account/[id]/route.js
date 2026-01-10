@@ -1,16 +1,12 @@
-import dbConnect from '../../../../../lib/mongoose';
+
 import Business from '../../../../../models/Business';
-import moment from 'moment';
-import jwt from 'jsonwebtoken';
-import { Encrypt, } from '../../../../../Functions/Mics';
-import {Dencrypt} from '../../../../../Functions/Functions';
+import {Dencrypt,Encrypt} from '../../../../../Functions/Functions';
 
 export async function GET(request,{params}) {
   const { id } = await params;
  
   try {
-    await dbConnect();
-    const businesses = await Business.findById(id);
+    const businesses = await Business.findById(id).lean();
     return new Response(JSON.stringify(businesses), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -26,12 +22,11 @@ export async function GET(request,{params}) {
 
 export async function PATCH(request,{params}) {
   try {
-    await dbConnect();
     const body = await request.json();
     const token = request.headers.get('authorization')?.split(' ')[1];
     
     if (!token) {
-      return new Response(JSON.stringify({ error: 'Unauthorized: No token provided' }), {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -40,7 +35,7 @@ export async function PATCH(request,{params}) {
     const { id } = await params;
     
     //CHECK IF THE BUSINESSIS ALREADY ACTIVATED
-    const biz =  await Business.findById(Dencrypt(id))
+    const biz =  await Business.findById(Dencrypt(id)).lean()
     
     if (!biz.isActive){
       throw new Error('Account update failed. Contact Support.')
