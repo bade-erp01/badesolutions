@@ -561,7 +561,7 @@ const generatePdf = async (business, customer, bill) => {
                 alt="logo"
               />
               <div className="text-sm text-gray-700 space-y-1">
-                <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
             {userInfo.business.companyName}
                 </h3>
                 <p className="text-gray-500">{userInfo.business.email}</p>
