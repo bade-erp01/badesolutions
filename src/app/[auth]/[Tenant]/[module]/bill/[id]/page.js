@@ -723,7 +723,7 @@ export default function InvoicePage({
 
   return (
     <>
-      <div className="max-w-5xl text-xs mx-auto px-6 py-10 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
+      <div className="max-w-6xl text-xs mx-auto px-6 py-10 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
           <span
