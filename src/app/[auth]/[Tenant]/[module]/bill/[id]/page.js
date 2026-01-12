@@ -27,7 +27,10 @@ import {
   PrinterIcon,
   ArrowUturnLeftIcon,
   AdjustmentsVerticalIcon,
-  TruckIcon
+  TruckIcon,
+  LockClosedIcon,
+  ShieldCheckIcon,
+  XMarkIcon
 } from "@heroicons/react/24/solid";
 
 export default function InvoicePage({
@@ -582,6 +585,75 @@ export default function InvoicePage({
     }
   };
 
+
+  // Action button for canceling sales and returns
+  const ActionBtn = async (orderId,option) => {
+    const confirmed = await Swal.fire({
+      title: "Confirm Action?",
+      text: option === "Approved" ? "Proceed with approval will lead to inventory update and this action cannot be undone." : "Are you sure you want to decline this invoice?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Proceed",
+      cancelButtonText: "No",
+      reverseButtons: true,
+    });
+
+    if (!confirmed.isConfirmed) return;
+
+    const { value: opCode } = await Swal.fire({
+      title: "Security Check point",
+      input: "password",
+      inputLabel: "Enter Ops Code to proceed",
+      inputPlaceholder: "Type in Ops code 🔐",
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+    });
+
+    if (!opCode) {
+      Swal.fire("Cancelled", "Operation was cancelled.", "info");
+      return;
+    }
+
+    try {
+      plsWait("Processing Request...");
+      const res = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/Recalled/invoice/${Encrypt(
+          orderId
+        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}&option=${option}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+            access: `${Encrypt(userInfo.user._id)}`,
+          },
+          body: JSON.stringify({ id: Encrypt(orderId) }),
+        }
+      );
+
+      const result = await res.json();
+
+      if (res.ok) {
+        SuccessToast(result.message);
+        
+        if(result.Updatedinvoice){
+          setSinglebill(Dencrypt(result.Updatedinvoice))
+          Router.refresh()
+        }
+
+        Router.refresh()
+        
+      } else {
+        throw new Error(result.error || "Request failed");
+      }
+    } catch (err) {
+      ErrorMessage(
+        err.message || "An error occurred while processing request."
+      );
+      Router.refresh();
+    }
+  }
+
   const cancelSales = async (orderId,option) => {
     const confirmed = await Swal.fire({
       title: "Confirm Action?",
@@ -738,7 +810,7 @@ export default function InvoicePage({
         {/* Print Button */}
         <div className="flex justify-end mb-6">
          
-         {(Singlebill.billStatus?.toUpperCase() !== "CANCELLED" && Singlebill.billStatus?.toUpperCase() !== "PROCESSING" && Singlebill.billStatus?.toUpperCase() !== "RECALLED" ) &&
+         {(Singlebill.billStatus?.toUpperCase() === "INVOICE" || Singlebill.billStatus?.toUpperCase() === "ORDER" && Singlebill.billStatus?.toUpperCase() !== "RECALLED" ) &&
             userInfo.user.cancelInvoice && (
               <>
                 <button
@@ -752,7 +824,7 @@ export default function InvoicePage({
                 </span>
               </button>
 
-              {userInfo.user.cancelInvoice && userInfo.business.subscriptionplan === "Standard" && (
+              {userInfo.user.cancelInvoice && userInfo.business.subscriptionplan === "Standard" && !Singlebill.memoId && (
                 <button
                 title={`Return line item(s) in ${Singlebill.billStatus}`}
                 onClick={() => cancelSales(Singlebill._id,"Recalled")}
@@ -782,6 +854,47 @@ export default function InvoicePage({
                <TruckIcon className="w-5 h-5 text-gray-100" />
               <span>Generate WayBill</span>
             </button>
+          )}
+
+          {userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus?.toUpperCase() === "RECALLED" && (
+            <button
+              title={`Lock ${Singlebill.billStatus}`}
+              onClick={() =>
+               cancelSales(Singlebill._id,"Locked")
+              }
+               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
+            >
+               <LockClosedIcon className="w-5 h-5 text-gray-100" />
+              <span>Lock Updates</span>
+            </button>
+          )}
+
+
+          {/* approve inventory adjustment */}
+          {userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "LOCKED" && (
+           <>
+             <button
+              title={`Approve ${Singlebill.billStatus} Ajustment`}
+             onClick={() =>
+               ActionBtn(Singlebill._id,"Approved")
+              }
+               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
+            >
+               <ShieldCheckIcon className="w-5 h-5 text-gray-100" />
+              <span>Approve Ajustment</span>
+            </button>
+
+             <button
+              title={`Decline ${Singlebill.billStatus} Adjustment`}
+              onClick={() =>
+               ActionBtn(Singlebill._id,"Declined")
+              }
+               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-red-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
+            >
+               <XMarkIcon className="w-5 h-5 text-gray-100" />
+              <span>Decline Updates</span>
+            </button>
+           </>
           )}
 
           {Singlebill.billStatus?.toUpperCase() === "INVOICE" && (

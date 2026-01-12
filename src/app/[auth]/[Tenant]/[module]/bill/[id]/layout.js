@@ -117,7 +117,9 @@ async function StoreLayoutContent({ params }) {
       <BackButton />
       <hr className="my-4 border-gray-700" />
       <nav className="grow">
-        <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+        <div className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[40vh]"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#4B5563 transparent' }}
+        >
         
          <ul className="divide-y divide-gray-700">
           {Inv.ActivityLog?.map((log, index) => {
@@ -139,13 +141,13 @@ async function StoreLayoutContent({ params }) {
         <br />
         <hr/>
         <span className="text-xs mt-2">Total Payment Recorded</span>
-        <h5 className="text-gray-400 font-semibold text-lg">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
+        <h5 className=" text-md px-2 bg-gray-100/50 py-2 rounded-sm text-gray-100 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
       </nav>
      </aside>
 
      {/* Main Content (Right Side) */}
      <main className="flex-1 overflow-hidden">
-      <section className=" flex-2 max-w-screen-xl h-[83vh] overflow-y-scroll">
+      <section className=" flex-2 max-w-7xl h-[83vh] overflow-y-scroll">
         <SingleInvoice
          userInfo={userInfo}
          SinglebillItem={Inv}
