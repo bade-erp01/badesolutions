@@ -1095,7 +1095,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                 <Input
                   label="Address"
                   name="billingAddress"
-                  value={formData.billingAddress}
+                  value={formData.billingAddress || formData.street}
                   onChange={handleChange}
                 />
                 <Input
