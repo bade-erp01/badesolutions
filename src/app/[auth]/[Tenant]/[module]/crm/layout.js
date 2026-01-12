@@ -97,7 +97,7 @@ export default async function crmLayout({ children, params }) {
               </Link>
             )}
 
-            {userData?.user?.isAdmin && (
+            {/* {userData?.user?.isAdmin && (
               <>
                 <BulkUploader
                   tenantId={userData}
@@ -110,7 +110,7 @@ export default async function crmLayout({ children, params }) {
                   />
                 )}
               </>
-            )}
+            )} */}
 
             <DebtorsReportModal users={parsedUsers} business={userData.business} data={customerList} />
             <ReceivablesAgingModal data={customerList} />

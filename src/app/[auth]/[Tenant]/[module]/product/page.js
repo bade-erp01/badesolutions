@@ -120,9 +120,9 @@ export default async function Productlayout({ children, params }) {
 
               <PurchaseDumpModal  business={userData.business} EXPRESS_PRIVATE_URL={baseUrl}  Products={productList} storesData={storeList} vendorsData={vendorList} />
 
-              {userData?.user?.isAdmin && (
+              {/* {userData?.user?.isAdmin && (
                 <BulkUploader tenantId={userData} collectionName="product" />
-              )}
+              )} */}
 
               <ExcelDownloadBtn data={productList} page="product" />
             </nav>
