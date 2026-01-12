@@ -8,6 +8,7 @@ import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import Footer2 from "@/app/Components/Footer2";
 import MailAndWhatsapp from "@/app/Components/MailAndWhatsapp";
+import PartialInvoiceDisplay from "@/app/Components/PartialInvoiceDisplay";
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -141,7 +142,9 @@ async function StoreLayoutContent({ params }) {
         <br />
         <hr/>
         <span className="text-xs mt-2">Total Payment Recorded</span>
-        <h5 className=" text-md px-2 bg-gray-100/50 py-2 rounded-sm text-gray-100 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
+        <h5 className=" text-md px-1 bg-gray-100/50 py-1 rounded-sm text-gray-100 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
+        <br />
+        {Inv.memoId && (<PartialInvoiceDisplay data={Inv.memoId} />)}
       </nav>
      </aside>
 

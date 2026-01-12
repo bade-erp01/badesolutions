@@ -4,9 +4,10 @@ import {
   CalculatorIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import {totalInWords} from "../../../Functions/Functions"
+import { totalInWords } from "../../../Functions/Functions";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import Marquee from "react-fast-marquee";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -31,14 +32,13 @@ ChartJS.register(
   Title
 );
 
-function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
+function CustomerCategoryPieChart({ customersList, invoiceList, userData }) {
   const pieRef = useRef(null);
   const [customers] = useState(customersList || []);
   const [invoice] = useState(invoiceList || []);
 
   // get debtors
-  const debtors = customers.filter(cust => cust.Debt > 0);
-
+  const debtors = customers.filter((cust) => cust.Debt > 0);
 
   const categoryCount =
     customers?.reduce((acc, curr) => {
@@ -98,14 +98,20 @@ function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
       .slice(0, 5);
 
   return (
-   <section className="sm:p-10 mx-auto max-w-6xl transition-all duration-700">
+    <section className="sm:p-10 mx-auto max-w-6xl transition-all duration-700">
       {/* Summary Cards */}
       <div className="text-right">
         <span className="text-xs text-gray-900 tracking-tight mb-1">
-           Total Debt: {totalInWords(customers.filter((c) => c.Debt > 0).reduce((acc, curr) => acc + curr.Debt, 0), userData.business.currency?.currency )}
+          Total Debt:{" "}
+          {totalInWords(
+            customers
+              .filter((c) => c.Debt > 0)
+              .reduce((acc, curr) => acc + curr.Debt, 0),
+            userData.business.currency?.currency
+          )}
         </span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-7">
         {[
           {
             title: "Crm List",
@@ -125,7 +131,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
               .filter((c) => c.Debt > 0)
               .reduce((acc, curr) => acc + curr.Debt, 0)
               .toLocaleString()}`,
-            icon: < CalculatorIcon className="h-6 w-6 text-gray-300" />,
+            icon: <CalculatorIcon className="h-6 w-6 text-gray-300" />,
             bg: "bg-[#09090b]",
             textColor: "text-red-400",
           },
@@ -156,6 +162,39 @@ function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
           </div>
         ))}
       </div>
+      {/* debtors list */}
+
+      <div className="w-full bg-gray-500 text-white p-1">
+        <Marquee gradient={false} speed={40} className="px-4">
+          {debtors.length > 0 ? (
+            debtors.map((debtor) => (
+              <div key={debtor._id} className="mx-4 flex items-center gap-2">
+                <Image
+                  height={30}
+                  width={30}
+                  quality={100}
+                  loading="eager"
+                  priority={true}
+                  src={
+                    debtor.image ||
+                    "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
+                  }
+                  alt={debtor.Username}
+                  className="h-7 w-7 rounded-full shadow-sm"
+                />
+                <span className="font-medium">{debtor.Username}:</span>
+                <span className="text-red-400 font-semibold">
+                  {userData.business.currency?.currency.Symbol}
+                  {debtor.Debt.toLocaleString()}
+                </span>
+                <span className="mx-2">|</span>
+              </div>
+            ))
+          ) : (
+            <span className="text-gray-300">No debtors to display.</span>
+          )}
+        </Marquee>
+      </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -175,12 +214,15 @@ function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
                   className="text-sm flex items-center justify-between py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 rounded-md"
                 >
                   <Image
-                  height={40}
-                  width={40}
-                  quality={100}
-                  loading="eager"
-                  priority={true}
-                    src={debtor.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}
+                    height={40}
+                    width={40}
+                    quality={100}
+                    loading="eager"
+                    priority={true}
+                    src={
+                      debtor.image ||
+                      "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
+                    }
                     alt={debtor.Username}
                     className="h-8 w-8 rounded-full shadow-sm"
                   />
@@ -210,26 +252,28 @@ function CustomerCategoryPieChart({ customersList, invoiceList ,userData}) {
 }
 
 function summarizeCustomerInvoices(customers, invoices) {
- const summarized = customers
-  .filter(cust => cust.Debt > 0)
-  .map(customer => {
-  // .sort((a, b) => b.Debt - a.Debt) // Sort by highest debt first
-    // const customerInvoices = invoices.filter(
-    //   (invoice) => invoice.customer === customer._id
-    // );
-    // const totalAmount = customerInvoices.reduce(
-    //   (sum, invoice) => sum + invoice.grandTotal,
-    //   0
-    // );
-    return {
-      username: customer.Username,
-      totalAmount:customer.Debt,
-      image: customer.image || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
-    };
-  });
+  const summarized = customers
+    .filter((cust) => cust.Debt > 0)
+    .map((customer) => {
+      // .sort((a, b) => b.Debt - a.Debt) // Sort by highest debt first
+      // const customerInvoices = invoices.filter(
+      //   (invoice) => invoice.customer === customer._id
+      // );
+      // const totalAmount = customerInvoices.reduce(
+      //   (sum, invoice) => sum + invoice.grandTotal,
+      //   0
+      // );
+      return {
+        username: customer.Username,
+        totalAmount: customer.Debt,
+        image:
+          customer.image ||
+          "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
+      };
+    });
 
   const chartData = {
-    labels: summarized.map((item) => item.username.substring(0,5)),
+    labels: summarized.map((item) => item.username.substring(0, 5)),
     datasets: [
       {
         label: "Total Amount",
@@ -303,8 +347,15 @@ function summarizeCustomerInvoices(customers, invoices) {
           tooltipEl.innerHTML = `
             <div style="text-align:center;">
               <strong>${customer.username}</strong><br/>
-              <img src="${imageUrl || "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"}" alt="${customer.username}" style="width:30px;height:auto;border-radius:4px;margin-top:4px;" />
-              <div style="margin-top:6px;">Debt: ${userData.business.currency?.currency.Symbol}${customer.totalAmount.toLocaleString()}</div>
+              <img src="${
+                imageUrl ||
+                "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
+              }" alt="${
+            customer.username
+          }" style="width:30px;height:auto;border-radius:4px;margin-top:4px;" />
+              <div style="margin-top:6px;">Debt: ${
+                userData.business.currency?.currency.Symbol
+              }${customer.totalAmount.toLocaleString()}</div>
             </div>
           `;
 
@@ -362,7 +413,5 @@ function summarizeCustomerInvoices(customers, invoices) {
     </div>
   );
 }
-
-
 
 export default CustomerCategoryPieChart;
