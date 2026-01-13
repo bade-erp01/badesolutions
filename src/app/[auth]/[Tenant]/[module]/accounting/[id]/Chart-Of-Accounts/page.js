@@ -70,21 +70,19 @@ const FinancialOverview = ({ data }) => {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm text-gray-800 border border-gray-200 shadow-md rounded-lg overflow-hidden">
-                  <thead className="bg-grey-600 text-white uppercase text-xs sticky top-0 z-10">
+                  <thead className="bg-gray-600 text-white uppercase text-xs sticky top-0 z-10">
                     <tr>
-                      <th className="px-4 py-3 text-left">Code</th>
-                      <th className="px-4 py-3 text-center">Description</th>
-                      <th className="px-4 py-3 text-center">Account Type</th>
-                      {/* <th className="px-4 py-3 text-center">
+                      <th className="px-4 py-3 ">Code</th>
+                      <th className="px-4 py-3 ">Description</th>
+                      <th className="px-4 py-3 ">Account Type</th>
+                      <th className="px-4 py-3 ">
                         Financial Statement
-                      </th> */}
-                      <th>
-                        GL Bal
                       </th>
-                      <th> </th>
+                      <th className="px-4 py-3 ">GL Bal</th>
+                      
                     </tr>
                   </thead>
-                  <tbody className="divide-y bg-grey-600">
+                  <tbody className="divide-y bg-gray-50">
                     {accs
                       .sort((a, b) => a.code.localeCompare(b.code))
                       .map((account, index) => {
@@ -103,35 +101,35 @@ const FinancialOverview = ({ data }) => {
                         return (
                           <tr
                             key={index}
-                            className="hover:bg-gray-800 transition-colors text-left"
+                            className="hover:bg-gray-100 transition-colors"
                           >
-                            <td colSpan={4} className="p-1">
+                            <td colSpan={5} className="p-0">
                               <details className="group">
                                 <summary className="flex items-center justify-between cursor-pointer bg-gray-800 hover:bg-gray-900 text-xs text-white transition-colors px-4 py-2">
-                                  <div className="flex gap-4 w-full">
-                                    <span className="w-1/4">{account.code}</span>
-                                    <span className="w-1/4 truncate">
+                                  <div className="grid grid-cols-5 gap-4 w-full">
+                                    <span>{account.code}</span>
+                                    <span className="truncate">
                                       {account.description}
                                     </span>
-                                    <span className="w-1/4 italic">
+                                    <span className="italic">
                                       {account.AccountType}
                                     </span>
-                                    {/* <span className="w-1/4">
-                                      {account.reportsTo}
-                                    </span> */}
-                                    <span className="w-1/4">
-                                      {account?.Balance?.toLocaleString() || 0.00}
+                                    <span>{account.reportsTo}</span>
+                                    <span>
+                                      {account?.Balance?.toLocaleString() ||
+                                        0.0}
                                     </span>
                                   </div>
-                                  <span className="text-gray-500 group-open:rotate-180 transition-transform duration-300">
+                                  <span className="text-gray-400 group-open:rotate-180 transition-transform duration-300">
                                     ▼
                                   </span>
                                 </summary>
-                                <div className=" text-white">
+
+                                <div className="text-white bg-gray-800">
                                   {paginatedTransactions.length > 0 ? (
                                     <>
-                                      <div className="overflow-x-auto p-3">
-                                        <table className="min-w-full text-white bg-gray-800">
+                                      <div className="overflow-x-auto p-3 bg-gray-800">
+                                        <table className="min-w-full text-white bg-gray-800 rounded">
                                           <thead className="bg-gray-700 text-white uppercase text-xs sticky top-0 z-10">
                                             <tr>
                                               <th className="text-left px-2 py-1">
@@ -150,19 +148,21 @@ const FinancialOverview = ({ data }) => {
                                                 Reference
                                               </th>
                                               <th className="text-left px-2 py-1">
-                                                GL.Bal
+                                                GL Bal
                                               </th>
                                             </tr>
                                           </thead>
-                                          <tbody className="">
+                                          <tbody>
                                             {paginatedTransactions.map(
                                               (entry, idx) => (
                                                 <tr
                                                   key={idx}
-                                                  className="text-xs px-2 py-1"
+                                                  className="text-xs"
                                                 >
                                                   <td>
-                                                    {moment(entry.date).format("YYYY-MM")}
+                                                    {moment(entry.date).format(
+                                                      "YYYY-MM"
+                                                    )}
                                                   </td>
                                                   <td>{entry.amount}</td>
                                                   <td className="capitalize italic">
@@ -178,7 +178,7 @@ const FinancialOverview = ({ data }) => {
                                         </table>
                                       </div>
 
-                                      {/* Pagination Controls */}
+                                      {/* Pagination */}
                                       <div className="flex justify-center items-center gap-2 text-xs py-2">
                                         <button
                                           onClick={() =>
