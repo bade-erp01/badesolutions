@@ -1,7 +1,7 @@
 import dbConnect from '../../../../lib/mongoose';
 import Business from '../../../../models/Business';
 import mongoose from 'mongoose';
-import {Dencrypt,Encrypt,formatMongooseError} from '../../../../../../Functions/Functions'
+import {Dencrypt,Encrypt,formatMongooseError} from '../../../../Functions/Functions'
 
 // export async function GET(request) {
 //   try {
