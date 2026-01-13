@@ -4,6 +4,9 @@ import { Dencrypt,Encrypt } from '../../../../../../../Functions/Functions';
 import axios from 'axios';
 import Employee from "../../../../../../../models/Users";
 import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
+import Nav1 from '@/app/Components/Nav1';
+import BackButton from '@/app/Components/BackBotton';
+import Footer2 from '@/app/Components/Footer2';
 
 const SingleCustomerpage = lazy(() => import('./page'));
 
@@ -36,13 +39,42 @@ export default async function StoreLayout2({ params }) {
   }
 
   return (
-    <Suspense fallback={<SuspenenseFallBack  pagedata={`${data.result?.Username}`}/>}>
-      <SingleCustomerpage
-        userInfo={userData}
-        data={data}
-        cust={data.result}
-        salesPerson={ParsedStaff}
-      />
-    </Suspense>
-  );
-}
+      <div className="flex flex-col min-h-screen overflow-hidden">
+        <Nav1
+          user={userData.user}
+          business={userData.business}
+          page={data.result.Username}
+        />
+  
+        <div className="flex flex-1 text-white bt-2">
+          {/* Sidebar */}
+          <aside
+            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
+            style={{ overflowY: "auto" }}
+          >
+           <BackButton/>
+            <hr />
+            <nav className="space-y-4">
+              
+            </nav>
+          </aside>
+  
+          {/* Main Content */}
+          <main className="flex-1">
+            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
+              <Suspense fallback={<SuspenenseFallBack  pagedata={`${data.result?.Username}`}/>}>
+                <SingleCustomerpage
+                  userInfo={userData}
+                  data={data}
+                  cust={data.result}
+                  salesPerson={ParsedStaff}
+                />
+              </Suspense>
+            </section>
+          </main>
+        </div>
+  
+        <Footer2 />
+      </div>
+    );
+  }
