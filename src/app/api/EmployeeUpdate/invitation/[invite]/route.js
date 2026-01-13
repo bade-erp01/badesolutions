@@ -1,9 +1,10 @@
 import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 import userS from '../../../../../../models/Users';
-import {Dencrypt,Encrypt,formatMongooseError} from '../../../../../../Functions/Functions'
+import {Dencrypt,formatMongooseError} from '../../../../../../Functions/Functions'
+import {Encrypt} from '../../../../../../Functions/Mics'
 import {UserActivationMail} from '../../../../../../EmailTrigers/ActivateUser';
-import dbConnect from '../../../../lib/mongoose';
+import dbConnect from '../../../../../../lib/mongoose';
 
 export async function PATCH(req, { params }) {
   try {
