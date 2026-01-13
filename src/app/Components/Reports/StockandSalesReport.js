@@ -126,6 +126,7 @@ export default function StockandSalesReport({
           Sold: 0,
           pcs: 0,
           Stock: 0,
+          PcsStock: 0,
           rStock: 0,
           rPcs: 0,
           productId: baseObj.productId || "",
@@ -225,7 +226,17 @@ export default function StockandSalesReport({
         const id = item._id;
         const existing = summaryMap.get(id);
         if (existing) {
-          existing.Stock = `Case: ${item.currentQty || 0}, Pcs: ${item.pcs || 0}`;
+          existing.Stock = item.currentQty || 0;
+          summaryMap.set(id, existing);
+        }
+      });
+
+      // pcs inventory
+      inventory.forEach(item => {
+        const id = item._id;
+        const existing = summaryMap.get(id);
+        if (existing) {
+          existing.PcsStock = item.pcs || 0;
           summaryMap.set(id, existing);
         }
       });
@@ -338,8 +349,8 @@ export default function StockandSalesReport({
                   <th style="padding: 6px; text-align: right;">Pcs [Buy]</th>
                   <th style="padding: 6px; text-align: right;">Case [Sell]</th>
                   <th style="padding: 6px; text-align: right;">Pcs [Sell]</th>
-                  <th style="padding: 6px; text-align: right;">Case Returned</th>
-                  <th style="padding: 6px; text-align: right;">Pcs Returned</th>
+                  <th style="padding: 6px; text-align: right;">Case Rtnd</th>
+                  <th style="padding: 6px; text-align: right;">Pcs Rtnd</th>
                   <th style="padding: 6px; text-align: right;">Avail. Stock</th>
                   <th style="padding: 6px; text-align: right;">Sales Volume</th>
                 </tr>
@@ -358,7 +369,7 @@ export default function StockandSalesReport({
                       <td style="padding: 6px; text-align: right;">${item.pcs}</td>
                       <td style="padding: 6px; text-align: right;">${item.rStock}</td>
                       <td style="padding: 6px; text-align: right;">${item.rPcs}</td>
-                      <td style="padding: 6px; text-align: right;">${item.Stock || ''}</td>
+                      <td style="padding: 6px; text-align: right;">C:${item.Stock || 0}, P:${item.PcsStock || 0}</td>
                       <td style="padding: 6px; text-align: right;">${item.salesVolume.toLocaleString() || 0}</td>
                     </tr>
                   `;
@@ -397,9 +408,10 @@ export default function StockandSalesReport({
             "Pcs Buy": item.PurchPcs,
             "Case Sell": item.Sold,
             "Pcs Sell": item.pcs,
-            "Returned Case": item.rStock,
-            "Returned Pcs": item.rPcs,
-            "Current Stock": item.Stock,
+            "Rtnd Case": item.rStock,
+            "Rtnd Pcs": item.rPcs,
+            "Invty Case": item.Stock,
+            "Invty Pcs": item.PcsStock,
             "Sales Volume": item.salesVolume.toLocaleString() || 0
           }));
 
@@ -427,13 +439,14 @@ export default function StockandSalesReport({
             item.pcs,
             item.rStock,
             item.rPcs,
-            item.Stock,
+            `c:${item.Stock}`,
+            `p:${item.PcsStock}`,
             item.salesVolume.toLocaleString() || 0
           ]);
 
           const doc = new jsPDF();
           autoTable(doc,{
-            head: [["Product", "Vendor", "Store", "Case [Buy]", "Pcs [Buy]", "Case [Sell]", "Pcs [Sell]", "Case Returned", "Pcs Returned", "Avail. Stock", "Sales Volume"]],
+            head: [["Product", "Vendor", "Store", "Case [Buy]", "Pcs [Buy]", "Case [Sell]", "Pcs [Sell]", "Case Rtnd", "Pcs Rtnd", "Avail.C", "Avail.P", "Sales Volume"]],
             body: pdfData,
             startY: 10,
             styles: { fontSize: 8 }
