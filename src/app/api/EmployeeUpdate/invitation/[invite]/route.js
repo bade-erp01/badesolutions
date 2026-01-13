@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 import userS from '../../../../../../models/Users';
-import {Dencrypt,formatMongooseError} from '../../../../../../Functions/Functions'
+import {Dencrypt,Encrypt,formatMongooseError} from '../../../../../../Functions/Functions'
 import {UserActivationMail} from '../../../../../../EmailTrigers/ActivateUser';
+import dbConnect from '../../../../lib/mongoose';
 
 export async function PATCH(req, { params }) {
   try {
@@ -12,6 +13,7 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: 'Something went wrong' }, { status: 400 });
     }
 
+    await dbConnect(Encrypt("BadeAdmin"))
     const user = await userS.findById(Dencrypt(Params.invite)).lean();
     
     if (!user) {

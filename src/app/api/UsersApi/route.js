@@ -2,8 +2,7 @@ import dbConnect from "../../../../lib/mongoose";
 import mongoose from "mongoose";
 import Users from "../../../../models/Users";
 import Business from "../../../../models/Business";
-import { formatMongooseError } from "../../../../Functions/Functions";
-import { Encrypt } from "../../../../Functions/Mics";
+import { formatMongooseError,Encrypt } from "../../../../Functions/Functions";
 import { NextResponse } from 'next/server';
 import * as yup from 'yup';
 
@@ -32,7 +31,7 @@ export async function GET(request) {
     const token = authHeader.split(" ")[1];
     const dbtoken = dbHeader.split(" ")[1];
     // Ensure Mongoose connection is established
-    await dbConnect("BadeAdmin");
+    await dbConnect(Encrypt("BadeAdmin"));
     const employees = await Users.findByTenant(token);
     return new NextResponse(JSON.stringify(employees), {
       status: 200,
@@ -105,7 +104,7 @@ export async function POST(request) {
       );
     }
     
-    await dbConnect("BadeAdmin");
+    await dbConnect(Encrypt("BadeAdmin"));
     // check email and phone number with data base
     const existingUser = await Users.findOne({
       $or: [{ Email: body.Email }, { telephone: body.telephone }],
@@ -147,6 +146,7 @@ export async function PUT(request) {
   try {
     const body = await request.json();
     const { id, ...updateData } = body;
+    await dbConnect(Encrypt("BadeAdmin"));
     const result = await Users.findByIdAndUpdate(id, updateData, { new: true });
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -170,6 +170,7 @@ export async function PATCH(request) {
   try {
     const body = await request.json();
     const { id, ...updateData } = body;
+    await dbConnect(Encrypt("BadeAdmin"));
     const result = await Users.findByIdAndUpdate(id, updateData, { new: true });
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -189,24 +190,24 @@ export async function PATCH(request) {
   }
 }
 
-export async function DELETE(request) {
-  try {
-    const { id } = await request.json();
-    const result = await Users.findByIdAndDelete(id);
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        message: "Internal Server Error",
-        error: formatMongooseError(error),
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  }
-}
+// export async function DELETE(request) {
+//   try {
+//     const { id } = await request.json();
+//     const result = await Users.findByIdAndDelete(id);
+//     return new Response(JSON.stringify(result), {
+//       status: 200,
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (error) {
+//     return new Response(
+//       JSON.stringify({
+//         message: "Internal Server Error",
+//         error: formatMongooseError(error),
+//       }),
+//       {
+//         status: 500,
+//         headers: { "Content-Type": "application/json" },
+//       }
+//     );
+//   }
+// }
