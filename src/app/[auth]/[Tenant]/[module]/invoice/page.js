@@ -75,7 +75,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
               <div className="bg-gray-700 rounded p-3 shadow-md animate__animated animate__fadeInUp animate__faster">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-gray-100 text-gray-900 uppercase text-xs sticky top-0 z-10">
+                    <thead className=" text-gray-100 uppercase text-xs sticky top-0 z-10">
                       <tr>
                         <th className="px-4 py-3 text-left">Ref No</th>
                         <th className="px-4 py-3 text-left">Customer</th>
