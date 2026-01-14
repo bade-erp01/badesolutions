@@ -113,7 +113,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                             <td className="px-4 py-3 border-t border-white/10">{bill.RaiseBy}</td>
                             <td className="px-4 py-3 border-t border-white/10">
                               <span
-                                className={`inline-block px-2 py-0.5 text-xs rounded-full font-semibold${
+                                className={`inline-block px-2 py-0.5 text-xs rounded-full font-semibold ${
                                   bill.billStatus === "Invoice"
                                     ? "bg-green-500/30 text-green-300"
                                     : bill.billStatus === "Order"
