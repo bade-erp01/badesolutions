@@ -5,7 +5,7 @@ import { useSearchParams,useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { plsWait, ErrorMessage, SuccessToast, } from "../../../../../../../../Functions/Mics";
 
-export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE_URL}) {
+export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE_URL,userId}) {
   // const searchParams = useSearchParams();
   const Router = useRouter();
   // const storeParam = searchParams.get("store");
@@ -39,16 +39,19 @@ export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE
   const handleSubmit = (e) => {
     e.preventDefault();
     plsWait('Saving store settings...')
-    fetch(`${EXPRESS_PRIVATE_URL}/api/warehouse/edit/${Encrypt(Store._id)}`, {
+    fetch(`${EXPRESS_PRIVATE_URL}/api/warehouse/edit/${Encrypt(store._id)}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(store.tenantId)}`,
+        dbConnect: `Bearer ${store.rustyRoof}`,
+        access: userId,
       },
       body: JSON.stringify(formData),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(response.error);
         }
         return response.json();
       })
@@ -66,7 +69,7 @@ export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE
   return (
     <div>
       
-        <div className="m-5 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn text-xs p-6 shadow-sm ">
+        <div className=" bg-white m-6 animate__animated animate__fadeIn text-xs p-6 shadow-sm ">
           <h4 className="text-sm font-bold text-gray-800">
               {store.WHName.toUpperCase()} Settings
           </h4>

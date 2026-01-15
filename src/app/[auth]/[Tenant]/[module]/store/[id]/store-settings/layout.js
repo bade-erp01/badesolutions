@@ -5,6 +5,7 @@ import Footer2 from "@/app/Components/Footer2";
 import Users from '../../../../../../../../models/Users'
 import Page from './page'
 import BackButton from "@/app/Components/BackBotton";
+import { Encrypt } from "../../../../../../../../Functions/Mics";
 
 export const metadata = {
   title: "Stores Settings | B.A.D.E ERP Platform",
@@ -97,8 +98,8 @@ export default async function storelayout({ params }) {
         </aside>
 
         <main className="flex-1">
-          <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg relative z-10 h-[500px] overflow-y-auto">
-            <Page staffs={JSON.stringify(Employee)} store={stores} currentStoreKeeper={currentStoreKeeper} EXPRESS_PRIVATE_URL={baseUrl}/>
+          <section className="w-full max-w-7xl p-1 mx-auto flex flex-col gap-6 rounded-lg relative z-10 h-[500px] overflow-y-auto">
+            <Page staffs={JSON.stringify(Employee)} store={stores} currentStoreKeeper={currentStoreKeeper} EXPRESS_PRIVATE_URL={baseUrl} userId={Encrypt(userData.user._id)}/>
           </section>
         </main>
       </div>
