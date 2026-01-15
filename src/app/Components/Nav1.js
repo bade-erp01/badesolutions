@@ -136,27 +136,26 @@ export default function Nav1({ page, Module, user, business }) {
   return (
     <>
       <header
-        className="w-full flex items-center justify-between px-5 py-5 
- z-20 relative "
+        className="w-full flex items-center justify-between px-5 py-5 z-20 relative "
       >
         <nav className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
           <div className="container mx-auto flex justify-between items-center">
             {/* Logo */}
             <Link
               href={href}
-              className="text-fuchsia-800 text-sm font-bold flex items-center"
+              className="text-gray-800 text-sm font-bold flex items-center"
             >
               {page ? (
                 <>
-                  <Squares2X2Icon className="h-6 w-6 text-fuchsia-800 mr-2 -mt-1 hover:text-fuchsia-900 hover:scale-110 hover:drop-shadow-md transition-all duration-300 font-bold" />
+                  <Squares2X2Icon className="h-6 w-6 text-gray-800 mr-2 -mt-1 hover:text-gray-900 hover:scale-110 hover:drop-shadow-md transition-all duration-300 font-bold" />
                   {page.toUpperCase()}
                 </>
               ) : (
-                <h5 className="font-bold ">BADE</h5>
+                <h5 className="font-bold hover:scale-110 hover:drop-shadow-md transition-all duration-300">BADE</h5>
               )}
             </Link>
             {business && user ? (
-              // Search Bar - Visible on Desktop
+              // Search Bar - Visible on Desktop fuchsia
               Module?.length > 0 ? (
                 <form
                   onSubmit={handleSearch}

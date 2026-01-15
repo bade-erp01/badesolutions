@@ -14,8 +14,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 
-const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
-// const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
+// const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
+const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
 // const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
 const IV = '1234567890123456'; // 16 chars
@@ -553,7 +553,7 @@ const totalInWords = (amount, currency ) => {
 
 async function postPayment(customerId, user, config) {
   const { value: formValues } = await Swal.fire({
-    title: 'Register Payment',
+    title: 'Register Down Payment',
     html: `
       <style>
         .swal2-input, .swal2-select {
@@ -690,8 +690,6 @@ async function postPayment(customerId, user, config) {
     });
   }
 }
-
-
 
 
 async function GenerateSummary(customerId) {
