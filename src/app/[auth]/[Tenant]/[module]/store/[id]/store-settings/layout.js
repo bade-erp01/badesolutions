@@ -56,10 +56,10 @@ export const metadata = {
   favicon: "favicon.ico",
 };
 
-export default async function storelayout({ children, params }) {
+export default async function storelayout({ params }) {
   const userData = await fetchUser();
-  const Employee = await Users.findByTenant(userData.business.tenantId).lean();
-  const Params = await params
+  const Employee = await Users.findByTenant(userData.business.tenantId).select("firstName lastName").lean();
+  const Params = await params;
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const res = await fetch(`${baseUrl}/api/Stores/${Params.id}`, {
     method: "GET",
@@ -69,12 +69,15 @@ export default async function storelayout({ children, params }) {
       dbConnect: `Bearer ${userData.business.rustyRoof}`,
     },
     // next: {
-      //   revalidate: 120, // 2 minutes
-      // },
+    //     revalidate: 120, // 2 minutes
+    //   },
     });
     
     const data = await res.json();
     const stores = data.Store;
+
+    // find current storekeeper from employee list
+    const currentStoreKeeper = Employee.find(staff => staff._id.toString() === stores.StoreKeeper.toString());
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -85,10 +88,7 @@ export default async function storelayout({ children, params }) {
       />
 
       <div className="flex flex-1 text-white bt-2">
-        <aside
-          className="w-75 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 h-[500px] max-h-[600px] overflow-y-auto md:block"
-          style={{ maxHeight: "600px", overflowY: "scroll" }}
-        >
+        <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-hidden">
           <BackButton />
           <hr />
           <nav className="space-y-4">
@@ -98,7 +98,7 @@ export default async function storelayout({ children, params }) {
 
         <main className="flex-1">
           <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg relative z-10 h-[500px] overflow-y-auto">
-            <Page staffs={JSON.stringify(Employee)} store={stores} />
+            <Page staffs={JSON.stringify(Employee)} store={stores} currentStoreKeeper={currentStoreKeeper} EXPRESS_PRIVATE_URL={baseUrl}/>
           </section>
         </main>
       </div>

@@ -1,12 +1,11 @@
 "use client";
 
-import { Dencrypt,EXPRESS_PRIVATE_URL,Encrypt } from "../../../../../../../../Functions/Functions";
+import { Dencrypt,Encrypt } from "../../../../../../../../Functions/Functions";
 import { useSearchParams,useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { plsWait, ErrorMessage, SuccessToast, } from "../../../../../../../../Functions/Mics";
-import {WrenchScrewdriverIcon,ChartPieIcon,ShieldExclamationIcon,PuzzlePieceIcon,CloudArrowUpIcon,QueueListIcon,CloudArrowDownIcon} from "@heroicons/react/24/outline"
 
-export default function Page({ staffs, store }) {
+export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE_URL}) {
   // const searchParams = useSearchParams();
   const Router = useRouter();
   // const storeParam = searchParams.get("store");
@@ -67,8 +66,11 @@ export default function Page({ staffs, store }) {
   return (
     <div>
       
-        <div className="m-5 bg-gray-100 p-6 shadow-sm ">
-         
+        <div className="m-5 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn text-xs p-6 shadow-sm ">
+          <h4 className="text-sm font-bold text-gray-800">
+              {store.WHName.toUpperCase()} Settings
+          </h4>
+          <hr className="my-4 border-gray-300" />
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -185,7 +187,7 @@ export default function Page({ staffs, store }) {
                 {formData.StoreKeeper && (
                   <option value={store.StoreKeeper}>
                     {store.StoreKeeper
-                      ? parsedStaffs.find(staff => staff._id === store.StoreKeeper)?.firstName + " (Current)"
+                      ? `${currentStoreKeeper?.firstName} ${currentStoreKeeper?.lastName} (Current)`
                       : "Select StoreKeeper"}
                   </option>
                 )}
