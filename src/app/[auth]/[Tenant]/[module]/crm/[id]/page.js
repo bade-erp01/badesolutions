@@ -1312,6 +1312,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     </option>
                     <option value="Cash on Delivery">Cash on Delivery </option>
                     <option value="Credit customer">Credit customer</option>
+                    <option value="Payment before delivery">Payment before delivery</option>
                   </select>
                 </div>
                 <div>
