@@ -438,14 +438,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
       // 🖋️ Header setup
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
+      doc.setFontSize(10);
       doc.text(`Transaction Statement`, 20, 20);
 
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
       doc.text(`Customer: ${cust.Username}`, 20, 30);
       doc.text(`Period: ${startDate} to ${endDate}`, 20, 35);
-      doc.setFontSize(17);
+      doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.text(
         `Current Balance: ${cust.Debt?.toLocaleString(undefined, {
@@ -485,6 +485,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         "Current Balance",
         "", // Empty CR
         "", // Empty DR
+        "",
         `${cust.Debt?.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
@@ -498,7 +499,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         startY: 50,
         theme: "grid",
         styles: {
-          fontSize: 10,
+          fontSize: 7,
           cellPadding: 3,
           halign: "start",
           valign: "middle",
@@ -532,7 +533,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           const pageWidth = pageSize.width || pageSize.getWidth();
           const pageNumber = doc.internal.getNumberOfPages();
 
-          doc.setFontSize(9);
+          doc.setFontSize(7);
           doc.text(
             `Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`,
             20,
