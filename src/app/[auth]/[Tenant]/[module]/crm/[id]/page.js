@@ -1307,7 +1307,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     onChange={handleChange}
                     className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
                   >
-                    <option value={cust.paymentTerms}>
+                    <option value={cust.paymentTerms} className="italic bg-gray-200">
                       {cust.paymentTerms || "Select one"}
                     </option>
                     <option value="Cash on Delivery">Cash on Delivery </option>
