@@ -65,7 +65,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
   };
 
   return (
-    <section className="min-h-screen ">
+    <section className="min-h-screen text-xs">
       <div className=" mx-auto bg-gray-50 border border-gray-200 shadow-sm">
         {/* Header Card */}
         <div className="bg-white overflow-hidden mb-4 border border-gray-100">

@@ -6,6 +6,7 @@ import Nav1 from "@/app/Components/Nav1"
 import BackButton from "@/app/Components/BackBotton"
 import Footer2 from "@/app/Components/Footer2"
 import PaymentReceipt from "@/app/Components/PrintReciept";
+import DialogDemo from "@/app/Components/AssignPayToInv";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -88,6 +89,8 @@ export default async function paymentlayout({ params }) {
            {(data.Payment.status === 'posted' && (userData?.user?.isAccountant || userData?.user?.postPayment)) && (
               <PaymentReceipt business={userData.business} payment={data.Payment} cust={data.Customers?.Username.toUpperCase()} />
           )}
+
+          <DialogDemo PayId={data.Payment} />
          </aside>{" "}
          {/* Main Content Area */}
          <main className="flex-1 ">
