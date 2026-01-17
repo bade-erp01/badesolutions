@@ -158,7 +158,7 @@ const ModuleCard = ({ item, userInfo }) => {
   return (
     <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:scale-105 animate__animated animate__fadeInUp animate__faster">
       {/* Background gradient effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-linear-to-br from-slate-50 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <CardHeader className="relative z-10">
         <div className="flex items-start justify-between gap-4">
