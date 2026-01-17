@@ -3,20 +3,37 @@ import "animate.css";
 import React, { useState, useEffect } from "react";
 import dummyData from "../../../data/dummyData.json";
 import Image from "next/image";
-import {EXPRESS_PRIVATE_URL} from "../../../../Functions/Functions"
+import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import {
   plsWait,
   ErrorMessage,
-  SuccessToast,
-  AppDescription
+  AppDescription,
 } from "../../../../Functions/Mics";
 import { Encrypt } from "../../../../Functions/Functions";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ChevronDown, ChevronUp, Shield, Zap } from "lucide-react";
 
-const ModulesPage = ({userInfo}) => {
+const ModulesPage = ({ userInfo }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -30,35 +47,53 @@ const ModulesPage = ({userInfo}) => {
         business={userInfo.business}
         page={`App Store`}
       />
-      <div className="p-6 isolate  pt-14 lg:px-8 min-h-screen">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-        >
-          <div
-            style={{
-              clipPath:
-                "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-            }}
-            className="relative left-[calc(50%-11rem)] aspect-1155/678 w-144.5 -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-288.75"
-          />
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 pt-20">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-24">
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-slate-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+          </div>
+
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <Badge variant="outline" className="mx-auto">
+              <Zap className="w-3 h-3 mr-2" />
+              Explore Our Ecosystem
+            </Badge>
+
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-slate-900">
+              Powerful Modules for{" "}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-slate-900">
+                Your Business
+              </span>
+            </h1>
+
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              Unlock the full potential of your business with our expertly
+              crafted modules. From seamless integrations to advanced
+              functionalities, designed to streamline operations and drive
+              growth.
+            </p>
+
+            <div className="flex items-center justify-center gap-2 text-sm text-slate-500 pt-4">
+              <Shield className="w-4 h-4" />
+              Secured with industry-leading standards
+            </div>
+          </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          Explore Our Powerful Modules
-        </h1>
-        <p className="text-center text-gray-600 max-w-xl mx-auto mb-8">
-          Unlock the full potential of your business with our expertly crafted
-          modules. From seamless integrations to advanced functionalities, these
-          tools are designed to streamline operations, enhance productivity, and
-          drive growth.
-        </p>
-
+        {/* Modules Grid */}
         {isMounted && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dummyData.map((item, index) => (
-              <ModuleCard key={item.id || index} item={item} userInfo={userInfo}/>
-            ))}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {dummyData.map((item, index) => (
+                <ModuleCard
+                  key={item.id || index}
+                  item={item}
+                  userInfo={userInfo}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -67,10 +102,11 @@ const ModulesPage = ({userInfo}) => {
   );
 };
 
-const ModuleCard = ({ item,userInfo }) => {
-   const Router = useRouter()
+const ModuleCard = ({ item, userInfo }) => {
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const TenantId = userInfo?.business._id || "";
 
   useEffect(() => {
@@ -79,51 +115,54 @@ const ModuleCard = ({ item,userInfo }) => {
 
   const handlePayment = async (module) => {
     try {
-      if ( !userInfo) {
+      if (!userInfo) {
         window.location.href = "/Pricing";
         return;
       }
 
-      plsWait(
-        `Setting up installation for ${module.Name} Module.`
-      );
+      setIsLoading(true);
+      plsWait(`Setting up installation for ${module.Name} Module.`);
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/Payment_Collection`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await Encrypt(TenantId)}`,
-        },
-        body: JSON.stringify(module),
-      });
+      const request = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/Payment_Collection`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${await Encrypt(TenantId)}`,
+          },
+          body: JSON.stringify(module),
+        }
+      );
 
       const response = await request.json();
-      
+
       if (response.error) {
         throw new Error(response.error);
       }
 
-      if(response.data){
-        window.location.href = response.data
+      if (response.data) {
+        window.location.href = response.data;
       }
-      
     } catch (err) {
-      console.log(err.message)
+      console.log(err.message);
       ErrorMessage(`Something went wrong...Please try again`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (!isMounted) return null;
+
   return (
-    isMounted && (
-      <div
-        className="relative shadow-md rounded-lg p-2 transition-transform transform hover:scale-105 w-80 bg-cover bg-center animate__animated animate__fadeInUp animate__faster"
-        style={{
-          backgroundImage: `url('/assets/Copilot_20250529_150010.png')`,
-        }}
-      >
-        <div className="relative z-10 opacity-100 p-4 rounded-lg">
-          <div className="flex items-center gap-3">
+    <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:scale-105 animate__animated animate__fadeInUp animate__faster">
+      {/* Background gradient effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <CardHeader className="relative z-10">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1">
             {item.icon && (
               <Image
                 src={
@@ -131,101 +170,136 @@ const ModuleCard = ({ item,userInfo }) => {
                     ? item.icon
                     : `/assets/${item.icon}`
                 }
-                alt="icon"
-                width={40}
-                height={40}
-                className="rounded"
+                alt={item.Name}
+                width={48}
+                height={48}
+                className="rounded-lg"
               />
             )}
-            <h2 className="text-lg font-semibold text-gray-700">{item.Name}</h2>
+            <div className="flex-1">
+              <CardTitle className="text-xl text-slate-900">
+                {item.Name}
+              </CardTitle>
+              {item.installed && (
+                <Badge className="mt-2 bg-green-100 text-green-800 border-green-300">
+                  ✓ Installed
+                </Badge>
+              )}
+            </div>
           </div>
+        </div>
+        <CardDescription className="text-slate-600">
+          {expanded ? item.Description : `${item.Description.slice(0, 60)}...`}
+        </CardDescription>
+      </CardHeader>
 
-          <div className="mt-3">
-            <p className="text-gray-600">
-              {expanded
-                ? item.Description
-                : `${item.Description.slice(0, 50)}...`}
-            </p>
-
-            {expanded && item.apps?.length > 0 && (
-              <div
-                className="text-gray-600 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('/assets/Copilot_20250529_150010.png')`,
-                }}
-              >
-                <hr />
-                <small>Apps in Module</small>
+      <CardContent className="relative z-10 space-y-4">
+        {/* Apps List */}
+        {expanded && item.apps?.length > 0 && (
+          <>
+            <Separator className="bg-slate-200" />
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Apps in Module ({item.apps.length})
+              </p>
+              <div className="grid gap-2">
                 {item.apps.map((app, index) => (
-                  <div
-                    onClick={()=>AppDescription(app,item.Name)}
-                    key={app.id || index}
-                    className="relative p-2 transition-transform transform hover:scale-105 hover:shadow-md hover:rounded-lg hover:bg-purple-300"
-                    title={app.Description}
-                  >
-                    <ul className="flex flex-col md:flex-row items-center justify-between">
-                      <div className="flex flex-col md:flex-row items-center justify-between">
-                        <small>{index + 1}; </small>
-                        <li>
-                          <Image
-                            src={app.icon}
-                            width={20}
-                            height={20}
-                            alt={app.Name}
-                          />
-                        </li>
-                      </div>
-                        <li className="text-sm">
-                          <small>{app.Name}</small>
-                        </li>
-                     {/*  */}
-                    </ul>
-                  </div>
+                  <Dialog key={app.id || index}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="justify-start text-left h-auto p-2 hover:bg-slate-100"
+                        onClick={() => AppDescription(app, item.Name)}
+                      >
+                        <Image
+                          src={app.icon}
+                          width={20}
+                          height={20}
+                          alt={app.Name}
+                          className="mr-2"
+                        />
+                        <span className="text-sm text-slate-700">
+                          {app.Name}
+                        </span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>{app.Name}</DialogTitle>
+                        <DialogDescription>
+                          {app.Description}
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 ))}
               </div>
-            )}
+            </div>
+          </>
+        )}
 
-            <button
-              className="text-blue-500 text-sm mt-2 hover:underline"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? "Show Less" : "Read More"}
-            </button>
-          </div>
-
-          {!item.installed && (
-          <small className=" text-md text-gray-600 flex items-center space-x-1 font-bold">
-            <span>Secured payment with</span>
-            <Image
-              height={70}
-              width={70}
-              src="/assets/paystack-logo-png_seeklogo-409509-removebg-preview.png"
-              alt="Paystack Logo"
-              className="inline-block"
-            />
-          </small>
+        {/* Expand/Collapse Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-slate-600 hover:text-slate-900"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? (
+            <>
+              <ChevronUp className="w-4 h-4 mr-2" />
+              Show Less
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4 mr-2" />
+              Read More
+            </>
           )}
+        </Button>
 
-          {!item.installed ? (
-            userInfo  ? (
-              <button
-                onClick={() => handlePayment(item)}
-                className="mt-4 w-full bg-[#683874] text-white py-2 rounded-lg hover:bg-[#a073c5] transition"
-              >
-                Start your Expereience @ ₦{item.Amount}
-              </button>
-            ) : (
-              <button
-                onClick={() => (window.location.href = "/Pricing")}
-                className="mt-4 w-full bg-[#33302fde] text-white py-2 rounded-lg hover:bg-[#33302f] transition"
-              >
-                 Start your Expereience @ ₦{item.Amount}
-              </button>
-            )
-          ) : null}
-        </div>
-      </div>
-    )
+        <Separator className="bg-slate-200" />
+
+        {/* Pricing & CTA */}
+        {!item.installed && (
+          <>
+            <div className="flex items-center justify-between pt-2">
+              <div className="space-y-1">
+                <p className="text-xs text-slate-500 font-medium">Price</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  ₦{item.Amount.toLocaleString()}
+                </p>
+              </div>
+              <Image
+                height={40}
+                width={100}
+                src="/assets/paystack-logo-png_seeklogo-409509-removebg-preview.png"
+                alt="Paystack"
+                className="opacity-70"
+              />
+            </div>
+
+            <Button
+              onClick={() => handlePayment(item)}
+              disabled={isLoading}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-6 text-base"
+            >
+              {isLoading ? "Processing..." : "Start Your Experience"}
+            </Button>
+          </>
+        )}
+
+        {!userInfo && !item.installed && (
+          <Button
+            onClick={() => (window.location.href = "/Pricing")}
+            variant="outline"
+            className="w-full border-slate-300"
+          >
+            View Plans
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

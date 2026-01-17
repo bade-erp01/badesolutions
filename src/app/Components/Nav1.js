@@ -4,7 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import "animate.css";
-import { Squares2X2Icon,MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  Squares2X2Icon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Encrypt } from "../../../Functions/Functions";
@@ -12,6 +15,16 @@ import { useRouter } from "next/navigation";
 import moment from "moment";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 export default function Nav1({ page, Module, user, business }) {
   const pathName = usePathname();
@@ -19,19 +32,14 @@ export default function Nav1({ page, Module, user, business }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const router = useRouter();
-  const [date, setDate] = useState("");
-  const [weekday, setWeekday] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("Loading location...");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const now = new Date();
-    setDate(now.getDate() + getOrdinal(now.getDate()));
-    setWeekday(now.toLocaleDateString(undefined, { weekday: "short" }));
-    setTime(
-      // now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })
-      moment().format("HH:mm")
-    );
+    setTime(moment().format("HH:mm"));
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
@@ -59,26 +67,9 @@ export default function Nav1({ page, Module, user, business }) {
     }
   }, []);
 
-  function getOrdinal(n) {
-    if (n > 3 && n < 21) return "th";
-    switch (n % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  }
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredModules, setFilteredModules] = useState(Module || []);
-
   useEffect(() => {
-    setFilteredModules(Module || []);
-  }, [Module]);
+    setHydrated(true);
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -86,7 +77,6 @@ export default function Nav1({ page, Module, user, business }) {
 
     if (!trimmedTerm) {
       Swal.fire("No search query", "Please enter a search word", "warning");
-      setFilteredModules([]);
       return;
     }
 
@@ -113,10 +103,6 @@ export default function Nav1({ page, Module, user, business }) {
     }, 400);
   };
 
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
   if (!hydrated) {
     return (
       <div className="p-4 space-y-4 animate-pulse">
@@ -135,7 +121,7 @@ export default function Nav1({ page, Module, user, business }) {
 
   return (
     <>
-      <header
+       <header
         className="w-full flex items-center justify-between px-5 py-5 z-20 relative "
       >
         <nav className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
@@ -143,213 +129,229 @@ export default function Nav1({ page, Module, user, business }) {
             {/* Logo */}
             <Link
               href={href}
-              className="text-gray-800 text-sm font-bold flex items-center"
+              className="flex items-center gap-2 hover:opacity-80 transition"
             >
-              {page ? (
-                <>
-                  <Squares2X2Icon className="h-6 w-6 text-gray-800 mr-2 -mt-1 hover:text-gray-900 hover:scale-110 hover:drop-shadow-md transition-all duration-300 font-bold" />
-                  {page.toUpperCase()}
-                </>
-              ) : (
-                <h5 className="font-bold hover:scale-110 hover:drop-shadow-md transition-all duration-300">BADE</h5>
-              )}
+              <Squares2X2Icon className="h-6 w-6 text-gray-800 mr-2 -mt-1 hover:text-gray-900 hover:scale-110 hover:drop-shadow-md transition-all duration-300 font-bold" />
+              <span className="font-bold text-sm text-gray-900">
+                {page ? page.toUpperCase() : "BADE"}
+              </span>
             </Link>
-            {business && user ? (
-              // Search Bar - Visible on Desktop fuchsia
-              Module?.length > 0 ? (
-                <form
-                  onSubmit={handleSearch}
-                  title={`Search through ${page} collection ...`}
-                  className="md:flex items-center bg-white rounded-md px-3 py-1 shadow shadow-gray-300"
-                >
-                  <input
+
+            {/* Desktop Search Bar  fuchsia*/}
+            {business && user && Module?.length > 0 && (
+              <form
+                onSubmit={handleSearch}
+                className="hidden md:flex items-center gap-2 flex-1 mx-8 max-w-md"
+              >
+                <div className="relative w-full">
+                  <Input
                     type="search"
-                    className="outline-none px-2 w-40 lg:w-60 "
-                    placeholder={`Search ${page} ...`}
+                    placeholder={`Search ${page}...`}
+                    value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
                   />
-                  <button type="submit" className=" px-2 p-1 rounded-sm hover:bg-purple-400 transition">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-black" />
-                  </button>
-                </form>
-              ) : null
-            ) : (
-              <div className="md:flex gap-8 text-gray-700 font-medium text-sm">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
+                <Button type="submit" size="sm" variant="default">
+                  Search
+                </Button>
+              </form>
+            )}
+
+            {/* Desktop Navigation */}
+            {!business || !user ? (
+              <div className="hidden md:flex gap-6 items-center">
                 <Link
                   href="#"
-                  className={`hover:text-pink-500 transition ${
+                  className={`text-sm font-medium transition hover:text-blue-600 ${
                     pathName === "/Why_Badde"
-                      ? "text-pink-500 bg-gray-100 "
-                      : ""
+                      ? "text-blue-600"
+                      : "text-gray-700"
                   }`}
                 >
                   Why Bade?
                 </Link>
                 <Link
                   href="/Pricing"
-                  className={`hover:text-pink-500 transition ${
-                    pathName === "/Pricing"
-                      ? "text-pink-500 bg-gray-100 "
-                      : ""
+                  className={`text-sm font-medium transition hover:text-blue-600 ${
+                    pathName === "/Pricing" ? "text-blue-600" : "text-gray-700"
                   }`}
                 >
                   Pricing
                 </Link>
               </div>
-            )}
+            ) : null}
 
-            {business && user ? (
-              <div className="hidden md:flex space-x-6 items-center">
-                <div
-                  className="relative z-10 text-sm text-gray-600 mt-2"
-                  title={` 🕒${time},📍${location}`}
-                >
-                  <div className="flex items-center ">
-                    <small className="text-xs text-gray-500 font-small">
-                      🕒{time}, 📍{location}
-                    </small>
+            {/* Right Section */}
+            <div className="flex items-center gap-4">
+              {business && user ? (
+                <>
+                  {/* Time & Location */}
+                  <div className="hidden lg:flex items-center gap-2 text-xs text-gray-600">
+                    <Badge variant="secondary" className="whitespace-nowrap">
+                      🕒 {time}
+                    </Badge>
+                    <Badge variant="secondary" className="whitespace-nowrap">
+                      📍 {location}
+                    </Badge>
                   </div>
-                </div>
 
-                {/* Dropdown Menu */}
-                <div className="relative inline-block text-left">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center w-full rounded-md border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    aria-expanded="true"
-                    aria-haspopup="true"
-                  >
-                    {user?.image && (
-                      <Image
-                        src={user.image || "/person.png"}
-                        className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
-                        // loading="lazy"
-                        priority={true}
-                        quality={100}
-                        width={25}
-                        height={25}
-                        alt="user image"
-                      /> 
-                    )}
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div
-                      className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none animate__animated animate__slideInRight"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="menu-button"
-                      tabIndex={-1} // Corrected tabIndex usage
+                  {/* User Dropdown */}
+                  <div className="relative inline-block text-left">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center w-full rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      aria-expanded={isDropdownOpen}
+                      aria-haspopup="true"
+                      id="menu-button"
                     >
-                      <div className="py-1" role="none">
-                        <p
-                          className="text-gray-500 px-4 py-2 text-sm"
-                          role="menuitem"
-                          tabIndex={-1}
-                        >
-                          🏢 {business.companyName.toUpperCase()}
-                        </p>
-                        <hr className="border-gray-200" />
-                        <p
-                          className="text-gray-500 px-4 py-2 text-sm"
-                          role="menuitem"
-                          tabIndex={-1}
-                        >
-                          Signed in as <br /> {user?.Email || "Guest"}
-                        </p>
-                        <hr className="border-gray-200" />
-                        {user?.isAdmin && (
-                          <Link
-                            href={`/${sanitizedCompanyName}/account/${business._id}`}
-                            className={
-                              pathName === "/Account"
-                                ? "text-blue-400 block px-4 py-2 text-sm hover:bg-gray-100"
-                                : "text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100"
-                            }
+                      {user?.image && (
+                        <Image
+                          src={user.image || "/person.png"}
+                          className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
+                          priority={true}
+                          quality={100}
+                          width={25}
+                          height={25}
+                          alt="user image"
+                        />
+                      )}
+                    </button>
+
+                    {isDropdownOpen && (
+                      <div
+                        className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none animate__animated animate__slideInRight"
+                        role="menu"
+                        aria-orientation="vertical"
+                        aria-labelledby="menu-button"
+                      >
+                        <div className="py-1" role="none">
+                          <p
+                            className="text-gray-500 px-4 py-2 text-sm"
                             role="menuitem"
-                            tabIndex={-1}
                           >
-                            Account settings ⚙️
-                          </Link>
-                        )}
-                        {user.Notification.length > 0 && (
-                          // <Link
-                          //   href={`/${sanitizedCompanyName}/Notification`}
-                          //   className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-300"
-                          //   role="menuitem"
-                          //   tabIndex={-1}
-                          // >
-                          //   {user.Notification.length} Notifications 🔔
-                          // </Link>
-                          <UserNotification user={user} />
-                        )}
+                            🏢 {business.companyName.toUpperCase()}
+                          </p>
+                          <hr className="border-gray-200" />
+                          <p
+                            className="text-gray-500 px-4 py-2 text-sm"
+                            role="menuitem"
+                          >
+                            Signed in as <br /> {user?.Email.slice(0,10) || "Guest"}...
+                          </p>
+                          <hr className="border-gray-200" />
 
-                        <Logout />
+                          {user?.isAdmin && (
+                            <Link
+                              href={`/${sanitizedCompanyName}/account/${business._id}`}
+                              className={
+                                pathName === "/Account"
+                                  ? "text-blue-400 block px-4 py-2 text-sm hover:bg-gray-100"
+                                  : "text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100"
+                              }
+                              role="menuitem"
+                            >
+                              Account settings ⚙️
+                            </Link>
+                          )}
+
+                          {user?.Notification?.length > 0 && (
+                            <UserNotification user={user} />
+                          )}
+
+                          <Logout />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <Link
-                href="/Login"
-                className={`hover:text-pink-500 transition ${
-                  pathName === "/Login" ? "text-pink-500 bg-gray-100" : ""
-                }`}
-              >
-                Login
-              </Link>
-            )}
+                    )}
+                  </div>
+                </>
+              ) : (
+                <Button asChild variant="default">
+                  <Link href="/Login">Login</Link>
+                </Button>
+              )}
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-dark focus:outline-none"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? "✖" : "☰"}
-            </button>
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                {isOpen ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </nav>
+
+        {/* Mobile Menu */}
+        {isOpen && (
+          <div className="md:hidden border-t bg-white">
+            <div className="container mx-auto px-4 py-4 space-y-4">
+              {business && user && Module?.length > 0 && (
+                <form onSubmit={handleSearch} className="flex gap-2">
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <Button type="submit" size="sm">
+                    🔍
+                  </Button>
+                </form>
+              )}
+              <div className="space-y-2">
+                <Link href="/" className="block py-2 text-blue-600 font-medium">
+                  Home
+                </Link>
+                <Link
+                  href="/services"
+                  className="block py-2 text-blue-600 font-medium"
+                >
+                  Services
+                </Link>
+                <Link
+                  href="/contact"
+                  className="block py-2 text-blue-600 font-medium"
+                >
+                  Contact
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
-
-      {/* Mobile Search Bar */}
-      {isOpen && (
-        <form className="md:hidden mt-2 bg-white rounded-md shadow-md p-3 flex items-center">
-          <input
-            type="search"
-            className="outline-none px-2 w-full"
-            placeholder="Search..."
-          />
-          <button type="submit" className="text-blue-600 px-2">
-            🔍
-          </button>
-        </form>
-      )}
-
-      {/* Mobile Menu Dropdown */}
-      {isOpen && (
-        <div className="md:hidden mt-2 bg-white rounded-lg shadow-md p-4">
-          <Link
-            href="/"
-            className="block py-2 text-blue-600 hover:bg-gray-100 rounded"
-          >
-            Home
-          </Link>
-          <Link
-            href="/services"
-            className="block py-2 text-blue-600 hover:bg-gray-100 rounded"
-          >
-            Services
-          </Link>
-          <Link
-            href="/contact"
-            className="block py-2 text-blue-600 hover:bg-gray-100 rounded"
-          >
-            Contact
-          </Link>
-        </div>
-      )}
     </>
   );
 }
