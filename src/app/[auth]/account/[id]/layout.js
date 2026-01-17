@@ -102,7 +102,7 @@ export default async function SetUpLayout({children, params }) {
                 {userData?.user?.isAdmin && userData.business.subscriptionplan === "Standard" &&  (
                   <Link
                     href={`/auth/Apps`}
-                    className="flex items-center gap-3 p-3 bg-amber-600 rounded-md hover:bg-gray-700 transition  text-xs"
+                    className="flex items-center gap-3 p-3 bg-gray-100/50 rounded-md hover:bg-gray-700 transition  text-xs"
                   >
                     <Image
                       src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
