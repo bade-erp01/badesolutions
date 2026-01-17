@@ -23,7 +23,7 @@ export default function DialogDemo({PayId}) {
         <DialogTrigger asChild>
           <Button
             variant="default"
-            className="mt-3 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
+            className="mt-3 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full"
           >
             Assign {PayId.paymentReferenceNo} to an invoice
           </Button>
