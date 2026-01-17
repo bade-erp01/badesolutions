@@ -551,7 +551,7 @@ export default function MainDash({ userData }) {
 
                     <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden mb-1">
                       <div
-                        className="h-full bg-green-400 transition-all duration-300"
+                        className={`h-full ${Math.round(person.percentage) > 50 ? "bg-green-400" : "bg-black"} transition-all duration-300`}
                         style={{
                           width: `${Math.min(
                             Math.round(person.percentage),
