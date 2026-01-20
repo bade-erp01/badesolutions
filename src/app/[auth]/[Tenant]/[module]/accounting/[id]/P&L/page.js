@@ -72,7 +72,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
       <Nav1
         user={userData.user}
         business={userData.business}
-        page={`Profit & Loss`}
+        page={`Income Statement`}
       />
 
       <div className="flex flex-1 text-white bt-2 ">
