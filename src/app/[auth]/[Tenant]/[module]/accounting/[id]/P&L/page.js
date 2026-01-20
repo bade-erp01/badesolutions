@@ -210,7 +210,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                       <td className="p-3">
                         <details>
                           <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
-                            OPERATING INCOME
+                            OPERATING INCOME [EBIT]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             <p className="font-bold"> [C - D]</p>
