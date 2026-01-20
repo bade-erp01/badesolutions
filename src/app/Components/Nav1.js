@@ -15,15 +15,14 @@ import { useRouter } from "next/navigation";
 import moment from "moment";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge";
 
 export default function Nav1({ page, Module, user, business }) {
@@ -198,35 +197,30 @@ export default function Nav1({ page, Module, user, business }) {
                   </div>
 
                   {/* User Dropdown */}
-                  <div className="relative inline-block text-left">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center w-full rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      aria-expanded={isDropdownOpen}
-                      aria-haspopup="true"
-                      id="menu-button"
-                    >
-                      {user?.image && (
-                        <Image
-                          src={user.image || "/person.png"}
-                          className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
-                          priority={true}
-                          quality={100}
-                          width={25}
-                          height={25}
-                          alt="user image"
-                        />
-                      )}
-                    </button>
+                  <Popover className="relative inline-block text-left">
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" className="p-0 rounded-full"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        aria-expanded={isDropdownOpen}
+                        aria-haspopup="true"
+                        id="menu-button"
+                      >
+                        {user?.image && (
+                          <Image
+                            src={user.image || "/person.png"}
+                            className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
+                            priority={true}
+                            quality={100}
+                            width={25}
+                            height={25}
+                            alt="user image"
+                          />
+                        )}
+                      </Button>
+                    </PopoverTrigger>
 
                     {isDropdownOpen && (
-                      <div
-                        className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none animate__animated animate__slideInRight"
-                        role="menu"
-                        aria-orientation="vertical"
-                        aria-labelledby="menu-button"
-                      >
+                     <PopoverContent className="w-80">
                         <div className="py-1" role="none">
                           <p
                             className="text-gray-500 px-4 py-2 text-sm"
@@ -263,9 +257,9 @@ export default function Nav1({ page, Module, user, business }) {
 
                           <Logout />
                         </div>
-                      </div>
+                      </PopoverContent>
                     )}
-                  </div>
+                  </Popover>
                 </>
               ) : (
                 <Button asChild variant="default">
