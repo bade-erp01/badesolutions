@@ -239,7 +239,7 @@ export default function Nav1({ page, Module, user, business }) {
 
                           {user?.isAdmin && (
                             <Link
-                              href={`/${sanitizedCompanyName}/account/${business._id}`}
+                              href={`/${sanitizedCompanyName}/account/${Encrypt(business._id)}`}
                               className={
                                 pathName === "/Account"
                                   ? "text-blue-400 block px-4 py-2 text-sm hover:bg-gray-100"
