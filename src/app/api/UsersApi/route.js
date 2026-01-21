@@ -104,7 +104,6 @@ export async function POST(request) {
       );
     }
     
-    await dbConnect(Encrypt("BadeAdmin"));
     // check email and phone number with data base
     const existingUser = await Users.findOne({
       $or: [{ Email: body.Email }, { telephone: body.telephone }],

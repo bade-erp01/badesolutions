@@ -65,6 +65,10 @@ export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
 
+    if (!userData.user.isAdmin) {
+      return notFound();
+    }
+
   const RawBusiness = await Business.findById(Dencrypt(moduleList.id)).select("-payStackApiKey").lean();
   const parsedBusiness = JSON.parse(JSON.stringify(RawBusiness));
   const business = JSON.parse(JSON.stringify(parsedBusiness));

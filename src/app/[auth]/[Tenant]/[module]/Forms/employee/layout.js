@@ -3,13 +3,15 @@ import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
 import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import Link from "next/link"
-import { Encrypt } from '../../../../../../../Functions/Mics';
-import Image from 'next/image';
+import {notFound} from 'next/navigation';
 import Footer2 from '@/app/Components/Footer2';
 
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
-    // const module = await params;
+
+    if (!userData.user.isAdmin) {
+      notFound();
+    }
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
