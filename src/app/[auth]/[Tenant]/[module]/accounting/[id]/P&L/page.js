@@ -11,7 +11,6 @@ import { Encrypt,} from "../../../../../../../../Functions/Mics"
 export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
  const [initialData,setInitialData] = useState(Data)
 
-
   async function GeneratePNLSummary() {
     const { value: formValues } = await Swal.fire({
       title: "Generate income Statement",
@@ -139,11 +138,25 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                             NET SALES [A]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic"> - Dis. Allowed --- [₦0.00]</p>
-                            <p className="italic">
-                              {" "}
-                              - Cost of Goods Sold (COGS) --- [₦0.00]
-                            </p>
+                            <p className="italic"> Sales - Returns</p>
+                          </div>
+                        </details>
+                      </td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
+                    </tr>
+
+                    <tr>
+                      <td className="p-3">
+                        <details>
+                          <summary className="cursor-pointer hover:bg-gray-50 font-bold " title="Cost of Sales">
+                            C.O.S 
+                          </summary>
+                          <div className="flex flex-col gap-4 mt-2">
+                            <p className="italic">Opening inventory [a]</p>
+                            <p className="italic">+ Net purchase</p>
+                            <p className="italic" title="Cost of Goods Available for sales"> C.O.G.A.S [a + b] --- [00.00]</p>
+                            <p className="italic">- Closing inventory</p>
+                            <p className="italic" title="Cost of Goods Sold"> C.O.G.S</p>
                           </div>
                         </details>
                       </td>
