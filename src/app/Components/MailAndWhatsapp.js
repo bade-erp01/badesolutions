@@ -44,7 +44,7 @@ const MailAndWhatsapp = ({
     };
 
     return (
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-2">
             
             {/* Mail Button */}
             <button
@@ -52,7 +52,7 @@ const MailAndWhatsapp = ({
                 onClick={onMailClick}
                 className="mr-1 group inline-flex items-center gap-3 px-3 bg-gray-100/50 py-2 rounded-full text-gray-200 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out"
             >
-                <AtSymbolIcon className="w-5 h-5 text-blue-300" />
+                <AtSymbolIcon className="w-4 h-4 text-blue-300" />
             </button>
 
             {/* WhatsApp Button */}
@@ -64,8 +64,8 @@ const MailAndWhatsapp = ({
                 <Image
                     src="https://img.icons8.com/3d-fluency/94/whatsapp-logo.png"
                     alt="whatsapp"
-                    width={28}
-                    height={28}
+                    width={20}
+                    height={20}
                     priority={true}
                 />
             </button>

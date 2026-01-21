@@ -118,7 +118,7 @@ async function StoreLayoutContent({ params }) {
       <BackButton />
       <hr className="my-4 border-gray-700" />
       <nav className="grow">
-        <div className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[40vh]"
+        <div className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#4B5563 transparent' }}
         >
         
@@ -142,7 +142,7 @@ async function StoreLayoutContent({ params }) {
         <br />
         <hr/>
         <span className="text-xs mt-2">Total Payment Recorded</span>
-        <h5 className=" text-md px-1 bg-gray-100/50 py-1 rounded-sm text-gray-100 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
+        <h5 className=" text-md">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
         <br />
         {Inv.memoId && (<PartialInvoiceDisplay data={Inv.memoId} />)}
       </nav>
