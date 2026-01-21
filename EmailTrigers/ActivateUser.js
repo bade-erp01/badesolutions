@@ -4,7 +4,7 @@ import Business from "../models/Business";
 
 async function UserActivationMail(doc) {
   try {
-    const Biz = await Business.findOne({ tenantId: doc.tenantId });
+    const Biz = await Business.findOne({ tenantId: doc.tenantId }).lean();
 
     // Generate activation token
     const token = jwt.sign(

@@ -65,7 +65,6 @@ async function BusinessOnboardingMail(doc) {
     
 
     transporter.sendMail(message).then(async (msg) => {
-        dbConnect()
 
         // Hash the password before saving to the database
       const hashedPassword = await bcrypt.hash(plainPassword, 10);

@@ -21,7 +21,6 @@ import dbConnect from '../lib/Mongodb';
 async function userOnboardingMail(doc) {
    try {
     // find the business that registered the user
-    dbConnect("BadeAdmin")
 
     const Biz = await Business.findOne({tenantId:doc.tenantId}) 
 

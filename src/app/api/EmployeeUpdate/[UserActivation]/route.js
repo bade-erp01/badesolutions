@@ -12,7 +12,6 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: 'Something went wrong' }, { status: 400 });
     }
 
-    await dbConnect(Encrypt("BadeAdmin"))
     const user = await userS.findById(Dencrypt(Params.UserActivation)).select("status").lean();
     
     if (!user) {
