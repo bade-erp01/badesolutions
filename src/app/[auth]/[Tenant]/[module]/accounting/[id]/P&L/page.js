@@ -139,32 +139,15 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                             NET SALES [A]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            {/* <p className="italic"> - Dis. Allowed --- [₦0.00]</p>
+                            <p className="italic"> - Dis. Allowed --- [₦0.00]</p>
                             <p className="italic">
                               {" "}
                               - Cost of Goods Sold (COGS) --- [₦0.00]
-                            </p> */}
-                            <p className="italic"> Sales - Returns </p>
+                            </p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3">0</td>
-                    </tr>
-
-                    <tr>
-                      <td className="p-3">
-                        <details>
-                          <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
-                            COGS 
-                          </summary>
-                          <div className="flex flex-col gap-4 mt-2">
-                            {/* show list of rxpense category */}
-                            <P  className="italic">Cost of sales </P>
-                            <p className="italic">Opening Inventory</p>
-                          </div>
-                        </details>
-                      </td>
-                      <td className="py-3"> 0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
                     </tr>
 
                     <tr>
