@@ -132,7 +132,7 @@ export default function InvoicePage({
       // Left Column: Customer Info
       doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
       doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.setFontSize(7).setTextColor(0, 0, 0);
       doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
       doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
       doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
@@ -163,7 +163,7 @@ export default function InvoicePage({
           ],
         ],
         theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1 },
+        styles: { fontSize: 7, cellPadding: 1 },
         columnStyles: {
           0: { fontStyle: "bold", halign: "right" },
           1: { halign: "right" },
@@ -187,7 +187,7 @@ export default function InvoicePage({
             "Total",
           ],
         ],
-        body: bill.orders.map((ord, i) => [
+        body: bill.orders.filter(entry => entry.Qty > 0 || entry.pcsReq > 0).map((ord, i) => [
           i + 1,
           `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
           ord.item?.ACDcode || "N/A",
@@ -199,14 +199,14 @@ export default function InvoicePage({
           ord.total?.toFixed(2) || 0,
         ]),
         theme: "grid",
-        styles: { fontSize: 9 },
+        styles: { fontSize: 7 },
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
       // 💰 Summary Table
       autoTable(doc, {
         startY: currentY,
-        tableWidth: 76,
+        tableWidth: 80,
         margin: { left: pageWidth - 90 },
         head: [],
         body: [
@@ -216,7 +216,7 @@ export default function InvoicePage({
           ["Total Due", bill.grandTotal.toFixed(2) || 0],
         ],
         theme: "grid",
-        styles: { fontSize: 9, cellPadding: 1 },
+        styles: { fontSize: 7, cellPadding: 1 },
         columnStyles: {
           0: { fontStyle: "bold", halign: "right" },
           1: { halign: "right" },
@@ -225,7 +225,7 @@ export default function InvoicePage({
       currentY = doc.lastAutoTable.finalY + 10;
 
       // ✍️ Signatures
-      doc.setFontSize(10);
+      doc.setFontSize(7);
       doc.text(
         `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
         margin,
@@ -467,7 +467,7 @@ export default function InvoicePage({
       // 📋 Metadata Table
       autoTable(doc, {
         startY: currentY + 30,
-        tableWidth: pageWidth * 0.4,
+        tableWidth: 80,
         margin: { left: pageWidth - pageWidth * 0.4 - margin },
         body: [
           [
@@ -480,7 +480,7 @@ export default function InvoicePage({
           // ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
         ],
         theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1 },
+        styles: { fontSize: 7, cellPadding: 1 },
         columnStyles: {
           0: { fontStyle: "bold", halign: "right" },
           1: { halign: "right" },
@@ -491,7 +491,7 @@ export default function InvoicePage({
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 5,
         head: [["#", "Product", "Code", "Case", "Pcs"]],
-        body: bill.orders.map((ord, i) => [
+        body: bill.orders.filter(entry => entry.Qty > 0 || entry.pcsReq > 0).map((ord, i) => [
           i + 1,
           ord.item?.Name,
           ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
@@ -500,7 +500,7 @@ export default function InvoicePage({
         ]),
         theme: "grid",
         styles: {
-          fontSize: 9,
+          fontSize: 7,
           cellPadding: 3,
           halign: "start",
           valign: "middle",
@@ -521,7 +521,7 @@ export default function InvoicePage({
           const pageWidth = pageSize.width || pageSize.getWidth();
           const pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
-          doc.setFontSize(9);
+          doc.setFontSize(7);
           doc.text(`${business.invoicePolicy}`, margin, pageHeight - 10);
           doc.text(`Page ${pageNumber}`, pageWidth - 60, pageHeight - 10);
         },
@@ -557,7 +557,7 @@ export default function InvoicePage({
         ],
         theme: "striped",
         styles: {
-          fontSize: 10,
+          fontSize: 7,
           cellPadding: 4,
           textColor: [0, 0, 0],
           lineColor: [200, 200, 200],
