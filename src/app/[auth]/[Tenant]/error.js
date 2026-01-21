@@ -14,7 +14,7 @@ export default function Tenanterror({ error }) {
     <div className="bg-white flex items-center justify-center min-h-screen">
       <div className="text-center">
         {/* <!-- Large 404 --> */}
-        <h1  onClick={handleRefresh} className="inline-block border-r border-gray-300 mr-5 pr-6 text-lg font-bold align-top">
+        <h1  onClick={handleRefresh} className="inline-block border-r border-gray-300 mr-5 pr-6 text-lg font-bold align-top cursor-pointer">
           Try again?
         </h1>
 

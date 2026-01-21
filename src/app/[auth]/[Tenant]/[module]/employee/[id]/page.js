@@ -65,10 +65,11 @@ export default function SingleEmployeeView({
       }
 
       plsWait("Applying changes, Please wait...");
-      const response = await fetch(`/api/EmployeeUpdate/${id}`, {
+      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/EmployeeUpdate/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
           access: `${Encrypt(userInfo._id)}`,
         },
       });

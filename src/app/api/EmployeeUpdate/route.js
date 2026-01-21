@@ -4,40 +4,6 @@ import business from "../../../../models/Business";
 import { ObjectId } from "mongodb";
 import { formatMongooseError,Encrypt } from "../../../../Functions/Functions";
 
-// Ensure Mongoose connection is established
-
-// get single user data
-// export async function GET(request) {
-  //   try {
-//     const { searchParams } = new URL(request.url);
-//     const userId = searchParams.get('userId');
-
-//     if (!userId) {
-//       return new Response('User ID is required', { status: 400 });
-//     }
-
-//     const employee = await Users.findById(userId);
-
-//     if (!employee) {
-  //       return new Response('User not found', { status: 404 });
-//     }
-
-//     return new Response(JSON.stringify(employee), {
-//       status: 200,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   } catch (error) {
-  //     return new Response(
-//       `Internal Server Error: ${error.message}`,
-//       {
-//         status: 500,
-//         headers: { "Content-Type": "application/json" },
-//       }
-//     );
-//   }
-// }
-
-
 
 // update a user data
 export async function PATCH(request) {
