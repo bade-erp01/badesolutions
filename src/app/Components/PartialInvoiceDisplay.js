@@ -157,6 +157,7 @@ export default function PartialInvoiceDisplay({data , business}) {
         });
         currentY = doc.lastAutoTable.finalY + 10;
   
+        
         // 💰 Summary Table
         autoTable(doc, {
           startY: currentY,
