@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 
-export default function DialogDemo({PayId}) {
-  const [invoices, setInvoices] = useState([]);
+export default function DialogDemo({PayId,pendingInvoices}) {
+  const [invoices] = useState(pendingInvoices ||[]);
   return (
     <Dialog>
       <form>
@@ -47,9 +47,9 @@ export default function DialogDemo({PayId}) {
                 className="border rounded-md p-2"
               >
                 <option value="">Select an invoice</option>
-                {invoices?.map((inv) => (
-                  <option key={inv.id} value={inv.id}>
-                    {inv.billReference}
+                {invoices?.filter(inv =>inv.paymentMethod < inv.grandTotal).map((inv) => (
+                  <option key={inv.id} value={inv.id} className="text-xs">
+                   {inv.billStatus.toUpperCase().slice(0,3)}/{inv.billReferenceNo} - ₦{(inv.grandTotal - inv.paymentMethod).toLocaleString()} unsettled
                   </option>
                 ))}
               </select>

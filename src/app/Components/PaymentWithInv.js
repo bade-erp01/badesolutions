@@ -6,6 +6,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import {useRouter} from "next/navigation";
 import {BanknotesIcon} from "@heroicons/react/24/outline";
 import moment from "moment";
+import {Encrypt} from "../../../Functions/Functions"
 
 const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
   const Router = useRouter()
