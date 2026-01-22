@@ -279,7 +279,7 @@ export default function PartialInvoiceDisplay({data , business}) {
         </table>
         <div style="margin-top: 12px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
           <button id="downloadAgingExcel" style="
-            background-color: #2b6cb0;
+            background-color: black;
             color: white;
             padding: 6px 12px;
             border-radius: 6px;
@@ -311,7 +311,7 @@ export default function PartialInvoiceDisplay({data , business}) {
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
       <ClipboardDocumentListIcon className="w-4 h-4 inline-block" />
-      View adjustment
+      View returned invoice details
     </button>
   );
 }

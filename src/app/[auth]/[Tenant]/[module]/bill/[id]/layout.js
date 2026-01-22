@@ -140,11 +140,18 @@ async function StoreLayoutContent({ params }) {
         <span className="text-xs mt-2">Share via</span>
         <MailAndWhatsapp baseUrl={process.env.EXPRESS_PRIVATE_URL} billId={Inv._id} firstName={userInfo.user.firstName} userId={userInfo.user._id} businessToken={userInfo.business.rustyRoof} />
         <br />
-        <hr/>
-        <span className="text-xs mt-2">Total Payment Recorded</span>
-        <h5 className=" text-md">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
-        <br />
         {Inv.memoId && (<PartialInvoiceDisplay data={Inv.memoId} business={userInfo.business} />)}
+        <hr/>
+       <div className="mt-4 p-4 rounded-lg bg-gray-200 shadow-md">
+          <span className="block text-xs text-black/80 tracking-wide uppercase">
+            Total Payment Recorded
+          </span>
+          <h5 className="mt-1 text-2xl font-semibold text-black">
+            {userInfo.business.currency?.currency.Symbol}
+            {Inv?.paymentMethod?.toLocaleString() || 0}
+          </h5>
+        </div>
+        <br />
       </nav>
      </aside>
 
