@@ -144,7 +144,7 @@ async function StoreLayoutContent({ params }) {
         <span className="text-xs mt-2">Total Payment Recorded</span>
         <h5 className=" text-md">{userInfo.business.currency?.currency.Symbol}{Inv?.paymentMethod.toLocaleString() || 0}</h5>
         <br />
-        {Inv.memoId && (<PartialInvoiceDisplay data={Inv.memoId} />)}
+        {Inv.memoId && (<PartialInvoiceDisplay data={Inv.memoId} business={userInfo.business} />)}
       </nav>
      </aside>
 
