@@ -90,7 +90,14 @@ export default async function paymentlayout({ params }) {
               <PaymentReceipt business={userData.business} payment={data.Payment} cust={data.Customers?.Username.toUpperCase()} />
           )}
 
-          <DialogDemo PayId={data.Payment} pendingInvoices={data.pendingInvoices}/>
+          {data?.Payment?.status === "posted" &&
+            (userData?.user?.isAccountant || userData?.user?.postPayment) && (
+              <DialogDemo
+                PayId={data.Payment}
+                pendingInvoices={data.pendingInvoices}
+              />
+          )}
+          
          </aside>{" "}
          {/* Main Content Area */}
          <main className="flex-1 ">
