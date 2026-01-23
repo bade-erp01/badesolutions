@@ -15,7 +15,7 @@ import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 
 // const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
-const EXPRESS_PRIVATE_URL = "https://bade-backend-5vegnfex0-obernard23s-projects.vercel.app/" 
+const EXPRESS_PRIVATE_URL = "https://bade-backend-5vegnfex0-obernard23s-projects.vercel.app" 
 // const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
 const IV = '1234567890123456'; // 16 chars
