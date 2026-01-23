@@ -31,6 +31,11 @@ const nextConfig = {
         protocol:"https",
         hostname:"api.badesolutions.com.ng",
         pathname:"/**"
+      },
+      {
+        protocol:"https",
+        hostname:"bade-backend-5vegnfex0-obernard23s-projects.vercel.app",
+        pathname:"/**"
       }
     ],
   },
