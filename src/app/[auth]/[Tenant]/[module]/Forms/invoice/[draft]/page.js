@@ -532,7 +532,7 @@ const generatePdf = async (business, customer, bill) => {
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
-      <div className="max-w-5xl mx-auto px-6 py-10 bg-white shadow-2xl text-xs m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
+      <div className="max-w-6xl mx-auto px-6 py-10 bg-white shadow-2xl text-xs m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
           <span
@@ -894,7 +894,7 @@ const generatePdf = async (business, customer, bill) => {
                 </div>
               )} 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-          <div className="bg-gradient-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
+          <div className="bg-linear-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
             <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
               Summary
             </h3>
