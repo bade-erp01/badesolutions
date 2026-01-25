@@ -11,7 +11,7 @@ import {
   ClipboardDocumentListIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/navigation"
+import Link from "next/link";
 
 const SingleCustomerpage = lazy(() => import("./page"));
 
