@@ -69,7 +69,7 @@ export default async function StoreLayout2({ params }) {
                   .replace(/\s+/g, "-")
                   .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                   userData.user._id,
-                )}/Module/Forms/${moduleParams.module.toLowerCase()}`}
+                )}/Module/Forms/${decoy.module.toLowerCase()}`}
                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
               >
                 <PlusCircleIcon className="h-6 w-6 text-gray-100" />
