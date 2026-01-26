@@ -36,6 +36,11 @@ const nextConfig = {
         protocol:"https",
         hostname:"bade-backend-5vegnfex0-obernard23s-projects.vercel.app",
         pathname:"/**"
+      },
+      {
+        protocol:"https",
+        hostname:"firebasestorage.googleapis.com",
+        pathname:"/**"
       }
     ],
   },
