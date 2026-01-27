@@ -61,7 +61,7 @@ const MailAndWhatsapp = ({
                 onClick={onWhatsappClick}
                 className="mr-1 group inline-flex items-center gap-3 px-3 py-2 rounded-full text-gray-200 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out"
             >
-                <ChatBubbleLeftRightIcon className="w-4 h-4 text-green-300"/>
+                <ChatBubbleLeftRightIcon className="w-4 h-4 text-gray-200"/>
             </button>
         </div>
     );
