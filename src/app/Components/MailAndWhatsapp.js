@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import { AtSymbolIcon } from '@heroicons/react/24/outline';
+import { AtSymbolIcon,ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { Encrypt } from "../../../Functions/Functions";
 import {plsWait, SuccessToast, ErrorMessage} from '../../../Functions/Mics';
@@ -61,13 +61,7 @@ const MailAndWhatsapp = ({
                 onClick={onWhatsappClick}
                 className="mr-1 group inline-flex items-center gap-3 px-3 py-2 rounded-full text-gray-200 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out"
             >
-                <Image
-                    src="https://img.icons8.com/3d-fluency/94/whatsapp-logo.png"
-                    alt="whatsapp"
-                    width={20}
-                    height={20}
-                    priority={true}
-                />
+                <ChatBubbleLeftRightIcon className="w-4 h-4 text-green-300"/>
             </button>
         </div>
     );
