@@ -337,6 +337,54 @@ export default function DraftPurchasePage({
     }
   };
 
+
+  // lock rfp
+  const LockRFP = async (status) => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to proceed with updating this Request for Purchase?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update it!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      plsWait("Updating Request for Purchase");
+
+      const url = `${EXPRESS_PRIVATE_URL}/api/VendorBillPost?po=${Singlebill._id}&user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        body: JSON.stringify(status),
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            dbConnect: `Bearer ${Business.rustyRoof}`,
+            access: `${Encrypt(user._id)}`,
+          },
+      });
+
+      const data = await response.json();
+
+      if (data.message) {
+        SuccessToast(data.message);
+        window.location.reload();
+        router.refresh(); // Or use router.refresh() if you're in App Router
+      } else {
+        throw new Error(data.error || "Update failed");
+      }
+    } catch (error) {
+      ErrorMessage(error.message || "Network error");
+    }
+  };
+
   // generate pdf
   const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
       return new Promise((resolve, reject) => {
@@ -656,7 +704,7 @@ export default function DraftPurchasePage({
             {user.raiseLpo &&
               Singlebill.status.toLowerCase() === "draft" && (
               <button
-                onClick={() => updateRFP("Pending")}
+                onClick={() => LockRFP({status:"Pending",Remarks:Singlebill.Remarks,discount:Singlebill.discount,shippingFee:Singlebill.shippingFee})}
                     title="Process this draft to order"
                     className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-white font-semibold hover:shadow-xl  transition duration-200 ease-in-out text-xs"
                   >
@@ -1016,12 +1064,12 @@ export default function DraftPurchasePage({
                     className="w-full ml-2 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                     defaultValue={Singlebill.Remarks || ""}
                     onBlur={(e) => {
-                      const val = e.target.value.trim(); // Optional: remove extra spaces
+                      const val = e.target.value; // Optional: remove extra spaces
                       setsingleBill({ ...Singlebill, Remarks: val });
                     }}
                   />
                 ) : (
-                 ""
+                 <p className="text-xs">{Singlebill.Remarks}</p>
                 )}
               </div>
               <div className="flex justify-between text-lg font-bold mt-4 border-t pt-2">
