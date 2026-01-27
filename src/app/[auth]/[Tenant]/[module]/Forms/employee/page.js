@@ -12,7 +12,7 @@ import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 
-export default function NewEmployeeForm({userData}) {
+export default function NewEmployeeForm({userData,baseUrl}) {
   const states = NaijaStates.states();
   const [Formtext,setFormText] = useState('')
   const [formData, setFormData] = useState({});
@@ -30,11 +30,12 @@ export default function NewEmployeeForm({userData}) {
     e.preventDefault();
     plsWait('Please wait... Do not refresh this page')
     try {
-      const response = await fetch(`/api/UsersApi`, {
+      const response = await fetch(`${baseUrl}/api/createUser`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userData.business.tenantId}`,
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`
       },
       body: JSON.stringify(formData),
       });

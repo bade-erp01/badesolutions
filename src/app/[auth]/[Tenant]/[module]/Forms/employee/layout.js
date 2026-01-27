@@ -8,6 +8,7 @@ import Footer2 from '@/app/Components/Footer2';
 
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL2
 
     if (!userData.user.isAdmin) {
       notFound();
@@ -46,7 +47,7 @@ export default async function SetUpLayout({children, params }) {
             {/* Main Content Area */}
             <main className="flex-1 ">
               <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[82dvh] overflow-y-auto">
-               <NewEmployeeForm userData={userData} />
+               <NewEmployeeForm userData={userData} baseUrl={baseUrl}/>
               </section>
             </main>
           </div>
