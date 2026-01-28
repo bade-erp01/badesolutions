@@ -20,11 +20,13 @@ import Swal from "sweetalert2";
 export default function DialogDemo({PayId,pendingInvoices, userData,baseUrl}) {
   const [invoices] = useState(pendingInvoices ||[]);
   const [invoice,setInvoice] = useState("")
-  const Router = useRouter()
+  const router = useRouter();
 
 
-  const OnSubmit = async (e) => {
-    // Ask for confirmation
+  const OnSubmit = async () => {
+   
+    try {
+       // Ask for confirmation
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Once assigned, this payment cannot be reassigned. Do you want to proceed?",
@@ -40,12 +42,11 @@ export default function DialogDemo({PayId,pendingInvoices, userData,baseUrl}) {
       return; // stop if user cancels
     }
 
-    try {
       const formData = {
         invId: invoice,
       };
 
-      plsWait("")
+      plsWait("Registering payment to sales...")
 
       const response = await fetch(`${baseUrl}/api/DownPatToInv/${Encrypt(PayId._id)}`, {
         method: "PATCH",
@@ -63,7 +64,7 @@ export default function DialogDemo({PayId,pendingInvoices, userData,baseUrl}) {
         throw new Error(data.error);
       } else {
         SuccessToast(data.message);
-        Router.refresh();
+        router.refresh();
       }
     } catch (err) {
       ErrorMessage(err.message);
