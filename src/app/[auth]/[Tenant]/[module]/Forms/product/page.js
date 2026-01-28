@@ -89,7 +89,7 @@ export default function ProductForm({
           BuyingPrice: 0,
         });
         router.push(
-          `/${businessData.companyName}/${Encrypt(userData.user._id)}/product/product/${data.data}?Modules=product`,
+          `/${businessData.companyName}/${Encrypt(userData._id)}/product/product/${data.data}?Modules=product`,
         );
       } else {
         throw new Error(data.error || "Unexpected error occurred.");
