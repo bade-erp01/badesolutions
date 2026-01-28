@@ -95,7 +95,7 @@ export default function ProductForm({
         throw new Error(data.error || "Unexpected error occurred.");
       }
     } catch (error) {
-      ErrorMessage(error.message || "Failed to create product.");
+      ErrorMessage("Failed to create product.");
     }
   };
 
