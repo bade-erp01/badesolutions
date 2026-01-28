@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  PhotoIcon,
-  UserCircleIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   plsWait,
   SuccessToast,
@@ -15,7 +10,12 @@ import { Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export default function ProductForm({ userData, businessData, VendorList,EXPRESS_PRIVATE_URL }) {
+export default function ProductForm({
+  userData,
+  businessData,
+  VendorList,
+  EXPRESS_PRIVATE_URL,
+}) {
   const [user] = useState(userData);
   const [business] = useState(businessData);
   const router = useRouter();
@@ -31,7 +31,6 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
     Pricelist6: 1,
     Pricelist7: 1,
     Vendor: "",
-    ADCcode: "",
     color: "",
     Description: "",
     Sellable: true,
@@ -67,8 +66,31 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
       if (data.Message) {
         SuccessToast(data.Message);
-        setFormData({});
-        router.refresh();
+        setFormData({
+          Name: "",
+          UOM: "",
+          category: "",
+          Pricelist1: 1,
+          Pricelist2: 1,
+          Pricelist3: 1,
+          Pricelist4: 1,
+          Pricelist5: 1,
+          Pricelist6: 1,
+          Pricelist7: 1,
+          Vendor: "",
+          color: "",
+          Description: "",
+          Sellable: true,
+          Ecom_sale: false,
+          Manufacturer: "",
+          VAT: 0,
+          Pieces: 1,
+          category: "",
+          BuyingPrice: 0,
+        });
+        router.push(
+          `/${userData.business.companyName}/${Encrypt(userData.user._id)}/product/product/${data.data}?Modules=product`,
+        );
       } else {
         throw new Error(data.error || "Unexpected error occurred.");
       }
@@ -77,7 +99,8 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
     }
   };
 
-  const inputClass = "block w-full rounded-md bg-white px-2.5 py-1 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 transition-colors";
+  const inputClass =
+    "block w-full rounded-md bg-white px-2.5 py-1 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 transition-colors";
   const labelClass = "block text-xs font-semibold text-gray-700 mb-1.5";
 
   return (
@@ -87,19 +110,25 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
           {/* Header Section */}
           <div className="bg-gray-700 px-8 py-6">
             <h2 className="text-2xl font-bold text-white">Create Product</h2>
-            <p className="text-indigo-100 text-sm mt-1">Ensure to provide correct information for your product</p>
+            <p className="text-indigo-100 text-sm mt-1">
+              Ensure to provide correct information for your product
+            </p>
           </div>
 
           {/* Form Content */}
           <div className="px-8 py-8">
             {/* Basic Information Section */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Product Information</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Product Information
+              </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Name */}
                 <div>
-                  <label htmlFor="Name" className={labelClass}>Product Name</label>
+                  <label htmlFor="Name" className={labelClass}>
+                    Product Name
+                  </label>
                   <input
                     id="Name"
                     name="Name"
@@ -113,7 +142,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Category */}
                 <div>
-                  <label htmlFor="category" className={labelClass}>Category</label>
+                  <label htmlFor="category" className={labelClass}>
+                    Category
+                  </label>
                   <input
                     id="category"
                     name="category"
@@ -126,7 +157,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Buying Price */}
                 <div>
-                  <label htmlFor="BuyingPrice" className={labelClass}>Vendor Price</label>
+                  <label htmlFor="BuyingPrice" className={labelClass}>
+                    Vendor Price
+                  </label>
                   <input
                     required
                     id="BuyingPrice"
@@ -142,7 +175,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Manufacturer */}
                 <div>
-                  <label htmlFor="Manufacturer" className={labelClass}>Manufacturer</label>
+                  <label htmlFor="Manufacturer" className={labelClass}>
+                    Manufacturer
+                  </label>
                   <input
                     id="Manufacturer"
                     name="Manufacturer"
@@ -155,7 +190,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Pieces */}
                 <div>
-                  <label htmlFor="Pieces" className={labelClass}>Pieces in Carton</label>
+                  <label htmlFor="Pieces" className={labelClass}>
+                    Pieces in Carton
+                  </label>
                   <input
                     id="Pieces"
                     required
@@ -170,7 +207,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Vendor */}
                 <div>
-                  <label htmlFor="Vendor" className={labelClass}>Vendor</label>
+                  <label htmlFor="Vendor" className={labelClass}>
+                    Vendor
+                  </label>
                   <select
                     id="Vendor"
                     name="Vendor"
@@ -189,7 +228,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Unit of Measure */}
                 <div>
-                  <label htmlFor="UMO" className={labelClass}>Unit of Measure</label>
+                  <label htmlFor="UMO" className={labelClass}>
+                    Unit of Measure
+                  </label>
                   <input
                     id="UMO"
                     name="UMO"
@@ -202,7 +243,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* Color */}
                 <div>
-                  <label htmlFor="color" className={labelClass}>Color</label>
+                  <label htmlFor="color" className={labelClass}>
+                    Color
+                  </label>
                   <input
                     id="color"
                     name="color"
@@ -214,7 +257,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
                 {/* VAT */}
                 <div>
-                  <label htmlFor="VAT" className={labelClass}>VAT (%)</label>
+                  <label htmlFor="VAT" className={labelClass}>
+                    VAT (%)
+                  </label>
                   <input
                     id="VAT"
                     name="VAT"
@@ -237,7 +282,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <span className="text-xs font-medium text-gray-700">Sell on ERP</span>
+                    <span className="text-xs font-medium text-gray-700">
+                      Sell on ERP
+                    </span>
                   </label>
                 </div>
 
@@ -251,7 +298,9 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <span className="text-xs font-medium text-gray-700">Sell on E-commerce</span>
+                    <span className="text-xs font-medium text-gray-700">
+                      Sell on E-commerce
+                    </span>
                   </label>
                 </div>
               </div>
@@ -259,9 +308,11 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
 
             {/* Price Lists Section */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Price Lists</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Price Lists
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                {[1, 2, 3, 4, 5, 6, 7].map((num) =>
                   businessData.subscriptionplan === "Standard" || num <= 2 ? (
                     <div key={num}>
                       <label htmlFor={`Pricelist${num}`} className={labelClass}>
@@ -278,16 +329,20 @@ export default function ProductForm({ userData, businessData, VendorList,EXPRESS
                         placeholder="0.00"
                       />
                     </div>
-                  ) : null
-                ))}
+                  ) : null,
+                )}
               </div>
             </div>
 
             {/* Description Section */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Description</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Description
+              </h3>
               <div>
-                <label htmlFor="Description" className={labelClass}>Product Description</label>
+                <label htmlFor="Description" className={labelClass}>
+                  Product Description
+                </label>
                 <textarea
                   id="Description"
                   onChange={handleChange}
