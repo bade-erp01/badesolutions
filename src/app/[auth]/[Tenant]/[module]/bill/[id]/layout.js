@@ -138,7 +138,7 @@ async function StoreLayoutContent({ params }) {
         <br />
         <hr/>
         <span className="text-xs mt-2">Share via</span>
-        <MailAndWhatsapp baseUrl={process.env.EXPRESS_PRIVATE_URL} billId={Inv._id} firstName={userInfo.user.firstName} userId={userInfo.user._id} businessToken={userInfo.business.rustyRoof} />
+        {/* <MailAndWhatsapp baseUrl={process.env.EXPRESS_PRIVATE_URL} billId={Inv._id} firstName={userInfo.user.firstName} userId={userInfo.user._id} businessToken={userInfo.business.rustyRoof} /> */}
         <br />
         {Inv.memoId && (<PartialInvoiceDisplay data={Inv.memoId} business={userInfo.business} />)}
         <hr/>
