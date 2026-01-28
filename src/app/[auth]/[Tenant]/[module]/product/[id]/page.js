@@ -406,7 +406,7 @@ export default function SingleProductpage({
                             onClick={() =>
                               UpdateBuyingPrice(BuyingPrice.BuyingPrice)
                             }
-                            className="mt-3 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-purple-600 hover:bg-purple-800 transition-colors duration-200 shadow-md cursor-pointer"
+                            className="mt-3 inline-block w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-gray-600 hover:bg-gray-800 transition-colors duration-200 shadow-md cursor-pointer text-xs"
                           >
                             Update Buying Price
                           </span>
