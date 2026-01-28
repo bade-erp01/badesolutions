@@ -11,12 +11,65 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Encrypt, ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
-export default function DialogDemo({PayId,pendingInvoices}) {
+export default function DialogDemo({PayId,pendingInvoices, userData,baseUrl}) {
   const [invoices] = useState(pendingInvoices ||[]);
+  const [invoice,setInvoice] = useState("")
+  const Router = useRouter()
+
+
+  const OnSubmit = async (e) => {
+    // Ask for confirmation
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Once assigned, this payment cannot be reassigned. Do you want to proceed?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#2d5274",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel"
+    });
+
+    if (!result.isConfirmed) {
+      return; // stop if user cancels
+    }
+
+    try {
+      const formData = {
+        invId: invoice,
+      };
+
+      plsWait("")
+
+      const response = await fetch(`${baseUrl}/api/DownPatToInv/${Encrypt(PayId._id)}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: Encrypt(userData.user._id),
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      } else {
+        SuccessToast(data.message);
+        Router.refresh();
+      }
+    } catch (err) {
+      ErrorMessage(err.message);
+    }
+  };
+
   return (
     <Dialog>
       <form>
@@ -43,12 +96,13 @@ export default function DialogDemo({PayId,pendingInvoices}) {
               <Label htmlFor="invoice-select">Invoice Ref</Label>
               <select
                 id="invoice-select"
-                name="invoice"
+                name="invId"
                 className="border rounded-md p-2"
+                onChange={(e)=>setInvoice(e.target.value)}
               >
                 <option value="">Select an invoice</option>
                 {invoices?.filter(inv =>inv.paymentMethod < inv.grandTotal).map((inv) => (
-                  <option key={inv.id} value={inv.id} className="text-xs">
+                  <option key={inv._id} value={inv._id} className="text-xs">
                    {inv.billStatus.toUpperCase().slice(0,3)}/{inv.billReferenceNo} - ₦{(inv.grandTotal - inv.paymentMethod).toLocaleString()} unsettled
                   </option>
                 ))}
@@ -59,7 +113,7 @@ export default function DialogDemo({PayId,pendingInvoices}) {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={OnSubmit}>Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </form>

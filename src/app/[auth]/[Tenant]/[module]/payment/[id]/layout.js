@@ -90,11 +90,13 @@ export default async function paymentlayout({ params }) {
               <PaymentReceipt business={userData.business} payment={data.Payment} cust={data.Customers?.Username.toUpperCase()} />
           )}
 
-          {data?.Payment?.status === "posted" &&
+          {data?.Payment?.status === "posted" && !data?.Payment?.BillNo &&
             (userData?.user?.isAccountant || userData?.user?.postPayment) && (
               <DialogDemo
                 PayId={data.Payment}
                 pendingInvoices={data.pendingInvoices}
+                userData={userData}
+                baseUrl={process.env.EXPRESS_PRIVATE_URL2}
               />
           )}
           
