@@ -148,7 +148,10 @@ async function StoreLayoutContent({ params }) {
           </span>
           <h5 className="mt-1 text-2xl font-semibold text-black">
             {userInfo.business.currency?.currency.Symbol}
-            {Inv?.paymentMethod?.toLocaleString() || 0}
+            {Inv?.paymentMethod?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            }) || 0}
           </h5>
         </div>
         <br />
