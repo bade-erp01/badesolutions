@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
+import { PaperClipIcon } from "@heroicons/react/24/outline";
 import {
   Empty,
   EmptyContent,
@@ -91,6 +91,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                       <th className="px-4 py-3 text-left">Ref No</th>
                       <th className="px-4 py-3 text-left">Customer</th>
                       <th className="px-4 py-3 text-left">Order Date</th>
+                      <th className="px-4 py-3 text-left">Alt</th>
                       <th className="px-4 py-3 text-left">Raised By</th>
                       <th className="px-4 py-3 text-left">Status</th>
                       <th className="px-4 py-3 text-right">Value</th>
@@ -128,6 +129,11 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                           </td>
                           <td className="px-4 py-3 border-t border-white/10">
                             {bill.startDate}
+                          </td>
+                          <td className="px-4 py-3 border-t border-white/10">
+                            {bill.memoId && (
+                              <PaperClipIcon class="h-5 w-5 text-gray-300" />
+                            )}
                           </td>
                           <td className="px-4 py-3 border-t border-white/10">
                             {bill.RaiseBy}

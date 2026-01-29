@@ -1,6 +1,6 @@
 "use client";
 import Swal from "sweetalert2";
-import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+import { PaperClipIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {totalInWords} from "../../../Functions/Functions";
@@ -310,8 +310,8 @@ export default function PartialInvoiceDisplay({data , business}) {
       onClick={showModal}
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
-      <ClipboardDocumentListIcon className="w-4 h-4 inline-block" />
-      View returned invoice details
+      <PaperClipIcon className="w-4 h-4 inline-block" />
+      View returned SKU details
     </button>
   );
 }
