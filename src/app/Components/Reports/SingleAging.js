@@ -34,17 +34,19 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
           entry.customer.toString() === customer._id.toString() &&
           entry.billStatus !== "Draft" &&
           entry.billStatus !== "Cancelled" &&
-          entry.paymentMethod > 0
+          Number(entry.paymentMethod) > 0
       );
+
+      console.log(customerInvoices)
 
       const agingData = {
         Name: customer.Username,
-        Rep: Rep ?? "Unknown",
+        Rep: Rep ? Rep : "N/A",
         Current: customer.Debt,
       };
 
       let remainingPayment = customerPayments.reduce(
-        (total, payment) => total + payment.paymentMethod,
+        (total, payment) => total + Number(payment.paymentMethod),
         0
       );
 
@@ -53,11 +55,11 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
           moment(entry.startDate).isBetween(period.start, period.end, null, "[]")
         );
         const invoiceTotal = periodInvoices.reduce((total, inv) => total + inv.grandTotal, 0);
-
+        
         const periodPayments = customerPayments.filter((payment) =>
           moment(payment.startDate).isBetween(period.start, period.end, null, "[]")
-        );
-        const paymentTotal = periodPayments.reduce((total, pay) => total + pay.paymentMethod, 0);
+      );
+        const paymentTotal = periodPayments.reduce((total, pay) => total + Number(pay.paymentMethod), 0);
 
         let periodTotal = invoiceTotal - paymentTotal;
 
@@ -71,7 +73,6 @@ const AgingReportDownloader = ({ customer, invoices, payments, Rep }) => {
 
       // Strict matching: payments only reduce invoices in the same bucket
       //  let periodTotal = invoiceTotal - paymentTotal;
-
       aging.push(agingData);
 
       // Export to Excel
