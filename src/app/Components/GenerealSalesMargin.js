@@ -10,7 +10,7 @@ import "animate.css";
  * - Uses Plotly.js for rendering charts
  */
 export default function GenerealSalesMargin({
-  businessColor = "c4b4ff",
+  businessColor = "90a1b9",
   yearlysales,
   warehouses,
 }) {
