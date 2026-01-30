@@ -388,7 +388,7 @@ const generatePdf = async (business, customer, bill) => {
     try {
       plsWait('Updating cart...');
 
-      const url = `${EXPRESS_PRIVATE_URL}/${companyName}/Invoice/Cart/Update?user=${Encrypt(
+      const url = `${EXPRESS_PRIVATE_URL}/api/Invoice/Cart/Update?user=${Encrypt(
         userId
       )}`;
 
