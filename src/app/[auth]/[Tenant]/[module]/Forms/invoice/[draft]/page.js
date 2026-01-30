@@ -451,9 +451,7 @@ const generatePdf = async (business, customer, bill) => {
       plsWait("Please wait while i process your request. This should only take a bit. Do not reload this page...");
 
       const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/${
-          Business.CompanyName
-        }/wareHouse/Bill?user=${Encrypt(user._id)}&ops=${Encrypt(userInput)}`,
+        `${EXPRESS_PRIVATE_URL}/api/wareHouse/Bill?user=${Encrypt(user._id)}&ops=${Encrypt(userInput)}`,
         {
           method: "PATCH",
           headers: {
