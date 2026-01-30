@@ -76,7 +76,7 @@ export default function Nav1({ page, Module, user, business }) {
     const trimmedTerm = searchTerm.trim();
 
     if (!trimmedTerm) {
-      ErrorMessage("No search query", "Please enter a search word", "warning");
+      ErrorMessage("Please enter a search word");
       return;
     }
 
