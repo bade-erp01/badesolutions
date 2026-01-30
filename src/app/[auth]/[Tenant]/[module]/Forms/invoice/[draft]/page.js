@@ -78,7 +78,7 @@ export default function DraftInvoicePage({
     try {
       plsWait("Updating Discount"); // starts spinner or loading indicator
 
-      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/discount/update?user=${Encrypt(user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/discount/update?user=${Encrypt(user._id)}`;
 
       const response = await fetch(url, {
         body: JSON.stringify({ billId, value }),
@@ -307,7 +307,7 @@ const generatePdf = async (business, customer, bill) => {
       throw new Error('Product not found')
      }
 
-      const url = `${EXPRESS_PRIVATE_URL}/${Business.companyName}/Draft/add/order?order_id=${bill._id}&productId=${productId}&priceList=${Singlebill.customer.priceList}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order?order_id=${bill._id}&productId=${productId}&priceList=${Singlebill.customer.priceList}`;
       const res = await fetch(url, {
         method: "PUT",
         headers: {
@@ -350,9 +350,7 @@ const generatePdf = async (business, customer, bill) => {
         return;
       }
       plsWait("Deleting draft. Please wait.")
-      const url = `${EXPRESS_PRIVATE_URL}/${
-        Business.companyName
-      }/Draft/salesDelete?id=${Encrypt(bill._id)}&user=${Encrypt(user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/salesDelete?id=${Encrypt(bill._id)}&user=${Encrypt(user._id)}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: { 
