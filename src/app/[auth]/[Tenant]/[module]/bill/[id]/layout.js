@@ -71,9 +71,9 @@ async function StoreLayoutContent({ params }) {
 
   const AppFinder = userInfo.user.Apps.find((app) => {
     return app.Name === "CRM";
-  });
+ }); 
 
-  if (!AppFinder) {
+ if (!AppFinder) {
     return notFound();
   }
 
@@ -93,11 +93,12 @@ async function StoreLayoutContent({ params }) {
     Inv = data.Inv || [];
     cust = data.cust || [];
   } catch (err) {
-    return (
-      <div className="text-red-500 p-6">
-        Failed to load. Please try again later.
-      </div>
-    );
+    // return (
+    //   <div className="text-red-500 p-6">
+    //     Failed to load. Please try again later.
+    //   </div>
+    // );
+    throw new Error("Failed to load. Please try again later.")
   }
 
  return (
