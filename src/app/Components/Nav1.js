@@ -11,6 +11,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Encrypt } from "../../../Functions/Functions";
+import {plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics"
 import { useRouter } from "next/navigation";
 import moment from "moment";
 import Logout from "@/app/Components/Logout";
@@ -75,21 +76,11 @@ export default function Nav1({ page, Module, user, business }) {
     const trimmedTerm = searchTerm.trim();
 
     if (!trimmedTerm) {
-      Swal.fire("No search query", "Please enter a search word", "warning");
+      ErrorMessage("No search query", "Please enter a search word", "warning");
       return;
     }
 
-    Swal.fire({
-      title: "Searching...",
-      text: `Searching for "${trimmedTerm}" in the ${page} list...`,
-      icon: "info",
-      showClass: {
-        popup: "animate__animated animate__fadeInUp animate__faster",
-      },
-      hideClass: {
-        popup: "animate__animated animate__fadeOutDown animate__faster",
-      },
-    });
+    plsWait(`Searching for "${trimmedTerm}" in the ${page} list...`)
 
     setTimeout(() => {
       router.push(
