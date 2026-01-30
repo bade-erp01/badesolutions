@@ -489,9 +489,7 @@ const generatePdf = async (business, customer, bill) => {
     try {
       plsWait("Removing item from order...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/${
-        Business.companyName
-      }/Draft/delete/order?user=${Encrypt(user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/delete/order?user=${Encrypt(user._id)}`;
 
       const response = await fetch(url, {
         method: "DELETE",
