@@ -1105,6 +1105,12 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   value={formData.Region}
                   onChange={handleChange}
                 />
+                <Input
+                  label="merchandiser"
+                  name="merchandiser"
+                  value={formData.merchandiser}
+                  onChange={handleChange}
+                />
               </Grid>
             </Section>
 

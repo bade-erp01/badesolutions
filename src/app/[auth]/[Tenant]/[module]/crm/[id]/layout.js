@@ -19,9 +19,7 @@ export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
   const decoy = await params;
   let data = {};
-  const staffRaw = await Employee.findByTenant(userData.business.tenantId)
-    .select("firstName lastName")
-    .lean();
+  const staffRaw = await Employee.findByTenant(userData.business.tenantId).select("firstName lastName").lean();
   const StringedStaff = JSON.stringify(staffRaw);
   const ParsedStaff = JSON.parse(StringedStaff);
 
