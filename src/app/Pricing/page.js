@@ -15,7 +15,7 @@ export default function Pricing() {
         <>
             <div className=" py-16 px-6 md:px-12" 
                  style={{
-          backgroundImage: 'url("/john-vid-Bdd7oMnJohg-unsplash.jpg")',
+          backgroundImage: 'url("/josh-calabrese-Ca8r0PSWg9Q-unsplash.jpg")',
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "grayscale(30%)",
@@ -26,7 +26,7 @@ export default function Pricing() {
                 {/* Header Section */}
                 <div className="text-center mb-12">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Small Price for <span className="text-white">Huge productivity boost 🚀</span>
+                        Small Price for Huge productivity boost
                     </h1>
                     <div className="w-full text-center mt-6">
                     <Marquee gradient={false} speed={40} className="w-full py-3">
@@ -55,7 +55,7 @@ export default function Pricing() {
                         ))}
                     </div>
                     </Marquee>
-                    <p className="text-white text-md mt-2 font-semibold tracking-wide">
+                    <p className="text-black/50 text-md mt-2 font-semibold tracking-wide">
                         Trusted by forward-thinking individuals and businesses worldwide.
                     </p>
                     </div>
