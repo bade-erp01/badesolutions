@@ -62,7 +62,7 @@ export default function Home() {
           </div>
           <div className="text-center bg-black/20 backdrop-blur-xs rounded-xl p-2">
             <h1 className="text-center text-gray-900 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter leading-tight mb-6">
-              <span className="text-balance bg-gradient-to-r from-gray-200 via-gray-300 to-pink-300 bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">
+              <span className="text-balance bg-gradient-to-r from-gray-200 via-gray-300 to-orange-400 bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">
                 Business Automated Dynamic Enterprise.
               </span>
             </h1>
