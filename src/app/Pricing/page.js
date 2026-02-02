@@ -66,7 +66,7 @@ export default function Pricing() {
                     <div className="bg-white shadow-lg rounded-lg p-6 text-center">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Basic License</h3>
                          <p className="text-sm text-gray-700 mb-4">For Small SME&lsquo;S</p>
-                        <div className="text-xl font-bold mb-2"><strike>₦1,500/ user / Month</strike></div>
+                        <div className="text-xl font-bold mb-2"><strike>₦2,500/ user / Month</strike></div>
                         <button disabled onClick={()=>(router.push('/auth/SignUp?plan=Basic'))} className="w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
                           <strike> Get Basic License</strike>
                         </button>
