@@ -42,7 +42,7 @@ export default function Home() {
       <div
         className=""
         style={{
-          backgroundImage: 'url("/josh-calabrese-Ca8r0PSWg9Q-unsplash.jpg")',
+          backgroundImage: 'url("/adrian-sulyok-c_4eaGRDSVU-unsplash.jpg")',
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "grayscale(40%)",
@@ -51,24 +51,23 @@ export default function Home() {
       >
         <Nav1 />
         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 animate__slideInUp animate__animated">
-          <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-            <div className="relative rounded-full px-3 py-1 text-sm/6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 font-semibold">
+          <div className="hidden sm:mb-8 sm:flex sm:justify-center  bg-black/20 backdrop-blur-xs rounded-xl">
+            <div className="relative rounded-full px-3 py-1 text-sm/6 text-gray-200 ring-1 ring-gray-200/10 hover:ring-gray-200/20 font-semibold">
               Cloud ERP to enrich your business.{" "}
-              <Link href="/Pricing" className="font-bold text-indigo-600">
+              <Link href="/Pricing" className="font-bold text-orange-300">
                 <span aria-hidden="true" className="absolute inset-0" />
                 Get started with B.A.D.E <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
           </div>
-          <div className="text-center">
+          <div className="text-center bg-black/20 backdrop-blur-xs rounded-xl p-2">
             <h1 className="text-center text-gray-900 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter leading-tight mb-6">
-              <span className="text-balance bg-gradient-to-r from-gray-600 via-gray-600 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">
+              <span className="text-balance bg-gradient-to-r from-gray-200 via-gray-300 to-pink-300 bg-clip-text text-transparent drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">
                 Business Automated Dynamic Enterprise.
               </span>
             </h1>
             <p
-              className="mt-2 text-sm font-bold text-pretty text-grey-400 sm:text-xl/8 
-              bg-white/20 backdrop-blur-xs rounded-xl px-6 py-4 border border-white/20 shadow-lg"
+              className="mt-2 text-sm text-pretty text-white"
             >
               Streamline Your Success with 🚀 AI-powered automation, seamless
               collaboration, and real-time insights—all in one scalable ERP
@@ -79,14 +78,14 @@ export default function Home() {
                 href="/Pricing"
                 className="rounded-md bg-gray-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Get started with B.A.D.E
+                Get started with B.A.D.E →
               </Link>
-              <Link
+              {/* <Link
                 href="/auth/Apps"
-                className="text-sm/6 font-semibold text-gray-900"
+                className="text-sm/6 font-semibold text-orange-400"
               >
                 Learn more <span aria-hidden="true">→</span>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
