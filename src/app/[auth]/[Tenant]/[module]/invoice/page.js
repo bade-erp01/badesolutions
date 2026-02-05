@@ -139,6 +139,9 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                             )}
                           </td>
                           <td className="px-4 py-3 border-t border-white/10">
+                            {bill.orders.length}
+                          </td>
+                          <td className="px-4 py-3 border-t border-white/10">
                             {bill.RaiseBy}
                           </td>
                           <td className="px-4 py-3 border-t border-white/10">
