@@ -76,14 +76,14 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
 
           {/* Image Section */}
           <div className="flex items-center space-x-6 pb-6">
-            <div className="w-32 h-32 rounded-lg overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 shadow-md border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+            <div className="w-32 h-32 rounded-lg overflow-hidden bg-linear-to-br from-gray-200 to-gray-300 shadow-md border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
               <Image
                 height={128}
                 width={128}
                 src={formData.image || "https://img.icons8.com/stickers/100/decentralized-network.png"}
                 alt="Asset"
-                quality={100}
-                priority={true}
+                quality={90}
+                priority
                 className="w-full h-full object-cover"
               />
             </div>
@@ -200,12 +200,12 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
 
             {/* Depreciation Rate */}
             <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Depreciation Rate (%)</label>
+              <label className="block text-xs font-semibold text-gray-900 mb-2">Depreciation Rate </label>
               {!DecryptedAsset.runDepreciation ? (
                 <input
-                  value={formData.depreciationRate?.$numberDecimal || 0}
-                  id="depreciationRate"
-                  name="depreciationRate"
+                  value={formData.ResidualValue?.$numberDecimal || 0}
+                  id="ResidualValue"
+                  name="ResidualValue"
                   required
                   placeholder="0.00"
                   type="number"

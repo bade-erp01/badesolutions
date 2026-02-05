@@ -124,22 +124,12 @@ export default async function layout({params}) {
                       <ul className="divide-y divide-gray-700">
                           <li  className="py-3 px-4 text-xs text-italic">
                             <div className="flex justify-between items-center">
-                              <span className="text-italic">Write off Value: 
+                              <span className="text-italic">Depreciation Value: 
                                 {DecryptedAsset.ResidualValue.$numberDecimal}
                                 </span>
                             </div>
                             <hr className="border-gray-500" />
                           </li>
-
-                          <li  className="py-3 px-4 text-xs text-italic">
-                            <div className="flex justify-between items-center">
-                              <span className="text-italic">Depreciation Rate:
-                                {DecryptedAsset?.depreciationRate?.$numberDecimal || 0}
-                                </span>
-                            </div>
-                            <hr className="border-gray-500" />
-                          </li>
-
 
                           <li  className="py-3 px-4 text-xs text-italic">
                             <div className="flex justify-between items-center">

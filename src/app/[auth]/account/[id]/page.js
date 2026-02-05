@@ -162,7 +162,7 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
           className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
             !formData.isVerified
               ? "bg-red-50 text-red-600 border-red-200"
-              : "bg-indigo-50 text-indigo-700 border-indigo-200"
+              : "bg-indigo-50 text-green-700 border-green-200"
           }`}
         >
           {formData.isVerified ? "Verified Account" : "Not Verified"}
@@ -211,7 +211,7 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
 
         {/* Attachment */}
         <div className="flex items-center gap-3 bg-white shadow-md p-4 rounded-md">
-          <div className="flex-shrink-0 w-10 h-10 overflow-hidden rounded-full border border-gray-300">
+          <div className="shrink-0 w-10 h-10 overflow-hidden rounded-full border border-gray-300">
             <Image
             height={10}
             width={10}
