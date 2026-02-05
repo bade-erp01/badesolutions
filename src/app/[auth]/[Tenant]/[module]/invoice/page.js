@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import axios from "axios";
-import { PaperClipIcon } from "@heroicons/react/24/outline";
+import { PaperClipIcon,ShoppingCartIcon } from "@heroicons/react/24/outline";
 import {
   Empty,
   EmptyContent,
@@ -92,6 +92,9 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                       <th className="px-4 py-3 text-left">Customer</th>
                       <th className="px-4 py-3 text-left">Order Date</th>
                       <th className="px-4 py-3 text-left">Alt</th>
+                      <th className="px-4 py-3 text-left">
+                        <ShoppingCartIcon class="h-5 w-6 text-gray-500" />
+                      </th>
                       <th className="px-4 py-3 text-left">Raised By</th>
                       <th className="px-4 py-3 text-left">Status</th>
                       <th className="px-4 py-3 text-right">Value</th>
