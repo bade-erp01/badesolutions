@@ -93,7 +93,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                       <th className="px-4 py-3 text-left">Order Date</th>
                       <th className="px-4 py-3 text-left">Alt</th>
                       <th className="px-4 py-3 text-left">
-                        <ShoppingCartIcon class="h-5 w-6 text-gray-500" />
+                        <ShoppingCartIcon class="h-5 w-6 text-gray-100" />
                       </th>
                       <th className="px-4 py-3 text-left">Raised By</th>
                       <th className="px-4 py-3 text-left">Status</th>
