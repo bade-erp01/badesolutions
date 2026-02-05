@@ -15,9 +15,9 @@ import {
   plsWait,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import {EXPRESS_PRIVATE_URL,Encrypt,Dencrypt} from "../../../../../Functions/Functions"
+import {Encrypt,Dencrypt} from "../../../../../Functions/Functions"
 
-export default function BusinessDatas({ data, userInfo }) {
+export default function BusinessDatas({ data, userInfo,baseUrl }) {
   const navigation = useRouter();
   const [formData, setFormData] = useState(data);
   const [currencies] = useState(currency);
@@ -68,7 +68,7 @@ export default function BusinessDatas({ data, userInfo }) {
               
               const resizedImage = canvas.toDataURL('image/jpeg', 0.7); // Adjust quality as needed
     
-              const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${moduleList}`, {
+              const request = await fetch(`${baseUrl}/api/images/upload?id=${id}&module=${moduleList}`, {
                 method: "POST",
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
@@ -104,9 +104,8 @@ export default function BusinessDatas({ data, userInfo }) {
   const config = {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userInfo.business.tenantId}`,
-      // "X-Requested-With": "XMLHttpRequest",
-      dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
+      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+      access:`${Encrypt(userInfo.user._id)}`
     },
   };
 
@@ -115,7 +114,7 @@ export default function BusinessDatas({ data, userInfo }) {
     try {
       plsWait("Submitting Business update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const url = `/api/account/${Encrypt(formData._id)}`;
+      const url = `${baseUrl}/api/account/${Encrypt(formData._id)}`;
       // Await axios call directly
       const { data } = await axios.patch(url, formData, config);
 
@@ -174,14 +173,16 @@ export default function BusinessDatas({ data, userInfo }) {
       <div className="flex flex-wrap gap-8 items-center py-4">
         {/* Avatar */}
         <div className="flex items-center space-x-6">
-          <div className="w-28 h-28 rounded-full overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
+          <div className="w-28 h-28 rounded-full overflow-hidden bg-linear-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
             {formData.companyLogo ? (
               <Image
-              width={10}
-              height={10}
-                src={formData.companyLogo}
-                alt="Avatar"
-                className="w-full h-full object-cover"
+              width={200}
+              height={200}
+              quality={90}
+              src={formData.companyLogo}
+              priority
+              alt="Avatar"
+              className="w-full h-full object-cover"
               />
             ) : (
               <span className="text-gray-400 text-lg font-semibold">

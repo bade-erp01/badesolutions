@@ -64,6 +64,7 @@ export async function generateMetadata() {
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
     const moduleList = await params;
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
     if (!userData.user.isAdmin) {
       return notFound();
@@ -125,8 +126,8 @@ export default async function SetUpLayout({children, params }) {
             </aside>{" "}
             {/* Main Content Area */}
             <main className="flex-1 ">
-              <section className="w-full p-2 max-w-screen-xl flex flex-col gap-6 rounded-lg  relative z-10 max-h-[83dvh] overflow-y-auto">
-                <BusinessDatas data={business} userInfo={userData} />
+              <section className="w-full p-2 max-w-7xl flex flex-col gap-6 rounded-lg  relative z-10 max-h-[83dvh] overflow-y-auto">
+                <BusinessDatas data={business} userInfo={userData} baseUrl={baseUrl} />
                 {/* {children} */}
               </section>
             </main>
