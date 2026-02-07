@@ -27,6 +27,7 @@ export default async function Layout({ children }) {
   const userInfo = userData?.user;
   const businessInfo = userData?.business;
   const SessionId = userData?.SessionId.data
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL
 
   if (!userInfo || !businessInfo || !SessionId || userInfo.status !== "active" || SessionId !== userInfo.SessionId) {
     redirect("/Login");
@@ -39,7 +40,7 @@ export default async function Layout({ children }) {
     // redirect("/Renew");
 
     // Option 2: Show renewal component directly
-    return <RenewSubscription business={businessInfo}/>;
+    return <RenewSubscription business={businessInfo} baseUrl={baseUrl} User={userInfo}/>;
   }
 
   return <div style={{ overflowY: "hidden" }}>

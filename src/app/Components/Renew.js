@@ -1,11 +1,17 @@
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import {useRouter} from "next/navigation"
+import {Encrypt,Dencrypt} from "../../../Functions/Functions"
+import { ErrorMessage, plsWait } from "../../../Functions/Mics";
 
-const RenewButton = ({ redirectUrl }) => {
+const RenewButton = ({id ,baseUrl,User}) => {
+  const [user] = useState(Dencrypt(User))
   const MySwal = withReactContent(Swal);
+  const router = useRouter();
+  const redirectUrl = `${baseUrl}/api/Renew/Subscription/${id}`;
 
   const handleRenewClick = () => {
     MySwal.fire({
@@ -28,9 +34,25 @@ const RenewButton = ({ redirectUrl }) => {
         cancelButton:
           "bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-300 transition-all font-medium",
       },
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        window.location.href = redirectUrl;
+        plsWait("Initiating secured Payment")
+        const InitiatePayment = await fetch(redirectUrl,{
+          method:"POST",
+          body:JSON.stringify({}),
+          headers:{
+            Authorization:`Bearer ${id}`,
+            access:Encrypt(user._id),
+          }
+        });
+
+        const response = await InitiatePayment.json()
+        if (response.data){
+           router.push(response.data);
+        }else{
+          ErrorMessage(response.error)
+        }
+       
       }
     });
   };
