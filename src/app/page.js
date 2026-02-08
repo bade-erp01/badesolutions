@@ -69,7 +69,7 @@ export default function Home() {
             <p
               className="mt-2 text-sm text-pretty text-white"
             >
-              Streamline Your Success with 🚀 AI-powered automation, seamless
+              Streamline Your Success with AI-powered automation, seamless
               collaboration, and real-time insights—all in one scalable ERP
               solution.
             </p>
