@@ -5,11 +5,11 @@ import "animate.css";
 
 /**
  * GenerealSalesMargin
- * - Displays revenue by warehouse (pie chart) and monthly sales turnover (bar chart)
+ * - Displays revenue by warehouse (pie chart) and monthly sales turnover (random bar/line chart with random colors)
  * - Uses Plotly.js for rendering charts
  */
 export default function GenerealSalesMargin({
-  businessColor = "27272a",
+  businessColor = "27272a", // fallback color
   yearlysales,
   warehouses,
 }) {
@@ -19,7 +19,7 @@ export default function GenerealSalesMargin({
   const [whs, setWhs] = useState(Array.isArray(warehouses) ? warehouses : []);
 
   const pieRef = useRef(null);
-  const barRef = useRef(null);
+  const chartRef = useRef(null);
   const plotlyRef = useRef(null);
 
   const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
@@ -58,7 +58,7 @@ export default function GenerealSalesMargin({
     let mounted = true;
 
     const pieNode = pieRef.current;
-    const barNode = barRef.current;
+    const chartNode = chartRef.current;
 
     (async () => {
       try {
@@ -74,19 +74,28 @@ export default function GenerealSalesMargin({
         const pieLayout = { title: "REVENUE GENERATION MARGIN" };
         if (mounted && pieNode) Plotly.newPlot(pieNode, pieData, pieLayout);
 
-        // BAR chart: month-by-month turnover
-        const xArray = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        // Randomize chart type (bar vs line)
+        const chartType = Math.random() < 0.5 ? "bar" : "scatter";
+        const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
+
+        // Randomize color
+        const colors = ["#FF5733", "#33FF57", "#3357FF", "#FFC300", "#8E44AD", "#16A085"];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // Monthly turnover chart
+        const xArray = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
         const yArray = monthTotals.map((v) => Number(v.toFixed(2)));
-        const barData = [
+        const chartData = [
           {
             x: xArray,
             y: yArray,
-            type: "bar",
-            marker: { color: businessColor },
+            type: chartType,
+            mode: chartMode,
+            marker: { color: randomColor || businessColor },
           },
         ];
-        const barLayout = { title: "M/M SALES TURN OVER" };
-        if (mounted && barNode) Plotly.newPlot(barNode, barData, barLayout);
+        const chartLayout = { title: `M/M SALES TURN OVER (${chartType.toUpperCase()})` };
+        if (mounted && chartNode) Plotly.newPlot(chartNode, chartData, chartLayout);
       } catch (err) {
         setError(err?.message || String(err));
       }
@@ -98,7 +107,7 @@ export default function GenerealSalesMargin({
         const Plotly = plotlyRef.current;
         if (Plotly) {
           if (pieNode) Plotly.purge(pieNode);
-          if (barNode) Plotly.purge(barNode);
+          if (chartNode) Plotly.purge(chartNode);
         }
       } catch (_) {}
     };
@@ -118,7 +127,7 @@ export default function GenerealSalesMargin({
       {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div>
-        <div ref={barRef} id="barChart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
+        <div ref={chartRef} id="chart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
 
         {/* Uncomment below to show pie chart */}
         {/* <div ref={pieRef} id="PIE" style={{ width: "100%", height: "50%" }} /> */}
