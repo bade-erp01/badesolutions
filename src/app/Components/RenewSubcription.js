@@ -50,7 +50,9 @@ const RenewSubscription = ({ business,baseUrl ,User}) => {
             <span>Priority support & feature updates</span>
           </div>
         </div>
-        <RenewButton id={Encrypt(business.tenantId)} baseUrl={baseUrl} User={Encrypt(User)}/>
+        {User.isAdmin &&(
+          <RenewButton id={Encrypt(business.tenantId)} baseUrl={baseUrl} User={Encrypt(User)}/>
+        )}
         <p className="mt-5 text-sm text-gray-500">
           Questions?{" "}
           <Link href="/Contact" className="text-blue-600 hover:underline">

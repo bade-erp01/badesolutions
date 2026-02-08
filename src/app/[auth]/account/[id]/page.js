@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { PhotoIcon, UserPlusIcon} from "@heroicons/react/24/outline";
+import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useState } from "react";
@@ -197,10 +198,10 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
               onClick={() => {
                 uploadFiles(Encrypt(formData._id), "Business");
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-300/50 text-black rounded-md shadow hover:bg-blue-600/50 transition"
             >
               <PhotoIcon className="h-5 w-5" />
-              <span className="text-sm font-medium">Upload</span>
+              <span className="text-sm font-medium ">Upload</span>
             </span>
           </div>
         </div>
@@ -209,41 +210,30 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
         <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
 
         {/* Attachment */}
-        <div className="flex items-center gap-3 bg-white shadow-md p-4 rounded-md">
-          <div className="shrink-0 w-10 h-10 overflow-hidden rounded-full border border-gray-300">
-            <Image
-            height={10}
-            width={10}
-              src={formData.currency?.currency.Flag}
-              alt={`${formData.currency?.currency.CountryName} Flag`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <span className="text-lg font-semibold text-gray-800">
-            {formData.currency?.currency.CountryName}
-          </span>
-        </div>
+        
+        <Link
+          href={`/${data?.companyName
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+              userInfo?.user._id
+            )}/Module/Forms/employee`}
+            className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            >
+                <UserPlusIcon class="h-6 w-6 text-gray-200"/>
+            Add user
+          </Link>
       </div>
 
       {/* Quick Actions */}
       <Section title="⚙️ Quick Actions">
         <div className="flex flex-wrap gap-4">
           {userInfo.user.isAdmin && formData.isActive && (
-          <Link
-          href={`/${data?.companyName
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-              userInfo?.user._id
-              )}/Module/Forms/employee`}
-              className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-              role="button"
-              tabIndex={0}
-              >
-                <UserPlusIcon class="h-6 w-6 text-gray-200"/>
-            Add user
-          </Link>
-
+            <>
+              <TermsAndConditionsLink BusinessPlan={data.subscriptionplan} />
+            </>
           )}
 
           {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
