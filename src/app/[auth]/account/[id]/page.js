@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { PhotoIcon, } from "@heroicons/react/24/outline";
+import { PhotoIcon, UserPlusIcon} from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useState } from "react";
@@ -9,7 +9,6 @@ import moment from "moment";
 import currency from "../../../../data/currencies.json";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import RenewButton from "@/app/Components/Renew"
 import {
   ErrorMessage,
   plsWait,
@@ -230,36 +229,22 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
       <Section title="⚙️ Quick Actions">
         <div className="flex flex-wrap gap-4">
           {userInfo.user.isAdmin && formData.isActive && (
-            <RenewButton />
-          )}
-
           <Link
-            href={`/${data?.companyName
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+          href={`/${data?.companyName
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
               userInfo?.user._id
-            )}/Module/Forms/employee`}
-            className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-            role="button"
-            tabIndex={0}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8 17l4 4 4-4m0-5V3m-8 4h8"
-              />
-            </svg>
+              )}/Module/Forms/employee`}
+              className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+              role="button"
+              tabIndex={0}
+              >
+                <UserPlusIcon class="h-6 w-6 text-gray-200"/>
             Add user
           </Link>
 
+          )}
 
           {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
             <span

@@ -7,8 +7,7 @@ import {Encrypt} from "../../../Functions/Functions"
 
 const RenewSubscription = ({ business,baseUrl ,User}) => {
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-200
- px-4 overflow-hidden">
+    <div className="relative flex items-center justify-center min-h-screen bg-linear-to-br from-orange-50 via-white to-orange-200 px-4 overflow-hidden">
       
       {/* Decorative Gradient Shape */}
       <div
