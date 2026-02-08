@@ -617,10 +617,10 @@ const generatePdf = async (business, customer, bill) => {
                     <button
                     title="Process this draft to order"
                     onClick={processInvoice}
-                    className="px-5 py-1.5 rounded-sm font-semibold text-base tracking-wide shadow-lg border bg-green-100 text-gray-900 border-green-300 inline-flex items-center justify-center hover:bg-green-200 hover:shadow-xl hover:border-green-400 transition duration-200 ease-in-out"
+                    className="px-5 py-2 rounded-sm font-semibold text-base tracking-wide shadow-lg border bg-gray-900/20  border-green-300 inline-flex items-center justify-center hover:bg-gray-900/50 hover:shadow-xl hover:border-green-400 transition duration-200 ease-in-out"
                     >
-                    <ShoppingCartIcon className="h-5 w-5 text-gray-900" /> {" "}
-                <span className="text-gray-500">Checkout Cart </span>
+                    <ShoppingCartIcon className="h-5 w-5 text-gray-100" /> {" "}
+                <span className="text-gray-100">Checkout Cart </span>
               </button>
             )}          
 
