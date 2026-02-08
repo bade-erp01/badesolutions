@@ -30,7 +30,7 @@ const RenewButton = ({id ,baseUrl,User}) => {
       customClass: {
         popup: "rounded-xl shadow-lg",
         confirmButton:
-          "bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all font-semibold",
+          "bg-indigo-400 text-white px-6 py-2 rounded-full hover:bg-indigo-500 transition-all font-semibold",
         cancelButton:
           "bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-300 transition-all font-medium",
       },
