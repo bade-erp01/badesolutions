@@ -1,12 +1,11 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import moment from "moment";
-import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import "animate.css";
 
 /**
  * GenerealSalesMargin
- * - Displays revenue by warehouse (pie chart) and monthly sales turnover (line chart)
+ * - Displays revenue by warehouse (pie chart) and monthly sales turnover (bar chart)
  * - Uses Plotly.js for rendering charts
  */
 export default function GenerealSalesMargin({
@@ -20,7 +19,7 @@ export default function GenerealSalesMargin({
   const [whs, setWhs] = useState(Array.isArray(warehouses) ? warehouses : []);
 
   const pieRef = useRef(null);
-  const lineRef = useRef(null);
+  const barRef = useRef(null);
   const plotlyRef = useRef(null);
 
   const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
@@ -59,7 +58,7 @@ export default function GenerealSalesMargin({
     let mounted = true;
 
     const pieNode = pieRef.current;
-    const lineNode = lineRef.current;
+    const barNode = barRef.current;
 
     (async () => {
       try {
@@ -75,12 +74,19 @@ export default function GenerealSalesMargin({
         const pieLayout = { title: "REVENUE GENERATION MARGIN" };
         if (mounted && pieNode) Plotly.newPlot(pieNode, pieData, pieLayout);
 
-        // Line chart: month-by-month
+        // BAR chart: month-by-month turnover
         const xArray = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
         const yArray = monthTotals.map((v) => Number(v.toFixed(2)));
-        const lineData = [{ x: xArray, y: yArray, type: "scatter", mode: "bar", marker: { color: businessColor } }];
-        const lineLayout = { title: "M/M SALES TURN OVER" };
-        if (mounted && lineNode) Plotly.newPlot(lineNode, lineData, lineLayout);
+        const barData = [
+          {
+            x: xArray,
+            y: yArray,
+            type: "bar",
+            marker: { color: businessColor },
+          },
+        ];
+        const barLayout = { title: "M/M SALES TURN OVER" };
+        if (mounted && barNode) Plotly.newPlot(barNode, barData, barLayout);
       } catch (err) {
         setError(err?.message || String(err));
       }
@@ -92,7 +98,7 @@ export default function GenerealSalesMargin({
         const Plotly = plotlyRef.current;
         if (Plotly) {
           if (pieNode) Plotly.purge(pieNode);
-          if (lineNode) Plotly.purge(lineNode);
+          if (barNode) Plotly.purge(barNode);
         }
       } catch (_) {}
     };
@@ -112,8 +118,8 @@ export default function GenerealSalesMargin({
       {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div>
-        <div ref={lineRef} id="myPlot" className="max-h-75" style={{ width: "100%", height: "25%" }} />
- 
+        <div ref={barRef} id="barChart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
+
         {/* Uncomment below to show pie chart */}
         {/* <div ref={pieRef} id="PIE" style={{ width: "100%", height: "50%" }} /> */}
       </div>
