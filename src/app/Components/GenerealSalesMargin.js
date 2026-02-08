@@ -79,7 +79,7 @@ export default function GenerealSalesMargin({
         const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
 
         // Randomize color
-        const colors = ["#FF5733", "#33FF57", "#3357FF", "#FFC300", "#8E44AD", "#16A085"];
+        const colors = ["#27272a", "#33FF57", "#FFC300", "#8E44AD", "#16A085"];
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
         // Monthly turnover chart
