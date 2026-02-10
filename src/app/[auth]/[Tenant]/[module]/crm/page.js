@@ -98,7 +98,7 @@ export default async function crmLayout({ params }) {
                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
               >
                 <ClipboardDocumentListIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Invoicing</span>
+                <span className="text-xs">Billing</span>
               </Link>
             )}
 

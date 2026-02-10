@@ -85,8 +85,8 @@ export default function DraftInvoicePage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-           dbConnect:`Bearer ${Business.rustyRoof}`,
-           access:`${Encrypt(user._id)}`
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            access:`${Encrypt(user._id)}`,
         },
       });
 
@@ -307,13 +307,13 @@ const generatePdf = async (business, customer, bill) => {
       throw new Error('Product not found')
      }
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order?order_id=${bill._id}&productId=${productId}&priceList=${Singlebill.customer.priceList}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(bill._id)}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
       const res = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-           dbConnect:`Bearer ${Business.rustyRoof}`,
-           access:`${Encrypt(user._id)}`
+           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+           access:`${Encrypt(user._id)}`,
         },
         body: JSON.stringify({ product: cleanedProducts.storeId }), // Ensure it's sent as an object
       });
@@ -350,13 +350,14 @@ const generatePdf = async (business, customer, bill) => {
         return;
       }
       plsWait("Deleting draft. Please wait.")
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/salesDelete?id=${Encrypt(bill._id)}&user=${Encrypt(user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/order/Delete/${Encrypt(bill._id)}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: { 
           "Content-Type": "application/json", 
-          dbConnect:`Bearer ${Business.rustyRoof}`,
-          access:`${Encrypt(user._id)}`
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access:`${Encrypt(user._id)}`,
+          "idempotency-key" : `delete-${bill._id}`
         },
       });
       const data = await response.json();
@@ -367,12 +368,12 @@ const generatePdf = async (business, customer, bill) => {
       } else {
         ErrorMessage(data.error || "Failed to delete draft invoice.");
         Swal.close();
-         router.refresh();
+        router.refresh();
       }
     } catch (error) {
       ErrorMessage(error.message || "Unexpected error occurred.");
       Swal.close();
-       router.refresh();
+      router.refresh();
     }
   };
 
@@ -396,8 +397,8 @@ const generatePdf = async (business, customer, bill) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          dbConnect:`Bearer ${Business.rustyRoof}`,
-          access:`${Encrypt(user._id)}`
+           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+           access:`${Encrypt(user._id)}`,
         },
         body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
       });
@@ -408,7 +409,7 @@ const generatePdf = async (business, customer, bill) => {
         SuccessToast(data.message);
 
         // ✅ Revalidate the invoice data (instead of reload)
-        mutate(`/api/storeApi/invoice/${billId}`);
+        mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${Encrypt(billId)}`);
         router.refresh();
       } else {
         throw new Error(data.error || "An unknown error occurred.");
@@ -456,9 +457,9 @@ const generatePdf = async (business, customer, bill) => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${Business._id}`,
-            dbConnect:`Bearer ${Business.rustyRoof}`,
-            access:`${Encrypt(user._id)}`
+            Authorization: `Bearer ${Encrypt(Business._id)}`,
+            access:`${Encrypt(user._id)}`,
+            "idempotency-key" : `invoice-${bill._id}`
           },
           body: JSON.stringify({ billId: bill._id, customer: Singlebill.customer._id,restriction:userInfo.business?.InvoiceRestriction }),
         }
@@ -491,8 +492,8 @@ const generatePdf = async (business, customer, bill) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          dbConnect:`Bearer ${Business.rustyRoof}`,
-          access:`${Encrypt(user._id)}`
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            access:`${Encrypt(user._id)}`,
         },
         body: JSON.stringify({ lineId, billId: bill._id }),
       });

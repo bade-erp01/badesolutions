@@ -9,7 +9,7 @@ import "animate.css";
  * - Uses Plotly.js for rendering charts
  */
 export default function GenerealSalesMargin({
-  businessColor = "27272a", // fallback color
+  businessColor = "#27272a", // fallback color
   yearlysales,
   warehouses,
 }) {
@@ -79,7 +79,7 @@ export default function GenerealSalesMargin({
         const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
 
         // Randomize color
-        const colors = ["#27272a", "#33FF57", "#FFC300", "#8E44AD", "#16A085"];
+        const colors = ["#27272a", "#FFC300", "#8E44AD", "#16A085"];
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
         // Monthly turnover chart

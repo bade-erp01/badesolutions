@@ -27,13 +27,14 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
       plsWait('Processing...')
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/payment/revoke/${id}?action=${action}&user=${userInfo.user._id}`,
+        `${EXPRESS_PRIVATE_URL}/api/payment/revoke/${Encrypt(id)}?action=${action}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-            access: `${Encrypt(userInfo.user._id)}`
+             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+             access: `${Encrypt(userInfo.user._id)}`,
+            "idempotency-key" : `payment-${action}-${id}`
           },
           body: JSON.stringify({ date: moment().format("L") }),
         }

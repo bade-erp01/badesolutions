@@ -626,6 +626,7 @@ export default function InvoicePage({
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
+            "idempotency-key" : `recalled-${option}-${bill._id}`
           },
           body: JSON.stringify({ id: Encrypt(orderId) }),
         }

@@ -70,6 +70,7 @@ export default async function layout({params}) {
     });
 
     const data = await res.json()
+    console.log(data)
 
     // decrypt the data
 
