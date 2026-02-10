@@ -300,7 +300,7 @@ const generatePdf = async (business, customer, bill) => {
       plsWait("Adding product...");
       // find the product and return the id
       const cleanedProducts = await products.find((product) => {
-        return product.item.ACDcode === productId ||  product.item.ADCcode === productId;
+        return product.item?.ACDcode === productId ||  product.item?.ADCcode === productId;
       });
 
      if(!cleanedProducts){
@@ -457,7 +457,7 @@ const generatePdf = async (business, customer, bill) => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business._id)}`,
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
             access:`${Encrypt(user._id)}`,
             "idempotency-key" : `invoice-${bill._id}`
           },
