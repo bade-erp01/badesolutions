@@ -13,7 +13,6 @@ const SalesDumpModal = ({ business, Employees }) => {
   const [ProductList, setProductList] = useState([]);
   const [StoreList, setStoreList] = useState([]);
   const [Vendors, setVendorList] = useState([]);
-  const [customers, setcustomers] = useState([]);
   
   const [filters, setFilters] = useState({
     startDate: "",
@@ -67,31 +66,11 @@ const SalesDumpModal = ({ business, Employees }) => {
     }
   };
 
-  // get customer details
-  const CustomerDetails = (id, field) => { 
-    try { 
-      const customer = customers.find((c) => c._id === id); 
-      return customer ? customer[field] : "N/A";
-    } catch (err) { 
-      return "N/A"; 
-    } 
-  };
-
   // GET REP / MANAGER
   const getEmployee = (id) =>{
     try{
       const Staff = Employees.find((s)=> s._id === id)
       return `${Staff.firstName} ${Staff.lastName}`
-    }catch(err){
-      return "N/A"
-    }
-  }
-
-  //get manager
-  const getManager = (id) =>{
-    try{
-       const customer = customers.find((c) => c._id === id);
-       return getEmployee(customer.accountManager.toString()) || "N/A"
     }catch(err){
       return "N/A"
     }
@@ -123,11 +102,11 @@ const SalesDumpModal = ({ business, Employees }) => {
             Store: getStoreName(sale.whId, stores),
             Invoicer: sale.RaiseBy,
             Customer: sale.customerName,
-            Rep:getEmployee(sale.salesPerson),
-            Manager:getManager(sale.customer),
-            Region: CustomerDetails(sale.customer,"Region"),
-            State: CustomerDetails(sale.customer,"state"),
-            merchandiser: CustomerDetails(sale.customer,"merchandiser"),
+            Rep:getEmployee(sale.customer.salesPerson),
+            Manager:getEmployee(sale.customer.Manager),
+            Region: sale.customer.Region,
+            State: sale.customer.state,
+            merchandiser: sale.customer?.merchandiser,
             product: getProductName(order.item._id, products),
             "Sys-Code": order.item.ACDcode || order.item.ADCcode,
             Trace: order.returnId,
@@ -252,7 +231,6 @@ const SalesDumpModal = ({ business, Employees }) => {
         setProductList(data.Products);
         setStoreList(data.Stores);
         setVendorList(data.Vendors);
-        setcustomers(data.customer);
 
         Swal.close();
 
