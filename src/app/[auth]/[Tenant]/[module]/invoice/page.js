@@ -74,7 +74,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
           <div className="border border-white/10 bg-gray-200 p-4 shadow-sm">
             <div className="border-b pb-4 mb-6">
               <h1 className="text-2xl font-bold text-gray-600">
-                Invoice Management
+                Sales Management
               </h1>
             </div>
           </div>
