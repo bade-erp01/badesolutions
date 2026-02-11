@@ -30,15 +30,15 @@ const FinancialOverview = ({ data }) => {
             "Non_current_liabilities",
             "Non_current_assets",
             "Cost_of_sales",
-          ].includes(key)
+          ].includes(key),
         )
-        .map(([_, account]) => account)
+        .map(([_, account]) => account),
     );
 
   const accs = allAccounts.flatMap((category) =>
     Object.entries(category)
       .filter(([key]) => key !== "accountCode")
-      .map(([_, account]) => account)
+      .map(([_, account]) => account),
   );
 
   const handleTransactionPageChange = (accountCode, direction, totalPages) => {
@@ -75,11 +75,8 @@ const FinancialOverview = ({ data }) => {
                       <th className="px-4 py-3 ">Code</th>
                       <th className="px-4 py-3 ">Description</th>
                       <th className="px-4 py-3 ">Account Type</th>
-                      <th className="px-4 py-3 ">
-                        Financial Statement
-                      </th>
+                      <th className="px-4 py-3 ">Financial Statement</th>
                       <th className="px-4 py-3 ">GL Bal</th>
-                      
                     </tr>
                   </thead>
                   <tbody className="divide-y bg-gray-50">
@@ -89,16 +86,17 @@ const FinancialOverview = ({ data }) => {
                         const currentPage = transactionPages[account.code] || 1;
                         const totalPages = Math.ceil(
                           (account.transactions?.length || 0) /
-                            itemsPerTransactionPage
+                            itemsPerTransactionPage,
                         );
                         const paginatedTransactions = account.transactions
                           ? account.transactions.slice(
                               (currentPage - 1) * itemsPerTransactionPage,
-                              currentPage * itemsPerTransactionPage
+                              currentPage * itemsPerTransactionPage,
                             )
                           : [];
 
                         return (
+                          <>
                           <tr
                             key={index}
                             className="hover:bg-gray-100 transition-colors"
@@ -161,7 +159,7 @@ const FinancialOverview = ({ data }) => {
                                                 >
                                                   <td>
                                                     {moment(entry.date).format(
-                                                      "YYYY-MM"
+                                                      "YYYY-MM",
                                                     )}
                                                   </td>
                                                   <td>{entry.amount}</td>
@@ -172,7 +170,7 @@ const FinancialOverview = ({ data }) => {
                                                   <td>{entry.reference}</td>
                                                   <td>{entry.Balance}</td>
                                                 </tr>
-                                              )
+                                              ),
                                             )}
                                           </tbody>
                                         </table>
@@ -185,7 +183,7 @@ const FinancialOverview = ({ data }) => {
                                             handleTransactionPageChange(
                                               account.code,
                                               "prev",
-                                              totalPages
+                                              totalPages,
                                             )
                                           }
                                           disabled={currentPage === 1}
@@ -201,7 +199,7 @@ const FinancialOverview = ({ data }) => {
                                             handleTransactionPageChange(
                                               account.code,
                                               "next",
-                                              totalPages
+                                              totalPages,
                                             )
                                           }
                                           disabled={currentPage === totalPages}
@@ -216,10 +214,54 @@ const FinancialOverview = ({ data }) => {
                                       No transactions available.
                                     </div>
                                   )}
+                                  {/* // snashot for monthly transaction capture */}
+                                  <div className="p-4 text-xs text-gray-300">
+                                      monthly transaction snapshots
+                                  </div>
+                                  {account.monthlyBalances.length > 0 ? (
+                                    <>
+                                      <div className="overflow-x-auto p-3 bg-gray-800">
+                                        <table className="min-w-full text-white bg-gray-800 rounded">
+                                          <thead className="bg-gray-700 text-white uppercase text-xs sticky top-0 z-10">
+                                            <tr>
+                                              <th className="text-left px-2 py-1">
+                                                Date
+                                              </th>
+                                              <th className="text-left px-2 py-1">
+                                                Amount
+                                              </th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {account.monthlyBalances.map(
+                                              (entry, idx) => (
+                                                <tr
+                                                  key={idx}
+                                                  className="text-xs"
+                                                >
+                                                  <td>
+                                                    {moment(entry.month).format(
+                                                      "YYYY-MM",
+                                                    )}
+                                                  </td>
+                                                  <td>Captured snapShot {entry.openingBalance}</td>
+                                                </tr>
+                                              ),
+                                            )}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="p-4 text-sm text-gray-300">
+                                      No Monthly Snaps available.
+                                    </div>
+                                  )}
                                 </div>
                               </details>
                             </td>
                           </tr>
+                          </>
                         );
                       })}
                   </tbody>

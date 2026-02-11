@@ -124,10 +124,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.totalInvoiceSale.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0.00
                     </td>
                     </tr>
 
@@ -171,16 +168,13 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* show list of rxpense category */}
-                            {initialData.directExpenseCat.map((cat,idx) =>(
+                            {initialData.ExpenseCats.filter((cat) => cat.type === "Direct").map((cat,idx) =>(
                               <p className="itaclic " key={idx}> {cat.NAME} </p>
                             ))}
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.directExpenses.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0
                     </td>
                     </tr>
 
@@ -195,7 +189,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0</td>
                     </tr>
 
                     <tr>
@@ -206,16 +200,13 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* lit of indirect expense */}
-                            {initialData.indirectExpenseCat.map((cat,idx) =>(
+                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").map((cat,idx) =>(
                               <p className="itaclic" key={idx}> {cat.NAME} </p>
                             ))}
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.Indirectexpense.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0
                     </td>
                     </tr>
 
@@ -248,10 +239,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                       <td className="cursor-pointer hover:bg-gray-50 font-bold ">
                         Taxes
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{initialData.Taxes.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0
                     </td>
                     </tr>
 

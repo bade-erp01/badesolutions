@@ -67,7 +67,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
       };
 
       const response = await axios.post(
-        `${EXPRESS_PRIVATE_URL}/${businessData.companyName}/Sales/Register-customer`,
+        `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
         formData,
         config
       );

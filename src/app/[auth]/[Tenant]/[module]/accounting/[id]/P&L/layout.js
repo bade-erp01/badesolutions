@@ -53,13 +53,9 @@ export const metadata = {
 
 export default async function layout({params}) {
   const userData = await fetchUser();
-  // First day of current month 
-  const firstDay = moment().startOf("month").format("YYYY-MM-DD"); 
-  // Last day of current month
-  const lastDay = moment().endOf("month").format("YYYY-MM-DD");
   
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const res = await fetch(`${baseUrl}/api/Generate/profitandLoss?startDate=${firstDay}&endDate=${lastDay}`, {
+    const res = await fetch(`${baseUrl}/api/Generate/profitandLoss`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -70,14 +66,6 @@ export default async function layout({params}) {
     });
 
     const data = await res.json()
-    console.log(data)
-
-    // decrypt the data
-
-    // if(!DecryptedData.pnl || !res.ok){
-    //   return notFound()
-    // }
-
   return (
     <Page userData={userData} Data={data} EXPRESS_PRIVATE_URL={baseUrl}/>
   )
