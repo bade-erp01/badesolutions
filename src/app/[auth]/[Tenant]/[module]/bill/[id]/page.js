@@ -833,7 +833,7 @@ export default function InvoicePage({
               >
                 < AdjustmentsVerticalIcon className="w-5 h-5 text-white" />
                 <span>
-                  Return/CN/{Singlebill.billStatus}
+                  Generate CN/Return
                 </span>
               </button>
               )}
