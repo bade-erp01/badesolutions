@@ -655,7 +655,7 @@ export default function DraftPurchasePage({
               priority
             />
             <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+               <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
                 {Business.companyName}
               </h3>
               <p className="text-gray-500 text-xl font-semibold">

@@ -137,7 +137,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
                 className="h-4 w-4 text-orange-500 border-gray-300 rounded"
               />
               <label className="ml-2 text-sm font-medium text-gray-700">
-                {formData.isActivated ? "Activate" : "Deactivate"}
+                {formData.isActivated ? "Activated" : "Deactivated"}
               </label>
             </div>
           </div>
