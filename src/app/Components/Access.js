@@ -1356,7 +1356,6 @@ export default function AccessControl({
 export function AssignTenantDropdown({businessInfo, businessData,userInfo,data }) {
   const [selectedTenant, setSelectedTenant] = useState(null);
   const [query, setQuery] = useState("");
-console.log(businessData)
 
   const filteredTenants =
     query === ""
