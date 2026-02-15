@@ -1,31 +1,66 @@
-import React from 'react'
-import SingleEmployeeView  from "./page"
-import { Dencrypt,Encrypt } from '../../../../../../../Functions/Functions'
-import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
-import Users from "../../../../../../../models/Users"
+import React from "react";
+import SingleEmployeeView from "./page";
+import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
+import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
+import Users from "../../../../../../../models/Users";
+import Businesses from "../../../../../../../models/Business";
+import Nav1 from "@/app/Components/Nav1";
+import Footer2 from "@/app/Components/Footer2";
+import BackButton from "@/app/Components/BackBotton";
 
-
-export default async function layout({children,params}) {
+export default async function layout({ children, params }) {
   const Params = await params;
   const userInfo = await fetchUser();
-    //  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    //   const res = await fetch(`${baseUrl}/api/EmployeeUpdate?userId=${Dencrypt(await Params?.id)}`, {
-    //     method: "GET",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       // "Authorization": `Bearer ${ userInfo.business.tenantId}`,
-    //       // dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
-    //       // access:`${Encrypt(userInfo.user._id)}`
-    //     }
-    //   })
-    const RawEmployee = await Users.findById(Dencrypt(Params?.id)).lean()
-    const StringedEmployee = JSON.stringify(RawEmployee)
-    const data = JSON.parse(StringedEmployee);
+  const RawEmployee = await Users.findById(Dencrypt(Params?.id))
+    .select("-password -opsCode")
+    .lean();
+  const StringedEmployee = JSON.stringify(RawEmployee);
+  const data = JSON.parse(StringedEmployee);
 
-    return (
-    <div>
-         <SingleEmployeeView userInfo={userInfo.user} businessInfo={userInfo.business} Backdata={data} module={Params?.module}/>
+  // get all business data
+  const RawBusiness = await Businesses.find({
+    isActive: true,
+    isVerified: true,
+  })
+    .select("tenantId companyName")
+    .lean();
+  const StringedBusiness = JSON.stringify(RawBusiness);
+  const businessData = JSON.parse(StringedBusiness);
+
+  return (
+    <div className="flex flex-col min-h-screen overflow-hidden">
+      <Nav1
+        user={userInfo.user}
+        business={userInfo.business}
+        page={`${RawEmployee?.firstName || "Unknown"} ${RawEmployee?.lastName || ""}`}
+      />
+      <div className="flex flex-1 text-white bt-2">
+        {/* Sidebar (collapsible on mobile) */}
+        <aside
+          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          style={{ overflowY: "auto" }}
+        >
+          <BackButton />
+          <hr />
+          <nav className="space-y-4  max-h-[83dvh] overflow-y-hidden ">
+           
+          </nav>
+        </aside>{" "}
+        {/* Main Content Area */}
+        <main className="flex-1 ">
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg  relative z-10 max-h-[82dvh] overflow-y-auto">
+            
+              <SingleEmployeeView
+                userInfo={userInfo.user}
+                businessInfo={userInfo.business}
+                Backdata={data}
+                module={Params?.module}
+                businessData={businessData}
+              />
+          </section>
+        </main>
+      </div>
+      <Footer2 />
     </div>
-   
-  )
+  );
 }

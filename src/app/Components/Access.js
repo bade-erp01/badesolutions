@@ -1,14 +1,27 @@
 "use client";
-import { UpdateEmployeeData } from "../../../Functions/Functions";
+import { UpdateEmployeeData ,EXPRESS_PRIVATE_URL} from "../../../Functions/Functions";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics";
 import { Encrypt } from "../../../Functions/Functions";
+import { Combobox } from "@headlessui/react";
+import Swal from "sweetalert2";
 
-export default function AccessControl({ userInfo, businessInfo, data }) {
+export default function AccessControl({
+  TenantData,
+  userInfo,
+  businessInfo,
+  data,
+}) {
   const [businessModules] = useState([...businessInfo.modules]);
   const [formData, setFormData] = useState({ ...data });
   const router = useRouter();
+
+  // get the business names 
+  const getBusinessName = (tenantId) => {
+    const tenant = TenantData.find((t) => t._id.toString() === tenantId.toString());
+    return tenant ? tenant.companyName : "Unknown Tenant";  
+  }
 
   const UpdateEmployeeModules = async (id, object) => {
     try {
@@ -61,13 +74,12 @@ export default function AccessControl({ userInfo, businessInfo, data }) {
     // Find the selected module by name
     const selectedAppName = name;
     const selectedModule = businessModules.find(
-      (mod) => mod.Name === selectedAppName
+      (mod) => mod.Name === selectedAppName,
     );
 
     // Call update function if module is found
     if (selectedModule) {
       UpdateEmployeeModules(formData._id, selectedModule);
-      
     }
   };
 
@@ -1249,7 +1261,7 @@ export default function AccessControl({ userInfo, businessInfo, data }) {
             {businessInfo?.modules && Array.isArray(businessInfo.modules) ? (
               businessInfo.modules.map((app, index) => {
                 const isChecked = formData.Apps?.some(
-                  (a) => a.Name === app.Name
+                  (a) => a.Name === app.Name,
                 );
 
                 return (
@@ -1305,6 +1317,142 @@ export default function AccessControl({ userInfo, businessInfo, data }) {
         </fieldset>
       </div>
       <hr />
+
+      {/* display all TenantData in a drop down */}
+      {userInfo?.isDev && (
+        <>
+          <AssignTenantDropdown businessData={TenantData} businessInfo={businessInfo} userInfo={userInfo} data={data}/>
+
+          {/* display all tenants assigned to the user account */}
+          <div className="mt-10">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">
+              Assigned Tenants
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {data?.toogledTenants?.filter((tenant) => tenant.tenantIds !== data.tenantId).map((tenant) => (
+                <span
+                  key={tenant._id}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-blue-200 hover:bg-blue-100 transition-colors duration-200"
+                >
+                  {getBusinessName(tenant.tenantIds)}
+                  <button
+                    onClick={() => handleRemoveTenant(tenant._id)}
+                    className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </form>
+  );
+}
+
+
+
+export function AssignTenantDropdown({businessInfo, businessData,userInfo,data }) {
+  const [selectedTenant, setSelectedTenant] = useState(null);
+  const [query, setQuery] = useState("");
+console.log(businessData)
+
+  const filteredTenants =
+    query === ""
+      ? businessData
+      : businessData.filter((tenant) =>
+          tenant.companyName.toLowerCase().includes(query.toLowerCase()),
+        );
+
+
+// handleTenantAssign
+const handleTenantAssign = async (tenantId) => {
+  try {
+    const result = await Swal.fire({
+      title: "Assign Tenant?",
+      text: "Are you sure you want to assign this tenant?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#30d6b2",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, assign it",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      plsWait('Assigning tenant...');
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/assign-tenant/${Encrypt(data._id)}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(businessInfo._id)}`,
+            access: `${Encrypt(userInfo._id)}`,
+          },
+          body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
+        }
+      );
+
+      if (response.ok) {
+        SuccessToast(response.message || "Tenant assigned successfully.");
+        setQuery("");
+        setSelectedTenant(null);
+        window.location.reload();
+      } else {
+        throw new Error("Failed to assign tenant.");
+      }
+    }
+  } catch (error) {
+    setQuery("");
+    setSelectedTenant(null);
+    ErrorMessage(error.message);
+  }
+};
+
+  return (
+    <div className="mt-10 space-y-10">
+      <fieldset className="grid grid-cols-4 gap-4">
+        <legend className="text-sm font-semibold text-gray-900 col-span-4">
+          Assign Tenant
+        </legend>
+
+        <div className="col-span-4">
+          <Combobox
+            value={selectedTenant}
+            onChange={(tenant) => {
+              setSelectedTenant(tenant);
+              handleTenantAssign(tenant.tenantId);
+            }}
+          >
+            <Combobox.Input
+              className="w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs"
+              displayValue={(tenant) => tenant?.companyName || ""}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search tenant..."
+            />
+            <Combobox.Options className="mt-2 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
+              {filteredTenants.length === 0 && (
+                <div className="px-4 py-2 text-gray-500">No tenants found</div>
+              )}
+              {filteredTenants.map((tenant) => (
+                <Combobox.Option
+                  key={tenant.tenantId}
+                  value={tenant}
+                  className={({ active }) =>
+                    `cursor-pointer px-4 py-2 text-xs ${
+                      active ? "bg-blue-600 text-white" : "text-gray-900"
+                    }`
+                  }
+                >
+                  {tenant.companyName}
+                </Combobox.Option>
+              ))}
+            </Combobox.Options>
+          </Combobox>
+        </div>
+      </fieldset>
+    </div>
   );
 }

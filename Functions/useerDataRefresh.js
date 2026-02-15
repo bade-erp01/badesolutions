@@ -38,9 +38,8 @@ const fetchUser = async () => {
     // Fetch user & business details
     const rawUserInfo = await User.findById(decodedUser.data)
       .select("-password -__v -createdAt -updatedAt -opsCode")
-      .populate("toogledTenants", "tenantId")
       .lean();
-
+      
     if (!rawUserInfo) {
       return { error: "User information not found." };
     }

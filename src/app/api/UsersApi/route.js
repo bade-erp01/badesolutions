@@ -7,51 +7,6 @@ import { NextResponse } from 'next/server';
 import * as yup from 'yup';
 
 
-// Replace direct MongoDB client usage with Mongoose models
-// Example for GET request
-export async function GET(request) {
-  try {
-    const authHeader = request.headers.get("authorization");
-    const dbHeader = request.headers.get("dbConnect");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    if (!dbHeader || !dbHeader.startsWith("Bearer ")) {
-      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-
-    const token = authHeader.split(" ")[1];
-    const dbtoken = dbHeader.split(" ")[1];
-    // Ensure Mongoose connection is established
-    await dbConnect(Encrypt("BadeAdmin"));
-    const employees = await Users.findByTenant(token);
-    return new NextResponse(JSON.stringify(employees), {
-      status: 200,
-      headers: { "Content-Type": "application/json",
-      'Cache-Control': 'public, max-age=180, stale-while-revalidate=300', },
-    });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        message: "Internal Server Error",
-        error: error.message,
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  }
-}
-
 // Update other methods (POST, PUT, PATCH, DELETE) similarly to use Mongoose models instead of raw MongoDB client.
 export async function POST(request) {
   try {
@@ -188,25 +143,3 @@ export async function PATCH(request) {
     );
   }
 }
-
-// export async function DELETE(request) {
-//   try {
-//     const { id } = await request.json();
-//     const result = await Users.findByIdAndDelete(id);
-//     return new Response(JSON.stringify(result), {
-//       status: 200,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   } catch (error) {
-//     return new Response(
-//       JSON.stringify({
-//         message: "Internal Server Error",
-//         error: formatMongooseError(error),
-//       }),
-//       {
-//         status: 500,
-//         headers: { "Content-Type": "application/json" },
-//       }
-//     );
-//   }
-// }

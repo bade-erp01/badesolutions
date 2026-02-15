@@ -33,6 +33,7 @@ export default function SingleEmployeeView({
   businessInfo,
   Backdata,
   module,
+  businessData
 }) {
   const states = NaijaStates.states();
   let [user] = useState(userInfo || {});
@@ -365,7 +366,7 @@ const getStatus = (lastSeen) => {
 
   return (
     <>
-      <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2">
+      <div className="m-3 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2">
         {/* form starts here */}
         <div className="space-y-5 mx-auto">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -374,7 +375,7 @@ const getStatus = (lastSeen) => {
               &apos;s profile
             </h4>
             <span
-              className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
+              className={`px-5 py-1.5 rounded-full font-semibold text-sm tracking-wide shadow-sm border ${
                 data.lastSeen === ""
                   ? "bg-red-50 text-red-600 border-red-200"
                   : "bg-green-50 text-green-700 border-green-200"
@@ -1273,7 +1274,7 @@ const getStatus = (lastSeen) => {
                   </p>
 
                   <div className="mt-10 space-y-10 ">
-                    <AccessControl businessInfo={businessInfo} data={data} />
+                    <AccessControl userInfo={userInfo} TenantData={businessData} businessInfo={businessInfo} data={data} />
                   </div>
                 </div>
               </div>

@@ -7,23 +7,24 @@ import "animate.css";
 import {
   Squares2X2Icon,
   MagnifyingGlassIcon,
+  PowerIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Encrypt } from "../../../Functions/Functions";
-import {plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics"
+import { Encrypt, EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 import { useRouter } from "next/navigation";
 import moment from "moment";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 
 export default function Nav1({ page, Module, user, business }) {
@@ -36,6 +37,47 @@ export default function Nav1({ page, Module, user, business }) {
   const [location, setLocation] = useState("Loading location...");
   const [searchTerm, setSearchTerm] = useState("");
 
+  const handleTenantSwitch = async (tenantId) => {
+    const result = await Swal.fire({
+      title: "Confirm Tenant Switch",
+      text: "Are you sure you want to switch to this tenant?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, switch",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      plsWait("Please wait while we switch your tenant...");
+
+      try {
+        // Example API call or navigation
+        const response = await fetch(
+          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(user._id)}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(business.tenantId)}`,
+              access: `${Encrypt(user._id)}`,
+            },
+            body: JSON.stringify({ tenantId }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to switch tenant.");
+        }
+        SuccessToast(response.message || "Tenant switched successfully.");
+        router.refresh();
+      } catch (error) {
+        ErrorMessage("An error occurred while switching tenant.");
+      }
+    }
+  };
+
   useEffect(() => {
     const now = new Date();
     setTime(moment().format("HH:mm"));
@@ -46,7 +88,7 @@ export default function Nav1({ page, Module, user, business }) {
           const { latitude, longitude } = pos.coords;
           try {
             const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
             );
             const data = await res.json();
             setLocation(
@@ -54,13 +96,13 @@ export default function Nav1({ page, Module, user, business }) {
                 data.address.town ||
                 data.address.village ||
                 data.address.state ||
-                "Your area"
+                "Your area",
             );
           } catch {
             setLocation("Your area");
           }
         },
-        () => setLocation("Your area")
+        () => setLocation("Your area"),
       );
     } else {
       setLocation("Your area");
@@ -80,13 +122,13 @@ export default function Nav1({ page, Module, user, business }) {
       return;
     }
 
-    plsWait(`Searching for "${trimmedTerm}" in the ${page} list...`)
+    plsWait(`Searching for "${trimmedTerm}" in the ${page} list...`);
 
     setTimeout(() => {
       router.push(
         `/Search/${encodeURIComponent(page)}?search=${encodeURIComponent(
-          trimmedTerm
-        )}`
+          trimmedTerm,
+        )}`,
       );
       Swal.close();
       setSearchTerm("");
@@ -111,9 +153,7 @@ export default function Nav1({ page, Module, user, business }) {
 
   return (
     <>
-       <header
-        className="w-full flex items-center justify-between px-4 py-4 z-20 relative "
-      >
+      <header className="w-full flex items-center justify-between px-4 py-4 z-20 relative ">
         <nav className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
           <div className="container mx-auto flex justify-between items-center">
             {/* Logo */}
@@ -190,7 +230,9 @@ export default function Nav1({ page, Module, user, business }) {
                   {/* User Dropdown */}
                   <Popover className="relative inline-block text-left">
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" className="p-0 rounded-full"
+                      <Button
+                        variant="ghost"
+                        className="p-0 rounded-full"
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         aria-expanded={isDropdownOpen}
                         aria-haspopup="true"
@@ -211,22 +253,56 @@ export default function Nav1({ page, Module, user, business }) {
                     </PopoverTrigger>
 
                     {isDropdownOpen && (
-                     <PopoverContent className="w-80">
+                      <PopoverContent className="w-80">
                         <div className="py-1" role="none">
                           <p
-                            className="text-gray-500 px-4 py-2 text-sm"
+                            className="text-green-700 px-4 py-2 text-sm"
                             role="menuitem"
+                            title="Active Business account"
                           >
-                            🏢 {business.companyName.toUpperCase()}
+                            <PowerIcon className="w-4 h-4 inline mr-2" />
+                            {business.companyName.toUpperCase()}
                           </p>
                           <hr className="border-gray-200" />
                           <p
                             className="text-gray-500 px-4 py-2 text-sm"
                             role="menuitem"
                           >
-                            Signed in as <br /> {user?.Email.slice(0,10) || "Guest"}...
+                            Signed in as <br />{" "}
+                            {user?.Email.slice(0, 20) || "Guest"}...
                           </p>
                           <hr className="border-gray-200" />
+
+                          {user.toogledTenants.length > 0 && (
+                            <>
+                              <div
+                                className="max-h-48 overflow-y-auto px-4 py-2 text-sm text-gray-700 border rounded-md"
+                                role="menuitem"
+                              >
+                                {user.toogledTenants
+                                  .filter(
+                                    (tenant) =>
+                                      tenant.tenantIds !== user.tenantId,
+                                  )
+                                  .map((tenant, index) => (
+                                    <button
+                                      key={tenant._id || index}
+                                      className="w-full text-left text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors duration-200"
+                                      onClick={() =>
+                                        handleTenantSwitch(
+                                          Encrypt(tenant.tenantIds),
+                                        )
+                                      }
+                                    >
+                                      🔄 Switch to{" "}
+                                      {tenant.companyName ||
+                                        `Tenant ${index + 1}`}
+                                    </button>
+                                  ))}
+                              </div>
+                              <hr className="border-gray-200" />
+                            </>
+                          )}
 
                           {user?.isAdmin && (
                             <Link
