@@ -125,7 +125,15 @@ export default async function storelayout({ children, params }) {
 
             {data.products.length > 0 && (
               <ExcelDownloadBtn
-                data={data.products}
+                data={data.products.map((product) => ({
+                  id: product._id,
+                  Name: product.productName,
+                  Case: product.currentQty,
+                  Pcs: product.pcs,
+                  ExpDate: product.expiryDate,
+                  Category: product.category,
+                  isActivated: product.isActivated,
+                }))}
                 page={`${data.Store?.WHName || "Store"} inventory`}
               />
             )}
