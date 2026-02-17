@@ -203,7 +203,7 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
               <label className="block text-xs font-semibold text-gray-900 mb-2" htmlFor="ResidualValue">Depreciation Rate</label>
               {!DecryptedAsset.runDepreciation ? (
                 <input
-                  value={Number(formData.ResidualValue?.$numberDecimal) || 0}
+                  value={Number(formData.ResidualValue?.$numberDecimal)}
                   id="ResidualValue"
                   name="ResidualValue"
                   required
