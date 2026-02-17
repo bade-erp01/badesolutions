@@ -8,7 +8,7 @@ import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import StockReportModal from "@/app/Components/Reports/StockReport";
 import StockandSalesReport from "@/app/Components/Reports/StockandSalesReport";
-import BulkUploader from "@/app/Components/BulkUploadProduct";
+import BulkUpdate from "@/app/Components/bulkUpdate"
 import { Encrypt } from "../../../../../../Functions/Functions";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
@@ -120,11 +120,50 @@ export default async function Productlayout({ children, params }) {
 
               <PurchaseDumpModal  business={userData.business} EXPRESS_PRIVATE_URL={baseUrl}  Products={productList} storesData={storeList} vendorsData={vendorList} />
 
-              {/* {userData?.user?.isAdmin && (
-                <BulkUploader tenantId={userData} collectionName="product" />
-              )} */}
+              <ExcelDownloadBtn 
+                data={productList.sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
+                  .map(product => ({
+                  id: product._id,
+                  Name: product.Name,
+                  Description: product.Description,
+                  category: product.category,
+                  sub_category:product.subcategory,
+                  Manufacturer:product.Manufacturer,
+                  code: product.ADCcode || product.ACDcode,
+                  Sales_count: product.TotalSale,
+                  Pieces:product.Pieces,
+                  Buying_Price: product.BuyingPrice,
+                  Manufacture_code: product.Manufacture_code,
+                  FOC: product.isAservice ? "Yes" : "No",
+                  Pricelist1: product.Pricelist1 || 0,
+                  Pricelist2: product.Pricelist2 || 0,
+                  Pricelist3: product.Pricelist3 || 0,
+                  Pricelist4: product.Pricelist4 || 0,
+                  Pricelist5: product.Pricelist5 || 0,
+                  Pricelist6: product.Pricelist6 || 0,
+                  Pricelist7: product.Pricelist7 || 0,
+                  Pricelist1Promo: product.Pricelist1Promo || 0,
+                  Pricelist2Promo: product.Pricelist2Promo || 0,
+                  Pricelist3Promo: product.Pricelist3Promo || 0,
+                  Pricelist4Promo: product.Pricelist4Promo || 0,
+                  Pricelist5Promo: product.Pricelist5Promo || 0,
+                  Pricelist6Promo: product.Pricelist6Promo || 0,
+                  Pricelist7Promo: product.Pricelist7Promo || 0,
+                  Pricelist1_PromoEndDate: product.Pricelist1PromoDate || "",
+                  Pricelist2_PromoEndDate: product.Pricelist2PromoDate || "",
+                  Pricelist3_PromoEndDate: product.Pricelist3PromoDate || "",
+                  Pricelist4_PromoEndDate: product.Pricelist4PromoDate || "",
+                  Pricelist5_PromoEndDate: product.Pricelist5PromoDate || "",
+                  Pricelist6_PromoEndDate: product.Pricelist6PromoDate || "",
+                  Pricelist7_PromoEndDate: product.Pricelist7PromoDate || "",
+                }))} 
+                page="product" 
+              />
 
-              <ExcelDownloadBtn data={productList} page="product" />
+              {userData?.user?.isAdmin && (
+                <BulkUpdate tenantId={userData} collectionName="product" WHID={""} />
+              )}
+
             </nav>
           </aside>
 

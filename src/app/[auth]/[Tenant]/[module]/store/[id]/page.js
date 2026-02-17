@@ -14,6 +14,7 @@ import {
   ClipboardDocumentCheckIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
+import BulkUpdate from "@/app/Components/bulkUpdate"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -136,6 +137,10 @@ export default async function storelayout({ children, params }) {
                 }))}
                 page={`${data.Store?.WHName || "Store"} inventory`}
               />
+            )}
+
+            {userData.user.isAdmin && (
+             < BulkUpdate tenantId={userData} collectionName={"inventory"} WHID={data.Store._id} />
             )}
           </nav>
         </aside>{" "}
