@@ -8,10 +8,7 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import StoreChart from "@/app/Components/StoreChart";
 import { Encrypt } from "../../../../../../../Functions/Functions";
 import {
-  ChartPieIcon,
-  UserGroupIcon,
   ShoppingCartIcon,
-  ClipboardDocumentCheckIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import BulkUpdate from "@/app/Components/bulkUpdate"

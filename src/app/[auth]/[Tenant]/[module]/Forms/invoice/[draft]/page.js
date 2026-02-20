@@ -503,7 +503,7 @@ const generatePdf = async (business, customer, bill) => {
       if (data.message) {
         SuccessToast(data.message);
 
-        // ✅ Refresh invoice data instead of reloading the page
+        // Refresh invoice data instead of reloading the page
         // mutate(`/api/invoice/${billId}`);
         router.refresh();
       } else {

@@ -44,7 +44,7 @@ export default function InvoicePage({
   const [Singlebill,setSinglebill] = useState(SinglebillItem);
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
 
-  // 🛠️ Safe image loader as Data URL
+  //  Safe image loader as Data URL
   const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
     return new Promise((resolve, reject) => {
       const img = new window.Image();
@@ -58,7 +58,7 @@ export default function InvoicePage({
         // Draw image
         ctx.drawImage(img, 0, 0);
 
-        // 💧 Add watermark (bottom right)
+        // Add watermark (bottom right)
 
         ctx.font = "italic bold 16px 'Courier New'";
         ctx.textAlign = "center"; // Or "left" depending on your layout
@@ -75,7 +75,7 @@ export default function InvoicePage({
     });
   };
 
-  // 📄 Full PDF generator
+  //  Full PDF generator
   const generatePdf = async (business, customer, bill) => {
     try {
       plsWait("Setting things up, Ensure your printer is connected ⌛...");
@@ -87,7 +87,7 @@ export default function InvoicePage({
       const margin = 10;
       let currentY = margin;
 
-      // 🖼️ Logo
+      //  Logo
       if (business.companyLogo) {
         try {
           const logo = await loadImageAsDataURL(business.companyLogo);
@@ -118,12 +118,12 @@ export default function InvoicePage({
 
       currentY = 50;
 
-      // 🚚 Customer Info + 🔳 QR Code in same row
+      // Customer Info + 🔳 QR Code in same row
       doc.setFontSize(17).setTextColor(0, 0, 0).setFont("helvetica", "bold");
       doc.text(
         `${bill.billStatus?.slice(0, 3).toUpperCase()}/${
           bill.billReferenceNo
-        }/${bill.invoicelocation}`,
+        }`,
         10,
         currentY
       );
@@ -148,7 +148,7 @@ export default function InvoicePage({
 
       currentY += 2;
 
-      // 🧾 Bill Metadata
+      //  Bill Metadata
       autoTable(doc, {
         startY: currentY,
         tableWidth: 80,
@@ -171,7 +171,7 @@ export default function InvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      // 📊 Invoice Table
+      //  Invoice Table
       autoTable(doc, {
         startY: currentY,
         head: [
@@ -203,7 +203,7 @@ export default function InvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      // 💰 Summary Table
+      //  Summary Table
       autoTable(doc, {
         startY: currentY,
         tableWidth: 80,
@@ -224,7 +224,7 @@ export default function InvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      // ✍️ Signatures
+      //  Signatures
       doc.setFontSize(7);
       doc.text(
         `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
@@ -251,11 +251,11 @@ export default function InvoicePage({
         currentY += 10;
       }
 
-      // 📎 Footer
+      //  Footer
       // doc.setFontSize(9);
       // doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
 
-      // 📄 Page Numbers
+      //  Page Numbers
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -267,7 +267,7 @@ export default function InvoicePage({
         );
       }
 
-      // 🖨️ Preview or Save
+      //  Preview or Save
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       const win = window.open(url, "_blank");
@@ -328,7 +328,7 @@ export default function InvoicePage({
           if (data.message) {
             SuccessToast(data.message);
     
-            // ✅ Revalidate the invoice data (instead of reload)
+            //  Revalidate the invoice data (instead of reload)
             setSinglebill(Dencrypt(data.Updatedinvoice))
             mutate(`/api/storeApi/invoice/${billId}`);
             Router.refresh();
@@ -394,7 +394,7 @@ export default function InvoicePage({
       const margin = 10;
       let currentY = margin;
 
-      // 🖼️ Logo
+      //  Logo
       if (business.companyLogo) {
         try {
           const logoDataURL = await loadImageAsDataURL(business.companyLogo);
@@ -413,7 +413,7 @@ export default function InvoicePage({
         }
       }
 
-      // 🏢 Business Info
+      //  Business Info
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
       doc.text(business.companyName, pageWidth - margin, currentY + 5, {
@@ -443,11 +443,11 @@ export default function InvoicePage({
 
       currentY += 50;
 
-      // 🔳 QR Code
+      //  QR Code
       const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
       doc.addImage(qrDataURL, "PNG", pageWidth - margin - 30, currentY, 30, 30);
 
-      // 🚚 Customer Info
+      // Customer Info
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
       doc.text(`${bill.WayBillNo}`, margin, currentY);
@@ -474,7 +474,7 @@ export default function InvoicePage({
             `${bill.billStatus} No:`,
             `${bill.billStatus?.slice(0, 3).toUpperCase()}/${
               bill.billReferenceNo
-            }/${bill.invoicelocation}`,
+            }`,
           ],
           // ["Order Date:", bill.startDate || ""],
           // ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
@@ -487,7 +487,7 @@ export default function InvoicePage({
         },
       });
 
-      // 📊 Invoice Table with Pagination
+      //  Invoice Table with Pagination
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 5,
         head: [["#", "Product", "Code", "Case", "Pcs"]],

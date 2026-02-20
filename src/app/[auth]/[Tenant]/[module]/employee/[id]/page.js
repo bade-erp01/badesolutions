@@ -1332,7 +1332,7 @@ const getStatus = (lastSeen) => {
               </button> */}
                 <button
                   type="submit"
-                  onClick={() => sendInvite(Encrypt(data._id))}
+                  onClick={() => sendInvite(Encrypt(data._id),`${EXPRESS_PRIVATE_URL}`,Encrypt(userInfo._id),Encrypt(businessInfo.tenantId))}
                   className="inline-flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-400 transition"
                 >
                   <svg

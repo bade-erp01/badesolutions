@@ -131,7 +131,7 @@ export function Encrypt(arg) {
   );
 }
 
-export async function sendInvite(id) {
+export async function sendInvite(id,url,user,biz) {
   const { isConfirmed } = await Swal.fire({
     title: "Invite User?",
     html: `
@@ -188,11 +188,13 @@ export async function sendInvite(id) {
   });
 
   try {
-    const response = await fetch(`/api/EmployeeUpdate/invitation/${encodeURIComponent(id)}`, {
+    const response = await fetch(`${url}/onboard/mail/${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${biz}`,
+        access: `${user}`,
       },
     });
 
