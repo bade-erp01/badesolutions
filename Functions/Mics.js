@@ -188,7 +188,7 @@ export async function sendInvite(id,url,user,biz) {
   });
 
   try {
-    const response = await fetch(`${url}/onboard/mail/${encodeURIComponent(id)}`, {
+    const response = await fetch(`${url}/api/onboard/invite/${id}`, {
       method: "PATCH",
       headers: {
         Accept: "application/json",
