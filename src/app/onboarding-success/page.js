@@ -21,8 +21,8 @@ export default function OnboardingSuccess() {
           </h1>
           <p className="text-gray-600 mb-6">
             Congratulations on successfully completing your onboarding. Your
-            business is almost ready to thrive with us. We sent you a welcome
-            email with all the details. If you have any questions, feel free to
+            business is almost ready to thrive with us. We sent you an activation
+            email.If you have any questions, feel free to
             reach out to our support team. Let's get started on this exciting
             journey together!
           </p>
