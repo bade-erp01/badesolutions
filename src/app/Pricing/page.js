@@ -26,8 +26,11 @@ export default function Pricing() {
                 {/* Header Section */}
                 <div className="text-center mb-12">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Small Price for Huge productivity boost
+                       User friendly cloud based ERP to boost productivity.
                     </h1>
+                    <p className="text-black/50 text-md mt-2 font-semibold tracking-wide">
+                        Trusted by forward-thinking individuals and businesses worldwide.
+                    </p>
                     <div className="w-full text-center mt-6">
                     <Marquee gradient={false} speed={40} className="w-full py-3">
                     <div className="flex items-center gap-4 px-4">
@@ -55,9 +58,6 @@ export default function Pricing() {
                         ))}
                     </div>
                     </Marquee>
-                    <p className="text-black/50 text-md mt-2 font-semibold tracking-wide">
-                        Trusted by forward-thinking individuals and businesses worldwide.
-                    </p>
                     </div>
                 </div>
                 {/* Pricing Cards */}
@@ -65,16 +65,16 @@ export default function Pricing() {
                     {/* Personal Plan */}
                     <div className="bg-white shadow-lg rounded-lg p-6 text-center">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Basic License</h3>
-                         <p className="text-sm text-gray-700 mb-4">For Small SME&lsquo;S</p>
-                        <div className="text-xl font-bold mb-2"><strike>₦2,500/ user / Month</strike></div>
-                        <button disabled onClick={()=>(router.push('/auth/SignUp?plan=Basic'))} className="w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
-                          <strike> Get Basic License</strike>
+                         <p className="text-sm text-gray-700 mb-4">For SME&lsquo;S</p>
+                        <div className="text-xl font-bold mb-2">₦2,500/ user / Month</div>
+                        <button  onClick={()=>(router.push('/auth/SignUp?plan=Basic'))} className="w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
+                          Get Basic License
                         </button>
                         <ul className="text-sm text-gray-600 mt-4 space-y-2">
-                            {/* <li>1 Admin User</li>
-                            <li>Email support</li>
-                            <li>Limited API usage</li> */}
-                            <li>Comming Soon</li>
+                            {/* <li>Email support</li> */}
+                            <li>Access Sales modules only</li>
+                            <li>Limited Api Access</li>
+                            <li>Default 4 Active users</li>
                         </ul>
                     </div>
                     {/* Standard Plan */}
@@ -87,15 +87,16 @@ export default function Pricing() {
                             Get Standard License
                         </button>
                         <ul className="text-sm text-gray-300 mt-4 space-y-2">
-                            <li>Trained Business AI Model</li>
+                            <li>Multi Business Management</li>
                             <li>Private Cloud Backup</li>
-                            <li>Api Support for Financial / Reporting Tools</li>
+                            <li>Api for Financial / Reporting Tools</li>
                             <li>Request Customized module</li>
                             <li>5G Wifi router (Aitel,MTN,Glo)</li>
-                            <li>Google S.E.O</li>
-                            <li>Dedicated storage Bucket</li>
-                            <li>Basic Deployment Support</li>
-                            <li>1 Customized Business Email</li>
+                            <li>Dedicated 3GB storage</li>
+                            <li>Training / Support</li>
+                            <li>Access to Bade Accounting Modules</li>
+                            <li>Access to App Store</li>
+                            <li>Default 6 Active users</li>
                         </ul>
                     </div>
                     {/* Pro Plan */}
@@ -111,12 +112,15 @@ export default function Pricing() {
                             <li>VPS (Virtual Private Server)</li>
                             <li>Customized Business Email</li>
                             <li>Priority support</li>
-                            {/* <li>Unlimited Api Access</li> */}
+                            <li>Unlimited Api Access</li>
                             <li>Google S.E.O</li>
+                            <li>Dedicated 32GB storage</li>
                             <li>Email & Phone support</li>
                             <li>Trained Business AI Model</li>
                             <li>Private Cloud Backup</li>
+                            <li>Dedicated cloud server</li>
                             <li>Api Support for Financial / Reporting Tools</li>
+                            
                         </ul>
                     </div>
                 </div>

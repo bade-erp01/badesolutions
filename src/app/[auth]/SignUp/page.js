@@ -1,34 +1,35 @@
 "use client";
 
-import { termsAndConditions } from "../../../../Functions/Functions";
+import { termsAndConditions, Encrypt } from "../../../../Functions/Functions";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Nav1 from "@/app/Components/Nav1";
 import Footer1 from "@/app/Components/Footer1";
-import Link from "next/link"
+import Link from "next/link";
 import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 
 export default function SignUpPage() {
   const params = useSearchParams();
   const plan = params.get("plan");
 
+  // check plan and ensure the match Basic or Standard
+  useEffect(() => {
+    if (plan !== "Basic" && plan !== "Standard") {
+      window.location.href = "/"; // Redirect to home if plan is invalid
+    }
+  }, [plan]);
+
   const [formData, setFormData] = useState({
     CompayName: "",
     email: "",
     Tel: "",
     plan: plan,
-    NumberOfUsers: "",
-    totalAmount: 0,
+    NumberOfUsers: plan === "Basic" ? 4 : 6,
+    renewalFee: plan === "Basic" ? 129000 : 309600,
+    totalAmount: plan === "Basic" ? 129000 : 379600,
+    referalCode: "",
   });
-
-  useEffect(() => {
-    const numberOfUsers = parseInt(formData.NumberOfUsers) || 0;
-    const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
-    const vat = baseAmount * numberOfUsers * 0.075;
-    const total = (baseAmount * numberOfUsers + vat) * 12;
-    setFormData((prev) => ({ ...prev, totalAmount: total }));
-  }, [formData.plan, formData.NumberOfUsers]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,7 +44,7 @@ export default function SignUpPage() {
     <>
       <Nav1 />
       <div className="min-h-screen flex items-center justify-center mb-4 ">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white/60 backdrop-blur-md rounded-xl shadow-2xl p-4">
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white backdrop-blur-md rounded-sm shadow-2xl p-4">
           {/* Left Section: Illustration */}
           <div className="flex justify-center">
             <Image
@@ -59,15 +60,15 @@ export default function SignUpPage() {
           </div>
 
           {/* Right Section: Sign-Up Form */}
-          <div className="w-full">
-            <h1 className="text-2xl font-extrabold text-gray-800 mb-2">
+          <div className="w-full bg-gray-300 p-4 shadow-lg rounded-sm border-lg animate__animated animate__fadeInUpBig animate__delay-2s">
+            <h1 className="text-2xl font-extrabold text-gray-800 mb-2 text-black">
               Sign up~{formData.plan} License
             </h1>
-            <p className="text-gray-600 mb-6 font-semibold">
+            <p className="text-gray-600 mb-6 font-semibold text-xs text-black">
               Business Automated Dynamic Enterprise [B.A.D.E]
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs ">
+            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <input
                 type="text"
                 name="CompayName"
@@ -75,7 +76,7 @@ export default function SignUpPage() {
                 value={formData.CompayName}
                 required
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
               />
               <input
                 type="email"
@@ -84,7 +85,7 @@ export default function SignUpPage() {
                 value={formData.email}
                 required
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
               />
               <input
                 type="tel"
@@ -93,46 +94,57 @@ export default function SignUpPage() {
                 value={formData.Tel}
                 required
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
               />
 
               <div>
-                <label className="block text-md font-bold text-gray-700 mb-1">
-                  Number of Users
+                <label className="block text-md font-bold text-gray-700 mb-1 text-black">
+                  Referal code
                 </label>
                 <input
-                  type="number"
-                  name="NumberOfUsers"
-                  placeholder="e.g. 5"
-                  value={formData.NumberOfUsers}
-                  required
-                  min={1}
+                  type="text"
+                  name="referalCode"
+                  placeholder="Referal Code"
+                  value={formData.referalCode}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 text-center text-lg bg-gray-100 font-bold rounded-lg focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
                 />
               </div>
 
               {formData.NumberOfUsers > 0 && (
                 <div className="text-lg font-semibold text-gray-800 mt-2">
-                  <p className="text-gray-700">
-                    Gross Due (incl. 7.5% VAT): ₦
-                    {formData.totalAmount.toLocaleString()} /Yearly
+                  <p className="text-gray-700 text-black">
+                    Total Due (incl. 7.5% VAT): ₦
+                    {formData.totalAmount.toLocaleString()} (
+                    {formData.NumberOfUsers} user access)
                   </p>
                 </div>
               )}
-              
-                <TermsAndConditionsLink BusinessPlan={formData.plan}/>
 
+              <div className="space-y-2">
+                <TermsAndConditionsLink BusinessPlan={formData.plan} />
+
+                <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+                  <span className="text-gray-700">
+                    Subsequent renewal fee will be
+                  </span>
+                  <span className="ml-1 font-bold text-green-600 text-xl">
+                    ₦{formData.renewalFee.toLocaleString()} /Yearly
+                  </span>
+                </div>
+              </div>
               {formData.NumberOfUsers > 0 && (
                 <>
                   <button
                     type="submit"
-                    className="w-full bg-fuchsia-500 text-white py-3 rounded-lg hover:bg-fuchsia-600 transition duration-300 font-semibold"
+                    className="w-full bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-semibold hover:transition-transform duration-500 hover:scale-100 hover:shadow-md"
                   >
                     Proceed to Pay ₦{formData.totalAmount.toLocaleString()}
                   </button>
                   <div className="text-center ">
-                    <p className="text-gray-500 font-semibold text-sm">Pay securely with</p>
+                    <p className="text-gray-500 font-semibold text-sm">
+                      Pay securely with
+                    </p>
                     <Image
                       height={60}
                       width={120}
@@ -143,13 +155,6 @@ export default function SignUpPage() {
                   </div>
                 </>
               )}
-
-              <p className="text-center mt-1 text-gray-600 text-sm">
-                Already have an account?{" "}
-                <Link href="/Login" className="text-blue-600 underline">
-                  Login here
-                </Link>
-              </p>
             </form>
           </div>
         </div>

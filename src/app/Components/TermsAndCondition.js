@@ -24,12 +24,12 @@ export default function TermsAndConditionsLink({ BusinessPlan }) {
           The provider may suspend or terminate your license if you breach these terms.</p>
 
           <p><strong>6. Acceptance</strong><br>
-          By viewing these terms you acknowledge and agree to them.</p>
+          By virtue of viewing or useage of application, you acknowledge and agree to our Terms and condition.</p>
         </div>
       `,
       icon: "info",
-      showConfirmButton: false, // 🚫 no confirm button
-      showCancelButton: false,  // 🚫 no cancel button
+      showConfirmButton: false, //  no confirm button
+      showCancelButton: false,  //  no cancel button
       width: 600,
       allowOutsideClick: true,  // allow closing by clicking outside
       allowEscapeKey: true,     // allow closing with ESC
@@ -39,7 +39,7 @@ export default function TermsAndConditionsLink({ BusinessPlan }) {
   return (
     <span
       onClick={showEulaModal}
-     className="text-indigo-300 hover:text-indigo-500 cursor-pointer text-xs tracking-wide"
+     className="text-red-500 hover:text-red-700 cursor-pointer text-sm tracking-wide"
     >
      Read T&C's of Use for {BusinessPlan} plan.
     </span>

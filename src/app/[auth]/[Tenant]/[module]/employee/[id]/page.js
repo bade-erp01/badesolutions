@@ -1323,13 +1323,14 @@ const getStatus = (lastSeen) => {
           <div className="mt-6 flex items-center justify-end gap-x-6">
             {!data.firstTimeOnboard ? (
               <div className="flex gap-4">
-                {/* <button
+                <button
                 type="button"
                 onClick={()=>DeleteUser(data._id,businessInfo)}
                 className="rounded-md px-3 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
               >
-                Delete User Account
-              </button> */}
+                Assign user License
+              </button>
+              
                 <button
                   type="submit"
                   onClick={() => sendInvite(Encrypt(data._id),`${EXPRESS_PRIVATE_URL}`,Encrypt(userInfo._id),Encrypt(businessInfo.tenantId))}
