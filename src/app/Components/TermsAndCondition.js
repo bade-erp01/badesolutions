@@ -39,7 +39,7 @@ export default function TermsAndConditionsLink({ BusinessPlan }) {
   return (
     <span
       onClick={showEulaModal}
-     className="text-red-500 hover:text-red-700 cursor-pointer text-sm tracking-wide"
+     className="text-blue-500 hover:blue-red-700 cursor-pointer text-sm tracking-wide"
     >
      Read T&C's of Use for {BusinessPlan} plan.
     </span>
