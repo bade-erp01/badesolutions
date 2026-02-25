@@ -421,7 +421,7 @@ const chartConfig = {
 export function ChartPieInteractive({customers}) {
   const id = "pie-interactive"
   const customerData = getCategoryData(customers)
-  const [activeCategory, setActiveCategory] = useState(customerData[0].category)
+  const [activeCategory, setActiveCategory] = useState(customerData[0]?.category)
 
   const activeIndex = useMemo(
     () => customerData.findIndex((item) => item.category === activeCategory),
