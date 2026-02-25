@@ -104,7 +104,7 @@ export default function InvoicePage({
 
       doc.setFontSize(8).setTextColor(0, 0, 0);
       doc.text(
-        `${business.shopAddress || ""}, ${business.companyState || ""}, ${
+        `${business.shopAddress || ""} ${business.companyState || ""}, ${
           business.companyCity || ""
         }`,
         pageWidth - 10,
@@ -420,7 +420,7 @@ export default function InvoicePage({
         align: "right",
       });
       doc.setFontSize(10);
-      const address = `${business.shopAddress}, ${business.companyCity}, ${business.companyState}`;
+      const address = `${business.shopAddress} ${business.companyCity} ${business.companyState}`;
       const wrappedAddress = doc.splitTextToSize(
         address.toLowerCase(),
         pageWidth * 0.5
@@ -758,7 +758,7 @@ export default function InvoicePage({
               </h3>
               <p className="text-gray-500">{userInfo.business.email}</p>
               <p className="text-gray-500">{userInfo.business.Tel}</p>
-              <p className="text-gray-500">{userInfo.business.shopAddress.slice(0,30)}...</p>
+              <p className="text-gray-500">{userInfo.business.shopAddress?.slice(0,30)}...</p>
               <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
               <h2
                 className={`mt-3 font-bold text-base ${
