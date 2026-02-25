@@ -17,11 +17,6 @@ export default function AccessControl({
   const [formData, setFormData] = useState({ ...data });
   const router = useRouter();
 
-  // get the business names 
-  const getBusinessName = (tenantId) => {
-    const tenant = TenantData.find((t) => t._id.toString() === tenantId.toString());
-    return tenant ? tenant.companyName : "Unknown Tenant";  
-  }
 
   const UpdateEmployeeModules = async (id, object) => {
     try {
@@ -1334,7 +1329,7 @@ export default function AccessControl({
                   key={tenant._id}
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-blue-200 hover:bg-blue-100 transition-colors duration-200"
                 >
-                  {getBusinessName(tenant.tenantIds)}
+                   {tenant.companyName || "Unknown Tenant"}
                   <button
                     onClick={() => handleRemoveTenant(tenant._id)}
                     className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
