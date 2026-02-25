@@ -294,7 +294,7 @@ export default function Nav1({ page, Module, user, business }) {
                                         )
                                       }
                                     >
-                                      🔄 Switch to{" "}
+                                      Switch to{" "}
                                       {tenant.companyName ||
                                         `Tenant ${index + 1}`}
                                     </button>
