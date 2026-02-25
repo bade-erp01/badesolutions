@@ -1430,7 +1430,7 @@ const handleTenantAssign = async (tenantId) => {
               {filteredTenants.length === 0 && (
                 <div className="px-4 py-2 text-gray-500">No tenants found</div>
               )}
-              {filteredTenants.map((tenant) => (
+              {filteredTenants.map((tenant,index) => (
                 <Combobox.Option
                   key={tenant.tenantId}
                   value={tenant}
@@ -1440,7 +1440,7 @@ const handleTenantAssign = async (tenantId) => {
                     }`
                   }
                 >
-                  {tenant.companyName}
+                  {tenant.companyName || `Tenant ${index + 1}`}
                 </Combobox.Option>
               ))}
             </Combobox.Options>
