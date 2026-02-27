@@ -195,7 +195,7 @@ export default function Nav1({ page, Module, user, business }) {
                 <Link
                   href="#"
                   className={`text-sm font-medium transition hover:text-blue-600 ${
-                    pathName === "/Why_Badde"
+                    pathName === "/Why_Bade"
                       ? "text-blue-600"
                       : "text-gray-700"
                   }`}
@@ -208,7 +208,15 @@ export default function Nav1({ page, Module, user, business }) {
                     pathName === "/Pricing" ? "text-blue-600" : "text-gray-700"
                   }`}
                 >
-                  Pricing
+                  Discover More
+                </Link>
+                 <Link
+                  href="/Marketers"
+                  className={`text-sm font-medium transition hover:text-blue-600 ${
+                    pathName === "/Marketers" ? "text-blue-600" : "text-gray-700"
+                  }`}
+                >
+                  Refer & Earn
                 </Link>
               </div>
             ) : null}

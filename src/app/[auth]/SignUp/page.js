@@ -41,10 +41,16 @@ export default function SignUpPage() {
   };
 
   return (
-    <>
+    <div  style={{
+            backgroundImage: 'url("/adrian-sulyok-c_4eaGRDSVU-unsplash.jpg")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "grayscale(40%)",
+            zIndex: -2,
+          }}>
       <Nav1 />
-      <div className="min-h-screen flex items-center justify-center mb-4 ">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white backdrop-blur-md rounded-sm shadow-2xl p-4">
+      <div className="min-h-screen flex items-center justify-center mb-4 animate__animated animate__zoomInDown">
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-black/50 backdrop-blur-xs shadow-2xl p-4">
           {/* Left Section: Illustration */}
           <div className="flex justify-center">
             <Image
@@ -160,6 +166,6 @@ export default function SignUpPage() {
         </div>
       </div>
       <Footer1 />
-    </>
+    </div>
   );
 }

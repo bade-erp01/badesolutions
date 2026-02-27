@@ -9,7 +9,7 @@ const BirthdayGreetings = ({ user, Business }) => {
   const MySwal = withReactContent(Swal);
   const audioRef = useRef(null);
 
-  // 🎉 Extended list of birthday messages
+  // Extended list of birthday messages
   const birthdayMessages = [
     `On behalf of ${Business.companyName.toLowerCase()}, we celebrate you on this special day. May your year be filled with joy and success! 🎈`,
     `Cheers to you, ${user.firstName?.toUpperCase() || 'User'}! ${Business.companyName.toLowerCase()} wishes you laughter, love, and cake today! 🍰`,
@@ -57,25 +57,25 @@ const BirthdayGreetings = ({ user, Business }) => {
       };
       localStorage.setItem(toastKey, JSON.stringify(updatedToastData));
 
-      // 🎉 Confetti burst
+      // Confetti burst
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
       });
 
-      // 🔊 Play birthday sound
+      // Play birthday sound
       if (audioRef.current) {
         audioRef.current.play().catch((err) => {
           console.warn("Audio playback failed:", err);
         });
       }
 
-      // 🎂 Pick a random message
+      // Pick a random message
       const randomMessage =
         birthdayMessages[Math.floor(Math.random() * birthdayMessages.length)];
 
-      // 🎂 Show SweetAlert2 toast
+      // Show SweetAlert2 toast
       MySwal.fire({
         toast: true,
         position: 'bottom-end',
@@ -102,7 +102,7 @@ const BirthdayGreetings = ({ user, Business }) => {
 
   return (
     <>
-      {/* 🔊 Birthday Sound */}
+      {/* Birthday Sound */}
       <audio ref={audioRef} preload="auto">
         <source src="/086060_tadawav-85939.mp3" type="audio/mpeg" />
         Your browser does not support the audio element.

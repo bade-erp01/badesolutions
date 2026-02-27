@@ -146,12 +146,6 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
             </div>
           
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-              {/* <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
-                            <span className="mr-2 text-gray-400">
-                               🏢
-                            </span>
-                            <input type="email" placeholder="Tenant Id" className="bg-transparent outline-none flex-1 text-gray-700 placeholder-gray-400" />
-                        </div> */}
               
               <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
                 <span className="mr-2 text-gray-400">
@@ -207,11 +201,6 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
                   I forgot
                 </Link>
               </div>
-                {/* <ReCAPTCHA
-                  sitekey={ReCAPTCHAKey}
-                  size="invisible"
-                  ref={recaptchaRef}
-                /> */}
               <div className="flex items-center justify-between mt-2">
                 <button className="bg-black text-white rounded p-2 ml-2 shadow-md">
                   Login
@@ -233,10 +222,6 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
                 </div>
                 <div className="relative z-10 text-sm text-gray-600 mt-2">
                   <div className="flex items-center gap-4">
-                    {/* <span className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                                </span> */}
-
                     <span className="text-xs text-gray-500 font-medium">
                       {time} <br />
                       How&apos;s {location} today?
@@ -244,14 +229,11 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
                   </div>
                 </div>
               </div>
-
-              {/* <div className="absolute left-1/2 bottom-[-60px] -translate-x-1/2 md:static md:translate-x-0 md:bottom-0 bg-black rounded-2xl shadow-lg px-8 py-6 flex flex-col md:flex-row items-center justify-between w-[320px] md:w-[340px] max-w-full gap-4 z-20"> */}
-              {/* <div className="text-white text-md font-semibold">See Pricing</div> */}
               <Link
-                href="/Pricing"
+                href="/Marketers"
                 className="text-white/80 bg-black border z-20 border-white/20 rounded-full px-6 py-2 font-medium hover:bg-dark/20 hover:border hover:border-gray-300 transition"
               >
-                Discover More →
+                Refer and Earn →
               </Link>
               {/* </div> */}
             </div>

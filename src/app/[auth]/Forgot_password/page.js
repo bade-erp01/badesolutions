@@ -50,9 +50,15 @@ export default function ForgotPasswordPage() {
 
 
   return (
-    <>
+    <div style={{
+            backgroundImage: 'url("/adrian-sulyok-c_4eaGRDSVU-unsplash.jpg")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "grayscale(40%)",
+            zIndex: -2,
+          }}>
       <Nav1 />
-      <div className="min-h-screen flex items-center justify-center  p-4">
+      <div className="min-h-screen flex items-center justify-center  p-4 animate__animated animate__zoomInDown">
         <div className="max-w-4xl w-full flex flex-col md:flex-row items-center bg-white shadow-lg">
           {/* Left Section: Illustration */}
           <div className="hidden md:flex w-1/2 items-center justify-center p-8">
@@ -69,7 +75,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Right Section: Forgot Password Form */}
-          <div className="w-full md:w-1/2 p-8">
+          <div className="w-full md:w-1/2 p-8 ">
             <h1 className="text-3xl font-bold text-gray-800">
               Forgot Password?
             </h1>
@@ -107,6 +113,6 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
       <Footer1 />
-    </>
+    </div>
   );
 }

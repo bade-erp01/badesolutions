@@ -21,9 +21,8 @@ export default async function layout({ children, params }) {
   const RawBusiness = await Businesses.find({
     isActive: true,
     isVerified: true,
-  })
-    .select("tenantId companyName")
-    .lean();
+  }).select("tenantId companyName").lean();
+  
   const StringedBusiness = JSON.stringify(RawBusiness);
   const businessData = JSON.parse(StringedBusiness);
 
