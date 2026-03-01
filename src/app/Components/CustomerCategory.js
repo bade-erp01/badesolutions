@@ -133,33 +133,23 @@ function CustomerCategoryPieChart({ customersList, invoiceList, userData }) {
       </div>
 
       {/* Line Chart */}
-      <div className="mt-12 h-[400px] animate-fade-in">
+      <div className="mt-8 animate-fade-in">
         {summarizeCustomerInvoices(customers, invoice)}
       </div>
     </section>
   );
 }
 
-function summarizeCustomerInvoices(customers) {
+function summarizeCustomerInvoices(customers, invoice) {
   const summarized = customers
     .filter((cust) => cust.Debt > 0)
-    .map((customer) => {
-      // .sort((a, b) => b.Debt - a.Debt) // Sort by highest debt first
-      // const customerInvoices = invoices.filter(
-      //   (invoice) => invoice.customer === customer._id
-      // );
-      // const totalAmount = customerInvoices.reduce(
-      //   (sum, invoice) => sum + invoice.grandTotal,
-      //   0
-      // );
-      return {
-        username: customer.Username,
-        totalAmount: customer.Debt,
-        image:
-          customer.image ||
-          "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
-      };
-    });
+    .map((customer) => ({
+      username: customer.Username,
+      totalAmount: customer.Debt,
+      image:
+        customer.image ||
+        "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png",
+    }));
 
   const chartData = {
     labels: summarized.map((item) => item.username.substring(0, 5)),
@@ -180,126 +170,25 @@ function summarizeCustomerInvoices(customers) {
     ],
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: {
-      padding: {
-        top: 20,
-        bottom: 10,
-        left: 10,
-        right: 10,
-      },
-    },
-    animation: {
-      duration: 1200,
-      easing: "easeOutQuart",
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: "#e2e8f0",
-          font: { size: 14, weight: "bold" },
-        },
-      },
-      tooltip: {
-        enabled: false,
-        external: function (context) {
-          const tooltipModel = context.tooltip;
-          const chartCanvas = context.chart.canvas;
-          let tooltipEl = document.getElementById("chartjs-tooltip");
-
-          if (!tooltipEl) {
-            tooltipEl = document.createElement("div");
-            tooltipEl.id = "chartjs-tooltip";
-            tooltipEl.style.position = "absolute";
-            tooltipEl.style.background = "#1e293b6c";
-            tooltipEl.style.border = "1px solid #38bdf8";
-            tooltipEl.style.borderRadius = "8px";
-            tooltipEl.style.padding = "10px";
-            tooltipEl.style.color = "#f1f5f9";
-            tooltipEl.style.pointerEvents = "none";
-            tooltipEl.style.transition = "all 0.3s ease";
-            tooltipEl.style.zIndex = "100";
-            document.body.appendChild(tooltipEl);
-          }
-
-          if (tooltipModel.opacity === 0) {
-            tooltipEl.style.opacity = "0";
-            return;
-          }
-
-          const index = tooltipModel.dataPoints[0].dataIndex;
-          const customer = summarized[index];
-          const imageUrl = customer.image;
-
-          tooltipEl.innerHTML = `
-            <div style="text-align:center;">
-              <strong>${customer.username}</strong><br/>
-              <img src="${
-                imageUrl ||
-                "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
-              }" alt="${
-            customer.username
-          }" style="width:30px;height:auto;border-radius:4px;margin-top:4px;" />
-              <div style="margin-top:6px;">Debt: ${
-                userData.business.currency?.currency.Symbol
-              }${customer.totalAmount.toLocaleString()}</div>
-            </div>
-          `;
-
-          const position = chartCanvas.getBoundingClientRect();
-          tooltipEl.style.left =
-            position.left + window.pageXOffset + tooltipModel.caretX + "px";
-          tooltipEl.style.top =
-            position.top + window.pageYOffset + tooltipModel.caretY - 80 + "px";
-          tooltipEl.style.opacity = "1";
-        },
-      },
-      title: {
-        display: true,
-        text: `Debtors Overview`,
-        font: { size: 20 },
-        color: "#e2e8f0",
-        padding: { top: 10, bottom: 20 },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Customer Name",
-          color: "#cbd5e1",
-          font: { size: 16, weight: "bold" },
-        },
-        ticks: {
-          color: "#94a3b8",
-          maxRotation: 45,
-          minRotation: 45,
-        },
-        grid: { display: false },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Debt Amount",
-          color: "#cbd5e1",
-          font: { size: 16, weight: "bold" },
-        },
-        ticks: { color: "#94a3b8" },
-        grid: {
-          color: "rgba(255,255,255,0.05)",
-          borderDash: [4, 4],
-        },
-        beginAtZero: true,
-      },
+  const chartConfig = {
+    totalAmount: {
+      label: "Total Amount",
+      color: "var(--chart-1)",
     },
   };
 
   return (
-    <div className="relative h-[400px] w-full bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg ring-1 ring-gray-700 border border-gray-700 p-6 rounded-lg animate-fade-in-up overflow-hidden">
-      <Line data={chartData} options={chartOptions} />
-    </div>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Debtors Overview</CardTitle>
+        <CardDescription>Debt amount by customer</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <Line data={chartData} />
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 }
 
