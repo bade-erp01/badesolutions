@@ -760,6 +760,22 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     }
   };
 
+  const updateServiceLocation = async () =>{
+    try{
+      plsWait("Updating service location... Please wait ⏳ This may take a moment.");
+      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(cust._id)}`;
+      const { data } = await axios.patch(url, { location: formData.location }, config);
+      if (data && data.message) {
+        SuccessToast(data.message);
+        navigation.refresh();
+      } else {
+        throw new Error("Something went wrong");
+      }
+    } catch (error) {
+      ErrorMessage(error?.response?.data?.error || error.message);
+    }
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -1474,7 +1490,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     onChange={handleChange}
                     className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
                   >
-                    {/* Show the current sales person as the first option if available */}
+                    {/* Show the current Service Warehouse */}
                     {(() => {
                       const location = data.wh.find(
                         (location) => location._id === cust.location
@@ -1840,6 +1856,19 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </button>
         </div>
       )}
+
+      {/* for invoicer to update only service location of customer  */}
+      {userInfo.user.raiseInvoice && !userInfo.user.editCustomer && (
+        <div className="pt-4">
+          <span
+            onClick={updateServiceLocation}
+            className="bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 transition"
+          >
+            Save Changes
+          </span>
+        </div>
+      )}
+
       <span className="text-sm text-gray-600 italic">
         Last updated:{" "}
         {moment(cust.updatedAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
