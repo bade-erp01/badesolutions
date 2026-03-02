@@ -10,28 +10,16 @@ import autoTable from "jspdf-autotable";
 import InvoicePaymentForm from "@/app/Components/PaymentWithInv"
 import {
   postPayment,
-  // GenerateSummary,
   pricelistSetter,
   EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../../../Functions/Functions";
 import { useState } from "react";
-import { Line } from "react-chartjs-2";
 import {
   PrinterIcon,
-  CalendarDaysIcon,
   WalletIcon,
-  ArrowLongRightIcon,ArrowUturnLeftIcon,TrashIcon
 } from "@heroicons/react/24/outline";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
+
 import {
   plsWait,
   Encrypt,
@@ -44,14 +32,7 @@ import { useRouter } from "next/navigation";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { useEffect } from "react";
 import  AgingReportDownloader from "@/app/Components/Reports/SingleAging"
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-);
+import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin"
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
@@ -593,84 +574,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     return { month: monthLabel, amount: total };
   });
 
-  const chartData = {
-    labels: monthlySales.map((e) => e.month),
-    datasets: [
-      {
-        label: `${moment().format("YYYY")} Sales`,
-        data: monthlySales.map((e) => e.amount),
-        backgroundColor: "rgba(8, 8, 8, 0.7)",
-        borderColor: "rgb(13, 14, 13)",
-        borderWidth: 2,
-        fill: false, // Optional: disables area fill under the line
-        tension: 0.4, // Curves the line between points
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "#fff", // Customize legend text color
-          font: {
-            size: 12,
-          },
-        },
-      },
-      title: {
-        display: true,
-        text: `${moment().format("YYYY")} Monthly Sales Overview`,
-        color: "#130c0cff",
-        font: {
-          size: 16,
-          weight: "bold",
-        },
-        padding: {
-          top: 10,
-          bottom: 30,
-        },
-      },
-      tooltip: {
-        enabled: true,
-        callbacks: {
-          label: function (context) {
-            return `${context.parsed.y.toLocaleString()}`;
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: "#ccc",
-        },
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        ticks: {
-          color: "#ccc",
-          callback: function (value) {
-            return `${value?.toLocaleString()}`;
-          },
-        },
-        grid: {
-          color: "rgba(255,255,255,0.1)",
-        },
-      },
-    },
-    animation: {
-      duration: 1000,
-      easing: "easeOutQuart",
-    },
-  };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -980,12 +883,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       </Section>
 
       {/* Sales Insight */}
-      <Section title="📈 Month-on-Month Sales Insight">
+      <Section title={`${cust.Username} Sales Insight`} className="lg:col-span-2">
         <div
-          className="bg-white rounded-lg p-4 shadow"
-          style={{ height: "250px" }}
+          className=""
         >
-          <Line data={chartData} options={chartOptions} />
+          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]}/>
         </div>
       </Section>
 
@@ -1969,3 +1871,89 @@ function Checkbox({ label, name, checked, onChange }) {
     </div>
   );
 }
+
+
+
+// schadcn chart
+// import { TrendingUp } from "lucide-react"
+// import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
+
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardFooter,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card"
+
+// import {
+//   ChartContainer,
+//   ChartLegend,
+//   ChartLegendContent,
+//   ChartTooltip,
+//   ChartTooltipContent,
+// } from "@/components/ui/chart"
+
+// const chartConfig = {
+//   desktop: {
+//     label: "Returns",
+//     color: "var(--chart-1)",
+//   },
+//   mobile: {
+//     label: "Sales",
+//     color: "var(--chart-2)",
+//   },
+// }
+
+// export function RadarChartComponent() {
+//   return (
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Radar Chart</CardTitle>
+//         <CardDescription>
+//           Showing performance comparison between Desktop and Mobile
+//         </CardDescription>
+//       </CardHeader>
+//       <CardContent>
+//         <ChartContainer 
+//            config={chartConfig} style={{ height: "350px",width:"350px" }} >
+//           <RadarChart
+//             data={[
+//               { subject: "Math", desktop: 120, mobile: 110 },
+//               { subject: "Science", desktop: 98, mobile: 130 },
+//               { subject: "English", desktop: 86, mobile: 90 },
+//               { subject: "History", desktop: 99, mobile: 85 },
+//               { subject: "Art", desktop: 85, mobile: 95 },
+//             ]}
+//           >
+//             <PolarGrid />
+//             <PolarAngleAxis dataKey="subject" />
+//             <Radar
+//               name="Desktop"
+//               dataKey="desktop"
+//               stroke={chartConfig.desktop.color}
+//               fill={chartConfig.desktop.color}
+//               fillOpacity={0.6}
+//             />
+//             <Radar
+//               name="Mobile"
+//               dataKey="mobile"
+//               stroke={chartConfig.mobile.color}
+//               fill={chartConfig.mobile.color}
+//               fillOpacity={0.6}
+//             />
+//             <ChartTooltip content={<ChartTooltipContent />} />
+//             <ChartLegend content={<ChartLegendContent />} />
+//           </RadarChart>
+//         </ChartContainer>
+//       </CardContent>
+//       <CardFooter>
+//         <p className="text-sm text-muted-foreground flex items-center gap-2">
+//           <TrendingUp className="h-4 w-4" />
+//           Data comparison for different subjects
+//         </p>
+//       </CardFooter>
+//     </Card>
+//   )
+// }
