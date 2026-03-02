@@ -883,7 +883,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       </Section>
 
       {/* Sales Insight */}
-      <Section title={`${cust.Username} Sales Insight`} className="lg:col-span-2">
+      <Section title={`📈 Month-on-Month Sales Insight for ${cust.Username}.`} className="lg:col-span-2">
         <div
           className=""
         >
