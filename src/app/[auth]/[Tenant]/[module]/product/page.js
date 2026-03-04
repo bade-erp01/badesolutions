@@ -161,7 +161,7 @@ export default async function Productlayout({ children, params }) {
               />
 
               {userData?.user?.isAdmin && (
-                <BulkUpdate tenantId={userData} collectionName="product" WHID={""} />
+                <BulkUpdate tenantId={userData} collectionName="product" WHID={userData?._id} />
               )}
 
             </nav>

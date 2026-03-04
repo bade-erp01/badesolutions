@@ -4,7 +4,7 @@ import { BellAlertIcon } from "@heroicons/react/24/outline";
 
 export default function UserNotification({ user }) {
   const notifications = user.Notification || [];
-  const unseenCount = notifications.filter(n => n.status === "Unseen").length;
+  const unseenCount = notifications.filter(n => n.status === "Unseen").length || 0;
   const pageSize = 5;
   const totalPages = Math.ceil(notifications.length / pageSize);
 
