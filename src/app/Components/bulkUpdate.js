@@ -27,7 +27,7 @@ const BulkUpdate = ({ tenantId, collectionName,WHID }) => {
       const parsedData = XLSX.utils.sheet_to_json(sheet);
 
       // Check row limit
-      if (parsedData.length > 50) {
+      if (data.length > 50) {
         ErrorMessage('Limit Exceeded. You can only upload up to 50 records at once.');
         router.refresh();
         return;
