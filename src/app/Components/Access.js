@@ -85,7 +85,7 @@ export default function AccessControl({
           Assign Operational Access
         </legend>
         <div className="flex flex-wrap gap-2 p-4">
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to onboard new customers`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -128,7 +128,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to register new products`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -171,7 +171,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to update create new supplier`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -214,7 +214,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to update customer information `}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -257,7 +257,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to update general products information `}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -300,7 +300,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData?.firstName} will be able to update purchase price of products`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -386,7 +386,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to update Suppliers infomation`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -426,7 +426,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to generate Sales receipt from BADE`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -469,7 +469,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to generate L.P.O`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -509,7 +509,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to POST and APPROVE credit and debit note respectively`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -552,7 +552,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to manage asset`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -595,7 +595,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to Raise/Request expense`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -638,7 +638,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to Approve expense`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -681,7 +681,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to create and manage expense tags`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -724,7 +724,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be notified when a new Sales order is generated`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -767,7 +767,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to register payment to vendors ledger.`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -810,7 +810,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to post payent to customers ledger.`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -853,7 +853,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to Assign credit limit to a customer's account`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -896,7 +896,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be notified when purchase price of products are updated`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -975,11 +975,11 @@ export default function AccessControl({
             </div>
             <div className="text-sm/6 pr-1">
               <label htmlFor="isHRM" className="font-medium text-gray-900">
-                HR Manager
+                Human Resource Manager
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will verify inter-stores transfers and purchase from suppliers`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -1023,7 +1023,7 @@ export default function AccessControl({
             </div>
           </div>
 
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will be able to perform full sales return`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -1197,7 +1197,7 @@ export default function AccessControl({
               </label>
             </div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`${formData.firstName} will act as a middleman to verify payments befor they impact customer ledger`}>
             <div className="flex h-6 shrink-0 items-center">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -1285,7 +1285,7 @@ export default function AccessControl({
             </div>
           </div>
 
-          <div className="flex gap-1">
+          <div className="flex gap-1" title={`Grant ${formData.firstName} access to view sensitive business dashboards.`}>
             <div className="flex h-6 shrink-0 items-center">
               <div className="group grid size-4 grid-cols-1">
                 <input
@@ -1332,7 +1332,7 @@ export default function AccessControl({
       </fieldset>
       {/* moduar acces */}
       <hr />
-      <div className="mt-10 space-y-10 ">
+      <div className="mt-10 space-y-10 " title={`Assign view only access to ${formData.firstName} on Apps installed on business enviroment`}>
         <fieldset className="grid grid-cols-4">
           <legend className="text-sm/6 font-semibold text-gray-900 col-span-4">
             Push Modular Application Access
