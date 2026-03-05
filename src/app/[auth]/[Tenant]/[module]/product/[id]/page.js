@@ -411,7 +411,7 @@ export default function SingleProductpage({
                       Buying Price
                     </label>
                     <div className="mt-2">
-                      {user.isAccountant ? (
+                      {user.editPurchasePrice ? (
                         <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
                           <input
                             value={BuyingPrice.BuyingPrice}
