@@ -928,6 +928,18 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   value={formData.merchandiser}
                   onChange={handleChange}
                 />
+                <Input
+                  label="latitude"
+                  name="latitude"
+                  value={formData.latitude || ""}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="longitude"
+                  name="longitude"
+                  value={formData.longitude || ""}
+                  onChange={handleChange}
+                />
               </Grid>
             </Section>
 
@@ -982,11 +994,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                         {cust.lastPayDate &&
                         cust.Debt > 0 &&
                         moment(cust.lastPayDate).isValid()
-                          ? `🕒 Debt incurred: ${moment().diff(
+                          ? `Debt incurred: ${moment().diff(
                               moment(cust.lastPayDate),
                               "days"
                             )} day(s) ago`
-                          : "✅ Not in Debt"}
+                          : "Not in Debt"}
                       </label>
 
                       <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
