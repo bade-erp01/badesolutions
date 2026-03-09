@@ -1539,7 +1539,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
               {/* display shop location on google maps here */}
               <div className="w-full h-96 rounded-lg overflow-hidden shadow-md border border-gray-300">
-                {cust.latitude && cust.longitude ? (
+                {!cust.latitude && !cust.longitude ? (
                   <iframe
                     width="100%"
                     height="100%"
