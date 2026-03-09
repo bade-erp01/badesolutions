@@ -18,6 +18,7 @@ import { useState } from "react";
 import {
   PrinterIcon,
   WalletIcon,
+  CalendarDaysIcon
 } from "@heroicons/react/24/outline";
 
 import {
@@ -225,103 +226,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       ErrorMessage(error.message);
     }
   };
-
-  // sheduleActivity
-  // components/ScheduleActivityAlert.js
-
-  const MySwal = withReactContent(Swal);
-
-  const scheduleActivity = async () => {
-    MySwal.fire({
-      title:
-        '<span class="text-xl font-semibold text-gray-800">Schedule an Activity</span>',
-      html: `
-      <div class="flex flex-col gap-4 text-left text-gray-700">
-        <label for="swal-select1" class="text-sm font-medium">Activity</label>
-        <select id="swal-select1" class="swal2-input bg-gray-100 border border-gray-300 rounded-md px-3 py-2">
-          <option value="" disabled selected>Select Activity</option>
-          <option value="Meeting">Meeting</option>
-          <option value="Call">Call</option>
-          <option value="Visitation">Visitation</option>
-          <option value="Raise Bill">Raise Bill</option>
-          <option value="Collect Payment">Collect Payment</option>
-          <option value="Send Invoice">Send Invoice</option>
-          <option value="Others">Others</option>
-        </select>
-
-        <label for="swal-assign" class="text-sm font-medium">Assign To</label>
-        <select id="swal-assign" class="swal2-input bg-gray-100 border border-gray-300 rounded-md px-3 py-2">
-          <option value="" disabled selected>Select assignee</option>
-          ${salesPerson
-            .map(
-              (employee) =>
-                `<option value="${employee._id}">${employee.firstName} ${employee.lastName}</option>`
-            )
-            .join("")}
-        </select>
-
-        <label for="swal-input3" class="text-sm font-medium">Date & Time</label>
-        <input type="datetime-local" id="swal-input3" class="swal2-input bg-gray-100 border border-gray-300 rounded-md px-3 py-2" />
-
-        <label for="swal-textarea" class="text-sm font-medium">Additional Notes</label>
-        <textarea id="swal-textarea" class="swal2-textarea bg-gray-100 border border-gray-300 rounded-md px-3 py-2" placeholder="Additional Notes"></textarea>
-      </div>
-    `,
-      customClass: {
-        popup: "p-6",
-        confirmButton:
-          "bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition",
-        cancelButton:
-          "bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 transition",
-      },
-      showCancelButton: true,
-      confirmButtonText: "Schedule",
-      preConfirm: () => {
-        const activity = document.getElementById("swal-select1").value;
-        const assignTo = document.getElementById("swal-assign").value;
-        const datetime = document.getElementById("swal-input3").value;
-        const notes = document.getElementById("swal-textarea").value;
-
-        if (!activity || !assignTo || !datetime || !notes.trim()) {
-          Swal.showValidationMessage(
-            "Please fill out all fields before scheduling."
-          );
-          return false;
-        }
-
-        return { activity, assignTo, datetime, notes };
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        plsWait("")
-        // 💾 Push to database or trigger backend logic
-        axios
-          .put(
-            `${EXPRESS_PRIVATE_URL}/api/Activity_Schedula/${Encrypt(cust._id)}`,
-            {
-              ...result.value,
-              customerId: Encrypt(cust._id),
-              tenantId: Encrypt(userInfo.business.tenantId),
-              raisedBy: `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-                access: `${Encrypt(userInfo.user._id)}`,
-              },
-            }
-          )
-          .then((data) => {
-            SuccessToast(data.data.message);
-            navigation.refresh();
-          })
-          .catch((error) => {
-            ErrorMessage("Failed to schedule activity.");
-          });
-      }
-    });
-  };
+ 
 
   let jsPDF;
   if (typeof window !== "undefined") {
@@ -823,16 +728,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <span className="text-xs">Print Statement</span>
           </span>
 
-          {/* <span
-            onClick={() => scheduleActivity(Encrypt(cust._id))}
-            className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            aria-label="Schedule Activity"
-          >
-            <CalendarDaysIcon className="h-5 w-5 text-white" />
-            <span className="text-sm font-semibold">Schedule Activity</span>
-          </span> */}
-
-
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
             <>
             <span
@@ -864,7 +759,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           )}
 
            {userInfo.business.subscriptionplan === "Standard" && (
-              <AgingReportDownloader  
+
+            <AgingReportDownloader  
                 customer={cust} 
                 invoices={Sales} 
                 payments={data.transcations} 
@@ -877,7 +773,10 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     : "Unknown";
                 }} 
               />
+
             )}
+
+
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
         </div>
       </Section>
@@ -1601,7 +1500,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           onClick={() => setisOpen3(!isOpen3)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">Crm tools</h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">Geo‑coordinates</h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${
               isOpen3 ? "rotate-180" : ""
@@ -1626,82 +1525,26 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           {/* Activity Log */}
           <Section title="">
             <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
-              {cust && cust.ActivityLog?.length > 0 ? (
-               <table className="min-w-full text-sm text-gray-700">
-  <thead>
-    <tr className="bg-gray-100 text-center">
-      <th className="px-2 py-1">Pending</th>
-      <th className="px-2 py-1">In progress</th>
-      <th className="px-2 py-1">Completed</th>
-    </tr>
-  </thead>
-  <tbody className="divide-y divide-gray-200">
-    <tr>
-      {/* Pending */}
-      <td className="align-top">
-        {cust.ActivityLog?.filter(entry => entry.Status === "Pending").map((activity, idx) => (
-          <div key={idx} className="max-w-xs mx-auto px-2 py-2 bg-gray-50 text-xs border rounded mb-2 shadow-sm">
-            <p className="text-gray-800 font-semibold truncate">Title: {activity.activity}</p>
-            <p className="text-gray-600 text-[11px]">Raised by: {activity.raisedBy}</p>
-            <p className="text-gray-600 text-[11px]">
-              Assigned:{" "}
-              {(() => {
-                const assignedId = Dencrypt(activity.assignTo);
-                const employee = salesPerson.find(emp => emp._id === assignedId);
-                return employee ? `${employee.firstName} ${employee.lastName}` : "Unassigned";
-              })()}
-            </p>
-            <p className="text-gray-500 text-[11px]">{moment(activity.datetime).fromNow()}</p>
-          </div>
-        ))}
-      </td>
-
-      {/* In progress */}
-      <td className="align-top">
-        {cust.ActivityLog?.filter(entry => entry.Status === "In progress").map((activity, idx) => (
-          <div key={idx} className="max-w-xs mx-auto px-2 py-2 bg-yellow-50 text-xs border rounded mb-2 shadow-sm">
-            <p className="text-gray-800 font-semibold truncate">Title: {activity.activity}</p>
-            <p className="text-gray-600 text-[11px]">Raised by: {activity.raisedBy}</p>
-            <p className="text-gray-600 text-[11px]">
-              Assigned:{" "}
-              {(() => {
-                const assignedId = Dencrypt(activity.assignTo);
-                const employee = salesPerson.find(emp => emp._id === assignedId);
-                return employee ? `${employee.firstName} ${employee.lastName}` : "Unassigned";
-              })()}
-            </p>
-            <p className="text-gray-500 text-[11px]">{moment(activity.datetime).fromNow()}</p>
-          </div>
-        ))}
-      </td>
-
-      {/* Completed */}
-      <td className="align-top">
-        {cust.ActivityLog?.filter(entry => entry.Status === "Completed").map((activity, idx) => (
-          <div key={idx} className="max-w-xs mx-auto px-2 py-2 bg-green-50 text-xs border rounded mb-2 shadow-sm">
-            <p className="text-gray-800 font-semibold truncate">Title: {activity.activity}</p>
-            <p className="text-gray-600 text-[11px]">Raised by: {activity.raisedBy}</p>
-            <p className="text-gray-600 text-[11px]">
-              Assigned:{" "}
-              {(() => {
-                const assignedId = Dencrypt(activity.assignTo);
-                const employee = salesPerson.find(emp => emp._id === assignedId);
-                return employee ? `${employee.firstName} ${employee.lastName}` : "Unassigned";
-              })()}
-            </p>
-            <p className="text-gray-500 text-[11px]">{moment(activity.datetime).fromNow()}</p>
-          </div>
-        ))}
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-              ) : (
-                <p className="text-gray-500 italic">
-                  No activities logged yet.
-                </p>
-              )}
+              {/* display shop location on google maps here */}
+              <div className="w-full h-96 rounded-lg overflow-hidden shadow-md border border-gray-300">
+                {cust.latitude && cust.longitude ? (
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cust.latitude},${cust.longitude}`}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <p className="text-gray-500 text-center">
+                      📍 No location coordinates available for this customer
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </Section>
         </div>

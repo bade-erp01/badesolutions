@@ -5,6 +5,9 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BackButton from "@/app/Components/BackBotton";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import Card from "@/app/Components/Card";
+import TaskAssigner from "@/app/Components/TaskAssigner"
+
+
 
 // ✅ Dynamic Metadata for SEO
 export async function generateMetadata() {
@@ -80,6 +83,7 @@ export default async function EmployeeListpage({ params }) {
             {userData?.user?.isAdmin && EmployeeList.data.length > 0 && (
               <ExcelDownloadBtn data={EmployeeList.data} page="employee" />
             )}
+            <TaskAssigner users={EmployeeList.data} userInfo={userData}  EXPRESS_PRIVATE_URL={baseUrl}/>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
