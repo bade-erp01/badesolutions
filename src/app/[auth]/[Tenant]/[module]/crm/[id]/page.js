@@ -1544,7 +1544,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     width="100%"
                     height="100%"
                     frameBorder="0"
-                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cust.latitude},${cust.longitude}`}
+                    src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAGHMSOVtzwCkZldk49OmtkP2RIxUD9vRU&q=${10.28},${9.8}`}
                     allowFullScreen=""
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
