@@ -1542,7 +1542,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         >
           {/* Activity Log */}
           <Section title="">
-            <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
+            <div className="bg-gray-50 rounded-lg p-4 overflow-x-auto">
               {/* display shop location on google maps here */}
               <div className="w-full h-96 rounded-lg overflow-hidden shadow-md">
                 {cust.latitude && cust.longitude ? (
