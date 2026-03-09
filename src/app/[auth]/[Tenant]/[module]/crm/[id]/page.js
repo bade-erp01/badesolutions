@@ -940,6 +940,12 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   value={formData.longitude || ""}
                   onChange={handleChange}
                 />
+                <Input
+                  label="Map Url"
+                  name="MapUrl"
+                  value={formData.MapUrl || ""}
+                  onChange={handleChange}
+                />
               </Grid>
             </Section>
 
@@ -1538,13 +1544,13 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           <Section title="">
             <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
               {/* display shop location on google maps here */}
-              <div className="w-full h-96 rounded-lg overflow-hidden shadow-md border border-gray-300">
-                {!cust.latitude && !cust.longitude ? (
+              <div className="w-full h-96 rounded-lg overflow-hidden shadow-md">
+                {cust.latitude && cust.longitude ? (
                   <iframe
                     width="100%"
                     height="100%"
                     frameBorder="0"
-                    src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAGHMSOVtzwCkZldk49OmtkP2RIxUD9vRU&q=${10.28},${9.8}`}
+                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cust.latitude},${cust.longitude}`}
                     allowFullScreen=""
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
