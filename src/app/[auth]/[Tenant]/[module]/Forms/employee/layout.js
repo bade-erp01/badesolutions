@@ -8,7 +8,7 @@ import Footer2 from '@/app/Components/Footer2';
 
 export default async function SetUpLayout({children, params }) {
     const userData = await fetchUser();
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL2
+    const baseUrl = process.env.EXPRESS_PRIVATE_URL
 
     if (!userData.user.isAdmin) {
       notFound();
