@@ -666,8 +666,7 @@ export default function DraftInvoicePage({
               <span className="mr-1">🗓️</span>
               {moment(Singlebill.startDate).format("YYYY-MM-DD")}
             </p>
-             <p>
-              <span className="mr-1">Pricelist</span>
+             <p className="px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border bg-yellow-50 text-yellow-700 border-yellow-200">
               {pricelistSetter(Singlebill.priceList,Business)}
             </p>
           </div>
@@ -896,6 +895,9 @@ export default function DraftInvoicePage({
                 </tr>
               ))}
             </tbody>
+           <caption class="text-sm font-medium text-gray-700 bg-gray-100 p-2 rounded">
+              Ensure to verify pricelist on {} account before closing Draft
+          </caption>
           </table>
         </div>
 
