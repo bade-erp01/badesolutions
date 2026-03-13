@@ -668,7 +668,7 @@ export default function DraftInvoicePage({
             </p>
              <p>
               <span className="mr-1">Pricelist</span>
-              {pricelistSetter(Singlebill.priceList)}
+              {pricelistSetter(Singlebill.priceList,Business)}
             </p>
           </div>
         </div>
