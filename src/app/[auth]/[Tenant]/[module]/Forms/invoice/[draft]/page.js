@@ -666,8 +666,8 @@ export default function DraftInvoicePage({
               <span className="mr-1">🗓️</span>
               {moment(Singlebill.startDate).format("YYYY-MM-DD")}
             </p>
-             <p className="px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border bg-yellow-50 text-yellow-700 border-yellow-200">
-              {pricelistSetter(Singlebill.priceList,Business)}
+             <p className="p-3 rounded-full font-semibold text-base tracking-wide shadow-sm border bg-green-50 text-green-700 border-green-200">
+              Current Pricelist: {pricelistSetter(Singlebill.priceList,Business)}
             </p>
           </div>
         </div>
