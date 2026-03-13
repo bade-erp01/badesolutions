@@ -32,7 +32,7 @@ import {
   ShieldCheckIcon,
   XMarkIcon
 } from "@heroicons/react/24/solid";
-import {pricelistSetter} from "../../../../../../../../Functions/Functions"
+import {pricelistSetter} from "../../../../../../../Functions/Functions"
 
 
 
