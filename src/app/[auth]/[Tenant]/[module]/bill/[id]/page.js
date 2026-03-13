@@ -806,7 +806,7 @@ export default function InvoicePage({
               <span className="mr-1">🗓️</span>
               {new Date(Singlebill.startDate).toLocaleDateString()}
             </p>
-             <p className="p-2 rounded-full text-sm tracking-wide shadow-sm border bg-green-50 text-green-700 border-green-200">
+             <p className="p-2 rounded-full text-sm tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200">
                Billed at: {pricelistSetter(Singlebill.priceList,userInfo.business)}
             </p>
           </div>
