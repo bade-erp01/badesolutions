@@ -1,11 +1,11 @@
 "use client";
 
 import { mutate } from "swr"; // make sure this is imported
-import { useState, useEffect, Suspense} from "react";
+import { useState, useEffect, Suspense } from "react";
 import QRCode from "qrcode";
 import Swal from "sweetalert2";
 import Image from "next/image";
-import SuspenenseFallBack from '@/app/Components/SuspenenseFallBack';
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import {
   totalInWords,
   Encrypt,
@@ -26,6 +26,7 @@ import {
   ShoppingCartIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
+import {pricelistSetter} from "../../../../../../../../Functions/Functions"
 
 export default function DraftInvoicePage({
   Business,
@@ -42,28 +43,28 @@ export default function DraftInvoicePage({
   const router = useRouter();
 
   // check epirt date function
-   const checkExpiryDate = (createdAt) => {
-     try {
-       // Expiry is 24 hours later
-       const expiryTime = moment(createdAt).add(24, "hours");
+  const checkExpiryDate = (createdAt) => {
+    try {
+      // Expiry is 24 hours later
+      const expiryTime = moment(createdAt).add(24, "hours");
 
-       // Current time
-       const now = moment();
+      // Current time
+      const now = moment();
 
-       // Calculate time left
-       const duration = moment.duration(expiryTime.diff(now));
-       if (duration.asMilliseconds() <= 0) {
-         return "⛔ Expired";
-       } else {
-         const hours = Math.floor(duration.asHours());
-         const minutes = duration.minutes();
-         const seconds = duration.seconds();
-         return `⏳Expire in: ${hours}h ${minutes}m ${seconds}s`;
-       }
-     } catch (err) {
-       return "";
-     }
-   };
+      // Calculate time left
+      const duration = moment.duration(expiryTime.diff(now));
+      if (duration.asMilliseconds() <= 0) {
+        return "⛔ Expired";
+      } else {
+        const hours = Math.floor(duration.asHours());
+        const minutes = duration.minutes();
+        const seconds = duration.seconds();
+        return `⏳Expire in: ${hours}h ${minutes}m ${seconds}s`;
+      }
+    } catch (err) {
+      return "";
+    }
+  };
 
   useEffect(() => {
     Swal.close();
@@ -85,8 +86,8 @@ export default function DraftInvoicePage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access:`${Encrypt(user._id)}`,
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
         },
       });
 
@@ -100,7 +101,7 @@ export default function DraftInvoicePage({
       }
     } catch (error) {
       ErrorMessage(
-        error.message || "Network or server error. Please try again."
+        error.message || "Network or server error. Please try again.",
       );
     }
   };
@@ -136,162 +137,217 @@ export default function DraftInvoicePage({
   };
 
   // Dummy implementations for missing functions (replace with your actual implementations)
-const generatePdf = async (business, customer, bill) => {
-  try {
-    Swal.fire({ title: "Setting things up ⌛...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // 🖼️ Logo on the Left, Business Info on the Right
-    if (business.companyLogo) {
-      try {
-        const logo = await loadImageAsDataURL(business.companyLogo);
-        doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-      } catch (err) {
-        console.warn("Logo failed to load");
-      }
-    }
-
-    doc.setFontSize(16).setFont("helvetica", "bold");
-    doc.text(business.companyName || "", pageWidth - 10, 12, { align: "right" });
-
-    doc.setFontSize(8).setTextColor(0, 0, 0);
-    doc.text(`${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`, pageWidth - 10, 20, { align: "right" });
-    doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-    doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, { align: "right" });
-
-    let currentY = 50;
-
-    // 🚚 Customer Info + 🔳 QR Code in same row
-    doc.setFontSize(15).setTextColor(0, 0, 0).setFont("helvetica", "bold");
-    doc.text("QUOTATION", 10, currentY);
-    currentY += 10;
-
-    // Left Column: Customer Info
-    doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-    doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-    doc.setFontSize(8).setTextColor(0, 0, 0);
-    doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
-    doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-    doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
-    doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
-
-    // Right Column: QR Code
+  const generatePdf = async (business, customer, bill) => {
     try {
-      const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-      doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
-    } catch (err) {
-      console.warn("QR code failed to generate");
-    }
+      Swal.fire({
+        title: "Setting things up ⌛...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    currentY += 30;
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
 
-    // 🧾 Bill Metadata (Placeholder for future use)
-    autoTable(doc, {
-      startY: currentY,
-      tableWidth: 80,
-      margin: { left: pageWidth - 90 },
-      head: [],
-      body: [],
-      theme: "plain",
-      styles: { fontSize: 9, cellPadding: 1 },
-      columnStyles: {
-        0: { fontStyle: "bold", halign: "right" },
-        1: { halign: "right" },
-      },
-    });
-    currentY = doc.lastAutoTable.finalY + 10;
+      // 🖼️ Logo on the Left, Business Info on the Right
+      if (business.companyLogo) {
+        try {
+          const logo = await loadImageAsDataURL(business.companyLogo);
+          doc.addImage(logo, "JPEG", 10, 12, 30, 30);
+        } catch (err) {
+          console.warn("Logo failed to load");
+        }
+      }
 
-    // 📊 Invoice Table
-    autoTable(doc, {
-      startY: currentY,
-      head: [["#", "Product", "Code", "Price","Promo", "CASE", "PCS", "VAT", "Total"]],
-      body: bill.orders.map((ord, i) => [
-        i + 1,
-        ord.item?.Name || "N/A",
-        ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-        ord.priceListPrice || 0,
-        ord.promotionData || 0,
-        ord.Qty || 0,
-        ord.pcsReq || 0,
-        ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
-        ord.total?.toFixed(2) || "0.00",
-      ]),
-      theme: "grid",
-      styles: { fontSize: 9 },
-    });
-    currentY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(16).setFont("helvetica", "bold");
+      doc.text(business.companyName || "", pageWidth - 10, 12, {
+        align: "right",
+      });
 
-    // 💰 Summary Table
-    autoTable(doc, {
-      startY: currentY,
-      tableWidth: 76,
-      margin: { left: pageWidth - 90 },
-      head: [],
-      body: [
-        ["Tax Rate", `${bill.taxRate?.toFixed(2) || 0} (inc in sub.)`],
-        ["Subtotal", bill.subTotal?.toFixed(2) || "0.00"],
-        ["Discount", bill.discount?.toFixed(2) || "0.00"],
-        ["Total Due", bill.grandTotal?.toFixed(2) || "0.00"],
-      ],
-      theme: "grid",
-      styles: { fontSize: 9, cellPadding: 1 },
-      columnStyles: {
-        0: { fontStyle: "bold", halign: "right" },
-        1: { halign: "right" },
-      },
-    });
-    currentY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.text(
+        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
+        pageWidth - 10,
+        20,
+        { align: "right" },
+      );
+      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
+      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
+        align: "right",
+      });
 
-    // ✍️ Signatures
-    doc.setFontSize(10);
-    doc.text(`${totalInWords(bill.grandTotal, business.currency?.currency)}`, 10, currentY);
-    currentY += 10;
-    doc.text("Authorized signatories", 10, currentY);
-    currentY += 10;
-    doc.text(`${business.companyName.toLowerCase()} _______________________________`, 10, currentY);
-    currentY += 10;
-    doc.text("Customer Sign & Date _______________________________", 10, currentY);
-    currentY += 10;
-    if (business.invoicePolicy) {
-      doc.text(business.invoicePolicy, 10, currentY);
+      let currentY = 50;
+
+      // 🚚 Customer Info + 🔳 QR Code in same row
+      doc.setFontSize(15).setTextColor(0, 0, 0).setFont("helvetica", "bold");
+      doc.text("QUOTATION", 10, currentY);
       currentY += 10;
-    }
 
-    // 📎 Footer
-    doc.setFontSize(9);
-    doc.text(`Kindly note that this ${bill.billStatus} is invalid after ${moment().format('l')}`, 10, pageHeight - 20);
+      // Left Column: Customer Info
+      doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
+      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
+      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
+      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
+      doc.text(
+        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
+        10,
+        currentY + 18,
+      );
+      doc.text(
+        `Download Date: ${moment().format("YYYY-MM-DD")}`,
+        10,
+        currentY + 24,
+      );
 
-    // 📄 Page Numbers
-    const totalPages = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10, { align: "right" });
-    }
+      // Right Column: QR Code
+      try {
+        const qrDataURL = await QRCode.toDataURL(
+          "https://badesolutions.com.ng",
+        );
+        doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
+      } catch (err) {
+        console.warn("QR code failed to generate");
+      }
 
-    // 📥 Output
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url, "_blank");
+      currentY += 30;
 
-    if (win) {
-      win.onload = () => {
+      // 🧾 Bill Metadata (Placeholder for future use)
+      autoTable(doc, {
+        startY: currentY,
+        tableWidth: 80,
+        margin: { left: pageWidth - 90 },
+        head: [],
+        body: [],
+        theme: "plain",
+        styles: { fontSize: 9, cellPadding: 1 },
+        columnStyles: {
+          0: { fontStyle: "bold", halign: "right" },
+          1: { halign: "right" },
+        },
+      });
+      currentY = doc.lastAutoTable.finalY + 10;
+
+      // 📊 Invoice Table
+      autoTable(doc, {
+        startY: currentY,
+        head: [
+          [
+            "#",
+            "Product",
+            "Code",
+            "Price",
+            "Promo",
+            "CASE",
+            "PCS",
+            "VAT",
+            "Total",
+          ],
+        ],
+        body: bill.orders.map((ord, i) => [
+          i + 1,
+          ord.item?.Name || "N/A",
+          ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
+          ord.priceListPrice || 0,
+          ord.promotionData || 0,
+          ord.Qty || 0,
+          ord.pcsReq || 0,
+          ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
+          ord.total?.toFixed(2) || "0.00",
+        ]),
+        theme: "grid",
+        styles: { fontSize: 9 },
+      });
+      currentY = doc.lastAutoTable.finalY + 10;
+
+      // 💰 Summary Table
+      autoTable(doc, {
+        startY: currentY,
+        tableWidth: 76,
+        margin: { left: pageWidth - 90 },
+        head: [],
+        body: [
+          ["Tax Rate", `${bill.taxRate?.toFixed(2) || 0} (inc in sub.)`],
+          ["Subtotal", bill.subTotal?.toFixed(2) || "0.00"],
+          ["Discount", bill.discount?.toFixed(2) || "0.00"],
+          ["Total Due", bill.grandTotal?.toFixed(2) || "0.00"],
+        ],
+        theme: "grid",
+        styles: { fontSize: 9, cellPadding: 1 },
+        columnStyles: {
+          0: { fontStyle: "bold", halign: "right" },
+          1: { halign: "right" },
+        },
+      });
+      currentY = doc.lastAutoTable.finalY + 10;
+
+      // ✍️ Signatures
+      doc.setFontSize(10);
+      doc.text(
+        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
+        10,
+        currentY,
+      );
+      currentY += 10;
+      doc.text("Authorized signatories", 10, currentY);
+      currentY += 10;
+      doc.text(
+        `${business.companyName.toLowerCase()} _______________________________`,
+        10,
+        currentY,
+      );
+      currentY += 10;
+      doc.text(
+        "Customer Sign & Date _______________________________",
+        10,
+        currentY,
+      );
+      currentY += 10;
+      if (business.invoicePolicy) {
+        doc.text(business.invoicePolicy, 10, currentY);
+        currentY += 10;
+      }
+
+      // 📎 Footer
+      doc.setFontSize(9);
+      doc.text(
+        `Kindly note that this ${bill.billStatus} is invalid after ${moment().format("l")}`,
+        10,
+        pageHeight - 20,
+      );
+
+      // 📄 Page Numbers
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.text(
+          `Page ${i} of ${totalPages}`,
+          pageWidth - 20,
+          pageHeight - 10,
+          { align: "right" },
+        );
+      }
+
+      // 📥 Output
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, "_blank");
+
+      if (win) {
+        win.onload = () => {
+          Swal.close();
+          win.print();
+        };
+      } else {
+        doc.save(`${bill.customerName || "invoice"}.pdf`);
         Swal.close();
-        win.print();
-      };
-    } else {
-      doc.save(`${bill.customerName || "invoice"}.pdf`);
+      }
+    } catch (error) {
       Swal.close();
+      console.error("Error generating PDF:");
     }
-  } catch (error) {
-    Swal.close();
-    console.error("Error generating PDF:");
-  }
-};
-
+  };
 
   // Optimized product selection handler
   const handleProductSelection = async (productId) => {
@@ -300,27 +356,30 @@ const generatePdf = async (business, customer, bill) => {
       plsWait("Adding product...");
       // find the product and return the id
       const cleanedProducts = await products.find((product) => {
-        return product.item?.ACDcode === productId ||  product.item?.ADCcode === productId;
+        return (
+          product.item?.ACDcode === productId ||
+          product.item?.ADCcode === productId
+        );
       });
 
-     if(!cleanedProducts){
-      throw new Error('Product not found')
-     }
+      if (!cleanedProducts) {
+        throw new Error("Product not found");
+      }
 
       const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(bill._id)}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
       const res = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-           access:`${Encrypt(user._id)}`,
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
         },
         body: JSON.stringify({ product: cleanedProducts.storeId }), // Ensure it's sent as an object
       });
       const data = await res.json();
       if (data.message) {
         SuccessToast(data.message);
-        setInputValue("")
+        setInputValue("");
         // Use Next.js router.reload() instead of window.location.reload()
         router.refresh();
       } else {
@@ -328,7 +387,7 @@ const generatePdf = async (business, customer, bill) => {
       }
     } catch (error) {
       ErrorMessage(error.message);
-      setInputValue("")
+      setInputValue("");
       router.refresh();
     }
   };
@@ -349,15 +408,15 @@ const generatePdf = async (business, customer, bill) => {
       if (!result.isConfirmed) {
         return;
       }
-      plsWait("Deleting draft. Please wait.")
+      plsWait("Deleting draft. Please wait.");
       const url = `${EXPRESS_PRIVATE_URL}/api/Draft/order/Delete/${Encrypt(bill._id)}`;
       const response = await fetch(url, {
         method: "DELETE",
-        headers: { 
-          "Content-Type": "application/json", 
+        headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access:`${Encrypt(user._id)}`,
-          "idempotency-key" : `delete-${bill._id}`
+          access: `${Encrypt(user._id)}`,
+          "idempotency-key": `delete-${bill._id}`,
         },
       });
       const data = await response.json();
@@ -378,29 +437,29 @@ const generatePdf = async (business, customer, bill) => {
   };
 
   const handleQtyChange = async (
-     lineId,
+    lineId,
     value,
     toUpdate,
     billId,
     storeId,
     userId,
-    companyName
+    companyName,
   ) => {
     try {
-      plsWait('Updating cart...');
+      plsWait("Updating cart...");
 
       const url = `${EXPRESS_PRIVATE_URL}/api/Invoice/Cart/Update?user=${Encrypt(
-        userId
+        userId,
       )}`;
 
       const response = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-           access:`${Encrypt(user._id)}`,
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
         },
-        body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
+        body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
       });
 
       const data = await response.json();
@@ -449,7 +508,9 @@ const generatePdf = async (business, customer, bill) => {
       }
 
       // loading indicator
-      plsWait("Please wait while i process your request. This should only take a bit. Do not reload this page...");
+      plsWait(
+        "Please wait while i process your request. This should only take a bit. Do not reload this page...",
+      );
 
       const response = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/wareHouse/Bill?user=${Encrypt(user._id)}&ops=${Encrypt(userInput)}`,
@@ -458,11 +519,15 @@ const generatePdf = async (business, customer, bill) => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access:`${Encrypt(user._id)}`,
-            "idempotency-key" : `invoice-${bill._id}`
+            access: `${Encrypt(user._id)}`,
+            "idempotency-key": `invoice-${bill._id}`,
           },
-          body: JSON.stringify({ billId: bill._id, customer: Singlebill.customer._id,restriction:userInfo.business?.InvoiceRestriction }),
-        }
+          body: JSON.stringify({
+            billId: bill._id,
+            customer: Singlebill.customer._id,
+            restriction: userInfo.business?.InvoiceRestriction,
+          }),
+        },
       );
 
       const data = await response.json();
@@ -492,8 +557,8 @@ const generatePdf = async (business, customer, bill) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access:`${Encrypt(user._id)}`,
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
         },
         body: JSON.stringify({ lineId, billId: bill._id }),
       });
@@ -508,11 +573,11 @@ const generatePdf = async (business, customer, bill) => {
         router.refresh();
       } else {
         ErrorMessage(data.error || "Something went wrong.");
-         router.refresh();
+        router.refresh();
       }
     } catch (err) {
       ErrorMessage("Unexpected error occurred.");
-       router.refresh();
+      router.refresh();
     }
   };
 
@@ -541,91 +606,98 @@ const generatePdf = async (business, customer, bill) => {
           </span>
           <div className="text-right">
             <span className="text-xs text-gray-900 tracking-tight mb-1">
-              Created on: {moment(Singlebill.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
+              Created on:{" "}
+              {moment(Singlebill.createdAt).format(
+                "dddd DD MMMM YYYY [at] hh:mm A",
+              )}
             </span>
-            </div>
+          </div>
         </div>
 
         {/* Company + Customer Info */}
-          <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
-            <div className="flex items-start gap-6 w-full md:w-auto">
-              <Image
-                src={userInfo.business.companyLogo}
-                width={90}
-                height={90}
-                alt="logo"
-              />
-              <div className="text-sm text-gray-700 space-y-1">
-                <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
-            {userInfo.business.companyName}
-                </h3>
-                <p className="text-gray-500">{userInfo.business.email}</p>
-                <p className="text-gray-500">{userInfo.business.Tel}</p>
-                <p className="text-gray-500">{userInfo.business.Address}</p>
-                <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
-                <h2
-            className={`mt-3 font-bold text-base ${
-              isCancelled ? "text-red-600" : "text-gray-800"
-            }`}
-                >
-            {Singlebill.billStatus.toUpperCase()} /{" "}
-            {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
-                </h2>
-                <h2 className=" mb-2 text-lg font-bold text-indigo-700 tracking-wide">
-            {Singlebill.WayBillNo}
-                </h2>
-              </div>
-            </div>
-
-            <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
-              <h3 className="text-xl font-bold text-gray-900 tracking-tight">
-                {Singlebill.customerName?.toUpperCase()}
+        <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
+          <div className="flex items-start gap-6 w-full md:w-auto">
+            <Image
+              src={userInfo.business.companyLogo}
+              width={90}
+              height={90}
+              alt="logo"
+            />
+            <div className="text-sm text-gray-700 space-y-1">
+              <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
+                {userInfo.business.companyName}
               </h3>
-              <p>
-                <span className="mr-1">📌</span>
-            {Singlebill.customer.billingAddress?.slice(0,30) || "N/A"}
-              </p>
-              <p>
-                <span className="mr-1">✉️</span>
-                <a
-            href={`mailto:${Singlebill.customer.Email}`}
-            className="hover:underline text-indigo-700"
-                >
-            {Singlebill.customer.Email || "N/A"}
-                </a>
-              </p>
-              <p>
-                <span className="mr-1">🗓️</span>
-                {moment(Singlebill.startDate).format("YYYY-MM-DD")}
-              </p>
+              <p className="text-gray-500">{userInfo.business.email}</p>
+              <p className="text-gray-500">{userInfo.business.Tel}</p>
+              <p className="text-gray-500">{userInfo.business.Address}</p>
+              <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
+              <h2
+                className={`mt-3 font-bold text-base ${
+                  isCancelled ? "text-red-600" : "text-gray-800"
+                }`}
+              >
+                {Singlebill.billStatus.toUpperCase()} /{" "}
+                {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
+              </h2>
+              <h2 className=" mb-2 text-lg font-bold text-indigo-700 tracking-wide">
+                {Singlebill.WayBillNo}
+              </h2>
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-            {/* CheckOut Button */}
-                  <div className="flex justify-evenly items-center gap-4">
-                   {(
-                    (!userInfo.business.InvoiceRestriction &&
-                    user._id === Singlebill.invoicerId &&
-                    user.raiseInvoice &&
-                    Singlebill.billStatus.toLowerCase() === "draft") ||
-                    (userInfo.business.InvoiceRestriction &&
-                    user._id === Singlebill.invoicerId &&
-                    user.raiseInvoice &&
-                    Singlebill.billStatus.toLowerCase() === "draft" &&
-                    isOlderThan24Hours)
-                  )  && Singlebill.orders.length > 0 && (
-                    <button
-                    title="Process this draft to order"
-                    onClick={processInvoice}
-                    className="px-5 py-2 rounded-sm font-semibold text-base tracking-wide shadow-lg border bg-black border-green-300 inline-flex items-center justify-center hover:bg-gray-900/50 hover:shadow-xl hover:border-green-400 transition duration-200 ease-in-out"
-                    >
-                    <ShoppingCartIcon className="h-5 w-5 text-gray-100" /> {" "}
-                <span className="text-gray-100">Checkout Cart </span>
-              </button>
-            )}          
+          <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
+            <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+              {Singlebill.customerName?.toUpperCase()}
+            </h3>
+            <p>
+              <span className="mr-1">📌</span>
+              {Singlebill.customer.billingAddress?.slice(0, 30) || "N/A"}
+            </p>
+            <p>
+              <span className="mr-1">✉️</span>
+              <a
+                href={`mailto:${Singlebill.customer.Email}`}
+                className="hover:underline text-indigo-700"
+              >
+                {Singlebill.customer.Email || "N/A"}
+              </a>
+            </p>
+            <p>
+              <span className="mr-1">🗓️</span>
+              {moment(Singlebill.startDate).format("YYYY-MM-DD")}
+            </p>
+             <p>
+              <span className="mr-1">Pricelist</span>
+              {pricelistSetter(Singlebill.priceList)}
+            </p>
+          </div>
+        </div>
 
-            {user._id === Singlebill.invoicerId && user.raiseInvoice &&
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+          {/* CheckOut Button */}
+          <div className="flex justify-evenly items-center gap-4">
+            {((!userInfo.business.InvoiceRestriction &&
+              user._id === Singlebill.invoicerId &&
+              user.raiseInvoice &&
+              Singlebill.billStatus.toLowerCase() === "draft") ||
+              (userInfo.business.InvoiceRestriction &&
+                user._id === Singlebill.invoicerId &&
+                user.raiseInvoice &&
+                Singlebill.billStatus.toLowerCase() === "draft" &&
+                isOlderThan24Hours)) &&
+              Singlebill.orders.length > 0 && (
+                <button
+                  title="Process this draft to order"
+                  onClick={processInvoice}
+                  className="px-5 py-2 rounded-sm font-semibold text-base tracking-wide shadow-lg border bg-black border-green-300 inline-flex items-center justify-center hover:bg-gray-900/50 hover:shadow-xl hover:border-green-400 transition duration-200 ease-in-out"
+                >
+                  <ShoppingCartIcon className="h-5 w-5 text-gray-100" />{" "}
+                  <span className="text-gray-100">Checkout Cart </span>
+                </button>
+              )}
+
+            {user._id === Singlebill.invoicerId &&
+              user.raiseInvoice &&
               Singlebill.billStatus.toLowerCase() === "draft" && (
                 <button
                   title="Delete this draft"
@@ -681,7 +753,7 @@ const generatePdf = async (business, customer, bill) => {
               </tr>
             </thead>
             <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill,index) => (
+              {Singlebill.orders.map((bill, index) => (
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-gray-50 transition"
@@ -709,36 +781,40 @@ const generatePdf = async (business, customer, bill) => {
                     />
                   </td>
                   {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
-                  <td className="px-4 py-2 text-center text-xs">{bill.item.ACDcode || bill.item.ADCcode}</td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "draft" ? (
-                     <input
-                      type="number"
-                      defaultValue={bill.Qty || 0}
-                      min={0}
-                      onBlur={(e) => {
-                        let val = e.target.value;
-                        if (val < 0) return
-                        if (val < 0) val = 0;
-                        handleQtyChange(
-                          bill._id,
-                          val,
-                          "Qty",
-                          Singlebill._id,
-                          bill.storeProductId,
-                          userInfo.user._id,
-                          userInfo.business.companyName
-                        );
-                      }}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
-                    />
+                    {bill.item.ACDcode || bill.item.ADCcode}
+                  </td>
+                  <td className="px-4 py-2 text-center text-xs">
+                    {user._id === Singlebill.invoicerId &&
+                    Singlebill.billStatus.toLowerCase() === "draft" ? (
+                      <input
+                        type="number"
+                        defaultValue={bill.Qty || 0}
+                        min={0}
+                        onBlur={(e) => {
+                          let val = e.target.value;
+                          if (val < 0) return;
+                          if (val < 0) val = 0;
+                          handleQtyChange(
+                            bill._id,
+                            val,
+                            "Qty",
+                            Singlebill._id,
+                            bill.storeProductId,
+                            userInfo.user._id,
+                            userInfo.business.companyName,
+                          );
+                        }}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
+                      />
                     ) : (
                       bill.Qty
                     )}
                   </td>
 
                   <td className="px-4 py-2 text-center text-xs">
-                    {Business.allowSkuSplitting && user._id === Singlebill.invoicerId &&
+                    {Business.allowSkuSplitting &&
+                    user._id === Singlebill.invoicerId &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
@@ -746,7 +822,7 @@ const generatePdf = async (business, customer, bill) => {
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                         onBlur={(e) => {
                           let val = e.target.value;
-                          if (val < 0) return
+                          if (val < 0) return;
                           if (val < 0) val = 0;
                           handleQtyChange(
                             bill._id, // lineId
@@ -755,7 +831,7 @@ const generatePdf = async (business, customer, bill) => {
                             Singlebill._id, // billId
                             bill.storeProductId, // storeId
                             userInfo.user._id, // userId
-                            userInfo.business.companyName // companyName
+                            userInfo.business.companyName, // companyName
                           );
                         }}
                       />
@@ -764,15 +840,16 @@ const generatePdf = async (business, customer, bill) => {
                     )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {user._id === Singlebill.invoicerId && Business.allowPriceChangeOnInvoice &&
+                    {user._id === Singlebill.invoicerId &&
+                    Business.allowPriceChangeOnInvoice &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
-                     <input
+                      <input
                         type="number"
                         defaultValue={bill.priceListPrice || 0}
                         className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                         onBlur={(e) => {
                           let val = e.target.value;
-                          if (val < 0) return
+                          if (val < 0) return;
                           if (val < 0) val = 0;
                           handleQtyChange(
                             bill._id, // lineId
@@ -781,7 +858,7 @@ const generatePdf = async (business, customer, bill) => {
                             Singlebill._id, // billId
                             bill.storeProductId, // storeId
                             userInfo.user._id, // userId
-                            userInfo.business.companyName // companyName
+                            userInfo.business.companyName, // companyName
                           );
                         }}
                       />
@@ -795,14 +872,17 @@ const generatePdf = async (business, customer, bill) => {
                     {bill.promotionData || 0}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {bill.vat > 0 && bill.item.VAT ? bill.item.VAT.$numberDecimal : 0}
+                    {bill.vat > 0 && bill.item.VAT
+                      ? bill.item.VAT.$numberDecimal
+                      : 0}
                   </td>
                   <td className="px-4 py-2 font-bold text-right text-xs">
                     {userInfo.business.currency?.currency.Symbol}
                     {bill.total?.toFixed(2)}
                   </td>
                   <td>
-                    {user._id === Singlebill.invoicerId && user.raiseInvoice &&
+                    {user._id === Singlebill.invoicerId &&
+                      user.raiseInvoice &&
                       Singlebill.billStatus.toLowerCase() === "draft" && (
                         <span
                           title={`Click to remove ${bill.item?.ADCcode?.toLowerCase()} from cart`}
@@ -819,75 +899,82 @@ const generatePdf = async (business, customer, bill) => {
           </table>
         </div>
 
-        {user._id === Singlebill.invoicerId &&  Singlebill.billStatus.toLowerCase() === "draft" && (
-          <div className="mb-8">
-            {/* Dropdown for small screens */}
-            <div className="block md:hidden">
-              <label
-                htmlFor="productDropdown"
-                className="block mb-2 text-sm font-medium text-gray-700"
-              >
-                Select {productList.length} Products
-              </label>
-              <select
-                onChange={(e) => {
-                  if(e.target.value !== ""){
-                   handleProductSelection(e.target.value);
-                  }
-                }}
-                id="productDropdown"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
-              >
+        {user._id === Singlebill.invoicerId &&
+          Singlebill.billStatus.toLowerCase() === "draft" && (
+            <div className="mb-8">
+              {/* Dropdown for small screens */}
+              <div className="block md:hidden">
+                <label
+                  htmlFor="productDropdown"
+                  className="block mb-2 text-sm font-medium text-gray-700"
+                >
+                  Select {productList.length} Products
+                </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value !== "") {
+                      handleProductSelection(e.target.value);
+                    }
+                  }}
+                  id="productDropdown"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
+                >
                   <option value={""}>Choose...</option>
-                 { products.map((product) => (
-                    <option key={product.item._id} value={product.item.ACDcode || product.item.ADCcode }>
-                      {product.item.Name} [ Case:{product.Case} Pcs:{product.pcs} ]
+                  {products.map((product) => (
+                    <option
+                      key={product.item._id}
+                      value={product.item.ACDcode || product.item.ADCcode}
+                    >
+                      {product.item.Name} [ Case:{product.Case} Pcs:
+                      {product.pcs} ]
                     </option>
-                   ))
-                  }
+                  ))}
                 </select>
-                </div>
+              </div>
 
-                {/* Datalist for medium and larger screens */}
-                <div className="hidden md:flex flex-col items-start justify-center space-y-4">
-                  <label
+              {/* Datalist for medium and larger screens */}
+              <div className="hidden md:flex flex-col items-start justify-center space-y-4">
+                <label
                   htmlFor="productDatalist"
                   className="text-sm font-medium text-gray-700"
-                  >
+                >
                   Search {productList.length} Products
-                  </label>
+                </label>
 
-                  <div className="flex items-center space-x-2">
-                 <input
-                  type="text"
-                  defaultValue={inputValue}
-                  list="productsList"
-                  id="productDatalist"
-                  onBlur={(e) => {
-                    const trimmedValue = e.target.value.trim();
-                    setInputValue(trimmedValue);
-                    if (trimmedValue !== "") {
-                      handleProductSelection(trimmedValue);
-                      setInputValue("")
-                    }
-                      e.target.value = ""
-                  }}
-                  className="w-72 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                  placeholder="Type to search products..."
-                />
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    defaultValue={inputValue}
+                    list="productsList"
+                    id="productDatalist"
+                    onBlur={(e) => {
+                      const trimmedValue = e.target.value.trim();
+                      setInputValue(trimmedValue);
+                      if (trimmedValue !== "") {
+                        handleProductSelection(trimmedValue);
+                        setInputValue("");
+                      }
+                      e.target.value = "";
+                    }}
+                    className="w-72 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    placeholder="Type to search products..."
+                  />
+                </div>
 
-                  <datalist id="productsList">
-                  { products.map((product) => (
-                    <option key={product.item._id} value={product.item.ACDcode || product.item.ADCcode }>
-                      {product.item.Name} [ Case:{product.Case} Pcs:{product.pcs} ]
+                <datalist id="productsList">
+                  {products.map((product) => (
+                    <option
+                      key={product.item._id}
+                      value={product.item.ACDcode || product.item.ADCcode}
+                    >
+                      {product.item.Name} [ Case:{product.Case} Pcs:
+                      {product.pcs} ]
                     </option>
-                   ))
-                  }
-                  </datalist>
-                </div>
-                </div>
-              )} 
+                  ))}
+                </datalist>
+              </div>
+            </div>
+          )}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
           <div className="bg-linear-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
             <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
@@ -904,17 +991,18 @@ const generatePdf = async (business, customer, bill) => {
               </div>
               <div className="flex justify-between">
                 <span>Discount Allowed:</span>
-                {user._id === Singlebill.invoicerId && Singlebill.billStatus === "Draft" ? (
-                 <input
+                {user._id === Singlebill.invoicerId &&
+                Singlebill.billStatus === "Draft" ? (
+                  <input
                     type="number"
                     defaultValue={Singlebill.discount || 0}
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                     onBlur={(e) => {
                       const val = parseFloat(e.target.value);
-                      if (val < 0) return
+                      if (val < 0) return;
                       updateDiscount(
                         Singlebill._id,
-                        isNaN(val) || val < 0 ? 0 : val
+                        isNaN(val) || val < 0 ? 0 : val,
                       );
                     }}
                   />
@@ -955,7 +1043,7 @@ const generatePdf = async (business, customer, bill) => {
             <p className="italic text-base text-orange-700">
               {totalInWords(
                 Singlebill.grandTotal,
-                userInfo.business.currency?.currency
+                userInfo.business.currency?.currency,
               )}
             </p>
           </div>
@@ -983,19 +1071,18 @@ const generatePdf = async (business, customer, bill) => {
 
         {/* Footer Reference */}
         <div className="mt-12 pt-8 border-t text-center text-md text-gray-800 tracking-wide">
-          
           {userInfo.business.InvoiceRestriction ? (
-              <>{checkExpiryDate(Singlebill.createdAt)}</>
-            ) : (
-              <h2
-                className={`mt-3 font-bold text-base ${
-                  isCancelled ? "text-red-600" : "text-gray-800"
-                }`}
-              >
-                {Singlebill.billStatus.toUpperCase()} /{" "}
-                {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
-              </h2>
-            )}
+            <>{checkExpiryDate(Singlebill.createdAt)}</>
+          ) : (
+            <h2
+              className={`mt-3 font-bold text-base ${
+                isCancelled ? "text-red-600" : "text-gray-800"
+              }`}
+            >
+              {Singlebill.billStatus.toUpperCase()} /{" "}
+              {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
+            </h2>
+          )}
         </div>
       </div>
     </Suspense>

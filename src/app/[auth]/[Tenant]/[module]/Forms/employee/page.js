@@ -30,7 +30,7 @@ export default function NewEmployeeForm({userData,baseUrl}) {
     e.preventDefault();
     plsWait('Please wait... Do not refresh this page')
     try {
-      const response = await fetch(`${baseUrl}/api/createUser`, {
+      const response = await fetch(`${baseUrl}/api/createUser/${Encrypt(userData.user._id)}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
