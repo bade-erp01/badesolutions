@@ -32,6 +32,9 @@ import {
   ShieldCheckIcon,
   XMarkIcon
 } from "@heroicons/react/24/solid";
+import {pricelistSetter} from "../../../../../../../../Functions/Functions"
+
+
 
 export default function InvoicePage({
   userInfo,
@@ -802,6 +805,9 @@ export default function InvoicePage({
             <p>
               <span className="mr-1">🗓️</span>
               {new Date(Singlebill.startDate).toLocaleDateString()}
+            </p>
+             <p className="p-2 rounded-full text-sm tracking-wide shadow-sm border bg-green-50 text-green-700 border-green-200">
+               Billed at: {pricelistSetter(Singlebill.priceList,userInfo.business)}
             </p>
           </div>
         </div>
