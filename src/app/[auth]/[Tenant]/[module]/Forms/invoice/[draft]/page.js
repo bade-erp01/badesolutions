@@ -896,7 +896,7 @@ export default function DraftInvoicePage({
               ))}
             </tbody>
            <caption class="text-sm font-medium text-gray-700 bg-gray-100 p-2 rounded">
-              Ensure to verify pricelist on {} account before closing Draft
+              ⚠️ Ensure to verify pricelist on {} account before closing Draft
           </caption>
           </table>
         </div>
