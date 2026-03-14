@@ -38,7 +38,7 @@ export default function MainDash({ userData }) {
     str && str.length > length ? str.substring(0, length) + "..." : str;
   const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
 
-  // 🧠 Memoized sorted invoices
+  // Memoized sorted invoices
   const sortedInvoices = useMemo(() => {
     return (
       tenantData?.invoice?.sort(
@@ -160,7 +160,7 @@ export default function MainDash({ userData }) {
     // Tab visibility
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible" && userData.user.c_levelDash) {
-        // console.log("👁️ Tab became visible");
+        // console.log(" Tab became visible");
         fetchTenantData();
       }
     };
@@ -172,7 +172,7 @@ export default function MainDash({ userData }) {
     };
 
     const handleOffline = () => {
-      plsWait("📴Currently Offline");
+      plsWait("Currently Offline");
     };
 
     // User activity listeners
@@ -284,7 +284,7 @@ export default function MainDash({ userData }) {
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-lg shadow-md animate__animated animate__flipInY">
+            <div className="bg-white p-5 rounded shadow-md animate__animated animate__flipInY">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm text-gray-500">Purchase</h3>
