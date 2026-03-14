@@ -51,10 +51,6 @@ export default function SalesRportModal({ user, business, baseUrl }) {
 
   const showModal = (initialInvoices = [], customers = [], stores = [], users = []) => {
     // local helpers that use the provided lists (avoids stale closure over state)
-    const getCustomer = (id) => {
-      const selectedCustomer = customers.find((cust) => cust._id === id);
-      return selectedCustomer?.Username || "";
-    };
 
     const getSTore = (id) => {
       const selectedStore = stores.find((s) => s._id === id);
@@ -74,7 +70,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
         <td style="padding: 4px;">${index + 1}</td>
         <td style="padding: 4px; text-align: left;">${(item.billReferenceNo || "").trim()}</td>
         <td style="padding: 4px;">${(item.invoicelocation || "").trim()}</td>
-        <td style="padding: 4px;">${getCustomer(item.customer)}</td>
+        <td style="padding: 4px;">${item.customer.Username}</td>
         <td style="padding: 4px;">${getSTore(item.whId)}</td>
         <td style="padding: 4px;">${getUser(item.invoicerId)}</td>
         <td style="padding: 4px;">${getUser(item.salesPerson)}</td>
@@ -227,7 +223,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
               othersMatch &&
               (!Rep || (item.salesPerson || "").toLowerCase() === Rep.toLowerCase()) &&
               (!Status || (item.billStatus || "").toLowerCase() === Status.toLowerCase()) &&
-              (!customer || item.customer === customer) &&
+              (!customer || item.customer._id === customer) &&
               (!Store || item.whId === Store) &&
               (!PriceList || (item.priceList || "").toLowerCase() === PriceList.toLowerCase())
             );
@@ -273,7 +269,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
                     "Store code": entry.invoicelocation,
                     Store: getSTore(entry.whId),
                     Invoicer: getUser(entry.invoicerId),
-                    Customer: getCustomer(entry.customer),
+                    Customer: entry.customer.Username,
                     Rep: getUser(entry.salesPerson),
                     status: entry.billStatus,
                     Pricelist: pricelistSetter(entry.priceList, business),

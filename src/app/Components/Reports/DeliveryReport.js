@@ -49,10 +49,10 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
         } 
       };
 
-  const getCustomer = (id) => {
-    const selectedCustomer = customersList.find((cust) => cust._id.toString() === id.toString());
-    return selectedCustomer?.Username || "";
-  };
+  // const getCustomer = (id) => {
+  //   const selectedCustomer = customersList.find((cust) => cust._id.toString() === id.toString());
+  //   return selectedCustomer?.Username || "";
+  // };
 
   const getSTore = (id) => {
     const selectedBank = StoresList.find((bank) => bank._id === id);
@@ -71,7 +71,7 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 4px;">${index + 1}</td>
         <td style="padding: 4px; text-align: left;">${item.billReferenceNo?.trim() || ""}</td>
-        <td style="padding: 4px;">${getCustomer(item.customer)}</td>
+        <td style="padding: 4px;">${item.customer.Username}</td>
         <td style="padding: 4px;">${getSTore(item.whId)}</td>
         <td style="padding: 4px;">${getUser(item.invoicerId)}</td>
         <td style="padding: 4px;">${getUser(item.salesPerson)}</td>
@@ -196,7 +196,7 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
                     (!end || (itemDate && itemDate.isSameOrBefore(end, "day"))) &&
                     (!Rep || item.salesPerson === Rep) &&
                     (!Status || item.billStatus?.toLowerCase() === Status.toLowerCase()) &&
-                    (!customer || item.customer === customer) &&
+                    (!customer || item.customer._id.toString() === customer) &&
                     (!Store || item.whId === Store)
                 );
             });
@@ -241,14 +241,19 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
                     "Store code":entry.invoicelocation,
                     "Store":getSTore(entry.whId),
                     "Invoicer":getUser(entry.invoicerId),
-                    "Customer":getCustomer(entry.customer),
+                    "Customer":entry.customer.Username,
+                    "Address":entry.customer.billingAddress,
+                    "State": entry.customer.state,
+                    "Region": entry.customer.Region,
                     "Rep":getUser(entry.salesPerson),
                     "status":entry.billStatus,
                     "Date":entry.DELIVERYDATE ? moment(entry.DELIVERYDATE).format('YYYY-MM-DD'):'',
                     "Driver":entry.DriverName,
                     "Vehicle No":entry.DriverNumber,
                     "W/B":entry.WayBillNo,
-                    "Shipping Fee":entry.shippingFee
+                    "Comment":entry.DeliveryComment,
+                    "Shipping Fee":entry.shippingFee,
+                    "GrandTotal":entry.grandTotal
                   })
                 })
                 const excelBtn = downloadExcel( clean,`${searchPeriod} Logistics Report`);
