@@ -50,7 +50,7 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
       };
 
   const getCustomer = (id) => {
-    const selectedCustomer = customersList.find((cust) => cust._id === id);
+    const selectedCustomer = customersList.find((cust) => cust._id.toString() === id.toString());
     return selectedCustomer?.Username || "";
   };
 
