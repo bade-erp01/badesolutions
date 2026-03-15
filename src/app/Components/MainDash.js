@@ -574,7 +574,7 @@ export default function MainDash({ userData }) {
                   Sales Team Kpi Millestone
                 </h4> */}
 
-                <h4 className="text-sm text-gray-500 font-semibold mb-4">
+                <h4 className="text-lg text-gray-500 font-semibold mb-4">
                  ⏰ Tasks Reminder
                 </h4>
 
