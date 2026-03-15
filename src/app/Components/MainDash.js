@@ -16,10 +16,16 @@ import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { ShoppingBagIcon, ArrowTrendingDownIcon,ShoppingCartIcon ,ArrowTrendingUpIcon,BanknotesIcon} from "@heroicons/react/24/outline";
+import {
+  ShoppingBagIcon,
+  ArrowTrendingDownIcon,
+  ShoppingCartIcon,
+  ArrowTrendingUpIcon,
+  BanknotesIcon,
+} from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
-import PendingPaymentReminder from "@/app/Components/RemindPendingPayments"
+import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -42,7 +48,7 @@ export default function MainDash({ userData }) {
   const sortedInvoices = useMemo(() => {
     return (
       tenantData?.invoice?.sort(
-        (a, b) => b.billReferenceNo - a.billReferenceNo
+        (a, b) => b.billReferenceNo - a.billReferenceNo,
       ) || []
     );
   }, [tenantData]);
@@ -66,15 +72,17 @@ export default function MainDash({ userData }) {
         }, 300); // 300ms debounce
       }
     },
-    [totalPages]
+    [totalPages],
   );
 
   // Memoized paginated MonitoredProduct
   // Memoized sorted monitored products
   const sortedMonitoredProducts = useMemo(() => {
-    return tenantData?.MonitoredProduct?.sort(
-      (a, b) => a.productName.localeCompare(b.productName)
-    ) || [];
+    return (
+      tenantData?.MonitoredProduct?.sort((a, b) =>
+        a.productName.localeCompare(b.productName),
+      ) || []
+    );
   }, [tenantData]);
 
   //  Memoized paginated MonitoredProduct
@@ -87,7 +95,6 @@ export default function MainDash({ userData }) {
     return Math.ceil(sortedMonitoredProducts.length / monitoredItemsPerPage);
   }, [sortedMonitoredProducts]);
 
-
   // ⏱ Debounced page change
   const handleMonitoredProductPageChange = useCallback(
     (page) => {
@@ -97,7 +104,7 @@ export default function MainDash({ userData }) {
         }, 300); // 300ms debounce
       }
     },
-    [totalMonitoredProductPages]
+    [totalMonitoredProductPages],
   );
 
   useEffect(() => {
@@ -118,7 +125,7 @@ export default function MainDash({ userData }) {
         const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Report`, {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
-            access:`${Encrypt(userData?.user._id)}`,
+            access: `${Encrypt(userData?.user._id)}`,
           },
         });
 
@@ -128,7 +135,7 @@ export default function MainDash({ userData }) {
         setTenantData(data);
       } catch (err) {
         setError(
-          "The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists."
+          "The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.",
         );
       } finally {
         setLoading(false);
@@ -147,14 +154,13 @@ export default function MainDash({ userData }) {
     };
 
     // ensure on user with cleveldashboard acess can call the api
-    if(userData.user.c_levelDash){
-    // Initial fetch
-    fetchTenantData();
-    resetInactivityTimer();
+    if (userData.user.c_levelDash) {
+      // Initial fetch
+      fetchTenantData();
+      resetInactivityTimer();
 
-    // Set interval for periodic fetch
-    intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
-    
+      // Set interval for periodic fetch
+      intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
     }
 
     // Tab visibility
@@ -168,7 +174,7 @@ export default function MainDash({ userData }) {
     // Network status
     const handleOnline = () => {
       SuccessToast("🌐 Back online");
-      if(userData.user.c_levelDash) fetchTenantData();
+      if (userData.user.c_levelDash) fetchTenantData();
     };
 
     const handleOffline = () => {
@@ -178,7 +184,7 @@ export default function MainDash({ userData }) {
     // User activity listeners
     const activityEvents = ["mousemove", "keydown", "scroll", "touchstart"];
     activityEvents.forEach((event) =>
-      window.addEventListener(event, resetInactivityTimer)
+      window.addEventListener(event, resetInactivityTimer),
     );
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -190,7 +196,7 @@ export default function MainDash({ userData }) {
       clearInterval(intervalRef.current);
       clearTimeout(inactivityTimer.current);
       activityEvents.forEach((event) =>
-        window.removeEventListener(event, resetInactivityTimer)
+        window.removeEventListener(event, resetInactivityTimer),
       );
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("online", handleOnline);
@@ -258,7 +264,10 @@ export default function MainDash({ userData }) {
                   <h3 className="text-sm text-gray-500">Today&lsquo;s Sales</h3>
                   <p className="text-2xl text-green-600 font-bold mt-1">
                     {/* total sales */}
-                    <TodaySaleTotal tenantData={tenantData} userData={userData}/>
+                    <TodaySaleTotal
+                      tenantData={tenantData}
+                      userData={userData}
+                    />
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     Auto Updates every 1 minutes
@@ -275,7 +284,10 @@ export default function MainDash({ userData }) {
                 <div>
                   <h3 className="text-sm text-gray-500">Revenue</h3>
                   <p className="text-2xl text-gray-500 font-bold mt-1">
-                    <TodaySRevenueTotal tenantData={tenantData} userData={userData}/>
+                    <TodaySRevenueTotal
+                      tenantData={tenantData}
+                      userData={userData}
+                    />
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-[#ddd6ff] text-white shadow-md">
@@ -285,16 +297,19 @@ export default function MainDash({ userData }) {
             </div>
 
             <div className="bg-white p-5 rounded shadow-md animate__animated animate__flipInY">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm text-gray-500">Purchase</h3>
-                    {/* purchase value */}
-                      <PurchaseOrderTotal  tenantData={tenantData} userData={userData}/>
-                  </div>
-                  <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
-                    <ShoppingBagIcon className="h-6 w-6 text-gray-900" />
-                  </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">Purchase</h3>
+                  {/* purchase value */}
+                  <PurchaseOrderTotal
+                    tenantData={tenantData}
+                    userData={userData}
+                  />
                 </div>
+                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
+                  <ShoppingBagIcon className="h-6 w-6 text-gray-900" />
+                </div>
+              </div>
             </div>
 
             <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
@@ -302,7 +317,7 @@ export default function MainDash({ userData }) {
                 <div>
                   <h3 className="text-sm text-gray-500">Expenses</h3>
                   <p className="text-2xl text-red-500 font-bold mt-1">
-                      <ExpenseTotal tenantData={tenantData} userData={userData}/>
+                    <ExpenseTotal tenantData={tenantData} userData={userData} />
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
@@ -359,7 +374,7 @@ export default function MainDash({ userData }) {
                                 href={`/${
                                   userData.business.companyName
                                 }/${Encrypt(
-                                  userData.user._id
+                                  userData.user._id,
                                 )}/bill/bill/${Encrypt(invoice._id)}`}
                                 className="text-indigo-600"
                               >
@@ -429,112 +444,180 @@ export default function MainDash({ userData }) {
                   </button>
                 </div>
               </div>
-              
-            {/* Monitored Products */}
+
+              {/* Monitored Products */}
               {paginatedMonitoredProduct.length > 0 ? (
                 <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg text-gray-500 font-semibold">
-                    Monitored Products
-                  </h3>
-                </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg text-gray-500 font-semibold">
+                      Monitored Products
+                    </h3>
+                  </div>
 
-                <div className="overflow-y-hidden max-h-96">
-                  <table className="w-full text-left text-sm">
-                    <thead className="text-xs text-gray-500 border-b">
-                      <tr>
-                        <th className="py-3 border-r">S/N</th>
-                        <th className="p-3">Product Name</th>
-                        <th className="py-3">InStock</th>
-                        <th className="py-3">Monitor</th>
-                        <th className="py-3">Re-Order</th>
-                        <th className="py-3"></th>
-                      </tr>
-                    </thead>
+                  <div className="overflow-y-hidden max-h-96">
+                    <table className="w-full text-left text-sm">
+                      <thead className="text-xs text-gray-500 border-b">
+                        <tr>
+                          <th className="py-3 border-r">S/N</th>
+                          <th className="p-3">Product Name</th>
+                          <th className="py-3">InStock</th>
+                          <th className="py-3">Monitor</th>
+                          <th className="py-3">Re-Order</th>
+                          <th className="py-3"></th>
+                        </tr>
+                      </thead>
 
-                    <tbody className="text-gray-700">
-                      {paginatedMonitoredProduct.length > 0 ? (
-                        paginatedMonitoredProduct.map((product, index) => (
-                          <tr
-                            key={index}
-                            className="border-b animate__animated animate__fadeInRight text-xs"
-                          >
-                            <td className="py-3 border-r">
-                              {(monitoredCurrentPage - 1) * monitoredItemsPerPage + index + 1}
-                            </td>
-                            <td className="p-3 font-semibold text-blue-700">
-                              <Link href={`/${
-                                  userData.business.companyName
-                                }/${Encrypt(
-                                  userData.user._id
-                                )}/product/product/${Encrypt(product.productId)}?Modules=product`} >
-                                {product.productName}
-                              </Link>
-                            </td>
-                            <td className="py-3">{product.currentQty}</td>
-                            <td className="py-3">{product.replenishMin}</td>
-                            <td className="py-3">{product.replenishQty}</td>
-                            <td className="py-3" title="Raise purchase order">
-                              <button className="text-black hover:underline">
-                                <ShoppingCartIcon className="h-5 w-5 inline-block mr-1" />
-                              </button>
+                      <tbody className="text-gray-700">
+                        {paginatedMonitoredProduct.length > 0 ? (
+                          paginatedMonitoredProduct.map((product, index) => (
+                            <tr
+                              key={index}
+                              className="border-b animate__animated animate__fadeInRight text-xs"
+                            >
+                              <td className="py-3 border-r">
+                                {(monitoredCurrentPage - 1) *
+                                  monitoredItemsPerPage +
+                                  index +
+                                  1}
+                              </td>
+                              <td className="p-3 font-semibold text-blue-700">
+                                <Link
+                                  href={`/${
+                                    userData.business.companyName
+                                  }/${Encrypt(
+                                    userData.user._id,
+                                  )}/product/product/${Encrypt(product.productId)}?Modules=product`}
+                                >
+                                  {product.productName}
+                                </Link>
+                              </td>
+                              <td className="py-3">{product.currentQty}</td>
+                              <td className="py-3">{product.replenishMin}</td>
+                              <td className="py-3">{product.replenishQty}</td>
+                              <td className="py-3" title="Raise purchase order">
+                                <button className="text-black hover:underline">
+                                  <ShoppingCartIcon className="h-5 w-5 inline-block mr-1" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="py-6 text-center text-gray-500 text-sm"
+                            >
+                              No monitored products found.
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={6} className="py-6 text-center text-gray-500 text-sm">
-                            No monitored products found.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
 
-                {/* Pagination Controls */}
-                <div className="flex justify-center items-center gap-2 mt-4 text-sm">
-                  <button
-                    onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage - 1)}
-                    disabled={monitoredCurrentPage === 1}
-                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-                  >
-                    Prev
-                  </button>
-                  {Array.from({ length: totalMonitoredProductPages }, (_, i) => (
+                  {/* Pagination Controls */}
+                  <div className="flex justify-center items-center gap-2 mt-4 text-sm">
                     <button
-                      key={i}
-                      onClick={() => handleMonitoredProductPageChange(i + 1)}
-                      className={`px-3 py-1 rounded border ${
-                        monitoredCurrentPage === i + 1
-                          ? "bg-indigo-600 text-white"
-                          : "border-gray-300 hover:bg-gray-100"
-                      }`}
+                      onClick={() =>
+                        handleMonitoredProductPageChange(
+                          monitoredCurrentPage - 1,
+                        )
+                      }
+                      disabled={monitoredCurrentPage === 1}
+                      className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
                     >
-                      {i + 1}
+                      Prev
                     </button>
-                  ))}
-                  <button
-                    onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage + 1)}
-                    disabled={monitoredCurrentPage === totalMonitoredProductPages}
-                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
+                    {Array.from(
+                      { length: totalMonitoredProductPages },
+                      (_, i) => (
+                        <button
+                          key={i}
+                          onClick={() =>
+                            handleMonitoredProductPageChange(i + 1)
+                          }
+                          className={`px-3 py-1 rounded border ${
+                            monitoredCurrentPage === i + 1
+                              ? "bg-indigo-600 text-white"
+                              : "border-gray-300 hover:bg-gray-100"
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ),
+                    )}
+                    <button
+                      onClick={() =>
+                        handleMonitoredProductPageChange(
+                          monitoredCurrentPage + 1,
+                        )
+                      }
+                      disabled={
+                        monitoredCurrentPage === totalMonitoredProductPages
+                      }
+                      className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ):""}
+              ) : (
+                ""
+              )}
             </section>
             <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
               <h3 className="text-lg text-gray-500 font-semibold mb-4">
                 🗿 Quick Stats Widget
               </h3>
               <div className="flex flex-col">
-                <h4 className="text-sm text-gray-500 font-semibold mb-4">
+                {/* <h4 className="text-sm text-gray-500 font-semibold mb-4">
                   Sales Team Kpi Millestone
+                </h4> */}
+
+                <h4 className="text-sm text-gray-500 font-semibold mb-4">
+                 ⏰ Tasks Reminder
                 </h4>
 
-                {tenantData.result.map((person, index) => (
+                {userData?.user?.TaskLogs && userData.user.TaskLogs.length > 0 ? (
+                  userData.user.TaskLogs.map((task, idx) => (
+                    <div
+                      key={idx}
+                      className="text-xs bg-gray-100/50 flex gap-3 rounded-sm p-1 mb-1 hover:border-gray-200 hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
+                      title={task.notes}
+                    >
+                      <div>
+                        <p className="font-medium text-gray-900">{task.Text}</p>
+                        <p className="text-xs font-semibold text-gray-500">* {task.notes}</p>
+                        <p className="text-xs text-gray-500">
+                          Created:{" "}
+                          {new Date(task.createdAt).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+
+                      {/* Badge button */}
+                      <button
+                        className={`ml-auto px-2 py-1 rounded-sm text-xs font-medium transition-all duration-200 ${
+                          task.Status === "Done"
+                            ? "bg-green-500 text-white"
+                            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                        }`}
+                      >
+                        {task.Status === "Done" ? "✓ Completed" : "○ Mark as Done"}
+                      </button>
+                      <hr />
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-500 italic">No task assigned</p>
+                )}
+
+                {/* {tenantData.result.map((person, index) => (
                   <div
                     key={index}
                     className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
@@ -571,7 +654,7 @@ export default function MainDash({ userData }) {
                       </span>
                     </div>
                   </div>
-                ))}
+                ))} */}
                 <div className="text-center mt-6 border-bottom ">
                   <ExcelDownloadBtn
                     data={tenantData.result}
@@ -655,12 +738,13 @@ export default function MainDash({ userData }) {
           </footer>
 
           {/* pending payment reminder */}
-          {tenantData.PendingPaymenet.length > 0 && userData.user.postPayment && (
-            <PendingPaymentReminder 
-              data={tenantData.PendingPaymenet} 
-              business={userData.business} 
-            />
-          )}
+          {tenantData.PendingPaymenet.length > 0 &&
+            userData.user.postPayment && (
+              <PendingPaymentReminder
+                data={tenantData.PendingPaymenet}
+                business={userData.business}
+              />
+            )}
         </div>
       ) : (
         <main className="flex-1">
@@ -677,8 +761,6 @@ export default function MainDash({ userData }) {
     </>
   );
 }
-
-
 
 const formatNumberShort = (num) => {
   if (num >= 1_000_000_000) {
@@ -705,7 +787,6 @@ const PurchaseOrderTotal = ({ tenantData, userData }) => {
   );
 };
 
-
 const TodaySaleTotal = ({ tenantData, userData }) => {
   const total = tenantData?.TodaySale;
 
@@ -716,7 +797,6 @@ const TodaySaleTotal = ({ tenantData, userData }) => {
     </p>
   );
 };
-
 
 const TodaySRevenueTotal = ({ tenantData, userData }) => {
   const total = tenantData?.Revenue;
