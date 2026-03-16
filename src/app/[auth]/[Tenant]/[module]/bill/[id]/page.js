@@ -771,10 +771,10 @@ export default function InvoicePage({
                 {Singlebill.billStatus.toUpperCase()} /{" "}
                 {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
               </h2>
-              <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-wide">
+              <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-tight">
                 {Singlebill.WayBillNo}
               </h2>
-             <h2 className="mt-3 font-bold text-base mb-2 text-md text-black uppercase tracking-wide">
+             <h2 className="mt-3 font-bold text-base mb-2 text-md text-gray-500 uppercase tracking-tight">
                 Store: {Singlebill.whId?.WHName}
               </h2>
             </div>
