@@ -774,6 +774,9 @@ export default function InvoicePage({
               <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-wide">
                 {Singlebill.WayBillNo}
               </h2>
+             <h2 className="mt-3 font-bold text-base mb-2 text-md text-black uppercase tracking-wide">
+                Store: {Singlebill.whId?.WHName}
+              </h2>
             </div>
           </div>
 
