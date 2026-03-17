@@ -135,9 +135,12 @@ export default function SearchResultPage({ result, linkData }) {
               <Image
                 src="/Searching_Eyes_Animated_Illustration-removebg-preview.png"
                 alt="Searching Eyes Illustration"
-                width={70}
-                height={70}
+                width={128}
+                height={128}
                 className="mb-2"
+                quality={100}
+                loading="eager"
+                priority
               />
               <p className="text-lg text-gray-600 mb-2">
                 No results found for{" "}
