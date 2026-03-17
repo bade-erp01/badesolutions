@@ -701,7 +701,14 @@ export default function MainDash({ userData }) {
                   </ul>
                   <div className="text-center mt-6 border-bottom ">
                   <ExcelDownloadBtn
-                    data={tenantData.revenuePayments}
+                    data={tenantData.revenuePayments.map((payment) => ({
+                      Ref: payment.paymentReferenceNo,
+                      Accountant: payment.Accountant,
+                      Date:payment.PaymentDate,
+                      Amount:payment.crAmount,
+                      gateWay:payment.type,
+                      status:payment.status
+                    }))}
                     page={`${moment().format("DD-MM-YYYY")} Payments`}
                   />
                   </div>
