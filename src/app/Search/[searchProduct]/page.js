@@ -89,16 +89,6 @@ export default function SearchResultPage({ result, linkData }) {
   if (loading) {
     return (
       <div className="w-full max-w-5xl flex flex-col items-center justify-between mb-3">
-        <Image
-          src="/download__1_-removebg-preview.png"
-          alt="Searching Eyes Illustration"
-          width={128}
-          height={128}
-          className="mb-2 animate__animated animate__pulse animate__infinite"
-          quality={100}
-          loading="eager"
-          priority
-        />
         <p className="text-sm text-gray-800">
           Searching for{" "}
           <span className="text-purple-600 font-bold">
@@ -143,11 +133,11 @@ export default function SearchResultPage({ result, linkData }) {
           ) : (
             <div className="col-span-full flex flex-col items-center py-12">
               <Image
-                src="/Searching_Eyes_Animated_Illustration-removebg-preview.png"
+                src="/download__1_-removebg-preview.png"
                 alt="Searching Eyes Illustration"
                 width={128}
                 height={128}
-                className="mb-2"
+                className="mb-2 animate__animated animate__pulse animate__infinite"
                 quality={100}
                 loading="eager"
                 priority
