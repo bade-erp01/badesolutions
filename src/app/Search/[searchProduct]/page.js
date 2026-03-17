@@ -5,6 +5,7 @@ import { Dencrypt } from "../../../../Functions/Functions";
 import SearchCard from "../../Components/SearchResult";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Fuse from "fuse.js";
+import Image from "next/image";
 
 export default function SearchResultPage({ result, linkData }) {
   const searchParams = useSearchParams();
@@ -69,7 +70,6 @@ export default function SearchResultPage({ result, linkData }) {
             "status",
             "SerialNumber",
             "Category",
-            
           ],
         });
 
@@ -132,6 +132,13 @@ export default function SearchResultPage({ result, linkData }) {
             ))
           ) : (
             <div className="col-span-full flex flex-col items-center py-12">
+              <Image
+                src="/Searching_Eyes_Animated_Illustration-removebg-preview.png"
+                alt="Searching Eyes Illustration"
+                width={128}
+                height={128}
+                className="mb-4"
+              />
               <p className="text-lg text-gray-600 mb-2">
                 No results found for{" "}
                 <strong className="text-purple-700">

@@ -587,7 +587,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8 text-xs"
+      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border space-y-8 text-xs"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -957,7 +957,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               <Grid columns={3}>
                 {userInfo.user.isAdmin ? (
                   <div className="mb-2 ">
-                    <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
+                    <div className="max-w-md mx-auto p-6 bg-linear-to-br from-white to-gray-200 rounded-xl shadow-lg border border-gray-200">
                       <label className="block text-sm font-semibold text-gray-700 tracking-wide">
                         {cust.lastPayDate &&
                         cust.Debt > 0 &&
