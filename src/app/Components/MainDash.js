@@ -655,12 +655,12 @@ export default function MainDash({ userData }) {
                     </div>
                   </div>
                 ))} */}
-                <div className="text-center mt-6 border-bottom ">
+                {/* <div className="text-center mt-6 border-bottom ">
                   <ExcelDownloadBtn
                     data={tenantData.result}
                     page={`Sales Team Performance`}
                   />
-                </div>
+                </div> */}
 
                 <div className="mt-6 border-t-2">
                   <h4 className="text-lg text-gray-500 font-semibold mb-4">
@@ -699,6 +699,12 @@ export default function MainDash({ userData }) {
                       </li>
                     )}
                   </ul>
+                  <div className="text-center mt-6 border-bottom ">
+                  <ExcelDownloadBtn
+                    data={tenantData.revenuePayments}
+                    page={`${moment().format("DD-MM-YYYY")} Payments`}
+                  />
+                  </div>
                 </div>
               </div>
             </aside>
