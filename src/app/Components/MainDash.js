@@ -709,7 +709,7 @@ export default function MainDash({ userData }) {
                       gateWay:payment.type,
                       status:payment.status
                     }))}
-                    page={`${moment().format("DD-MM-YYYY")} Payments`}
+                    page={`Payments for ${moment().format("DD-MM-YYYY")}`}
                   />
                   </div>
                 </div>
