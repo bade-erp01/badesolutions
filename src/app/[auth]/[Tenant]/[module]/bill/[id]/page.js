@@ -774,7 +774,7 @@ export default function InvoicePage({
               <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-tight">
                 {Singlebill.WayBillNo}
               </h2>
-             <h2 className="mt-3 font-bold text-base mb-2 text-md text-gray-500 uppercase tracking-tight">
+             <h2 className="mt-3 font-bold text-base mb-2 text-md text-gray-300 uppercase tracking-tight">
                 Store: {Singlebill.whId?.WHName}
               </h2>
             </div>
@@ -866,11 +866,7 @@ export default function InvoicePage({
             </button>
           )}
 
-          {(userInfo.user._id === Singlebill.invoicerId &&
-            Singlebill.billStatus?.toUpperCase() === "RECALLED")
-            ||
-            (userInfo.user.cancelInvoice &&
-            Singlebill.billStatus?.toUpperCase() === "RECALLED") (
+          {userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus?.toUpperCase() === "RECALLED" && (
             <button
               title={`Lock ${Singlebill.billStatus}`}
               onClick={() =>
@@ -1010,69 +1006,50 @@ export default function InvoicePage({
                     {bill.pcsReq || 0}
                   </td>
                   <td className="px-4 py-2 text-center text-xs" title="Returned Case">
-                    {(
-                      (userInfo.user._id === Singlebill.invoicerId &&
-                      Singlebill.billStatus?.toLowerCase() === "recalled")
-                      ||
-                      (userInfo.user.cancelInvoice &&
-                      Singlebill.billStatus?.toLowerCase() === "recalled")
-                    ) ? (
-                      <input
-                        type="number"
-                        defaultValue={bill.RCRT || 0}
-                        min={0}
-                        onBlur={(e) => {
-                          let val = Number(e.target.value);
-
-                          // Clamp negative values to 0
-                          if (val < 0) val = 0;
-
-                          handleQtyChange(
-                            bill._id,
-                            val,
-                            "Qty",
-                            Singlebill._id,
-                            bill.storeProductId,
-                            userInfo.business.companyName
-                          );
-                        }}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                      />
+                    {userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "recalled" ? (
+                     <input
+                      type="number"
+                      defaultValue={bill.RCRT || 0}
+                      min={0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) return
+                        if (val < 0) val = 0;
+                        handleQtyChange(
+                          bill._id,
+                          val,
+                          "Qty",
+                          Singlebill._id,
+                          bill.storeProductId,
+                          userInfo.business.companyName
+                        );
+                      }}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
+                    />
                     ) : (
                       bill.RCRT
                     )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs" title="Returned Pcs">
-                    {(
-                      userInfo.business.allowSkuSplitting &&
-                      (
-                        (userInfo.user._id === Singlebill.invoicerId &&
-                        Singlebill.billStatus?.toLowerCase() === "recalled")
-                        ||
-                        (userInfo.user.cancelInvoice &&
-                        Singlebill.billStatus?.toLowerCase() === "recalled")
-                      )
-                    ) ? (
+                    {userInfo.business.allowSkuSplitting && userInfo.user._id === Singlebill.invoicerId &&
+                    Singlebill.billStatus.toLowerCase() === "recalled" ? (
                       <input
                         type="number"
                         defaultValue={bill.RPCS || 0}
-                        min={0}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                         onBlur={(e) => {
-                          let val = Number(e.target.value);
-
-                          // Clamp negative values to 0
+                          let val = e.target.value;
+                          if (val < 0) return
                           if (val < 0) val = 0;
-
                           handleQtyChange(
-                            bill._id,              // lineId
-                            val,                   // new value
-                            "pcs",                 // toUpdate
-                            Singlebill._id,        // billId
-                            bill.storeProductId,   // storeId
+                            bill._id, // lineId
+                            val, // new value
+                            "pcs", // toUpdate
+                            Singlebill._id, // billId
+                            bill.storeProductId, // storeId
                             userInfo.business.companyName // companyName
                           );
                         }}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                       />
                     ) : (
                       bill.RPCS || 0
