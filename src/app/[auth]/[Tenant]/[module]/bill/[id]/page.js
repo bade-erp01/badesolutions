@@ -866,7 +866,7 @@ export default function InvoicePage({
             </button>
           )}
 
-          {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus?.toUpperCase() === "RECALLED") || (userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") && (
+          {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus?.toUpperCase() === "RECALLED" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") && (
             <button
               title={`Lock ${Singlebill.billStatus}`}
               onClick={() =>
@@ -1006,7 +1006,7 @@ export default function InvoicePage({
                     {bill.pcsReq || 0}
                   </td>
                   <td className="px-4 py-2 text-center text-xs" title="Returned Case">
-                    {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "recalled") || (userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
+                    {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "recalled" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
                      <input
                       type="number"
                       defaultValue={bill.RCRT || 0}
@@ -1032,7 +1032,7 @@ export default function InvoicePage({
                   </td>
                   <td className="px-4 py-2 text-center text-xs" title="Returned Pcs">
                     {(userInfo.business.allowSkuSplitting && userInfo.user._id === Singlebill.invoicerId &&
-                    Singlebill.billStatus.toLowerCase() === "recalled") || (userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
+                    Singlebill.billStatus.toLowerCase() === "recalled" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
                       <input
                         type="number"
                         defaultValue={bill.RPCS || 0}
