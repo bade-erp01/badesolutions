@@ -20,6 +20,10 @@ export default function Footer2() {
         {" "} |  {" "}
        <span>Whatsapp Support on +234 704 4889 034</span>
         {" "} |  {" "}
+        <span>  
+          May this blessed day bring you joy, peace, and endless blessings. As we celebrate Sallah, may your heart be filled with gratitude, your home with happiness, and your life with ease. Wishing you and your loved ones a wonderful celebration filled with harmony and prosperity. Eid Mubarak! 🌙✨
+        </span>
+        {" "} |  {" "}
       </Marquee>
     </footer>
   );
