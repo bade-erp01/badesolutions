@@ -117,7 +117,7 @@ export default function GenerealSalesMargin({
     <div className="space-y-4 animate__animated animate__fadeInUp animate__faster ">
       <div className="flex items-center justify-between">
         <h3 className="text-lg text-gray-500 font-semibold">
-          Total Converted Sales for {moment().format("YYYY")}
+          Overall Converted Sales for {moment().format("YYYY")}
         </h3>
         <div className="text-sm text-gray-500">
           {loading ? "Loading..." : error ? "Error" : "12 months performance"}

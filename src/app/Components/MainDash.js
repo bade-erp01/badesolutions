@@ -15,6 +15,7 @@ import {
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
+import GenerealPaymentMargin from "@/app/Components/GeneratePayment"
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import {
   ShoppingBagIcon,
@@ -334,6 +335,12 @@ export default function MainDash({ userData }) {
                 {/* Chart */}
                 <GenerealSalesMargin
                   yearlysales={tenantData.yearlysales}
+                  warehouses={tenantData.warehouses}
+                />
+                <div className="border border-dotted mb-2" />
+                {/* payment */}
+                <GenerealPaymentMargin
+                  yearlyPayment={tenantData.revenuePayments.filter(payment => payment.status === "posted")}
                   warehouses={tenantData.warehouses}
                 />
               </div>
@@ -673,8 +680,8 @@ export default function MainDash({ userData }) {
                       scrollbarColor: "#453d46ff transparent",
                     }}
                   >
-                    {tenantData.revenuePayments.length > 0 ? (
-                      tenantData.revenuePayments.map((payment) => (
+                    {tenantData.revenuePayments.filter(payment => payment.PaymentDate === moment().format('YYYY-MM-DD') && payment.collectionRef === 'PMNT'&& payment.cr === true && payment.status === "posted").length > 0 ? (
+                      tenantData.revenuePayments.filter(payment => payment.PaymentDate === moment().format('YYYY-MM-DD') && payment.collectionRef === 'PMNT'&& payment.cr === true && payment.status === "posted").map((payment) => (
                         <li
                           key={payment._id}
                           className="flex items-center justify-between px-4 py-2 bg-white shadow-sm rounded-md border border-gray-200 hover:shadow-md hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
@@ -701,7 +708,7 @@ export default function MainDash({ userData }) {
                   </ul>
                   <div className="text-center mt-6 border-bottom ">
                   <ExcelDownloadBtn
-                    data={tenantData.revenuePayments.map((payment) => ({
+                    data={tenantData.revenuePayments.filter(payment => payment.PaymentDate === moment().format('YYYY-MM-DD') && payment.collectionRef === 'PMNT'&& payment.cr === true && payment.status === "posted").map((payment) => ({
                       Ref: payment.paymentReferenceNo,
                       Accountant: payment.Accountant,
                       Date:payment.PaymentDate,
