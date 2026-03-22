@@ -32,7 +32,7 @@ const PasswordReset = ({params}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password: newPassword }),
+        body: JSON.stringify({ password: Encrypt(newPassword) }),
       });
 
       const result = await response.json();
