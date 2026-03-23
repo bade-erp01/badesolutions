@@ -331,7 +331,7 @@ export default function MainDash({ userData }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}
             <section className="lg:col-span-2">
-              <div className="bg-white rounded p-3 shadow-xl">
+              <div className="bg-white rounded p-3 shadow-xl mb-3">
                 {/* Chart */}
                 <GenerealSalesMargin
                   yearlysales={tenantData.yearlysales}
