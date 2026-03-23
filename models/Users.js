@@ -409,6 +409,10 @@ const EmployeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+     ReportUser: {
+      default: false,
+      type: Boolean,
+    },
     isDev: {
       type: Boolean,
       default: false,
