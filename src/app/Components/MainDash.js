@@ -338,7 +338,7 @@ export default function MainDash({ userData }) {
                   warehouses={tenantData.warehouses}
                 />
               </div>
-              
+
               <div className="bg-white rounded p-3 shadow-xl">
                 {/* payment */}
                 <GenerealPaymentMargin
@@ -351,7 +351,7 @@ export default function MainDash({ userData }) {
               <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg text-gray-500 font-semibold">
-                    Recent Sales
+                    Today's Sales
                   </h3>
                 </div>
 
