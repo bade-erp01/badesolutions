@@ -82,6 +82,7 @@ export default async function layout({children,params}) {
                  <BackButton />
                   <hr />
                   <nav className="space-y-4">
+                   {userData.user.isAdmin && ( 
                     <Link
                       href={`/${userData.business?.companyName
                         .toLowerCase()
@@ -93,7 +94,7 @@ export default async function layout({children,params}) {
                     >
                        <PlusCircleIcon className="h-6 w-6 text-gray-100" />
                       <small>New Vendor</small>
-                    </Link>
+                    </Link>)}
 
                     {userData.user.raiseLpo || (userData.user.allowInternalTransfers && (
                     <Link

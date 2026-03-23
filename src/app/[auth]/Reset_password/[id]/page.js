@@ -25,7 +25,7 @@ const PasswordReset = ({params}) => {
     
     try {
         plsWait("please wait...")
-      const endpoint = `${EXPRESS_PRIVATE_URL}/api/Reset-password/${Encrypt(UserId)}/Security`;
+      const endpoint = `${EXPRESS_PRIVATE_URL}/api/Reset-password/${UserId}/Security`;
 
       const response = await fetch(endpoint, {
         method: 'PATCH',
@@ -47,6 +47,7 @@ const PasswordReset = ({params}) => {
       }
     } catch (err) {
       ErrorMessage(err.message);
+      setConfirmPassword('');
     }
   };
 

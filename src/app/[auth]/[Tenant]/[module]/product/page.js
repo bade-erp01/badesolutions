@@ -1,4 +1,3 @@
-
 import Card from "@/app/Components/Card";
 import ProductSalesChart from "@/app/Components/productChart";
 import Nav1 from "@/app/Components/Nav1";
@@ -8,7 +7,7 @@ import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import StockReportModal from "@/app/Components/Reports/StockReport";
 import StockandSalesReport from "@/app/Components/Reports/StockandSalesReport";
-import BulkUpdate from "@/app/Components/bulkUpdate"
+import BulkUpdate from "@/app/Components/bulkUpdate";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
@@ -64,18 +63,14 @@ export default async function Productlayout({ children, params }) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`
+        access: `${Encrypt(userData.user._id)}`,
       },
-      next: { revalidate: 60 } // cache for 1 minutes
+      next: { revalidate: 60 }, // cache for 1 minutes
     });
 
     if (!res.ok) throw new Error("Failed to fetch product data");
 
-    const {
-      productList,
-      vendorList,
-      storeList
-    } = await res.json();
+    const { productList, vendorList, storeList } = await res.json();
 
     return (
       <div className="flex flex-col min-h-screen overflow-hidden">
@@ -100,7 +95,10 @@ export default async function Productlayout({ children, params }) {
                   href={`/${userData.business.companyName
                     .toLowerCase()
                     .replace(/\s+/g, "-")
-                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
+                    .replace(
+                      /[^a-z0-9-]/g,
+                      "",
+                    )}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <PlusCircleIcon className="h-4 w-4 text-gray-100" />
@@ -108,62 +106,79 @@ export default async function Productlayout({ children, params }) {
                 </Link>
               )}
 
-               <StockReportModal
-                baseUrl={baseUrl}
-                userData={userData}
-              /> 
+              {userData?.user?.ReportUser && (
+                <>
+                  <StockReportModal baseUrl={baseUrl} userData={userData} />
 
-              <StockandSalesReport
-                baseUrl={baseUrl}
-                userData={userData}
-              />
+                  <StockandSalesReport baseUrl={baseUrl} userData={userData} />
 
-              <PurchaseDumpModal  business={userData.business} EXPRESS_PRIVATE_URL={baseUrl}  Products={productList} storesData={storeList} vendorsData={vendorList} />
+                  <PurchaseDumpModal
+                    business={userData.business}
+                    EXPRESS_PRIVATE_URL={baseUrl}
+                    Products={productList}
+                    storesData={storeList}
+                    vendorsData={vendorList}
+                  />
 
-              <ExcelDownloadBtn 
-                data={productList.sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
-                  .map(product => ({
-                  id: product._id,
-                  Name: product.Name,
-                  Description: product.Description,
-                  category: product.category,
-                  sub_category:product.subcategory,
-                  Manufacturer:product.Manufacturer,
-                  code: product.ADCcode || product.ACDcode,
-                  Sales_count: product.TotalSale,
-                  Pieces:product.Pieces,
-                  Buying_Price: product.BuyingPrice,
-                  Manufacture_code: product.Manufacture_code,
-                  FOC: product.isAservice ? "Yes" : "No",
-                  Pricelist1: product.Pricelist1 || 0,
-                  Pricelist2: product.Pricelist2 || 0,
-                  Pricelist3: product.Pricelist3 || 0,
-                  Pricelist4: product.Pricelist4 || 0,
-                  Pricelist5: product.Pricelist5 || 0,
-                  Pricelist6: product.Pricelist6 || 0,
-                  Pricelist7: product.Pricelist7 || 0,
-                  Pricelist1Promo: product.Pricelist1Promo || 0,
-                  Pricelist2Promo: product.Pricelist2Promo || 0,
-                  Pricelist3Promo: product.Pricelist3Promo || 0,
-                  Pricelist4Promo: product.Pricelist4Promo || 0,
-                  Pricelist5Promo: product.Pricelist5Promo || 0,
-                  Pricelist6Promo: product.Pricelist6Promo || 0,
-                  Pricelist7Promo: product.Pricelist7Promo || 0,
-                  Pricelist1_PromoEndDate: product.Pricelist1PromoDate || "",
-                  Pricelist2_PromoEndDate: product.Pricelist2PromoDate || "",
-                  Pricelist3_PromoEndDate: product.Pricelist3PromoDate || "",
-                  Pricelist4_PromoEndDate: product.Pricelist4PromoDate || "",
-                  Pricelist5_PromoEndDate: product.Pricelist5PromoDate || "",
-                  Pricelist6_PromoEndDate: product.Pricelist6PromoDate || "",
-                  Pricelist7_PromoEndDate: product.Pricelist7PromoDate || "",
-                }))} 
-                page="product" 
-              />
-
-              {userData?.user?.isAdmin && (
-                <BulkUpdate tenantId={userData} collectionName="product" WHID={userData?._id} />
+                  <ExcelDownloadBtn
+                    data={productList
+                      .sort((a, b) =>
+                        a.Name.trim().localeCompare(b.Name.trim()),
+                      )
+                      .map((product) => ({
+                        id: product._id,
+                        Name: product.Name,
+                        Description: product.Description,
+                        category: product.category,
+                        sub_category: product.subcategory,
+                        Manufacturer: product.Manufacturer,
+                        code: product.ADCcode || product.ACDcode,
+                        Sales_count: product.TotalSale,
+                        Pieces: product.Pieces,
+                        Buying_Price: product.BuyingPrice,
+                        Manufacture_code: product.Manufacture_code,
+                        FOC: product.isAservice ? "Yes" : "No",
+                        Pricelist1: product.Pricelist1 || 0,
+                        Pricelist2: product.Pricelist2 || 0,
+                        Pricelist3: product.Pricelist3 || 0,
+                        Pricelist4: product.Pricelist4 || 0,
+                        Pricelist5: product.Pricelist5 || 0,
+                        Pricelist6: product.Pricelist6 || 0,
+                        Pricelist7: product.Pricelist7 || 0,
+                        Pricelist1Promo: product.Pricelist1Promo || 0,
+                        Pricelist2Promo: product.Pricelist2Promo || 0,
+                        Pricelist3Promo: product.Pricelist3Promo || 0,
+                        Pricelist4Promo: product.Pricelist4Promo || 0,
+                        Pricelist5Promo: product.Pricelist5Promo || 0,
+                        Pricelist6Promo: product.Pricelist6Promo || 0,
+                        Pricelist7Promo: product.Pricelist7Promo || 0,
+                        Pricelist1_PromoEndDate:
+                          product.Pricelist1PromoDate || "",
+                        Pricelist2_PromoEndDate:
+                          product.Pricelist2PromoDate || "",
+                        Pricelist3_PromoEndDate:
+                          product.Pricelist3PromoDate || "",
+                        Pricelist4_PromoEndDate:
+                          product.Pricelist4PromoDate || "",
+                        Pricelist5_PromoEndDate:
+                          product.Pricelist5PromoDate || "",
+                        Pricelist6_PromoEndDate:
+                          product.Pricelist6PromoDate || "",
+                        Pricelist7_PromoEndDate:
+                          product.Pricelist7PromoDate || "",
+                      }))}
+                    page="product"
+                  />
+                </>
               )}
-
+              
+              {userData?.user?.isAdmin && (
+                <BulkUpdate
+                  tenantId={userData}
+                  collectionName="product"
+                  WHID={userData?._id}
+                />
+              )}
             </nav>
           </aside>
 
@@ -176,15 +191,20 @@ export default async function Productlayout({ children, params }) {
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
-                  {productList.sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
-                  .map(element => (
-                    <Card key={element._id} data={element} module={'product'} />
-                  ))}
+                  {productList
+                    .sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
+                    .map((element) => (
+                      <Card
+                        key={element._id}
+                        data={element}
+                        module={"product"}
+                      />
+                    ))}
                 </div>
               </div>
             </section>
           </main>
-        </div> 
+        </div>
 
         <Footer2 />
       </div>

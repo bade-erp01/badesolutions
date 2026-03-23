@@ -86,11 +86,13 @@ export default async function paymentlayout({ children, params }) {
           <BackButton />
           <hr />
           <nav className="space-y-4">
-            <CashregisterReport
-              dataArray={data.Payments}
-              banks={data.Accounts}
-              customers={data.Customers}
-            />
+            {userData?.user?.ReportUser && (
+              <CashregisterReport
+                dataArray={data.Payments}
+                banks={data.Accounts}
+                customers={data.Customers}
+              />
+            )}
           </nav>
         </aside>{" "}
         {/* Main Content Area */}

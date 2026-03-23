@@ -64,28 +64,34 @@ export default async function Employeelayout({ children, params }) {
           <BackButton />
           <hr />
           <nav className="space-y-4">
+            {userData?.user?.ReportUser && (
+              <>
+              
               <SalesRportModal
-                business={userData.business}
-                baseUrl={baseUrl}
-                user={parsedUser}
+              business={userData.business}
+              baseUrl={baseUrl}
+              user={parsedUser}
               />
 
               <DeliveryRportModal
-                baseUrl={baseUrl}
-                business={userData.business}
-                user={parsedUser}
+              baseUrl={baseUrl}
+              business={userData.business}
+              user={parsedUser}
               />
 
               <SalesDumpModal
-                baseUrl={baseUrl}
-                business={userData.business}
-                user={parsedUser}
-                Employees={parsedUser}
+              baseUrl={baseUrl}
+              business={userData.business}
+              user={parsedUser}
+              Employees={parsedUser}
               />
 
-              {userData?.user?.c_levelDash && (
-                <SalesDashboard  business={userData.business} baseUrl={baseUrl} />
-              )}
+              </>
+            )}
+
+            {userData?.user?.c_levelDash && (
+              <SalesDashboard  business={userData.business} baseUrl={baseUrl} />
+            )}
             
           </nav>
         </aside>

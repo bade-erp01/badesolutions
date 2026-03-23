@@ -112,14 +112,18 @@ export default async function storelayout({ children, params }) {
                 </Link>
               </>
             )}
+
+
             {/* store settings */}
-            <Link
+            {userData.user.isAdmin && (
+              <Link
               href={`/${userData.business.companyName}/${Params.Tenant}/${Params.module}/store/${Params.id}/store-settings`}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg transition duration-200 `}
-            >
+              >
               <WrenchScrewdriverIcon className="h-6 w-6 text-gray-100" />
               <span className="text-sm font-medium">Store Settings</span>
-            </Link>
+              </Link>
+            )}
 
             {data.products.length > 0 && (
               <ExcelDownloadBtn

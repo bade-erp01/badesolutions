@@ -17,7 +17,7 @@ export default function Tenanterror({ error }) {
         {/* <!-- Message --> */}
         <div className="inline-block text-left">
           <h2 className="text-sm font-normal text-gray-600 mb-2">
-            Token is short lived and has expired. Try again.!
+            Tokens are short lived and it seems this one has expired. Try again.!
           </h2>
         </div>
       </div>

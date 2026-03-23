@@ -117,12 +117,17 @@ export default async function crmLayout({ params }) {
               </>
             )}
 
-            <DebtorsReportModal
-              users={parsedUsers}
-              business={userData.business}
-              data={customerList}
-            />
-            <ReceivablesAgingModal data={customerList} />
+            {userData.user.ReportUser && (
+              <>
+                <DebtorsReportModal
+                  users={parsedUsers}
+                  business={userData.business}
+                  data={customerList}
+                />
+                <ReceivablesAgingModal data={customerList} />
+              </>
+            )}
+           
           </nav>
         </aside>
 
