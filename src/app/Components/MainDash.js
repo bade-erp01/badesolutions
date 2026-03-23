@@ -337,7 +337,9 @@ export default function MainDash({ userData }) {
                   yearlysales={tenantData.yearlysales}
                   warehouses={tenantData.warehouses}
                 />
-                <div className="border border-dotted mb-2" />
+              </div>
+              
+              <div className="bg-white rounded p-3 shadow-xl">
                 {/* payment */}
                 <GenerealPaymentMargin
                   yearlyPayment={tenantData.revenuePayments.filter(payment => payment.status === "posted")}
