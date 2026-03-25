@@ -185,7 +185,7 @@ export default async function TenantPage({ params }) {
               </p>
             </header>
 
-            <MainDash userData={userData} />
+            {/* <MainDash userData={userData} /> */}
           </section>
         </main>
       </div>
