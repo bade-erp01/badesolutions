@@ -3,16 +3,16 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import User from "../models/Users";
 import Business from "../models/Business";
-import dbConnect from "../lib/mongoose"; // Ensure DB connection
+import dbConnect from "../lib/mongoose";
 import { NextResponse } from 'next/server';
 
 
-const SECRET_KEY = "THESTARTUPWAY";
 
 const fetchUser = async () => {
   "use server";
   try {
     // Retrieve cookies
+    const SECRET_KEY = process.env.TenantToken;
     const cookieStore = await cookies();
     const userToken = cookieStore.get("userInfo")?.value;
     const businessToken = cookieStore.get("businessInfo")?.value;

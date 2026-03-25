@@ -823,8 +823,7 @@ export default function MainDash({ userData }) {
              payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"}).length > 0 &&
             userData.user.postPayment && (
               <PendingPaymentReminder
-                data={tenantData.revenuePayments.filter(()=>{
-             payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"})}
+                data={tenantData.revenuePayments.filter(()=>{payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"})}
                 business={userData.business}
               />
             )}

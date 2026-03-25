@@ -19,7 +19,9 @@ export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
   const decoy = await params;
   let data = {};
-  const staffRaw = await Employee.findByTenant(userData.business.tenantId).select("firstName lastName").lean();
+  const staffRaw = await Employee.findByTenant(userData.business.tenantId)
+    .select("firstName lastName")
+    .lean();
   const StringedStaff = JSON.stringify(staffRaw);
   const ParsedStaff = JSON.parse(StringedStaff);
 
@@ -88,6 +90,32 @@ export default async function StoreLayout2({ params }) {
                 <ClipboardDocumentListIcon className="h-6 w-6 text-gray-100" />
                 <span className="text-xs">Sales Management</span>
               </Link>
+            )}
+
+            {/* AuditLog */}
+            {data.result?.AuditLog.length > 0 && (
+              <div
+              className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#4B5563 transparent",
+              }}
+             >
+              <ul className="divide-y divide-gray-700">
+                {data.result?.AuditLog?.map((log, index) => {
+                  return (
+                    <li key={index} className="py-3 px-4 text-xs text-italic">
+                      <div className="flex justify-between items-center">
+                        <span className="text-italic">{log.message}</span>
+                      </div>
+                      <hr className="border-gray-500" />
+                    </li>
+                  );
+                }) || (
+                  <li className="py-3 px-4 text-sm">No audit trail logged.</li>
+                )}
+              </ul>
+            </div>
             )}
           </nav>
         </aside>
