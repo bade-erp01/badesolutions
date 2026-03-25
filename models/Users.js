@@ -169,11 +169,6 @@ const EmployeSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
-    opsCode: {
-      type: String,
-      minlength: 4,
-      select: false,
-    },
     image: {
       type: String,
       default: "/person.png",
@@ -181,12 +176,6 @@ const EmployeSchema = new mongoose.Schema(
     },
     Leave: {
       type: Array,
-    },
-    password: {
-      type: String,
-      minlength: 8, // Longer passwords are more secure
-      match: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
-      select: false,
     },
     workEmail: { type: String },
     Department: { type: String },

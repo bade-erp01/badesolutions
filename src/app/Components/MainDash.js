@@ -15,7 +15,7 @@ import {
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
-import GenerealPaymentMargin from "@/app/Components/GeneratePayment"
+import GenerealPaymentMargin from "@/app/Components/GeneratePayment";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import {
   ShoppingBagIcon,
@@ -27,6 +27,9 @@ import {
 import moment from "moment";
 import Link from "next/link";
 import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
+import withReactContent from "sweetalert2-react-content";
+import Swal from 'sweetalert2';
+
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -40,6 +43,7 @@ export default function MainDash({ userData }) {
   const [monitoredCurrentPage, setMonitoredCurrentPage] = useState(1);
   const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
+  const MySwal = withReactContent(Swal);
 
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
@@ -174,12 +178,34 @@ export default function MainDash({ userData }) {
 
     // Network status
     const handleOnline = () => {
-      SuccessToast("🌐 Back online");
+      SuccessToast("Back online");
       if (userData.user.c_levelDash) fetchTenantData();
     };
 
     const handleOffline = () => {
-      plsWait("Currently Offline");
+      MySwal.fire({
+        toast: true,
+        position: "bottom-start",
+        icon: 'info',
+        showConfirmButton: false,
+        // timer: 10000,
+        // timerProgressBar: true,
+        customClass: {
+          popup: "swal2-subscription-toast",
+        },
+        html: `
+            <div style="display: flex; align-items: center;">
+              <div style="text-align: left;">
+                <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
+              </div>
+            </div>
+        `,
+      });
+
+      setTimeout(()=>{
+        plsWait("Currently Offline");
+      },3000)
+
     };
 
     // User activity listeners
@@ -342,7 +368,9 @@ export default function MainDash({ userData }) {
               <div className="bg-white rounded p-3 shadow-xl">
                 {/* payment */}
                 <GenerealPaymentMargin
-                  yearlyPayment={tenantData.revenuePayments.filter(payment => payment.status === "posted")}
+                  yearlyPayment={tenantData.revenuePayments.filter(
+                    (payment) => payment.status === "posted",
+                  )}
                   warehouses={tenantData.warehouses}
                 />
               </div>
@@ -584,10 +612,11 @@ export default function MainDash({ userData }) {
                 </h4> */}
 
                 <h4 className="text-lg text-gray-500 font-semibold mb-4">
-                 ⏰ Tasks Reminder
+                  ⏰ Tasks Reminder
                 </h4>
 
-                {userData?.user?.TaskLogs && userData.user.TaskLogs.length > 0 ? (
+                {userData?.user?.TaskLogs &&
+                userData.user.TaskLogs.length > 0 ? (
                   userData.user.TaskLogs.map((task, idx) => (
                     <div
                       key={idx}
@@ -596,7 +625,9 @@ export default function MainDash({ userData }) {
                     >
                       <div>
                         <p className="font-medium text-gray-900">{task.Text}</p>
-                        <p className="text-xs font-semibold text-gray-500">* {task.notes}</p>
+                        <p className="text-xs font-semibold text-gray-500">
+                          * {task.notes}
+                        </p>
                         <p className="text-xs text-gray-500">
                           Created:{" "}
                           {new Date(task.createdAt).toLocaleString("en-US", {
@@ -617,13 +648,17 @@ export default function MainDash({ userData }) {
                             : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                         }`}
                       >
-                        {task.Status === "Done" ? "✓ Completed" : "○ Mark as Done"}
+                        {task.Status === "Done"
+                          ? "✓ Completed"
+                          : "○ Mark as Done"}
                       </button>
                       <hr />
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-gray-500 italic">No task assigned</p>
+                  <p className="text-xs text-gray-500 italic">
+                    No task assigned
+                  </p>
                 )}
 
                 {/* {tenantData.result.map((person, index) => (
@@ -682,26 +717,41 @@ export default function MainDash({ userData }) {
                       scrollbarColor: "#453d46ff transparent",
                     }}
                   >
-                    {tenantData.revenuePayments.filter(payment => payment.PaymentDate === moment().format('YYYY-MM-DD') && payment.collectionRef === 'PMNT'&& payment.cr === true && payment.status === "posted").length > 0 ? (
-                      tenantData.revenuePayments.filter(payment => payment.PaymentDate === moment().format('YYYY-MM-DD') && payment.collectionRef === 'PMNT'&& payment.cr === true && payment.status === "posted").map((payment) => (
-                        <li
-                          key={payment._id}
-                          className="flex items-center justify-between px-4 py-2 bg-white shadow-sm rounded-md border border-gray-200 hover:shadow-md hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-sm text-gray-800 font-semibold">
-                              {userData.business.currency?.currency.Symbol}
-                              {payment.crAmount.toLocaleString()}
+                    {tenantData.revenuePayments.filter(
+                      (payment) =>
+                        payment.PaymentDate === moment().format("YYYY-MM-DD") &&
+                        payment.collectionRef === "PMNT" &&
+                        payment.cr === true &&
+                        payment.status === "posted",
+                    ).length > 0 ? (
+                      tenantData.revenuePayments
+                        .filter(
+                          (payment) =>
+                            payment.PaymentDate ===
+                              moment().format("YYYY-MM-DD") &&
+                            payment.collectionRef === "PMNT" &&
+                            payment.cr === true &&
+                            payment.status === "posted",
+                        )
+                        .map((payment) => (
+                          <li
+                            key={payment._id}
+                            className="flex items-center justify-between px-4 py-2 bg-white shadow-sm rounded-md border border-gray-200 hover:shadow-md hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-sm text-gray-800 font-semibold">
+                                {userData.business.currency?.currency.Symbol}
+                                {payment.crAmount.toLocaleString()}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {payment.collectionRef}/{payment.type}
+                              </span>
+                            </div>
+                            <span className="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">
+                              Ref: {payment.paymentReferenceNo.slice(0, 6)}
                             </span>
-                            <span className="text-xs text-gray-500">
-                              {payment.collectionRef}/{payment.type}
-                            </span>
-                          </div>
-                          <span className="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">
-                            Ref: {payment.paymentReferenceNo.slice(0, 6)}
-                          </span>
-                        </li>
-                      ))
+                          </li>
+                        ))
                     ) : (
                       <li className="text-gray-500 italic">
                         No revenue payments recorded yet.
@@ -709,17 +759,26 @@ export default function MainDash({ userData }) {
                     )}
                   </ul>
                   <div className="text-center mt-6 border-bottom ">
-                  <ExcelDownloadBtn
-                    data={tenantData.revenuePayments.filter(payment => payment.PaymentDate === moment().format('YYYY-MM-DD') && payment.collectionRef === 'PMNT'&& payment.cr === true && payment.status === "posted").map((payment) => ({
-                      Ref: payment.paymentReferenceNo,
-                      Accountant: payment.Accountant,
-                      Date:payment.PaymentDate,
-                      Amount:payment.crAmount,
-                      gateWay:payment.type,
-                      status:payment.status
-                    }))}
-                    page={`Payments for ${moment().format("DD-MM-YYYY")}`}
-                  />
+                    <ExcelDownloadBtn
+                      data={tenantData.revenuePayments
+                        .filter(
+                          (payment) =>
+                            payment.PaymentDate ===
+                              moment().format("YYYY-MM-DD") &&
+                            payment.collectionRef === "PMNT" &&
+                            payment.cr === true &&
+                            payment.status === "posted",
+                        )
+                        .map((payment) => ({
+                          Ref: payment.paymentReferenceNo,
+                          Accountant: payment.Accountant,
+                          Date: payment.PaymentDate,
+                          Amount: payment.crAmount,
+                          gateWay: payment.type,
+                          status: payment.status,
+                        }))}
+                      page={`Payments for ${moment().format("DD-MM-YYYY")}`}
+                    />
                   </div>
                 </div>
               </div>
