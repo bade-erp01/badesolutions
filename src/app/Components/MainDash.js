@@ -819,14 +819,14 @@ export default function MainDash({ userData }) {
           </footer>
 
           {/* pending payment reminder */}
-          {tenantData.revenuePayments.filter(()=>{
+          {/* {tenantData.revenuePayments.filter(()=>{
              payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"}).length > 0 &&
             userData.user.postPayment && (
               <PendingPaymentReminder
                 data={tenantData.revenuePayments.filter(()=>{payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"})}
                 business={userData.business}
               />
-            )}
+            )} */}
         </div>
       ) : (
         <main className="flex-1">
