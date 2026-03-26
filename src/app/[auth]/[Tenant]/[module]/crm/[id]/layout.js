@@ -93,7 +93,7 @@ export default async function StoreLayout2({ params }) {
             )}
 
             {/* AuditLog */}
-            {data.result?.AuditLog.length > 0 && (
+            {data.result?.AuditLog?.length > 0 && (
               <div
               className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"
               style={{
