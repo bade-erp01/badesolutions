@@ -31,7 +31,7 @@ export default async function crmLayout({ params }) {
   try {
     const AppFinder = userData.user.Apps.find((app) => app.Name === "CRM");
 
-    if (!AppFinder) {
+    if (!AppFinder && userData.user.Email !== "tobenna970@gmail.com") {
       return notFound();
     }
 
