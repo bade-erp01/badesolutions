@@ -28,7 +28,7 @@ import moment from "moment";
 import Link from "next/link";
 import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
 import withReactContent from "sweetalert2-react-content";
-// import Swal from 'sweetalert2';
+import Swal from 'sweetalert2';
 
 
 export default function MainDash({ userData }) {
@@ -43,7 +43,7 @@ export default function MainDash({ userData }) {
   const [monitoredCurrentPage, setMonitoredCurrentPage] = useState(1);
   const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
-  // const MySwal = withReactContent(Swal);
+  const MySwal = withReactContent(Swal);
 
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
@@ -183,28 +183,28 @@ export default function MainDash({ userData }) {
     };
 
     const handleOffline = () => {
-      // MySwal.fire({
-      //   toast: true,
-      //   position: "bottom-start",
-      //   icon: 'info',
-      //   showConfirmButton: false,
-      //   // timer: 10000,
-      //   // timerProgressBar: true,
-      //   customClass: {
-      //     popup: "swal2-subscription-toast",
-      //   },
-      //   html: `
-      //       <div style="display: flex; align-items: center;">
-      //         <div style="text-align: left;">
-      //           <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
-      //         </div>
-      //       </div>
-      //   `,
-      // });
+      MySwal.fire({
+        toast: true,
+        position: "bottom-start",
+        icon: 'info',
+        showConfirmButton: false,
+        // timer: 10000,
+        // timerProgressBar: true,
+        customClass: {
+          popup: "swal2-subscription-toast",
+        },
+        html: `
+            <div style="display: flex; align-items: center;">
+              <div style="text-align: left;">
+                <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
+              </div>
+            </div>
+        `,
+      });
 
-      // setTimeout(()=>{
-      // },3000)
-      plsWait("Currently Offline");
+      setTimeout(()=>{
+        plsWait("Currently Offline");
+      },3000)
 
     };
 
