@@ -118,11 +118,7 @@ export default async function TenantPage({ params }) {
               {userData?.user?.Email.trim() === "tobenna970@gmail.com" && (
                 <>
                   <Link
-                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${"crm"
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}/${"crm"
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}`}
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${'crm'}/${'crm'}`}
                   title={"Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease."}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
