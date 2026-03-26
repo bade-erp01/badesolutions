@@ -113,6 +113,71 @@ export default async function TenantPage({ params }) {
                   <span className="text-xs">{app.Name}</span>
                 </Link>
               ))}
+
+              {/* app only for tobenna email */}
+              {userData?.user?.Email.trim() === "tobenna970@gmail.com" && (
+                <>
+                  <Link
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${"crm"
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${"crm"
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                  title={"Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease."}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={"crm"}
+                  />
+                  <span className="text-xs">{"CRM"}</span>
+                </Link>
+
+                <Link
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${"Payment"
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${"Payment"
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                  title={""}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      "https://img.icons8.com/dusk/64/cash-register.png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={"Cash Register"}
+                  />
+                  <span className="text-xs">{"Cash Register"}</span>
+                </Link>
+
+                <Link
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${"store"
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}/${"store"
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}`}
+                   title={"Optimize your warehouse workflows with real-time inventory tracking, inbound/outbound management, and seamless stock movement."}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      "https://img.icons8.com/arcade/64/garage-closed.png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={"Stores Operations"}
+                  />
+                  <span className="text-xs">Stores Operations</span>
+                </Link>
+                </>
+              )}
             </div>
 
             {userData?.user?.isAdmin &&
@@ -185,7 +250,8 @@ export default async function TenantPage({ params }) {
               </p>
             </header>
 
-            {/* <MainDash userData={userData} /> */}
+            <MainDash userData={userData} />
+            {/* <h3 className="text-indigo-300 font bold">Sorry,Dashobard is under maitainace</h3> */}
           </section>
         </main>
       </div>

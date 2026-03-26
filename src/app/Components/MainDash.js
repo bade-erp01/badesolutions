@@ -28,7 +28,7 @@ import moment from "moment";
 import Link from "next/link";
 import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
 import withReactContent from "sweetalert2-react-content";
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 
 
 export default function MainDash({ userData }) {
@@ -43,7 +43,7 @@ export default function MainDash({ userData }) {
   const [monitoredCurrentPage, setMonitoredCurrentPage] = useState(1);
   const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
-  const MySwal = withReactContent(Swal);
+  // const MySwal = withReactContent(Swal);
 
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
@@ -183,28 +183,28 @@ export default function MainDash({ userData }) {
     };
 
     const handleOffline = () => {
-      MySwal.fire({
-        toast: true,
-        position: "bottom-start",
-        icon: 'info',
-        showConfirmButton: false,
-        // timer: 10000,
-        // timerProgressBar: true,
-        customClass: {
-          popup: "swal2-subscription-toast",
-        },
-        html: `
-            <div style="display: flex; align-items: center;">
-              <div style="text-align: left;">
-                <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
-              </div>
-            </div>
-        `,
-      });
+      // MySwal.fire({
+      //   toast: true,
+      //   position: "bottom-start",
+      //   icon: 'info',
+      //   showConfirmButton: false,
+      //   // timer: 10000,
+      //   // timerProgressBar: true,
+      //   customClass: {
+      //     popup: "swal2-subscription-toast",
+      //   },
+      //   html: `
+      //       <div style="display: flex; align-items: center;">
+      //         <div style="text-align: left;">
+      //           <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
+      //         </div>
+      //       </div>
+      //   `,
+      // });
 
-      setTimeout(()=>{
-        plsWait("Currently Offline");
-      },3000)
+      // setTimeout(()=>{
+      // },3000)
+      plsWait("Currently Offline");
 
     };
 
@@ -607,10 +607,7 @@ export default function MainDash({ userData }) {
                 🗿 Quick Stats Widget
               </h3>
               <div className="flex flex-col">
-                {/* <h4 className="text-sm text-gray-500 font-semibold mb-4">
-                  Sales Team Kpi Millestone
-                </h4> */}
-
+                
                 <h4 className="text-lg text-gray-500 font-semibold mb-4">
                   ⏰ Tasks Reminder
                 </h4>
@@ -660,6 +657,10 @@ export default function MainDash({ userData }) {
                     No task assigned
                   </p>
                 )}
+
+                {/* <h4 className="text-sm text-gray-500 font-semibold mb-4">
+                  Sales Team Kpi Millestone
+                </h4> */}
 
                 {/* {tenantData.result.map((person, index) => (
                   <div
@@ -831,10 +832,9 @@ export default function MainDash({ userData }) {
       ) : (
         <main className="flex-1">
           <section className="w-full max-w-7xl mx-auto p-6 h-[500px] overflow-y-auto bg-linear-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
-            {/* Birthday Marquee */}
             <div className="mt-6">
               <div className="w-full text-center">
-                {/* shw birthday celebrant here */}
+                {/* show dashboard that is user orientend and not business oriented */}
               </div>
             </div>
           </section>
