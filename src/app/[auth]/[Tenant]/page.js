@@ -250,17 +250,8 @@ export default async function TenantPage({ params }) {
               </p>
             </header>
 
-            {/* <MainDash userData={userData} /> */}
-            <div className="w-full px-6 py-8 animate-pulse space-y-6">
-                    <div className="h-6 bg-gray-300 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                    <div className="h-48 bg-gray-300 rounded w-full"></div>
-                    <div className="space-y-3">
-                      <div className="h-4 bg-gray-300 rounded w-full"></div>
-                      <div className="h-4 bg-gray-300 rounded w-5/6"></div>
-                    </div>
-                    <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div>
-                  </div>
+            <MainDash userData={userData} />
+            
           </section>
         </main>
       </div>
