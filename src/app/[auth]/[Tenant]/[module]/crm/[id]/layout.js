@@ -117,6 +117,7 @@ export default async function StoreLayout2({ params }) {
               </ul>
             </div>
             )}
+            
           </nav>
         </aside>
 
