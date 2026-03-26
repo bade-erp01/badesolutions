@@ -178,6 +178,7 @@ export default async function TenantPage({ params }) {
                 </Link>
                 </>
               )}
+              
             </div>
 
             {userData?.user?.isAdmin &&
