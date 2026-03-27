@@ -20,7 +20,7 @@ export default function Page({Data,userData}) {
  const [indirectExpenses,setindirectExpenses] = useState(0)////indirect expense
  const [NetProfit,setNetProfit] = useState(0);
  const [Taxes,setTaxes] = useState(0);
- console.log(initialData.COAs)
+//  console.log(initialData.COAs)
 
   const generateDates = (end, start) => {
       const dates = [];
@@ -155,7 +155,7 @@ export default function Page({Data,userData}) {
         </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
+          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative h-[83vh] overflow-y-auto">
             <div className="bg-white rounded p-6 m-3 shadow-md animate__animated animate__fadeInUp animate__faster">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg text-gray-500 font-semibold">
