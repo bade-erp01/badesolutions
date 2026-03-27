@@ -67,6 +67,6 @@ export default async function layout({params}) {
 
     const data = await res.json()
   return (
-    <Page userData={userData} Data={data} EXPRESS_PRIVATE_URL={baseUrl}/>
+    <Page userData={userData} Data={data} />
   )
 }
