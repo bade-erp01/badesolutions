@@ -17,7 +17,7 @@ export default function InvoicePage({ invoice }) {
   const [user] = useState(data.StoreKeeper || {});
 
   // download functions
-  const printWayBill = async (business, customer, bill, user) => {
+  const printWayBill = async (biz, customer, bill, user) => {
     try {
       plsWait("⌛");
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -28,9 +28,9 @@ export default function InvoicePage({ invoice }) {
       let currentY = margin;
 
       //  Logo
-      if (business.companyLogo) {
+      if (biz.companyLogo) {
         try {
-          const logoDataURL = await loadImageAsDataURL(business.companyLogo);
+          const logoDataURL = await loadImageAsDataURL(biz.companyLogo);
           const logoWidth = pageWidth * 0.2;
           const logoHeight = logoWidth * 0.75;
           doc.addImage(
@@ -49,11 +49,11 @@ export default function InvoicePage({ invoice }) {
       //  Business Info
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
-      doc.text(business.companyName, pageWidth - margin, currentY + 5, {
+      doc.text(biz.companyName, pageWidth - margin, currentY + 5, {
         align: "right",
       });
       doc.setFontSize(10);
-      const address = `${business.shopAddress} ${business.companyCity} ${business.companyState}`;
+      const address = `${biz.shopAddress} ${biz.companyCity} ${biz.companyState}`;
       const wrappedAddress = doc.splitTextToSize(
         address.toLowerCase(),
         pageWidth * 0.5,
@@ -61,10 +61,10 @@ export default function InvoicePage({ invoice }) {
       doc.text(wrappedAddress, pageWidth - margin, currentY + 12, {
         align: "right",
       });
-      doc.text(`${business.email}`, pageWidth - margin, currentY + 20, {
+      doc.text(`${biz.email}`, pageWidth - margin, currentY + 20, {
         align: "right",
       });
-      doc.text(`(${business.Tel})`, pageWidth - margin, currentY + 26, {
+      doc.text(`(${biz.Tel})`, pageWidth - margin, currentY + 26, {
         align: "right",
       });
       doc.text(
@@ -163,7 +163,7 @@ export default function InvoicePage({ invoice }) {
           const pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
 
           doc.setFontSize(7);
-          doc.text(`${business.invoicePolicy}`, margin, pageHeight - 10);
+          doc.text(`${biz.invoicePolicy}`, margin, pageHeight - 10);
           doc.text(`Page ${pageNumber}`, pageWidth - 60, pageHeight - 10);
         },
       });
@@ -227,7 +227,7 @@ export default function InvoicePage({ invoice }) {
   };
 
   //  Full PDF generator
-  const generatePdf = async (business, customer, bill) => {
+  const generatePdf = async (biz, customer, bill) => {
     try {
       plsWait("⌛");
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -239,9 +239,9 @@ export default function InvoicePage({ invoice }) {
       let currentY = margin;
 
       //  Logo
-      if (business.companyLogo) {
+      if (biz.companyLogo) {
         try {
-          const logo = await loadImageAsDataURL(business.companyLogo);
+          const logo = await loadImageAsDataURL(biz.companyLogo);
           doc.addImage(logo, "JPEG", 10, 12, 30, 30);
         } catch (err) {
           console.warn("Logo failed to load");
@@ -249,21 +249,21 @@ export default function InvoicePage({ invoice }) {
       }
 
       doc.setFontSize(16).setFont("helvetica", "bold");
-      doc.text(business.companyName || "", pageWidth - 10, 12, {
+      doc.text(biz.companyName || "", pageWidth - 10, 12, {
         align: "right",
       });
 
       doc.setFontSize(8).setTextColor(0, 0, 0);
       doc.text(
-        `${business.shopAddress || ""} ${business.companyState || ""}, ${
-          business.companyCity || ""
+        `${biz.shopAddress || ""} ${biz.companyState || ""}, ${
+          biz.companyCity || ""
         }`,
         pageWidth - 10,
         20,
         { align: "right" },
       );
-      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
+      doc.text(biz.email || "", pageWidth - 10, 26, { align: "right" });
+      doc.text(`Tel: ${biz.Tel || "N/A"}`, pageWidth - 10, 32, {
         align: "right",
       });
 
@@ -378,7 +378,7 @@ export default function InvoicePage({ invoice }) {
       //  Signatures
       doc.setFontSize(7);
       doc.text(
-        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
+        `${totalInWords(bill.grandTotal, biz.currency?.currency)}`,
         margin,
         currentY,
       );
@@ -386,7 +386,7 @@ export default function InvoicePage({ invoice }) {
       doc.text("Authorized Signatures", margin, currentY);
       currentY += 10;
       doc.text(
-        `${business.companyName.toLowerCase()} _______________________________`,
+        `${biz.companyName.toLowerCase()} _______________________________`,
         margin,
         currentY,
       );
@@ -397,8 +397,8 @@ export default function InvoicePage({ invoice }) {
         currentY,
       );
       currentY += 10;
-      if (business.invoicePolicy) {
-        doc.text(business.invoicePolicy, margin, currentY);
+      if (biz.invoicePolicy) {
+        doc.text(biz.invoicePolicy, margin, currentY);
         currentY += 10;
       }
 
