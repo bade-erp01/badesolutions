@@ -20,7 +20,7 @@ export default function Page({Data,userData}) {
  const [indirectExpenses,setindirectExpenses] = useState(0)////indirect expense
  const [NetProfit,setNetProfit] = useState(0);
  const [Taxes,setTaxes] = useState(0);
-//  console.log(initialData.COAs)
+ console.log(initialData.COAs)
 
   const generateDates = (end, start) => {
       const dates = [];

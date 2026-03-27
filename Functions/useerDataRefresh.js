@@ -7,12 +7,12 @@ import dbConnect from "../lib/mongoose";
 import { NextResponse } from 'next/server';
 
 
-const SECRET_KEY = "THESTARTUPWAY";
 
 const fetchUser = async () => {
   "use server";
   try {
     // Retrieve cookies
+    const SECRET_KEY = process.env.TenantToken;
     const cookieStore = await cookies();
     const userToken = cookieStore.get("userInfo")?.value;
     const businessToken = cookieStore.get("businessInfo")?.value;

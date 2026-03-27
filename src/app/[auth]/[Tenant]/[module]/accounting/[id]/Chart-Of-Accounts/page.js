@@ -244,7 +244,7 @@ const FinancialOverview = ({ data }) => {
                                                       "YYYY-MM",
                                                     )}
                                                   </td>
-                                                  <td>Captured snapShot {entry.openingBalance}</td>
+                                                  <td>{entry.openingBalance}</td>
                                                 </tr>
                                               ),
                                             )}
