@@ -1,4 +1,4 @@
-"use client"; // if using Next.js App Router
+"use client"; 
 
 import React from "react";
 import * as XLSX from "xlsx";

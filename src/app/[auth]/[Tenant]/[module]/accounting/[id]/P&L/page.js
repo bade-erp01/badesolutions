@@ -291,7 +291,7 @@ export default function Page({Data,userData}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{(OpeningInventory + NetPurchase - closingInv) - (SALES - Return) - (OpeningInventory + NetPurchase) - closingInv }</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{((OpeningInventory + NetPurchase - closingInv) - (SALES - Return)) - (OpeningInventory + NetPurchase) - closingInv }</td>
                     </tr>
 
                     <tr>
