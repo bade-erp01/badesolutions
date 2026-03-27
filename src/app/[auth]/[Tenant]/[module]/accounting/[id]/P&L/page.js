@@ -17,7 +17,7 @@ export default function Page({Data,userData}) {
  const [closingInv,setClosingInv] = useState(0);
  const [COGS,setCOGS] = useState(0);
  const [DirectExpense,setDirectExpenses] = useState(0);//direct expense
- const [indirectExpenses,setindirectExpenses] = useState(0)
+ const [indirectExpenses,setindirectExpenses] = useState(0)////indirect expense
  const [NetProfit,setNetProfit] = useState(0);
  const [Taxes,setTaxes] = useState(0);
 //  console.log(initialData.COAs)
@@ -197,11 +197,11 @@ export default function Page({Data,userData}) {
                             NET SALES [A]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic"> SALES - {Return}</p>
+                            <p className="italic"> Sales - Return</p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{ SALES - Return}</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{SALES - Return}</td>
                     </tr>
 
                     <tr>
@@ -211,15 +211,15 @@ export default function Page({Data,userData}) {
                             C.O.S [B]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic">Opening inventory [a] [{OpeningInventory}]</p>
-                            <p className="italic">+ Net purchase [{NetPurchase}]</p>
-                            <p className="italic" title="Cost of Goods Available for sales"> C.O.G.A.S [a + b] --- [{OpeningInventory + NetPurchase}]</p>
-                            <p className="italic">- Closing inventory [{closingInv}]</p>
-                            <p className="italic" title="Cost of Goods Sold"> C.O.G.S [{COGS}]</p>
+                            <p className="italic">Opening inventory [a] [{userData.business.currency?.currency.Symbol}{OpeningInventory}]</p>
+                            <p className="italic">+ Net purchase [{userData.business.currency?.currency.Symbol}{NetPurchase}]</p>
+                            <p className="italic" title="Cost of Goods Available for sales"> C.O.G.A.S [a + b] --- [{userData.business.currency?.currency.Symbol}{OpeningInventory + NetPurchase}]</p>
+                            <p className="italic">- Closing inventory [{userData.business.currency?.currency.Symbol}{closingInv}]</p>
+                            <p className="italic" title="Cost of Goods Sold"> C.O.G.S [{userData.business.currency?.currency.Symbol}{COGS}]</p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{OpeningInventory + NetPurchase - closingInv}</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{(OpeningInventory + NetPurchase) - closingInv}</td>
                     </tr>
 
                     <tr>
@@ -230,10 +230,15 @@ export default function Page({Data,userData}) {
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* show list of rxpense category */}
-                            {initialData.ExpenseCats.filter((cat) => cat.type === "Direct").map((cat,idx) =>(
+                            {initialData.ExpenseCats.filter((cat) => cat.type === "Direct")
+                            .slice(0,3)
+                            .map((cat,idx) =>(
                               <p className="itaclic " key={idx}> {cat.NAME} </p>
                             ))}
                           </div>
+                          <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium text-black bg-blue-300 rounded-full">
+                              + {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length - 3} More
+                          </span>
                         </details>
                       </td>
                       <td className="py-3"> {userData.business.currency?.currency.Symbol}{DirectExpense}
@@ -251,7 +256,7 @@ export default function Page({Data,userData}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{(SALES - Return) - (OpeningInventory + NetPurchase) - closingInv}</td>
                     </tr>
 
                     <tr>
@@ -262,10 +267,13 @@ export default function Page({Data,userData}) {
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* lit of indirect expense */}
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").map((cat,idx) =>(
+                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").slice(0,3).map((cat,idx) =>(
                               <p className="itaclic" key={idx}> {cat.NAME} </p>
                             ))}
                           </div>
+                          <span className="px-1.5 py-0.5 text-xs font-semibold text-black bg-green-300 rounded-full">
+                            + {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length - 3} More
+                          </span>
                         </details>
                       </td>
                       <td className="py-3"> {userData.business.currency?.currency.Symbol}{indirectExpenses}
@@ -283,7 +291,7 @@ export default function Page({Data,userData}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{(OpeningInventory + NetPurchase - closingInv) - 0}</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{(OpeningInventory + NetPurchase - closingInv) - (SALES - Return) - (OpeningInventory + NetPurchase) - closingInv }</td>
                     </tr>
 
                     <tr>
