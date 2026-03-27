@@ -228,7 +228,7 @@ const FinancialOverview = ({ data }) => {
                                                 Date
                                               </th>
                                               <th className="text-left px-2 py-1">
-                                                Amount
+                                                Snapshot
                                               </th>
                                             </tr>
                                           </thead>
