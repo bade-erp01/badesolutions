@@ -3,13 +3,34 @@ import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
-import {useState} from "react"
+import {useState} from "react";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import {ErrorMessage,SuccessToast,} from "../../../../../../../../Functions/Mics"
-import { Encrypt,} from "../../../../../../../../Functions/Mics"
+import {ErrorMessage,SuccessToast,} from "../../../../../../../../Functions/Mics";
+import moment from "moment";
 
-export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
+export default function Page({Data,userData}) {
  const [initialData,setInitialData] = useState(Data)
+ const [SALES,setSALES] = useState(0);
+ const [Return,setReturn] = useState(0);
+ const [OpeningInventory,setOpeningInventory] = useState(0);
+ const [NetPurchase,setNetPurchase] = useState(0);
+ const [closingInv,setClosingInv] = useState(0);
+ const [COGS,setCOGS] = useState(0);
+ const [DirectExpense,setDirectExpenses] = useState(0);//direct expense
+ const [indirectExpenses,setindirectExpenses] = useState(0)
+ const [NetProfit,setNetProfit] = useState(0);
+ const [Taxes,setTaxes] = useState(0);
+//  console.log(initialData.COAs)
+
+  const generateDates = (end, start) => {
+      const dates = [];
+      let currentDate = moment(start);
+      while (currentDate <= moment(end)) {
+        dates.push(currentDate.format("YYYY-MM"));
+        currentDate = currentDate.add(1, "days");
+      }
+      return dates;
+    };
 
   async function GeneratePNLSummary() {
     const { value: formValues } = await Swal.fire({
@@ -34,32 +55,73 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
     if (!formValues) return;
 
     Swal.fire({
-      title: "Fetching report…",
+      title: "Computing income statement...",
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
 
     try {
       const { startDate, endDate } = formValues;
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Generate/profitandLoss?startDate=${startDate}&endDate=${endDate}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-          },
-          cache: "no-store", // Optional: disables caching for fresh data
-        }
+      const dates = generateDates(
+        endDate,startDate
       );
 
-      const TransactionResult = await res.json();
+      // do the filters here and update the initialData state with the new values to update the UI
+      // get sales snapshot from COA
+      setSALES(initialData.COAs[0].Revenue.Revenue.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
 
-      if (!res.ok) {
-        throw new Error(Transaction.error || "No transactions found.");
-      }
-      setInitialData(TransactionResult)
+      // GET RETURNS SNAPSHOTS FROM COA
+      setReturn(initialData.COAs[0].Revenue.Sales_Returns_Allowance.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+
+      // CALCULATE C.O.S
+      // CATPTURE CLOSING INVENTORY FOR LAST MONTH AS OPENING INVENTORY FOR CURRENT MONTH
+      setOpeningInventory(initialData.COAs[0].Asset.inventory.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).subtract(1, 'month').format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+
+      // CAPTURE NET PURCHASE
+      setNetPurchase(initialData.COAs[0].Expense.Purchases.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+
+      // CAPTURE setClosingInv
+      setClosingInv(initialData.COAs[0].Asset.inventory.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.closingBalance, 0));
+
+      // CAPTURE EXPENSE
+      setDirectExpenses(initialData.COAs[0].Expense.Direct_Expense.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+
+      // CAPTURE `COGS
+      setCOGS(initialData.COAs[0].Expense.COGS.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+
+      // CAPTURE setTaxes
+      setTaxes(initialData.COAs[0].Liability.Tax_payable.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+
+      // capture indirectExpenses
+      setindirectExpenses(initialData.COAs[0].Expense.Indirect_Expense.monthlyBalances.filter((entry) => {
+        const formattedDate = moment(entry.month).format('YYYY-MM');
+        return dates.includes(formattedDate);
+      }).reduce((acc, entry) => acc + entry.openingBalance, 0));
+      
       SuccessToast("Income statement updated.");
     } catch (err) {
       ErrorMessage(err.message);
@@ -119,12 +181,12 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                             SALES
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            {/* show list of rxpense category */}
-                            <p>All category</p>
+                            {/* show pricelist sales captured */}
+                            <p>All Pricelist</p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0.00
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{SALES}
                     </td>
                     </tr>
 
@@ -135,36 +197,36 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                             NET SALES [A]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic"> Sales - Returns</p>
+                            <p className="italic"> SALES - {Return}</p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{ SALES - Return}</td>
                     </tr>
 
                     <tr>
                       <td className="p-3">
                         <details>
                           <summary className="cursor-pointer hover:bg-gray-50 font-bold " title="Cost of Sales">
-                            C.O.S 
+                            C.O.S [B]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
-                            <p className="italic">Opening inventory [a]</p>
-                            <p className="italic">+ Net purchase</p>
-                            <p className="italic" title="Cost of Goods Available for sales"> C.O.G.A.S [a + b] --- [00.00]</p>
-                            <p className="italic">- Closing inventory</p>
-                            <p className="italic" title="Cost of Goods Sold"> C.O.G.S</p>
+                            <p className="italic">Opening inventory [a] [{OpeningInventory}]</p>
+                            <p className="italic">+ Net purchase [{NetPurchase}]</p>
+                            <p className="italic" title="Cost of Goods Available for sales"> C.O.G.A.S [a + b] --- [{OpeningInventory + NetPurchase}]</p>
+                            <p className="italic">- Closing inventory [{closingInv}]</p>
+                            <p className="italic" title="Cost of Goods Sold"> C.O.G.S [{COGS}]</p>
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{OpeningInventory + NetPurchase - closingInv}</td>
                     </tr>
 
                     <tr>
                       <td className="p-3">
                         <details>
                           <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
-                            DIRECT EXPENSE [B]
+                            DIRECT EXPENSE [C]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* show list of rxpense category */}
@@ -174,7 +236,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{DirectExpense}
                     </td>
                     </tr>
 
@@ -182,7 +244,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                       <td className="p-3">
                         <details>
                           <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
-                            GROSS PROFIT [C]
+                            GROSS PROFIT [D]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             <p className="font-bold "> [A - B] </p>
@@ -196,7 +258,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                       <td className="p-3">
                         <details>
                           <summary className="cursor-pointer hover:bg-gray-50 font-bold ">
-                            INDIRECT EXPENSE [D]
+                            INDIRECT EXPENSE [E]
                           </summary>
                           <div className="flex flex-col gap-4 mt-2">
                             {/* lit of indirect expense */}
@@ -206,7 +268,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{indirectExpenses}
                     </td>
                     </tr>
 
@@ -221,7 +283,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                           </div>
                         </details>
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{(OpeningInventory + NetPurchase - closingInv) - 0}</td>
                     </tr>
 
                     <tr>
@@ -239,7 +301,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                       <td className="cursor-pointer hover:bg-gray-50 font-bold ">
                         Taxes
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol} 0
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{Taxes}
                     </td>
                     </tr>
 
@@ -247,7 +309,7 @@ export default function Page({Data,userData,EXPRESS_PRIVATE_URL}) {
                       <td className="cursor-pointer hover:bg-gray-50 font-bold ">
                         Net Income
                       </td>
-                      <td className="py-3"> {userData.business.currency?.currency.Symbol}0</td>
+                      <td className="py-3"> {userData.business.currency?.currency.Symbol}{NetProfit}</td>
                     </tr>
                   </tbody>
                 </table>
