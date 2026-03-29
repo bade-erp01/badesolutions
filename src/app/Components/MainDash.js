@@ -11,6 +11,7 @@ import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
   Encrypt,
+  pricelistSetter
 } from "../../../Functions/Functions";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
@@ -781,6 +782,11 @@ export default function MainDash({ userData }) {
                       page={`Payments for ${moment().format("DD-MM-YYYY")}`}
                     />
                   </div>
+
+                  {/* gropued sales */}
+                   <div className="  transition-all duration-700 mt-5">
+                      <GropuedInvRadarChart invoice={tenantData.yearlysales} business={userData.business} />
+                   </div>
                 </div>
               </div>
             </aside>
@@ -904,3 +910,83 @@ const ExpenseTotal = ({ tenantData, userData }) => {
     </p>
   );
 };
+
+
+// sales by category
+import { TrendingUp } from "lucide-react"
+import { PolarAngleAxis, Radar, RadarChart } from "recharts"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+
+export function GropuedInvRadarChart({ invoice,business }) {
+  // Group invoices by priceList
+  const grouped = invoice.reduce((acc, entry) => {
+    const key = entry.priceList || "Unknown";
+    if (!acc[key]) {
+      acc[key] = 0;
+    }
+    acc[key] += entry.grandTotal || 0;
+    return acc;
+  }, {});
+
+  // Convert grouped object into chartData array pricelistSetter
+  const chartData = Object.entries(grouped).map(([name, debt]) => ({
+    name:pricelistSetter(name,business),
+    debt,
+  }));
+
+  const chartConfig = {
+    debt: {
+      label: "Total sales",
+      color: "var(--chart-3)",
+    },
+  };
+
+  return (
+    <Card>
+      <CardHeader className="items-center p-4">
+        <CardTitle>
+          <div className="flex items-center gap-2 leading-none font-medium">
+          Sales Categories <TrendingUp className="h-4 w-4" />
+        </div>
+        </CardTitle>
+        <CardDescription>Sales overview grouped by pricelist</CardDescription>
+      </CardHeader>
+      <CardContent className="pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
+          <RadarChart data={chartData}>
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <PolarAngleAxis dataKey="name" />
+            <Radar
+              dataKey="debt"
+              fill="var(--color-debt)"
+              fillOpacity={0.6}
+              dot={{ r: 4, fillOpacity: 1 }}
+            />
+          </RadarChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="text-muted-foreground">
+          {chartData.length} pricelists displayed
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}
+
