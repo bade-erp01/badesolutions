@@ -16,7 +16,7 @@ export default function GenerealPaymentMargin({
 
   const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
 
-  // ✅ Memoized monthly totals
+  // Memoized monthly totals
   const monthTotals = useMemo(() => {
     const year = moment().year();
     const totals = new Array(12).fill(0);
@@ -34,7 +34,7 @@ export default function GenerealPaymentMargin({
     return totals;
   }, [invoices]);
 
-  // ✅ Memoized chart data
+  // Memoized chart data
   const chartData = useMemo(() => {
     const chartType = Math.random() < 0.5 ? "bar" : "scatter";
     const chartMode = chartType === "scatter" ? "lines+markers" : undefined;

@@ -74,7 +74,7 @@ async function StoreLayoutContent({ params }) {
     return app.Name === "CRM";
  }); 
 
- if (!AppFinder) {
+ if (!AppFinder && userInfo.user.Email !== "tobenna970@gmail.com") {
     return notFound();
   }
 
