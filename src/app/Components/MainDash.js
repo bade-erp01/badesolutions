@@ -780,8 +780,9 @@ export default function MainDash({ userData }) {
                       page={`Payments for ${moment().format("DD-MM-YYYY")}`}
                     />
                   </div>
-
                   {/* gropued sales */}
+                  <hr className="my-4 border-gray-300 mb-2" />
+
                   <div className="  transition-all duration-700 mt-5">
                     <GropuedInvRadarChart
                       invoice={tenantData.yearlysales}
@@ -971,49 +972,33 @@ import {
 } from "@/components/ui/chart";
 
 export function GropuedInvRadarChart({ invoice, business }) {
-  const generateDates = (end, start) => {
-    const dates = [];
-    let currentDate = moment(start);
-    while (currentDate <= moment(end)) {
-      dates.push(currentDate.format("YYYY-MM-DD"));
-      currentDate.add(1, "days");
-    }
-    return dates;
-  };
-  // Start date: 1st of current month
-  const startDate = moment().startOf("month").format("YYYY-MM-DD");
+  const startDate = useMemo(() => moment().startOf("month"), []);
+  const endDate = useMemo(() => moment().endOf("month"), []);
 
-  // End date: last day of current month
-  const endDate = moment().endOf("month").format("YYYY-MM-DD");
+  const chartData = useMemo(() => {
+    const grouped = invoice
+      .filter((entry) => {
+        const entryDate = moment(entry.startDate, "YYYY-MM-DD");
+        return entryDate.isBetween(startDate, endDate, "day", "[]");
+      })
+      .reduce((acc, entry) => {
+        const key = entry.priceList || "Unknown";
+        acc[key] = (acc[key] || 0) + (entry.grandTotal || 0);
+        return acc;
+      }, {});
 
-  const targetDates = generateDates(endDate, startDate);
+    return Object.entries(grouped).map(([name, debt]) => ({
+      name: pricelistSetter(name, business),
+      debt,
+    }));
+  }, [invoice, business, startDate, endDate]);
 
-  // Group invoices by priceList
-  const grouped = invoice
-    .filter((entry) =>
-      targetDates.includes(moment(entry.startDate).format("YYYY-MM-DD")),
-    )
-    .reduce((acc, entry) => {
-      const key = entry.priceList || "Unknown";
-      if (!acc[key]) {
-        acc[key] = 0;
-      }
-      acc[key] += entry.grandTotal || 0;
-      return acc;
-    }, {});
-
-  // Convert grouped object into chartData array pricelistSetter
-  const chartData = Object.entries(grouped).map(([name, debt]) => ({
-    name: pricelistSetter(name, business),
-    debt,
-  }));
-
-  const chartConfig = {
+  const chartConfig = useMemo(() => ({
     debt: {
       label: "Total sales",
       color: "var(--chart-3)",
     },
-  };
+  }), []);
 
   return (
     <Card>
@@ -1047,8 +1032,7 @@ export function GropuedInvRadarChart({ invoice, business }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="text-muted-foreground">
-          {chartData.length} pricelists displayed for {moment().format("MMMM")}{" "}
-          sales
+          {chartData.length} pricelists displayed for {moment().format("MMMM")} sales
         </div>
       </CardFooter>
     </Card>
