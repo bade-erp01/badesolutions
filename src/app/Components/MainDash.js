@@ -11,7 +11,7 @@ import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
   Encrypt,
-  pricelistSetter
+  pricelistSetter,
 } from "../../../Functions/Functions";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
@@ -29,8 +29,7 @@ import moment from "moment";
 import Link from "next/link";
 import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
 import withReactContent from "sweetalert2-react-content";
-import Swal from 'sweetalert2';
-
+import Swal from "sweetalert2";
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -132,6 +131,7 @@ export default function MainDash({ userData }) {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
             access: `${Encrypt(userData?.user._id)}`,
+            // cache: "force-cache" // or "default", "reload", "no-store"
           },
         });
 
@@ -187,7 +187,7 @@ export default function MainDash({ userData }) {
       MySwal.fire({
         toast: true,
         position: "bottom-start",
-        icon: 'info',
+        icon: "info",
         showConfirmButton: false,
         // timer: 10000,
         // timerProgressBar: true,
@@ -203,10 +203,9 @@ export default function MainDash({ userData }) {
         `,
       });
 
-      setTimeout(()=>{
+      setTimeout(() => {
         plsWait("Currently Offline");
-      },3000)
-
+      }, 3000);
     };
 
     // User activity listeners
@@ -608,7 +607,6 @@ export default function MainDash({ userData }) {
                 🗿 Quick Stats Widget
               </h3>
               <div className="flex flex-col">
-                
                 <h4 className="text-lg text-gray-500 font-semibold mb-4">
                   ⏰ Tasks Reminder
                 </h4>
@@ -784,9 +782,12 @@ export default function MainDash({ userData }) {
                   </div>
 
                   {/* gropued sales */}
-                   <div className="  transition-all duration-700 mt-5">
-                      <GropuedInvRadarChart invoice={tenantData.yearlysales} business={userData.business} />
-                   </div>
+                  <div className="  transition-all duration-700 mt-5">
+                    <GropuedInvRadarChart
+                      invoice={tenantData.yearlysales}
+                      business={userData.business}
+                    />
+                  </div>
                 </div>
               </div>
             </aside>
@@ -819,6 +820,39 @@ export default function MainDash({ userData }) {
             </div>
           )}
 
+          {/* produt promo */}
+          {tenantData.promotions?.length > 0 && (
+            <div className="w-full text-center mt-3">
+              <Marquee
+                gradient={false}
+                speed={40}
+                className="w-full bg-gray-100/50 py-2"
+              >
+                <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
+                  🗂️ Products On Promo:
+                </span>
+                {tenantData.promotions.map((product) => (
+                  <span
+                    key={product._id}
+                    className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                  >
+                    {product.Name} Promo:{" "}
+                    {userData.business.currency?.currency.Symbol}
+                    {(
+                      product.Pricelist1Promo ??
+                      product.Pricelist2Promo ??
+                      product.Pricelist3Promo ??
+                      product.Pricelist4Promo ??
+                      product.Pricelist5Promo ??
+                      product.Pricelist6Promo ??
+                      product.Pricelist7Promo
+                    )?.toLocaleString()}
+                  </span>
+                ))}
+              </Marquee>
+            </div>
+          )}
+
           {/* Footer */}
           <footer className="mt-8 text-sm text-gray-500">
             © <span id="year">{moment().format("YYYY")}</span> Business
@@ -826,11 +860,18 @@ export default function MainDash({ userData }) {
           </footer>
 
           {/* pending payment reminder */}
-          {tenantData.revenuePayments.filter((payment)=>{
-             payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"}).length > 0 &&
+          {tenantData.revenuePayments.filter((payment) => {
+            payment.collectionRef === "PMNT" &&
+              payment.cr === true &&
+              payment.status === "Pending";
+          }).length > 0 &&
             userData.user.postPayment && (
               <PendingPaymentReminder
-                data={tenantData.revenuePayments.filter((payment)=>{payment.collectionRef === "PMNT" &&  payment.cr === true && payment.status === "Pending"})}
+                data={tenantData.revenuePayments.filter((payment) => {
+                  payment.collectionRef === "PMNT" &&
+                    payment.cr === true &&
+                    payment.status === "Pending";
+                })}
                 business={userData.business}
               />
             )}
@@ -911,10 +952,9 @@ const ExpenseTotal = ({ tenantData, userData }) => {
   );
 };
 
-
 // sales by category
-import { TrendingUp } from "lucide-react"
-import { PolarAngleAxis, Radar, RadarChart } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { PolarAngleAxis, Radar, RadarChart } from "recharts";
 
 import {
   Card,
@@ -923,45 +963,48 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
-export function GropuedInvRadarChart({ invoice,business }) {
-
+export function GropuedInvRadarChart({ invoice, business }) {
   const generateDates = (end, start) => {
-      const dates = [];
-      let currentDate = moment(start);
-      while (currentDate <= moment(end)) {
-        dates.push(currentDate.format('YYYY-MM-DD'));
-        currentDate.add(1, 'days');
-      }
-      return dates;
-    };
-    // Start date: 1st of current month
-    const startDate = moment().startOf('month').format('YYYY-MM-DD');
+    const dates = [];
+    let currentDate = moment(start);
+    while (currentDate <= moment(end)) {
+      dates.push(currentDate.format("YYYY-MM-DD"));
+      currentDate.add(1, "days");
+    }
+    return dates;
+  };
+  // Start date: 1st of current month
+  const startDate = moment().startOf("month").format("YYYY-MM-DD");
 
-    // End date: last day of current month
-    const endDate = moment().endOf('month').format('YYYY-MM-DD');
+  // End date: last day of current month
+  const endDate = moment().endOf("month").format("YYYY-MM-DD");
 
-    const targetDates = generateDates(endDate, startDate);
+  const targetDates = generateDates(endDate, startDate);
 
   // Group invoices by priceList
-  const grouped = invoice.filter(entry => targetDates.includes(moment(entry.startDate).format('YYYY-MM-DD'))).reduce((acc, entry) => {
-    const key = entry.priceList || "Unknown";
-    if (!acc[key]) {
-      acc[key] = 0;
-    }
-    acc[key] += entry.grandTotal || 0;
-    return acc;
-  }, {});
+  const grouped = invoice
+    .filter((entry) =>
+      targetDates.includes(moment(entry.startDate).format("YYYY-MM-DD")),
+    )
+    .reduce((acc, entry) => {
+      const key = entry.priceList || "Unknown";
+      if (!acc[key]) {
+        acc[key] = 0;
+      }
+      acc[key] += entry.grandTotal || 0;
+      return acc;
+    }, {});
 
   // Convert grouped object into chartData array pricelistSetter
   const chartData = Object.entries(grouped).map(([name, debt]) => ({
-    name:pricelistSetter(name,business),
+    name: pricelistSetter(name, business),
     debt,
   }));
 
@@ -977,8 +1020,8 @@ export function GropuedInvRadarChart({ invoice,business }) {
       <CardHeader className="items-center p-4">
         <CardTitle>
           <div className="flex items-center gap-2 leading-none font-medium">
-          Sales Categories <TrendingUp className="h-4 w-4" />
-        </div>
+            Sales Categories <TrendingUp className="h-4 w-4" />
+          </div>
         </CardTitle>
         <CardDescription>Sales overview grouped by pricelist</CardDescription>
       </CardHeader>
@@ -988,7 +1031,10 @@ export function GropuedInvRadarChart({ invoice,business }) {
           className="mx-auto aspect-square max-h-[250px]"
         >
           <RadarChart data={chartData}>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
             <PolarAngleAxis dataKey="name" />
             <Radar
               dataKey="debt"
@@ -1001,10 +1047,10 @@ export function GropuedInvRadarChart({ invoice,business }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="text-muted-foreground">
-          {chartData.length} pricelists displayed for {moment().format('MMMM')} sales
+          {chartData.length} pricelists displayed for {moment().format("MMMM")}{" "}
+          sales
         </div>
       </CardFooter>
     </Card>
   );
 }
-
