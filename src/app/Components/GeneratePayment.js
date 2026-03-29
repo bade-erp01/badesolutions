@@ -1,80 +1,71 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import moment from "moment";
 import "animate.css";
 
-/**
- * GenerealPaymentMargin
- * - Displays monthly sales turnover (random bar/line chart with random colors)
- * - Uses Plotly.js for rendering charts
- */
 export default function GenerealPaymentMargin({
-  businessColor = "#27272a", // fallback color
+  businessColor = "#27272a",
   yearlyPayment,
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [invoices, setInvoices] = useState(Array.isArray(yearlyPayment) ? yearlyPayment : []);
+  const [invoices] = useState(Array.isArray(yearlyPayment) ? yearlyPayment : []);
 
   const chartRef = useRef(null);
   const plotlyRef = useRef(null);
 
   const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
 
-  const computeAggregates = useCallback(() => {
+  // ✅ Memoized monthly totals
+  const monthTotals = useMemo(() => {
     const year = moment().year();
-    const monthTotals = new Array(12).fill(0);
+    const totals = new Array(12).fill(0);
 
-    for (let i = 0; i < invoices.length; i++) {
-      const inv = invoices[i];
-      if (!inv) continue;
-      const status = String(inv.billStatus || "").toLowerCase();
-      if (status === "cancelled") continue;
+    invoices.forEach((inv) => {
+      if (!inv) return;
+      if (String(inv.billStatus || "").toLowerCase() === "cancelled") return;
 
       const s = moment(inv.PaymentDate);
       if (s.isValid() && s.year() === year) {
-        monthTotals[s.month()] += toNum(inv.crAmount);
+        totals[s.month()] += toNum(inv.crAmount);
       }
-    }
+    });
 
-    return { monthTotals };
+    return totals;
   }, [invoices]);
 
+  // ✅ Memoized chart data
+  const chartData = useMemo(() => {
+    const chartType = Math.random() < 0.5 ? "bar" : "scatter";
+    const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
+    const colors = ["#27272a", "#16A085"];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+    return [
+      {
+        x: ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],
+        y: monthTotals.map((v) => Number(v.toFixed(2))),
+        type: chartType,
+        mode: chartMode,
+        marker: { color: randomColor || businessColor },
+      },
+    ];
+  }, [monthTotals, businessColor]);
+
+  const chartLayout = useMemo(() => ({
+    title: "M/M PAYMENT RECORD",
+  }), []);
+
   useEffect(() => {
-    if (loading) return;
     let mounted = true;
-
-    const chartNode = chartRef.current;
-
     (async () => {
       try {
-        const Plotly = (await import("plotly.js-dist-min")).default || (await import("plotly.js-dist-min"));
+        const Plotly = (await import("plotly.js-dist-min")).default;
         plotlyRef.current = Plotly;
 
-        const { monthTotals } = computeAggregates();
-
-        // Randomize chart type (bar vs line)
-        const chartType = Math.random() < 0.5 ? "bar" : "scatter";
-        const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
-
-        // Randomize color
-        const colors = ["#27272a", "#16A085"];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-        // Monthly turnover chart
-        const xArray = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-        const yArray = monthTotals.map((v) => Number(v.toFixed(2)));
-        const chartData = [
-          {
-            x: xArray,
-            y: yArray,
-            type: chartType,
-            mode: chartMode,
-            marker: { color: randomColor || businessColor },
-          },
-        ];
-        const chartLayout = { title: `M/M PAYMENT RECORD (${chartType.toUpperCase()})` };
-        if (mounted && chartNode) Plotly.newPlot(chartNode, chartData, chartLayout);
+        if (mounted && chartRef.current) {
+          Plotly.newPlot(chartRef.current, chartData, chartLayout);
+        }
       } catch (err) {
         setError(err?.message || String(err));
       }
@@ -82,17 +73,15 @@ export default function GenerealPaymentMargin({
 
     return () => {
       mounted = false;
-      try {
-        const Plotly = plotlyRef.current;
-        if (Plotly && chartNode) {
-          Plotly.purge(chartNode);
-        }
-      } catch (_) {}
+      const Plotly = plotlyRef.current;
+      if (Plotly && chartRef.current) {
+        Plotly.purge(chartRef.current);
+      }
     };
-  }, [loading, computeAggregates, businessColor]);
+  }, [chartData, chartLayout]);
 
   return (
-    <div className="space-y-4 animate__animated animate__fadeInUp animate__faster ">
+    <div className="space-y-4 animate__animated animate__fadeInUp animate__faster">
       <div className="flex items-center justify-between">
         <h3 className="text-lg text-gray-500 font-semibold">
           Overall Payment collection for {moment().format("YYYY")}
@@ -105,7 +94,7 @@ export default function GenerealPaymentMargin({
       {error && <div className="text-sm text-red-600">{error}</div>}
 
       <div>
-        <div ref={chartRef} id="chart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
+         <div ref={chartRef} id="chart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
       </div>
     </div>
   );
