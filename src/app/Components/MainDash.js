@@ -931,8 +931,26 @@ import {
 } from "@/components/ui/chart"
 
 export function GropuedInvRadarChart({ invoice,business }) {
+
+  const generateDates = (end, start) => {
+      const dates = [];
+      let currentDate = moment(start);
+      while (currentDate <= moment(end)) {
+        dates.push(currentDate.format('YYYY-MM-DD'));
+        currentDate.add(1, 'days');
+      }
+      return dates;
+    };
+    // Start date: 1st of current month
+    const startDate = moment().startOf('month').format('YYYY-MM-DD');
+
+    // End date: last day of current month
+    const endDate = moment().endOf('month').format('YYYY-MM-DD');
+
+    const targetDates = generateDates(endDate, startDate);
+
   // Group invoices by priceList
-  const grouped = invoice.reduce((acc, entry) => {
+  const grouped = invoice.filter(entry => targetDates.includes(moment(entry.startDate).format('YYYY-MM-DD'))).reduce((acc, entry) => {
     const key = entry.priceList || "Unknown";
     if (!acc[key]) {
       acc[key] = 0;
@@ -983,7 +1001,7 @@ export function GropuedInvRadarChart({ invoice,business }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="text-muted-foreground">
-          {chartData.length} pricelists displayed
+          {chartData.length} pricelists displayed for {moment().format('MMMM')} sales
         </div>
       </CardFooter>
     </Card>
