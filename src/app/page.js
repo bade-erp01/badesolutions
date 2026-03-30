@@ -1,40 +1,21 @@
+"use client"
+
 import Image from "next/image";
 import Nav1 from "./Components/Nav1";
 import Footer1 from "./Components/Footer1";
 import Link from "next/link";
 import "animate.css";
+import {useRouter} from "next/navigation"
 
-export const metadata = {
-  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  description:
-    "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
-  keywords: [
-    "Business Automation",
-    "Enterprise Solutions",
-    "B.A.D.E",
-    "AI-powered Business",
-    "Workflow Optimization",
-    "Process Automation",
-  ],
-  author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: "#f4a8ff",
-  ogTitle:
-    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
-  ogDescription:
-    "Streamline your business with AI-driven automation, real-time insights, and scalability",
-  ogImage: "/assets/bade.png",
-  ogUrl: "https://badesolutions.com.ng",
-  twitterCard: "favicon.ico",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription:
-    "Automate and optimize your enterprise with cutting-edge business solutions",
-  twitterImage: "favicon.ico",
-  favicon: "favicon.ico",
-};
 
 export default function Home() {
+  const router = useRouter()
+
+  const redirect = (url) =>{
+    alert("Redirecting to "+url)
+    router.push(url)
+  }
+
   return (
     <div className="">
      
@@ -103,19 +84,6 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="w-full flex justify-center mt-2 mb-2">
-        <div className="flex bg-gray-100 rounded-lg overflow-hidden shadow text-sm">
-          <button className="px-6 py-2 text-gray-500 font-semibold hover:bg-gray-200 transition">
-            Meeting
-          </button>
-          <button className="px-6 py-2 bg-white text-gray-900 font-bold border-b-2 border-gray-900">
-            Management
-          </button>
-          <button className="px-6 py-2 text-gray-500 font-semibold hover:bg-gray-200 transition">
-            Results
-          </button>
-        </div>
-      </section>
 
       <section className="w-full max-w-5xl mx-auto py-8 md:py-12 px-4 md:px-0">
         <div
@@ -153,19 +121,26 @@ export default function Home() {
             </p>
             <span className="text-2xl text-gray-400">→</span>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition ">
+          <div className="bg-white rounded-xl shadow-lg p-5 flex flex-col items-center text-center hover:shadow-xl transition ">
             <Image
-              src="/Light switch (2).jpg"
+              src="/Gps, Map, Navigation, Direction Solid Icon Vector Illustration Logo Template_ Suitable For Many Purposes_.jpg"
               alt="Performance"
               width={250}
               height={250}
+              quality={100}
+              priority={true}
               className="mb-4"
             />
-            <h3 className="text-lg font-semibold mb-2">Access Controls</h3>
+            <h3 className="text-lg font-semibold mb-2">Sales Portal</h3>
             <p className="text-gray-500 mb-2">
-              Control who can view, edit, or manage resources by setting clear access permissions.
+              Business on the go with our mobile-friendly portal, designed for sales team to stay connected and productive from anywhere.
             </p>
-            <span className="text-2xl text-gray-400">→</span>
+            <Link
+                href="/SalesPortal"
+                className="rounded-md bg-gray-900 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Access Portal →
+            </Link> 
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition">
             <Image
