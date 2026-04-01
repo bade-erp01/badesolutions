@@ -20,7 +20,7 @@ export default function Logout({ userData }) {
       await dispatch(logoutAction()); // Await if it's async
 
       SuccessToast("You have been logged out successfully.");
-      router.push("/Login");
+      router.push("/");
     } catch (e) {
       ErrorMessage("Logout failed. Please try again.");
     } finally {
