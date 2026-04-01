@@ -122,19 +122,19 @@ export default function TenantPage({ userData }) {
         </div>
       </nav>
 
-      <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
+      <div className="flex flex-2 max-h-[91vh] overflow-y-hidden">
         {/* Sidebar */}
         {isLoggedIn && (
-          <aside className="absolute top-0 left-0 h-full w-72 bg-gray-800/70 text-white px-4 py-4 overflow-y-auto z-30 flex flex-col">
+          <aside className="absolute top-0 left-0 h-full w-72 bg-[#1e2939] text-white px-4 py-4 overflow-y-auto z-30 flex flex-col">
             <div className="flex items-center gap-2 mb-4">
               <h2 className="text-sm font-bold">Menu</h2>
             </div>
             <hr className="border-gray-600 mb-4" />
 
             {/* Navigation links */}
-            <nav  className="w-full bg-[#fcfcfcda] p-2 rounded-2xl shadow-xs shadow-gray-400">
+            <nav  className="w-full">
               <div
-                className="bg-grey-100 max-h-[40vh] overflow-y-auto"
+                className="max-h-[40vh] overflow-y-auto"
                 style={{
                   scrollbarWidth: "thin",
                   scrollbarColor: "#d9d1daff transparent",
@@ -251,7 +251,7 @@ export default function TenantPage({ userData }) {
       </div>
       <SubscriptionReminder Business={userData.business} />
       <BirthdayGreetings Business={userData.business} user={userData.user} />
-      <Footer2 />
+      
     </div>
   );
 }
