@@ -1,9 +1,10 @@
 import React from "react";
 import { fetchUser } from "../../../../Functions/whoIsSalesPerson";
+import { redirect } from "next/navigation";
 import NavWrapper from "@/app/Components/NavWrapper";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
-import {Encrypt} from "../../../../Functions/Functions"
+import {Encrypt,Dencrypt} from "../../../../Functions/Functions"
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -59,6 +60,13 @@ export const dynamic = "force-dynamic";
 export default async function layout({ children }) {
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const SessionId = Dencrypt(userData?.SessionId)
+  
+    // Redirect if either user OR business is missing 
+    if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId) {
+      redirect('/SalesPortal/Login');
+    }
+
 
   let productList = [];
   try {
@@ -76,7 +84,7 @@ export default async function layout({ children }) {
       productList = products;
     }
   } catch (err) {
-    console.error("Failed to fetch product data", err);
+    throw new Error("Failed to fetch product data");
   }
 
   return (

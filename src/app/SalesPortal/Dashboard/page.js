@@ -9,6 +9,8 @@ import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
 import { useState } from "react";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon } from "@heroicons/react/24/outline";
+
 
 export default function TenantPage({ userData }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -82,7 +84,7 @@ export default function TenantPage({ userData }) {
           <div className="flex items-center gap-4">
             <button
               onClick={handleToggle}
-              className="rounded-lg bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-slate-900/20 transition hover:bg-slate-800"
+              className="rounded-lg px-5 py-2 text-sm font-semibold text-slate-900 transition hover:text-slate-800"
             >
               {isLoggedIn ? (
                 <svg
@@ -123,94 +125,76 @@ export default function TenantPage({ userData }) {
       <div className="flex flex-2 max-h-[91vh] overflow-y-hidden">
         {/* Sidebar */}
         {isLoggedIn && (
-          <aside className="absolute top-0 left-0 h-full w-72 bg-[#1e2939] text-white px-4 py-4 overflow-y-auto z-30 flex flex-col">
-            <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-sm font-bold">Menu</h2>
-            </div>
-            <hr className="border-gray-600 mb-4" />
+          <aside className="fixed top-0 left-0 w-72 h-full bg-[#1e2939] text-white px-4 py-4 z-30 flex flex-col shadow-lg animate__animated animate__slideInLeft">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-sm font-bold">Menu</h2>
+          </div>
+          <hr className="border-gray-600 mb-4" />
 
-            {/* Navigation links */}
-            <nav  className="w-full">
-              <div
-                className="max-h-[40vh] overflow-y-auto"
-                style={{
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "#d9d1daff transparent",
-                }}
-              >
-                <Link
-                  href={`/SalesPortal/Customers`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <Image
-                    src="https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png"
-                    width={24}
-                    height={24}
-                    alt="crm"
-                  />
-                  <span className="text-xs">My customers</span>
-                </Link>
+          {/* Navigation links */}
+          <nav className="w-full space-y-2">
+            <Link
+              href={`/SalesPortal/Dashboard`}
+              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition bg-gray-200/50"
+            >
+              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Dashboard</span>
+            </Link>
 
-                <Link
-                  href={`/SalesPortal/Products`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <Image
-                    src="https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png"
-                    width={24}
-                    height={24}
-                    alt="Products"
-                  />
-                  <span className="text-xs">Products List</span>
-                </Link>
+            <Link
+              href={`/SalesPortal/Products`}
+              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "
+            >
+              <CubeIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Products</span>
+            </Link>
 
-                <Link
-                  href={`/SalesPortal/Route`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <Image
-                    src="https://img.icons8.com/keek/100/map-marker.png"
-                    width={24}
-                    height={24}
-                    alt="route"
-                  />
-                  <span className="text-xs">My route</span>
-                </Link>
+            <Link
+              href={`/SalesPortal/Customers`}
+              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+            >
+             <UserGroupIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">My customers</span>
+            </Link>
+
+            <Link
+              href={`/SalesPortal/Route`}
+              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+            >
+              <MapIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">My Route</span>
+            </Link>
+          </nav>
+
+          {/* Logout pinned at bottom */}
+          <div className="mt-auto pt-6">
+            <button
+              className="flex items-center gap-3 px-4 py-2 w-full rounded-md transition-colors bg-gray-200 hover:bg-gray-300"
+              aria-label="User Profile"
+            >
+              <Image
+                src={userData?.user?.image || "/person.png"}
+                alt="User avatar"
+                width={28}
+                height={28}
+                className="rounded-full border border-black object-cover"
+              />
+              <div className="flex flex-col items-start">
+                <span className="text-sm text-black font-medium">
+                  {userData?.user?.firstName} {userData?.user?.lastName}
+                </span>
+                <span className="text-xs text-gray-500">My Account</span>
               </div>
-            </nav>
-
-            {/* Logout pinned at bottom */}
-            <div className="mt-auto">
-              <button
-                className="flex items-center gap-3 px-4 py-2 w-full mt-2 rounded-md transition-colors bg-gray-200 hover:bg-gray-300"
-                aria-label="User Profile"
-              >
-                {/* User avatar */}
-                <Image
-                  src={userData?.user?.image || "/person.png"}
-                  alt="User avatar"
-                  width={28}
-                  height={28}
-                  className="rounded-full border border-black object-cover"
-                />
-
-                {/* User info */}
-                <div className="flex flex-col items-start">
-                  <span className="text-sm text-black font-medium">
-                    {userData?.user?.firstName} {userData?.user?.lastName}
-                  </span>
-                  <span className="text-xs text-gray-500">My Account</span>
-                </div>
-              </button>
-              {userData?.Notification?.length > 0 && (
+            </button>
+            {userData?.Notification?.length > 0 && (
               <>
-                <br/>
+                <br />
                 <UserNotification user={userData} />
               </>
-              )}
-              <Logout />
-            </div>
-          </aside>
+            )}
+            <Logout />
+          </div>
+        </aside>
         )}
 
         {/* Main Content */}
