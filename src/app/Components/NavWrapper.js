@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon } from "@heroicons/react/24/outline";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon } from "@heroicons/react/24/outline";
 
 export default function NavWrapper({ userData, data, navtitle }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,30 +40,41 @@ export default function NavWrapper({ userData, data, navtitle }) {
           </div>
           <hr className="border-gray-600 mb-4" />
 
-          {/* Navigation links */}
+          {/* Navigation links bg-gray-200/50*/}
           <nav className="w-full space-y-2">
+          <Link
+            href={`/SalesPortal/Dashboard`}
+            className={"flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "}
+          >
+            <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+            <span className="text-xs">Dashboard</span>
+          </Link>
+          
             <Link
-              href={`/SalesPortal/Dashboard`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              href="/SalesPortal/Products"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                ${navtitle === "Products" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
             >
-              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Dashboard</span>
+              <CubeIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Products</span>
             </Link>
 
             <Link
-              href={`/SalesPortal/Customers`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              href="/SalesPortal/Customers"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                ${navtitle === "Customers" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
             >
-             <UserGroupIcon class="h-6 w-6 text-gray-100" />
+              <UserGroupIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">My customers</span>
             </Link>
 
             <Link
-              href={`/SalesPortal/Route`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              href="/SalesPortal/Route"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                ${navtitle === "Route" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
             >
-              <MapIcon class="h-6 w-6 text-gray-100" />
-              <span className="text-xs">My route</span>
+              <MapIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">My Route</span>
             </Link>
           </nav>
 
