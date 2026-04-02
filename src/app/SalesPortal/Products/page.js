@@ -1,5 +1,5 @@
 
-export default async function ProductPage({children}) {
+export default function ProductPage({children}) {
   
   return  <>
   {children}

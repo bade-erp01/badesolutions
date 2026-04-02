@@ -49,7 +49,6 @@ export const metadata = {
   twitterDescription:
     "Manage your stores with ease using B.A.D.E — Nigeria’s AI-powered ERP solution.",
   twitterImage: "/assets/store-settings-og.png",
-  themeColor: "#f4a8ff",
   applicationName: "B.A.D.E ERP",
   creator: "Bernard Fidels Ogoh",
   favicon: "favicon.ico",

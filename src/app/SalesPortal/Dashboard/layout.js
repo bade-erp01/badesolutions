@@ -38,11 +38,11 @@ export const metadata = {
 
 export default async function Layout() {
   const userData = await fetchUser();
-  const SessionId = Dencrypt(userData?.SessionId)
+  // const SessionId = Dencrypt(userData?.SessionId)
   const baseUrl = process.env.EXPRESS_PRIVATE_URL
 
   // Redirect if either user OR business is missing 
-  if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId) {
+  if (!userData?.user || !userData?.business  || userData.user.status !== "active" || !userData.user.SessionId) {
     redirect('/SalesPortal/Login');
   }
 
