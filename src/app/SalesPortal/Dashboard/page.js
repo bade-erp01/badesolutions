@@ -1,10 +1,8 @@
 "use client";
 
-import Footer2 from "@/app/Components/Footer2";
 import Link from "next/link";
 import Image from "next/image";
 import moment from "moment";
-import { Encrypt } from "../../../../Functions/Functions";
 import UserNotification from "@/app/Components/UserNotification";
 import Logout from "@/app/Components/Logout";
 import MainDash from "@/app/Components/MainDash";
