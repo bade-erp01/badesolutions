@@ -479,8 +479,8 @@ export default function InvoicePage({
               bill.billReferenceNo
             }`,
           ],
-          // ["Order Date:", bill.startDate || ""],
-          // ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
+          ["Order Date:", bill.startDate || ""],
+          ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
         ],
         theme: "plain",
         styles: { fontSize: 7, cellPadding: 1 },
