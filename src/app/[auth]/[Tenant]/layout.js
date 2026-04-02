@@ -2,9 +2,11 @@ import CookiesPolicyAlert from "@/app/Components/Cookies";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
 import { redirect } from "next/navigation";
 import moment from "moment";
-import RenewSubscription from "@/app/Components/RenewSubcription"; // hypothetical component
+import{Dencrypt} from "../../../../Functions/Functions";
+import RenewSubscription from "@/app/Components/RenewSubcription"; 
+// hypothetical component
 
-  export const metadata = {
+export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
   keywords: ["Business Automation", "Enterprise Solutions", "B.A.D.E", "AI-powered Business", "Workflow Optimization", "Process Automation"],
@@ -22,13 +24,16 @@ import RenewSubscription from "@/app/Components/RenewSubcription"; // hypothetic
   favicon: "favicon.ico",
 };
 
+//  Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 export default async function Layout({ children }) {
   const userData = await fetchUser();
   const userInfo = userData?.user;
   const businessInfo = userData?.business;
-  const SessionId = userData?.SessionId.data
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL
-
+  const SessionId = userData?.SessionId;
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  // Redirect if either user OR business is missing 
   if (!userInfo || !businessInfo || !SessionId || userInfo.status !== "active" || SessionId !== userInfo.SessionId) {
     redirect("/Login");
   }
@@ -36,15 +41,14 @@ export default async function Layout({ children }) {
   const isSubscriptionExpired = moment().isAfter(moment(businessInfo.subscriptionEndDate));
 
   if (isSubscriptionExpired) {
-    // Option 1: Redirect to renewal page
-    // redirect("/Renew");
-
-    // Option 2: Show renewal component directly
-    return <RenewSubscription business={businessInfo} baseUrl={baseUrl} User={userInfo}/>;
+    // Show renewal component directly
+    return <RenewSubscription business={businessInfo} baseUrl={baseUrl} User={userInfo} />;
   }
 
-  return <div style={{ overflowY: "hidden" }}>
-     <CookiesPolicyAlert />
-    {children}
-    </div>;
+  return (
+    <div style={{ overflowY: "hidden" }}>
+      <CookiesPolicyAlert />
+      {children}
+    </div>
+  );
 }

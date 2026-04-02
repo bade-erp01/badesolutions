@@ -11,6 +11,8 @@ import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
 
+export const dynamic = "force-dynamic";
+
 export default async function TenantPage({ params }) {
   const userData = await fetchUser();
 
@@ -212,7 +214,7 @@ export default async function TenantPage({ params }) {
 
             <Logout />
             <TermsAndConditionsLink
-              BusinessPlan={userData.business.subscriptionplan}
+              BusinessPlan={userData?.business?.subscriptionplan}
             />
           </nav>
         </aside>

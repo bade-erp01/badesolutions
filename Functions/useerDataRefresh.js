@@ -1,6 +1,6 @@
 
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { Dencrypt } from "./Functions";
 import User from "../models/Users";
 import Business from "../models/Business";
 import dbConnect from "../lib/mongoose";
@@ -12,7 +12,6 @@ const fetchUser = async () => {
   "use server";
   try {
     // Retrieve cookies
-    const SECRET_KEY = process.env.TenantToken;
     const cookieStore = await cookies();
     const userToken = cookieStore.get("userInfo")?.value;
     const businessToken = cookieStore.get("businessInfo")?.value;
@@ -22,13 +21,13 @@ const fetchUser = async () => {
       //redirect to login page
       return { error: "Session expired, please log in again." };
     }
-    
+   
     // Decode JWT Tokens
     let decodedUser, decodedBusiness,decodedSessionId;
     try {
-      decodedUser = jwt.verify(userToken, SECRET_KEY);
-      decodedBusiness = jwt.verify(businessToken, SECRET_KEY);
-      decodedSessionId = jwt.verify(StoredSession,SECRET_KEY)
+      decodedUser = Dencrypt(userToken);
+      decodedBusiness = Dencrypt(businessToken);
+      decodedSessionId = Dencrypt(StoredSession)
       
     } catch (error) {
       return { error: "Invalid session tokens, please log in again." };
@@ -36,7 +35,7 @@ const fetchUser = async () => {
     
     await dbConnect("BadeAdmin"); // Ensure database connection
     // Fetch user & business details
-    const rawUserInfo = await User.findById(decodedUser.data)
+    const rawUserInfo = await User.findById(decodedUser)
       .select("-password -__v -createdAt -updatedAt -opsCode")
       .lean();
       
