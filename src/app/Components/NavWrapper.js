@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon } from "@heroicons/react/24/outline";
 
 export default function NavWrapper({ userData, data, navtitle }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,15 +43,18 @@ export default function NavWrapper({ userData, data, navtitle }) {
           {/* Navigation links */}
           <nav className="w-full space-y-2">
             <Link
+              href={`/SalesPortal/Dashboard`}
+              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+            >
+              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Dashboard</span>
+            </Link>
+
+            <Link
               href={`/SalesPortal/Customers`}
               className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
             >
-              <Image
-                src="https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png"
-                width={24}
-                height={24}
-                alt="crm"
-              />
+             <UserGroupIcon class="h-6 w-6 text-gray-100" />
               <span className="text-xs">My customers</span>
             </Link>
 
@@ -58,12 +62,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
               href={`/SalesPortal/Route`}
               className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
             >
-              <Image
-                src="https://img.icons8.com/keek/100/map-marker.png"
-                width={24}
-                height={24}
-                alt="route"
-              />
+              <MapIcon class="h-6 w-6 text-gray-100" />
               <span className="text-xs">My route</span>
             </Link>
           </nav>
