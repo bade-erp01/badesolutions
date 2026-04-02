@@ -88,7 +88,9 @@ export default async function layout({ children }) {
   }
 
   return (
-    <NavWrapper userData={userData} navtitle="Products" data={productList}>
+    <NavWrapper userData={userData} navtitle="Products" data={productList.filter(
+    (item) =>
+      !(item.Name && item.Name.toLowerCase().startsWith("foc")))}>
       {children}
       <SubscriptionReminder Business={userData?.business} />
       <BirthdayGreetings Business={userData?.business} user={userData?.user} />
