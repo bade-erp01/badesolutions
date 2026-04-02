@@ -1,12 +1,19 @@
 "use client";
 import { useState } from "react";
 import Nav2 from "@/app/Components/Nav2";
-import Card from "@/app/Components/Card";
+// import Card from "@/app/Components/Card";
 import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon } from "@heroicons/react/24/outline";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon } from "@heroicons/react/24/outline";
+import "animate.css";
+import { Encrypt } from "../../../Functions/Functions";
+import { useParams } from "next/navigation";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+
+
+
 
 export default function NavWrapper({ userData, data, navtitle }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,6 +74,10 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <span className="text-xs">My customers</span>
             </Link>
 
+            {navtitle === "Customers" ? (
+              <DialogDemo />
+            ):""}
+
             <Link
               href="/SalesPortal/Route"
               className={`flex items-center gap-3 p-3 rounded-md transition 
@@ -123,7 +134,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
                 <Card
                   key={element._id}
                   data={element}
-                  module="product"
+                  module={navtitle}
                   className="shadow-md hover:shadow-lg transition rounded-lg"
                 />
               ))}
@@ -138,3 +149,133 @@ export default function NavWrapper({ userData, data, navtitle }) {
     </div>
   );
 }
+
+
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Field, FieldGroup } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export function DialogDemo() {
+  return (
+    <Dialog>
+      <form>
+        <DialogTrigger asChild>
+          <Button variant="default" className="text-gray-200 border-gray-300 hover:bg-gray-500 w-full px-6 py-2">
+            <UserPlusIcon className="h-4 w-4 text-gray-200" />
+            Add new Lead
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Register customer profile</DialogTitle>
+            <DialogDescription>
+              Creating a prospecting is customer profile is as simple as ABC... just click save when you&apos;re
+              done.
+            </DialogDescription>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <Label htmlFor="name-1">Name</Label>
+              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+            </Field>
+            <Field>
+              <Label htmlFor="username-1">Office Address</Label>
+              <Input id="username-1" name="username" defaultValue="@peduarte" />
+            </Field>
+            <Field>
+              <Label htmlFor="username-1">Email</Label>
+              <Input id="username-1" name="username" defaultValue="@peduarte" />
+            </Field>
+            <Field>
+              <Label htmlFor="username-1">Telephone</Label>
+              <Input id="username-1" name="username" defaultValue="@peduarte" />
+            </Field>
+
+          </FieldGroup>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </form>
+    </Dialog>
+  )
+}
+
+
+
+export function Card ({ data, module }) {
+  const { auth, Tenant } = useParams();
+
+  const truncate = (str, length = 20) =>
+    str && str.length > length ? str.substring(0, length) + "..." : str;
+
+  const title =
+    data.Name ||
+    data.firstName ||
+    data.WHName ||
+    data.productName ||
+    data.billReferenceNo ||
+    data.Username ||
+    data.CustomerCode ||
+    data.paymentReferenceNo ||
+    data.accountName ||
+    data.refNo ||
+    `${data.billStatus}/${data.billReferenceNo}`;
+
+  const subtitle =
+    data.CustomerCode ||
+    data.Email ||
+    data.billStatus ||
+    data.ADCcode ||
+    data.ACDcode ||
+    data.status ||
+    `${data.currentQty ? `${data.currentQty} :case,` : ""}${data.pcs ? `${data.pcs}:pcs` : ""}`;
+
+  const imageSrc = data.image || data.Image || data.icon || "/preview.png";
+  const linkHref = `/SalesPortal/${module}/${Encrypt(data._id)}`;
+
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <Link href={linkHref} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
+          <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-20 w-full h-full">
+            <Image
+              src={imageSrc}
+              width={60}
+              height={60}
+              alt={truncate(title) || "photo"}
+              className="rounded-md object-cover w-16 h-16 drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]"
+              quality={100}
+              priority={true}
+            />
+            <div className="flex flex-col justify-center w-full">
+              <p className="font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>
+              <small className="text-gray-500 mt-1 text-xs">{truncate(subtitle)}</small>
+            </div>
+          </div>
+        </Link>
+      </HoverCardTrigger>
+      <HoverCardContent className="bg-gray-50">
+        <div className="space-y-2">
+          <p className="font-semibold text-sm">{title}</p>
+          <p className="text-xs text-gray-600">{subtitle}</p>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+};
+
