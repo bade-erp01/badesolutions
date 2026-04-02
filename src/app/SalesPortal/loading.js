@@ -11,13 +11,6 @@ export default function Loading() {
       ></div>
 
       <div className="flex flex-1 flex-col md:flex-row">
-        {/* Sidebar */}
-        <aside
-          className="bg-[#1e1e20]/80 backdrop-blur-lg text-white p-4 md:w-64 w-full md:h-auto h-40 animate-pulse"
-          aria-hidden="true"
-        >
-          <div className="h-6 bg-gray-300 rounded w-full"></div>
-        </aside>
 
         {/* Main Content */}
         <main className="flex-1 p-4 overflow-y-auto">
