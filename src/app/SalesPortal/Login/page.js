@@ -145,14 +145,7 @@ export default function Login({
               Enterprise sales productivity suite
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/SalesPortal/Login"
-              className="rounded-lg bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-slate-900/20 transition hover:bg-slate-800"
-            >
-              Login
-            </Link>
-          </div>
+          
         </div>
       </nav>
       <div className="min-h-screen flex items-center justify-center  p-4">

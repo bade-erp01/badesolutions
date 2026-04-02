@@ -19,7 +19,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
   const filteredData = Data.filter(
     (item) =>
       item?.Name?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.Username?.toLowerCase().includes(searchTerm.toLowerCase()),
-    ).sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()));
+    ).sort((a, b) => a.Name?.trim().localeCompare(b.Name?.trim()));
 
   return (
     <div className="relative flex flex-col min-h-[90dvh]">
