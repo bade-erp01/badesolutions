@@ -141,7 +141,7 @@ export default function TenantPage({ userData }) {
                 }}
               >
                 <Link
-                  href={`/${companySlug}/${Encrypt(userData.user._id)}/crm/crm`}
+                  href={`/SalesPortal/Customers`}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <Image
@@ -154,7 +154,7 @@ export default function TenantPage({ userData }) {
                 </Link>
 
                 <Link
-                  href={`/${companySlug}/${Encrypt(userData.user._id)}/crm/crm`}
+                  href={`/SalesPortal/Products`}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <Image
@@ -167,7 +167,7 @@ export default function TenantPage({ userData }) {
                 </Link>
 
                 <Link
-                  href={`/${companySlug}/${Encrypt(userData.user._id)}/crm/crm`}
+                  href={`/SalesPortal/Route`}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <Image

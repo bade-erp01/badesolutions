@@ -32,7 +32,7 @@ const fetchUser = async () => {
     // Fetch user & business details
     decodedUser = Dencrypt(userToken);
     const rawUserInfo = await User.findById(decodedUser)
-      .select("-password -__v -createdAt -updatedAt -opsCode")
+      .select("-password -__v -createdAt -updatedAt -opsCode -Apps")
       .lean();
 
     if (!rawUserInfo) {
@@ -40,7 +40,7 @@ const fetchUser = async () => {
     }
 
     const rawBusinessInfo = await Business.findOne({ tenantId: rawUserInfo.tenantId })
-      .select("-payStackApiKey")
+      .select("-payStackApiKey -rustyRoof")
       .lean();
 
     if (!rawUserInfo || !rawBusinessInfo) {
