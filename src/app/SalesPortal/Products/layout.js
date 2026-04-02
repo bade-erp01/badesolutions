@@ -62,8 +62,8 @@ export default async function layout({ children }) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
+      Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
+      access: `${Encrypt(userData?.user?._id)}`,
     },
     next: { revalidate: 60 }, // cache for 1 minutes
   });
@@ -75,8 +75,8 @@ export default async function layout({ children }) {
   return (
     <NavWrapper userData={userData} navtitle={"Products"} data={productList}>
       {children}
-      <SubscriptionReminder Business={userData.business} />
-      <BirthdayGreetings Business={userData.business} user={userData.user} />
+      <SubscriptionReminder Business={userData?.business} />
+      <BirthdayGreetings Business={userData?.business} user={userData?.user} />
     </NavWrapper>
   );
 }
