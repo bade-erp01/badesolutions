@@ -5,7 +5,7 @@ import CookiesPolicyAlert from "@/app/Components/Cookies"
 import TenantPage from "./page"
 import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
-import {Dencrypt} from "../../../../Functions/Functions"
+import { Dencrypt } from "../../../../Functions/Functions"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -36,6 +36,9 @@ export const metadata = {
   favicon: "favicon.ico",
 };
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+
 export default async function Layout() {
   const userData = await fetchUser();
   const SessionId = Dencrypt(userData?.SessionId)
@@ -46,8 +49,6 @@ export default async function Layout() {
     redirect('/SalesPortal/Login');
   }
 
-
-
   const isSubscriptionExpired = moment().isAfter(moment(userData.business.subscriptionEndDate));
 
   if (isSubscriptionExpired) {
@@ -57,8 +58,8 @@ export default async function Layout() {
 
   return (
     <>
-    <CookiesPolicyAlert />
-    <TenantPage userData={userData}/>
+      <CookiesPolicyAlert />
+      <TenantPage userData={userData}/>
     </>
   );
 }
