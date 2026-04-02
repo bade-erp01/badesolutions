@@ -18,7 +18,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
   // Filter logic
   const filteredData = Data.filter(
     (item) =>
-      item.Name.toLowerCase().includes(searchTerm.toLowerCase()),
+      item?.Name?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.Username?.toLowerCase().includes(searchTerm.toLowerCase()),
     ).sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()));
 
   return (
