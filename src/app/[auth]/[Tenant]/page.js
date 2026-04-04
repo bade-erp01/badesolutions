@@ -137,7 +137,7 @@ export default async function TenantPage({ params }) {
 
                 <Link
                   href={`/${companySlug}/${Encrypt(userData.user._id)}/${'employee'}/${'employee'}`}
-                  title={"Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease."}
+                  title={"Centralize all employee records in one place—manage profiles, roles, documents, and organizational structure with precision and ease."}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <Image
@@ -153,7 +153,7 @@ export default async function TenantPage({ params }) {
 
                 <Link
                   href={`/${companySlug}/${Encrypt(userData.user._id)}/${'product'}/${'product'}`}
-                  title={"Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease."}
+                  title={"Manage your entire product catalog with tools for pricing strategies, categorization, and lifecycle tracking to stay ahead of demand."}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
                   <Image
