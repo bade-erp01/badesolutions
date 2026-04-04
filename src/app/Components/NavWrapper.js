@@ -8,7 +8,7 @@ import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
 import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
 import "animate.css";
-import { Encrypt } from "../../../Functions/Functions";
+import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea"
@@ -26,6 +26,7 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { plsWait, SuccessToast,ErrorMessage } from "../../../Functions/Mics";
 
 
 
@@ -89,7 +90,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
             </Link>
 
             {navtitle === "Customers" && (
-              <DialogDemo />
+              <DialogDemo userData={userData} EXPRESS_PRIVATE_URL={EXPRESS_PRIVATE_URL}/>
             )}
 
             <Link
@@ -168,10 +169,48 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
 
 
-export function DialogDemo() {
+export function DialogDemo(userData) {
+  const [formData, setFormData] = useState({});
+   const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      try {
+        plsWait('Submiting customer data...');
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            dbConnect: `Bearer ${userData.business.rustyRoof}`,
+            access: `${Encrypt(userData.user._id)}`,
+          },
+        };
+  
+        const response = await axios.post(
+          `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
+          formData,
+          config
+        );
+
+        SuccessToast(response.data?.message || "Customer created successfully!");
+        setFormData({});
+        router.push(`/SalesPortal/Customers/${response.data.newCustomer}`)
+        
+      } catch (error) {
+        ErrorMessage(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to create customer. Please try again."
+        );
+      }
+    };
+
   return (
     <Dialog>
-      <form>
+      <form onSubmit={handleSubmit}>
         <DialogTrigger asChild>
           <Button variant="default" className="text-gray-200 border-gray-300 hover:bg-gray-500 w-full px-6 py-2">
             <UserPlusIcon className="h-4 w-4 text-gray-200" />
@@ -188,20 +227,33 @@ export function DialogDemo() {
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="name-1">Name</Label>
-              <Input required id="name-1" name="Username" defaultValue="Pedro Duarte" />
+              <Label htmlFor="name-1">Buseness Name</Label>
+              <Input required id="name-1" name="Username" type="text" placeholder="ABC enterprises..."onChange={handleChange}
+                value={formData.Username || ""} />
             </Field>
             <Field>
-              <Label htmlFor="Address">Office Address</Label>
-              <Input required id="Address" name="Address" defaultValue="123 Main Street..." />
+              <Label htmlFor="billingAddress">Office Address</Label>
+              <Input required placeholder="123 Main Street..."  id="billingAddress"
+                name="billingAddress"
+                type="text"
+                rows="3"
+                onChange={handleChange}
+                value={formData.billingAddress || ""} />
             </Field>
             <Field>
               <Label htmlFor="Email">Email</Label>
-              <Input id="Email" name="Email" defaultValue="Lead@xyz.com" />
+              <Input id="Email" name="Email" type="email" placeholder="Abc@xyz.com" onChange={handleChange}
+                value={formData.Email || ""}/>
             </Field>
             <Field>
-              <Label htmlFor="Telephone">Telephone</Label>
-              <Input required id="Telephone" name="Telephone" defaultValue="+234 1234567" />
+              <Label htmlFor="phone">Telephone</Label>
+              <Input required id="phone" name="phone" type="tel" placeholder="+234 1234567"  onChange={handleChange}
+                value={formData.phone || ""}/>
+            </Field>
+            <Field>
+              <Label htmlFor="ContactPerson">Contact person</Label>
+              <Input required id="ContactPerson" name="ContactPerson" placeholder="Pedro Duarte"  onChange={handleChange}
+                value={formData.ContactPerson || ""}/>
             </Field>
 
           </FieldGroup>
