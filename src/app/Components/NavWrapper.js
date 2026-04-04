@@ -6,12 +6,26 @@ import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon } from "@heroicons/react/24/outline";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
 import "animate.css";
 import { Encrypt } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Field, FieldGroup } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 
 
@@ -74,9 +88,9 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <span className="text-xs">My customers</span>
             </Link>
 
-            {navtitle === "Customers" ? (
+            {navtitle === "Customers" && (
               <DialogDemo />
-            ):""}
+            )}
 
             <Link
               href="/SalesPortal/Route"
@@ -86,6 +100,8 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <MapIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">My Route</span>
             </Link>
+            
+            <TextareaButton/>
           </nav>
 
           {/* Logout pinned at bottom */}
@@ -151,20 +167,6 @@ export default function NavWrapper({ userData, data, navtitle }) {
 }
 
 
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 export function DialogDemo() {
   return (
@@ -279,3 +281,58 @@ export function Card ({ data, module }) {
   );
 };
 
+
+// write a report
+export function TextareaButton() {
+  const [photo, setPhoto] = useState(null)
+  const [message, setMessage] = useState("")
+
+  // Count words safely
+  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
+  const maxWords = 200
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="default" className={`flex gap-3 p-4 rounded-md transition bg-gray-200/50 hover:bg-gray-700 w-full`}>
+         <PencilSquareIcon className="h-4 w-4 text-gray-200"/>
+        Write a report
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="w-full max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            New Report
+            </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-4">
+          <Textarea
+            placeholder="Type your message here (max 200 words)."
+            value={message}
+            onChange={(e) => {
+              const text = e.target.value
+              const words = text.trim().split(/\s+/).filter(Boolean)
+              if (words.length <= maxWords) {
+                setMessage(text)
+              }
+            }}
+          />
+          <p className="text-xs text-gray-500">
+            {wordCount}/{maxWords} words
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setPhoto(e.target.files[0])}
+            className="border rounded p-2"
+          />
+
+          <Button disabled={wordCount === 0} >Send message</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}

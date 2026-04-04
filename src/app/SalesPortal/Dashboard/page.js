@@ -9,8 +9,19 @@ import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
 import { useState } from "react";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon } from "@heroicons/react/24/outline";
-
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 
 export default function TenantPage({ userData }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -164,6 +175,7 @@ export default function TenantPage({ userData }) {
               <MapIcon class="h-6 w-6 text-gray-100" />
               <span className="text-xs">My Route</span>
             </Link>
+            <TextareaButton/>
           </nav>
 
           {/* Logout pinned at bottom */}
@@ -236,4 +248,60 @@ export default function TenantPage({ userData }) {
       
     </div>
   );
+}
+
+
+
+export function TextareaButton() {
+  const [photo, setPhoto] = useState(null)
+  const [message, setMessage] = useState("")
+
+  // Count words safely
+  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
+  const maxWords = 200
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="default" className={`flex gap-3 p-4 rounded-md transition bg-gray-200/50 hover:bg-gray-700 w-full`}>
+         <PencilSquareIcon className="h-4 w-4 text-gray-200"/>
+        Write a report
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="w-full max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            New Report
+            </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-4">
+          <Textarea
+            placeholder="Type your message here (max 200 words)."
+            value={message}
+            onChange={(e) => {
+              const text = e.target.value
+              const words = text.trim().split(/\s+/).filter(Boolean)
+              if (words.length <= maxWords) {
+                setMessage(text)
+              }
+            }}
+          />
+          <p className="text-xs text-gray-500">
+            {wordCount}/{maxWords} words
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setPhoto(e.target.files[0])}
+            className="border rounded p-2"
+          />
+
+          <Button disabled={wordCount === 0} >Send message</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }
