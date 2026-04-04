@@ -182,26 +182,26 @@ export function DialogDemo() {
           <DialogHeader>
             <DialogTitle>Register customer profile</DialogTitle>
             <DialogDescription>
-              Creating a prospecting is customer profile is as simple as ABC... just click save when you&apos;re
+              Creating a prospecting customer profile is as simple as ABC... just click save when you&apos;re
               done.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
               <Label htmlFor="name-1">Name</Label>
-              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+              <Input required id="name-1" name="Username" defaultValue="Pedro Duarte" />
             </Field>
             <Field>
-              <Label htmlFor="username-1">Office Address</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
+              <Label htmlFor="Address">Office Address</Label>
+              <Input required id="Address" name="Address" defaultValue="123 Main Street..." />
             </Field>
             <Field>
-              <Label htmlFor="username-1">Email</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
+              <Label htmlFor="Email">Email</Label>
+              <Input id="Email" name="Email" defaultValue="Lead@xyz.com" />
             </Field>
             <Field>
-              <Label htmlFor="username-1">Telephone</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
+              <Label htmlFor="Telephone">Telephone</Label>
+              <Input required id="Telephone" name="Telephone" defaultValue="+234 1234567" />
             </Field>
 
           </FieldGroup>
@@ -304,7 +304,7 @@ export function TextareaButton() {
         <DialogHeader>
           <DialogTitle>
             New Report
-            </DialogTitle>
+          </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
