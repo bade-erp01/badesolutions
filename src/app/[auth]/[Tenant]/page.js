@@ -136,6 +136,38 @@ export default async function TenantPage({ params }) {
                 </Link>
 
                 <Link
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${'employee'}/${'employee'}`}
+                  title={"Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease."}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={"employee"}
+                  />
+                  <span className="text-xs">{"Employee Management"}</span>
+                </Link>
+
+                <Link
+                  href={`/${companySlug}/${Encrypt(userData.user._id)}/${'product'}/${'product'}`}
+                  title={"Empower your sales team with a customer-first CRM—track leads, manage relationships, and automate KYC with ease."}
+                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                >
+                  <Image
+                    src={
+                      "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png"
+                    }
+                    width={24}
+                    height={24}
+                    alt={"Product Management"}
+                  />
+                  <span className="text-xs">{"Product Management"}</span>
+                </Link>
+
+                <Link
                   href={`/${companySlug}/${Encrypt(userData.user._id)}/${"Payment"
                     .toLowerCase()
                     .replace(/\s+/g, "")}/${"Payment"
