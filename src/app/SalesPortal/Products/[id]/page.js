@@ -1082,15 +1082,14 @@ function ProductChart({ productId, productName, umo, business, user }) {
         </div>
       ) : (
         <div id="code">
-          <h5 className="text-lg font-semibold text-gray-700 mb-1">
-            📈 Month-on-Month Sales Insight for {productName},{tottalSales}
-            <br />
+          <p className="text-md font-semibold text-gray-700 mb-1">
+            📈 Sales Insight for {productName},{tottalSales}
             <hr />
             <br />
+          </p>
             <i className="text-gray-500 text-sm">
               Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
             </i>
-          </h5>
           <div
             id="myPlot"
             className=""
