@@ -60,8 +60,8 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
+          Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
         },
       };
 
