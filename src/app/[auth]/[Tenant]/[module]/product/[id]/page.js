@@ -1291,7 +1291,7 @@ export default function SingleProductpage({
                 </div>
               </div>
             </div>
-            <br/>
+            <br />
             <div className="border rounded-lg overflow-hidden">
               <span
                 onClick={() => setIsOpen2(!isOpen2)}
@@ -1321,35 +1321,60 @@ export default function SingleProductpage({
                   isOpen2 ? "block" : "hidden"
                 }`}
               >
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                {/* display reviews */}
-                {formData.comments?.length > 0 ? (
-                  formData.comments?.map((comment, index) => (
-                    <div
-                      key={index}
-                      className="sm:col-span-6 border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        {comment.createdAt && (
-                          <span className="text-xs text-gray-500">
-                            {new Date(comment.createdAt).toLocaleDateString()}
-                          </span>
-                        )}
+                <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  {formData.comments?.length > 0 ? (
+                    formData.comments.map((comment, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-xl p-5 bg-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            {/* Avatar or initials */}
+                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                              {comment.comment?.charAt(0) || "U"}
+                            </div>
+                            <div>
+                              {comment.createdAt && (
+                                <p className="text-xs text-gray-500">
+                                  {new Date(
+                                    comment.createdAt,
+                                  ).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          {/* Rating as stars */}
+                          <div className="flex items-center">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <svg
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < comment.rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.36 2.44a1 1 0 00-.364 1.118l1.286 3.95c.3.921-.755 1.688-1.54 1.118l-3.36-2.44a1 1 0 00-1.176 0l-3.36 2.44c-.785.57-1.84-.197-1.54-1.118l1.286-3.95a1 1 0 00-.364-1.118l-3.36-2.44c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.95z" />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                          {comment.comment || `Comment ${index + 1}`}
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-700 whitespace-pre-line">
-                        {comment.comment || `Comment ${index + 1}`}
-                      </p>
+                    ))
+                  ) : (
+                    <div className="sm:col-span-2 text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
+                      No reviews available for this product.
                     </div>
-                  ))
-                ) : (
-                  <div className="sm:col-span-6 text-sm text-gray-500">
-                    No reviews available for this product.
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
               </div>
             </div>
-
           </div>
 
           <div className="border-b border-gray-900/10 pb-12">
