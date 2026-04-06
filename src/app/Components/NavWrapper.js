@@ -8,7 +8,7 @@ import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
 import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
 import "animate.css";
-import { Encrypt,EXPRESS_PRIVATE_URL,Dencrypt } from "../../../Functions/Functions";
+import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea"
@@ -198,8 +198,7 @@ export function DialogDemo({userData}) {
 
         SuccessToast(response.data?.message || "Customer created successfully!");
         setFormData({});
-        const newCustomer = Dencrypt(response.data.newCustomer)
-        router.push(`/SalesPortal/Customers/${Encrypt(newCustomer._id)}`)
+        router.push(`/SalesPortal/Customers/${response.data.newCustomer}`)
         
       } catch (error) {
         ErrorMessage(
