@@ -918,7 +918,7 @@ export function CommentForm({ userData, product }) {
     comment: "",
     rating: 0,
     userId: userData._id,
-    userName: userData.firstName
+    userName: userData.firstName,
   });
 
   const router = useRouter();
@@ -934,79 +934,80 @@ export function CommentForm({ userData, product }) {
   const handleSubmit = async () => {
     plsWait("Submitting review.");
     try {
-        const request = await axios.post(
+      const request = await axios.post(
         `${EXPRESS_PRIVATE_URL}/api/product/review/${Encrypt(product._id)}`,
         formData,
         {
-            headers: { 
+          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
-            access: `${Encrypt(userData._id)}`
-            },
-        }
-        );
+            access: `${Encrypt(userData._id)}`,
+          },
+        },
+      );
 
-        const response = request.data;
+      const response = request.data;
 
+      if (response.message) {
         SuccessToast(response.message || "Review submitted successfully!");
         setFormData({});
-        // router.refresh(); // refresh page or redirect
+        router.refresh(); // refresh page or redirect
+      }
     } catch (err) {
-        console.error(err); // helpful for debugging
-        ErrorMessage(err.response?.data?.message || err.message || "Error saving comment");
+      ErrorMessage(err.response?.data?.error || "Error saving review");
     }
-    };
+  };
 
   return (
     <Card className="max-w-full mx-auto shadow-lg">
       <CardHeader>
         <CardTitle>Submit a Review for {product.Name.toLowerCase()}</CardTitle>
       </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="comment">Comment</Label>
-            <Textarea
-              id="comment"
-              name="comment"
-              placeholder="Write your review..."
-              maxLength={500}
-              required
-              value={formData.comment}
-              onChange={handleChange}
-            />
-          </div>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="comment">Comment</Label>
+          <Textarea
+            id="comment"
+            name="comment"
+            placeholder="Write your review..."
+            maxLength={500}
+            required
+            value={formData.comment}
+            onChange={handleChange}
+          />
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="rating">Rating</Label>
-            <div className="flex items-center gap-2">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => handleRating(value)}
-                  className={`text-3xl transition-colors ${
-                    formData.rating >= value
-                      ? "text-yellow-400"
-                      : "text-gray-300 hover:text-yellow-300"
-                  }`}
-                  aria-label={`${value} star${value > 1 ? "s" : ""}`}
-                >
-                  {formData.rating >= value ? "★" : "☆"}
-                </button>
-              ))}
-            </div>
-            <input type="hidden" name="rating" value={formData.rating} />
+        <div className="space-y-2">
+          <Label htmlFor="rating">Rating</Label>
+          <div className="flex items-center gap-2">
+            {[1, 2, 3, 4, 5].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => handleRating(value)}
+                className={`text-3xl transition-colors ${
+                  formData.rating >= value
+                    ? "text-yellow-400"
+                    : "text-gray-300 hover:text-yellow-300"
+                }`}
+                aria-label={`${value} star${value > 1 ? "s" : ""}`}
+              >
+                {formData.rating >= value ? "★" : "☆"}
+              </button>
+            ))}
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button
+          <input type="hidden" name="rating" value={formData.rating} />
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-end">
+        <Button
           onClick={handleSubmit}
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Submit Review
-          </Button>
-        </CardFooter>
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          Submit Review
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

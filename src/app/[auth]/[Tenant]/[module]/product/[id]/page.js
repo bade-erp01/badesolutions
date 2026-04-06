@@ -45,12 +45,14 @@ export default function SingleProductpage({
   const navigation = useParams();
   const router = useRouter();
   const [isOpen3, setIsOpen3] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const link = `/${navigation.auth}/${
     navigation.Tenant
   }/product/product/${Encrypt(Backdata.CopyID)}?Modules=product`;
   const [BuyingPrice, setBuyingPrice] = useState({
-    BuyingPrice: Number(Backdata?.BuyingPrice) || Number(Backdata?.vendor_Price) || 0,
+    BuyingPrice:
+      Number(Backdata?.BuyingPrice) || Number(Backdata?.vendor_Price) || 0,
   });
 
   useProductEditTour(Backdata.Name); // for driver
@@ -107,7 +109,7 @@ export default function SingleProductpage({
                   dbConnect: `Bearer ${business.rustyRoof}`,
                   access: `${Encrypt(user._id)}`,
                 },
-              }
+              },
             );
 
             const response = await request.json();
@@ -137,7 +139,6 @@ export default function SingleProductpage({
 
   const [formData, setFormData] = useState({ ...data });
 
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -165,7 +166,7 @@ export default function SingleProductpage({
             productId: Backdata._id,
             updatedBuyingPrice: priceValue,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -188,7 +189,7 @@ export default function SingleProductpage({
       const { data } = await axios.patch(
         `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
         formData,
-        { headers }
+        { headers },
       );
 
       if (data && data.result) {
@@ -221,9 +222,12 @@ export default function SingleProductpage({
           <div className="flex flex-wrap gap-8 items-center py-4">
             {/* Avatar */}
             <div className="flex items-center space-x-6">
-              <div  onClick={() => {
-                    uploadFiles(Encrypt(data._id), "product");
-                  }} className="w-28 h-28 rounded overflow-hidden flex items-center justify-center">
+              <div
+                onClick={() => {
+                  uploadFiles(Encrypt(data._id), "product");
+                }}
+                className="w-28 h-28 rounded overflow-hidden flex items-center justify-center"
+              >
                 <Image
                   height={70}
                   width={70}
@@ -235,7 +239,6 @@ export default function SingleProductpage({
                   quality={100}
                 />
               </div>
-              
             </div>
 
             {/* Divider */}
@@ -383,7 +386,7 @@ export default function SingleProductpage({
                     </div>
                   </div>
 
-                    <div className="sm:col-span-2 sm:col-start-1">
+                  <div className="sm:col-span-2 sm:col-start-1">
                     <label
                       htmlFor="Subcategory"
                       className="block text-sm/6 font-medium text-gray-900"
@@ -531,7 +534,7 @@ export default function SingleProductpage({
                         {/* <option  value={formData.Vendor}> {formData.Vendor}</option> */}
                         {(() => {
                           const Selectedvendor = vendor.find(
-                            (person) => person._id === formData.Vendor
+                            (person) => person._id === formData.Vendor,
                           );
 
                           if (Selectedvendor) {
@@ -983,7 +986,9 @@ export default function SingleProductpage({
                     {/* End Date input */}
                     <div className="mt-2">
                       <input
-                        value={moment(formData.Pricelist1PromoDate).format('YYYY-MM-DD')}
+                        value={moment(formData.Pricelist1PromoDate).format(
+                          "YYYY-MM-DD",
+                        )}
                         id="Pricelist1PromoDate"
                         name="Pricelist1PromoDate"
                         type="date"
@@ -1028,13 +1033,15 @@ export default function SingleProductpage({
                       htmlFor="Pricelist2PromoDate"
                       className="block text-sm/6 font-medium text-gray-900 mt-4"
                     >
-                     {businessInfo.priceList2} Promo End Date
+                      {businessInfo.priceList2} Promo End Date
                     </label>
 
                     {/* End Date input */}
                     <div className="mt-2">
                       <input
-                        value={moment(formData.Pricelist2PromoDate).format('YYYY-MM-DD')}
+                        value={moment(formData.Pricelist2PromoDate).format(
+                          "YYYY-MM-DD",
+                        )}
                         id="Pricelist2PromoDate"
                         name="Pricelist2PromoDate"
                         type="date"
@@ -1076,11 +1083,13 @@ export default function SingleProductpage({
                           htmlFor="Pricelist3PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList3} Promo End Date
+                          {businessInfo.priceList3} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={moment(formData.Pricelist3PromoDate).format('YYYY-MM-DD')}
+                            value={moment(formData.Pricelist3PromoDate).format(
+                              "YYYY-MM-DD",
+                            )}
                             id="Pricelist3PromoDate"
                             name="Pricelist3PromoDate"
                             type="date"
@@ -1120,11 +1129,13 @@ export default function SingleProductpage({
                           htmlFor="Pricelist4PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList4} Promo End Date
+                          {businessInfo.priceList4} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={moment(formData.Pricelist4PromoDate).format('YYYY-MM-DD') }
+                            value={moment(formData.Pricelist4PromoDate).format(
+                              "YYYY-MM-DD",
+                            )}
                             id="Pricelist4PromoDate"
                             name="Pricelist4PromoDate"
                             type="date"
@@ -1164,11 +1175,13 @@ export default function SingleProductpage({
                           htmlFor="Pricelist5PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList5} Promo End Date
+                          {businessInfo.priceList5} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={moment(formData.Pricelist5PromoDate).format('YYYY-MM-DD')}
+                            value={moment(formData.Pricelist5PromoDate).format(
+                              "YYYY-MM-DD",
+                            )}
                             id="Pricelist5PromoDate"
                             name="Pricelist5PromoDate"
                             type="date"
@@ -1212,7 +1225,9 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={moment(formData.Pricelist6PromoDate).format('YYYY-MM-DD')}
+                            value={moment(formData.Pricelist6PromoDate).format(
+                              "YYYY-MM-DD",
+                            )}
                             id="Pricelist6PromoDate"
                             name="Pricelist6PromoDate"
                             type="date"
@@ -1235,7 +1250,7 @@ export default function SingleProductpage({
                         </label>
                         <div className="mt-2">
                           <input
-                            value={formData.Pricelist7Promo || 0 }
+                            value={formData.Pricelist7Promo || 0}
                             id="Pricelist7Promo"
                             name="Pricelist7Promo"
                             type="number"
@@ -1252,11 +1267,13 @@ export default function SingleProductpage({
                           htmlFor="Pricelist7PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList7} Promo End Date
+                          {businessInfo.priceList7} Promo End Date
                         </label>
                         <div className="mt-2">
                           <input
-                            value={moment(formData.Pricelist7PromoDate).format('YYYY-MM-DD')}
+                            value={moment(formData.Pricelist7PromoDate).format(
+                              "YYYY-MM-DD",
+                            )}
                             id="Pricelist7PromoDate"
                             name="Pricelist7PromoDate"
                             type="date"
@@ -1274,6 +1291,65 @@ export default function SingleProductpage({
                 </div>
               </div>
             </div>
+            <br/>
+            <div className="border rounded-lg overflow-hidden">
+              <span
+                onClick={() => setIsOpen2(!isOpen2)}
+                className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+              >
+                <h2 className="text-base/7 font-semibold text-gray-900">
+                  Product reviews
+                </h2>
+                <svg
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    isOpen2 ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </span>
+              <div
+                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                  isOpen2 ? "block" : "hidden"
+                }`}
+              >
+              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                {/* display reviews */}
+                {formData.comments?.length > 0 ? (
+                  formData.comments?.map((comment, index) => (
+                    <div
+                      key={index}
+                      className="sm:col-span-6 border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        {comment.createdAt && (
+                          <span className="text-xs text-gray-500">
+                            {new Date(comment.createdAt).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-700 whitespace-pre-line">
+                        {comment.comment || `Comment ${index + 1}`}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="sm:col-span-6 text-sm text-gray-500">
+                    No reviews available for this product.
+                  </div>
+                )}
+              </div>
+              </div>
+            </div>
+
           </div>
 
           <div className="border-b border-gray-900/10 pb-12">
@@ -1298,90 +1374,92 @@ export default function SingleProductpage({
 
               {/* only show table if storeProduct is more than 0 */}
               {StoreProduct.length > 0 && (
-              <table className="w-full text-left text-xs text-black border border-gray-300">
-                <caption className="text-start font-bold text-sm text-gray-600">
-                  {data.Name} In Store Inventory
-                </caption>
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-300 px-2 py-1">#</th>
-                    <th className="border border-gray-300 px-2 py-1">Store</th>
-                    <th className="border border-gray-300 px-2 py-1">
-                      Product
-                    </th>
-                    <th className="border border-gray-300 px-2 py-1">
-                      Quantity in store
-                    </th>
-                    <th className="border border-gray-300 px-2 py-1">
-                      Download
-                    </th>
-                    {userInfo?.isAdmin && (
+                <table className="w-full text-left text-xs text-black border border-gray-300">
+                  <caption className="text-start font-bold text-sm text-gray-600">
+                    {data.Name} In Store Inventory
+                  </caption>
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="border border-gray-300 px-2 py-1">#</th>
                       <th className="border border-gray-300 px-2 py-1">
-                        Monitor
+                        Store
                       </th>
-                    )}
-                  </tr>
-                </thead>
+                      <th className="border border-gray-300 px-2 py-1">
+                        Product
+                      </th>
+                      <th className="border border-gray-300 px-2 py-1">
+                        Quantity in store
+                      </th>
+                      <th className="border border-gray-300 px-2 py-1">
+                        Download
+                      </th>
+                      {userInfo?.isAdmin && (
+                        <th className="border border-gray-300 px-2 py-1">
+                          Monitor
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
                   <tbody>
-                  {StoreProduct?.map((log, index) =>
-                    log.products.map((product, pIndex) => (
-                      <tr
-                        key={`${index}-${pIndex}`}
-                        className="border border-gray-300"
-                      >
-                        <td className="border border-gray-300 px-2 py-1">
-                          {index + 1}
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          <Link
-                            className="text-blue-600 hover:underline visited:text-purple-600"
-                            href={`/${navigation.auth}/${
-                              navigation.Tenant
-                            }/inventory/inventory/${Encrypt(
-                              product._id
-                            )}?Modules=inventory`}
-                          >
-                            {log.warehouseName}
-                          </Link>
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          {product.productName}
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          Case:{product.currentQty}, Pcs:{product.pcs}
-                        </td>
-                        <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
-                          <ExcelDownloadBtn
-                            data={[
-                              {
-                                Store: log.warehouseName,
-                                Product: product.productName,
-                                Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
-                              },
-                            ]}
-                            page={`${
-                              log.warehouseName.substring(0, 4) || "store"
-                            }-${
-                              product.productName.substring(0, 4) || "product"
-                            }`}
-                          />
-                        </td>
-                        {userInfo?.isAdmin && (
+                    {StoreProduct?.map((log, index) =>
+                      log.products.map((product, pIndex) => (
+                        <tr
+                          key={`${index}-${pIndex}`}
+                          className="border border-gray-300"
+                        >
+                          <td className="border border-gray-300 px-2 py-1">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1">
+                            <Link
+                              className="text-blue-600 hover:underline visited:text-purple-600"
+                              href={`/${navigation.auth}/${
+                                navigation.Tenant
+                              }/inventory/inventory/${Encrypt(
+                                product._id,
+                              )}?Modules=inventory`}
+                            >
+                              {log.warehouseName}
+                            </Link>
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1">
+                            {product.productName}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-1">
+                            Case:{product.currentQty}, Pcs:{product.pcs}
+                          </td>
                           <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
-                            <AutoreplenishReminder
-                              storeProduct={product}
-                              business={businessInfo}
-                              user={userInfo}
-                              baseUrl={EXPRESS_PRIVATE_URL}
+                            <ExcelDownloadBtn
+                              data={[
+                                {
+                                  Store: log.warehouseName,
+                                  Product: product.productName,
+                                  Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
+                                },
+                              ]}
+                              page={`${
+                                log.warehouseName.substring(0, 4) || "store"
+                              }-${
+                                product.productName.substring(0, 4) || "product"
+                              }`}
                             />
                           </td>
-                        )}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-                )}
+                          {userInfo?.isAdmin && (
+                            <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
+                              <AutoreplenishReminder
+                                storeProduct={product}
+                                business={businessInfo}
+                                user={userInfo}
+                                baseUrl={EXPRESS_PRIVATE_URL}
+                              />
+                            </td>
+                          )}
+                        </tr>
+                      )),
+                    )}
+                  </tbody>
+                </table>
+              )}
 
               {/* Price change */}
               <div className="mt-10">
@@ -1500,7 +1578,7 @@ function ProductChart({ productId, productName, umo, business, user }) {
             sold: order.total,
             InvoiceDate: invoice.startDate,
             _id: order.item._id,
-          }))
+          })),
         );
 
         const productSales = data.filter((item) => item._id === productId);
