@@ -278,7 +278,7 @@ export default function SingleProductpage({
               className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
             >
               <h2 className="text-base/7 font-semibold text-gray-900">
-                Product Information
+                Information
               </h2>
               <svg
                 className={`w-5 h-5 transform transition-transform duration-300 ${
@@ -566,7 +566,7 @@ export default function SingleProductpage({
                       htmlFor="UMO"
                       className="block text-sm/6 font-medium text-gray-900"
                     >
-                      Unit of Measure
+                      Standard Unit of Measure
                     </label>
                     <div className="mt-2">
                       <input
@@ -925,7 +925,7 @@ export default function SingleProductpage({
                 className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
               >
                 <h2 className="text-base/7 font-semibold text-gray-900">
-                  Promo Section
+                  Promotions
                 </h2>
                 <svg
                   className={`w-5 h-5 transform transition-transform duration-300 ${
@@ -1298,7 +1298,7 @@ export default function SingleProductpage({
                 className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
               >
                 <h2 className="text-base/7 font-semibold text-gray-900">
-                  Product reviews
+                  Reviews
                 </h2>
                 <svg
                   className={`w-5 h-5 transform transition-transform duration-300 ${
