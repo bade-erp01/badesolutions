@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
 import Nav2 from "@/app/Components/Nav2";
-// import Card from "@/app/Components/Card";
+import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
 import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
 import "animate.css";
-import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import { Encrypt,EXPRESS_PRIVATE_URL,Dencrypt } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea"
@@ -27,6 +27,7 @@ import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { plsWait, SuccessToast,ErrorMessage } from "../../../Functions/Mics";
+import axios from "axios"
 
 
 
@@ -169,15 +170,15 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
 
 
-export function DialogDemo(userData) {
-  const [formData, setFormData] = useState({});
+export function DialogDemo({userData}) {
+  const [formData, setFormData] = useState({salesPerson:userData.user._id});
+  const router = useRouter()
    const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    
   };
   
     const handleSubmit = async (e) => {
-      e.preventDefault();
-
       try {
         plsWait('Submiting customer data...');
         const config = {
@@ -190,14 +191,15 @@ export function DialogDemo(userData) {
         };
   
         const response = await axios.post(
-          `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
-          formData,
-          config
-        );
+        `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
+        formData,
+        config
+      );
 
         SuccessToast(response.data?.message || "Customer created successfully!");
         setFormData({});
-        router.push(`/SalesPortal/Customers/${response.data.newCustomer}`)
+        const newCustomer = Dencrypt(response.data.newCustomer)
+        router.push(`/SalesPortal/Customers/${Encrypt(newCustomer._id)}`)
         
       } catch (error) {
         ErrorMessage(
@@ -210,11 +212,11 @@ export function DialogDemo(userData) {
 
   return (
     <Dialog>
-      <form onSubmit={handleSubmit}>
+      <form >
         <DialogTrigger asChild>
           <Button variant="default" className="text-gray-200 border-gray-300 hover:bg-gray-500 w-full px-6 py-2">
             <UserPlusIcon className="h-4 w-4 text-gray-200" />
-            Add new Lead
+            Add a new Lead
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-sm">
@@ -261,7 +263,7 @@ export function DialogDemo(userData) {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={handleSubmit}>Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </form>

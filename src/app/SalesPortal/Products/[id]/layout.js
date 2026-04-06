@@ -95,7 +95,6 @@ export default async function layout({ params }) {
       );
     }
   } catch (err) {
-    console.log(err.message)
     return (
         <div className="text-black p-6">
           Failed to load. Please try again later.
