@@ -56,13 +56,12 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
     if (!validateForm()) return;
 
     try {
-      plsWait('Submitung customer data...');
+      plsWait('Submiting customer data...');
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
-          dbConnect: `Bearer ${businessData.rustyRoof}`,
-          access: `${Encrypt(userData._id)}`,
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: `${Encrypt(userData.user._id)}`,
         },
       };
 
