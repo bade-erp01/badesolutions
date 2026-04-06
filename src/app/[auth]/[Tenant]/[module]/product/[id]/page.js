@@ -1321,38 +1321,34 @@ export default function SingleProductpage({
                   isOpen2 ? "block" : "hidden"
                 }`}
               >
-                <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="mt-10 max-h-96 overflow-y-auto space-y-4">
                   {formData.comments?.length > 0 ? (
                     formData.comments.map((comment, index) => (
                       <div
                         key={index}
-                        className="border border-gray-200 rounded-xl p-5 bg-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                        className="border border-gray-200 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
                       >
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-3">
-                            {/* Avatar or initials */}
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                            {/* Avatar/initials */}
+                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
                               {comment.comment?.charAt(0) || "U"}
                             </div>
                             <div>
                               {comment.createdAt && (
                                 <p className="text-xs text-gray-500">
-                                  {new Date(
-                                    comment.createdAt,
-                                  ).toLocaleDateString()}
+                                  {new Date(comment.createdAt).toLocaleDateString()}
                                 </p>
                               )}
                             </div>
                           </div>
-                          {/* Rating as stars */}
+                          {/* Rating stars */}
                           <div className="flex items-center">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <svg
                                 key={i}
                                 className={`h-4 w-4 ${
-                                  i < comment.rating
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
+                                  i < comment.rating ? "text-yellow-400" : "text-gray-300"
                                 }`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
@@ -1368,7 +1364,7 @@ export default function SingleProductpage({
                       </div>
                     ))
                   ) : (
-                    <div className="sm:col-span-2 text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
+                    <div className="text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
                       No reviews available for this product.
                     </div>
                   )}
