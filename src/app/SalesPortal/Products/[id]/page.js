@@ -18,6 +18,17 @@ import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
 import { useState } from "react";
 import Image from "next/image";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 export default function SingleProductpage({
   userInfo,
@@ -25,19 +36,10 @@ export default function SingleProductpage({
   Backdata,
 }) {
   const [data] = useState(Backdata);
-  const router = useRouter();
   const [isOpen3, setIsOpen3] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
- 
 
   useProductEditTour(Backdata.Name); // for driver
-
-
-  const [headers] = useState({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-    access: `${Encrypt(userInfo._id)}`,
-  });
 
   const [formData] = useState({ ...data });
 
@@ -69,7 +71,6 @@ export default function SingleProductpage({
                   quality={100}
                 />
               </div>
-              
             </div>
 
             {/* Divider */}
@@ -133,7 +134,6 @@ export default function SingleProductpage({
               }`}
             >
               <div className="border-b bg- border-gray-900/10 pb-12">
-                
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                   <div className="sm:col-span-3">
                     <label
@@ -143,7 +143,9 @@ export default function SingleProductpage({
                       Name
                     </label>
                     <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900">{formData.Name}</h3>
+                      <h3 className="font-semibold text-gray-900">
+                        {formData.Name}
+                      </h3>
                     </div>
                   </div>
 
@@ -169,11 +171,13 @@ export default function SingleProductpage({
                       Product category
                     </label>
                     <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900">{formData.category}</h3>
+                      <h3 className="font-semibold text-gray-900">
+                        {formData.category}
+                      </h3>
                     </div>
                   </div>
 
-                    <div className="sm:col-span-2 sm:col-start-1">
+                  <div className="sm:col-span-2 sm:col-start-1">
                     <label
                       htmlFor="Subcategory"
                       className="block text-sm/6 font-medium text-gray-900"
@@ -181,15 +185,9 @@ export default function SingleProductpage({
                       Product Sub-Category
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.Subcategory}
-                        id="Subcategory"
-                        name="Subcategory"
-                        type="text"
-                        
-                        autoComplete="Subcategory-level2"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Subcategory}
+                      </h5>
                     </div>
                   </div>
 
@@ -201,15 +199,9 @@ export default function SingleProductpage({
                       Manufacturer
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.Manufacturer}
-                        id="Manufacturer"
-                        name="Manufacturer"
-                        type="text"
-                        
-                        autoComplete="postal-code"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Manufacturer}
+                      </h5>
                     </div>
                   </div>
 
@@ -221,15 +213,9 @@ export default function SingleProductpage({
                       Bar Code
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.Manufacture_code}
-                        id="Manufacture_code"
-                        name="Manufacture_code"
-                        type="text"
-                        
-                        autoComplete="Manufacture_code"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Manufacture_code}
+                      </h5>
                     </div>
                   </div>
 
@@ -241,15 +227,9 @@ export default function SingleProductpage({
                       Define Pieces in {formData.UMO || "Case"}
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.Pieces}
-                        id="Pieces"
-                        required
-                        name="Pieces"
-                        type="number"
-                        autoComplete="Pieces-level2"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Pieces}
+                      </h5>
                     </div>
                   </div>
 
@@ -258,38 +238,12 @@ export default function SingleProductpage({
                       htmlFor="UMO"
                       className="block text-sm/6 font-medium text-gray-900"
                     >
-                      Unit of Measure
+                      Standard Unit of Measure
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.UMO}
-                        id="UMO"
-                        name="UMO"
-                        type="text"
-                        
-                        autoComplete="workTelephone"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2 sm:col-start-1">
-                    <label
-                      htmlFor="color"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Color
-                    </label>
-                    <div className="mt-2">
-                      <input
-                        value={formData.color}
-                        id="color"
-                        name="color"
-                        
-                        type="color"
-                        autoComplete="address-level2"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.UMO}
+                      </h5>
                     </div>
                   </div>
 
@@ -301,16 +255,9 @@ export default function SingleProductpage({
                       VAT Percentage (%)
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.VAT.$numberDecimal}
-                        id="VAT"
-                        name="VAT"
-                        
-                        type="number"
-                        step="any"
-                        autoComplete="VAT"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.VAT.$numberDecimal}
+                      </h5>
                     </div>
                   </div>
 
@@ -322,32 +269,22 @@ export default function SingleProductpage({
                       {businessInfo.priceList1} Price
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.Pricelist1}
-                        id="Pricelist1"
-                        name="Pricelist1"
-                        type="number"
-                        step="any"
-                        
-                        autoComplete="Pricelist-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 sm:text-sm">
+                        {formData.Pricelist1}
+                      </h5>
                     </div>
                     <label
                       htmlFor="VatpriceList1"
-                      className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                     >
-                      <input
-                        checked={formData.VatpriceList1 || false}
-                        
-                        id="VatpriceList1"
-                        name="VatpriceList1"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />{" "}
                       Apply {data.VAT.$numberDecimal}% Vat on{" "}
                       {businessInfo.priceList1}?
                     </label>
+                    <div className="mt-2">
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 sm:text-sm">
+                        {formData.VatpriceList1 ? "Yes" : "No"}
+                      </h5>
+                    </div>
                   </div>
                   <div className="sm:col-span-2">
                     <label
@@ -357,32 +294,22 @@ export default function SingleProductpage({
                       {businessInfo.priceList2} Price
                     </label>
                     <div className="mt-2">
-                      <input
-                        value={formData.Pricelist2}
-                        
-                        id="Pricelist2"
-                        name="Pricelist2"
-                        type="number"
-                        step="any"
-                        autoComplete="Pricelist2-code"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Pricelist2}
+                      </h5>
                     </div>
                     <label
                       htmlFor="VatpriceList2"
-                      className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                      className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                     >
-                      <input
-                        checked={formData.VatpriceList2 || false}
-                        
-                        id="VatpriceList2"
-                        name="VatpriceList2"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />{" "}
                       Apply {data.VAT.$numberDecimal}% Vat on{" "}
                       {businessInfo.priceList2}?
                     </label>
+                    <div className="mt-2">
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.VatpriceList2 ? "Yes" : "No"}
+                      </h5>
+                    </div>
                   </div>
 
                   {businessInfo.subscriptionplan === "Standard" && (
@@ -395,32 +322,22 @@ export default function SingleProductpage({
                           {businessInfo.priceList3} Price
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist3}
-                            id="Pricelist3"
-                            name="Pricelist3"
-                            
-                            type="number"
-                            step="any"
-                            autoComplete="Pricelist-level2"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist3}
+                          </h5>
                         </div>
                         <label
                           htmlFor="VatpriceList3"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                         >
-                          <input
-                            checked={formData.VatpriceList3 || false}
-                            
-                            id="VatpriceList3"
-                            name="VatpriceList3"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
                           Apply {data.VAT.$numberDecimal}% Vat on{" "}
                           {businessInfo.priceList3}?
                         </label>
+                        <div className="mt-2">
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.VatpriceList3 ? "Yes" : "No"}
+                          </h5>
+                        </div>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -431,32 +348,22 @@ export default function SingleProductpage({
                           {businessInfo.priceList4} Price
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist4}
-                            id="Pricelist4"
-                            name="Pricelist4"
-                            type="number"
-                            step="any"
-                            
-                            autoComplete="Pricelist1-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist4}
+                          </h5>
                         </div>
                         <label
                           htmlFor="VatpriceList4"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                         >
-                          <input
-                            checked={formData.VatpriceList4 || false}
-                            
-                            id="VatpriceList4"
-                            name="VatpriceList4"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
                           Apply {data.VAT.$numberDecimal}% Vat on{" "}
                           {businessInfo.priceList4}?
                         </label>
+                        <div className="mt-2">
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.VatpriceList4 ? "Yes" : "No"}
+                          </h5>
+                        </div>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -467,31 +374,22 @@ export default function SingleProductpage({
                           {businessInfo.priceList5} Price
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist5}
-                            
-                            id="Pricelist5"
-                            name="Pricelist5"
-                            type="number"
-                            step="any"
-                            autoComplete="Pricelist1-code"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist5}
+                          </h5>
                         </div>
                         <label
                           htmlFor="VatpriceList5"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                         >
-                          <input
-                            checked={formData.VatpriceList5 || false}
-                            id="VatpriceList5"
-                            name="VatpriceList5"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
                           Apply {data.VAT.$numberDecimal}% Vat on{" "}
                           {businessInfo.priceList5}?
                         </label>
+                        <div className="mt-2">
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.VatpriceList5 ? "Yes" : "No"}
+                          </h5>
+                        </div>
                       </div>
 
                       <div className="sm:col-span-2 sm:col-start-1">
@@ -502,30 +400,22 @@ export default function SingleProductpage({
                           {businessInfo.priceList6} Price
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist6}
-                            id="Pricelist6"
-                            name="Pricelist6"
-                            step="any"
-                            type="number"
-                            autoComplete="Pricelist1-level2"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist6}
+                          </h5>
                         </div>
                         <label
                           htmlFor="VatpriceList6"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                         >
-                          <input
-                            checked={formData.VatpriceList6 || false}
-                            id="VatpriceList6"
-                            name="VatpriceList6"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
                           Apply {data.VAT.$numberDecimal}% Vat on{" "}
                           {businessInfo.priceList6}?
                         </label>
+                        <div className="mt-2">
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.VatpriceList6 ? "Yes" : "No"}
+                          </h5>
+                        </div>
                       </div>
 
                       <div className="sm:col-span-2">
@@ -536,32 +426,22 @@ export default function SingleProductpage({
                           {businessInfo.priceList7} Price
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist7}
-                            id="Pricelist7"
-                            name="Pricelist7"
-                            type="number"
-                            step="any"
-                            
-                            autoComplete="Pricelist1-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist7}
+                          </h5>
                         </div>
                         <label
                           htmlFor="VatpriceList7"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
+                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
                         >
-                          <input
-                            checked={formData.VatpriceList7 || false}
-                            
-                            id="VatpriceList7"
-                            name="VatpriceList7"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
                           Apply {data.VAT.$numberDecimal}% Vat on{" "}
                           {businessInfo.priceList7}?
                         </label>
+                        <div className="mt-2">
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.VatpriceList7 ? "Yes" : "No"}
+                          </h5>
+                        </div>
                       </div>
                     </>
                   )}
@@ -610,20 +490,11 @@ export default function SingleProductpage({
                       {businessInfo.priceList1} Promo
                     </label>
 
-                    {/* Promo input */}
+                    {/* Promo value */}
                     <div className="mt-2">
-                      <input
-                        value={formData.Pricelist1Promo}
-                        id="Pricelist1Promo"
-                        name="Pricelist1Promo"
-                        type="number"
-                        step="any"
-                        
-                        autoComplete="Pricelist1-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Pricelist1Promo ?? ""}
+                      </h5>
                     </div>
 
                     {/* End Date label */}
@@ -634,20 +505,15 @@ export default function SingleProductpage({
                       {businessInfo.priceList1} Promo End Date
                     </label>
 
-                    {/* End Date input */}
+                    {/* End Date value */}
                     <div className="mt-2">
-                      <input
-                        value={moment(formData.Pricelist1PromoDate).format('YYYY-MM-DD')}
-                        id="Pricelist1PromoDate"
-                        name="Pricelist1PromoDate"
-                        type="date"
-                        
-                        autoComplete="Pricelist1PromoDate"
-                        min={new Date().toISOString().split("T")[0]}
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Pricelist1PromoDate
+                          ? moment(formData.Pricelist1PromoDate).format(
+                              "YYYY-MM-DD",
+                            )
+                          : ""}
+                      </h5>
                     </div>
                   </div>
 
@@ -660,21 +526,11 @@ export default function SingleProductpage({
                       {businessInfo.priceList2} Promo
                     </label>
 
-                    {/* Promo input */}
+                    {/* Promo value */}
                     <div className="mt-2">
-                      <input
-                        value={formData.Pricelist2Promo}
-                        id="Pricelist2Promo"
-                        name="Pricelist2Promo"
-                        type="number"
-                        step="any"
-                        min={0}
-                        
-                        autoComplete="Pricelist2Promo"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Pricelist2Promo ?? ""}
+                      </h5>
                     </div>
 
                     {/* End Date label */}
@@ -682,23 +538,18 @@ export default function SingleProductpage({
                       htmlFor="Pricelist2PromoDate"
                       className="block text-sm/6 font-medium text-gray-900 mt-4"
                     >
-                     {businessInfo.priceList2} Promo End Date
+                      {businessInfo.priceList2} Promo End Date
                     </label>
 
-                    {/* End Date input */}
+                    {/* End Date value */}
                     <div className="mt-2">
-                      <input
-                        value={moment(formData.Pricelist2PromoDate).format('YYYY-MM-DD')}
-                        id="Pricelist2PromoDate"
-                        name="Pricelist2PromoDate"
-                        type="date"
-                        
-                        min={new Date().toISOString().split("T")[0]}
-                        autoComplete="Pricelist2PromoDate"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
+                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                        {formData.Pricelist2PromoDate
+                          ? moment(formData.Pricelist2PromoDate).format(
+                              "YYYY-MM-DD",
+                            )
+                          : ""}
+                      </h5>
                     </div>
                   </div>
 
@@ -712,39 +563,24 @@ export default function SingleProductpage({
                           {businessInfo.priceList3} Promo
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist3Promo || 0}
-                            id="Pricelist3Promo"
-                            name="Pricelist3Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            
-                            autoComplete="Pricelist3Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist3Promo ?? ""}
+                          </h5>
                         </div>
                         <label
                           htmlFor="Pricelist3PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList3} Promo End Date
+                          {businessInfo.priceList3} Promo End Date
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist3PromoDate).format('YYYY-MM-DD')}
-                            id="Pricelist3PromoDate"
-                            name="Pricelist3PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            
-                            autoComplete="Pricelist3PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist3PromoDate
+                              ? moment(formData.Pricelist3PromoDate).format(
+                                  "YYYY-MM-DD",
+                                )
+                              : ""}
+                          </h5>
                         </div>
                       </div>
 
@@ -756,39 +592,24 @@ export default function SingleProductpage({
                           {businessInfo.priceList4} Promo
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist4Promo || 0}
-                            id="Pricelist4Promo"
-                            name="Pricelist4Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            
-                            autoComplete="Pricelist4Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist4Promo ?? ""}
+                          </h5>
                         </div>
                         <label
                           htmlFor="Pricelist4PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList4} Promo End Date
+                          {businessInfo.priceList4} Promo End Date
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist4PromoDate).format('YYYY-MM-DD') }
-                            id="Pricelist4PromoDate"
-                            name="Pricelist4PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            
-                            autoComplete="Pricelist4PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist4PromoDate
+                              ? moment(formData.Pricelist4PromoDate).format(
+                                  "YYYY-MM-DD",
+                                )
+                              : ""}
+                          </h5>
                         </div>
                       </div>
 
@@ -800,39 +621,24 @@ export default function SingleProductpage({
                           {businessInfo.priceList5} Promo
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist5Promo || 0}
-                            id="Pricelist5Promo"
-                            name="Pricelist5Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            
-                            autoComplete="Pricelist5Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist5Promo ?? ""}
+                          </h5>
                         </div>
                         <label
                           htmlFor="Pricelist5PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList5} Promo End Date
+                          {businessInfo.priceList5} Promo End Date
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist5PromoDate).format('YYYY-MM-DD')}
-                            id="Pricelist5PromoDate"
-                            name="Pricelist5PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            
-                            autoComplete="Pricelist5PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist5PromoDate
+                              ? moment(formData.Pricelist5PromoDate).format(
+                                  "YYYY-MM-DD",
+                                )
+                              : ""}
+                          </h5>
                         </div>
                       </div>
 
@@ -844,19 +650,9 @@ export default function SingleProductpage({
                           {businessInfo.priceList6} Promo
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist6Promo || 0}
-                            id="Pricelist6Promo"
-                            name="Pricelist6Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            
-                            autoComplete="Pricelist6Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist6Promo ?? ""}
+                          </h5>
                         </div>
                         <label
                           htmlFor="Pricelist6PromoDate"
@@ -865,18 +661,13 @@ export default function SingleProductpage({
                           {businessInfo.priceList6} Promo End Date
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist6PromoDate).format('YYYY-MM-DD')}
-                            id="Pricelist6PromoDate"
-                            name="Pricelist6PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            
-                            autoComplete="Pricelist6PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist6PromoDate
+                              ? moment(formData.Pricelist6PromoDate).format(
+                                  "YYYY-MM-DD",
+                                )
+                              : ""}
+                          </h5>
                         </div>
                       </div>
 
@@ -888,39 +679,24 @@ export default function SingleProductpage({
                           {businessInfo.priceList7} Promo
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={formData.Pricelist7Promo || 0 }
-                            id="Pricelist7Promo"
-                            name="Pricelist7Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            
-                            autoComplete="Pricelist7Promo-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist7Promo ?? ""}
+                          </h5>
                         </div>
                         <label
                           htmlFor="Pricelist7PromoDate"
                           className="block text-sm/6 font-medium text-gray-900 mt-4"
                         >
-                         {businessInfo.priceList7} Promo End Date
+                          {businessInfo.priceList7} Promo End Date
                         </label>
                         <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist7PromoDate).format('YYYY-MM-DD')}
-                            id="Pricelist7PromoDate"
-                            name="Pricelist7PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            
-                            autoComplete="Pricelist7PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
+                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
+                            {formData.Pricelist7PromoDate
+                              ? moment(formData.Pricelist7PromoDate).format(
+                                  "YYYY-MM-DD",
+                                )
+                              : ""}
+                          </h5>
                         </div>
                       </div>
                     </>
@@ -930,28 +706,7 @@ export default function SingleProductpage({
             </div>
           </div>
 
-          <div className="border-b border-gray-900/10 pb-12">
-            <h5 className="text-black font-semibold"> Description.</h5>
-            <div className="col-span-full">
-              <label
-                htmlFor="Description"
-                className="block text-sm/6 font-medium text-gray-900"
-              >
-                Write Something Simple and Consise about this product
-              </label>
-              <div className="">
-                <textarea
-                  id="Description"
-                  name="Description"
-                  
-                  value={formData.Description}
-                  className="w-full text-black h-32 p-3 border border-dashed border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="Enter your text here..."
-                />
-              </div>
-
-            </div>
-          </div>
+          <CommentForm userData={userInfo} product={data} />
         </form>
       </div>
     </Suspense>
@@ -987,13 +742,15 @@ function ProductChart({ productId, productName, umo, business, user }) {
         const result = await response.json();
         if (!result?.invoice) return;
 
-        const data = result.invoice.filter(entry => entry.salesPerson === user._id).flatMap((invoice) =>
-          invoice.orders.map((order) => ({
-            sold: order.total,
-            InvoiceDate: invoice.startDate,
-            _id: order.item._id,
-          }))
-        );
+        const data = result.invoice
+          .filter((entry) => entry.salesPerson === user._id)
+          .flatMap((invoice) =>
+            invoice.orders.map((order) => ({
+              sold: order.total,
+              InvoiceDate: invoice.startDate,
+              _id: order.item._id,
+            })),
+          );
 
         const productSales = data.filter((item) => item._id === productId);
 
@@ -1024,7 +781,6 @@ function ProductChart({ productId, productName, umo, business, user }) {
     };
 
     fetchProductData(); // Initial fetch
-
   }, [productId, productName, umo, business]);
 
   useEffect(() => {
@@ -1087,9 +843,9 @@ function ProductChart({ productId, productName, umo, business, user }) {
             <hr />
             <br />
           </p>
-            <i className="text-gray-500 text-sm">
-              Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
-            </i>
+          <i className="text-gray-500 text-sm">
+            Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
+          </i>
           <div
             id="myPlot"
             className=""
@@ -1154,4 +910,103 @@ function useProductEditTour(product) {
       return () => clearTimeout(timeoutId);
     }
   }, [product]);
+}
+
+// comment
+export function CommentForm({ userData, product }) {
+  const [formData, setFormData] = useState({
+    comment: "",
+    rating: 0,
+    userId: userData._id,
+    userName: userData.firstName
+  });
+
+  const router = useRouter();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleRating = (value) => {
+    setFormData({ ...formData, rating: value });
+  };
+
+  const handleSubmit = async () => {
+    plsWait("Submitting review.");
+    try {
+        const request = await axios.post(
+        `${EXPRESS_PRIVATE_URL}/api/product/review/${Encrypt(product._id)}`,
+        formData,
+        {
+            headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
+            access: `${Encrypt(userData._id)}`
+            },
+        }
+        );
+
+        const response = request.data;
+
+        SuccessToast(response.message || "Review submitted successfully!");
+        setFormData({});
+        // router.refresh(); // refresh page or redirect
+    } catch (err) {
+        console.error(err); // helpful for debugging
+        ErrorMessage(err.response?.data?.message || err.message || "Error saving comment");
+    }
+    };
+
+  return (
+    <Card className="max-w-full mx-auto shadow-lg">
+      <CardHeader>
+        <CardTitle>Submit a Review for {product.Name.toLowerCase()}</CardTitle>
+      </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="comment">Comment</Label>
+            <Textarea
+              id="comment"
+              name="comment"
+              placeholder="Write your review..."
+              maxLength={500}
+              required
+              value={formData.comment}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="rating">Rating</Label>
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => handleRating(value)}
+                  className={`text-3xl transition-colors ${
+                    formData.rating >= value
+                      ? "text-yellow-400"
+                      : "text-gray-300 hover:text-yellow-300"
+                  }`}
+                  aria-label={`${value} star${value > 1 ? "s" : ""}`}
+                >
+                  {formData.rating >= value ? "★" : "☆"}
+                </button>
+              ))}
+            </div>
+            <input type="hidden" name="rating" value={formData.rating} />
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button
+          onClick={handleSubmit}
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Submit Review
+          </Button>
+        </CardFooter>
+    </Card>
+  );
 }
