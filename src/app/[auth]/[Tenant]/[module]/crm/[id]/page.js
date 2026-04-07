@@ -43,6 +43,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const [isOpen2, setisOpen2] = useState(false);
   const [isOpen3, setisOpen3] = useState(false);
   const [isOpen4, setisOpen4] = useState(false);
+  const [isOpen5, setisOpen5] = useState(false)
   const [BalanceData, setBalanceData] = useState({
     Debt: Number(cust.Debt),
   });
@@ -1513,6 +1514,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </Section>
         </div>
       </div>
+
       <div className="border rounded-lg overflow-hidden ">
         <span
           onClick={() => setisOpen3(!isOpen3)}
@@ -1608,6 +1610,81 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </Section>
         </div>
       </div>
+
+      {/* help desk */}
+      <div className="border rounded-lg overflow-hidden">
+              <span
+                onClick={() => setisOpen5(!isOpen5)}
+                className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+              >
+                <h2 className="text-base/7 font-semibold text-gray-900">
+                  Support Tickets
+                </h2>
+                <svg
+                  className={`w-5 h-5 transform transition-transform duration-300 ${
+                    isOpen5 ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </span>
+              <div
+                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                  isOpen5 ? "block" : "hidden"
+                }`}
+              >
+                <div className="mt-10 max-h-96 overflow-y-auto space-y-4">
+                  {data.SupportTicket?.length > 0 ? (
+                    data.SupportTicket.map((ticket, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-3">
+                            {/* Avatar/initials */}
+                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
+                              {ticket.status}
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              {ticket.TicketId}
+                            </p>
+                            <div>
+                              {ticket.createdAt && (
+                                <p className="text-xs text-gray-500">
+                                  {new Date(ticket.createdAt).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          {/* sla level */}
+                          <div className="flex items-center">
+                              <div className={`text-gray-300`}>
+                                {ticket.SLA}
+                              </div>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                          {ticket.comment}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
+                      No new support ticket.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
       {userInfo.user.editCustomer && (
         <div className="pt-4">
