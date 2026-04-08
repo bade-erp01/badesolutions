@@ -12,6 +12,9 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge"
+import CalendarDemo from "@/app/Components/Datepicker";
+import moment from "moment"
 
 const SingleCustomerpage = lazy(() => import("./page"));
 
@@ -57,7 +60,7 @@ export default async function StoreLayout2({ params }) {
         {/* Sidebar */}
         <aside
           className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
-          style={{ overflowY: "auto" }}
+          style={{ overflowY: "auto",scrollbarWidth: "thin",scrollbarColor: "#453d46ff transparent", }}
         >
           <BackButton />
           <hr />
@@ -113,6 +116,28 @@ export default async function StoreLayout2({ params }) {
                   );
                 }) || (
                   <li className="py-3 px-4 text-sm">No audit trail logged.</li>
+                )}
+              </ul>
+            </div>
+            )}
+
+            {/* RouteDays */}
+            <CalendarDemo useCase="RouteDays" userData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL} id={data.result._id}/>
+            {data.result?.RouteDays?.length > 0 && (
+              <div
+              className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#4B5563 transparent",
+              }}
+             >
+              <ul className="divide-y divide-gray-700">
+                {data.result?.RouteDays?.map((log, index) => {
+                  return (
+                    <Badge key={index}>{moment(log.date).format('l')}</Badge>
+                  );
+                }) || (
+                  <li className="py-3 px-4 text-sm">No date assigned.</li>
                 )}
               </ul>
             </div>
