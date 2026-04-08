@@ -124,23 +124,11 @@ export default async function StoreLayout2({ params }) {
             {/* RouteDays */}
             <CalendarDemo useCase="RouteDays" userData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL} id={data.result._id}/>
             {data.result?.RouteDays?.length > 0 && (
-              <div
-              className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"
-              style={{
-                scrollbarWidth: "thin",
-                scrollbarColor: "#4B5563 transparent",
-              }}
-             >
-              <ul className="divide-y divide-gray-700">
-                {data.result?.RouteDays?.map((log, index) => {
-                  return (
-                    <Badge key={index}>{moment(log.date).format('l')}</Badge>
-                  );
-                }) || (
-                  <li className="py-3 px-4 text-sm">No date assigned.</li>
-                )}
-              </ul>
-            </div>
+              data.result.RouteDays.map((log, index) => (
+                <Badge key={index}>
+                  {moment(log.date).format("l")}
+                </Badge>
+              ))
             )}
             
           </nav>
