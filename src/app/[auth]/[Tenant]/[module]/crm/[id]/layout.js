@@ -13,7 +13,6 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge"
-import CalendarDemo from "@/app/Components/Datepicker";
 import moment from "moment"
 
 const SingleCustomerpage = lazy(() => import("./page"));
@@ -122,15 +121,20 @@ export default async function StoreLayout2({ params }) {
             )}
 
             {/* RouteDays */}
-            <CalendarDemo useCase="RouteDays" userData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL} id={data.result._id}/>
-            {data.result?.RouteDays?.length > 0 && (
-              data.result.RouteDays.map((log, index) => (
-                <Badge key={index}>
-                  {moment(log.date).format("l")}
-                </Badge>
-              ))
+            {userData.user._id === data.result?.accountManager && (
+              <>
+              <p>Route day/days assigned</p>
+              {data.result?.RouteDays?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {data.result?.RouteDays?.map((log, index) => (
+                    <Badge key={index}>
+                      {moment(log.date).format("l")}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              </>
             )}
-            
           </nav>
         </aside>
 
