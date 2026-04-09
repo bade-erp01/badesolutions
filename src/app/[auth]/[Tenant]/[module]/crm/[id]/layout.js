@@ -127,7 +127,7 @@ export default async function StoreLayout2({ params }) {
               {data.result?.RouteDays?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {data.result?.RouteDays?.map((log, index) => (
-                    <Badge key={index}>
+                    <Badge key={log._id}>
                       {log.date} <TrashIcon
                           className="h-6 w-6 text-gray-100 cursor-pointer"
                           title={`Remove ${log.date} from list`}
