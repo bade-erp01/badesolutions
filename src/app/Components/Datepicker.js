@@ -33,9 +33,11 @@ export default function DaySelector({ useCase, userData, baseUrl, id }) {
       if(result.message){
         SuccessToast(result.message)
         router.refresh()
+      }else{
+        throw new Error(result.error)
       }
     } catch (err) {
-      ErrorMessage(err.error || "Failed to assign new day")
+      ErrorMessage( err.message || "Failed to assign new day")
       router.refresh()
     }
   }
