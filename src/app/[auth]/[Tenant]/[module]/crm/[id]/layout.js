@@ -9,7 +9,7 @@ import BackButton from "@/app/Components/BackBotton";
 import Footer2 from "@/app/Components/Footer2";
 import {
   ClipboardDocumentListIcon,
-  PlusCircleIcon,
+  PlusCircleIcon,TrashIcon
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge"
@@ -123,12 +123,15 @@ export default async function StoreLayout2({ params }) {
             {/* RouteDays */}
             {userData.user._id === data.result?.accountManager && (
               <>
-              <p>Route day/days assigned</p>
+              <p className="text-xs">{data.result?.RouteDays?.length} Route day/days assigned</p>
               {data.result?.RouteDays?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {data.result?.RouteDays?.map((log, index) => (
                     <Badge key={index}>
-                      {moment(log.date).format("l")}
+                      {log.date} <TrashIcon
+                          className="h-6 w-6 text-gray-100 cursor-pointer"
+                          title={`Remove ${log.date} from list`}
+                        />
                     </Badge>
                   ))}
                 </div>
