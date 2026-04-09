@@ -19,6 +19,19 @@ import {
   CameraIcon
 } from "@heroicons/react/24/outline";
 
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 import {
   plsWait,
   Encrypt,
@@ -119,22 +132,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     `;
   }
 
-  function normalizeDate(value) {
-    if (!value) return null;
-    const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
-    if (isSerial) {
-      const serial = parseFloat(value);
-      const baseDate = moment("1899-12-30");
-      const days = Math.floor(serial);
-      const timeFraction = serial - days;
-      const date = baseDate.clone().add(days, "days");
-      const time = moment.duration(timeFraction * 24, "hours");
-      return date.add(time).format("YYYY-MM-DD HH:mm:ss");
-    }
-    return moment(value).isValid()
-      ? moment(value).format("YYYY-MM-DD HH:mm:ss")
-      : null;
-  }
 
   if (!cust) {
     return (
@@ -484,21 +481,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     }
   };
 
-  const updateServiceLocation = async () =>{
-    try{
-      plsWait("Updating service location... Please wait ⏳ This may take a moment.");
-      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(cust._id)}`;
-      const { data } = await axios.patch(url, { location: formData.location }, config);
-      if (data && data.message) {
-        SuccessToast(data.message);
-        navigation.refresh();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    } catch (error) {
-      ErrorMessage(error?.response?.data?.error || error.message);
-    }
-  }
 
   return (
     <form
@@ -573,14 +555,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <span className="text-xs">Print Statement</span>
           </span>
 
-           <span
-            onClick={() => GenerateSummary(Encrypt(cust._id))}
-            className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            aria-label="Print Statement"
-          >
-            <QuestionMarkCircleIcon className="h-6 w-6 text-white" />
-            <span className="text-xs">Report an issue</span>
-          </span>
+           <TextareaButton/>
 
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
             <>
@@ -1229,3 +1204,67 @@ function Checkbox({ label, name, checked, onChange }) {
     </div>
   );
 }
+
+
+export function TextareaButton() {
+  const [photo1, setPhoto1] = useState(null);
+  const [photo2, setPhoto2] = useState(null);
+  const [message, setMessage] = useState("");
+
+  // Count words safely
+  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
+  const maxWords = 200
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <QuestionMarkCircleIcon className="h-6 w-6 text-white" />
+        Open a support ticket
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="w-full max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            New Ticket
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-4">
+          <Textarea
+            placeholder="Type your message here (max 200 words)."
+            value={message}
+            onChange={(e) => {
+              const text = e.target.value
+              const words = text.trim().split(/\s+/).filter(Boolean)
+              if (words.length <= maxWords) {
+                setMessage(text)
+              }
+            }}
+          />
+          <p className="text-xs text-gray-500">
+            {wordCount}/{maxWords} words
+          </p>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setPhoto1(e.target.files[0])}
+            className="border rounded p-2"
+          />
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setPhoto2(e.target.files[0])}
+            className="border rounded p-2"
+          />
+
+          <Button disabled={wordCount === 0} >Send message</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
