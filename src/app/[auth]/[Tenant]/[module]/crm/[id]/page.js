@@ -1660,16 +1660,19 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-3">
                             {/* Avatar/initials */}
-                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
+                            <div className="p-2 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
                               {ticket.status}
                             </div>
                             <p className="text-xs text-gray-500">
                               {ticket.TicketId}
                             </p>
-                            <div>
-                              {ticket.createdAt && (
-                                <p className="text-xs text-gray-500">
+                             <p className="text-xs text-gray-500">
                                   {new Date(ticket.createdAt).toLocaleDateString()}
+                            </p>
+                            <div>
+                              {ticket.attachments.length > 0 && (
+                                <p className="text-xs text-gray-300">
+                                  {ticket.attachments.length} attachement
                                 </p>
                               )}
                             </div>
