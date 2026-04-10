@@ -45,7 +45,7 @@ export default function DaySelector({ useCase, userData, baseUrl, id }) {
   return (
     <div className="space-y-2">
       <Select onValueChange={handleChange} value={day}>
-        <SelectTrigger className="w-full bg-white/50 text-gray-100">
+        <SelectTrigger className="w-full bg-white/50 ">
           <SelectValue placeholder="-- Choose a day --" />
         </SelectTrigger>
         <SelectContent>

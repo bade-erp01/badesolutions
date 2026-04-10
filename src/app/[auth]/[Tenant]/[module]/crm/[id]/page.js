@@ -1655,7 +1655,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     data.SupportTicket.map((ticket, index) => (
                       <div
                         key={index}
-                        className="border border-gray-200 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+                        className="text-xs border border-gray-200 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-3">
@@ -1679,7 +1679,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                           </div>
                           {/* sla level */}
                           <div className="flex items-center">
-                              <div className={`text-gray-300`}>
+                              <div className={`text-gray-600`}>
                                 {ticket.SLA}
                               </div>
                           </div>

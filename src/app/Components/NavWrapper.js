@@ -338,25 +338,75 @@ export function Card ({ data, module }) {
 export function TextareaButton() {
   const [photo, setPhoto] = useState(null)
   const [message, setMessage] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  // Count words safely
-  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
   const maxWords = 200
+  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
+
+  const handleSend = async () => {
+    if (wordCount === 0) return
+    setLoading(true)
+
+    try {
+
+       let photoUrl = null
+
+      // Upload to Cloudinary if photo exists
+      if (photo) {
+        const formData = new FormData()
+        formData.append("file", photo)
+        formData.append("upload_preset", "reports_upload")
+
+        const cloudinaryRes = await fetch(
+          "https://api.cloudinary.com/v1_1/dgiajxtvn/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        )
+
+        const cloudinaryData = await cloudinaryRes.json()
+        photoUrl = cloudinaryData.secure_url
+        console.log("Uploaded to Cloudinary:", photoUrl)
+      }
+
+      const formData = new FormData()
+      formData.append("message", message)
+      if (photo) formData.append("photo", photo)
+
+      const response = await fetch("/api/reports", {
+        method: "POST",
+        body: formData,
+      })
+
+      const result = await response.json()
+      console.log("Report submitted:", result)
+
+      // Reset after success
+      setMessage("")
+      setPhoto(null)
+    } catch (err) {
+      console.error("Error submitting report:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default" className={`flex gap-3 p-4 rounded-md transition bg-gray-200/50 hover:bg-gray-700 w-full`}>
-         <PencilSquareIcon className="h-4 w-4 text-gray-200"/>
-        Write a report
+        <Button
+          variant="default"
+          className="flex gap-3 p-4 rounded-md transition bg-gray-200/50 hover:bg-gray-700 w-full"
+        >
+          <PencilSquareIcon className="h-4 w-4 text-gray-200" />
+          Write a report
         </Button>
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-sm">
         <DialogHeader>
-          <DialogTitle>
-            New Report
-          </DialogTitle>
+          <DialogTitle>New Report</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -382,7 +432,12 @@ export function TextareaButton() {
             className="border rounded p-2"
           />
 
-          <Button disabled={wordCount === 0} >Send message</Button>
+          <Button
+            onClick={handleSend}
+            disabled={wordCount === 0 || loading}
+          >
+            {loading ? "Sending..." : "Send message"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
