@@ -16,11 +16,18 @@ import {
   PrinterIcon,
   WalletIcon,
   QuestionMarkCircleIcon,
-  CameraIcon
+  CameraIcon,
+  PaperClipIcon,
 } from "@heroicons/react/24/outline";
-
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -30,7 +37,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   plsWait,
@@ -42,8 +50,8 @@ import axios from "axios";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { useEffect } from "react";
-import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin"
+import { useEffect,useRef } from "react";
+import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
@@ -132,14 +140,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     `;
   }
 
-
   if (!cust) {
     return (
       <p className="text-center text-gray-500">Customer data not found.</p>
     );
   }
-
- 
 
   let jsPDF;
   if (typeof window !== "undefined") {
@@ -213,10 +218,10 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`, 
+            access: `${Encrypt(userInfo.user._id)}`,
           },
           cache: "no-store", // Optional: disables caching for fresh data
-        }
+        },
       );
 
       const TransactionResult = await res.json();
@@ -230,7 +235,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       // 🖼️ Load and watermark image
       const imageDataURL = await loadImageAsDataURL(
         userInfo.business.companyLogo,
-        "B.A.D.E"
+        "B.A.D.E",
       );
 
       const doc = new jsPDF();
@@ -252,7 +257,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           maximumFractionDigits: 2,
         })}`,
         20,
-        42
+        42,
       );
 
       // 🖼️ Logo
@@ -336,12 +341,12 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           doc.text(
             `Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`,
             20,
-            pageHeight - 10
+            pageHeight - 10,
           );
           doc.text(
             `visit: badesolutions.com.ng`,
             pageWidth - 60,
-            pageHeight - 10
+            pageHeight - 10,
           );
           doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
             align: "center",
@@ -392,7 +397,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     return { month: monthLabel, amount: total };
   });
 
-
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
@@ -422,7 +426,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       plsWait("Submitting customer update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
-        cust._id
+        cust._id,
       )}`;
       // Await axios call directly
       const { data } = await axios.patch(url, formData, config);
@@ -440,7 +444,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
   const handleCreateInvoice = async () => {
     plsWait(
-      "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page."
+      "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page.",
     );
 
     try {
@@ -454,7 +458,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       const { data } = await axios.post(
         url,
         { customer: cust._id, whId: cust.location },
-        config
+        config,
       );
 
       // Handle response (redirect or update UI as needed)
@@ -465,7 +469,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         navigation.push(
           `/${router.auth}/${router.Tenant}/${
             router.module
-          }/Forms/invoice/${Encrypt(data.result)}`
+          }/Forms/invoice/${Encrypt(data.result)}`,
         );
       } else {
         Swal.fire({
@@ -480,7 +484,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       ErrorMessage(error?.response?.data?.error || error.message);
     }
   };
-
 
   return (
     <form
@@ -537,14 +540,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               </span>
             )}
 
-            <span
-                onClick={handleCreateInvoice}
-                className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
-                aria-label="Create Invoice"
-              >
-                <CameraIcon className="h-5 w-5 text-white"/>
-                <span className="text-xs">Capture stock level</span>
-              </span>
+          <span
+            onClick={handleCreateInvoice}
+            className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
+            aria-label="Create Invoice"
+          >
+            <CameraIcon className="h-5 w-5 text-white" />
+            <span className="text-xs">Capture stock level</span>
+          </span>
 
           <span
             onClick={() => GenerateSummary(Encrypt(cust._id))}
@@ -555,23 +558,24 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <span className="text-xs">Print Statement</span>
           </span>
 
-           <TextareaButton/>
+          <TextareaButton user={userInfo.user} cust={cust._id}/>
 
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
             <>
-            <span
-              onClick={() =>
+              <span
+                onClick={() =>
                   postPayment(
                     Encrypt(cust._id),
                     `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-                    config
-                  )}
-              className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              aria-label="Register Payment"
-            >
-              <WalletIcon className="h-5 w-5 text-white" />
-              <span className="text-xs">Register Payment</span>
-            </span>
+                    config,
+                  )
+                }
+                className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                aria-label="Register Payment"
+              >
+                <WalletIcon className="h-5 w-5 text-white" />
+                <span className="text-xs">Register Payment</span>
+              </span>
             </>
           )}
 
@@ -581,10 +585,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
       {/* Sales Insight */}
       <Section title={``} className="lg:col-span-2">
-        <div
-          className=""
-        >
-          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]}/>
+        <div className="">
+          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]} />
         </div>
       </Section>
 
@@ -701,7 +703,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   onChange={handleChange}
                 />
 
-                <Select
+                <Selects
                   label="State"
                   name="state"
                   value={formData.state}
@@ -753,32 +755,32 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               subtitle="(Manage credit, debt, and payment settings)"
             >
               <Grid columns={3}>
-                    <div className="mb-2">
-                      <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                        {cust.lastPayDate &&
-                        cust.Debt > 0 &&
-                        moment(cust.lastPayDate).isValid()
-                          ? `Debt incurred: ${moment().diff(
-                              moment(cust.lastPayDate),
-                              "days"
-                            )} day(s) ago`
-                          : "Not in Debt"}
-                      </label>
+                <div className="mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                    {cust.lastPayDate &&
+                    cust.Debt > 0 &&
+                    moment(cust.lastPayDate).isValid()
+                      ? `Debt incurred: ${moment().diff(
+                          moment(cust.lastPayDate),
+                          "days",
+                        )} day(s) ago`
+                      : "Not in Debt"}
+                  </label>
 
-                      <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
-                        {formData.Debt?.toLocaleString()}
-                      </div>
-                    </div>
+                  <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                    {formData.Debt?.toLocaleString()}
+                  </div>
+                </div>
 
-                    <div className="mb-2">
-                          <label className="block text-sm font-semibold text-gray-700 tracking-wide">
-                            Credit Limit
-                          </label>
+                <div className="mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide">
+                    Credit Limit
+                  </label>
 
-                          <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
-                            {formData.creditLimit?.toLocaleString()}
-                          </div>
-                    </div>
+                  <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                    {formData.creditLimit?.toLocaleString()}
+                  </div>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
@@ -791,12 +793,17 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     onChange={handleChange}
                     className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
                   >
-                    <option value={cust.paymentTerms} className="italic bg-gray-200">
+                    <option
+                      value={cust.paymentTerms}
+                      className="italic bg-gray-200"
+                    >
                       {cust.paymentTerms || "Select one"}
                     </option>
                     <option value="Cash on Delivery">Cash on Delivery </option>
                     <option value="Credit customer">Credit customer</option>
-                    <option value="Payment before delivery">Payment before delivery</option>
+                    <option value="Payment before delivery">
+                      Payment before delivery
+                    </option>
                   </select>
                 </div>
               </Grid>
@@ -819,7 +826,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             {/* Services */}
             <Section title="🛎 Services">
               <Grid columns={2}>
-                
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     preferred Shipping Method
@@ -849,9 +855,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           onClick={() => setisOpen2(!isOpen2)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">
-            Ledger
-          </h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">Ledger</h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${
               isOpen2 ? "rotate-180" : ""
@@ -953,7 +957,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                             data={data.transcations}
                             page={`${cust.Username.substring(
                               0,
-                              8
+                              8,
                             )} transaction`}
                           />
                         </td>
@@ -1002,7 +1006,9 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           onClick={() => setisOpen3(!isOpen3)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">Geo‑coordinates</h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">
+            Geo‑coordinates
+          </h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${
               isOpen3 ? "rotate-180" : ""
@@ -1156,7 +1162,7 @@ function Input({
   );
 }
 
-function Select({
+function Selects({
   label,
   name,
   value,
@@ -1205,30 +1211,156 @@ function Checkbox({ label, name, checked, onChange }) {
   );
 }
 
-
-export function TextareaButton() {
-  const [photo1, setPhoto1] = useState(null);
-  const [photo2, setPhoto2] = useState(null);
+export function TextareaButton({ user, cust }) {
+  const [photo, setPhoto] = useState([]);
   const [message, setMessage] = useState("");
+  const [SLA, setSLA] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Count words safely
-  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
-  const maxWords = 200
+  const maxWords = 200;
+  const wordCount = message.trim().split(/\s+/).filter(Boolean).length;
+
+  const fileInputRef = useRef(null);
+
+  // Upload docs
+  const processAndUploadFile = async (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const img = new window.Image();
+          img.onload = async () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxWidth = 800;
+            const maxHeight = 600;
+            let { width, height } = img;
+
+            if (width > height && width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            } else if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const resizedImage = canvas.toDataURL("image/jpeg", 0.7);
+
+            const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/attachement`, {
+              method: "POST",
+              body: JSON.stringify({ image: resizedImage }),
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${Encrypt(user.tenantId)}`,
+                access: `${Encrypt(user._id)}`,
+              },
+            });
+
+            const response = await request.json();
+            resolve({ success: !!response.message });
+              setPhoto((prev) => [
+              ...prev,
+              ...response.data.map((url) => ({
+                _id: uuidv4(),
+                url
+              }))
+            ]);
+
+          };
+          img.src = e.target.result;
+        } catch (error) {
+          resolve({ success: false });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileSelect = async (event) => {
+    const files = Array.from(event.target.files);
+    const maxSize = 1024 * 1024; // 1MB
+
+    const validFiles = files.filter((file) => {
+      if (file.size > maxSize) {
+        ErrorMessage(`File "${file.name}" exceeds 1MB limit.`);
+        return false;
+      }
+      if (file.type === "application/pdf") {
+        ErrorMessage(`PDF files are not allowed: "${file.name}".`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      plsWait("Uploading...");
+      const results = await Promise.allSettled(
+        validFiles.map((file) => processAndUploadFile(file))
+      );
+
+      const successfulUploads = results.filter(
+        (r) => r.status === "fulfilled" && r.value.success
+      ).length;
+      const failedUploads = results.length - successfulUploads;
+
+      SuccessToast(
+        `Successfully uploaded ${successfulUploads} file(s). Failed: ${failedUploads}`
+      );
+    }
+  };
+
+  const handleSend = async () => {
+    if (wordCount === 0) return;
+    setLoading(true);
+
+    try {
+      plsWait("Creating new ticket...");
+      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/tickets/${Encrypt(cust)}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(user.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+        },
+        body: JSON.stringify({
+          message,
+          attachments: photo,
+          SLA,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.message) {
+        SuccessToast(result.message);
+        setMessage("");
+        setSLA("");
+        setPhoto([]);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      ErrorMessage(err.message || "Error submitting ticket:");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400">
-        <QuestionMarkCircleIcon className="h-6 w-6 text-white" />
-        Open a support ticket
+          <QuestionMarkCircleIcon className="h-6 w-6 text-white" />
+          Open a support ticket
         </Button>
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-sm">
         <DialogHeader>
-          <DialogTitle>
-            New Ticket
-          </DialogTitle>
+          <DialogTitle>New Ticket</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -1236,10 +1368,10 @@ export function TextareaButton() {
             placeholder="Type your message here (max 200 words)."
             value={message}
             onChange={(e) => {
-              const text = e.target.value
-              const words = text.trim().split(/\s+/).filter(Boolean)
+              const text = e.target.value;
+              const words = text.trim().split(/\s+/).filter(Boolean);
               if (words.length <= maxWords) {
-                setMessage(text)
+                setMessage(text);
               }
             }}
           />
@@ -1247,24 +1379,41 @@ export function TextareaButton() {
             {wordCount}/{maxWords} words
           </p>
 
+          <Select value={SLA} onValueChange={(val) => setSLA(val)}>
+            <SelectTrigger className="w-full bg-white/50">
+              <SelectValue placeholder="-- Choose Priority Level --" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Low">Low</SelectItem>
+              <SelectItem value="Medium">Medium</SelectItem>
+              <SelectItem value="High">High</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Hidden file input */}
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setPhoto1(e.target.files[0])}
-            className="border rounded p-2"
+            multiple
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileSelect}
           />
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setPhoto2(e.target.files[0])}
-            className="border rounded p-2"
-          />
+          <Button
+            type="button"
+            className="inline-flex items-center justify-center bg-gray-600 border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl w-full transition duration-200 ease-in-out text-xs"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <PaperClipIcon className="h-6 w-6 text-white" />
+            <span className="ml-2">Upload attachments</span>
+          </Button>
 
-          <Button disabled={wordCount === 0} >Send message</Button>
+          <Button onClick={handleSend} disabled={wordCount === 0 || loading}>
+            {loading ? "Creating ticket..." : "Create ticket"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-
