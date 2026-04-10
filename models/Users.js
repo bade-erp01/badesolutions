@@ -275,6 +275,10 @@ const EmployeSchema = new mongoose.Schema(
       default: false,
       type: Boolean,
     },
+    isHelpDeskOfficer:{
+      default: false,
+      type: Boolean,
+    },
     editCustomer: {
       default: false,
       type: Boolean,
