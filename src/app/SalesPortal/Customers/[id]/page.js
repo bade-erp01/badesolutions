@@ -1,8 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
@@ -11,7 +10,7 @@ import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../Functions/Functions";
-import { useState } from "react";
+import { useState, useEffect,useRef } from "react";
 import {
   PrinterIcon,
   WalletIcon,
@@ -48,9 +47,7 @@ import {
 } from "../../../../../Functions/Mics";
 import axios from "axios";
 import moment from "moment";
-import { useRouter } from "next/navigation";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { useEffect,useRef } from "react";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
@@ -232,7 +229,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
       Swal.close();
 
-      // 🖼️ Load and watermark image
+      // Load and watermark image
       const imageDataURL = await loadImageAsDataURL(
         userInfo.business.companyLogo,
         "B.A.D.E",
@@ -260,10 +257,10 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         42,
       );
 
-      // 🖼️ Logo
+      //  Logo
       doc.addImage(imageDataURL, "PNG", 150, 10, 35, 35);
 
-      // 📊 Table data
+      //  Table data
       const headers = [["#", "Reference No", "Date", "CR", "DR", "Balance"]];
       const rows = TransactionResult.map((tx, i) => [
         i + 1,
@@ -452,7 +449,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       const user = userInfo;
 
       // Avoid unnecessary template literals
-      const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${Encrypt(user.user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/requisition/new/${Encrypt(user.user._id)}`;
 
       // Await axios call directly
       const { data } = await axios.post(
@@ -467,15 +464,13 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
         navigation.push(
-          `/${router.auth}/${router.Tenant}/${
-            router.module
-          }/Forms/invoice/${Encrypt(data.result)}`,
+          `/`,
         );
       } else {
         Swal.fire({
           icon: "error",
           title: "Invoice Creation Error",
-          text: "Could not retrieve invoice ID for redirection.",
+          text: "Something went wrong.",
           confirmButtonText: "Close",
         });
       }
@@ -1216,6 +1211,8 @@ export function TextareaButton({ user, cust }) {
   const [message, setMessage] = useState("");
   const [SLA, setSLA] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter()
+
 
   const maxWords = 200;
   const wordCount = message.trim().split(/\s+/).filter(Boolean).length;
@@ -1339,6 +1336,7 @@ export function TextareaButton({ user, cust }) {
         setMessage("");
         setSLA("");
         setPhoto([]);
+        router.refresh()
       } else {
         throw new Error(result.error);
       }

@@ -54,7 +54,7 @@ export default function AccessControl({
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    UpdateEmployeeData(formData._id, e.target.name, e.target.checked);
+    UpdateEmployeeData(formData._id, e.target.name, e.target.checked,userInfo._id);
   };
 
   const handleChange2 = async (e) => {
@@ -1023,6 +1023,47 @@ export default function AccessControl({
             </div>
           </div>
 
+          <div className="flex gap-1" title={`${formData.firstName} will be responsible for support related issue.`}>
+            <div className="flex h-6 shrink-0 items-center ">
+              <div className="group grid size-4 grid-cols-1">
+                <input
+                  checked={formData.isHelpDeskOfficer || false}
+                  onChange={handleChange}
+                  id="isHelpDeskOfficer"
+                  name="isHelpDeskOfficer"
+                  type="checkbox"
+                  aria-describedby="isHelpDeskOfficer-description"
+                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                />
+                <svg
+                  fill="none"
+                  viewBox="0 0 14 14"
+                  className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
+                >
+                  <path
+                    d="M3 8L6 11L11 3.5"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-0 group-has-checked:opacity-100"
+                  />
+                  <path
+                    d="M3 7H11"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-0 group-has-indeterminate:opacity-100"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="text-sm/6 pr-1">
+              <label htmlFor="isHelpDeskOfficer" className="font-medium text-gray-900">
+                Help-Desk Officer
+              </label>
+            </div>
+          </div>
+
           <div className="flex gap-1" title={`${formData.firstName} will be able to perform full sales return`}>
             <div className="flex h-6 shrink-0 items-center ">
               <div className="group grid size-4 grid-cols-1">
@@ -1333,7 +1374,7 @@ export default function AccessControl({
             <div className="flex h-6 shrink-0 items-center">
               <div className="group grid size-4 grid-cols-1">
                 <input
-                  checked={formData.ReportUser || false}
+                  checked={formData.ReportUser}
                   onChange={handleChange}
                   id="ReportUser"
                   name="ReportUser"
@@ -1375,7 +1416,7 @@ export default function AccessControl({
 
         </div>
       </fieldset>
-      {/* moduar acces ReportUser*/}
+      {/* moduar acces */}
       <hr />
       <div className="mt-10 space-y-10 " title={`Assign view only access to ${formData.firstName} on Apps installed on business enviroment`}>
         <fieldset className="grid grid-cols-4">

@@ -13,7 +13,7 @@ export async function PATCH(request) {
     
     if (!id) {
       return new Response(
-        JSON.stringify({ error: "Missing ID parameter." }),
+        JSON.stringify({ error: "Missing parameter." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -27,7 +27,7 @@ export async function PATCH(request) {
     }
     
     await dbConnect("BadeAdmin");
-    const result = await Users.findByIdAndUpdate(new ObjectId(id), updateFields, { new: true });
+    const result = await Users.findByIdAndUpdate(id, updateFields, { new: true });
 
 
     if (!result) {
