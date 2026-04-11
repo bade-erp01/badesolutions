@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon,QueueListIcon,Square3Stack3DIcon } from "@heroicons/react/24/outline";
 import "animate.css";
 import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
@@ -38,11 +38,12 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
   const toggleSideNav = () => setIsOpen((prev) => !prev);
 
-  // Filter logic
-  const filteredData = Data.filter(
-    (item) =>
-      item?.Name?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.Username?.toLowerCase().includes(searchTerm.toLowerCase()),
-    ).sort((a, b) => a.Name?.trim().localeCompare(b.Name?.trim()));
+  const filteredData = Data.filter(item =>
+      Object.values(item).some(val =>
+        typeof val === "string" &&
+        val.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    ).sort((a, b) =>(a.Name ?? "").trim().localeCompare((b.Name ?? "").trim()) );
 
   return (
     <div className="relative flex flex-col min-h-[90dvh]">
@@ -81,6 +82,17 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <span className="text-xs">Products</span>
             </Link>
 
+            {navtitle === "Products" && (
+            <Link
+              href="/SalesPortal/reports"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                ${navtitle === "reports" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <Square3Stack3DIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Product Report</span>
+            </Link>
+            )}
+
             <Link
               href="/SalesPortal/Customers"
               className={`flex items-center gap-3 p-3 rounded-md transition 
@@ -101,6 +113,15 @@ export default function NavWrapper({ userData, data, navtitle }) {
             >
               <MapIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">My Route</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Requisitions"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                ${navtitle === "Requisitions" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <QueueListIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Requisitions</span>
             </Link>
             
             <TextareaButton/>
@@ -212,7 +233,7 @@ export function DialogDemo({userData}) {
     <Dialog>
       <form >
         <DialogTrigger asChild>
-          <Button variant="default" className="text-gray-200 border-gray-300 hover:bg-gray-500 w-full px-6 py-2">
+          <Button variant="default" className="flex items-center gap-3 p-3 rounded-md transition">
             <UserPlusIcon className="h-4 w-4 text-gray-200" />
             Add a new Lead
           </Button>
@@ -227,7 +248,7 @@ export function DialogDemo({userData}) {
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="name-1">Buseness Name</Label>
+              <Label htmlFor="name-1">Business Name</Label>
               <Input required id="name-1" name="Username" type="text" placeholder="ABC enterprises..."onChange={handleChange}
                 value={formData.Username || ""} />
             </Field>
@@ -367,7 +388,7 @@ export function TextareaButton() {
 
         const cloudinaryData = await cloudinaryRes.json()
         photoUrl = cloudinaryData.secure_url
-        console.log("Uploaded to Cloudinary:", photoUrl)
+        // console.log("Uploaded to Cloudinary:", photoUrl)
       }
 
       const formData = new FormData()
@@ -380,7 +401,7 @@ export function TextareaButton() {
       })
 
       const result = await response.json()
-      console.log("Report submitted:", result)
+      // console.log("Report submitted:", result)
 
       // Reset after success
       setMessage("")

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Nav1 from "@/app/Components/Nav1"
 import BackButton from "@/app/Components/BackBotton"
 import Footer2 from "@/app/Components/Footer2";
+import { Encrypt } from '../../../../../../../../Functions/Functions';
 
 export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
@@ -16,8 +17,8 @@ export default async function StoreLayout2({ params }) {
     const res = await axios.get(`${baseUrl}/api/Invoice/${decoy.draft}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${userData.business.tenantId}`,
-        dbConnect:`Bearer ${userData.business.rustyRoof}`,
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
       },
       next: { revalidate: 120 } // cache for 2 minutes
     });

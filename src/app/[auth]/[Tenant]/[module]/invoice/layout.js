@@ -43,7 +43,7 @@ export const metadata = {
 export default async function Employeelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const user = await EMPLOYEES.findByTenant(userData.business.tenantId).lean();
+  const user = await EMPLOYEES.findByTenant(userData.business.tenantId).select("-Apps").lean();
   const stringedUser = JSON.stringify(user);
   const parsedUser = JSON.parse(stringedUser);
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
@@ -66,7 +66,6 @@ export default async function Employeelayout({ children, params }) {
           <nav className="space-y-4">
             {userData?.user?.ReportUser && (
               <>
-              
               <SalesRportModal
               business={userData.business}
               baseUrl={baseUrl}

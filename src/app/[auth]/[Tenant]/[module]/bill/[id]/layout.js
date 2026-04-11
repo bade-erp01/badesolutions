@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import SingleInvoice from "./page";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
+import {Encrypt} from "../../../../../../../Functions/Functions";
 import axios from "axios";
 import { notFound } from "next/navigation";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
@@ -84,8 +85,8 @@ async function StoreLayoutContent({ params }) {
     const res = await axios.get(`${baseUrl}/api/Invoice/${Params.id}`, {
       headers: {
         "Content-Type": "application/json",
-        dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-        Authorization: `Bearer ${userInfo.business.tenantId}`,
+        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+        access: `${Encrypt(userInfo.user._id)}`,
       },
     });
 
@@ -94,12 +95,11 @@ async function StoreLayoutContent({ params }) {
     Inv = data.Inv || [];
     cust = data.cust || [];
   } catch (err) {
-    // return (
-    //   <div className="text-red-500 p-6">
-    //     Failed to load. Please try again later.
-    //   </div>
-    // );
-    throw new Error("Failed to load. Please try again later.")
+    return (
+      <div className="text-red-500 p-6">
+        Failed to load. Please try again later.
+      </div>
+    );
   }
 
  return (

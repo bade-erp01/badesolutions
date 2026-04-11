@@ -128,7 +128,7 @@ export default function Login({
   return (
     <div
       style={{
-        backgroundImage: "url('/bg.jpg')",
+        backgroundImage: "url('/kvistholt-photography-oZPwn40zCK4-unsplash.jpg')",
         backgroundAttachment: "fixed",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -234,7 +234,7 @@ export default function Login({
               </form>
               {/* Event Card */}
               <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 w-[340px] max-w-full flex flex-col gap-6 relative overflow-auto">
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full opacity-60 blur-2xl z-0" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-gray-700 to-gray-500 rounded-full opacity-60 blur-2xl z-0" />
 
                 <div className="flex justify-between gap-4 items-start relative z-10">
                   <div>
@@ -247,7 +247,7 @@ export default function Login({
                   </div>
                   <div className="relative z-10 text-sm text-gray-600 mt-2">
                     <div className="flex items-center gap-4">
-                      <span className="text-xs text-gray-500 font-medium">
+                      <span className="text-xs text-gray-900 font-medium">
                         {time} <br />
                         How&apos;s {location} today?
                       </span>
@@ -269,7 +269,7 @@ export default function Login({
             </div>
           ) : (
             <h3
-              className={`text-amber-950 font-semibold font-stretch-50% text-shadow-2xl text-2md`}
+              className={`text-white font-semibold font-stretch-50% text-shadow-2xl text-2md`}
             >
               Welcome Back {userInfo.firstName}..!!
             </h3>
@@ -278,8 +278,8 @@ export default function Login({
         {/* Decorative spheres and background */}
         <div className="absolute inset-0 -z-10 flex items-end justify-center">
           <div className="w-[420px] h-[420px] bg-gradient-to-br from-[#f5ede7] to-[#e7e3df] rounded-full absolute left-1/2 -translate-x-1/2 bottom-0 blur-2xl opacity-80" />
-          <div className="w-40 h-40 bg-gradient-to-br from-orange-200 to-orange-400 rounded-full absolute left-12 bottom-12 blur-xl opacity-70" />
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-300 rounded-full absolute right-20 bottom-24 blur-lg opacity-60" />
+          <div className="w-40 h-40 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full absolute left-12 bottom-12 blur-xl opacity-70" />
+          <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-300 rounded-full absolute right-20 bottom-24 blur-lg opacity-60" />
           <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full absolute left-32 bottom-32 blur-md opacity-50" />
         </div>
       </div>

@@ -464,7 +464,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
         navigation.push(
-          `/`,
+          `/SalesPortal/Requisitions/${Encrypt(data.result)}`,
         );
       } else {
         Swal.fire({
@@ -617,7 +617,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <Section title="Identity">
               <Grid>
                 <Input
-                  label="Name"
+                  label="Business Name"
                   name="Username"
                   value={formData.Username}
                   onChange={handleChange}

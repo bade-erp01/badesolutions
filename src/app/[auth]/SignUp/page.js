@@ -45,34 +45,16 @@ export default function SignUpPage() {
             backgroundImage: 'url("/adrian-sulyok-c_4eaGRDSVU-unsplash.jpg")',
             backgroundSize: "cover",
             backgroundPosition: "center",
-            filter: "grayscale(40%)",
+            filter: "grayscale(90%)",
             zIndex: -2,
           }}>
       <Nav1 />
-      <div className="min-h-screen flex items-center justify-center mb-4 animate__animated animate__zoomInDown">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-black/50 backdrop-blur-xs shadow-2xl p-4">
-          {/* Left Section: Illustration */}
-          <div className="flex justify-center">
-            <Image
-              src="/Julian_Burford-removebg-preview.png"
-              alt="Illustration"
-              width={400}
-              height={400}
-              priority={true}
-              quality={100}
-              loading="eager"
-              className="drop-shadow-xl transition-transform duration-500 hover:scale-105"
-            />
-          </div>
+      <div className="min-h-screen flex items-center justify-center mb-1 shadow-lg animate__animated animate__zoomInDown">
 
-          {/* Right Section: Sign-Up Form */}
-          <div className="w-full bg-gray-300 p-4 shadow-lg rounded-sm border-lg animate__animated animate__fadeInUpBig animate__delay-2s">
+          <div className="w-120 bg-gray-300/80 p-4 shadow-lg rounded-sm border-lg animate__animated animate__fadeInUpBig animate__delay-2s">
             <h1 className="text-2xl font-extrabold text-gray-800 mb-2 text-black">
               Sign up~{formData.plan} License
             </h1>
-            <p className="text-gray-600 mb-6 font-semibold text-xs text-black">
-              Business Automated Dynamic Enterprise [B.A.D.E]
-            </p>
 
             <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <input
@@ -82,7 +64,7 @@ export default function SignUpPage() {
                 value={formData.CompayName}
                 required
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
+                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
               />
               <input
                 type="email"
@@ -91,7 +73,7 @@ export default function SignUpPage() {
                 value={formData.email}
                 required
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
+                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
               />
               <input
                 type="tel"
@@ -100,7 +82,7 @@ export default function SignUpPage() {
                 value={formData.Tel}
                 required
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
+                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
               />
 
               <div>
@@ -113,12 +95,12 @@ export default function SignUpPage() {
                   placeholder="Referal Code"
                   value={formData.referalCode}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 hover:transition-transform duration-500 hover:scale-105 hover:shadow-md"
+                  className="w-full px-3 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
                 />
               </div>
 
               {formData.NumberOfUsers > 0 && (
-                <div className="text-lg font-semibold text-gray-800 mt-2">
+                <div className="text-md font-semibold text-black mt-2">
                   <p className="text-gray-700 text-black">
                     Total Due (incl. 7.5% VAT): ₦
                     {formData.totalAmount.toLocaleString()} (
@@ -130,7 +112,7 @@ export default function SignUpPage() {
               <div className="space-y-2">
                 <TermsAndConditionsLink BusinessPlan={formData.plan} />
 
-                <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+                <div className="bg-gray-50 border border-gray-200 rounded-md p-2">
                   <span className="text-gray-700">
                     Subsequent renewal fee will be
                   </span>
@@ -163,7 +145,7 @@ export default function SignUpPage() {
               )}
             </form>
           </div>
-        </div>
+        
       </div>
       <Footer1 />
     </div>

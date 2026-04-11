@@ -46,8 +46,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
         const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
           headers: {
             "Content-Type": "application/json",
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
-            Authorization: `Bearer ${userData.business.tenantId}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
           },
         });
 

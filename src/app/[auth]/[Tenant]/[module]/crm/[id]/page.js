@@ -7,7 +7,7 @@ import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import Image from "next/image";
 import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
-import InvoicePaymentForm from "@/app/Components/PaymentWithInv"
+import InvoicePaymentForm from "@/app/Components/PaymentWithInv";
 import {
   postPayment,
   pricelistSetter,
@@ -18,9 +18,9 @@ import { useState } from "react";
 import {
   PrinterIcon,
   WalletIcon,
-  CalendarDaysIcon
+  CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
-import DaySelector  from "@/app/Components/Datepicker";
+import DaySelector from "@/app/Components/Datepicker";
 
 import {
   plsWait,
@@ -33,8 +33,8 @@ import moment from "moment";
 import { useRouter } from "next/navigation";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { useEffect } from "react";
-import  AgingReportDownloader from "@/app/Components/Reports/SingleAging"
-import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin"
+import AgingReportDownloader from "@/app/Components/Reports/SingleAging";
+import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
@@ -44,7 +44,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const [isOpen2, setisOpen2] = useState(false);
   const [isOpen3, setisOpen3] = useState(false);
   const [isOpen4, setisOpen4] = useState(false);
-  const [isOpen5, setisOpen5] = useState(false)
+  const [isOpen5, setisOpen5] = useState(false);
   const [BalanceData, setBalanceData] = useState({
     Debt: Number(cust.Debt),
   });
@@ -199,7 +199,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
       const response = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
-          userInfo.user._id
+          userInfo.user._id,
         )}/${Encrypt(cust._id)}/${field}`,
         {
           method: "PATCH",
@@ -213,7 +213,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             Debt: value,
             creditLimit: value,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -228,7 +228,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       ErrorMessage(error.message);
     }
   };
- 
 
   let jsPDF;
   if (typeof window !== "undefined") {
@@ -302,10 +301,10 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`, 
+            access: `${Encrypt(userInfo.user._id)}`,
           },
           cache: "no-store", // Optional: disables caching for fresh data
-        }
+        },
       );
 
       const TransactionResult = await res.json();
@@ -319,7 +318,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       // 🖼️ Load and watermark image
       const imageDataURL = await loadImageAsDataURL(
         userInfo.business.companyLogo,
-        "B.A.D.E"
+        "B.A.D.E",
       );
 
       const doc = new jsPDF();
@@ -341,7 +340,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           maximumFractionDigits: 2,
         })}`,
         20,
-        42
+        42,
       );
 
       // 🖼️ Logo
@@ -425,12 +424,12 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           doc.text(
             `Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`,
             20,
-            pageHeight - 10
+            pageHeight - 10,
           );
           doc.text(
             `visit: badesolutions.com.ng`,
             pageWidth - 60,
-            pageHeight - 10
+            pageHeight - 10,
           );
           doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, {
             align: "center",
@@ -481,7 +480,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     return { month: monthLabel, amount: total };
   });
 
-
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
@@ -511,7 +509,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       plsWait("Submitting customer update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
-        cust._id
+        cust._id,
       )}`;
       // Await axios call directly
       const { data } = await axios.patch(url, formData, config);
@@ -529,7 +527,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
   const handleCreateInvoice = async () => {
     plsWait(
-      "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page."
+      "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page.",
     );
 
     try {
@@ -543,7 +541,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       const { data } = await axios.post(
         url,
         { customer: cust._id, whId: cust.location },
-        config
+        config,
       );
 
       // Handle response (redirect or update UI as needed)
@@ -554,7 +552,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         navigation.push(
           `/${router.auth}/${router.Tenant}/${
             router.module
-          }/Forms/invoice/${Encrypt(data.result)}`
+          }/Forms/invoice/${Encrypt(data.result)}`,
         );
       } else {
         Swal.fire({
@@ -570,11 +568,17 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     }
   };
 
-  const updateServiceLocation = async () =>{
-    try{
-      plsWait("Updating service location... Please wait ⏳ This may take a moment.");
+  const updateServiceLocation = async () => {
+    try {
+      plsWait(
+        "Updating service location... Please wait ⏳ This may take a moment.",
+      );
       const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(cust._id)}`;
-      const { data } = await axios.patch(url, { location: formData.location }, config);
+      const { data } = await axios.patch(
+        url,
+        { location: formData.location },
+        config,
+      );
       if (data && data.message) {
         SuccessToast(data.message);
         navigation.refresh();
@@ -584,7 +588,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     } catch (error) {
       ErrorMessage(error?.response?.data?.error || error.message);
     }
-  }
+  };
 
   return (
     <form
@@ -732,63 +736,64 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
             <>
-            <span
-              onClick={() =>
+              <span
+                onClick={() =>
                   postPayment(
                     Encrypt(cust._id),
                     `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-                    config
-                  )}
-              className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              aria-label="Register Payment"
-            >
-              <WalletIcon className="h-5 w-5 text-white" />
-              <span className="text-xs">Register Down Payment</span>
-            </span>
+                    config,
+                  )
+                }
+                className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                aria-label="Register Payment"
+              >
+                <WalletIcon className="h-5 w-5 text-white" />
+                <span className="text-xs">Register Down Payment</span>
+              </span>
 
-             {userInfo.business.subscriptionplan === "Standard" && (
-               <InvoicePaymentForm
-                customerId={Encrypt(cust._id)}
-                user={`${userInfo.user.firstName} ${userInfo.user.lastName}`}
-                config={config}
-                invoices={Sales.filter(
-                  inv => inv.billStatus !== "Cancelled" && inv.paymentMethod < inv.grandTotal
-                )}
-                baseUrl={EXPRESS_PRIVATE_URL}
-              />
-             )}
+              {userInfo.business.subscriptionplan === "Standard" && (
+                <InvoicePaymentForm
+                  customerId={Encrypt(cust._id)}
+                  user={`${userInfo.user.firstName} ${userInfo.user.lastName}`}
+                  config={config}
+                  invoices={Sales.filter(
+                    (inv) =>
+                      inv.billStatus !== "Cancelled" &&
+                      inv.paymentMethod < inv.grandTotal,
+                  )}
+                  baseUrl={EXPRESS_PRIVATE_URL}
+                />
+              )}
             </>
           )}
 
-           {userInfo.business.subscriptionplan === "Standard" && (
-
-            <AgingReportDownloader  
-                customer={cust} 
-                invoices={Sales} 
-                payments={data.transcations} 
-                Rep={() => {
-                  const salespers = salesPerson.find(
-                    (person) => person._id === cust.salesPerson
-                  );
-                  return salespers 
-                    ? `${salespers.firstName} ${salespers.lastName || ""}` 
-                    : "Unknown";
-                }} 
-              />
-
-            )}
-
+          {userInfo.business.subscriptionplan === "Standard" && (
+            <AgingReportDownloader
+              customer={cust}
+              invoices={Sales}
+              payments={data.transcations}
+              Rep={() => {
+                const salespers = salesPerson.find(
+                  (person) => person._id === cust.salesPerson,
+                );
+                return salespers
+                  ? `${salespers.firstName} ${salespers.lastName || ""}`
+                  : "Unknown";
+              }}
+            />
+          )}
 
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
         </div>
       </Section>
 
       {/* Sales Insight */}
-      <Section title={`📈 Month-on-Month Sales Insight for ${cust.Username}.`} className="lg:col-span-2">
-        <div
-          className=""
-        >
-          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]}/>
+      <Section
+        title={`📈 Month-on-Month Sales Insight for ${cust.Username}.`}
+        className="lg:col-span-2"
+      >
+        <div className="">
+          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]} />
         </div>
       </Section>
 
@@ -824,7 +829,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <Section title="Identity">
               <Grid>
                 <Input
-                  label="Name"
+                  label="Business Name"
                   name="Username"
                   value={formData.Username}
                   onChange={handleChange}
@@ -966,7 +971,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                         moment(cust.lastPayDate).isValid()
                           ? `🕒 Debt incurred: ${moment().diff(
                               moment(cust.lastPayDate),
-                              "days"
+                              "days",
                             )} day(s) ago`
                           : "✅ Not in Debt"}
                       </label>
@@ -1004,7 +1009,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                         moment(cust.lastPayDate).isValid()
                           ? `Debt incurred: ${moment().diff(
                               moment(cust.lastPayDate),
-                              "days"
+                              "days",
                             )} day(s) ago`
                           : "Not in Debt"}
                       </label>
@@ -1038,7 +1043,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                               // Ensure non-negative
                               if (e.target.value < 0) {
                                 ErrorMessage(
-                                  "Value less than 0 is not allowed"
+                                  "Value less than 0 is not allowed",
                                 );
                                 return (e.target.value = 0);
                               }
@@ -1150,12 +1155,17 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     onChange={handleChange}
                     className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
                   >
-                    <option value={cust.paymentTerms} className="italic bg-gray-200">
+                    <option
+                      value={cust.paymentTerms}
+                      className="italic bg-gray-200"
+                    >
                       {cust.paymentTerms || "Select one"}
                     </option>
                     <option value="Cash on Delivery">Cash on Delivery </option>
                     <option value="Credit customer">Credit customer</option>
-                    <option value="Payment before delivery">Payment before delivery</option>
+                    <option value="Payment before delivery">
+                      Payment before delivery
+                    </option>
                   </select>
                 </div>
                 <div>
@@ -1170,7 +1180,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   >
                     {(() => {
                       const bankJournal = data.Accounts.find(
-                        (person) => person._id === cust.BankJournal
+                        (person) => person._id === cust.BankJournal,
                       );
 
                       if (bankJournal) {
@@ -1239,7 +1249,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     {/* Show the current sales person as the first option if available */}
                     {(() => {
                       const salespers = salesPerson.find(
-                        (person) => person._id === cust.salesPerson
+                        (person) => person._id === cust.salesPerson,
                       );
                       if (salespers) {
                         return (
@@ -1276,7 +1286,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     {/* Show the current sales person as the first option if available */}
                     {(() => {
                       const Manager = salesPerson.find(
-                        (person) => person._id === cust.accountManager
+                        (person) => person._id === cust.accountManager,
                       );
                       if (Manager) {
                         return (
@@ -1314,7 +1324,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     {/* Show the current Service Warehouse */}
                     {(() => {
                       const location = data.wh.find(
-                        (location) => location._id === cust.location
+                        (location) => location._id === cust.location,
                       );
                       if (location) {
                         return (
@@ -1356,13 +1366,18 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     <option value="Land">Land</option>
                   </select>
                 </div>
-                {userInfo.user._id === cust.accountManager && (
+                {userInfo.user._id === cust.accountManager && userInfo.business.subscriptionplan === "Standard" && (
                   <div>
-                   <label className="block text-sm font-medium text-gray-700">
-                    Assign days /day for sale rep visit
-                  </label>
-                  <DaySelector useCase="RouteDays" userData={userInfo} baseUrl={EXPRESS_PRIVATE_URL} id={cust._id}/>
-                </div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Assign days /day for sale rep visit
+                    </label>
+                    <DaySelector
+                      useCase="RouteDays"
+                      userData={userInfo}
+                      baseUrl={EXPRESS_PRIVATE_URL}
+                      id={cust._id}
+                    />
+                  </div>
                 )}
               </Grid>
             </Section>
@@ -1375,9 +1390,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           onClick={() => setisOpen2(!isOpen2)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">
-            Ledger
-          </h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">Ledger</h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${
               isOpen2 ? "rotate-180" : ""
@@ -1479,7 +1492,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                             data={data.transcations}
                             page={`${cust.Username.substring(
                               0,
-                              8
+                              8,
                             )} transaction`}
                           />
                         </td>
@@ -1529,7 +1542,9 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           onClick={() => setisOpen3(!isOpen3)}
           className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
         >
-          <h2 className="text-base/7 font-semibold text-gray-900">Geo‑coordinates</h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">
+            Geo‑coordinates
+          </h2>
           <svg
             className={`w-5 h-5 transform transition-transform duration-300 ${
               isOpen3 ? "rotate-180" : ""
@@ -1622,81 +1637,83 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
       {/* help desk */}
       <div className="border rounded-lg overflow-hidden">
-              <span
-                onClick={() => setisOpen5(!isOpen5)}
-                className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
-              >
-                <h2 className="text-base/7 font-semibold text-gray-900">
-                  {data.SupportTicket?.length} Support Tickets
-                </h2>
-                <svg
-                  className={`w-5 h-5 transform transition-transform duration-300 ${
-                    isOpen5 ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        <span
+          onClick={() => setisOpen5(!isOpen5)}
+          className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+        >
+          <h2 className="text-base/7 font-semibold text-gray-900">
+            {data.SupportTicket?.length} Support Tickets
+          </h2>
+          <svg
+            className={`w-5 h-5 transform transition-transform duration-300 ${
+              isOpen5 ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </span>
+        <div
+          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+            isOpen5 ? "block" : "hidden"
+          }`}
+        >
+          <div
+            className="mt-5 max-h-96 overflow-y-auto space-y-4 p-2"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "#4B5563 transparent",
+            }}
+          >
+            {data.SupportTicket?.length > 0 ? (
+              data.SupportTicket.map((ticket, index) => (
+                <div
+                  key={index}
+                  className="text-xs border border-gray-200 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </span>
-              <div
-                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
-                  isOpen5 ? "block" : "hidden"
-                }`}
-              >
-                <div className="mt-10 max-h-96 overflow-y-auto space-y-4">
-                  {data.SupportTicket?.length > 0 ? (
-                    data.SupportTicket.map((ticket, index) => (
-                      <div
-                        key={index}
-                        className="text-xs border border-gray-200 rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-3">
-                            {/* Avatar/initials */}
-                            <div className="p-2 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                              {ticket.status}
-                            </div>
-                            <p className="text-xs text-gray-500">
-                              {ticket.TicketId}
-                            </p>
-                             <p className="text-xs text-gray-500">
-                                  {new Date(ticket.createdAt).toLocaleDateString()}
-                            </p>
-                            <div>
-                              {ticket.attachments.length > 0 && (
-                                <p className="text-xs text-gray-300">
-                                  {ticket.attachments.length} attachement
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          {/* sla level */}
-                          <div className="flex items-center">
-                              <div className={`text-gray-600`}>
-                                {ticket.SLA}
-                              </div>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                          {ticket.comment}
-                        </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-3">
+                      {/* Avatar/initials */}
+                      <div className="p-2 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                        {ticket.status}
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
-                      No new support ticket.
+                      <p className="text-xs text-gray-500">{ticket.TicketId}</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(ticket.createdAt).toLocaleDateString()}
+                      </p>
+                      <div>
+                        {ticket.attachments?.length > 0 && (
+                          <p className="text-xs text-gray-300">
+                            {ticket.attachments.length} attachement
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  )}
+                    {/* sla level */}
+                    <div className="flex items-center">
+                      <div className={`text-gray-600`}>{ticket.SLA}</div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                    {ticket.comment}
+                  </p>
                 </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
+                No new support ticket.
               </div>
-            </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {userInfo.user.editCustomer && (
         <div className="pt-4">
@@ -1821,89 +1838,3 @@ function Checkbox({ label, name, checked, onChange }) {
     </div>
   );
 }
-
-
-
-// schadcn chart
-// import { TrendingUp } from "lucide-react"
-// import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
-
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card"
-
-// import {
-//   ChartContainer,
-//   ChartLegend,
-//   ChartLegendContent,
-//   ChartTooltip,
-//   ChartTooltipContent,
-// } from "@/components/ui/chart"
-
-// const chartConfig = {
-//   desktop: {
-//     label: "Returns",
-//     color: "var(--chart-1)",
-//   },
-//   mobile: {
-//     label: "Sales",
-//     color: "var(--chart-2)",
-//   },
-// }
-
-// export function RadarChartComponent() {
-//   return (
-//     <Card>
-//       <CardHeader>
-//         <CardTitle>Radar Chart</CardTitle>
-//         <CardDescription>
-//           Showing performance comparison between Desktop and Mobile
-//         </CardDescription>
-//       </CardHeader>
-//       <CardContent>
-//         <ChartContainer 
-//            config={chartConfig} style={{ height: "350px",width:"350px" }} >
-//           <RadarChart
-//             data={[
-//               { subject: "Math", desktop: 120, mobile: 110 },
-//               { subject: "Science", desktop: 98, mobile: 130 },
-//               { subject: "English", desktop: 86, mobile: 90 },
-//               { subject: "History", desktop: 99, mobile: 85 },
-//               { subject: "Art", desktop: 85, mobile: 95 },
-//             ]}
-//           >
-//             <PolarGrid />
-//             <PolarAngleAxis dataKey="subject" />
-//             <Radar
-//               name="Desktop"
-//               dataKey="desktop"
-//               stroke={chartConfig.desktop.color}
-//               fill={chartConfig.desktop.color}
-//               fillOpacity={0.6}
-//             />
-//             <Radar
-//               name="Mobile"
-//               dataKey="mobile"
-//               stroke={chartConfig.mobile.color}
-//               fill={chartConfig.mobile.color}
-//               fillOpacity={0.6}
-//             />
-//             <ChartTooltip content={<ChartTooltipContent />} />
-//             <ChartLegend content={<ChartLegendContent />} />
-//           </RadarChart>
-//         </ChartContainer>
-//       </CardContent>
-//       <CardFooter>
-//         <p className="text-sm text-muted-foreground flex items-center gap-2">
-//           <TrendingUp className="h-4 w-4" />
-//           Data comparison for different subjects
-//         </p>
-//       </CardFooter>
-//     </Card>
-//   )
-// }

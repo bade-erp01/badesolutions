@@ -25,11 +25,11 @@ export default function Pricing() {
         <Nav1 />
                 {/* Header Section */}
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    <h1 className="text-lg md:text-lg font-bold text-gray-900 mb-4">
                        User friendly cloud based ERP to boost productivity.
                     </h1>
                     <p className="text-black/50 text-md mt-2 font-semibold tracking-wide">
-                        Trusted by forward-thinking individuals and businesses worldwide.
+                        Simple plans for growing teams worldwide.
                     </p>
                     <div className="w-full text-center mt-6">
                     <Marquee gradient={false} speed={40} className="w-full py-3">
@@ -64,7 +64,7 @@ export default function Pricing() {
                 <div className="grid grid-cols-1  md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                     {/* Personal Plan */}
                     <div className="bg-white shadow-lg rounded-lg p-6 text-center">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Basic License</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Basic</h3>
                          <p className="text-sm text-gray-700 mb-4">For SME&lsquo;S</p>
                         <div className="text-xl font-bold mb-2">₦2,500/ user / Month</div>
                         <button  onClick={()=>(router.push('/auth/SignUp?plan=Basic'))} className="w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
@@ -75,12 +75,13 @@ export default function Pricing() {
                             <li>Access Sales modules only</li>
                             <li>Limited Api Access</li>
                             <li>Default 4 Active users</li>
+                            <li>Email support</li>
                         </ul>
                     </div>
                     {/* Standard Plan */}
                     <div className="bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-lg rounded-lg p-6 text-center relative">
                         <span className="absolute top-4 right-4 bg-orange-500 text-xs font-bold px-2 py-1 rounded-full">MOST POPULAR</span>
-                        <h3 className="text-lg font-semibold mb-2">Standard License</h3>
+                        <h3 className="text-lg font-semibold mb-2">Standard</h3>
                         <p className="text-sm text-gray-300 mb-4">For freelancers & solopreneurs</p>
                         <div className="text-xl font-bold mb-2">₦4,000/ user / Month </div>
                         <button onClick={()=>(router.push('/auth/SignUp?plan=Standard'))} className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition">
@@ -92,16 +93,16 @@ export default function Pricing() {
                             <li>Api for Financial / Reporting Tools</li>
                             <li>Request Customized module</li>
                             <li>5G Wifi router (Aitel,MTN,Glo)</li>
-                            <li>Dedicated 3GB storage</li>
                             <li>Training / Support</li>
-                            <li>Access to Bade Accounting Modules</li>
+                            <li>Access to EXTRA Modules</li>
                             <li>Access to App Store</li>
                             <li>Default 6 Active users</li>
+                            <li>Email & Phone support</li>
                         </ul>
                     </div>
                     {/* Pro Plan */}
                     <div className="bg-white shadow-lg border-1 border-neutral-200 rounded-lg p-6 text-center">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Pro License</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Pro</h3>
                         <p className="text-sm text-gray-500 mb-4">For professionals & teams</p>
                         <button className="w-full bg-gray-900 text-white py-2 rounded-lg font-semibold hover:bg-gray-800 transition">
                         Contact Sales
@@ -112,13 +113,11 @@ export default function Pricing() {
                             <li>VPS (Virtual Private Server)</li>
                             <li>Customized Business Email</li>
                             <li>Priority support</li>
-                            <li>Unlimited Api Access</li>
                             <li>Google S.E.O</li>
-                            <li>Dedicated 32GB storage</li>
+                            <li>Dedicated CMS</li>
                             <li>Email & Phone support</li>
                             <li>Trained Business AI Model</li>
                             <li>Private Cloud Backup</li>
-                            <li>Dedicated cloud server</li>
                             <li>Api Support for Financial / Reporting Tools</li>
                             
                         </ul>

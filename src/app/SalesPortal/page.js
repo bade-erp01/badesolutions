@@ -149,67 +149,6 @@ export default function SalesPortalLanding() {
         </div>
       </section>
 
-      {/* Pricing CTA */}
-      <section id="pricing" className="bg-white py-16 px-6">
-        <div className="mx-auto max-w-5xl px-6">
-          <h3 className="text-center text-3xl font-bold text-slate-900">
-            Simple plans for growing teams
-          </h3>
-          <p className="mt-2 text-center text-slate-600">
-            No surprises. Upgrade any time.
-          </p>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                name: "Starter",
-                price: "$29/mo",
-                features: ["Basic analytics", "Email support", "1 user"],
-              },
-              {
-                name: "Pro",
-                price: "$79/mo",
-                features: [
-                  "Pipeline AI",
-                  "CRM sync",
-                  "5 users",
-                  "Priority support",
-                ],
-              },
-              {
-                name: "Enterprise",
-                price: "Custom",
-                features: [
-                  "Custom onboarding",
-                  "SLA",
-                  "Unlimited users",
-                  "Dedicated CSM",
-                ],
-              },
-            ].map((plan) => (
-              <article
-                key={plan.name}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-7 shadow-sm"
-              >
-                <h4 className="text-lg font-bold text-slate-900">
-                  {plan.name}
-                </h4>
-                <p className="mt-2 text-3xl font-extrabold text-slate-900">
-                  {plan.price}
-                </p>
-                <ul className="mt-4 space-y-2 text-sm text-slate-600">
-                  {plan.features.map((f) => (
-                    <li key={f}>• {f}</li>
-                  ))}
-                </ul>
-                <button className="mt-6 w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-slate-800">
-                  Choose
-                </button>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Footer */}
       <Footer2 />
     </div>
