@@ -38,12 +38,20 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
   const toggleSideNav = () => setIsOpen((prev) => !prev);
 
-  const filteredData = Data.filter(item =>
-      Object.values(item).some(val =>
-        typeof val === "string" &&
-        val.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    ).sort((a, b) =>(a.Name ?? "").trim().localeCompare((b.Name ?? "").trim()) );
+  let filteredData = [];
+
+  // Filter logic
+  if(navtitle === "Requisitions"){
+    filteredData = Data.filter(
+    (item) =>
+      item?.billStatus?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.billReferenceNo?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }else{
+    filteredData = Data.filter(
+     (item) =>
+       item?.Name?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.Username?.toLowerCase().includes(searchTerm.toLowerCase()),
+     ).sort((a, b) => a.Name?.trim().localeCompare(b.Name?.trim()));
+  }
 
   return (
     <div className="relative flex flex-col min-h-[90dvh]">
@@ -124,7 +132,6 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <span className="text-xs">Requisitions</span>
             </Link>
             
-            <TextareaButton/>
           </nav>
 
           {/* Logout pinned at bottom */}
@@ -355,112 +362,4 @@ export function Card ({ data, module }) {
 };
 
 
-// write a report
-export function TextareaButton() {
-  const [photo, setPhoto] = useState(null)
-  const [message, setMessage] = useState("")
-  const [loading, setLoading] = useState(false)
 
-  const maxWords = 200
-  const wordCount = message.trim().split(/\s+/).filter(Boolean).length
-
-  const handleSend = async () => {
-    if (wordCount === 0) return
-    setLoading(true)
-
-    try {
-
-       let photoUrl = null
-
-      // Upload to Cloudinary if photo exists
-      if (photo) {
-        const formData = new FormData()
-        formData.append("file", photo)
-        formData.append("upload_preset", "reports_upload")
-
-        const cloudinaryRes = await fetch(
-          "https://api.cloudinary.com/v1_1/dgiajxtvn/image/upload",
-          {
-            method: "POST",
-            body: formData,
-          }
-        )
-
-        const cloudinaryData = await cloudinaryRes.json()
-        photoUrl = cloudinaryData.secure_url
-        // console.log("Uploaded to Cloudinary:", photoUrl)
-      }
-
-      const formData = new FormData()
-      formData.append("message", message)
-      if (photo) formData.append("photo", photo)
-
-      const response = await fetch("/api/reports", {
-        method: "POST",
-        body: formData,
-      })
-
-      const result = await response.json()
-      console.log("Report submitted:", result)
-
-      // Reset after success
-      setMessage("")
-      setPhoto(null)
-    } catch (err) {
-      console.error("Error submitting report:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="default"
-          className="flex gap-3 p-4 rounded-md transition bg-gray-200/50 hover:bg-gray-700 w-full"
-        >
-          <PencilSquareIcon className="h-4 w-4 text-gray-200" />
-          Write a report
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent className="w-full max-w-sm">
-        <DialogHeader>
-          <DialogTitle>New Report</DialogTitle>
-        </DialogHeader>
-
-        <div className="grid gap-4">
-          <Textarea
-            placeholder="Type your message here (max 200 words)."
-            value={message}
-            onChange={(e) => {
-              const text = e.target.value
-              const words = text.trim().split(/\s+/).filter(Boolean)
-              if (words.length <= maxWords) {
-                setMessage(text)
-              }
-            }}
-          />
-          <p className="text-xs text-gray-500">
-            {wordCount}/{maxWords} words
-          </p>
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setPhoto(e.target.files[0])}
-            className="border rounded p-2"
-          />
-
-          <Button
-            onClick={handleSend}
-            disabled={wordCount === 0 || loading}
-          >
-            {loading ? "Sending..." : "Send message"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-}
