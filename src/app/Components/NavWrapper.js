@@ -401,7 +401,7 @@ export function TextareaButton() {
       })
 
       const result = await response.json()
-      // console.log("Report submitted:", result)
+      console.log("Report submitted:", result)
 
       // Reset after success
       setMessage("")
