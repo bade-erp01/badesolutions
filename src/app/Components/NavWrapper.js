@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Nav2 from "@/app/Components/Nav2";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
@@ -198,47 +198,88 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
 
 
-export function DialogDemo({userData}) {
-  const [formData, setFormData] = useState({salesPerson:userData.user._id});
-  const router = useRouter()
-   const handleChange = (e) => {
+export function DialogDemo({ userData }) {
+  const [formData, setFormData] = useState({ salesPerson: userData.user._id });
+  const router = useRouter();
+
+  // Auto-populate billingAddress + capture lat/lon
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const apiKey = "838e5f01c66d4d97a7334734fbd2e10a"; // your OpenCage key
+          const url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&no_annotations=1`;
+
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data.results.length > 0) {
+            const address = data.results[0].formatted;
+            setFormData((prev) => ({
+              ...prev,
+              billingAddress: address, // auto-fill address
+              latitude,              
+              longitude,              
+            }));
+          } else {
+            // still capture lat/lon even if no address found
+            setFormData((prev) => ({
+              ...prev,
+              latitude,
+              longitude,
+            }));
+          }
+        } catch (err) {
+          // fallback: just store lat/lon
+          setFormData((prev) => ({
+            ...prev,
+            latitude,
+            longitude,
+          }));
+        }
+      });
+    }
+  }, []);
+
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    
   };
-  
-    const handleSubmit = async (e) => {
-      try {
-        plsWait('Submiting customer data...');
-        const config = {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-          },
-        };
-  
-        const response = await axios.post(
-        `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      plsWait("Submitting customer data...");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: `${Encrypt(userData.user._id)}`,
+        },
+      };
+
+      const response = await axios.post(
+        `${process.env.EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
         formData,
         config
       );
 
-        SuccessToast(response.data?.message || "Customer created successfully!");
-        setFormData({});
-        router.push(`/SalesPortal/Customers/${response.data.newCustomer}`)
-        
-      } catch (error) {
-        ErrorMessage(
-          error.response?.data?.message ||
-            error.message ||
-            "Failed to create customer. Please try again."
-        );
-      }
-    };
+      SuccessToast(response.data?.message || "Customer created successfully!");
+      setFormData({});
+      router.push(`/SalesPortal/Customers/${response.data.newCustomer}`);
+    } catch (error) {
+      ErrorMessage(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create customer. Please try again."
+      );
+    }
+  };
 
   return (
     <Dialog>
-      <form >
+      <form onSubmit={handleSubmit}>
         <DialogTrigger asChild>
           <Button variant="default" className="flex items-center gap-3 p-3 rounded-md transition">
             <UserPlusIcon className="h-4 w-4 text-gray-200" />
@@ -249,53 +290,81 @@ export function DialogDemo({userData}) {
           <DialogHeader>
             <DialogTitle>Register customer profile</DialogTitle>
             <DialogDescription>
-              Creating a prospecting customer profile is as simple as ABC... just click save when you&apos;re
-              done.
+              Creating a prospecting customer profile is as simple as ABC... just click save when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
               <Label htmlFor="name-1">Business Name</Label>
-              <Input required id="name-1" name="Username" type="text" placeholder="ABC enterprises..."onChange={handleChange}
-                value={formData.Username || ""} />
+              <Input
+                required
+                id="name-1"
+                name="Username"
+                type="text"
+                placeholder="ABC enterprises..."
+                onChange={handleChange}
+                value={formData.Username || ""}
+              />
             </Field>
             <Field>
               <Label htmlFor="billingAddress">Office Address</Label>
-              <Input required placeholder="123 Main Street..."  id="billingAddress"
+              <Input
+                required
+                placeholder="123 Main Street..."
+                id="billingAddress"
                 name="billingAddress"
                 type="text"
-                rows="3"
                 onChange={handleChange}
-                value={formData.billingAddress || ""} />
+                value={formData.billingAddress || ""}
+              />
             </Field>
             <Field>
               <Label htmlFor="Email">Email</Label>
-              <Input id="Email" name="Email" type="email" placeholder="Abc@xyz.com" onChange={handleChange}
-                value={formData.Email || ""}/>
+              <Input
+                id="Email"
+                name="Email"
+                type="email"
+                placeholder="Abc@xyz.com"
+                onChange={handleChange}
+                value={formData.Email || ""}
+              />
             </Field>
             <Field>
               <Label htmlFor="phone">Telephone</Label>
-              <Input required id="phone" name="phone" type="tel" placeholder="+234 1234567"  onChange={handleChange}
-                value={formData.phone || ""}/>
+              <Input
+                required
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="+234 1234567"
+                onChange={handleChange}
+                value={formData.phone || ""}
+              />
             </Field>
             <Field>
               <Label htmlFor="ContactPerson">Contact person</Label>
-              <Input required id="ContactPerson" name="ContactPerson" placeholder="Pedro Duarte"  onChange={handleChange}
-                value={formData.ContactPerson || ""}/>
+              <Input
+                required
+                id="ContactPerson"
+                name="ContactPerson"
+                placeholder="Pedro Duarte"
+                onChange={handleChange}
+                value={formData.ContactPerson || ""}
+              />
             </Field>
-
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>Save changes</Button>
+            <Button type="submit">Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </form>
     </Dialog>
-  )
+  );
 }
+
 
 
 
