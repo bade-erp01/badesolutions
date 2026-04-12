@@ -134,10 +134,10 @@ const Card = ({ data, module }) => {
               </p>
             )}
             {data.firstName && (
-              <p variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs">
                 {data.status}
                 <Separator />
-              </p>
+              </Badge>
             )}
           </div>
         </div>
