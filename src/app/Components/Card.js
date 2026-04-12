@@ -134,7 +134,7 @@ const Card = ({ data, module }) => {
               </p>
             )}
             {data.firstName && (
-              <Badge variant="outline" className={`${data.status ==='suspended' && 'bg-amber-400'} text-xs`}>
+              <Badge variant="outline" className={`text-xs`}>
                 {data.status}
                 <Separator />
               </Badge>
