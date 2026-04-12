@@ -947,12 +947,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   value={formData.longitude || ""}
                   onChange={handleChange}
                 />
-                <Input
-                  label="Map Url"
-                  name="MapUrl"
-                  value={formData.MapUrl || ""}
-                  onChange={handleChange}
-                />
               </Grid>
             </Section>
 
