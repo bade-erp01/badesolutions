@@ -216,12 +216,25 @@ export function DialogDemo({ userData }) {
           const data = await res.json();
 
           if (data.results.length > 0) {
-            const address = data.results[0].formatted;
+            const comp = data.results[0].components;
+
+            // Build a robust address string
+            const house = comp.house_number || "";
+            const road = comp.road || "";
+            const suburb = comp.suburb || comp.neighbourhood || "";
+            const city = comp.city || comp.town || comp.village || "";
+            const state = comp.state || "";
+            const country = comp.country || "";
+
+            const address = [house, road, suburb, city, state, country]
+              .filter(Boolean)
+              .join(", ");
+
             setFormData((prev) => ({
               ...prev,
-              billingAddress: address, // auto-fill address
-              latitude,              
-              longitude,              
+              billingAddress: address || data.results[0].formatted,
+              latitude,
+              longitude,
             }));
           } else {
             // still capture lat/lon even if no address found
@@ -232,6 +245,7 @@ export function DialogDemo({ userData }) {
             }));
           }
         } catch (err) {
+          console.error("Error reverse geocoding:", err);
           // fallback: just store lat/lon
           setFormData((prev) => ({
             ...prev,
