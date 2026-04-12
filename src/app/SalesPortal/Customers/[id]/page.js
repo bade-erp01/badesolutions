@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogClose,
@@ -49,6 +50,7 @@ import axios from "axios";
 import moment from "moment";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
+import Link from "next/link"
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
@@ -735,12 +737,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   value={formData.longitude || ""}
                   onChange={handleChange}
                 />
-                <Input
-                  label="Map Url"
-                  name="MapUrl"
-                  value={formData.MapUrl || ""}
-                  onChange={handleChange}
-                />
+                <GpsLocationButton cust={cust}/>
               </Grid>
             </Section>
 
@@ -1032,20 +1029,18 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               <div className="w-full h-96 rounded-lg overflow-hidden shadow-md">
                 {cust.latitude && cust.longitude ? (
                   <iframe
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cust.latitude},${cust.longitude}`}
-                    allowFullScreen=""
+                    title="Customer Location"
+                    src={`https://www.google.com/maps?q=${cust.latitude},${cust.longitude}&z=15&output=embed`}
+                    className="w-full h-full"
                     loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  ></iframe>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-center">
-                      📍 No location coordinates available for this customer
-                    </p>
-                  </div>
+                  <iframe
+                    title="Customer Location"
+                    src={`https://maps.google.com/maps?q=${cust.state}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    className="w-full h-full"
+                    loading="lazy"
+                  ></iframe>
                 )}
               </div>
             </div>
@@ -1413,5 +1408,26 @@ export function TextareaButton({ user, cust }) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+
+export function GpsLocationButton({cust}) {
+  const handleClick = () => {
+    window.location.href = "";
+  };
+
+  return (
+    <div className="flex flex-col items-start gap-2">
+      <Label htmlFor="gps-button">Ensure you are in {cust.Username}'s Location before using this feature.</Label>
+      <Link
+        variant="default"
+        className="flex items-center gap-2 p-3 rounded-md transition bg-gray-600 w-full text-white"
+        href={`https://www.gps-coordinates.net/my-location`}
+        target="blank"
+      >
+        Get My Geo‑coordinates
+      </Link>
+    </div>
   );
 }

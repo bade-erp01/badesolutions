@@ -9,7 +9,7 @@ import MainDash from "@/app/Components/MainDash";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
 import { useState } from "react";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,PencilSquareIcon } from "@heroicons/react/24/outline";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,PencilSquareIcon,Square3Stack3DIcon,QueueListIcon } from "@heroicons/react/24/outline";
 import {
   Dialog,
   DialogClose,
@@ -78,11 +78,6 @@ export default function TenantPage({ userData }) {
     }, ${name}.`;
   };
 
-  const companySlug = userData?.business?.companyName
-    ?.toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-
   return (
     <div className="relative flex flex-col bg-gray-100 min-h-screen">
       <nav className="sticky top-0 z-20 backdrop-blur w-full bg-[#fcfcfcda] p-2 shadow-xs shadow-gray-400 border-b border-slate-200">
@@ -142,40 +137,48 @@ export default function TenantPage({ userData }) {
           </div>
           <hr className="border-gray-600 mb-4" />
 
-          {/* Navigation links */}
+          {/* Navigation links bg-gray-200/50*/}
           <nav className="w-full space-y-2">
+          <Link
+            href={`#`}
+            className={"flex items-center gap-3 p-3 rounded-md bg-gray-200 text-gray-700 transition "}
+          >
+            <PresentationChartLineIcon class="h-6 w-6 text-gray-700" />
+            <span className="text-xs">Dashboard</span>
+          </Link>
+          
             <Link
-              href={`/SalesPortal/Dashboard`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition bg-gray-200/50"
+              href="/SalesPortal/Products"
+              className={`flex items-center gap-3 p-3 rounded-md transition`}
             >
-              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Dashboard</span>
-            </Link>
-
-            <Link
-              href={`/SalesPortal/Products`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "
-            >
-              <CubeIcon class="h-6 w-6 text-gray-100" />
+              <CubeIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">Products</span>
             </Link>
 
             <Link
-              href={`/SalesPortal/Customers`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              href="/SalesPortal/Customers"
+              className={`flex items-center gap-3 p-3 rounded-md transition`}
             >
-             <UserGroupIcon class="h-6 w-6 text-gray-100" />
+              <UserGroupIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">My customers</span>
             </Link>
 
             <Link
-              href={`/SalesPortal/Route`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              href="/SalesPortal/Route"
+              className={`flex items-center gap-3 p-3 rounded-md transition`}
             >
-              <MapIcon class="h-6 w-6 text-gray-100" />
+              <MapIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">My Route</span>
             </Link>
-            <TextareaButton/>
+
+            <Link
+              href="/SalesPortal/Requisitions"
+              className={`flex items-center gap-3 p-3 rounded-md transition`}
+            >
+              <QueueListIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Requisitions</span>
+            </Link>
+            
           </nav>
 
           {/* Logout pinned at bottom */}

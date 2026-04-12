@@ -90,11 +90,11 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <span className="text-xs">Products</span>
             </Link>
 
-            {navtitle === "Products" && (
+            {navtitle === "Products" || navtitle === "Reports" && (
             <Link
-              href="/SalesPortal/reports"
+              href="/SalesPortal/Reports"
               className={`flex items-center gap-3 p-3 rounded-md transition 
-                ${navtitle === "reports" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+                ${navtitle === "Reports" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
             >
               <Square3Stack3DIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">Product Report</span>
@@ -321,16 +321,15 @@ export function DialogDemo({ userData }) {
               />
             </Field>
             <Field>
-              <Label htmlFor="billingAddress">Office Address</Label>
-              <Input
-                required
-                placeholder="123 Main Street..."
-                id="billingAddress"
-                name="billingAddress"
-                type="text"
-                onChange={handleChange}
-                value={formData.billingAddress || ""}
-              />
+            <Label htmlFor="billingAddress">Office Address</Label>
+            <Textarea
+              required
+              placeholder="123 Main Street..."
+              id="billingAddress"
+              name="billingAddress"
+              onChange={handleChange}
+              value={formData.billingAddress || ""}
+            />
             </Field>
             <Field>
               <Label htmlFor="Email">Email</Label>
