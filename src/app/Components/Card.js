@@ -121,7 +121,7 @@ const Card = ({ data, module }) => {
                 <Separator />
               </Badge>
             )}
-            {data.status && (
+            {data.Debt && (
               <p variant="outline" className="text-xs">
                 {data.Debt > 0 ? `Owes: $${data.Debt}` : "No Debt"}
                 <Separator />
