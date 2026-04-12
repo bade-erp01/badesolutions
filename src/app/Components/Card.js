@@ -104,10 +104,10 @@ const Card = ({ data, module }) => {
               </>
             )}
             {data.Email && (
-              <Badge variant="outline" className="text-xs">
+              <p variant="outline" className="text-xs">
                 {data.Email}
                 <Separator />
-              </Badge>
+              </p>
             )}
             {data.CustomerCode && (
               <Badge variant="secondary" className="text-xs">
@@ -115,11 +115,17 @@ const Card = ({ data, module }) => {
                 <Separator />
               </Badge>
             )}
-            {data.status && (
-              <Badge variant="outline" className="text-xs">
-                {data.Debt > 0 ? `Owes: $${data.Debt}` : "No Debt"}
+            {data.ADCcode || data.ACDcode && (
+              <Badge variant="secondary" className="text-xs">
+                {data.ADCcode || data.ACDcode}
                 <Separator />
               </Badge>
+            )}
+            {data.status && (
+              <p variant="outline" className="text-xs">
+                {data.Debt > 0 ? `Owes: $${data.Debt}` : "No Debt"}
+                <Separator />
+              </p>
             )}
           </div>
         </div>
