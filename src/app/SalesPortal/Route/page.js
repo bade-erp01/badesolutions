@@ -149,7 +149,7 @@ export default function Page({ userInfo, data }) {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-xl font-bold mb-2">
+      <h2 className="text-sm font-bold mb-2">
         {moment().format("dddd")}s Route Plan
       </h2>
 
