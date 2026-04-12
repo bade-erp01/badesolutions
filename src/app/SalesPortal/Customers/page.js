@@ -70,7 +70,7 @@ export default async function layout({ children }) {
 
   let Array = [];
   try {
-    const res = await fetch(`${baseUrl}/api/crm`, {
+    const res = await fetch(`${baseUrl}/api/Sales_Portal/Route/${Encrypt(userData?.user._id)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -87,9 +87,7 @@ export default async function layout({ children }) {
   }
 
   return (
-    <NavWrapper userData={userData} navtitle="Customers" data={Array.filter(
-    (item) =>
-      (item.salesPerson === userData?.user?._id))}>
+    <NavWrapper userData={userData} navtitle="Customers" data={Array.customers}>
       {children}
       <SubscriptionReminder Business={userData?.business} />
       <BirthdayGreetings Business={userData?.business} user={userData?.user} />

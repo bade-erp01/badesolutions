@@ -1576,17 +1576,18 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     width="100%"
                     height="100%"
                     frameBorder="0"
-                    src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cust.latitude},${cust.longitude}`}
+                    src={`https://www.google.com/maps?q=${cust.latitude},${cust.longitude}&z=15&output=embed`}
                     allowFullScreen=""
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500 text-center">
-                      📍 No location coordinates available for this customer
-                    </p>
-                  </div>
+                  <iframe
+                    title="Customer Location"
+                    src={`https://maps.google.com/maps?q=${cust.state}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    className="w-full h-full"
+                    loading="lazy"
+                  />
                 )}
               </div>
             </div>
