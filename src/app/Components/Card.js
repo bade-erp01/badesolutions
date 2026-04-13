@@ -109,12 +109,6 @@ const Card = ({ data, module }) => {
                 <Separator />
               </p>
             )}
-            {data.email && (
-              <p variant="outline" className="text-xs">
-                {data.email}
-                <Separator />
-              </p>
-            )}
             {data.CustomerCode && (
               <Badge variant="secondary" className="text-xs">
                 {data.CustomerCode}
@@ -129,13 +123,13 @@ const Card = ({ data, module }) => {
             )}
             {data.Debt > 0  && (
               <p variant="outline" className="text-xs">
-                {data.Debt > 0 ? `Owes: ${data.Debt}` : "No Debt"}
+                {`Owes: ${data.Debt.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}`}
                 <Separator />
               </p>
             )}
             {data.firstName && (
-              <span variant="outline" className={`${data.status ==='suspended' ? 'bg-amber-400':"bg-green-300"} p-1 text-xs rounded-md`}>
-                {data.status}
+              <span variant="outline" className={`${data.status ==='suspended' ? 'bg-amber-300':"bg-green-300"} p-1 text-xs rounded-md`}>
+                {data.status ==='suspended' ? "Inactive" : data.status}
               </span>
             )}
           </div>
