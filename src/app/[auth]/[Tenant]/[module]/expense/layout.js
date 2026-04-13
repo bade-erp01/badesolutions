@@ -7,7 +7,8 @@ import { TagIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import ExpenseCategoryModal from "@/app/Components/CreateExpenseCat";
-import ExpenseCategoriesModal from "@/app/Components/expensecateTable"
+import ExpenseCategoriesModal from "@/app/Components/expensecateTable";
+import ExpensesPage from "./page"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -67,13 +68,14 @@ export default async function ExpenseLayout({ children, params }) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userData.business.tenantId}`,
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
       },
       next: {
         revalidate: 120,
       },
     }),
+
   ]);
 
   const catList = await cat.json();
@@ -116,7 +118,7 @@ export default async function ExpenseLayout({ children, params }) {
               {userData?.user?.expenseManager && (
                   <>
                   {/* show tags  */}
-                  <ExpenseCategoriesModal data={catList} baseUrl={baseUrl} userData={userData} />
+                  <ExpenseCategoriesModal data={catList || []} baseUrl={baseUrl} userData={userData} />
 
                   {/* create tags */}
                   <ExpenseCategoryModal baseUrl={baseUrl} userData={userData} />
@@ -128,10 +130,9 @@ export default async function ExpenseLayout({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative z-10 max-h-[82dvh] overflow-y-auto">
-              {/* display Charts of accounts */}
-              {children}
-            </section>
+           <section className="w-full max-w-7xl flex flex-col gap-6 rounded-lg  relative z-10 h-[83vh] overflow-y-auto">
+            <ExpensesPage baseUrl={baseUrl} userData={userData} />
+          </section>
           </main>
         </div>
 

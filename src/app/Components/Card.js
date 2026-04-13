@@ -126,6 +126,11 @@ const Card = ({ data, module }) => {
                 {data.status ==='suspended' ? "Inactive" : data.status}
               </span>
             )}
+            {data.refNo && (
+              <span variant="outline" className={`${data.status ==='Approved' ? 'bg-green-300':"bg-amber-300"} p-1 text-xs rounded-md`}>
+                {data.status}
+              </span>
+            )}
           </div>
         </div>
       </HoverCardContent>
