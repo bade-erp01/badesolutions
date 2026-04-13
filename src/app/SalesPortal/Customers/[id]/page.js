@@ -10,7 +10,7 @@ import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../Functions/Functions";
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   PrinterIcon,
   WalletIcon,
@@ -50,7 +50,7 @@ import axios from "axios";
 import moment from "moment";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
-import Link from "next/link"
+import Link from "next/link";
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
@@ -465,9 +465,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       if (data && data.result) {
         // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        navigation.push(
-          `/SalesPortal/Requisitions/${Encrypt(data.result)}`,
-        );
+        navigation.push(`/SalesPortal/Requisitions/${Encrypt(data.result)}`);
       } else {
         Swal.fire({
           icon: "error",
@@ -555,7 +553,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             <span className="text-xs">Print Statement</span>
           </span>
 
-          <TextareaButton user={userInfo.user} cust={cust._id}/>
+          <TextareaButton user={userInfo.user} cust={cust._id} />
 
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
             <>
@@ -737,7 +735,20 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   value={formData.longitude || ""}
                   onChange={handleChange}
                 />
-                <GpsLocationButton cust={cust}/>
+                <div className="flex flex-col items-start gap-2">
+                  <Label htmlFor="gps-button">
+                    Ensure you are in {cust.Username}'s Location before using
+                    this feature.
+                  </Label>
+                  <Link
+                    variant="default"
+                    className="flex items-center gap-2 p-3 rounded-md transition bg-gray-600 w-full text-white"
+                    href={`https://www.gps-coordinates.net/my-location`}
+                    target="blank"
+                  >
+                    Get My Geo‑coordinates
+                  </Link>
+                </div>
               </Grid>
             </Section>
 
@@ -1206,8 +1217,7 @@ export function TextareaButton({ user, cust }) {
   const [message, setMessage] = useState("");
   const [SLA, setSLA] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter()
-
+  const router = useRouter();
 
   const maxWords = 200;
   const wordCount = message.trim().split(/\s+/).filter(Boolean).length;
@@ -1242,26 +1252,28 @@ export function TextareaButton({ user, cust }) {
 
             const resizedImage = canvas.toDataURL("image/jpeg", 0.7);
 
-            const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/attachement`, {
-              method: "POST",
-              body: JSON.stringify({ image: resizedImage }),
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-                access: `${Encrypt(user._id)}`,
+            const request = await fetch(
+              `${EXPRESS_PRIVATE_URL}/api/attachement`,
+              {
+                method: "POST",
+                body: JSON.stringify({ image: resizedImage }),
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${Encrypt(user.tenantId)}`,
+                  access: `${Encrypt(user._id)}`,
+                },
               },
-            });
+            );
 
             const response = await request.json();
             resolve({ success: !!response.message });
-              setPhoto((prev) => [
+            setPhoto((prev) => [
               ...prev,
               ...response.data.map((url) => ({
                 _id: uuidv4(),
-                url
-              }))
+                url,
+              })),
             ]);
-
           };
           img.src = e.target.result;
         } catch (error) {
@@ -1291,16 +1303,16 @@ export function TextareaButton({ user, cust }) {
     if (validFiles.length > 0) {
       plsWait("Uploading...");
       const results = await Promise.allSettled(
-        validFiles.map((file) => processAndUploadFile(file))
+        validFiles.map((file) => processAndUploadFile(file)),
       );
 
       const successfulUploads = results.filter(
-        (r) => r.status === "fulfilled" && r.value.success
+        (r) => r.status === "fulfilled" && r.value.success,
       ).length;
       const failedUploads = results.length - successfulUploads;
 
       SuccessToast(
-        `Successfully uploaded ${successfulUploads} file(s). Failed: ${failedUploads}`
+        `Successfully uploaded ${successfulUploads} file(s). Failed: ${failedUploads}`,
       );
     }
   };
@@ -1311,19 +1323,22 @@ export function TextareaButton({ user, cust }) {
 
     try {
       plsWait("Creating new ticket...");
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/tickets/${Encrypt(cust)}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/tickets/${Encrypt(cust)}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(user.tenantId)}`,
+            access: `${Encrypt(user._id)}`,
+          },
+          body: JSON.stringify({
+            message,
+            attachments: photo,
+            SLA,
+          }),
         },
-        body: JSON.stringify({
-          message,
-          attachments: photo,
-          SLA,
-        }),
-      });
+      );
 
       const result = await response.json();
       if (result.message) {
@@ -1331,7 +1346,7 @@ export function TextareaButton({ user, cust }) {
         setMessage("");
         setSLA("");
         setPhoto([]);
-        router.refresh()
+        router.refresh();
       } else {
         throw new Error(result.error);
       }
@@ -1408,26 +1423,5 @@ export function TextareaButton({ user, cust }) {
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-
-export function GpsLocationButton({cust}) {
-  const handleClick = () => {
-    window.location.href = "";
-  };
-
-  return (
-    <div className="flex flex-col items-start gap-2">
-      <Label htmlFor="gps-button">Ensure you are in {cust.Username}'s Location before using this feature.</Label>
-      <Link
-        variant="default"
-        className="flex items-center gap-2 p-3 rounded-md transition bg-gray-600 w-full text-white"
-        href={`https://www.gps-coordinates.net/my-location`}
-        target="blank"
-      >
-        Get My Geo‑coordinates
-      </Link>
-    </div>
   );
 }
