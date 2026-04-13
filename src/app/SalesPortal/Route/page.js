@@ -87,7 +87,7 @@ function CustomerCard({ customer, index, today }) {
 
               <div className="flex items-center gap-2">
                 <span className="font-medium">Address:</span>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className={`truncate w-48`}>
                   {customer.deliveryAddress || customer.billingAddress}
                 </Badge>
               </div>
