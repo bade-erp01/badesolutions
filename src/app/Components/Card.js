@@ -109,17 +109,11 @@ const Card = ({ data, module }) => {
                 <Separator />
               </p>
             )}
-            {data.CustomerCode && (
-              <Badge variant="secondary" className="text-xs">
-                {data.CustomerCode}
-                <Separator />
-              </Badge>
-            )}
             {data.ADCcode || data.ACDcode && (
-              <Badge variant="secondary" className="text-xs">
+              <span variant="secondary" className="text-xs p-1 bg-blue-300 rounded-md">
                 {data.ADCcode || data.ACDcode}
                 <Separator />
-              </Badge>
+              </span>
             )}
             {data.Debt > 0  && (
               <p variant="outline" className="text-xs">
