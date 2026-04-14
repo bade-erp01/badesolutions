@@ -6,6 +6,9 @@ import Nav1 from "@/app/Components/Nav1"
 import BackButton from "@/app/Components/BackBotton"
 import Footer2 from "@/app/Components/Footer2";
 import { Encrypt } from '../../../../../../../../Functions/Functions';
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+
 
 export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
@@ -62,6 +65,8 @@ export default async function StoreLayout2({ params }) {
                  }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}
                 </ul>
                </div>
+               <Separator className="my-4 border-gray-700" />
+                <ProgressDemo count={data.Inv.orders?.length || 0} />
              </nav>
             </aside>
        
@@ -80,4 +85,19 @@ export default async function StoreLayout2({ params }) {
   } catch (error) {
     return notFound(); // Or show a more graceful error component if you prefer
   }
+}
+
+
+export function ProgressDemo({count}) {
+
+  return (
+    <div className="w-full max-w-md mx-auto space-y-4">
+      <h2 className="text-md font-semibold">{200 - count} Order available </h2>
+      <Progress value={(count / 200) * 100} className="h-4  [&>div]:bg-yellow-500" />
+      <p className="text-sm text-gray-200">
+        {count} / 200 orders added to this invoice.
+      </p>
+
+    </div>
+  );
 }
