@@ -1425,7 +1425,7 @@ export function MyComponent({ cust, userInfo }) {
   const router = useRouter();
   const handleCreateInvoice = async () => {
     try {
-      plsWait("Generating stock position card...");
+      plsWait("Generating stock card...");
       const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/position/new`, {
         method: "POST",
         headers: {
@@ -1442,10 +1442,10 @@ export function MyComponent({ cust, userInfo }) {
 
       const data = await response.json();
 
-      SuccessToast("Invoice created successfully!");
+      SuccessToast("Redirecting!");
       router.push(`/SalesPortal/Reports/${Encrypt(data.invoiceId)}`);
     } catch (error) {
-      ErrorToast("Error creating new template for stock position card");
+      ErrorToast("Error creating new template for stock card");
       router.refresh()
     }
   };
