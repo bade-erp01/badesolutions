@@ -46,6 +46,11 @@ export default function NavWrapper({ userData, data, navtitle }) {
     (item) =>
       item?.billStatus?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.billReferenceNo?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
+  }else if (navtitle === "Reports"){
+    filteredData = Data.filter(
+      (item) =>
+        item?.Ref?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.status?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
   }else{
     filteredData = Data.filter(
      (item) =>
@@ -90,7 +95,6 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <span className="text-xs">Products</span>
             </Link>
 
-            {navtitle === "Products" || navtitle === "Reports" && (
             <Link
               href="/SalesPortal/Reports"
               className={`flex items-center gap-3 p-3 rounded-md transition 
@@ -99,7 +103,6 @@ export default function NavWrapper({ userData, data, navtitle }) {
               <Square3Stack3DIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">Product Report</span>
             </Link>
-            )}
 
             <Link
               href="/SalesPortal/Customers"
@@ -397,6 +400,7 @@ export function Card ({ data, module }) {
     data.CustomerCode ||
     data.paymentReferenceNo ||
     data.accountName ||
+    data.Ref ||
     data.refNo ||
     `${data.billStatus}/${data.billReferenceNo}`;
 

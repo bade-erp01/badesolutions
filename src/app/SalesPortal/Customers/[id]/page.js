@@ -535,14 +535,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               </span>
             )}
 
-          <span
-            onClick={handleCreateInvoice}
-            className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
-            aria-label="Create Invoice"
-          >
-            <CameraIcon className="h-5 w-5 text-white" />
-            <span className="text-xs">Capture stock level</span>
-          </span>
+          <MyComponent cust={cust} userInfo={userInfo} />
 
           <span
             onClick={() => GenerateSummary(Encrypt(cust._id))}
@@ -1425,3 +1418,48 @@ export function TextareaButton({ user, cust }) {
     </Dialog>
   );
 }
+
+
+
+export function MyComponent({ cust, userInfo }) {
+  const router = useRouter();
+  const handleCreateInvoice = async () => {
+    try {
+      plsWait("Generating stock position card...");
+      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/position/new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userInfo.user.tenantId)}`,
+          access: `${Encrypt(userInfo.user._id)}`,
+        },
+        body: JSON.stringify({ leadId:Encrypt(cust._id)}),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      SuccessToast("Invoice created successfully!");
+      router.push(`/SalesPortal/Reports/${Encrypt(data.invoiceId)}`);
+    } catch (error) {
+      ErrorToast("Error creating new template for stock position card");
+      router.refresh()
+    }
+  };
+
+  return (
+    <span
+      onClick={handleCreateInvoice}
+      className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
+      aria-label="Create Invoice"
+    >
+      <CameraIcon className="h-5 w-5 text-white" />
+      <span className="text-xs">Capture stock level</span>
+    </span>
+  );
+}
+
+

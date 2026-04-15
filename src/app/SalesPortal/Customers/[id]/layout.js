@@ -89,7 +89,11 @@ export default async function layout({ params }) {
       data = await res.json();
     }
   } catch (err) {
-    throw new Error("Failed to fetch product data");
+    return(
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500 text-lg">Failed to load customer data. Please try again later.</p>
+      </div>
+    );
   }
   return (
     <div className="">
