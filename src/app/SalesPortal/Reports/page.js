@@ -1,0 +1,97 @@
+import React from "react";
+import { fetchUser } from "../../../../Functions/whoIsSalesPerson";
+import { redirect } from "next/navigation";
+import NavWrapper from "@/app/Components/NavWrapper";
+import SubscriptionReminder from "@/app/Components/SubscritionReminder";
+import BirthdayGreetings from "@/app/Components/BithdayToast";
+import {Encrypt,Dencrypt} from "../../../../Functions/Functions"
+
+export const metadata = {
+  title: "B.A.D.E ERP Platform",
+  description:
+    "Configure and manage your stores with B.A.D.E — Nigeria’s leading AI-powered ERP solution for businesses of all sizes. Built for scalability, automation, and real-time insights.",
+  keywords: [
+    "Store Management",
+    "ERP Nigeria",
+    "Business Automation",
+    "B.A.D.E",
+    "AI ERP",
+    "Retail Optimization",
+    "Inventory Control",
+    "Bernard Fidels Ogoh",
+    "ERP Abuja",
+    "ERP Lagos",
+    "ERP Port Harcourt",
+    "Nigerian Business Software",
+    "SME ERP",
+    "Enterprise Resource Planning",
+    "AI Business Tools",
+    "Affordable ERP Nigeria",
+    "Scalable ERP",
+    "Digital Transformation",
+    "Next-gen ERP",
+    "Business Intelligence",
+    "Workflow Automation",
+    "Store Settings Dashboard",
+    "Tenant Management",
+    "Multi-store ERP",
+  ],
+  author: "Business Automated Dynamic Enterprise [B.A.D.E]",
+  robots: "index, follow",
+  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
+  ogTitle: " B.A.D.E ERP Platform",
+  ogDescription:
+    "Take control of your store operations with B.A.D.E — the smart ERP for Nigerian enterprises.",
+  ogImage: "/assets/store-settings-og.png",
+  ogUrl: "https://badesolutions.com.ng/storelayout",
+  ogType: "website",
+  twitterCard: "summary_large_image",
+  twitterTitle: " B.A.D.E ERP Platform",
+  twitterDescription:
+    "Manage your stores with ease using B.A.D.E — Nigeria’s AI-powered ERP solution.",
+  twitterImage: "/assets/store-settings-og.png",
+  applicationName: "B.A.D.E ERP",
+  creator: "Bernard Fidels Ogoh",
+  favicon: "favicon.ico",
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function layout({ children }) {
+  const userData = await fetchUser();
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const SessionId = Dencrypt(userData?.SessionId)
+  
+    // Redirect if either user OR business is missing 
+    if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId) {
+      redirect('/SalesPortal/Login');
+    }
+
+
+  let Array = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/Sales_Portal/stock/position`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
+        access: `${Encrypt(userData?.user?._id)}`,
+      },
+      next: { revalidate: 60 },
+    });
+    if (res.ok) {
+      Array = await res.json();
+    }
+  } catch (err) {
+    throw new Error("Failed to fetch data");
+  }
+
+  return (
+    <NavWrapper userData={userData} navtitle="Reports" data={Array.data}>
+      {children}
+      <SubscriptionReminder Business={userData?.business} />
+      <BirthdayGreetings Business={userData?.business} user={userData?.user} />
+    </NavWrapper>
+  );
+}
+
