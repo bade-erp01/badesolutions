@@ -478,9 +478,7 @@ export function Dashboard({ userData, baseUrl }) {
                       key={debtor._id}
                       className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
                     >
-                      {debtor.Username} owes{" "}
-                      {userData.business.currency?.currency.Symbol}
-                      {debtor.Debt?.toLocaleString()},
+                      {debtor.Username}
                     </span>
                   ))}
                 </Marquee>
