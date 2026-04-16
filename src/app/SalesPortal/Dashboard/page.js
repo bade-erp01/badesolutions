@@ -372,17 +372,17 @@ export function Dashboard({ userData, baseUrl }) {
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-sm font-semibold">Tasks</CardTitle>
-                <Badge variant="outline" className="text-xs">{memoizedTasks.length}</Badge>
+                <Badge variant="outline" className="text-xs">{userData.user?.TaskLogs.length}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-2 max-h-64 overflow-y-auto">
-              {memoizedTasks.map((task) => (
+              {userData.user?.TaskLogs?.map((task) => (
                 <div
                   key={task.id}
                   onClick={() => setSelectedTask(task)}
                   className="flex items-center justify-between text-sm p-2 rounded-md hover:bg-gray-100 cursor-pointer transition"
                 >
-                  <span className={task.status === "done" ? "line-through text-gray-400" : "text-gray-900"}>{task.title}</span>
+                  <span className={task.status === "done" ? "line-through text-gray-400" : "text-gray-900"}>{task.Text}</span>
                   <Badge
                     variant={task.status === "done" ? "default" : "secondary"}
                     className="text-xs"
