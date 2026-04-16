@@ -8,36 +8,31 @@ import Logout from "@/app/Components/Logout";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
 import { useState, useEffect, useMemo } from "react";
-import { PresentationChartLineIcon, UserGroupIcon, MapIcon, CubeIcon, QueueListIcon } from "@heroicons/react/24/outline";
+import {
+  PresentationChartLineIcon,
+  UserGroupIcon,
+  MapIcon,
+  CubeIcon,
+  QueueListIcon,
+} from "@heroicons/react/24/outline";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
-import {Separator} from "@/components/ui/separator";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  ResponsiveContainer,
-} from "recharts";
+import { ResponsiveContainer } from "recharts";
 // ChartRadialShape component remains the same
-import { TrendingUp } from "lucide-react"
+import { TrendingUp } from "lucide-react";
 import {
   Label,
   PolarGrid,
   PolarRadiusAxis,
   RadialBar,
   RadialBarChart,
-} from "recharts"
-
-import {
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card"
-import { ChartContainer } from "@/components/ui/chart"
-import {Encrypt,Dencrypt} from "../../../../Functions/Functions"
-
+} from "recharts";
+import Marquee from "react-fast-marquee";
+import { CardDescription, CardFooter } from "@/components/ui/card";
+import { ChartContainer } from "@/components/ui/chart";
+import { Encrypt, Dencrypt } from "../../../../Functions/Functions";
 
 export default function TenantPage({ userData, baseUrl }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -156,7 +151,9 @@ export default function TenantPage({ userData, baseUrl }) {
             <nav className="w-full space-y-2">
               <Link
                 href={`#`}
-                className={"flex items-center gap-3 p-3 rounded-md bg-gray-200 text-gray-700 transition "}
+                className={
+                  "flex items-center gap-3 p-3 rounded-md bg-gray-200 text-gray-700 transition "
+                }
               >
                 <PresentationChartLineIcon className="h-6 w-6 text-gray-700" />
                 <span className="text-xs">Dashboard</span>
@@ -264,14 +261,6 @@ export default function TenantPage({ userData, baseUrl }) {
   );
 }
 
-
-const kpis = [
-  { title: "Today's Sales", value: "₦250,000" },
-  { title: "Total Debt", value: "₦1,200,000" },
-  { title: "Total Customers", value: "320" },
-  { title: "Today's Route", value: "Abuja → Kaduna" },
-];
-
 const salesData = [
   { month: "Jan", sales: 200 },
   { month: "Feb", sales: 300 },
@@ -288,36 +277,34 @@ const tasks = [
 export function Dashboard({ userData, baseUrl }) {
   const [dashboardTasks, setDashboardData] = useState(tasks);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [error,setError] = useState("")
-  
- useEffect(() => {
-  const fetchTasks = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
-          access: `${Encrypt(userData?.user?._id)}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch tasks");
-      const data = await response.json();
-      setDashboardData(Dencrypt(data));
-      console.log(Dencrypt(data))
-    } catch (error) {
-      setError(
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
+            access: `${Encrypt(userData?.user?._id)}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch tasks");
+        const data = await response.json();
+        setDashboardData(Dencrypt(data));
+      } catch (error) {
+        setError(
           "The dashboard server is currently down or unreachable. Please try again later if the issue persists.",
         );
-    }
-  };
+      }
+    };
 
-  // ensure on user with cleveldashboard acess can call the api
+    // ensure on user with cleveldashboard acess can call the api
     if (userData.user.c_levelDash) {
-     
       // Fetch immediately on mount
       fetchTasks();
-      
+
       // Then fetch every 2 minutes
       const interval = setInterval(() => {
         fetchTasks();
@@ -325,11 +312,29 @@ export function Dashboard({ userData, baseUrl }) {
 
       return () => clearInterval(interval);
     }
+  }, [userData]);
 
-}, [userData]);
-
-
-  const memoizedKpis = useMemo(() => kpis, []);
+  const memoizedKpis = useMemo(
+    () => [
+      {
+        title: "Today's Sales",
+        value: `${userData.business.currency?.currency.Symbol}${dashboardTasks.Sales?.reduce((sum, payment) => sum + (payment.grandTotal || 0), 0) || 0}`,
+      },
+      {
+        title: "Todays Overdue Payments",
+        value: `${userData.business.currency?.currency.Symbol}${dashboardTasks.Mycustomers?.filter((customer) => customer.Debt > 0).reduce((sum, customer) => sum + (customer.Debt || 0), 0) || 0}`,
+      },
+      {
+        title: "Payments Received",
+        value: "320",
+      },
+      {
+        title: "Today's Route",
+        value: `${dashboardTasks.Mycustomers?.length || 0}`,
+      },
+    ],
+    [dashboardTasks, userData.business.currency],
+  );
   const memoizedSalesData = useMemo(() => salesData, []);
   const memoizedTasks = useMemo(() => dashboardTasks, [dashboardTasks]);
 
@@ -338,13 +343,20 @@ export function Dashboard({ userData, baseUrl }) {
       {/* KPI Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {memoizedKpis.map((kpi, i) => (
-          <Card key={i} className="shadow-md hover:shadow-lg transition-shadow bg-linear-to-br from-white to-gray-50 border-gray-200">
+          <Card
+            key={i}
+            className="shadow-md hover:shadow-lg transition-shadow bg-linear-to-br from-white to-gray-50 border-gray-200"
+          >
             <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-bold text-gray-600 uppercase tracking-wide">{kpi.title}</CardTitle>
+              <CardTitle className="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                {kpi.title}
+              </CardTitle>
               <Separator />
             </CardHeader>
             <CardContent>
-              <p className="text-xl md:text-md font-bold text-gray-900">{kpi.value}</p>
+              <p className="text-xl md:text-md font-bold text-gray-900">
+                {kpi.value}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -358,7 +370,9 @@ export function Dashboard({ userData, baseUrl }) {
           <Card className="shadow-md border-gray-200 bg-white">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-sm font-semibold">Sales Target</CardTitle>
+                <CardTitle className="text-sm font-semibold">
+                  Sales Target
+                </CardTitle>
                 <Badge className="bg-green-100 text-green-800">On Track</Badge>
               </div>
             </CardHeader>
@@ -372,7 +386,9 @@ export function Dashboard({ userData, baseUrl }) {
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-sm font-semibold">Tasks</CardTitle>
-                <Badge variant="outline" className="text-xs">{userData.user?.TaskLogs.length}</Badge>
+                <Badge variant="outline" className="text-xs">
+                  {userData.user?.TaskLogs.length}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-2 max-h-64 overflow-y-auto">
@@ -382,7 +398,15 @@ export function Dashboard({ userData, baseUrl }) {
                   onClick={() => setSelectedTask(task)}
                   className="flex items-center justify-between text-sm p-2 rounded-md hover:bg-gray-100 cursor-pointer transition"
                 >
-                  <span className={task.status === "done" ? "line-through text-gray-400" : "text-gray-900"}>{task.Text}</span>
+                  <span
+                    className={
+                      task.status === "done"
+                        ? "line-through text-gray-400"
+                        : "text-gray-900"
+                    }
+                  >
+                    {task.Text}
+                  </span>
                   <Badge
                     variant={task.status === "done" ? "default" : "secondary"}
                     className="text-xs"
@@ -398,34 +422,70 @@ export function Dashboard({ userData, baseUrl }) {
         {/* Middle + Right: Charts & Analytics */}
         <div className="lg:col-span-2 space-y-4">
           {/* MoM Sales Trend */}
-                <Card className="shadow-md border-gray-200 bg-white">
-                <CardHeader className="pb-3">
-                </CardHeader>
-                <CardContent>
-                  <div className="w-full h-[250px] sm:h-[350px] md:h-[350px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <GenerealSalesMargin yearlysales={[]} warehouses={[]} />
-                  </ResponsiveContainer>
-                  </div>
-                </CardContent>
-                </Card>
+          <Card className="shadow-md border-gray-200 bg-white">
+            <CardHeader className="pb-3"></CardHeader>
+            <CardContent>
+              <div className="w-full h-[350px] sm:h-[350px] md:h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <GenerealSalesMargin yearlysales={[]} warehouses={[]} />
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-                {/* Quick Stats */}
+          {/* Quick Stats */}
           <div className="grid grid-cols-2 gap-4">
             <Card className="shadow-md border-gray-200 bg-linear-to-br from-blue-50 to-indigo-50">
               <CardContent className="pt-4">
-                <p className="text-xs text-gray-600 font-medium">Conversion Rate</p>
+                <p className="text-xs text-gray-600 font-medium">
+                  Conversion Rate
+                </p>
                 <p className="text-2xl font-bold text-indigo-600 mt-1">24.5%</p>
-                <p className="text-xs text-green-600 mt-2">↑ 2.3% from last week</p>
+                <p className="text-xs text-green-600 mt-2">
+                  ↑ 2.3% from last week
+                </p>
               </CardContent>
             </Card>
             <Card className="shadow-md border-gray-200 bg-linear-to-br from-purple-50 to-pink-50">
               <CardContent className="pt-4">
-                <p className="text-xs text-gray-600 font-medium">Avg Order Value</p>
-                <p className="text-2xl font-bold text-purple-600 mt-1">₦15,800</p>
-                <p className="text-xs text-green-600 mt-2">↑ 5.1% from last week</p>
+                <p className="text-xs text-gray-600 font-medium">
+                  Avg Order Value
+                </p>
+                <p className="text-2xl font-bold text-purple-600 mt-1">
+                  ₦15,800
+                </p>
+                <p className="text-xs text-green-600 mt-2">
+                  ↑ 5.1% from last week
+                </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* marque for route visits */}
+          <div className="w-full text-center mt-3">
+            {dashboardTasks.Mycustomers?.length > 0 && (
+              <div className="w-full text-center mt-3">
+                <Marquee
+                  gradient={false}
+                  speed={30}
+                  className="w-full bg-gray-100/50 py-2"
+                >
+                  <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
+                    Route Visits:
+                  </span>
+                  {dashboardTasks.Mycustomers.map((debtor) => (
+                    <span
+                      key={debtor._id}
+                      className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                    >
+                      {debtor.Username} owes{" "}
+                      {userData.business.currency?.currency.Symbol}
+                      {debtor.Debt?.toLocaleString()},
+                    </span>
+                  ))}
+                </Marquee>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -433,12 +493,11 @@ export function Dashboard({ userData, baseUrl }) {
   );
 }
 
-
-export const description = "A radial chart with a custom shape"
+export const description = "A radial chart with a custom shape";
 
 const chartData = [
   { browser: "safari", visitors: 1260, fill: "var(--color-safari)" },
-]
+];
 
 const chartConfig = {
   visitors: {
@@ -448,7 +507,7 @@ const chartConfig = {
     label: "Safari",
     color: "var(--chart-2)",
   },
-}
+};
 
 export function ChartRadialShape() {
   return (
@@ -502,7 +561,7 @@ export function ChartRadialShape() {
                           Visitors
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -519,5 +578,5 @@ export function ChartRadialShape() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
