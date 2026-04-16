@@ -59,7 +59,7 @@ export default async function Layout() {
   return (
     <>
       <CookiesPolicyAlert />
-      <TenantPage userData={userData}/>
+      <TenantPage userData={userData} baseUrl={baseUrl}/>
     </>
   );
 }
