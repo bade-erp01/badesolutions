@@ -427,7 +427,7 @@ export function Dashboard({ userData, baseUrl }) {
             <CardContent>
               <div className="w-full h-[350px] sm:h-[350px] md:h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <GenerealSalesMargin yearlysales={[]} warehouses={[]} />
+                  <GenerealSalesMargin yearlysales={dashboardTasks.Sales} warehouses={[]} />
                 </ResponsiveContainer>
               </div>
             </CardContent>
