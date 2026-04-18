@@ -506,7 +506,7 @@ export function MainDash({ userData, baseUrl }) {
                         </>
                       );
                     } else {
-                      return `No change from yesterday (${yesterday})`;
+                      return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${yesterday})`;
                     }
                   })()}
                 </p>
