@@ -15,6 +15,7 @@ import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   BanknotesIcon,
+  BellAlertIcon
 } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
@@ -565,7 +566,7 @@ export function MainDash({ userData, baseUrl }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
-                  <ArrowTrendingDownIcon className="h-6 w-6 text-red-400" />
+                  <BellAlertIcon className="h-6 w-6 text-red-400" />
                 </div>
               </div>
             </div>
