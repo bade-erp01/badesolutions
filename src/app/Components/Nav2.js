@@ -39,7 +39,7 @@ export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
             <Button type="submit" size="sm" variant="default">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              Search
             </Button>
           </form>
         )}
