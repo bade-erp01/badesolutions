@@ -10,7 +10,6 @@ import {
   totalInWords,
   Encrypt,
   EXPRESS_PRIVATE_URL,
-  pricelistSetter,
 } from "../../../../../Functions/Functions";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -25,20 +24,16 @@ import {
   TrashIcon,
   PrinterIcon,
   ShoppingCartIcon,
-  PlusIcon,
 } from "@heroicons/react/24/solid";
 
 export default function DraftInvoicePage({
   Business,
-  customer,
-  Whouse,
   bill,
   products,
   user,
 }) {
   // Use useState to store products
   const [inputValue, setInputValue] = useState("");
-  const [productList, setProductList] = useState(products || []);
   // const [qty,setQty] = useState('')
   const router = useRouter();
 
@@ -411,7 +406,6 @@ export default function DraftInvoicePage({
     billId,
     storeId,
     userId,
-    companyName,
   ) => {
     try {
       plsWait("Updating cart...");
@@ -555,7 +549,6 @@ export default function DraftInvoicePage({
     business: Business,
   };
   const Singlebill = bill;
-  const cust = Singlebill.customer;
   const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
 
   return (
@@ -681,7 +674,7 @@ export default function DraftInvoicePage({
                   <th
                     key={i}
                     className={`px-4 py-3 font-semibold whitespace-nowrap text-center ${
-                      i === 2 || i === 7 || i === 8
+                      (Singlebill.billStatus.toLowerCase() !== "requisition" || i === 7)
                         ? "hidden sm:table-cell"
                         : ""
                     }`}
@@ -692,13 +685,14 @@ export default function DraftInvoicePage({
               </tr>
             </thead>
             <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill, index) => (
+              {Singlebill.orders.map((bill) => (
                 <tr
                   key={bill._id}
                   className="border-t hover:bg-gray-50 transition"
                 >
                   <td className="px-4 py-2 text-indigo-700 text-center text-xs">
-                    <a
+                    {Singlebill.billStatus.toLowerCase() !== "requisition" ? (
+                      <a
                       href={`/SalesPortal/Products/${Encrypt(
                         bill.item._id,
                       )}`}
@@ -706,6 +700,9 @@ export default function DraftInvoicePage({
                     >
                       {bill.item.Name}
                     </a>
+                    ):(
+                      bill.item.Name
+                    )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {user._id === Singlebill.invoicerId &&
@@ -724,7 +721,6 @@ export default function DraftInvoicePage({
                             Singlebill._id,
                             bill.storeProductId,
                             userInfo.user._id,
-                            userInfo.business.companyName,
                           );
                         }}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
@@ -751,7 +747,6 @@ export default function DraftInvoicePage({
                             Singlebill._id,
                             bill.storeProductId,
                             userInfo.user._id,
-                            userInfo.business.companyName,
                           );
                         }}
                       />
@@ -787,14 +782,14 @@ export default function DraftInvoicePage({
           </table>
         </div>
 
-        {user._id === Singlebill.invoicerId && (
+        {user._id === Singlebill.invoicerId && Singlebill.billStatus === "Requisition" && (
           <div className="mb-8">
             <div className="block md:hidden">
               <label
                 htmlFor="productDropdown"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Select {productList.length} Products
+                Select {products.length} Products
               </label>
               <select
                 onChange={(e) => {
@@ -823,7 +818,7 @@ export default function DraftInvoicePage({
                 htmlFor="productDatalist"
                 className="text-sm font-medium text-gray-700"
               >
-                Search {productList.length} Products
+                Search {products.length} Products
               </label>
 
               <div className="flex w-full max-w-xl items-center space-x-2">

@@ -304,7 +304,7 @@ export default function MainDash({ userData }) {
                             >
                               {(() => {
                                 const today = tenantData.TodaySale || 0;
-                                const yesterday = tenantData.yesterdaySale || 0;
+                                const yesterday = formatNumberShort(tenantData.yesterdaySale) || 0;
                                 const diff = today - yesterday;
                                 const percentage =
                                   yesterday > 0 ? ((diff / yesterday) * 100) : '0.00';
