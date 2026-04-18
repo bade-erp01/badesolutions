@@ -495,14 +495,14 @@ export function MainDash({ userData, baseUrl }) {
                       return (
                         <>
                           <ArrowTrendingUpIcon className="w-4 h-4" />
-                          {`Up ${percentage}% from yesterday (${yesterday})`}
+                          {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
                         </>
                       );
                     } else if (today < yesterday) {
                       return (
                         <>
                           <ArrowTrendingDownIcon className="w-4 h-4" />
-                          {`Down ${percentage}% from yesterday (${yesterday})`}
+                          {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
                         </>
                       );
                     } else {
