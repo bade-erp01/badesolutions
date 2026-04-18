@@ -738,8 +738,6 @@ export function MainDash({ userData, baseUrl }) {
                   ))}
 
                 <div className="mt-6 border-t-2">
-                  {/* gropued sales */}
-                  <hr className="my-4 border-gray-300 mb-2" />
 
                   <div className="  transition-all duration-700 mt-5">
                     <ChartRadialShape data={tenantData?.result} />
