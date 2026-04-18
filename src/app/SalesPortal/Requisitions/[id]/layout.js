@@ -101,7 +101,7 @@ export default async function layout({ params }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           {/* Left: Username */}
           <h1 className="text-lg font-semibold tracking-tight text-slate-900">
-            {`${data.Inv.billStatus?.slice(0,3).toUpperCase()} /${data.Inv.invoicelocation}`}
+            {`${data.Inv.billStatus?.slice(0,3).toUpperCase()}/${data.Inv.billReferenceNo}`}
           </h1>
 
           {/* Right: Back button */}

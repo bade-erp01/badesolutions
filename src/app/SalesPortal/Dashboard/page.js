@@ -1,26 +1,25 @@
 "use client";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 
-import Link from "next/link";
-import Image from "next/image";
-import moment from "moment";
-import UserNotification from "@/app/Components/UserNotification";
-import Logout from "@/app/Components/Logout";
-import SubscriptionReminder from "@/app/Components/SubscritionReminder";
-import BirthdayGreetings from "@/app/Components/BithdayToast";
-import { useState, useEffect, useMemo } from "react";
-import {
-  PresentationChartLineIcon,
-  UserGroupIcon,
-  MapIcon,
-  CubeIcon,
-  QueueListIcon,
-} from "@heroicons/react/24/outline";
+import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../../Functions/Functions";
+import { SuccessToast, plsWait } from "../../../../Functions/Mics";
+import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ResponsiveContainer } from "recharts";
-// ChartRadialShape component remains the same
+import {
+  ArrowTrendingDownIcon,
+  ArrowTrendingUpIcon,
+  BanknotesIcon,
+} from "@heroicons/react/24/outline";
+import moment from "moment";
+import Link from "next/link";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 import { TrendingUp } from "lucide-react";
 import {
   Label,
@@ -29,17 +28,38 @@ import {
   RadialBar,
   RadialBarChart,
 } from "recharts";
-import Marquee from "react-fast-marquee";
-import { CardDescription, CardFooter } from "@/components/ui/card";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
-import { Encrypt, Dencrypt } from "../../../../Functions/Functions";
+import Nav2 from "@/app/Components/Nav2";
+import Image from "next/image";
+import Logout from "@/app/Components/Logout";
+import UserNotification from "@/app/Components/UserNotification";
+import {
+  PresentationChartLineIcon,
+  UserGroupIcon,
+  MapIcon,
+  CubeIcon,
+  UserPlusIcon,
+  PencilSquareIcon,
+  QueueListIcon,
+  Square3Stack3DIcon,
+} from "@heroicons/react/24/outline";
+import "animate.css";
 
-export default function TenantPage({ userData, baseUrl }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function DashboardLayout({ userData, baseUrl }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm] = useState("");
+  const navtitle = "Dashboard";
 
-  const handleToggle = () => {
-    setIsLoggedIn(!isLoggedIn);
-  };
+  const toggleSideNav = () => setIsOpen((prev) => !prev);
 
   const languages = useMemo(() => ["es", "en", "de", "fr"], []);
 
@@ -90,429 +110,793 @@ export default function TenantPage({ userData, baseUrl }) {
   }, [languages]);
 
   return (
-    <div className="relative flex flex-col bg-gray-100 min-h-screen">
-      <nav className="sticky top-0 z-20 backdrop-blur w-full bg-[#fcfcfcda] p-2 shadow-xs shadow-gray-400 border-b border-slate-200">
-        <div className="mx-auto flex max-w-7xl items-center justify-between ">
-          <div>
-            <h1 className="text-xl font-black tracking-tight text-slate-900">
-              Dashboard
-            </h1>
+    <div className="relative flex flex-col min-h-[90dvh]">
+      {/* Nav gets toggle + search setter */}
+      <Nav2
+        navtitle={"Dashboard"}
+        onToggleSideNav={toggleSideNav}
+        onSearchChange={searchTerm}
+        userData={userData}
+      />
+
+      {/* Side nav */}
+      {isOpen && (
+        <aside className="fixed top-0 left-0 w-72 h-full bg-[#1e2939] text-white px-4 py-4 z-30 flex flex-col shadow-lg animate__animated animate__slideInLeft">
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-sm font-bold">Menu</h2>
           </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleToggle}
-              className="rounded-lg px-5 py-2 text-sm font-semibold text-slate-900 transition hover:text-slate-800"
+          <hr className="border-gray-600 mb-4" />
+
+          {/* Navigation links bg-gray-200/50*/}
+          <nav className="w-full space-y-2">
+            <Link
+              href={`#`}
+              className={
+                "flex items-center gap-3 p-3 rounded-md transition bg-gray-200/50"
+              }
             >
-              {isLoggedIn ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18 18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                  />
-                </svg>
-              )}
+              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Dashboard</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Products"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                 ${navtitle === "Products" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <CubeIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Products</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Reports"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                 ${navtitle === "Reports" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <Square3Stack3DIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Product Report</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Customers"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                 ${navtitle === "Customers" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <UserGroupIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">My customers</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Route"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                 ${navtitle === "Route" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <MapIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">My Route</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Requisitions"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                 ${navtitle === "Requisitions" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <QueueListIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Requisitions</span>
+            </Link>
+          </nav>
+
+          {/* Logout pinned at bottom */}
+          <div className="mt-auto pt-6">
+            <button
+              className="flex items-center gap-3 px-4 py-2 w-full rounded-md transition-colors bg-gray-200 hover:bg-gray-300"
+              aria-label="User Profile"
+            >
+              <Image
+                src={userData?.user?.image || "/person.png"}
+                alt="User avatar"
+                width={28}
+                height={28}
+                className="rounded-full border border-black object-cover"
+              />
+              <div className="flex flex-col items-start">
+                <span className="text-sm text-black font-medium">
+                  {userData?.user?.firstName} {userData?.user?.lastName}
+                </span>
+                <span className="text-xs text-gray-500">My Account</span>
+              </div>
             </button>
+            {userData?.Notification?.length > 0 && (
+              <>
+                <br />
+                <UserNotification user={userData} />
+              </>
+            )}
+            <Logout />
           </div>
+        </aside>
+      )}
+
+      {/* Main content */}
+      <main
+        className="flex-1 m-3"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#453d46ff transparent",
+        }}
+      >
+        <header className="mb-2">
+          <div className="flex items-center space-x-2">
+            <Image
+              src={userData.user.image || userData.business.companyLogo || "/person.png"}
+              className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
+              // loading="lazy"
+              priority={true}
+              quality={100}
+              width={25}
+              height={25}
+              alt="user image"
+            />
+            <h2 className="text-xl font-bold text-gray-900">
+              {getLocalizedGreeting(userData.user.firstName)}
+            </h2>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
+          </p>
+        </header>
+        <MainDash userData={userData} baseUrl={baseUrl} />
+      </main>
+    </div>
+  );
+}
+
+export function MainDash({ userData, baseUrl }) {
+  const [loading, setLoading] = useState(true);
+  const [tenantData, setTenantData] = useState(null);
+  const inactivityTimer = useRef(null);
+  const intervalRef = useRef(null);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const [status, setStatus] = useState("Active"); // UI status indicator
+  const MySwal = withReactContent(Swal);
+
+  const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
+
+  // Memoized sorted invoices
+  const sortedInvoices = useMemo(() => {
+    return (
+      tenantData?.invoice?.sort(
+        (a, b) => b.billReferenceNo - a.billReferenceNo,
+      ) || []
+    );
+  }, [tenantData]);
+
+  // Memoized paginated invoices MonitoredProduct
+  const paginatedInvoices = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return sortedInvoices.slice(start, start + itemsPerPage);
+  }, [sortedInvoices, currentPage]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(sortedInvoices.length / itemsPerPage);
+  }, [sortedInvoices]);
+
+  // ⏱ Debounced page change
+  const handlePageChange = useCallback(
+    (page) => {
+      if (page >= 1 && page <= totalPages) {
+        setTimeout(() => {
+          setCurrentPage(page);
+        }, 300); // 300ms debounce
+      }
+    },
+    [totalPages],
+  );
+
+  useEffect(() => {
+    const fetchTenantData = async () => {
+      const isVisible = document.visibilityState === "visible";
+      const isOnline = navigator.onLine;
+
+      if (!isVisible || !isOnline || status === "Inactive") {
+        //  ErrorMessage("⏸ Fetch paused due to:", {
+        //     visibility: isVisible,
+        //     online: isOnline,
+        //     activity: status
+        //   });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
+          headers: {
+            Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
+            access: `${Encrypt(userData?.user._id)}`,
+            // cache: "force-cache" // or "default", "reload", "no-store"
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch dashboard data");
+
+        const data = await res.json();
+        setTenantData(data);
+      } catch (err) {
+        setError(
+          "The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const resetInactivityTimer = () => {
+      // if (status === "Inactive") {
+      //   console.log("🔄 User became active again");
+      // }
+      setStatus("Active");
+      clearTimeout(inactivityTimer.current);
+      inactivityTimer.current = setTimeout(() => {
+        setStatus("Inactive");
+      }, INACTIVITY_LIMIT);
+    };
+
+    // ensure on user with cleveldashboard acess can call the api
+    if (userData.user.c_levelDash) {
+      // Initial fetch
+      fetchTenantData();
+      resetInactivityTimer();
+
+      // Set interval for periodic fetch
+      intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
+    }
+
+    // Tab visibility
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && userData.user.c_levelDash) {
+        // console.log(" Tab became visible");
+        fetchTenantData();
+      }
+    };
+
+    // Network status
+    const handleOnline = () => {
+      SuccessToast("Back online");
+      if (userData.user.c_levelDash) fetchTenantData();
+    };
+
+    const handleOffline = () => {
+      MySwal.fire({
+        toast: true,
+        position: "bottom-start",
+        icon: "info",
+        showConfirmButton: false,
+        // timer: 10000,
+        // timerProgressBar: true,
+        customClass: {
+          popup: "swal2-subscription-toast",
+        },
+        html: `
+            <div style="display: flex; align-items: center;">
+              <div style="text-align: left;">
+                <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
+              </div>
+            </div>
+        `,
+      });
+
+      setTimeout(() => {
+        plsWait("Currently Offline");
+      }, 3000);
+    };
+
+    // User activity listeners
+    const activityEvents = ["mousemove", "keydown", "scroll", "touchstart"];
+    activityEvents.forEach((event) =>
+      window.addEventListener(event, resetInactivityTimer),
+    );
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalRef.current);
+      clearTimeout(inactivityTimer.current);
+      activityEvents.forEach((event) =>
+        window.removeEventListener(event, resetInactivityTimer),
+      );
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [userData, EXPRESS_PRIVATE_URL, Encrypt]);
+
+  if (loading) {
+    return (
+      <div className="w-full px-6 py-8 animate-pulse space-y-6">
+        <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+        <div className="h-48 bg-gray-300 rounded w-full"></div>
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-full"></div>
+          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
         </div>
-      </nav>
+        <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div>
+      </div>
+    );
+  }
 
-      <div className="flex flex-2 max-h-[91vh] overflow-y-hidden">
-        {/* Sidebar */}
-        {isLoggedIn && (
-          <aside className="fixed top-0 left-0 w-72 h-full bg-[#1e2939] text-white px-4 py-4 z-30 flex flex-col shadow-lg animate__animated animate__slideInLeft">
-            <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-sm font-bold">Menu</h2>
-            </div>
-            <hr className="border-gray-600 mb-4" />
+  if (error) {
+    return (
+      <div className="w-full px-6 py-10 flex flex-col items-center justify-center bg-grey-200 border border-red-200 rounded-md shadow-sm">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-10 w-10 text-red-500 mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01M4.93 4.93l14.14 14.14M12 2a10 10 0 100 20 10 10 0 000-20z"
+          />
+        </svg>
+        <h2 className="text-lg font-semibold text-red-700">
+          Dashboard Unavailable
+        </h2>
+        <p className="text-sm text-red-600 mt-2 max-w-md text-center">
+          {error}
+        </p>
+      </div>
+    );
+  }
 
-            <nav className="w-full space-y-2">
-              <Link
-                href={`#`}
-                className={
-                  "flex items-center gap-3 p-3 rounded-md bg-gray-200 text-gray-700 transition "
-                }
-              >
-                <PresentationChartLineIcon className="h-6 w-6 text-gray-700" />
-                <span className="text-xs">Dashboard</span>
-              </Link>
-
-              <Link
-                href="/SalesPortal/Products"
-                className={`flex items-center gap-3 p-3 rounded-md transition`}
-              >
-                <CubeIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Products</span>
-              </Link>
-
-              <Link
-                href="/SalesPortal/Customers"
-                className={`flex items-center gap-3 p-3 rounded-md transition`}
-              >
-                <UserGroupIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">My customers</span>
-              </Link>
-
-              <Link
-                href="/SalesPortal/Route"
-                className={`flex items-center gap-3 p-3 rounded-md transition`}
-              >
-                <MapIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">My Route</span>
-              </Link>
-
-              <Link
-                href="/SalesPortal/Requisitions"
-                className={`flex items-center gap-3 p-3 rounded-md transition`}
-              >
-                <QueueListIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Requisitions</span>
-              </Link>
-            </nav>
-
-            <div className="mt-auto pt-6">
-              <button
-                className="flex items-center gap-3 px-4 py-2 w-full rounded-md transition-colors bg-gray-200 hover:bg-gray-300"
-                aria-label="User Profile"
-              >
-                <Image
-                  src={userData?.user?.image || "/person.png"}
-                  alt="User avatar"
-                  width={28}
-                  height={28}
-                  className="rounded-full border border-black object-cover"
-                />
-                <div className="flex flex-col items-start">
-                  <span className="text-sm text-black font-medium">
-                    {userData?.user?.firstName} {userData?.user?.lastName}
-                  </span>
-                  <span className="text-xs text-gray-500">My Account</span>
-                </div>
-              </button>
-              {userData?.Notification?.length > 0 && (
-                <>
-                  <br />
-                  <UserNotification user={userData} />
-                </>
-              )}
-              <Logout />
-            </div>
-          </aside>
-        )}
-
-        {/* Main Content */}
-        <main
-          className="flex-1 w-full h-screen overflow-y-scroll p-6 bg-linear-to-br from-gray-200 via-gray-100 to-gray-300"
+  return (
+    <>
+      {userData.user.c_levelDash ? (
+        <div
+          className="text-xs"
           style={{
             scrollbarWidth: "thin",
             scrollbarColor: "#453d46ff transparent",
           }}
         >
-          <section className="mb-3 ">
-            <header className="mb-2">
-              <div className="flex items-center space-x-2">
-                <Image
-                  src={userData.user.image || "/person.png"}
-                  className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
-                  priority={true}
-                  quality={100}
-                  width={25}
-                  height={25}
-                  alt="user image"
-                />
-                <h2 className="text-xl font-bold text-gray-900">
-                  {getLocalizedGreeting(userData.user.firstName)}
-                </h2>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
-              </p>
-            </header>
+          {/* KPI cards */}
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+           <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
+                <p className="text-2xl text-green-600 font-bold mt-1">
+                  {/* total sales */}
+                  <TodaySaleTotal tenantData={tenantData} userData={userData} />
+                </p>
+                <p
+                  className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
+                    tenantData.TodaySale > tenantData.yesterdaySale
+                      ? 'text-green-600'
+                      : tenantData.TodaySale < tenantData.yesterdaySale
+                      ? 'text-red-600'
+                      : 'text-gray-500'
+                  }`}
+                >
+                  {(() => {
+                    const today = tenantData.TodaySale || 0;
+                    const yesterday = tenantData.yesterdaySale || 0;
+                    const diff = today - yesterday;
+                    const percentage =
+                      yesterday > 0 ? ((diff / yesterday) * 100).toFixed(2) : '0.00';
 
-            <Dashboard userData={userData} baseUrl={baseUrl} />
+                    if (today > yesterday) {
+                      return (
+                        <>
+                          <ArrowTrendingUpIcon className="w-4 h-4" />
+                          {`Up ${percentage}% from yesterday (${yesterday})`}
+                        </>
+                      );
+                    } else if (today < yesterday) {
+                      return (
+                        <>
+                          <ArrowTrendingDownIcon className="w-4 h-4" />
+                          {`Down ${percentage}% from yesterday (${yesterday})`}
+                        </>
+                      );
+                    } else {
+                      return `No change from yesterday (${yesterday})`;
+                    }
+                  })()}
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
+                <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
+              </div>
+            </div>
+          </div>
+
+            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">
+                    Todays Overdue Payments
+                  </h3>
+                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                    {userData.business.currency?.currency.Symbol}
+                    {tenantData.Routes?.filter(
+                      (customer) => customer.Debt > 0,
+                    ).reduce(
+                      (sum, customer) =>
+                        sum + (formatNumberShort(customer.Debt) || 0),
+                      0,
+                    ) || 0}
+                  </p>
+                </div>
+                <div className="p-3 rounded-full bg-[#ddd6ff] text-white shadow-md">
+                  <BanknotesIcon className="h-6 w-6 text-gray-500" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded shadow-md animate__animated animate__flipInY">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">Todays Route</h3>
+                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                    {tenantData.Routes?.length || 0}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
+                  <MapIcon className="h-6 w-6 text-gray-900" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">Pending Task</h3>
+                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                    {tenantData.result.Task.filter(
+                      (entry) => entry.status === "pending",
+                    ).length || 0}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
+                  <ArrowTrendingDownIcon className="h-6 w-6 text-red-400" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Activity / feed */}
+            <section className="lg:col-span-2">
+              <div className="bg-white rounded p-3 shadow-xl mb-3">
+                {/* Chart */}
+                <GenerealSalesMargin
+                  yearlysales={tenantData.yearlysales}
+                  warehouses={tenantData.warehouses}
+                />
+              </div>
+
+              {/* Properties table */}
+              <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg text-gray-500 font-semibold">
+                    Today's Sales.
+                  </h3>
+                </div>
+
+                <div className="overflow-y-hidden max-h-96">
+                  <table className="w-full text-left text-sm">
+                    <thead className="text-xs text-gray-500 border-b">
+                      <tr>
+                        <th className="py-3 border-r">S/N</th>
+                        <th className="p-3">Ref</th>
+                        <th className="py-3">Customer</th>
+                        <th className="py-3">Grand Total</th>
+                        <th className="py-3">Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="text-gray-700">
+                      {paginatedInvoices.length > 0 ? (
+                        paginatedInvoices.map((invoice, index) => (
+                          <tr
+                            key={index}
+                            className="border-b animate__animated animate__fadeInRight text-xs"
+                          >
+                            <td className="py-3 border-r">
+                              {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+                            <td className="p-3 font-semibold text-blue-700">
+                              <Link
+                                href={`/${
+                                  userData.business.companyName
+                                }/${Encrypt(
+                                  userData.user._id,
+                                )}/bill/bill/${Encrypt(invoice._id)}`}
+                                className="text-indigo-600"
+                              >
+                                {invoice.billReferenceNo}/
+                                {invoice.invoicelocation}
+                              </Link>
+                            </td>
+                            <td className="py-3">{invoice.customerName}</td>
+                            <td className="py-3">
+                              {userData.business.currency?.currency.Symbol}
+                              {invoice.grandTotal?.toLocaleString()}
+                            </td>
+                            <td
+                              className={`py-3 ${
+                                invoice.billStatus !== "Cancelled"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {invoice.billStatus}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="py-6 text-center text-gray-500 text-sm"
+                          >
+                            No invoices found for this page.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i + 1)}
+                      className={`px-3 py-1 rounded border ${
+                        currentPage === i + 1
+                          ? "bg-indigo-600 text-white"
+                          : "border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </section>
+            <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
+              <h3 className="text-lg text-gray-500 font-semibold mb-4">
+                🗿 Quick Stats Widget
+              </h3>
+              <div className="flex flex-col">
+                <h4 className="text-lg text-gray-500 font-semibold mb-4">
+                  ⏰ Tasks Reminder
+                </h4>
+
+                {tenantData.result.Task &&
+                  tenantData.result.Task.map((task, idx) => (
+                    <div
+                      key={idx}
+                      className="text-xs bg-gray-100/50 flex gap-3 rounded-sm p-1 mb-1 hover:border-gray-200 hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
+                      title={task.notes}
+                    >
+                      <div>
+                        <p className="font-medium text-gray-900">{task.Text}</p>
+                        <p className="text-xs font-semibold text-gray-500">
+                          * {task.notes}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Created:{" "}
+                          {new Date(task.createdAt).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+
+                      {/* Badge button */}
+                      <button
+                        className={`ml-auto px-2 py-1 rounded-sm text-xs font-medium transition-all duration-200 ${
+                          task.Status === "Done"
+                            ? "bg-green-500 text-white"
+                            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                        }`}
+                      >
+                        {task.Status === "Done"
+                          ? "✓ Completed"
+                          : "○ Mark as Done"}
+                      </button>
+                      <hr />
+                    </div>
+                  ))}
+
+                <div className="mt-6 border-t-2">
+                  {/* gropued sales */}
+                  <hr className="my-4 border-gray-300 mb-2" />
+
+                  <div className="  transition-all duration-700 mt-5">
+                    <ChartRadialShape data={tenantData?.result} />
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+          {tenantData.Routes.filter(cust => cust.Debt > 0)?.length > 0 && (
+            <div className="w-full text-center mt-3">
+              {tenantData.Routes.filter(cust => cust.Debt > 0)?.length > 0 && (
+                <div className="w-full text-center mt-3">
+                  <Marquee
+                    gradient={false}
+                    speed={30}
+                    className="w-full bg-gray-100/50 py-2"
+                  >
+                    <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
+                      ⚠️ Debtors:
+                    </span>
+                    {tenantData.Routes.filter(cust => cust.Debt > 0).map((debtor) => (
+                      <span
+                        key={debtor._id}
+                        className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                      >
+                        {debtor.Username} owes{" "}
+                        {userData.business.currency?.currency.Symbol}
+                        {debtor.Debt?.toLocaleString()},
+                      </span>
+                    ))}
+                  </Marquee>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* produt promo */}
+          {tenantData.promotions?.length > 0 && (
+            <div className="w-full text-center mt-3">
+              <Marquee
+                gradient={false}
+                speed={40}
+                className="w-full bg-gray-100/50 py-2"
+              >
+                <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
+                  🗂️ Products On Promo:
+                </span>
+                {tenantData.promotions.map((product) => (
+                  <span
+                    key={product._id}
+                    className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                  >
+                    {product.Name} Promo:{" "}
+                    {userData.business.currency?.currency.Symbol}
+                    {(
+                      product.Pricelist1Promo ??
+                      product.Pricelist2Promo ??
+                      product.Pricelist3Promo ??
+                      product.Pricelist4Promo ??
+                      product.Pricelist5Promo ??
+                      product.Pricelist6Promo ??
+                      product.Pricelist7Promo
+                    )?.toLocaleString()}
+                  </span>
+                ))}
+              </Marquee>
+            </div>
+          )}
+
+          {/* Footer */}
+          <footer className="mt-8 text-sm text-gray-500">
+            © <span id="year">{moment().format("YYYY")}</span> Business
+            Automated Dynamic Enterprise — All rights reserved.
+          </footer>
+        </div>
+      ) : (
+        <main className="flex-1">
+          <section className="w-full max-w-7xl mx-auto p-6 h-[500px] overflow-y-auto bg-linear-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
+            <div className="mt-6">
+              <div className="w-full text-center">
+                {/* show dashboard that is user orientend and not business oriented */}
+                <h2 className="text-2xl font-bold text-gray-700 mb-4">
+                  Welcome {userData.user.firstName} to your Sales Portal.
+                </h2>
+                <p className="text-gray-500 mb-6">
+                  Here you can view your sales performance, manage your customers, and track your routes. Explore the different sections to get insights into your sales activities and stay on top of your daily tasks.
+                </p>
+                <div className="flex justify-center">
+                  <Image
+                    src={userData.business.companyLogo}
+                    alt="Dashboard Placeholder"
+                    width={400}
+                    height={300}
+                    className="rounded-lg shadow-md"
+                  />
+                  </div>
+              </div>
+              <footer className="mt-8 text-sm text-gray-500">
+                © <span id="year">{moment().format("YYYY")}</span> Business
+                Automated Dynamic Enterprise — All rights reserved.
+              </footer>
+            </div>
           </section>
         </main>
-      </div>
-      <SubscriptionReminder Business={userData.business} />
-      <BirthdayGreetings Business={userData.business} user={userData.user} />
-    </div>
+      )}
+    </>
   );
 }
 
-const salesData = [
-  { month: "Jan", sales: 200 },
-  { month: "Feb", sales: 300 },
-  { month: "Mar", sales: 250 },
-  { month: "Apr", sales: 400 },
-];
-
-const tasks = [
-  { id: 1, title: "Follow up with Client A", status: "pending" },
-  { id: 2, title: "Deliver goods to Route B", status: "done" },
-  { id: 3, title: "Prepare invoice for Client C", status: "pending" },
-];
-
-export function Dashboard({ userData, baseUrl }) {
-  const [dashboardTasks, setDashboardData] = useState(tasks);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
-            access: `${Encrypt(userData?.user?._id)}`,
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch tasks");
-        const data = await response.json();
-        setDashboardData(Dencrypt(data));
-      } catch (error) {
-        setError(
-          "The dashboard server is currently down or unreachable. Please try again later if the issue persists.",
-        );
-      }
-    };
-
-    // ensure on user with cleveldashboard acess can call the api
-    if (userData.user.c_levelDash) {
-      // Fetch immediately on mount
-      fetchTasks();
-
-      // Then fetch every 2 minutes
-      const interval = setInterval(() => {
-        fetchTasks();
-      }, 120000);
-
-      return () => clearInterval(interval);
-    }
-  }, [userData]);
-
-  const memoizedKpis = useMemo(
-    () => [
-      {
-        title: "Today's Sales",
-        value: `${userData.business.currency?.currency.Symbol}${dashboardTasks.Sales?.reduce((sum, payment) => sum + (payment.grandTotal || 0), 0) || 0}`,
-      },
-      {
-        title: "Todays Overdue Payments",
-        value: `${userData.business.currency?.currency.Symbol}${dashboardTasks.Mycustomers?.filter((customer) => customer.Debt > 0).reduce((sum, customer) => sum + (customer.Debt || 0), 0) || 0}`,
-      },
-      {
-        title: "Payments Received",
-        value: "320",
-      },
-      {
-        title: "Today's Route",
-        value: `${dashboardTasks.Mycustomers?.length || 0}`,
-      },
-    ],
-    [dashboardTasks, userData.business.currency],
-  );
-  const memoizedSalesData = useMemo(() => salesData, []);
-  const memoizedTasks = useMemo(() => dashboardTasks, [dashboardTasks]);
-
-  return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* KPI Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {memoizedKpis.map((kpi, i) => (
-          <Card
-            key={i}
-            className="shadow-md hover:shadow-lg transition-shadow bg-linear-to-br from-white to-gray-50 border-gray-200"
-          >
-            <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-bold text-gray-600 uppercase tracking-wide">
-                {kpi.title}
-              </CardTitle>
-              <Separator />
-            </CardHeader>
-            <CardContent>
-              <p className="text-xl md:text-md font-bold text-gray-900">
-                {kpi.value}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Middle + Left Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Sales Target + Tasks */}
-        <div className="space-y-4">
-          {/* Sales Target */}
-          <Card className="shadow-md border-gray-200 bg-white">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-sm font-semibold">
-                  Sales Target
-                </CardTitle>
-                <Badge className="bg-green-100 text-green-800">On Track</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <ChartRadialShape data={[{ name: "Achieved", value: 70 }]} />
-            </CardContent>
-          </Card>
-
-          {/* Tasks */}
-          <Card className="shadow-md border-gray-200 bg-white">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-sm font-semibold">Tasks</CardTitle>
-                <Badge variant="outline" className="text-xs">
-                  {userData.user?.TaskLogs.length}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2 max-h-64 overflow-y-auto">
-              {userData.user?.TaskLogs?.map((task) => (
-                <div
-                  key={task.id}
-                  onClick={() => setSelectedTask(task)}
-                  className="flex items-center justify-between text-sm p-2 rounded-md hover:bg-gray-100 cursor-pointer transition"
-                >
-                  <span
-                    className={
-                      task.status === "done"
-                        ? "line-through text-gray-400"
-                        : "text-gray-900"
-                    }
-                  >
-                    {task.Text}
-                  </span>
-                  <Badge
-                    variant={task.status === "done" ? "default" : "secondary"}
-                    className="text-xs"
-                  >
-                    {task.status}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Middle + Right: Charts & Analytics */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* MoM Sales Trend */}
-          <Card className="shadow-md border-gray-200 bg-white">
-            <CardHeader className="pb-3"></CardHeader>
-            <CardContent>
-              <div className="w-full h-[350px] sm:h-[350px] md:h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <GenerealSalesMargin yearlysales={dashboardTasks.Sales} warehouses={[]} />
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="shadow-md border-gray-200 bg-linear-to-br from-blue-50 to-indigo-50">
-              <CardContent className="pt-4">
-                <p className="text-xs text-gray-600 font-medium">
-                  Conversion Rate
-                </p>
-                <p className="text-2xl font-bold text-indigo-600 mt-1">24.5%</p>
-                <p className="text-xs text-green-600 mt-2">
-                  ↑ 2.3% from last week
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="shadow-md border-gray-200 bg-linear-to-br from-purple-50 to-pink-50">
-              <CardContent className="pt-4">
-                <p className="text-xs text-gray-600 font-medium">
-                  Avg Order Value
-                </p>
-                <p className="text-2xl font-bold text-purple-600 mt-1">
-                  ₦15,800
-                </p>
-                <p className="text-xs text-green-600 mt-2">
-                  ↑ 5.1% from last week
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* marque for route visits */}
-          <div className="w-full text-center mt-3">
-            {dashboardTasks.Mycustomers?.length > 0 && (
-              <div className="w-full text-center mt-3">
-                <Marquee
-                  gradient={false}
-                  speed={30}
-                  className="w-full bg-gray-100/50 py-2"
-                >
-                  <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
-                    Route Visits:
-                  </span>
-                  {dashboardTasks.Mycustomers.map((debtor) => (
-                    <span
-                      key={debtor._id}
-                      className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
-                    >
-                      {debtor.Username}
-                    </span>
-                  ))}
-                </Marquee>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export const description = "A radial chart with a custom shape";
-
-const chartData = [
-  { browser: "safari", visitors: 1260, fill: "var(--color-safari)" },
-];
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  safari: {
-    label: "Safari",
-    color: "var(--chart-2)",
-  },
+const formatNumberShort = (num) => {
+  if (num >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(2) + " B"; // billions
+  } else if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(2) + " M"; // millions
+  } else if (num >= 1_000) {
+    return (num / 1_000).toFixed(2) + " K"; // thousands
+  }
+  return num.toString();
 };
 
-export function ChartRadialShape() {
+const TodaySaleTotal = ({ tenantData, userData }) => {
+  const total = tenantData?.TodaySale;
+
+  return (
+    <p className="text-2xl text-gray-500 font-bold mt-1">
+      {userData.business.currency?.currency.Symbol}
+      {formatNumberShort(total)}
+    </p>
+  );
+};
+
+// sales millstone
+export function ChartRadialShape({ data }) {
+  const chartData = [
+    {
+      browser: "Target",
+      visitors: data?.salesTarget || 0,
+      fill: "var(--color-safari)",
+    },
+  ];
+
+  const chartConfig = {
+    visitors: {
+      label: "Sales",
+    },
+    safari: {
+      label: "Target set",
+      color: "var(--chart-2)",
+    },
+  };
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Radial Chart - Shape</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>{data?.firstName} Sales Target</CardTitle>
+        <CardDescription>
+          from: {data?.start} - To: {data?.end}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -521,18 +905,19 @@ export function ChartRadialShape() {
         >
           <RadialBarChart
             data={chartData}
-            endAngle={100}
-            innerRadius={65}
-            outerRadius={95}
+            startAngle={0}
+            endAngle={250}
+            outerRadius={90}
+            innerRadius={80}
           >
             <PolarGrid
               gridType="circle"
               radialLines={false}
               stroke="none"
               className="first:fill-muted last:fill-background"
-              polarRadius={[86, 74]}
+              polarRadius={[90, 80]}
             />
-            <RadialBar dataKey="visitors" background />
+            <RadialBar dataKey="visitors" background cornerRadius={10} />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -549,14 +934,14 @@ export function ChartRadialShape() {
                           y={viewBox.cy}
                           className="fill-foreground text-4xl font-bold"
                         >
-                          {chartData[0].visitors.toLocaleString()}
+                          {(data?.totalSales || 0).toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Sales
                         </tspan>
                       </text>
                     );
@@ -569,10 +954,12 @@ export function ChartRadialShape() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          You have completed {(data?.totalSales || 0).toLocaleString()} /{" "}
+          {(data?.salesTarget || 0).toLocaleString()}
+          <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          {data?.percentage || "0.00"}% of target achieved
         </div>
       </CardFooter>
     </Card>

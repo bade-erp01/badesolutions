@@ -285,26 +285,55 @@ export default function MainDash({ userData }) {
         >
           {/* KPI cards */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-500">Today&lsquo;s Sales</h3>
-                  <p className="text-2xl text-green-600 font-bold mt-1">
-                    {/* total sales */}
-                    <TodaySaleTotal
-                      tenantData={tenantData}
-                      userData={userData}
-                    />
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Auto Updates every 1 minutes
-                  </p>
-                </div>
-                <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
-                  <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
-                </div>
-              </div>
-            </div>
+            <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
+                            <p className="text-2xl text-green-600 font-bold mt-1">
+                              {/* total sales */}
+                              <TodaySaleTotal tenantData={tenantData} userData={userData} />
+                            </p>
+                            <p
+                              className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
+                                tenantData.TodaySale > tenantData.yesterdaySale
+                                  ? 'text-green-600'
+                                  : tenantData.TodaySale < tenantData.yesterdaySale
+                                  ? 'text-red-600'
+                                  : 'text-gray-500'
+                              }`}
+                            >
+                              {(() => {
+                                const today = tenantData.TodaySale || 0;
+                                const yesterday = tenantData.yesterdaySale || 0;
+                                const diff = today - yesterday;
+                                const percentage =
+                                  yesterday > 0 ? ((diff / yesterday) * 100) : '0.00';
+            
+                                if (today > yesterday) {
+                                  return (
+                                    <>
+                                      <ArrowTrendingUpIcon className="w-4 h-4" />
+                                      {`Up ${percentage}% from yesterday (${yesterday})`}
+                                    </>
+                                  );
+                                } else if (today < yesterday) {
+                                  return (
+                                    <>
+                                      <ArrowTrendingDownIcon className="w-4 h-4" />
+                                      {`Down ${percentage}% from yesterday (${yesterday})`}
+                                    </>
+                                  );
+                                } else {
+                                  return `No change from yesterday (${yesterday})`;
+                                }
+                              })()}
+                            </p>
+                          </div>
+                          <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
+                            <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
+                          </div>
+                        </div>
+                      </div>
 
             <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
               <div className="flex items-center justify-between">

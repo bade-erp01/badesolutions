@@ -26,7 +26,7 @@ export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
         </h1>
 
         {/* Search Bar */}
-        {navtitle && (
+        {navtitle && navtitle !== "Dashboard" && (
           <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 mx-8 max-w-md">
             <div className="relative w-full">
               <Input
