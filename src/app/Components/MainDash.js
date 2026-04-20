@@ -312,7 +312,12 @@ export default function MainDash({ userData }) {
                       const today = Number(tenantData.TodaySale) || 0;
                       const yesterday = Number(tenantData.yesterdaySale) || 0;
                       const diff = today - yesterday;
-                      const percentage = ((diff / yesterday) * 100).toFixed(2);
+                      let percentage;
+                      if (yesterday > 0) {
+                        percentage = ((diff / yesterday) * 100).toFixed(2);
+                      } else {
+                        percentage = "100"; // or "100.00" if you want to show full increase
+                      }
 
                       if (today > yesterday) {
                         return (
