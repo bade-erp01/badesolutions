@@ -914,8 +914,12 @@ export default function MainDash({ userData }) {
             )}
         </div>
       ) : (
-        <main className="flex-1">
-          <section className="w-full max-w-4xl mx-auto p-8">
+        <main className="flex-1" style={{
+          backgroundImage: `url("/business-report-graphs-charts-business-reports-pile-documents-business-concept.jpg")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}>
+          <section className="w-full max-w-4xl p-9">
             <div className="text-center space-y-6">
               <p className="text-gray-600 max-w-2xl mx-auto text-md">
                 Track your sales performance, manage customer relationships, and monitor your daily activities all in one place.
@@ -933,10 +937,10 @@ export default function MainDash({ userData }) {
                 Navigate through the menu to explore your dashboard features and gain valuable insights into your business operations.
               </p>
             </div>
+          </section>
             <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
               © <span id="year">{moment().format("YYYY")}</span> Business Automated Dynamic Enterprise — All rights reserved.
             </footer>
-          </section>
         </main>
       )}
     </>
