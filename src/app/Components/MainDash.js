@@ -316,25 +316,25 @@ export default function MainDash({ userData }) {
                       if (yesterday > 0) {
                         percentage = ((diff / yesterday) * 100).toFixed(2);
                       } else {
-                        percentage = "100"; // or "100.00" if you want to show full increase
+                        percentage = "100"; 
                       }
 
                       if (today > yesterday) {
                         return (
                           <>
                             <ArrowTrendingUpIcon className="w-4 h-4" />
-                            {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
+                            {`Up ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
                           </>
                         );
                       } else if (today < yesterday) {
                         return (
                           <>
                             <ArrowTrendingDownIcon className="w-4 h-4" />
-                            {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
+                            {`Down ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
                           </>
                         );
                       } else {
-                        return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`;
+                        return `No change from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`;
                       }
                     })()}
                   </p>
