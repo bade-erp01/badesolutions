@@ -5,6 +5,7 @@ import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import Page from "./page";
+import {Encrypt} from "../../../../../../../Functions/Functions"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -63,22 +64,19 @@ const [storeRes, ExpenseCat] = await Promise.all([
       revalidate: 120,
     },
   }),
+
   fetch(`${baseUrl}/api/ExpenseCat`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
+      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+      access: `${Encrypt(userData.user._id)}`,
     },
-    // next: {
-    //   revalidate: 120,
-    // },
   }),
 ]);
 
 const StoreList = await storeRes.json();
 const ExpenseCatList = await ExpenseCat.json();
-
 
   // check if user has access to crm and cash register
   const ExpenseFinder = userData.user.Apps.find((app) => {

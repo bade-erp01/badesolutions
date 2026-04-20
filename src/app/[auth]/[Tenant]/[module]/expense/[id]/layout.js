@@ -1,7 +1,6 @@
 import {fetchUser} from "../../../../../../../Functions/useerDataRefresh"
 import { notFound } from "next/navigation";
-import { Encrypt } from "../../../../../../../Functions/Mics";
-import User from "../../../../../../../models/Users"
+import { Encrypt,Dencrypt } from "../../../../../../../Functions/Functions";
 import Page from "./page"
 
 
@@ -55,8 +54,7 @@ export default async function ExpenseLayout({ children, params }) {
           method: "GET",
           headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${userData.business.tenantId}`,
-              dbConnect: `Bearer ${userData.business.rustyRoof}`,
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
               access: `${Encrypt(userData.user._id)}`,
             },
         });

@@ -131,7 +131,7 @@ export default async function ExpenseLayout({ children, params }) {
           {/* Main Content */}
           <main className="flex-1">
            <section className="w-full max-w-7xl flex flex-col gap-6 rounded-lg  relative z-10 h-[83vh] overflow-y-auto">
-            <ExpensesPage baseUrl={baseUrl} userData={userData} />
+            {children}
           </section>
           </main>
         </div>

@@ -9,6 +9,17 @@ import {
   SuccessToast,
   Encrypt,
 } from "../../../../../../../Functions/Mics";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
 export default function Page({
   StoreList,
@@ -34,36 +45,23 @@ export default function Page({
     setServerError(null);
   };
 
-  //      const validateForm = () => {
-  //     const newErrors = {};
-  //     if (!formData.Username || formData.Username.length < 2) {
-  //       newErrors.Username = "Name is required and must be at least 2 characters.";
-  //     }
-  //     if (!formData.phone || !/^\d{10,15}$/.test(formData.phone)) {
-  //       newErrors.phone = "Telephone is required and must be valid.";
-  //     }
-  //     if (!formData.Email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.Email)) {
-  //       newErrors.Email = "Email is required and must be valid.";
-  //     }
-  //     if (formData.Debt && isNaN(formData.Debt)) {
-  //       newErrors.Debt = "Opening Balance must be a number.";
-  //     }
-  //     setErrors(newErrors);
-  //     return Object.keys(newErrors).length === 0;
-  //   };
+  const handleSelectChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: undefined });
+    setServerMsg(null);
+    setServerError(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!validateForm()) return;
 
     try {
-      plsWait("Submitung Expense data...");
+      plsWait("Submitting Expense data...");
+      setLoading(true);
       const config = {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
-          dbConnect: `Bearer ${businessData.rustyRoof}`,
-          "X-Requested-With": "XMLHttpRequest",
           access: `${Encrypt(userData._id)}`,
         },
       };
@@ -74,10 +72,9 @@ export default function Page({
         config,
       );
 
-      SuccessToast(response.data?.message || "Customer created successfully!");
+      SuccessToast(response.data?.message || "Expense created successfully!");
       setFormData({});
 
-      ///redirect to sigle customer page
       router.push(
         `/${params.auth}/${params.Tenant}/${`expense`}/${`expense`}/${response.data.expense}?Modules=${`expense`}`,
       );
@@ -87,33 +84,23 @@ export default function Page({
           error.message ||
           "Failed to create expense. Please try again.",
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="w-full  mx-auto p-10 bg-white shadow-xl border border-gray-200">
+    <div className="w-full mx-auto p-10 bg-white shadow-xl border border-gray-200">
       <form className="space-y-10" onSubmit={handleSubmit} autoComplete="off">
         {/* Header */}
         <div className="border-b pb-4">
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-            ✨ New Expense
+            New Expense
           </h2>
           <p className="text-sm text-gray-500 mt-1">
             Fill in the details below to record a new expense.
           </p>
         </div>
-
-        {/* Success & Error Messages */}
-        {serverMsg && (
-          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-green-700 shadow-sm">
-            ✅ <span>{serverMsg}</span>
-          </div>
-        )}
-        {serverError && (
-          <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 shadow-sm">
-            ⚠️ <span>{serverError}</span>
-          </div>
-        )}
 
         {/* Form Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -121,21 +108,19 @@ export default function Page({
           <div>
             <label
               htmlFor="payee"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Beneficiary <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               id="payee"
               name="payee"
               type="text"
               required
               onChange={handleChange}
               value={formData.payee || ""}
-              className={`mt-2 block w-full rounded-lg border ${
-                errors.payee ? "border-red-400" : "border-gray-300"
-              } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
               placeholder="Beneficiary Name"
+              className={`${errors.payee ? "border-red-400" : ""} text-black`}
             />
             {errors.payee && (
               <p className="text-red-500 text-xs mt-1">{errors.payee}</p>
@@ -146,21 +131,19 @@ export default function Page({
           <div>
             <label
               htmlFor="payeebankAccount"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Beneficiary Account Number <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               id="payeebankAccount"
               name="payeebankAccount"
               type="text"
               required
               onChange={handleChange}
               value={formData.payeebankAccount || ""}
-              className={`mt-2 block w-full rounded-lg border ${
-                errors.payeebankAccount ? "border-red-400" : "border-gray-300"
-              } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
               placeholder="e.g. 0123456789"
+              className={`${errors.payeebankAccount ? "border-red-400" : ""} text-black`}
             />
             {errors.payeebankAccount && (
               <p className="text-red-500 text-xs mt-1">
@@ -173,20 +156,18 @@ export default function Page({
           <div>
             <label
               htmlFor="payeeBankName"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Beneficiary Bank <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               id="payeeBankName"
               name="payeeBankName"
               type="text"
               onChange={handleChange}
               value={formData.payeeBankName || ""}
-              className={`mt-2 block w-full rounded-lg border ${
-                errors.payeeBankName ? "border-red-400" : "border-gray-300"
-              } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
               placeholder="GT Bank..."
+              className={`${errors.payeeBankName ? "border-red-400" : ""} text-black`}
             />
             {errors.payeeBankName && (
               <p className="text-red-500 text-xs mt-1">
@@ -199,19 +180,17 @@ export default function Page({
           <div>
             <label
               htmlFor="Date"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Date <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               id="Date"
               name="Date"
               type="date"
               onChange={handleChange}
               value={formData.Date || ""}
-              className={`mt-2 block w-full rounded-lg border ${
-                errors.Date ? "border-red-400" : "border-gray-300"
-              } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
+              className={`${errors.Date ? "border-red-400" : ""} text-black`}
             />
             {errors.Date && (
               <p className="text-red-500 text-xs mt-1">{errors.Date}</p>
@@ -222,21 +201,19 @@ export default function Page({
           <div>
             <label
               htmlFor="Amount"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Amount <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               id="Amount"
               name="Amount"
               type="number"
               onChange={handleChange}
               value={formData.Amount || 0}
               required
-              className={`mt-2 block w-full rounded-lg border ${
-                errors.Amount ? "border-red-400" : "border-gray-300"
-              } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50`}
               placeholder="0"
+              className={`${errors.Amount ? "border-red-400" : ""} text-black`}
             />
             {errors.Amount && (
               <p className="text-red-500 text-xs mt-1">{errors.Amount}</p>
@@ -244,47 +221,52 @@ export default function Page({
           </div>
 
           {/* Store */}
-          <div>
+          <div className="w-full">
             <label
               htmlFor="WHID"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Store <span className="text-red-500">*</span>
             </label>
             <select
               id="WHID"
               name="WHID"
-              required
-              onChange={handleChange}
               value={formData.WHID || ""}
-              className="mt-2 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50"
+              onChange={(e) => handleSelectChange("WHID", e.target.value)}
+              className="w-full rounded-md border border-gray-300 text-black px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             >
-              <option value="">Choose...</option>
-              {StoreList.map((store) => (
+              <option value="" disabled>
+                Choose a store...
+              </option>
+              {StoreList?.map((store) => (
                 <option key={store._id} value={store._id}>
                   {store.WHName}
                 </option>
               ))}
             </select>
+            {errors.WHID && (
+              <p className="text-xs text-red-500 mt-1">{errors.WHID}</p>
+            )}
           </div>
 
           {/* Expense Tags */}
           <div>
             <label
               htmlFor="category"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Expense Tags
             </label>
             <select
               id="category"
               name="category"
-              onChange={handleChange}
-              required
               value={formData.category || ""}
-              className="mt-2 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50"
+              onChange={(e) => handleSelectChange("category", e.target.value)}
+              className="w-full rounded-md border border-gray-300 text-black px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             >
-              <option value="">Select...</option>
+              <option value="" disabled>
+                Select a tag...
+              </option>
               {ExpenseCatList.sort((a, b) => a.NAME.localeCompare(b.NAME))
                 .filter((cate) => cate.status)
                 .map((cat) => (
@@ -293,68 +275,41 @@ export default function Page({
                   </option>
                 ))}
             </select>
+            {errors.category && (
+              <p className="text-xs text-red-500 mt-1">{errors.category}</p>
+            )}
           </div>
 
           {/* Remarks */}
           <div className="md:col-span-2">
             <label
               htmlFor="remarks"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Remarks
             </label>
             <textarea
               id="remarks"
               name="remarks"
-              rows="3"
+              rows={3}
               onChange={handleChange}
               value={formData.remarks || ""}
-              className="mt-2 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-800 px-4 py-2 bg-gray-50"
               placeholder="Write a remark or note to approval office..."
-            ></textarea>
+              className="w-full rounded-md border border-gray-300 text-black px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            />
+            {errors.remarks && (
+              <p className="text-xs text-red-500 mt-1">{errors.remarks}</p>
+            )}
           </div>
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-end mt-10">
           {userData.expenseUser && (
-            <button
-              type="submit"
-              disabled={loading}
-              className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-lg shadow-md transition ${
-                loading
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-            >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8z"
-                    />
-                  </svg>
-                  Submitting...
-                </>
-              ) : (
-                "Submit Expense for Approval"
-              )}
-            </button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? "Submitting..." : "Submit Expense for Approval"}
+            </Button>
           )}
         </div>
       </form>
