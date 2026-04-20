@@ -86,7 +86,7 @@ export default async function paymentlayout({ params }) {
          >
            <BackButton />
            <hr />
-           {(data.Payment.status === 'posted' && (userData?.user?.isAccountant || userData?.user?.postPayment)) && (
+           {(data.Payment.status === 'posted' && (userData?.user?.isAccountant )) && (
               <PaymentReceipt business={userData.business} payment={data.Payment} cust={data.Customers?.Username.toUpperCase()} />
           )}
 
