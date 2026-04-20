@@ -130,15 +130,17 @@ export default function DashboardLayout({ userData, baseUrl }) {
 
           {/* Navigation links bg-gray-200/50*/}
           <nav className="w-full space-y-2">
-            <Link
+            {userData.user.c_levelDash && (
+              <Link
               href={`#`}
               className={
                 "flex items-center gap-3 p-3 rounded-md transition bg-gray-200/50"
               }
-            >
-              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Dashboard</span>
-            </Link>
+              >
+                <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+                <span className="text-xs">Dashboard</span>
+              </Link>
+            )}
 
             <Link
               href="/SalesPortal/Products"
