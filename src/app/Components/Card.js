@@ -127,7 +127,7 @@ const Card = ({ data, module }) => {
               </span>
             )}
             {data.refNo && (
-              <span variant="outline" className={`${data.status ==='Approved' ? 'bg-green-300':"bg-amber-300"} p-1 text-xs rounded-md`}>
+              <span variant="outline" className={`p-1 text-xs rounded-md`}>
                 {data.status}
               </span>
             )}

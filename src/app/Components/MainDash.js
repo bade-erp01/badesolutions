@@ -167,6 +167,9 @@ export default function MainDash({ userData }) {
 
       // Set interval for periodic fetch
       intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
+    } else {
+      // show second dashboard
+      setLoading(false);
     }
 
     // Tab visibility
@@ -286,54 +289,58 @@ export default function MainDash({ userData }) {
           {/* KPI cards */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
-                            <p className="text-2xl text-green-600 font-bold mt-1">
-                              {/* total sales */}
-                              <TodaySaleTotal tenantData={tenantData} userData={userData} />
-                            </p>
-                            <p
-                              className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
-                                tenantData.TodaySale > tenantData.yesterdaySale
-                                  ? 'text-green-600'
-                                  : tenantData.TodaySale < tenantData.yesterdaySale
-                                  ? 'text-red-600'
-                                  : 'text-gray-500'
-                              }`}
-                            >
-                              {(() => {
-                                const today = tenantData.TodaySale || 0;
-                                const yesterday = formatNumberShort(tenantData.yesterdaySale) || 0;
-                                const diff = today - yesterday;
-                                const percentage =
-                                  yesterday > 0 ? ((diff / yesterday) * 100) : '0.00';
-            
-                                if (today > yesterday) {
-                                  return (
-                                    <>
-                                      <ArrowTrendingUpIcon className="w-4 h-4" />
-                                      {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
-                                    </>
-                                  );
-                                } else if (today < yesterday) {
-                                  return (
-                                    <>
-                                      <ArrowTrendingDownIcon className="w-4 h-4" />
-                                      {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
-                                    </>
-                                  );
-                                } else {
-                                  return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${yesterday})`;
-                                }
-                              })()}
-                            </p>
-                          </div>
-                          <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
-                            <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
-                          </div>
-                        </div>
-                      </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
+                  <p className="text-2xl text-green-600 font-bold mt-1">
+                    {/* total sales */}
+                    <TodaySaleTotal
+                      tenantData={tenantData}
+                      userData={userData}
+                    />
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
+                      tenantData.TodaySale > tenantData.yesterdaySale
+                        ? "text-green-600"
+                        : tenantData.TodaySale < tenantData.yesterdaySale
+                          ? "text-red-600"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {(() => {
+                      const today = tenantData.TodaySale || 0;
+                      const yesterday =
+                        formatNumberShort(tenantData.yesterdaySale) || 0;
+                      const diff = today - yesterday;
+                      const percentage =
+                        yesterday > 0 ? (diff / yesterday) * 100 : "0.00";
+
+                      if (today > yesterday) {
+                        return (
+                          <>
+                            <ArrowTrendingUpIcon className="w-4 h-4" />
+                            {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
+                          </>
+                        );
+                      } else if (today < yesterday) {
+                        return (
+                          <>
+                            <ArrowTrendingDownIcon className="w-4 h-4" />
+                            {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
+                          </>
+                        );
+                      } else {
+                        return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${yesterday})`;
+                      }
+                    })()}
+                  </p>
+                </div>
+                <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
+                  <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
+                </div>
+              </div>
+            </div>
 
             <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
               <div className="flex items-center justify-between">
@@ -908,12 +915,27 @@ export default function MainDash({ userData }) {
         </div>
       ) : (
         <main className="flex-1">
-          <section className="w-full max-w-7xl mx-auto p-6 h-[500px] overflow-y-auto bg-linear-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
-            <div className="mt-6">
-              <div className="w-full text-center">
-                {/* show dashboard that is user orientend and not business oriented */}
+          <section className="w-full max-w-4xl mx-auto p-8">
+            <div className="text-center space-y-6">
+              <p className="text-gray-600 max-w-2xl mx-auto text-md">
+                Track your sales performance, manage customer relationships, and monitor your daily activities all in one place.
+              </p>
+              <div className="flex justify-center pt-4">
+                <Image
+                  src={userData.business.companyLogo}
+                  alt="Company Logo"
+                  width={150}
+                  height={150}
+                  className="rounded-full shadow-lg hover:shadow-2xl transition-shadow"
+                />
               </div>
+              <p className="text-gray-500 text-sm pt-6">
+                Navigate through the menu to explore your dashboard features and gain valuable insights into your business operations.
+              </p>
             </div>
+            <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
+              © <span id="year">{moment().format("YYYY")}</span> Business Automated Dynamic Enterprise — All rights reserved.
+            </footer>
           </section>
         </main>
       )}
@@ -1022,12 +1044,15 @@ export function GropuedInvRadarChart({ invoice, business }) {
     }));
   }, [invoice, business, startDate, endDate]);
 
-  const chartConfig = useMemo(() => ({
-    debt: {
-      label: "Total sales",
-      color: "var(--chart-3)",
-    },
-  }), []);
+  const chartConfig = useMemo(
+    () => ({
+      debt: {
+        label: "Total sales",
+        color: "var(--chart-3)",
+      },
+    }),
+    [],
+  );
 
   return (
     <Card>
@@ -1061,7 +1086,8 @@ export function GropuedInvRadarChart({ invoice, business }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="text-muted-foreground">
-          {chartData.length} pricelists displayed for {moment().format("MMMM")} sales
+          {chartData.length} pricelists displayed for {moment().format("MMMM")}{" "}
+          sales
         </div>
       </CardFooter>
     </Card>

@@ -15,12 +15,7 @@ import { Encrypt, Dencrypt } from "../../../../Functions/Functions";
 import Footer2 from "@/app/Components/Footer2";
 import { useRouter } from "next/navigation";
 
-export default function Login({
-  userInfo,
-  businessInfo,
-  url,
-  SessionId,
-}) {
+export default function Login({ userInfo, businessInfo, url, SessionId }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const [date, setDate] = useState("");
@@ -80,7 +75,7 @@ export default function Login({
   // login form
 
   const handleChange = async (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value, location });
   };
 
   const handleSubmit = async (e) => {
@@ -128,7 +123,8 @@ export default function Login({
   return (
     <div
       style={{
-        backgroundImage: "url('/kvistholt-photography-oZPwn40zCK4-unsplash.jpg')",
+        backgroundImage:
+          "url('/kvistholt-photography-oZPwn40zCK4-unsplash.jpg')",
         backgroundAttachment: "fixed",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -145,7 +141,6 @@ export default function Login({
               Enterprise sales productivity suite
             </p>
           </div>
-          
         </div>
       </nav>
       <div className="min-h-screen flex items-center justify-center  p-4">
@@ -268,11 +263,25 @@ export default function Login({
               </p>
             </div>
           ) : (
-            <h3
-              className={`text-white font-semibold font-stretch-50% text-shadow-2xl text-2md`}
-            >
-              Welcome Back {userInfo.firstName}..!!
-            </h3>
+            <div className="max-w-sm w-full bg-white rounded-xl shadow-lg p-4 flex items-center gap-4">
+              <Image
+                src={
+                  userInfo?.image || businessInfo?.companyLogo || "/bade.jpg"
+                }
+                alt="Logo"
+                width={60}
+                height={60}
+                className="rounded-full shadow-md"
+                quality={100}
+                loading="eager"
+              />
+              <div>
+                <h3 className="text-amber-950 font-semibold text-md leading-tight">
+                  Welcome Back {userInfo?.firstName || "Guest"}..!!
+                </h3>
+                <p className="text-sm text-gray-600">Glad to see you again</p>
+              </div>
+            </div>
           )}
         </div>
         {/* Decorative spheres and background */}

@@ -15,7 +15,7 @@ import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   BanknotesIcon,
-  BellAlertIcon
+  BellAlertIcon,
 } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Link from "next/link";
@@ -228,7 +228,11 @@ export default function DashboardLayout({ userData, baseUrl }) {
         <header className="mb-2">
           <div className="flex items-center space-x-2">
             <Image
-              src={userData.user.image || userData.business.companyLogo || "/person.png"}
+              src={
+                userData.user.image ||
+                userData.business.companyLogo ||
+                "/person.png"
+              }
               className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
               // loading="lazy"
               priority={true}
@@ -315,6 +319,7 @@ export function MainDash({ userData, baseUrl }) {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
             access: `${Encrypt(userData?.user._id)}`,
             // cache: "force-cache" // or "default", "reload", "no-store"
+            next: { revalidate: 60 },
           },
         });
 
@@ -350,6 +355,9 @@ export function MainDash({ userData, baseUrl }) {
 
       // Set interval for periodic fetch
       intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
+    } else {
+      // show second dashboard
+      setLoading(false);
     }
 
     // Tab visibility
@@ -468,55 +476,60 @@ export function MainDash({ userData, baseUrl }) {
         >
           {/* KPI cards */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-           <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
-                <p className="text-2xl text-green-600 font-bold mt-1">
-                  {/* total sales */}
-                  <TodaySaleTotal tenantData={tenantData} userData={userData} />
-                </p>
-                <p
-                  className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
-                    tenantData.TodaySale > tenantData.yesterdaySale
-                      ? 'text-green-600'
-                      : tenantData.TodaySale < tenantData.yesterdaySale
-                      ? 'text-red-600'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  {(() => {
-                    const today = tenantData.TodaySale || 0;
-                    const yesterday = tenantData.yesterdaySale || 0;
-                    const diff = today - yesterday;
-                    const percentage =
-                      yesterday > 0 ? ((diff / yesterday) * 100).toFixed(2) : '0.00';
+            <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
+                  <p className="text-2xl text-green-600 font-bold mt-1">
+                    {/* total sales */}
+                    <TodaySaleTotal
+                      tenantData={tenantData}
+                      userData={userData}
+                    />
+                  </p>
+                  <p
+                    className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
+                      tenantData.TodaySale > tenantData.yesterdaySale
+                        ? "text-green-600"
+                        : tenantData.TodaySale < tenantData.yesterdaySale
+                          ? "text-red-600"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {(() => {
+                      const today = tenantData.TodaySale || 0;
+                      const yesterday = tenantData.yesterdaySale || 0;
+                      const diff = today - yesterday;
+                      const percentage =
+                        yesterday > 0
+                          ? ((diff / yesterday) * 100).toFixed(2)
+                          : "0.00";
 
-                    if (today > yesterday) {
-                      return (
-                        <>
-                          <ArrowTrendingUpIcon className="w-4 h-4" />
-                          {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
-                        </>
-                      );
-                    } else if (today < yesterday) {
-                      return (
-                        <>
-                          <ArrowTrendingDownIcon className="w-4 h-4" />
-                          {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
-                        </>
-                      );
-                    } else {
-                      return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${yesterday})`;
-                    }
-                  })()}
-                </p>
-              </div>
-              <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
-                <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
+                      if (today > yesterday) {
+                        return (
+                          <>
+                            <ArrowTrendingUpIcon className="w-4 h-4" />
+                            {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
+                          </>
+                        );
+                      } else if (today < yesterday) {
+                        return (
+                          <>
+                            <ArrowTrendingDownIcon className="w-4 h-4" />
+                            {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
+                          </>
+                        );
+                      } else {
+                        return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${yesterday})`;
+                      }
+                    })()}
+                  </p>
+                </div>
+                <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
+                  <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
+                </div>
               </div>
             </div>
-          </div>
 
             <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
               <div className="flex items-center justify-between">
@@ -738,7 +751,6 @@ export function MainDash({ userData, baseUrl }) {
                   ))}
 
                 <div className="mt-6 border-t-2">
-
                   <div className="  transition-all duration-700 mt-5">
                     <ChartRadialShape data={tenantData?.result} />
                   </div>
@@ -746,9 +758,10 @@ export function MainDash({ userData, baseUrl }) {
               </div>
             </aside>
           </div>
-          {tenantData.Routes.filter(cust => cust.Debt > 0)?.length > 0 && (
+          {tenantData.Routes.filter((cust) => cust.Debt > 0)?.length > 0 && (
             <div className="w-full text-center mt-3">
-              {tenantData.Routes.filter(cust => cust.Debt > 0)?.length > 0 && (
+              {tenantData.Routes.filter((cust) => cust.Debt > 0)?.length >
+                0 && (
                 <div className="w-full text-center mt-3">
                   <Marquee
                     gradient={false}
@@ -758,16 +771,18 @@ export function MainDash({ userData, baseUrl }) {
                     <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
                       ⚠️ Debtors:
                     </span>
-                    {tenantData.Routes.filter(cust => cust.Debt > 0).map((debtor) => (
-                      <span
-                        key={debtor._id}
-                        className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
-                      >
-                        {debtor.Username} owes{" "}
-                        {userData.business.currency?.currency.Symbol}
-                        {debtor.Debt?.toLocaleString()},
-                      </span>
-                    ))}
+                    {tenantData.Routes.filter((cust) => cust.Debt > 0).map(
+                      (debtor) => (
+                        <span
+                          key={debtor._id}
+                          className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                        >
+                          {debtor.Username} owes{" "}
+                          {userData.business.currency?.currency.Symbol}
+                          {debtor.Debt?.toLocaleString()},
+                        </span>
+                      ),
+                    )}
                   </Marquee>
                 </div>
               )}
@@ -815,32 +830,34 @@ export function MainDash({ userData, baseUrl }) {
         </div>
       ) : (
         <main className="flex-1">
-          <section className="w-full max-w-7xl mx-auto p-6 h-[500px] overflow-y-auto bg-linear-to-br from-gray-100 via-white to-gray-200 backdrop-blur-md rounded-xl shadow-xl">
-            <div className="mt-6">
-              <div className="w-full text-center">
-                {/* show dashboard that is user orientend and not business oriented */}
-                <h2 className="text-2xl font-bold text-gray-700 mb-4">
-                  Welcome {userData.user.firstName} to your Sales Portal.
-                </h2>
-                <p className="text-gray-500 mb-6">
-                  Here you can view your sales performance, manage your customers, and track your routes. Explore the different sections to get insights into your sales activities and stay on top of your daily tasks.
+          <main className="flex-1">
+            <section className="w-full max-w-4xl mx-auto p-8">
+              <div className="text-center space-y-6">
+                <p className="text-gray-600 max-w-2xl mx-auto text-md">
+                  Track your sales performance, manage customer relationships,
+                  optimize your routes, and monitor your daily activities all in
+                  one place.
                 </p>
-                <div className="flex justify-center">
+                <div className="flex justify-center pt-4">
                   <Image
                     src={userData.business.companyLogo}
-                    alt="Dashboard Placeholder"
-                    width={400}
-                    height={300}
-                    className="rounded-lg shadow-md"
+                    alt="Company Logo"
+                    width={100}
+                    height={100}
+                    className="rounded-full shadow-lg hover:shadow-2xl transition-shadow"
                   />
-                  </div>
+                </div>
+                <p className="text-gray-500 text-sm pt-6">
+                  Navigate through the menu to explore your dashboard features
+                  and gain valuable insights into your business operations.
+                </p>
               </div>
-              <footer className="mt-8 text-sm text-gray-500">
+              <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
                 © <span id="year">{moment().format("YYYY")}</span> Business
                 Automated Dynamic Enterprise — All rights reserved.
               </footer>
-            </div>
-          </section>
+            </section>
+          </main>
         </main>
       )}
     </>

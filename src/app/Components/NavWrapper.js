@@ -78,13 +78,15 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
           {/* Navigation links bg-gray-200/50*/}
           <nav className="w-full space-y-2">
-          <Link
-            href={`/SalesPortal/Dashboard`}
-            className={"flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "}
-          >
-            <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
-            <span className="text-xs">Dashboard</span>
-          </Link>
+          {userData.user.c_levelDash && (
+            <Link
+              href={`/SalesPortal/Dashboard`}
+              className={"flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "}
+            >
+              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Dashboard</span>
+            </Link>
+          )}
           
             <Link
               href="/SalesPortal/Products"

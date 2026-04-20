@@ -36,7 +36,7 @@ export default async function layout({ children, params }) {
   const userInfo = userData.user;
   const businessInfo = userData.business;
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const SessionId = userData?.SessionId?.data;
+  const SessionId = userData?.SessionId || null;
 
   return (
     <>
