@@ -1,6 +1,8 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -10,114 +12,120 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Encrypt, ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics";
-import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
+import { Encrypt, ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics"
+import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions"
 
-export default function DialogDemo({PayId,pendingInvoices, userData,baseUrl}) {
-  const [invoices] = useState(pendingInvoices ||[]);
-  const [invoice,setInvoice] = useState("")
-  const router = useRouter();
-
+export default function DialogDemo({ PayId, pendingInvoices, userData }) {
+  const [invoices] = useState(pendingInvoices || [])
+  const [invoice, setInvoice] = useState("")
+  const router = useRouter()
 
   const OnSubmit = async () => {
-   
     try {
-       // Ask for confirmation
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Once assigned, this payment cannot be reassigned. Do you want to proceed?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#2d5274",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, proceed",
-      cancelButtonText: "Cancel"
-    });
-
-    if (!result.isConfirmed) {
-      return; // stop if user cancels
-    }
-
-      const formData = {
-        invId: invoice,
-      };
-
       plsWait("Registering payment to sales...")
 
-      const response = await fetch(`${baseUrl}/api/DownPatToInv/${Encrypt(PayId._id)}`, {
+      const formData = { invId:Encrypt(invoice) }
+
+      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/DownPayToInvoice/${Encrypt(PayId._id)}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: Encrypt(userData.user._id),
+           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+           access: `${Encrypt(userData.user._id)}`,
+          "idempotency-key": `assign-payment-${PayId._id}`,
         },
         body: JSON.stringify(formData),
-      });
+      })
 
-      const data = await response.json();
-
+      const data = await response.json()
       if (!response.ok) {
-        throw new Error(data.error);
+        throw new Error(data.error)
       } else {
-        SuccessToast(data.message);
-        router.refresh();
+        SuccessToast(data.message)
+        router.refresh()
       }
     } catch (err) {
-      ErrorMessage(err.message);
+      ErrorMessage(err.message)
     }
-  };
+  }
 
   return (
     <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button
-            variant="default"
-            className="mt-3 flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full"
-          >
-            Assign {PayId.paymentReferenceNo} to an invoice
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Assign {PayId.crAmount.toLocaleString()} to customer's Invoice</DialogTitle>
-            <DialogDescription className="text-red-400 text-xs">
-              Note that changes will be reflected in the customer's Aging
-              ledger. and once assigned, the payment cannot be reassigned to
-              another invoice. Ensure to verify and confirm the invoice details
-              before proceeding.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="invoice-select">Invoice Ref</Label>
-              <select
-                id="invoice-select"
-                name="invId"
-                className="border rounded-md p-2"
-                onChange={(e)=>setInvoice(e.target.value)}
-              >
-                <option value="">Select an invoice</option>
-                {invoices?.filter(inv =>inv.paymentMethod < inv.grandTotal).map((inv) => (
-                  <option key={inv._id} value={inv._id} className="text-xs">
-                   {inv.billStatus.toUpperCase().slice(0,3)}/{inv.billReferenceNo} - ₦{(inv.grandTotal - inv.paymentMethod).toLocaleString()} unsettled
-                  </option>
-                ))}
-              </select>
-            </div>
+      <DialogTrigger asChild>
+        <Button variant="default" className="w-full mt-3">
+          Assign {PayId.paymentReferenceNo.slice(0, 10)}... to an invoice
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            Assign {PayId.crAmount.toLocaleString()} to customer’s Invoice
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Once assigned, the payment cannot be reassigned. Ensure invoice details are correct before proceeding.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="invoice-select">Invoice Ref</Label>
+            <Select onValueChange={(val) => setInvoice(val)}>
+              <SelectTrigger id="invoice-select">
+                <SelectValue placeholder="Select an invoice" />
+              </SelectTrigger>
+              <SelectContent>
+                {invoices
+                  ?.filter((inv) => inv.paymentMethod < inv.grandTotal)
+                  .map((inv) => (
+                    <SelectItem key={inv._id} value={inv._id}>
+                      {inv.billStatus.toUpperCase().slice(0, 3)}/{inv.billReferenceNo} – ₦
+                      {(inv.grandTotal - inv.paymentMethod).toLocaleString()} unsettled
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit" onClick={OnSubmit}>Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+        </div>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+
+          {/* Confirmation using shadcn AlertDialog */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button disabled={!invoice}>Save changes</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Once assigned, this payment cannot be reassigned. Do you want to proceed?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={OnSubmit}>Yes, proceed</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
-  );
+  )
 }
