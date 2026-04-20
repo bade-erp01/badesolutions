@@ -49,7 +49,7 @@ import {
   MapIcon,
   CubeIcon,
   UserPlusIcon,
-  PencilSquareIcon,
+  BuildingStorefrontIcon,
   QueueListIcon,
   Square3Stack3DIcon,
 } from "@heroicons/react/24/outline";
@@ -132,10 +132,10 @@ export default function DashboardLayout({ userData, baseUrl }) {
           <nav className="w-full space-y-2">
             {userData.user.c_levelDash && (
               <Link
-              href={`#`}
-              className={
-                "flex items-center gap-3 p-3 rounded-md transition bg-gray-200/50"
-              }
+                href={`#`}
+                className={
+                  "flex items-center gap-3 p-3 rounded-md transition bg-gray-200/50"
+                }
               >
                 <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
                 <span className="text-xs">Dashboard</span>
@@ -185,6 +185,15 @@ export default function DashboardLayout({ userData, baseUrl }) {
             >
               <QueueListIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">Requisitions</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Inventory"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                            ${navtitle === "Inventory" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Inventory</span>
             </Link>
           </nav>
 

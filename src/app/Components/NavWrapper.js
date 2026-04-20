@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,PencilSquareIcon,QueueListIcon,Square3Stack3DIcon } from "@heroicons/react/24/outline";
+import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,BuildingStorefrontIcon,QueueListIcon,Square3Stack3DIcon } from "@heroicons/react/24/outline";
 import "animate.css";
 import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
@@ -135,6 +135,15 @@ export default function NavWrapper({ userData, data, navtitle }) {
             >
               <QueueListIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">Requisitions</span>
+            </Link>
+
+            <Link
+              href="/SalesPortal/Inventory"
+              className={`flex items-center gap-3 p-3 rounded-md transition 
+                ${navtitle === "Inventory" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
+            >
+              <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
+              <span className="text-xs">Inventory</span>
             </Link>
             
           </nav>
