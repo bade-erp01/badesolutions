@@ -189,15 +189,14 @@ export default function DashboardLayout({ userData, baseUrl }) {
 
             {userData.user.workLocation && (
               <Link
-              href="/SalesPortal/Inventory"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
+                href="/SalesPortal/Inventory"
+                className={`flex items-center gap-3 p-3 rounded-md transition 
                             ${navtitle === "Inventory" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Inventory</span>
-            </Link>
-          )}
-          
+              >
+                <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
+                <span className="text-xs">Inventory</span>
+              </Link>
+            )}
           </nav>
 
           {/* Logout pinned at bottom */}
@@ -503,38 +502,42 @@ export function MainDash({ userData, baseUrl }) {
                   </p>
                   <p
                     className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
-                      tenantData.TodaySale > tenantData.yesterdaySale
+                      Number(tenantData.TodaySale) >
+                      Number(tenantData.yesterdaySale)
                         ? "text-green-600"
-                        : tenantData.TodaySale < tenantData.yesterdaySale
+                        : Number(tenantData.TodaySale) <
+                            Number(tenantData.yesterdaySale)
                           ? "text-red-600"
                           : "text-gray-500"
                     }`}
                   >
                     {(() => {
-                      const today = tenantData.TodaySale || 0;
-                      const yesterday = tenantData.yesterdaySale || 0;
+                      const today = Number(tenantData.TodaySale) || 0;
+                      const yesterday = Number(tenantData.yesterdaySale) || 0;
                       const diff = today - yesterday;
-                      const percentage =
-                        yesterday > 0
-                          ? ((diff / yesterday) * 100).toFixed(2)
-                          : "0.00";
+                      let percentage;
+                      if (yesterday > 0) {
+                        percentage = ((diff / yesterday) * 100).toFixed(2);
+                      } else {
+                        percentage = "100";
+                      }
 
                       if (today > yesterday) {
                         return (
                           <>
                             <ArrowTrendingUpIcon className="w-4 h-4" />
-                            {`Up ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
+                            {`Up ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
                           </>
                         );
                       } else if (today < yesterday) {
                         return (
                           <>
                             <ArrowTrendingDownIcon className="w-4 h-4" />
-                            {`Down ${percentage}% from yesterday (${userData.business.currency?.currency.Symbol}${yesterday})`}
+                            {`Down ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
                           </>
                         );
                       } else {
-                        return `No change from yesterday's (${userData.business.currency?.currency.Symbol}${yesterday})`;
+                        return `No change from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`;
                       }
                     })()}
                   </p>
