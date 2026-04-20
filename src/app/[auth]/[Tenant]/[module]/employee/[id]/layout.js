@@ -26,6 +26,23 @@ export default async function layout({ children, params }) {
   const StringedBusiness = JSON.stringify(RawBusiness);
   const businessData = JSON.parse(StringedBusiness);
 
+  // fetch store 
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const res = await fetch(`${baseUrl}/api/Stores`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userInfo.business.tenantId}`,
+      dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+    },
+    next: {
+      revalidate: 120, // 2 minutes
+    },
+  });
+
+
+  const StoreList = await res.json();
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
@@ -55,6 +72,7 @@ export default async function layout({ children, params }) {
                 Backdata={data}
                 module={Params?.module}
                 businessData={businessData}
+                storeList={StoreList || []}
               />
           </section>
         </main>

@@ -33,7 +33,8 @@ export default function SingleEmployeeView({
   businessInfo,
   Backdata,
   module,
-  businessData
+  businessData,
+  storeList,
 }) {
   const states = NaijaStates.states();
   let [user] = useState(userInfo || {});
@@ -66,14 +67,17 @@ export default function SingleEmployeeView({
       }
 
       plsWait("Applying changes, Please wait...");
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/EmployeeUpdate/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-          access: `${Encrypt(userInfo._id)}`,
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/EmployeeUpdate/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
+            access: `${Encrypt(userInfo._id)}`,
+          },
         },
-      });
+      );
       const data = await response.json();
       if (response.ok) {
         SuccessToast(data.message);
@@ -107,7 +111,7 @@ export default function SingleEmployeeView({
             headers: { "Content-Type": "application/json" },
             dbConnect: `Bearer ${businessInfo.rustyRoof}`,
             access: `${Encrypt(userInfo._id)}`,
-          }
+          },
         );
 
         const response = await request.json();
@@ -178,7 +182,7 @@ export default function SingleEmployeeView({
                   dbConnect: `Bearer ${businessInfo.rustyRoof}`,
                   access: `${Encrypt(userInfo._id)}`,
                 },
-              }
+              },
             );
 
             const response = await request.json();
@@ -200,30 +204,29 @@ export default function SingleEmployeeView({
     }
   };
 
-const getStatus = (lastSeen) => {
-  // If lastSeen is explicitly "Online"
-  if (lastSeen === "Online") {
-    return "Not Logged in";
-  }
+  const getStatus = (lastSeen) => {
+    // If lastSeen is explicitly "Online"
+    if (lastSeen === "Online") {
+      return "Not Logged in";
+    }
 
-  const lastSeenTime = moment(lastSeen, moment.ISO_8601, true);
+    const lastSeenTime = moment(lastSeen, moment.ISO_8601, true);
 
-  // Validate date
-  if (!lastSeenTime.isValid()) {
-    return "Unknown status";
-  }
+    // Validate date
+    if (!lastSeenTime.isValid()) {
+      return "Unknown status";
+    }
 
-  const diffMinutes = moment().diff(lastSeenTime, "minutes");
+    const diffMinutes = moment().diff(lastSeenTime, "minutes");
 
-  if (diffMinutes <= 5) {
-    return "Online"; // Active within the last 5 minutes
-  } else if (diffMinutes < 1440) {
-    return `Last login ${lastSeenTime.fromNow()}`; // Shows relative time (e.g., "3 hours ago")
-  } else {
-    return "Offline"; // Inactive for more than a day
-  }
-};
-
+    if (diffMinutes <= 5) {
+      return "Online"; // Active within the last 5 minutes
+    } else if (diffMinutes < 1440) {
+      return `Last login ${lastSeenTime.fromNow()}`; // Shows relative time (e.g., "3 hours ago")
+    } else {
+      return "Offline"; // Inactive for more than a day
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -279,7 +282,7 @@ const getStatus = (lastSeen) => {
                   dbConnect: `Bearer ${businessInfo.rustyRoof}`,
                   access: `${Encrypt(userInfo._id)}`,
                 },
-              }
+              },
             );
 
             const response = await request.json();
@@ -313,13 +316,13 @@ const getStatus = (lastSeen) => {
           for (const file of files) {
             if (file.size > maxSize) {
               Swal.showValidationMessage(
-                `File "${file.name}" exceeds ${maxSize / 1024 / 1024}MB limit.`
+                `File "${file.name}" exceeds ${maxSize / 1024 / 1024}MB limit.`,
               );
               return false;
             }
             if (file.type === "application/pdf") {
               Swal.showValidationMessage(
-                `PDF files are not allowed: "${file.name}".`
+                `PDF files are not allowed: "${file.name}".`,
               );
               return false;
             }
@@ -331,16 +334,16 @@ const getStatus = (lastSeen) => {
       if (files && files.length > 0) {
         plsWait("Uploading...");
         const uploadPromises = Array.from(files).map((file) =>
-          processAndUploadFile(file)
+          processAndUploadFile(file),
         );
 
         const results = await Promise.all(uploadPromises);
 
         const successfulUploads = results.filter(
-          (result) => result.success
+          (result) => result.success,
         ).length;
         const failedUploads = results.filter(
-          (result) => !result.success
+          (result) => !result.success,
         ).length;
 
         Swal.fire({
@@ -808,14 +811,31 @@ const getStatus = (lastSeen) => {
                         Work Location
                       </label>
                       <div className="mt-2">
-                        <input
+                        <select
                           id="workLocation"
                           name="workLocation"
-                          type="text"
                           value={formData.workLocation}
                           onChange={handleChange}
-                          autoComplete="address-level2"
-                          className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                          className="col-start-1 w-full row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                        >
+                          <option value={formData.workLocation}>
+                            {
+                              // find assigne store and return store name
+                              storeList && storeList.find(
+                                  (store) =>
+                                    store._id === formData.workLocation,
+                                )?.WHName  || "Choose..."}
+                          </option>
+                          {storeList &&
+                            storeList.map((store, index) => (
+                              <option value={store._id} key={index}>
+                                {store.WHName}
+                              </option>
+                            ))}
+                        </select>
+                        <ChevronDownIcon
+                          aria-hidden="true"
+                          className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
                         />
                       </div>
                     </div>
@@ -1274,7 +1294,12 @@ const getStatus = (lastSeen) => {
                   </p>
 
                   <div className="mt-10 space-y-10 ">
-                    <AccessControl userInfo={userInfo} TenantData={businessData} businessInfo={businessInfo} data={data} />
+                    <AccessControl
+                      userInfo={userInfo}
+                      TenantData={businessData}
+                      businessInfo={businessInfo}
+                      data={data}
+                    />
                   </div>
                 </div>
               </div>
@@ -1304,7 +1329,7 @@ const getStatus = (lastSeen) => {
                           DeleteAttachment(
                             userInfo._id,
                             "Employee",
-                            attachment._id
+                            attachment._id,
                           )
                         }
                       >
@@ -1330,10 +1355,17 @@ const getStatus = (lastSeen) => {
               >
                 Assign user License
               </button> */}
-              
+
                 <button
                   type="submit"
-                  onClick={() => sendInvite(Encrypt(data._id),`${EXPRESS_PRIVATE_URL}`,Encrypt(userInfo._id),Encrypt(businessInfo.tenantId))}
+                  onClick={() =>
+                    sendInvite(
+                      Encrypt(data._id),
+                      `${EXPRESS_PRIVATE_URL}`,
+                      Encrypt(userInfo._id),
+                      Encrypt(businessInfo.tenantId),
+                    )
+                  }
                   className="inline-flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-400 transition"
                 >
                   <svg
@@ -1411,7 +1443,7 @@ function SalePersonChart({ customerId, customerName, business }) {
         }));
 
         const productSales = data.filter(
-          (item) => item.salesPerson === customerId
+          (item) => item.salesPerson === customerId,
         );
 
         const monthlySales = productSales.reduce((acc, curr) => {

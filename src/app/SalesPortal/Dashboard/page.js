@@ -187,7 +187,8 @@ export default function DashboardLayout({ userData, baseUrl }) {
               <span className="text-xs">Requisitions</span>
             </Link>
 
-            <Link
+            {userData.user.workLocation && (
+              <Link
               href="/SalesPortal/Inventory"
               className={`flex items-center gap-3 p-3 rounded-md transition 
                             ${navtitle === "Inventory" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
@@ -195,6 +196,8 @@ export default function DashboardLayout({ userData, baseUrl }) {
               <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
               <span className="text-xs">Inventory</span>
             </Link>
+          )}
+          
           </nav>
 
           {/* Logout pinned at bottom */}
