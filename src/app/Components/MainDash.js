@@ -312,8 +312,7 @@ export default function MainDash({ userData }) {
                       const today = Number(tenantData.TodaySale) || 0;
                       const yesterday = Number(tenantData.yesterdaySale) || 0;
                       const diff = today - yesterday;
-                      const percentage =
-                        yesterday > 0 ? ((diff / yesterday) * 100).toFixed(2) : "0.00";
+                      const percentage = ((diff / yesterday) * 100).toFixed(2);
 
                       if (today > yesterday) {
                         return (
