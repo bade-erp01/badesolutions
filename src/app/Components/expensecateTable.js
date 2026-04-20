@@ -78,8 +78,7 @@ export default function ExpenseCategoriesModal({
                       Authorization: `Bearer ${Encrypt(
                         userData.business.tenantId
                       )}`,
-                      dbConnect: `Bearer ${userData.business.rustyRoof}`,
-                      access: Encrypt(userData.business.rustyRoof),
+                      access: `${Encrypt(userData.user._id)}`,
                     },
                   }
                 );

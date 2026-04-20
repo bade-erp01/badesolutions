@@ -58,8 +58,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${business.tenantId}`,
-            dbConnect: `Bearer ${business.rustyRoof}`,
+            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             access: `${Encrypt(Currentuser._id)}`,
           },
         }
@@ -120,8 +119,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            dbConnect: `Bearer ${business.rustyRoof}`,
-            access: Encrypt(Currentuser._id),
+            access: `${Encrypt(Currentuser._id)}`,
           },
         }
       );
