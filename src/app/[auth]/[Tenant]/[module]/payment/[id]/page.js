@@ -127,7 +127,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
               Reverse Payment
             </Button>
           )}
-
+          <Separator />
           <p className="text-xs text-muted-foreground">
             Last edited {moment(payment.updatedAt).format("dddd, DD MMM YYYY [at] hh:mm A")}
           </p>
