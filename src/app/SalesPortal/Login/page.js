@@ -147,7 +147,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
           {/* Login Card */}
           {!SessionId ||
-          SessionId !== userInfo?.SessionId ||
+          Dencrypt(SessionId) !== userInfo?.SessionId ||
           !userInfo ||
           !businessInfo ? (
             <div className="bg-white/80 backdrop-blur-md rounded-md shadow-xl p-8 w-[340px] max-w-full flex flex-col gap-6">
@@ -280,6 +280,13 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                   Welcome Back {userInfo?.firstName || "Guest"}..!!
                 </h3>
                 <p className="text-sm text-gray-600">Glad to see you again</p>
+
+                <Link
+                  href="/SalesPortal/Dashboard"
+                  className="inline-block mt-3 px-4 py-2 bg-black text-white rounded-lg shadow hover:bg-black transition-colors duration-200 font-medium"
+                >
+                  Go to Dashboard
+                </Link>
               </div>
             </div>
           )}

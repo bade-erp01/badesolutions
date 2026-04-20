@@ -1,7 +1,13 @@
 import React from 'react'
+import GeoUpdater from '@/app/Components/LocationGrabber';
+import { fetchUser } from '../../../Functions/whoIsSalesPerson';
 
-export default function layout({ children }) {
+export default async function layout({ children }) {
+  const userData = await fetchUser();
   return (
-    <div>{children}</div>
+    <>
+      {userData?.user && userData?.business && (<GeoUpdater userData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL} />)}
+      {children}
+    </>
   )
 }
