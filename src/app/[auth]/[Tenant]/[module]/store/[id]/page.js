@@ -1,3 +1,11 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"; // adjust import path to your shadcn setup
 import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
@@ -70,7 +78,7 @@ export default async function storelayout({ children, params }) {
       dbConnect: `Bearer ${userData.business.rustyRoof}`,
     },
     next: {
-      revalidate: 120, // 2 minutes
+      revalidate: 120,
     },
   });
 
@@ -85,91 +93,149 @@ export default async function storelayout({ children, params }) {
       />
 
       <div className="flex flex-1 text-white bt-2">
-        {/* Sidebar (collapsible on mobile) */}
+        {/* Sidebar */}
         <aside
-          className={`w-70 bg-[#1e1e20]/70 backdrop-blur-md 
-              text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
-          style={{ overflowY: "auto" }}
+          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md 
+          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block"
         >
           <BackButton />
           <hr />
           <nav className="space-y-4">
-            {/* create purchase */}
+            {/* Purchase Order */}
             {(userData?.user?.raiseLpo ||
               userData?.user?.allowInternalTransfers) && (
-              <>
-                <Link
-                  href={`/${userData.business?.companyName
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")
-                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                    userData?.user._id
-                  )}/purchase/Forms/purchase`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
-                  <small>Purchase Order</small>
-                </Link>
-              </>
-            )}
-
-
-            {/* store settings */}
-            {userData.user.isAdmin && (
               <Link
-              href={`/${userData.business.companyName}/${Params.Tenant}/${Params.module}/store/${Params.id}/store-settings`}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition duration-200 `}
+                href={`/${userData.business?.companyName
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                  userData?.user._id
+                )}/purchase/Forms/purchase`}
+                className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
               >
-              <WrenchScrewdriverIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-sm font-medium">Store Settings</span>
+                <ShoppingCartIcon className="h-6 w-6 text-gray-100" />
+                <small>Purchase Order</small>
               </Link>
             )}
 
+            {/* Store Settings */}
+            {userData.user.isAdmin && (
+              <Link
+                href={`/${userData.business.companyName}/${Params.Tenant}/${Params.module}/store/${Params.id}/store-settings`}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg transition duration-200"
+              >
+                <WrenchScrewdriverIcon className="h-6 w-6 text-gray-100" />
+                <span className="text-sm font-medium">Store Settings</span>
+              </Link>
+            )}
+
+            {/* Excel Download */}
             {data.products.length > 0 && (
               <ExcelDownloadBtn
-                data={data.products.map((product) => ({
+                data={data?.products?.map((product) => ({
                   id: product._id,
                   Name: product.productName,
-                  Vendor:product.vendorName,
+                  Vendor: product.Vendor.Name,
                   Case: product.currentQty,
                   Pcs: product.pcs,
                   ExpDate: product.expiryDate,
                   Category: product.category,
                   isActivated: product.isActivated,
                 }))}
-                page={`${data.Store?.WHName || "Store"} inventory`}
+                page={`${data?.Store?.WHName || "Store"} inventory`}
               />
             )}
 
+            {/* Bulk Update */}
             {userData.user.isAdmin && (
-             < BulkUpdate tenantId={userData} collectionName={"inventory"} WHID={data.Store._id} />
+              <BulkUpdate
+                tenantId={userData}
+                collectionName={"inventory"}
+                WHID={data.Store._id}
+              />
             )}
           </nav>
-        </aside>{" "}
-        {/* Main Content Area */}
-        <main className="flex-1">
-          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg relative z-10 max-h-[83dvh] overflow-y-hidden ">
-            <div className=" overflow-y-auto">
-            {/* Chart: only show if user has c_levelDash */}
-            {userData?.user?.c_levelDash && (
-              <div className="m-3">
-                <StoreChart productsList={data.products} />
-              </div>
-            )}
+        </aside>
 
-            {/* Product Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 p-1">
-              {data.products
-                ?.sort((a, b) => a.productName.localeCompare(b.productName))
-                .map((element) => (
-                  <Card
-                    key={element._id}
-                    data={element}
-                    module="inventory"
-                    className="shadow-lg rounded-lg bg-white hover:shadow-xl transition-shadow duration-300"
-                  />
-                ))}
+        {/* Main Content */}
+        <main className="flex-1">
+          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg relative z-10 max-h-[83dvh] overflow-y-hidden">
+            <div className="overflow-y-auto">
+              {/* Chart */}
+              {userData?.user?.c_levelDash && (
+                <div className="m-3">
+                  <StoreChart productsList={data.products} />
+                </div>
+              )}
+
+              {/* Table */}
+              <div className="p-4 bg-gray-200">
+                <Table className="w-full text-black bg-gray-200">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-black">S/N</TableHead>
+                      <TableHead className="text-black">Name</TableHead>
+                      <TableHead className="text-black">Vendor</TableHead>
+                      <TableHead className="text-black">Case</TableHead>
+                      <TableHead className="text-black">Pcs</TableHead>
+                      <TableHead className="text-black">Expiry Date</TableHead>
+                      <TableHead className="text-black">Category</TableHead>
+                      <TableHead className="text-black">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.products
+                      ?.sort((a, b) => a.productName.localeCompare(b.productName))
+                      .map((product, index) => (
+                        <TableRow
+                          key={product._id}
+                          className={`hover:bg-gray-200 ${
+                            index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
+                          }`}
+                        >
+                          <TableCell className="text-black">
+                            {index + 1}
+                          </TableCell>
+                          <TableCell className="text-indigo-800">
+                            <Link href={`/`}>
+                              {product.productName}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-black">{product.Vendor?.Name}</TableCell>
+                            <TableCell
+                              className={`text-black ${
+                                product.currentQty < 0
+                                  ? "bg-red-100"
+                                  : product.currentQty === 0
+                                  ? "bg-yellow-100"
+                                  : "bg-green-100"
+                              }`}
+                            >
+                              {product.currentQty}
+                            </TableCell>
+
+                            <TableCell
+                              className={`text-black ${
+                                product.pcs < 0
+                                  ? "bg-red-100"
+                                  : product.pcs === 0
+                                  ? "bg-yellow-100"
+                                  : "bg-green-100"
+                              }`}
+                            >
+                              {product.pcs}
+                            </TableCell>
+                          <TableCell className="text-black">{product.expiryDate}</TableCell>
+                          <TableCell className="text-black">{product.category}</TableCell>
+                          <TableCell className="text-black">
+                            {product.isActivated ? "Active" : "Inactive"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
               </div>
+
             </div>
           </section>
         </main>

@@ -1,6 +1,5 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import dbConnect from "../../../../../../lib/mongoose"
 import Link from "next/link";
 import Card from "@/app/Components/Card";
 import Footer2 from "@/app/Components/Footer2";

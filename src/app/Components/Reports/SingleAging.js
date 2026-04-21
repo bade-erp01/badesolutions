@@ -29,7 +29,7 @@ const AgingReportDownloader = ({ customer, invoices, Rep }) => {
 
       const agingData = {
         Name: customer.Username,
-        Rep: Rep || "N/A",
+        Rep: Rep,
         Current: customer.Debt || 0,
       };
 

@@ -67,6 +67,13 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = data.transcations.slice(indexOfFirstRow, indexOfLastRow);
 
+  const salespers = salesPerson.find(
+      (person) => person._id.toString() === cust.salesPerson.toString(),
+    );
+    const repName = salespers
+      ? `${salespers.firstName} ${salespers.lastName || ""}`
+      : "Unknown";
+
   // for tts
   function getCustomerSummary(customer) {
     if (!customer) return "Invalid customer data.";
@@ -772,14 +779,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               customer={cust}
               invoices={Sales}
               payments={data.transcations}
-              Rep={() => {
-                const salespers = salesPerson.find(
-                  (person) => person._id === cust.salesPerson,
-                );
-                return salespers
-                  ? `${salespers.firstName} ${salespers.lastName || ""}`
-                  : "Unknown";
-              }}
+              Rep={repName}
             />
           )}
 
