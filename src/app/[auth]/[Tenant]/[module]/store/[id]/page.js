@@ -197,7 +197,7 @@ export default async function storelayout({ children, params }) {
                             {index + 1}
                           </TableCell>
                           <TableCell className="text-indigo-800">
-                            <Link href={`/`}>
+                            <Link href={`/${userData.business.companyName}/${Params.Tenant}/inventory/inventory/${Encrypt(product._id)}`}>
                               {product.productName}
                             </Link>
                           </TableCell>
