@@ -29,7 +29,7 @@ import {
   EmptyTitle,
   EmptyDescription,
 } from "@/components/ui/empty";
-import { Seperator } from "@/app/Components/Seperator";
+import { Separator } from "@/components/ui/separator"
 
 export default function InvoiceLandingPage({ baseUrl, userData }) {
   const [searchRef, setSearchRef] = useState("");
@@ -84,7 +84,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
       <Card>
         <CardHeader>
           <CardTitle>Sales Management</CardTitle>
-          <Seperator/>
+          <Separator/>
         </CardHeader>
         <CardContent>
           {isLoading ? (
