@@ -3,19 +3,32 @@
 import { useState, useEffect, Suspense } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import axios from "axios";
-import { PaperClipIcon,ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { Paperclip, ShoppingCart } from "lucide-react";
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import {
   Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
+  EmptyIcon,
   EmptyTitle,
+  EmptyDescription,
 } from "@/components/ui/empty";
-
 
 export default function InvoiceLandingPage({ baseUrl, userData }) {
   const [searchRef, setSearchRef] = useState("");
@@ -30,14 +43,13 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   const params = useParams();
   const itemsPerPage = 20;
 
-  // Fetch bills from API
   useEffect(() => {
     const fetchBills = async () => {
       setIsLoading(true);
       try {
         const query = new URLSearchParams({
-          page: currentPage,
-          itemsPerPage,
+          page: currentPage.toString(),
+          itemsPerPage: itemsPerPage.toString(),
           searchRef,
           startDate,
           endDate,
@@ -52,12 +64,12 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
         });
 
         const data = await response.data;
-
         setBillList(data.invoices || []);
         setTotalPages(data.totalPages);
         setTotalInvoices(data.totalInvoices);
         setCurrentPage(data.currentPage);
       } catch (error) {
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
@@ -68,159 +80,124 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Invoice List"} />}>
-      <div className="text-white text-xs">
-        <div className="mx-auto">
-          {/* Filter Component */}
-          <div className="border border-white/10 bg-gray-200 p-4 shadow-sm">
-            <div className="border-b pb-4 mb-6">
-              <h1 className="text-2xl font-bold text-gray-600">
-                Sales Management
-              </h1>
-            </div>
-          </div>
-
-          {/* Table Container */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales Management</CardTitle>
+        </CardHeader>
+        <CardContent>
           {isLoading ? (
             <SuspenenseFallBack pagedata={"Invoice List"} />
           ) : billList.length > 0 ? (
-            <div className="bg-gray-700 rounded p-3 shadow-md animate__animated animate__fadeInUp animate__faster">
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead className=" text-gray-100 uppercase text-xs sticky top-0 z-10">
-                    <tr>
-                      <th className="px-4 py-3 text-left">Ref No</th>
-                      <th className="px-4 py-3 text-left">Customer</th>
-                      <th className="px-4 py-3 text-left">Order Date</th>
-                      <th className="px-4 py-3 text-left">Alt</th>
-                      <th className="px-4 py-3 text-left">
-                        <ShoppingCartIcon class="h-5 w-6 text-gray-100" />
-                      </th>
-                      <th className="px-4 py-3 text-left">Raised By</th>
-                      <th className="px-4 py-3 text-left">Status</th>
-                      <th className="px-4 py-3 text-right">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {billList.map((bill) => {
-                      const url =
-                        bill.billStatus?.toLowerCase() === "draft"
-                          ? `/${params.auth}/${params.Tenant}/${
-                              params.module
-                            }/Forms/invoice/${Encrypt(bill._id)}`
-                          : `/${params.auth}/${
-                              params.Tenant
-                            }/bill/bill/${Encrypt(bill._id)}`;
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ref No</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Order Date</TableHead>
+                    <TableHead>Alt</TableHead>
+                    <TableHead>
+                      <ShoppingCart className="h-4 w-4" />
+                    </TableHead>
+                    <TableHead>Raised By</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Value</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {billList.map((bill) => {
+                    const url =
+                      bill.billStatus?.toLowerCase() === "draft"
+                        ? `/${params.auth}/${params.Tenant}/${params.module}/Forms/invoice/${Encrypt(bill._id)}`
+                        : `/${params.auth}/${params.Tenant}/bill/bill/${Encrypt(bill._id)}`;
 
-                      return (
-                        <tr
-                          key={bill._id}
-                          className="transition text-xs text-white hover:bg-gray-500/50"
-                          title={`${bill.billReferenceNo}/${bill.invoicelocation}`}
-                        >
-                          <td className="px-4 py-3 border-t border-white/10">
-                            <Link
-                              href={url}
-                              className="text-indigo-400 hover:text-indigo-300 underline font-bold"
-                            >
-                              {bill?.billReferenceNo && bill?.invoicelocation
-                                ? `${bill.billReferenceNo}/${bill.invoicelocation}`
-                                : "View Draft"}
-                            </Link>
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10 font-semibold">
-                            {bill.customerName}
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10">
-                            {bill.startDate}
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10">
-                            {bill.memoId && (
-                              <PaperClipIcon class="h-5 w-5 text-gray-300" />
-                            )}
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10">
-                            {bill.orders.length} SKU
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10">
-                            {bill.RaiseBy}
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10">
-                            <span
-                              className={`inline-block px-2 py-0.5 text-xs rounded-full font-semibold ${
-                                bill.billStatus === "Invoice"
-                                  ? "bg-green-500/30 text-green-300"
-                                  : bill.billStatus === "Order"
-                                  ? "bg-yellow-500/30 text-yellow-300"
-                                  : bill.billStatus === "Cancelled"
-                                  ? "bg-red-500/30 text-red-300"
-                                  : bill.billStatus === "Processing"
-                                  ? "bg-gray-900 text-white"
-                                  : "bg-gray-500/30"
-                              }`}
-                            >
-                              {bill.billStatus}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 border-t border-white/10 text-right font-bold">
-                            ₦{bill.grandTotal.toLocaleString()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                    return (
+                      <TableRow key={bill._id}>
+                        <TableCell>
+                          <Link
+                            href={url}
+                            className="text-indigo-600 hover:underline font-medium"
+                          >
+                            {bill?.billReferenceNo && bill?.invoicelocation
+                              ? `${bill.billReferenceNo}/${bill.invoicelocation}`
+                              : "View Draft"}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{bill.customerName}</TableCell>
+                        <TableCell>{bill.startDate}</TableCell>
+                        <TableCell>
+                          {bill.memoId && (
+                            <Paperclip className="h-4 w-4 text-gray-400" />
+                          )}
+                        </TableCell>
+                        <TableCell>{bill.orders.length} SKU</TableCell>
+                        <TableCell>{bill.RaiseBy}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
+                              bill.billStatus === "Invoice"
+                                ? "bg-green-100 text-green-700"
+                                : bill.billStatus === "Order"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : bill.billStatus === "Cancelled"
+                                ? "bg-red-100 text-red-700"
+                                : bill.billStatus === "Processing"
+                                ? "bg-gray-200 text-gray-800"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {bill.billStatus}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right font-bold">
+                          ₦{bill.grandTotal.toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
 
-              {/* Pagination Controls */}
-              <div className="flex justify-between items-center px-4 py-3 border-t border-white/10 bg-[#121216]">
-                <span className="text-sm text-white/60">
+              {/* Pagination Buttons */}
+              <div className="flex justify-between items-center mt-4">
+                <span className="text-sm text-muted-foreground">
                   Page {currentPage} of {totalPages}
                 </span>
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
-                    className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-30 text-black"
                     disabled={currentPage === 1}
                   >
                     Previous
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
-                    className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-30 text-black"
                     disabled={currentPage === totalPages}
                   >
                     Next
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
             <Empty>
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                </EmptyMedia>
-                <EmptyTitle className="text-black font-bold">No sales registerd Yet</EmptyTitle>
-                <EmptyDescription>
-                  You haven&apos;t created any order yet. Get started by
-                  recording your first sales.
-                </EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <div className="flex gap-2">
-                  <EmptyDescription>
-                    Navigate to the CRM section to create your first customer
-                    before recording sales.
-                  </EmptyDescription>
-                </div>
-              </EmptyContent>
+              <EmptyIcon />
+              <EmptyTitle>No sales registered yet</EmptyTitle>
+              <EmptyDescription>
+                You haven&apos;t created any order yet. Get started by recording your first sales.
+              </EmptyDescription>
             </Empty>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </Suspense>
   );
 }
