@@ -167,12 +167,12 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-        <section className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 py-16 md:py-20 text-center text-white">
+        {/* <section className="w-full py-16 md:py-20 text-center text-white">
           <div className="max-w-3xl mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-bold mb-8">Trusted by Businesses Worldwide</h2>
             <TestimonialCarousel />
           </div>
-        </section>
+        </section> */}
 
         {/* Final CTA Section */}
       <section className="w-full py-20 px-4 text-center bg-gradient-to-b from-white to-gray-50">
