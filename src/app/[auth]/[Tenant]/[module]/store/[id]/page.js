@@ -135,7 +135,7 @@ export default async function storelayout({ children, params }) {
                 data={data?.products?.map((product) => ({
                   id: product._id,
                   Name: product.productName,
-                  Vendor: product.Vendor.Name,
+                  supplier: product.Vendor.Name,
                   Case: product.currentQty,
                   Pcs: product.pcs,
                   ExpDate: product.expiryDate,
