@@ -6,7 +6,6 @@ import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
 import moment from "moment"
 
 
-
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description:
