@@ -342,84 +342,10 @@ export default function Nav1({ page, Module, user, business }) {
                 </Button>
               )}
 
-              {/* Mobile Menu Button */}
-              <button
-                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                {isOpen ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18 18 6M6 6l12 12"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                    />
-                  </svg>
-                )}
-              </button>
             </div>
           </div>
         </nav>
 
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="md:hidden border-t bg-white">
-            <div className="container mx-auto px-4 py-4 space-y-4">
-              {business && user && Module?.length > 0 && (
-                <form onSubmit={handleSearch} className="flex gap-2">
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <Button type="submit" size="sm">
-                    🔍
-                  </Button>
-                </form>
-              )}
-              <div className="space-y-2">
-                <Link href="/" className="block py-2 text-blue-600 font-medium">
-                  Home
-                </Link>
-                <Link
-                  href="/services"
-                  className="block py-2 text-blue-600 font-medium"
-                >
-                  Services
-                </Link>
-                <Link
-                  href="/contact"
-                  className="block py-2 text-blue-600 font-medium"
-                >
-                  Contact
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
     </>
   );
