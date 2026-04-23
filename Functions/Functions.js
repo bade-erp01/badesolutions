@@ -1,8 +1,4 @@
 
-// import jsPDFInvoiceTemplate from "jspdf-invoice-template";
-// import jsPDF from "jspdf";
-// import autoTable from "jspdf-autotable";
-// import moment from "moment";
 import CryptoJS from 'crypto-js';
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/src/sweetalert2.scss";
@@ -69,8 +65,8 @@ async function termsAndConditions(payload) {
 function Encrypt(arg) {
   return jwt.sign(
     { id: arg },
-    "THESTARTUPWAY", // ✅ Use a secure secret key
-    { expiresIn: "3d" } // ✅ Token expires in 3 days
+    "THESTARTUPWAY", //  Use a secure secret key
+    { expiresIn: "3d" } //  Token expires in 3 days
   );
 }
 
@@ -118,8 +114,8 @@ function EncryptBAckend(payload) {
   // encyps data {} objects from back end
   return jwt.sign(
     payload,
-    "SWISSFLOWER", // ✅ Use a secure secret key
-    { expiresIn: "3d" } // ✅ Token expires in 3 days
+    "SWISSFLOWER", //  Use a secure secret key
+    { expiresIn: "3d" } //  Token expires in 3 days
   );
 }
 
@@ -144,20 +140,30 @@ function DecryptBAckend(payload) {
 
 
 //update employee data
-const UpdateEmployeeData = async (id, fieldName, value) => {
+const UpdateEmployeeData = async (id, fieldName, value,userId) => {
   try {
     plsWait(`Updating User...⌛`);
 
-    const { data } = await axios.patch("/api/EmployeeUpdate", {
-      [fieldName]: value,
-      id,
-    });
+    const { data } = await axios.patch(
+      "/api/EmployeeUpdate",
+      {
+        [fieldName]: value,
+        id,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userId)}`,
+        },
+      }
+    );
 
     SuccessToast(data.message);
   } catch (error) {
-    ErrorMessage(error.response.data.error);
+    ErrorMessage(error.response?.data?.error || "Something went wrong");
   }
 };
+
 
 const UpdateEmployeeModules = async (id, object) => {
   try {
@@ -169,7 +175,7 @@ const UpdateEmployeeModules = async (id, object) => {
     const response = await fetch("/api/EmployeeUpdate", {
       method: "PUT",
       body,
-      timeout: 10000, // ✅ 10s timeout for better error handling
+      timeout: 10000, //10s timeout for better error handling
     });
     const req = await response.json();
 
@@ -184,30 +190,6 @@ const UpdateEmployeeModules = async (id, object) => {
   }
 };
 
-// const downloadExcel = async (payload) => {
-//   try {
-//     // const response = await fetch("/api/monthlyReport");
-//     if (!payload) {
-//       throw new Error(`No data to download`);
-//     }
-
-//     const blob = await payload.blob();
-//     const url = URL.createObjectURL(blob);
-//     console.log(blob,url)
-
-//     const a = document.createElement("a");
-//     a.href = url;
-//     a.download = "MonthlyReport.xlsx";
-//     document.body.appendChild(a);
-//     a.click();
-
-//     document.body.removeChild(a);
-//     URL.revokeObjectURL(url);
-//   } catch (error) {
-//     console.log(error)
-//     ErrorMessage("Error downloading file:", error.message);
-//   }
-// };
 
 const downloadExcel = (data, page) => {
   try {
@@ -300,255 +282,6 @@ const totalInWords = (amount, currency ) => {
   const words = convert(Math.floor(amount));
   return `${words} ${currency?.Currency.charAt(0).toUpperCase() + currency?.Currency.slice(1)} Only`;
 };
-
-
-
-// const generatePdf = async (business, customer, bill) => {
-//   try {
-//     plsWait("Downloading...");
-
-//     const pdf = await jsPDFInvoiceTemplate.default({
-//       outputType: jsPDFInvoiceTemplate.OutputType.Blob,
-//       returnJsPDFDocObject: true,
-//       fileName: bill.customerName || "invoice",
-//       compress: true,
-//       orientationLandscape: false,
-
-//       logo: {
-//         src: business.CompayLogo || "/logo.jpg",
-//         type: "JPG",
-//         width: 40,
-//         height: 30.66,
-//         margin: { top: 0, left: 0 },
-//       },
-
-//       stamp: {
-//         inAllPages: true,
-//         src: "/QRBADE.png",
-//         type: "JPG",
-//         width: 20,
-//         height: 20,
-//         margin: { top: 0, left: 0 },
-//       },
-
-//       business: {
-//         name: business.CompayName,
-//         address: business.Address,
-//         email: business.email,
-//         email_1: `(${business.CompayZip}) ${business.Tel}`,
-//         phone: business.ShopAddress,
-//         website: `Invoiced By ${bill.RaiseBy}`,
-//       },
-
-//       contact: {
-//         label: "Shipping Details",
-//         name: bill.customerName?.toUpperCase() || "",
-//         address: `Shipped To: ${customer?.street || "N/A"}`,
-//         phone: `Phone: ${customer?.phone || "N/A"}`,
-//         email: `Contact Person: ${customer?.contactPerson || bill.customerName}`,
-//         otherInfo: `Download date: ${moment().format("YYYY-MM-DD")}`,
-//       },
-
-//       invoice: {
-//         label: `*${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`,
-//         num: bill.WayBillNo || "",
-//         invDate: `Order Date: ${bill.startDate}`,
-//         invGenDate: `Invoice Date: ${bill.DELIVERYDATE?.slice(0, 10) || ""}`,
-//         headerBorder: true,
-//         tableBodyBorder: true,
-
-//         header: [
-//           { title: "#" },
-//           { title: "Product", style: { width: 60 } },
-//           { title: "Code" },
-//           { title: "Price", style: { width: 25 } },
-//           { title: "CRTN" },
-//           { title: "PCS" },
-//           { title: "VAT" },
-//           { title: "Total" },
-//         ],
-
-//         table: Array.isArray(bill.orders)
-//           ? bill.orders.map((ord, i) => [
-//               i + 1,
-//               `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
-//               ord.item?.Manufacture_code || "N/A",
-//               ord.priceListPrice,
-//               ord.Qty,
-//               ord.pcsReq || 0,
-//               ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
-//               ord.total,
-//             ])
-//           : [],
-
-//         additionalRows: [
-//           {
-//             col1: "Tax Rate:",
-//             col3: `${bill.taxRate || 0} (inc in sub.)`,
-//             style: { fontSize: 10 },
-//           },
-//           {
-//             col1: "Subtotal:",
-//             col3: bill.subTotal || 0,
-//             style: { fontSize: 10 },
-//           },
-//           {
-//             col1: "Discount:",
-//             col3: bill.discount || 0,
-//             style: { fontSize: 10 },
-//           },
-//           {
-//             col1: "Total Due:",
-//             col3: bill.grandTotal || 0,
-//             style: { fontSize: 11 },
-//           },
-//         ],
-
-//         invDescLabel: "Authorized Signatures",
-//         invDesc: `
-// Customer Sign & Date _______________________________
-
-// Amaco Resources Ltd _______________________________
-
-// ${business.InvoicePolicy || ""}
-//         `,
-//         invTotal: `Downloaded on ${moment().format("YYYY-MM-DD")}`,
-//       },
-
-//       footer: {
-//         text: "This invoice was generated by Business Automated Dynamic Enterprise",
-//       },
-
-//       pageEnable: true,
-//       pageLabel: "Page ",
-//     });
-
-//     const blob = new Blob([pdf.blob], { type: "application/pdf" });
-//     const url = URL.createObjectURL(blob);
-//     const win = window.open(url, "_blank");
-
-//     if (win) {
-//       win.onload = () => {
-//         plsWait(false);
-//         win.print();
-//       };
-//     } else {
-//       plsWait(false);
-//       alert("Unable to open PDF window.");
-//     }
-//   } catch (error) {
-//     plsWait(false);
-//     console.error("PDF generation failed:", error);
-//     alert("Oops! Something went wrong while generating your invoice.");
-//   }
-// };
-
-
-// const generatePdf = async (business, customer, bill) => {
-//   try {
-//     plsWait("Downloading...");
-//     const doc = new jsPDF();
-
-//     // Add logo
-//     if (business.CompayLogo) {
-//       const logo = await loadImage(business.CompayLogo);
-//       doc.addImage(logo, "JPEG", 10, 10, 40, 30);
-//     }
-
-//     // Business Info
-//     doc.setFontSize(16);
-//     doc.text(business.CompayName, 60, 20);
-//     doc.setFontSize(10);
-//     doc.text(business.Address, 60, 26);
-//     doc.text(`Email: ${business.email}`, 60, 32);
-//     doc.text(`(${business.CompayZip}) ${business.Tel}`, 60, 38);
-//     doc.text(`Invoiced By: ${bill.RaiseBy}`, 60, 44);
-
-//     // Contact Info
-//     doc.setFontSize(12);
-//     doc.text("Shipping Details", 10, 60);
-//     doc.setFontSize(10);
-//     doc.text(`Name: ${bill.customerName?.toUpperCase() || ""}`, 10, 66);
-//     doc.text(`Address: ${customer?.street || "N/A"}`, 10, 72);
-//     doc.text(`Phone: ${customer?.phone || "N/A"}`, 10, 78);
-//     doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName}`, 10, 84);
-//     doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, 90);
-
-//     // Invoice Info
-//     doc.setFontSize(12);
-//     doc.text(`Invoice: ${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}/${bill.invoicelocation}`, 10, 100);
-//     doc.text(`Waybill No: ${bill.WayBillNo || ""}`, 10, 106);
-//     doc.text(`Order Date: ${bill.startDate}`, 10, 112);
-//     doc.text(`Invoice Date: ${bill.DELIVERYDATE?.slice(0, 10) || ""}`, 10, 118);
-
-//     // Table
-//     autoTable(doc, {
-//       startY: 125,
-//       head: [["#", "Product", "Code", "Price", "CRTN", "PCS", "VAT", "Total"]],
-//       body: bill.orders.map((ord, i) => [
-//         i + 1,
-//         `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
-//         ord.item?.Manufacture_code || "N/A",
-//         ord.priceListPrice,
-//         ord.Qty,
-//         ord.pcsReq || 0,
-//         ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
-//         ord.total,
-//       ]),
-//       theme: "grid",
-//       styles: { fontSize: 9 },
-//     });
-
-//     // Additional Summary
-//     const summaryY = doc.lastAutoTable.finalY + 10;
-//     doc.setFontSize(10);
-//     doc.text(`Tax Rate: ${bill.taxRate || 0} (inc in sub.)`, 10, summaryY);
-//     doc.text(`Subtotal: ${bill.subTotal || 0}`, 10, summaryY + 6);
-//     doc.text(`Discount: ${bill.discount || 0}`, 10, summaryY + 12);
-//     doc.text(`Total Due: ${bill.grandTotal || 0}`, 10, summaryY + 18);
-
-//     // Signature
-//     doc.setFontSize(11);
-//     doc.text("Authorized Signatures", 10, summaryY + 30);
-//     doc.text("Customer Sign & Date _______________________________", 10, summaryY + 40);
-//     doc.text("Amaco Resources Ltd _______________________________", 10, summaryY + 50);
-//     if (business.InvoicePolicy) {
-//       doc.text(business.InvoicePolicy, 10, summaryY + 60);
-//     }
-
-//     // Footer
-//     doc.setFontSize(9);
-//     doc.text(
-//       "This invoice was generated by Business Automated Dynamic Enterprise",
-//       10,
-//       280
-//     );
-
-//     // Save PDF
-//     doc.save(`${bill.customerName || "invoice"}.pdf`);
-//     plsWait(false);
-//   } catch (error) {
-//     plsWait(false);
-//     console.error("PDF generation failed:", error);
-//     alert("Oops! Something went wrong while generating your invoice.");
-//   }
-// };
-
-// // Helper to load image as base64
-// const loadImage = (src) => {
-//   return new Promise((resolve) => {
-//     const img = new Image();
-//     img.crossOrigin = "Anonymous";
-//     img.onload = () => {
-//       const canvas = document.createElement("canvas");
-//       canvas.width = img.width;
-//       canvas.height = img.height;
-//       canvas.getContext("2d").drawImage(img, 0, 0);
-//       resolve(canvas.toDataURL("image/jpeg"));
-//     };
-//     img.src = src;
-//   });
-// };
 
 
 async function postPayment(customerId, user, config) {
@@ -798,7 +531,7 @@ const pricelistSetter = (priceList, Business) => {
     case 'Pricelist7':
       return Business.priceList7; 
     default:
-      return 'N/A';
+      return priceList;
   }
 };
 
