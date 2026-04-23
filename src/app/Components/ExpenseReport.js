@@ -100,13 +100,14 @@ function showExpenseSwal(data) {
     }
 
     const downloadCSV = (filtered) => {
-        const headers = ["Ref No","Tag", "Store", "Account", "Payee", "Category", "Date", "Status","Amount"]
+        const headers = ["Ref No","Tag", "Store", "Acc. posted", "Payee","Payee Acc", "Category", "Date", "Status","Amount"]
         const rows = filtered.map((item) => [
             item.refNo,
             item.category.NAME,
             getStoreName(item.WHID),
             getAccountName(item.BankAccount),
             item.payee,
+            item.payeebankAccount,
             item.category.type,
             item.Date,
             item.status,
