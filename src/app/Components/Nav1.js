@@ -19,7 +19,6 @@ import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -29,7 +28,6 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Nav1({ page, Module, user, business }) {
   const pathName = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const router = useRouter();
@@ -79,7 +77,6 @@ export default function Nav1({ page, Module, user, business }) {
   };
 
   useEffect(() => {
-    const now = new Date();
     setTime(moment().format("HH:mm"));
 
     if (navigator.geolocation) {
@@ -195,9 +192,7 @@ export default function Nav1({ page, Module, user, business }) {
                 <Link
                   href="#"
                   className={`text-sm font-medium transition hover:text-blue-600 ${
-                    pathName === "/Why_Bade"
-                      ? "text-blue-600"
-                      : "text-gray-700"
+                    pathName === "/Why_Bade" ? "text-blue-600" : "text-gray-700"
                   }`}
                 >
                   Why Bade?
@@ -210,10 +205,12 @@ export default function Nav1({ page, Module, user, business }) {
                 >
                   Discover More
                 </Link>
-                 <Link
+                <Link
                   href="/Marketers"
                   className={`text-sm font-medium transition hover:text-blue-600 ${
-                    pathName === "/Marketers" ? "text-blue-600" : "text-gray-700"
+                    pathName === "/Marketers"
+                      ? "text-blue-600"
+                      : "text-gray-700"
                   }`}
                 >
                   Refer & Earn
@@ -290,20 +287,21 @@ export default function Nav1({ page, Module, user, business }) {
                                 {user.toogledTenants
                                   .filter(
                                     (tenant) =>
-                                      tenant.tenantIds !== user.tenantId,
+                                      tenant.tenantIds?.tenantId.toString() !==
+                                      user.tenantId.toString(),
                                   )
                                   .map((tenant, index) => (
                                     <button
-                                      key={tenant._id || index}
+                                      key={tenant.tenantIds?._id || index}
                                       className="w-full text-left text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors duration-200"
                                       onClick={() =>
                                         handleTenantSwitch(
-                                          Encrypt(tenant.tenantIds),
+                                          Encrypt(tenant.tenantIds?.tenantId), // encrypt the actual tenantId
                                         )
                                       }
                                     >
                                       Switch to{" "}
-                                      {tenant.companyName ||
+                                      {tenant.tenantIds?.companyName ||
                                         `Tenant ${index + 1}`}
                                     </button>
                                   ))}
@@ -341,11 +339,9 @@ export default function Nav1({ page, Module, user, business }) {
                   <Link href="/Login">Get started →</Link>
                 </Button>
               )}
-
             </div>
           </div>
         </nav>
-
       </header>
     </>
   );

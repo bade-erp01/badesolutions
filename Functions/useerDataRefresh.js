@@ -36,9 +36,13 @@ const fetchUser = async () => {
     await dbConnect("BadeAdmin"); // Ensure database connection
     // Fetch user & business details
     const rawUserInfo = await User.findById(decodedUser)
-      .select("-password -__v -createdAt -updatedAt -opsCode")
-      .lean();
-      
+    .select("-password -__v -createdAt -updatedAt -opsCode")
+    .populate({
+      path: "toogledTenants.tenantIds", // drill down into the subdocument field
+      model: "Business",            // explicitly tell Mongoose which model to use
+      select: "tenantId companyName" 
+    }) .lean();
+
     if (!rawUserInfo) {
       return { error: "User information not found." };
     }
