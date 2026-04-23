@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import ExpenseCategoryModal from "@/app/Components/CreateExpenseCat";
 import ExpenseCategoriesModal from "@/app/Components/expensecateTable";
-import ExpensesPage from "./page"
+import ExpenseReportModal from "@/app/Components/ExpenseReport"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -122,8 +122,10 @@ export default async function ExpenseLayout({ children, params }) {
 
                   {/* create tags */}
                   <ExpenseCategoryModal baseUrl={baseUrl} userData={userData} />
+
                   </>
               )}
+              {userData?.user?.ReportUser && (<ExpenseReportModal userData={userData} baseUrl={baseUrl} />)}
 
             </nav>
           </aside>

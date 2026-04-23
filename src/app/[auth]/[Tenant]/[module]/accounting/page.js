@@ -21,6 +21,7 @@ import {Encrypt} from "../../../../../../Functions/Mics"
 import { notFound } from 'next/navigation';
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import EMPLOYEES from "../../../../../../models/Users";
+import ExpenseReportModal from "@/app/Components/ExpenseReport"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -59,7 +60,6 @@ export default async function AccountingPage({ children, params }) {
 
   try {
    const MenuItems = [
-  { label: "Expense Report", icon: CurrencyDollarIcon, url: 'ExpenseReport' },
   { label: "Balance Sheet", icon: DocumentChartBarIcon, url: 'BalanceSheet' },
   { label: "Account Receivable", icon: DocumentTextIcon, url: 'Receivables' },
   { label: "Account Payables", icon: BanknotesIcon, url: 'Payables' },
@@ -91,6 +91,7 @@ export default async function AccountingPage({ children, params }) {
                 baseUrl={baseUrl}
                 user={parsedUser}
               />
+              {userData?.user?.ReportUser && (<ExpenseReportModal userData={userData} baseUrl={baseUrl} />)}
               {MenuItems.map(({ label, icon: Icon, url }, index) => (
                 <Link
                   key={index}
