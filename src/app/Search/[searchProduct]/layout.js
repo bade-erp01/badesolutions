@@ -34,10 +34,8 @@ export default async function searchLayout({children, params }) {
   const config = {
     headers: {
       "Content-Type": "application/json",
-       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      // "X-Requested-With": "XMLHttpRequest",
-      dbConnect:`Bearer ${userData.business.rustyRoof}`,
-      access:`${Encrypt(userData.user._id)}`,
+      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+      access: `${Encrypt(userData.user._id)}`,
     },
   };
 
