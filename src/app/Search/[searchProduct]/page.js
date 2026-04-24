@@ -198,8 +198,13 @@ export default function SearchResultPage({ result, linkData }) {
           {selectedIds.length > 0 && (
             <button
               onClick={handleDeleteSelected}
-              className="absolute bottom-40 
-              left-20 bg-red-600 text-white px-4 py-2 rounded shadow-md hover:bg-red-700 transition"
+              style={{
+              position: "fixed",
+              bottom: "25px",
+              right: "20px",
+              zIndex: 1000,
+            }}
+              className="bg-red-600 text-white px-4 py-2 rounded shadow-md hover:bg-red-700 transition"
             >
               Delete Selected
             </button>
