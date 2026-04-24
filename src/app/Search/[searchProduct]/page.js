@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useParams } from "next/navigation";
 import { Dencrypt } from "../../../../Functions/Functions";
+import {ErrorMessage,SuccessToast, plsWait,} from "../../../../Functions/Mics"
 import SearchCard from "../../Components/SearchResult";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Fuse from "fuse.js";
@@ -19,6 +20,55 @@ export default function SearchResultPage({ result, linkData }) {
   const [filteredModules, setFilteredModules] = useState([]);
   const [error, setError] = useState(null);
 
+  // Track selected IDs
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  // Toggle handler
+  const toggleSelection = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id) // remove if already selected
+        : [...prev, id] // add if not selected
+    );
+  };
+
+  // Delete handler
+  const handleDeleteSelected = async () => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${selectedIds.length} selected entr${selectedIds.length > 1 ? "ies" : "y"}?`
+      )
+    ) {
+      try {
+        plsWait(`Submiting request to delete ${selectedIds.length} items`)
+
+        setTimeout(()=>{
+          throw new Error("this feature is not supported yet")
+        },3000)
+        return
+        // Call your backend delete API
+        const response = await fetch("/api/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: selectedIds }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete entries");
+        }
+
+        // Remove deleted items from UI
+        setFilteredModules((prev) =>
+          prev.filter((item) => !selectedIds.includes(item._id))
+        );
+        setSelectedIds([]);
+        alert("Selected entries deleted successfully.");
+      } catch (err) {
+        ErrorMessage(err.message)
+      }
+    }
+  };
+
   useEffect(() => {
     const handleSearch = async () => {
       try {
@@ -26,50 +76,12 @@ export default function SearchResultPage({ result, linkData }) {
           includeScore: true,
           threshold: 0.3,
           keys: [
-            "Name",
-            "description",
-            "paymentReferenceNo",
-            "firstName",
-            "lastName",
-            "Email",
-            "telephone",
-            "phone",
-            "status",
-            "ADCcode",
-            "ACDcode",
-            "billStatus",
-            "crAmount",
-            "Accountant",
-            "ProductName",
-            "WHName",
-            "Username",
-            "productName",
-            "billReferenceNo",
-            "customerName",
-            "CustomerCode",
-            "startDate",
-            "RaiseBy",
-            "invoicelocation",
-            "WayBillNo",
-            "DriverName",
-            "DriverNumber",
-            "vehicleNumber",
-            "priceList",
-            "category",
-            "Debt",
-            "ContactPerson",
-            "CreditId",
-            "DebitId",
-            "customer",
-            "refNo",
-            "transferedDate",
-            "recievedDate",
-            "ResidualValue",
-            "AssetCode",
-            "SerialNumber",
-            "status",
-            "SerialNumber",
-            "Category",
+            "Name","description","paymentReferenceNo","firstName","lastName","Email","telephone","phone","status",
+            "ADCcode","ACDcode","billStatus","crAmount","Accountant","ProductName","WHName","Username","productName",
+            "billReferenceNo","customerName","CustomerCode","startDate","RaiseBy","invoicelocation","WayBillNo",
+            "DriverName","DriverNumber","vehicleNumber","priceList","category","Debt","ContactPerson","CreditId",
+            "DebitId","customer","refNo","transferedDate","recievedDate","ResidualValue","AssetCode","SerialNumber",
+            "Category"
           ],
         });
 
@@ -112,9 +124,15 @@ export default function SearchResultPage({ result, linkData }) {
             </span>{" "}
             in {page.searchProduct} List...
           </p>
-        ) : (
-          ""
+        ) : null}
+
+        {/* Show selected count */}
+        {selectedIds.length > 0 && (
+          <p className="text-sm text-black mb-2">
+            {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected
+          </p>
         )}
+
         <div
           className="grid gap-6 w-full max-w-5xl"
           style={{
@@ -128,6 +146,9 @@ export default function SearchResultPage({ result, linkData }) {
                 data={product}
                 module={page.searchProduct}
                 UserData={UserData}
+                selected={selectedIds.includes(product._id)}
+                onToggle={toggleSelection}
+                showCheckbox={product.billStatus === "Draft"}
               />
             ))
           ) : (
@@ -156,20 +177,34 @@ export default function SearchResultPage({ result, linkData }) {
           )}
         </div>
       </div>
+
+      {/* Floating buttons */}
       {filteredModules.length > 0 && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "40px",
-            right: "20px",
-            zIndex: 1000,
-          }}
-        >
-          <ExcelDownloadBtn
-            data={filteredModules}
-            page={`Search result for ${searchTerm}`}
-          />
-        </div>
+        <>
+          <div
+            style={{
+              position: "fixed",
+              bottom: "40px",
+              right: "20px",
+              zIndex: 1000,
+            }}
+          >
+            <ExcelDownloadBtn
+              data={filteredModules}
+              page={`Search result for ${searchTerm}`}
+            />
+          </div>
+
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="absolute bottom-40 
+              left-20 bg-red-600 text-white px-4 py-2 rounded shadow-md hover:bg-red-700 transition"
+            >
+              Delete Selected
+            </button>
+          )}
+        </>
       )}
     </div>
   );
