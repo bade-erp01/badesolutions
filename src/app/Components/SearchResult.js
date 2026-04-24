@@ -75,7 +75,6 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.customer,
     data.refNo,
     data.Description,
-    
   ];
   const title = titleCandidates.find(Boolean) || "";
 
