@@ -64,6 +64,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.WHName ||
     data.productName ||
     data.billReferenceNo ||
+    data.customerName ||
     data.Username ||
     data.CustomerCode ||
     data.paymentReferenceNo ||
