@@ -64,6 +64,8 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.firstName,
     data.Name,
     data.WHName,
+    module === "purchase" ? data.billReferenceNo : "",
+    data.billReferenceNo === "" ? data.customerName : data.billReferenceNo,
     data.productName,
     data.Username,
     data.paymentReferenceNo,
@@ -73,8 +75,6 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.customer,
     data.refNo,
     data.Description,
-    module === "purchase" ? data.billReferenceNo : "",
-    data.billReferenceNo === "" ? data.customerName : data.billReferenceNo
     
   ];
   const title = titleCandidates.find(Boolean) || "";
