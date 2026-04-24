@@ -9,6 +9,7 @@ import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/h
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Encrypt } from "../../../Functions/Functions";
+import { Badge } from "@/components/ui/badge";
 
 const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }) => {
   const [auth] = useState(UserData.business.companyName);
@@ -111,15 +112,15 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <p className="text-xs text-gray-500 mt-1 truncate">
+                <Badge variant="outline" className="truncate"> 
                   {truncate(subtitle)}
-                </p>
+                </Badge>
               </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-64">
               <p className="text-sm font-medium">{title}</p>
               <Separator className="my-2" />
-              <p className="text-xs text-gray-600">{subtitle}</p>
+              <Badge variant="outline" className="truncate">{subtitle}</Badge>
             </HoverCardContent>
           </HoverCard>
         </CardContent>
