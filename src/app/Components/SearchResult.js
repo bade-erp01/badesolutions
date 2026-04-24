@@ -121,8 +121,8 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <Badge variant="outline" className="truncate">
-                  {truncate(subtitle)}
+                <Badge variant={subtitle === "cancelled" ? "outline" : "destructive"}>
+                  {subtitle}
                 </Badge>
               </Link>
             </HoverCardTrigger>
