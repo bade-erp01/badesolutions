@@ -204,7 +204,7 @@ export default function SearchResultPage({ result, linkData }) {
               right: "20px",
               zIndex: 1000,
             }}
-              className="bg-red-600 text-white px-4 py-2 rounded shadow-md hover:bg-red-700 transition"
+              className="bg-red-600 text-white text-sm px-4 py-2 rounded shadow-md hover:bg-red-700 transition"
             >
               Delete {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""}.
             </button>
