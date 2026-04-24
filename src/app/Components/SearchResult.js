@@ -122,7 +122,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <Badge variant={subtitle === "cancelled" ? "destructive" : "outline"}>
+                <Badge variant={subtitle === "Cancelled" ? "destructive" : "outline"}>
                   {subtitle}
                 </Badge>
               </Link>
