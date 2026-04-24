@@ -65,7 +65,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.Name,
     data.WHName,
     module === "purchase" ? data.billReferenceNo : "",
-    data.billReferenceNo === "" ? data.customerName : data.billReferenceNo,
+    data.billReferenceNo === "" ? data.customerName : `${data.billStatus?.toUpperCase()?.slice(0, 3)}/${data.billReferenceNo}`,
     data.productName,
     data.Username,
     data.paymentReferenceNo,
