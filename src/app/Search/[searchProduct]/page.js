@@ -125,13 +125,7 @@ export default function SearchResultPage({ result, linkData }) {
             in {page.searchProduct} List...
           </p>
         ) : null}
-
-        {/* Show selected count */}
-        {selectedIds.length > 0 && (
-          <p className="text-sm text-black mb-2">
-            {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected
-          </p>
-        )}
+        
 
         <div
           className="grid gap-6 w-full max-w-5xl"
