@@ -63,17 +63,16 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.Name ||
     data.WHName ||
     data.productName ||
-    data.billReferenceNo ||
-    data.customerName ||
     data.Username ||
-    data.CustomerCode ||
     data.paymentReferenceNo ||
+    data.CustomerCode ||
     data.CreditId ||
     data.DebitId ||
     data.customer ||
     data.refNo ||
     data.Description ||
-    `${data.billStatus}/${data.billReferenceNo}`;
+    `${data.billReferenceNo ? `${data.billStatus.toUpperCase().slice(0,3)}/${data.billReferenceNo}` : ""} : ${data.customerName}`||
+    ``;
 
   const subtitle =
     data.CustomerCode ||
