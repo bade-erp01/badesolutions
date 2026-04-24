@@ -296,7 +296,7 @@ export default function Nav1({ page, Module, user, business }) {
                                       className="w-full text-left text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded transition-colors duration-200"
                                       onClick={() =>
                                         handleTenantSwitch(
-                                          Encrypt(tenant.tenantIds?.tenantId), // encrypt the actual tenantId
+                                          Encrypt(tenant.tenantIds?._id), // encrypt the actual tenantId
                                         )
                                       }
                                     >

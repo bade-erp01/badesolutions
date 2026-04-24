@@ -40,9 +40,9 @@ const fetchUser = async () => {
     .populate({
       path: "toogledTenants.tenantIds", // drill down into the subdocument field
       model: "Business",            // explicitly tell Mongoose which model to use
-      select: "tenantId companyName" 
-    }) .lean();
-
+      select: "tenantId companyName _id email" 
+    }).lean();
+    
     if (!rawUserInfo) {
       return { error: "User information not found." };
     }

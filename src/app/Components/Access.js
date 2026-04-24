@@ -1589,7 +1589,7 @@ const handleTenantAssign = async (tenantId) => {
             value={selectedTenant}
             onChange={(tenant) => {
               setSelectedTenant(tenant);
-              handleTenantAssign(tenant.tenantId);
+              handleTenantAssign(tenant._id);
             }}
           >
             <Combobox.Input
