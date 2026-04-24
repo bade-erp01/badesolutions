@@ -64,6 +64,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.Name ||
     data.WHName ||
     data.productName ||
+    `${data.billReferenceNo ? `${data.billStatus.toUpperCase().slice(0,3)}/${data.billReferenceNo}` : ""} : ${data.customerName}`||
     data.Username ||
     data.paymentReferenceNo ||
     data.CustomerCode ||
@@ -72,7 +73,6 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.customer ||
     data.refNo ||
     data.Description ||
-    `${data.billReferenceNo ? `${data.billStatus.toUpperCase().slice(0,3)}/${data.billReferenceNo}` : ""} : ${data.customerName}`||
     ``;
 
   const subtitle =
