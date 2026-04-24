@@ -200,7 +200,7 @@ export default function SearchResultPage({ result, linkData }) {
               onClick={handleDeleteSelected}
               style={{
               position: "fixed",
-              bottom: "110px",
+              bottom: "100px",
               right: "20px",
               zIndex: 1000,
             }}
