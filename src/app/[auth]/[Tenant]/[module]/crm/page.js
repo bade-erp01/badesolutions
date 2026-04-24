@@ -7,7 +7,6 @@ import Users from "../../../../../../models/Users";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import CustomerCategoryPieChart from "@/app/Components/CustomerCategory";
-import Card from "@/app/Components/Card";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import Footer2 from "@/app/Components/Footer2";
@@ -19,6 +18,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { Suspense } from "react";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import CustomerGrid from "./CustomerGrid"
 
 export default async function crmLayout({ params }) {
   const userData = await fetchUser(); // Fetch user data
@@ -160,17 +160,7 @@ export default async function crmLayout({ params }) {
                   )}
 
                   {/* Customer Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-                    {customerList
-                      .sort((a, b) => a.Username.localeCompare(b.Username))
-                      .map((element) => (
-                        <Card
-                          key={element._id}
-                          data={element}
-                          module={moduleParams.module}
-                        />
-                      ))}
-                  </div>
+                  <CustomerGrid customerList={customerList} moduleParams={moduleParams.module} />
                 </>
               )}
             </section>
