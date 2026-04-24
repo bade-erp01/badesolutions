@@ -64,6 +64,8 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.firstName,
     data.Name,
     data.WHName,
+    data.productName,
+    data.Username,
     module === "purchase" ? data.billReferenceNo : "",
     data.billReferenceNo === "" ? data.customerName : data.billReferenceNo,
     data.productName,
@@ -120,7 +122,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <Badge variant={subtitle === "cancelled" ? "outline" : "destructive"}>
+                <Badge variant={subtitle === "cancelled" ? "destructive" : "outline"}>
                   {subtitle}
                 </Badge>
               </Link>
