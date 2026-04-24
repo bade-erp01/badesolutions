@@ -64,10 +64,10 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.firstName,
     data.Name,
     data.WHName,
+    module === "purchase" ? data.billReferenceNo : "",
+    data.billReferenceNo === "" ? data.customerName : `${data.billStatus?.toUpperCase()?.slice(0, 3)}/${data.billReferenceNo}`,
     data.productName,
     data.Username,
-    module === "purchase" ? data.billReferenceNo : "",
-    data.billReferenceNo === "" ? data.customerName : data.billReferenceNo,
     data.paymentReferenceNo,
     data.CustomerCode,
     data.CreditId,
@@ -120,7 +120,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <Badge variant={subtitle === "cancelled" ? "destructive" : "outline"}>
+                <Badge variant={subtitle === "cancelled" ? "outline" : "destructive"}>
                   {subtitle}
                 </Badge>
               </Link>
