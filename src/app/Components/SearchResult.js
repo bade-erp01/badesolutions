@@ -73,9 +73,9 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.customer,
     data.refNo,
     data.Description,
-    data.billStatus === "Draft"
-      ? data.customerName || data.billReferenceNo 
-      : data.billStatus !== "Draft" ? data.billReferenceNo  : `${data.billStatus?.toUpperCase()?.slice(0, 3)}/${data.billReferenceNo}`,
+    module === "purchase" ? data.billReferenceNo : "",
+    module === "bill"
+      ?  data.billStatus === "Draft" ? data.customerName  : data.billReferenceNo : `${data.billStatus?.toUpperCase()?.slice(0, 3)}/${data.billReferenceNo}`,
   ];
   const title = titleCandidates.find(Boolean) || "";
 
