@@ -13,7 +13,12 @@ export default async function layout({ children, params }) {
   const userInfo = await fetchUser();
   const RawEmployee = await Users.findById(Dencrypt(Params?.id))
     .select("-password -opsCode")
-    .lean();
+    .populate({
+      path: "toogledTenants.tenantIds", // drill down into the subdocument field
+      model: "Business",            // explicitly tell Mongoose which model to use
+      select: "tenantId companyName" 
+    }).lean();
+    
   const StringedEmployee = JSON.stringify(RawEmployee);
   const data = JSON.parse(StringedEmployee);
 
