@@ -59,30 +59,39 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
 
-  const title =
-    data.firstName ||
-    data.Name ||
-    data.WHName ||
-    data.productName ||
-    data.Username ||
-    data.paymentReferenceNo ||
-    data.CustomerCode ||
-    data.CreditId ||
-    data.DebitId ||
-    data.customer ||
-    data.refNo ||
-    data.Description ||
-    (data.billReferenceNo !== "" ? `${data.billStatus.toUpperCase().slice(0,3)}/${data.billReferenceNo}` : data.customerName) ||
-    ``;
+  // Optimized title selection
+  const titleCandidates = [
+    data.firstName,
+    data.Name,
+    data.WHName,
+    data.productName,
+    data.Username,
+    data.paymentReferenceNo,
+    data.CustomerCode,
+    data.CreditId,
+    data.DebitId,
+    data.customer,
+    data.refNo,
+    data.Description,
+    data.billReferenceNo
+      ? `${data.billStatus?.toUpperCase().slice(0, 3)}/${data.billReferenceNo}`
+      : data.customerName,
+  ];
+  const title = titleCandidates.find(Boolean) || "";
 
-  const subtitle =
-    data.CustomerCode ||
-    data.Email ||
-    data.billStatus ||
-    data.ADCcode ||
-    data.ACDcode ||
-    data.status ||
-    `${data.currentQty ? `${data.currentQty} :case, ` : ""}${data.pcs ? `${data.pcs}:pcs` : ""}`;
+  // Optimized subtitle selection
+  const subtitleCandidates = [
+    data.CustomerCode,
+    data.Email,
+    data.billStatus,
+    data.ADCcode,
+    data.ACDcode,
+    data.status,
+    data.currentQty || data.pcs
+      ? `${data.currentQty ? `${data.currentQty} :case, ` : ""}${data.pcs ? `${data.pcs}:pcs` : ""}`
+      : null,
+  ];
+  const subtitle = subtitleCandidates.find(Boolean) || "";
 
   return (
     <Card
@@ -112,7 +121,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <Badge variant="outline" className="truncate"> 
+                <Badge variant="outline" className="truncate">
                   {truncate(subtitle)}
                 </Badge>
               </Link>
