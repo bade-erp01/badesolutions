@@ -1554,7 +1554,7 @@ const handleTenantAssign = async (tenantId) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(businessInfo._id)}`,
+            Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
             access: `${Encrypt(userInfo._id)}`,
           },
           body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
