@@ -130,7 +130,9 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
             <HoverCardContent className="w-64">
               <p className="text-sm font-medium">{title}</p>
               <Separator className="my-2" />
-              <Badge variant="outline" className="truncate">{subtitle}</Badge>
+              <Badge variant={subtitle === "Cancelled" ? "destructive" : "outline"}>
+                  {subtitle}
+              </Badge>
             </HoverCardContent>
           </HoverCard>
         </CardContent>
