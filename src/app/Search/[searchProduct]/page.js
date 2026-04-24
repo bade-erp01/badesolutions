@@ -200,13 +200,13 @@ export default function SearchResultPage({ result, linkData }) {
               onClick={handleDeleteSelected}
               style={{
               position: "fixed",
-              bottom: "60px",
+              bottom: "90px",
               right: "20px",
               zIndex: 1000,
             }}
               className="bg-red-600 text-white px-4 py-2 rounded shadow-md hover:bg-red-700 transition"
             >
-              Delete Selected
+              Delete {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""}.
             </button>
           )}
         </>
