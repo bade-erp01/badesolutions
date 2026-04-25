@@ -42,7 +42,7 @@ selectedLetter
             <Card
               key={element._id}
               data={element}
-              module={moduleParams.module}
+              module={moduleParams}
             />
           ))}
         </div>
