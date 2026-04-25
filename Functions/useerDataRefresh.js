@@ -29,62 +29,35 @@ const fetchUser = async () => {
       return { error: "Invalid session tokens, please log in again." };
     }
 
-    const userReq = await fetch(
-      `${process.env.EXPRESS_PRIVATE_URL}/api/user/${userToken}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(decodedBusiness)}`,
-          access: `${Encrypt(decodedUser)}`,
-          "Cache-Control": "max-age=120", // cache for 2 minutes
-        },
-      },
-    );
 
-    const response = await userReq.json()
+    await dbConnect("BadeAdmin"); // Ensure database connection
+    // Fetch user & business details
+    const rawUserInfo = await User.findById(decodedUser)
+    .select("-password -__v -createdAt -updatedAt -opsCode")
+    .populate({
+      path: "toogledTenants.tenantIds", // drill down into the subdocument field
+      model: "Business",            // explicitly tell Mongoose which model to use
+      select: "tenantId companyName _id email"
+    }).lean();
 
-    const rawUserInfo = response. employee;
-    const rawBusinessInfo = response.business
+    if (!rawUserInfo) {
+      return { error: "User information not found." };
+    }
 
-    if (!userReq.ok) {
+    const rawBusinessInfo = await Business.findOne({ tenantId: rawUserInfo.tenantId })
+      .select("-payStackApiKey")
+      .lean();
+    if (!rawUserInfo || !rawBusinessInfo) {
       return { error: "User or Business information not found." };
     }
 
+    // Convert data to plain objects
     return {
-      user: Dencrypt(rawUserInfo),
-      business: Dencrypt(rawBusinessInfo),
+      user: JSON.parse(JSON.stringify(rawUserInfo)),
+      business: JSON.parse(JSON.stringify(rawBusinessInfo)),
       SessionId: decodedSessionId
     };
-
-
-    // await dbConnect("BadeAdmin"); // Ensure database connection
-    // // Fetch user & business details
-    // const rawUserInfo = await User.findById(decodedUser)
-    // .select("-password -__v -createdAt -updatedAt -opsCode")
-    // .populate({
-    //   path: "toogledTenants.tenantIds", // drill down into the subdocument field
-    //   model: "Business",            // explicitly tell Mongoose which model to use
-    //   select: "tenantId companyName _id email"
-    // }).lean();
-
-    // if (!rawUserInfo) {
-    //   return { error: "User information not found." };
-    // }
-
-    // const rawBusinessInfo = await Business.findOne({ tenantId: rawUserInfo.tenantId })
-      // .select("-payStackApiKey")
-      // .lean();
-    // if (!rawUserInfo || !rawBusinessInfo) {
-    //   return { error: "User or Business information not found." };
-    // }
-
-    // // Convert data to plain objects
-    // return {
-    //   user: JSON.parse(JSON.stringify(rawUserInfo)),
-    //   business: JSON.parse(JSON.stringify(rawBusinessInfo)),
-    //   SessionId: decodedSessionId
-    // };
+    
   } catch (err) {
     return { error: "An unexpected error occurred, please try again later." };
   }
