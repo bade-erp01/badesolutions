@@ -1,18 +1,7 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
-import Link from "next/link";
-import {
-  ChartBarIcon,
-  CurrencyDollarIcon,
-  DocumentChartBarIcon,
-  DocumentTextIcon,
-  BanknotesIcon,
-  PresentationChartLineIcon,
-  BuildingLibraryIcon,
-  CubeIcon,
-  ShoppingCartIcon,
-} from "@heroicons/react/24/outline";
+import { Separator } from "@/components/ui/separator";
 import {Encrypt} from "../../../../../../../../Functions/Mics"
 import { notFound } from 'next/navigation';
 import BackButton from "@/app/Components/BackBotton";
@@ -55,7 +44,7 @@ export default async function AccountingPage({ children, params }) {
         <Nav1
           user={userData.user}
           business={userData.business}
-          page={`${moduleList.module} / ${moduleList.id}`}
+          page={`${moduleList.id}`}
         />
 
         <div className="flex flex-1 text-white bt-2">
@@ -64,11 +53,9 @@ export default async function AccountingPage({ children, params }) {
             className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
             style={{ overflowY: "auto" }}
           >
-            <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>
-            <hr className="border-gray-100 mb-4" />
-            <nav className="space-y-2">
+            <nav className="">
              <BackButton/>
-             
+             <Separator className="my-2" />
             </nav>
           </aside>
 

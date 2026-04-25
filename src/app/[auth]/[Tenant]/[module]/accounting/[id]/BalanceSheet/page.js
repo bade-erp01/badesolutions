@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   LineChart,
@@ -18,6 +13,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
+import { Separator } from "@/components/ui/separator";
 
 export default function BalanceSheet() {
   const [balanceData, setBalanceData] = useState({
@@ -72,7 +69,7 @@ export default function BalanceSheet() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Assets</CardTitle>
+                <CardTitle className="text-white text-md">Assets</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-bold text-purple-400">
@@ -82,7 +79,7 @@ export default function BalanceSheet() {
             </Card>
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Liabilities</CardTitle>
+                <CardTitle className="text-white text-md">Liabilities</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-bold text-red-400">
@@ -92,7 +89,7 @@ export default function BalanceSheet() {
             </Card>
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-white">Equity</CardTitle>
+                <CardTitle className="text-white text-md">Equity</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-bold text-green-400">
@@ -103,7 +100,7 @@ export default function BalanceSheet() {
           </div>
 
           {/* Financial Trends */}
-          <h2 className="text-xl font-semibold text-center mb-4 text-white">
+          <h2 className="text-xs text-center mb-4 text-white">
             Financial Trends
           </h2>
           <div className="h-80 bg-gray-900 p-2 rounded-md">
@@ -113,7 +110,11 @@ export default function BalanceSheet() {
                 <XAxis dataKey="quarter" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1F2937", borderColor: "#374151", color: "#F9FAFB" }}
+                  contentStyle={{
+                    backgroundColor: "#1F2937",
+                    borderColor: "#374151",
+                    color: "#F9FAFB",
+                  }}
                 />
                 <Legend />
                 <Line type="monotone" dataKey="assets" stroke="#A78BFA" />
@@ -122,17 +123,23 @@ export default function BalanceSheet() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-
+          <Separator className="my-2" />
+        </CardContent>
+        <footer className="backdrop-blur-md text-white px-4 py-4 flex items-center justify-between">
           {/* Export Button */}
-          <div className="mt-6 text-center">
-            <Button
+          <Button
               onClick={handleExport}
               className="bg-gray-700 hover:bg-gray-600 text-white"
             >
               Export Balance Sheet
-            </Button>
+          </Button>
+          <div className="flex items-center gap-2">
+            <ArrowTrendingUpIcon className="h-6 w-6 text-green-400" />
+            <span className="text-sm font-semibold">
+              Assets & Equity Growth
+            </span>
           </div>
-        </CardContent>
+        </footer>
       </Card>
     </div>
   );
