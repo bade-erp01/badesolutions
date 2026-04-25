@@ -43,7 +43,7 @@ export default function Page({ Data, userData }) {
   const [NetProfit, setNetProfit] = useState(0);
   const [Taxes, setTaxes] = useState(0);
   const [currency] = useState(userData.business.currency?.currency.Symbol);
-  //  console.log(initialData.COAs)
+  const [EBIT,setEBIT] = useState(0)
 
   const generateDates = (end, start) => {
     const dates = [];
@@ -161,6 +161,26 @@ export default function Page({ Data, userData }) {
           .reduce((acc, entry) => acc + entry.openingBalance, 0),
       );
 
+
+      
+      // capture indirectExpenses
+      setindirectExpenses(
+        initialData.COAs[0].Expense.Indirect_Expense.monthlyBalances
+        .filter((entry) => {
+          const formattedDate = moment(entry.month).format("YYYY-MM");
+          return dates.includes(formattedDate);
+        })
+        .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      );
+
+      // Operating incom
+      setEBIT(
+        (SALES - Return) 
+        - ((OpeningInventory + NetPurchase) - closingInv) 
+        - DirectExpense 
+        - indirectExpenses
+      );
+
       // CAPTURE setTaxes
       setTaxes(
         initialData.COAs[0].Liability.Tax_payable.monthlyBalances
@@ -170,16 +190,10 @@ export default function Page({ Data, userData }) {
           })
           .reduce((acc, entry) => acc + entry.openingBalance, 0),
       );
+      
+      // Net incom
+      setNetProfit( EBIT - Taxes);
 
-      // capture indirectExpenses
-      setindirectExpenses(
-        initialData.COAs[0].Expense.Indirect_Expense.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
-      );
 
       SuccessToast("Income statement updated.");
     } catch (err) {
@@ -306,13 +320,13 @@ export default function Page({ Data, userData }) {
                           <AccordionTrigger>Direct Expense [C]</AccordionTrigger>
                           <AccordionContent className="space-y-1 text-sm text-gray-600">
                             {initialData.ExpenseCats.filter(cat => cat.type === "Direct")
-                              .slice(0,3)
+                              .slice(0,8)
                               .map((cat, idx) => (
                                 <Badge variant="secondary" className="gap-1" key={idx}>{cat.NAME}</Badge>
                               ))}
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length > 3 && (
+                            {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length > 8 && (
                               <Badge variant="secondary">
-                                + {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length - 3} More
+                                + {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length - 8} More
                               </Badge>
                             )}
                           </AccordionContent>
@@ -338,13 +352,13 @@ export default function Page({ Data, userData }) {
                           <AccordionTrigger>Indirect Expense [E]</AccordionTrigger>
                           <AccordionContent className="space-y-1 text-sm text-gray-600">
                             {initialData.ExpenseCats.filter(cat => cat.type === "Indirect")
-                              .slice(0,3)
+                              .slice(0,8)
                               .map((cat, idx) => (
                                 <Badge variant="secondary" className="gap-1" key={idx}>{cat.NAME}</Badge>
                               ))}
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length > 3 && (
+                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length > 8 && (
                               <Badge variant="outline">
-                                + {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length - 3} More
+                                + {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length - 8} More
                               </Badge>
                             )}
                           </AccordionContent>
@@ -358,7 +372,7 @@ export default function Page({ Data, userData }) {
                   <TableRow>
                     <TableCell className="font-medium">Operating Income [EBIT]</TableCell>
                     <TableCell className="text-right font-medium">
-                      {currency}{((SALES - Return) - ((OpeningInventory + NetPurchase) - closingInv)) - DirectExpense - indirectExpenses}
+                      {currency}{EBIT}
                     </TableCell>
                   </TableRow>
 
