@@ -44,6 +44,7 @@ export default function Page({ Data, userData }) {
   const [Taxes, setTaxes] = useState(0);
   const [currency] = useState(userData.business.currency?.currency.Symbol);
   const [EBIT,setEBIT] = useState(0)
+   console.log(initialData.COAs)
 
   const generateDates = (end, start) => {
     const dates = [];
@@ -191,8 +192,13 @@ export default function Page({ Data, userData }) {
           .reduce((acc, entry) => acc + entry.openingBalance, 0),
       );
       
-      // Net incom
-      setNetProfit( EBIT - Taxes);
+      // compute net profit after tax
+      setNetProfit(
+        ((SALES - Return) - ((OpeningInventory + NetPurchase) - closingInv))
+        - DirectExpense
+        - indirectExpenses
+        - Taxes
+      );
 
 
       SuccessToast("Income statement updated.");
@@ -304,7 +310,7 @@ export default function Page({ Data, userData }) {
                             <p>+ Net purchase: {currency}{NetPurchase}</p>
                             <p>COGAS: {currency}{OpeningInventory + NetPurchase}</p>
                             <p>- Closing inventory: {currency}{closingInv}</p>
-                            <p>COGS: {currency}{COGS}</p>
+                            <p>COGS: {currency}{Math.round(COGS)}</p>
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
@@ -340,7 +346,7 @@ export default function Page({ Data, userData }) {
                   <TableRow>
                     <TableCell className="font-medium">Gross Profit [D]</TableCell>
                     <TableCell className="text-right font-medium">
-                      {currency}{(SALES - Return) - (OpeningInventory + NetPurchase) - closingInv}
+                      {currency}{Math.round(SALES - Return) - COGS}
                     </TableCell>
                   </TableRow>
 
