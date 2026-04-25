@@ -52,10 +52,10 @@ const Card = ({ data, module }) => {
       <HoverCardTrigger asChild>
         <Link
           href={linkHref}
-          className="block min-h-20 w-70"
+          className="block w-full h-full"
           style={{ textDecoration: "none" }}
         >
-          <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-sm shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-20 w-70">
+          <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-sm shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-20 w-full h-full">
             <Image
               src={imageSrc}
               width={60}
