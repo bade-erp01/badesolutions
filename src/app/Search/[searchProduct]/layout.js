@@ -70,7 +70,7 @@ export default async function searchLayout({children, params }) {
         <main className="flex-1 ">
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6 relative z-10 max-h-[83dvh] overflow-y-auto">
             {/* {children} */}
-            <SearchResultPage result={data} linkData={userData} />
+            <SearchResultPage result={data} linkData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL}/>
           </section>
         </main>
       </div>

@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams, useParams } from "next/navigation";
-import { Dencrypt } from "../../../../Functions/Functions";
+import { Dencrypt,Encrypt } from "../../../../Functions/Functions";
 import {ErrorMessage,SuccessToast, plsWait,} from "../../../../Functions/Mics"
 import SearchCard from "../../Components/SearchResult";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Fuse from "fuse.js";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 
-export default function SearchResultPage({ result, linkData }) {
+export default function SearchResultPage({ result, linkData, baseUrl }) {
   const searchParams = useSearchParams();
   const Module = searchParams.get("search");
   const page = useParams();
@@ -19,7 +20,7 @@ export default function SearchResultPage({ result, linkData }) {
   const [resultArray] = useState(Dencrypt(result));
   const [filteredModules, setFilteredModules] = useState([]);
   const [error, setError] = useState(null);
-
+  const router = useRouter()
   // Track selected IDs
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -40,17 +41,17 @@ export default function SearchResultPage({ result, linkData }) {
       )
     ) {
       try {
-        plsWait(`Submiting request to delete ${selectedIds.length} items`)
+        plsWait(`Submiting request to delete ${selectedIds.length} entr${selectedIds.length > 1 ? "ies" : "y"}`)
 
-        setTimeout(()=>{
-          throw new Error("this feature is not supported yet")
-        },3000)
-        return
         // Call your backend delete API
-        const response = await fetch("/api/delete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: selectedIds }),
+        const response = await fetch(`${baseUrl}/api/delete/multiple`, {
+          method: "DELETE",
+          headers: { 
+            "Content-Type": "application/json",
+             Authorization: `Bearer ${Encrypt(UserData.business.tenantId)}`,
+             access: `${Encrypt(UserData.user._id)}`,
+           },
+          body: JSON.stringify({ ids: Encrypt(selectedIds) }),
         });
 
         if (!response.ok) {
@@ -62,7 +63,8 @@ export default function SearchResultPage({ result, linkData }) {
           prev.filter((item) => !selectedIds.includes(item._id))
         );
         setSelectedIds([]);
-        alert("Selected entries deleted successfully.");
+        SuccessToast("Selected entries deleted successfully.");
+        router.refresh()
       } catch (err) {
         ErrorMessage(err.message)
       }
