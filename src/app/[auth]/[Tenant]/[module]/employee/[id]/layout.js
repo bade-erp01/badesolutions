@@ -2,7 +2,6 @@ import React from "react";
 import SingleEmployeeView from "./page";
 import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import Users from "../../../../../../../models/Users";
 import Businesses from "../../../../../../../models/Business";
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
@@ -11,16 +10,23 @@ import BackButton from "@/app/Components/BackBotton";
 export default async function layout({ children, params }) {
   const Params = await params;
   const userInfo = await fetchUser();
-  const RawEmployee = await Users.findById(Dencrypt(Params?.id))
-    .select("-password -opsCode")
-    .populate({
-      path: "toogledTenants.tenantIds", // drill down into the subdocument field
-      model: "Business",            // explicitly tell Mongoose which model to use
-      select: "tenantId companyName" 
-    }).lean();
-    
-  const StringedEmployee = JSON.stringify(RawEmployee);
-  const data = JSON.parse(StringedEmployee);
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+
+  const userReq = await fetch(
+      `${baseUrl}/api/user/${Params.id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+          access: `${Encrypt(userInfo.user._id)}`,
+        },
+      },
+    );
+
+  const response = await userReq.json()
+
+  const data = Dencrypt(response.employee);
 
   // get all business data
   const RawBusiness = await Businesses.find({
@@ -32,7 +38,6 @@ export default async function layout({ children, params }) {
   const businessData = JSON.parse(StringedBusiness);
 
   // fetch store 
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const res = await fetch(`${baseUrl}/api/Stores`, {
     method: "GET",
     headers: {
@@ -53,7 +58,7 @@ export default async function layout({ children, params }) {
       <Nav1
         user={userInfo.user}
         business={userInfo.business}
-        page={`${RawEmployee?.firstName || "Unknown"} ${RawEmployee?.lastName || ""}`}
+        page={`${data?.firstName || "Unknown"} ${data?.lastName || ""}`}
       />
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}

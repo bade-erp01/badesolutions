@@ -1496,12 +1496,12 @@ export default function AccessControl({
               Assigned Tenants
             </h3>
             <div className="flex flex-wrap gap-2">
-              {data?.toogledTenants?.filter((tenant) => tenant.tenantIds !== data.tenantId).map((tenant) => (
+              {data?.toogledTenants?.filter((tenant) => tenant.tenantIds.tenantId !== data.tenantId).map((tenant) => (
                 <span
                   key={tenant._id}
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-blue-200 hover:bg-blue-100 transition-colors duration-200"
                 >
-                   {tenant.companyName || "Unknown Tenant"}
+                   {tenant.tenantIds.companyName || "Unknown Tenant"}
                   <button
                     onClick={() => handleRemoveTenant(tenant._id)}
                     className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
