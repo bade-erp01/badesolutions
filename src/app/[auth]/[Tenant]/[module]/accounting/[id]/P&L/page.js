@@ -295,7 +295,7 @@ export default function Page({ Data, userData }) {
 
                   {/* NET SALES */}
                   <TableRow>
-                    <TableCell>Net Sales [A]</TableCell>
+                    <TableCell>Net Sales ~ [Sales - Return] [A]</TableCell>
                     <TableCell className="text-right">{currency}{SALES - Return}</TableCell>
                   </TableRow>
 
