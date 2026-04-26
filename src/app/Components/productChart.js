@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image"
+import Image from "next/image";
 import { Line } from "react-chartjs-2";
-import { StarIcon } from "@heroicons/react/24/solid";
+import { StarIcon, ChartBarIcon } from "@heroicons/react/24/solid";
 import {
   Chart as ChartJS,
   LineElement,
@@ -27,10 +27,10 @@ ChartJS.register(
 
 const ProductSalesChart = ({ productsList }) => {
   const [products] = useState(productsList);
-  const filtered = products.sort((a,b)=>b.TotalSale - a.TotalSale).filter((p) => p.TotalSale > 0);
+  const filtered = products.sort((a, b) => b.TotalSale - a.TotalSale).filter((p) => p.TotalSale > 0);
   const sorted = [...filtered];
-  const bestSort = products.sort((a,b)=>b.TotalSale - a.TotalSale);
-  const bestSeller = bestSort[0]
+  const bestSort = products.sort((a, b) => b.TotalSale - a.TotalSale);
+  const bestSeller = bestSort[0];
 
   const gradientFill = (ctx) => {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -47,7 +47,7 @@ const ProductSalesChart = ({ productsList }) => {
   };
 
   const data = {
-    labels: sorted.map((p) => p.Name.substring(0,7).trim()),
+    labels: sorted.map((p) => p.Name.substring(0, 7).trim()),
     datasets: [
       {
         label: "Heat Map",
@@ -58,7 +58,7 @@ const ProductSalesChart = ({ productsList }) => {
         pointBackgroundColor: "#a9c1e6ff",
         pointBorderColor: "#a9c1e6ff",
         pointBorderWidth: 2,
-        tension: 0.7, // 👈 curved lines
+        tension: 0.7,
         pointRadius: 2,
         pointHoverRadius: 4,
       },
@@ -139,9 +139,11 @@ const ProductSalesChart = ({ productsList }) => {
           maxRotation: 45,
           minRotation: 45,
         },
-        grid: { display: true ,
-           color: "rgba(255, 252, 252, 0.4)",
-          borderDash: [4, 4],},
+        grid: {
+          display: true,
+          color: "rgba(255, 252, 252, 0.4)",
+          borderDash: [4, 4],
+        },
       },
       y: {
         title: {
@@ -161,14 +163,15 @@ const ProductSalesChart = ({ productsList }) => {
   };
 
   return (
-    <div className="rounded-sm p-6 shadow-xl bg-white/60 backdrop-blur-md border text-xs border-gray-200 mb-6">
-      <h4 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+    <div className="rounded-lg p-6 shadow-lg bg-[#1e1e20]/70 backdrop-blur-md border border-gray-700 mb-6">
+      <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <ChartBarIcon className="h-6 w-6 text-sky-400" />
         <span>Product Sales Overview</span>
       </h4>
 
-      <div className="overflow-none mb-6">
+      <div className="mb-6">
         <div
-          className="border-2 bg-gray-700 border-gradient-to-r from-sky-400 to-purple-400 p-2"
+          className="border border-gray-600 rounded-lg p-2 bg-black/30"
           style={{
             minWidth: `600px`,
             height: "450px",
@@ -179,14 +182,14 @@ const ProductSalesChart = ({ productsList }) => {
       </div>
 
       {bestSeller && (
-        <div className="bg-gray-200 shadow-lg p-5 flex items-center gap-6 hover:shadow-md transition-all duration-300">
+        <div className="bg-black/40 border border-gray-600 rounded-lg shadow-md p-5 flex items-center gap-6">
           <Image
             src={bestSeller.image || "/preview.png"}
             alt={bestSeller.Name}
             width={50}
             height={50}
             quality={100}
-            className="w-24 h-24 object-cover rounded-lg border border-gray-300"
+            className="w-24 h-24 object-cover rounded-lg border border-gray-500"
           />
           <div>
             <div className="flex items-center gap-2 mb-1 text-xs">
@@ -200,9 +203,9 @@ const ProductSalesChart = ({ productsList }) => {
                 <StarIcon className="h-5 w-5 text-yellow-400" />
               </div>
             </div>
-            <h5 className="text-sm font-bold text-gray-900">{bestSeller.Name}</h5>
-            <p className="text-xs text-gray-600">{bestSeller?.ADCcode || bestSeller?.ACDcode || ""}</p>
-            <p className="text-xs text-gray-600 mt-1">
+            <h5 className="text-sm font-bold text-white">{bestSeller.Name}</h5>
+            <p className="text-xs text-gray-300">{bestSeller?.ADCcode || bestSeller?.ACDcode || ""}</p>
+            <p className="text-xs text-gray-400 mt-1">
               <strong>Description:</strong>{" "}
               {bestSeller?.description || bestSeller?.Description || "No description available."}
             </p>
