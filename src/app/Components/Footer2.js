@@ -11,7 +11,7 @@ export default function Footer2() {
         className="px-4"
       >
         <span className="text-xs md:text-base text-gray-200">
-          📢 You can request a customized business email that reflects your brand identity.{" "}
+          📢 Get a professional business email that reflects your brand identity.{" "}
         </span> 
         {" "} |  {" "}
         <span className="text-xs md:text-base text-gray-200">
