@@ -24,7 +24,7 @@ import {
   SuccessToast,
   plsWait,
   sendInvite,
-  DeleteUser,
+  SendTimeOutLink,
 } from "../../../../../../../Functions/Mics";
 import AccessControl from "@/app/Components/Access";
 
@@ -378,7 +378,7 @@ export default function SingleEmployeeView({
               &apos;s profile
             </h4>
             <span
-              className={`px-5 py-1.5 rounded-full font-semibold text-sm tracking-wide shadow-sm border ${
+              className={`px-5 py-1.5 rounded-full text-sm tracking-wide shadow-sm border ${
                 data.lastSeen === ""
                   ? "bg-red-50 text-red-600 border-red-200"
                   : "bg-green-50 text-green-700 border-green-200"
@@ -389,8 +389,8 @@ export default function SingleEmployeeView({
           </div>
 
           {/* Avatar & Attachment */}
-          <div className="flex flex-wrap gap-8 items-center py-4">
-            {/* Avatar */}
+          {/* <div className="flex flex-wrap gap-8 items-center py-4">
+          
             <div className="flex items-center gap-6">
               <div className="w-28 h-28 rounded-lg overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-md border border-gray-300 flex items-center justify-center">
                 {data.image ? (
@@ -419,10 +419,10 @@ export default function SingleEmployeeView({
                 <span className="text-sm font-medium">Upload</span>
               </button>
             </div>
-            {/* Divider */}
+            
             <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
 
-            {/* Attachment */}
+            
             {userInfo.isAdmin && (
               <div className="flex-1 min-w-[220px]">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -439,7 +439,42 @@ export default function SingleEmployeeView({
                 </button>
               </div>
             )}
+          </div> */}
+          <div className="flex items-center space-x-6">
+            <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
+              {Backdata.image ? (
+                <Image
+                  width={40}
+                  height={40}
+                  src={
+                    Backdata.image ||
+                    "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
+                  }
+                  loading="eager"
+                  quality={100}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-400 text-lg font-semibold">
+                  No Image
+                </span>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Profile Image
+              </label>
+              <input
+                type="file"
+                name="Image"
+                accept="image/*"
+                onChange={() => uploadFiles(Encrypt(data._id), "Employee")}
+                className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
           </div>
+
           {/* chart  */}
           <SalePersonChart
             customerId={Backdata._id}
@@ -821,10 +856,13 @@ export default function SingleEmployeeView({
                           <option value={formData.workLocation}>
                             {
                               // find assigne store and return store name
-                              storeList && storeList.find(
+                              (storeList &&
+                                storeList.find(
                                   (store) =>
                                     store._id === formData.workLocation,
-                                )?.WHName  || "Choose..."}
+                                )?.WHName) ||
+                                "Choose..."
+                            }
                           </option>
                           {storeList &&
                             storeList.map((store, index) => (
@@ -919,6 +957,27 @@ export default function SingleEmployeeView({
                         />
                       </div>
                     </div>
+
+                    <div className="sm:col-span-2">
+                    <label
+                      htmlFor="LeaveDaysCount"
+                      className="block text-sm/6 font-medium text-gray-900"
+                    >
+                      Allocate time off days
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.LeaveDaysCount}
+                        onChange={handleChange}
+                        id="LeaveDaysCount"
+                        name="LeaveDaysCount"
+                        disabled={data.requestLeave}
+                        type="tel"
+                        autoComplete="LeaveDaysCount"
+                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
 
                     <div className="sm:col-span-2 sm:col-start-1">
                       <label
@@ -1304,58 +1363,24 @@ export default function SingleEmployeeView({
                 </div>
               </div>
             )}
-
-            {user.isAdmin && (
-              <>
-                <h5 className="mt-6 text-sm font-semibold text-gray-900">
-                  Files and Attachements
-                </h5>
-                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {data.Attachments.map((attachment, index) => (
-                    <div
-                      key={attachment._id}
-                      className="relative w-full h-32 mb-4"
-                    >
-                      <Image
-                        height={10}
-                        width={10}
-                        src={Dencrypt(attachment.Url)}
-                        alt={`Attachment ${index + 1}`}
-                        className="w-full h-32 object-cover rounded border border-gray-300 hover:shadow-md"
-                      />
-                      <button
-                        className="absolute top-1 right-1 text-red-500 hover:text-red-700 transition"
-                        onClick={() =>
-                          DeleteAttachment(
-                            userInfo._id,
-                            "Employee",
-                            attachment._id,
-                          )
-                        }
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
         </div>
         {/* form ends here */}
 
-        {user.isAdmin && (
+        {(user.isAdmin || user.isHRM) && (
           <div className="mt-6 flex items-center justify-end gap-x-6">
+           {(data.requestLeave || businessData.subscriptionplan !== "Basic") &&(
+             <button
+              type="button"
+              onClick={() => SendTimeOutLink(data._id,businessInfo.tenantId,user._id,EXPRESS_PRIVATE_URL)}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-white bg-gray-500 hover:bg-black transition"
+            >
+              Send time-off invitation
+            </button>
+           )}
+
             {!data.firstTimeOnboard ? (
               <div className="flex gap-4">
-                {/* <button
-                type="button"
-                onClick={()=>DeleteUser(data._id,businessInfo)}
-                className="rounded-md px-3 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
-              >
-                Assign user License
-              </button> */}
-
                 <button
                   type="submit"
                   onClick={() =>

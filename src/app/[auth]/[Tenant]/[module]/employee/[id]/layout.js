@@ -6,6 +6,7 @@ import Businesses from "../../../../../../../models/Business";
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
+import CalendarDemo from "@/app/Components/calendar"
 
 export default async function layout({ children, params }) {
   const Params = await params;
@@ -21,6 +22,9 @@ export default async function layout({ children, params }) {
           Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
           access: `${Encrypt(userInfo.user._id)}`,
         },
+        // next: {
+        //   revalidate: 120, // 2 minutes
+        // },
       },
     );
 
@@ -68,8 +72,13 @@ export default async function layout({ children, params }) {
         >
           <BackButton />
           <hr />
-          <nav className="space-y-4  max-h-[83dvh] overflow-y-hidden ">
-           
+          <nav className="space-y-5  max-h-[83dvh] overflow-y-hidden ">
+           {userInfo.business.subscriptionplan !== "Basic" && (
+            <>
+              <CalendarDemo LeaveData={data?.Leave || []}/>
+             
+            </>
+           )}
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
@@ -83,6 +92,7 @@ export default async function layout({ children, params }) {
                 module={Params?.module}
                 businessData={businessData}
                 storeList={StoreList || []}
+                // storeList={[]}
               />
           </section>
         </main>

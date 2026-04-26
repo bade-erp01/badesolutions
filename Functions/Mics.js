@@ -126,8 +126,8 @@ export function Encrypt(arg) {
   // }
   return jwt.sign(
     { id: arg },
-    "THESTARTUPWAY", // ✅ Use a secure secret key
-    { expiresIn: "3d" } // ✅ Token expires in 3 days
+    "THESTARTUPWAY",
+    { expiresIn: "3d" } 
   );
 }
 
@@ -212,15 +212,15 @@ export async function sendInvite(id,url,user,biz) {
 
 
 
-export const DeleteUser = async (id,Business) => {
+export const SendTimeOutLink = async (id,Business,user,url) => {
   const { isConfirmed } = await Swal.fire({
-    title: "Delete User?",
-    text: "This will permanently delete the user's data.",
+    title: "Send Time off form?",
+    text: "This will send Time off request for to the user's email.",
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#EF4444",
+    confirmButtonColor: "#5db32c",
     cancelButtonColor: "#6B7280",
-    confirmButtonText: "Yes, delete it!",
+    confirmButtonText: "Yes, send it!",
     cancelButtonText: "Cancel",
     reverseButtons: true,
     focusCancel: true,
@@ -231,32 +231,23 @@ export const DeleteUser = async (id,Business) => {
   }
 
 
-  Swal.fire({
-    title: "Deleting...",
-    text: "Please wait while we remove the user data.",
-    didOpen: () => Swal.showLoading(),
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-  });
+  plsWait("Please wait...")
 
   try {
-    const response = await fetch(`/${Business.companyName}/user/${id}`, {
-      method: "DELETE",
+    const response = await fetch(`${url}/api/timeOff_invitation/${Encrypt(id)}`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(Business)}`,
+        access: `${Encrypt(user)}`
       },
     });
 
     const data = await response.json();
-    Swal.close();
-
     if (data.message) {
       SuccessToast(data.message);
-      setTimeout(() => {
-        window.location.assign(`/${Business.companyName}/Dashboard`);
-      }, 3000);
     } else {
-      throw new Error(data.error || "Unknown error occurred");
+      throw new Error(data.error || "Failed to send mail");
     }
   } catch (error) {
     ErrorMessage(error.message);
@@ -272,6 +263,6 @@ module.export = {
     AppDescription,
     Encrypt,
     sendInvite,
-    DeleteUser,
+    SendTimeOutLink,
     
 }

@@ -68,11 +68,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const currentRows = data.transcations.slice(indexOfFirstRow, indexOfLastRow);
 
   const salespers = salesPerson.find(
-      (person) => person._id.toString() === cust.salesPerson.toString(),
-    );
-    const repName = salespers
-      ? `${salespers.firstName} ${salespers.lastName || ""}`
-      : "Unknown";
+    (person) => person._id.toString() === cust.salesPerson.toString(),
+  );
+  const repName = salespers
+    ? `${salespers.firstName} ${salespers.lastName || ""}`
+    : "Unknown";
 
   // for tts
   function getCustomerSummary(customer) {
@@ -1360,19 +1360,20 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     <option value="Land">Land</option>
                   </select>
                 </div>
-                {userInfo.user._id === cust.accountManager && userInfo.business.subscriptionplan === "Standard" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Assign days /day for sale rep visit
-                    </label>
-                    <DaySelector
-                      useCase="RouteDays"
-                      userData={userInfo}
-                      baseUrl={EXPRESS_PRIVATE_URL}
-                      id={cust._id}
-                    />
-                  </div>
-                )}
+                {userInfo.user._id === cust.accountManager &&
+                  userInfo.business.subscriptionplan === "Standard" && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Assign days /day for sale rep visit
+                      </label>
+                      <DaySelector
+                        useCase="RouteDays"
+                        userData={userInfo}
+                        baseUrl={EXPRESS_PRIVATE_URL}
+                        id={cust._id}
+                      />
+                    </div>
+                  )}
               </Grid>
             </Section>
           </div>
