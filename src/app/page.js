@@ -53,7 +53,7 @@ export default function LandingPage() {
                   Architect scalable automation, operational intelligence, and enterprise-grade workflows with design language built for authority.
                 </p>
                 <div className="pt-2 flex flex-col sm:flex-row gap-4">
-                  <button onClick={()=>redirect('//SalesPortal')} className="rounded-full bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:scale-105 transition">
+                  <button onClick={()=>redirect('/Pricing')} className="rounded-full bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:scale-105 transition">
                     Explore Infrastructure
                   </button>
                   <button  onClick={()=>redirect('/SalesPortal')} className="rounded-full border border-zinc-500/60 backdrop-blur px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition">
