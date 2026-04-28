@@ -3,9 +3,9 @@
 import React, { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 
-export default function CalendarDemo({ LeaveData }) {
+export default function CalendarDemo({ employee }) {
   const [date, setDate] = useState(new Date())
-  const [leaveArray] = useState(LeaveData)
+  const [leaveArray] = useState(employee.Leave)
   const [selectedLeaves, setSelectedLeaves] = useState([])
 
   // Generate all dates between startDate and endDate
@@ -46,19 +46,11 @@ export default function CalendarDemo({ LeaveData }) {
         item.date.toDateString() === new Date(selectedDate).toDateString()
     )
     setSelectedLeaves(found.map((f) => f.leave))
-  } 
+  }
 
   return (
     <div className="p-2">
       <p className="text-sm font-bold">Time Off Calendar</p>
-
-      {/* Employee Info */}
-      <div className="mb-2">
-        <p>Name: {employee.firstName} {employee.lastName}</p>
-        <p>Email: {employee.Email}</p>
-        <p>Telephone: {employee.telephone}</p>
-        <p className="font-semibold">Total Leave Days: {totalLeaveDays}</p>
-      </div>
 
       {/* Calendar */}
       <Calendar
@@ -71,7 +63,7 @@ export default function CalendarDemo({ LeaveData }) {
           highlighted: highlightedDates.map((h) => h.date),
         }}
         modifiersClassNames={{
-          highlighted: "bg-blue-500 text-white rounded",
+          highlighted: `${status === "Approved" ? "bg-green-500" : "bg-gray-500"} text-white rounded`,
         }}
         components={{
           DayContent: ({ date, modifiers }) => {
@@ -90,15 +82,12 @@ export default function CalendarDemo({ LeaveData }) {
 
       {/* Selected Leave Details */}
       {selectedLeaves.length > 0 && (
-        <div className="mt-4 p-3 border rounded bg-gray-100">
-          <h3 className="font-bold">Leave Details for {date.toDateString()}</h3>
+        <div className="mt-4 text-xs p-1 border rounded">
           {selectedLeaves.map((leave, idx) => (
             <div key={idx} className="mb-2">
               <p>Type: {leave.leaveType}</p>
-              <p>Status: {leave.status}</p>
-              <p>Description: {leave.description}</p>
               <p>
-                From: {new Date(leave.startDate).toLocaleDateString()} To:{" "}
+                {new Date(leave.startDate).toLocaleDateString()} ~
                 {new Date(leave.endDate).toLocaleDateString()}
               </p>
               <p>Days: {leave.days}</p>

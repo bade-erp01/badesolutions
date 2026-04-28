@@ -22,9 +22,9 @@ export default async function layout({ children, params }) {
           Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
           access: `${Encrypt(userInfo.user._id)}`,
         },
-        // next: {
-        //   revalidate: 120, // 2 minutes
-        // },
+        next: {
+          revalidate: 120, // 2 minutes
+        },
       },
     );
 
@@ -67,7 +67,7 @@ export default async function layout({ children, params }) {
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
         <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          className="w-85 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
           style={{ overflowY: "auto" }}
         >
           <BackButton />
@@ -75,7 +75,7 @@ export default async function layout({ children, params }) {
           <nav className="space-y-5  max-h-[83dvh] overflow-y-hidden ">
            {userInfo.business.subscriptionplan !== "Basic" && (
             <>
-              <CalendarDemo LeaveData={data?.Leave || []}/>
+              <CalendarDemo employee={data}/>
              
             </>
            )}
@@ -91,7 +91,7 @@ export default async function layout({ children, params }) {
                 Backdata={data}
                 module={Params?.module}
                 businessData={businessData}
-                storeList={StoreList || []}
+                storeList={StoreList}
                 // storeList={[]}
               />
           </section>
