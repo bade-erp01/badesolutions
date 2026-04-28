@@ -57,20 +57,19 @@ export default function Page({user,baseUrl}) {
       plsWait("Submitting your request...");
       setLoading(true);
 
-      const res = await fetch(`${baseUrl}/api/timeoff`, {
+      const res = await fetch(`${baseUrl}/api/new/timeout/${Encrypt(user._id)}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(user.tenantId)}`,
           access: `${Encrypt(user._id)}`,
         },
-        body: JSON.stringify(Encrypt(form)),
+        body: JSON.stringify(form),
       });
 
       if (!res.ok) throw new Error("Failed to submit request");
 
       const data = await res.json();
-      console.log("Submitted:", data);
 
       SuccessToast("Request submitted successfully");
 
@@ -82,11 +81,12 @@ export default function Page({user,baseUrl}) {
         description: "",
         RefNo: `REF-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
       });
+
+      router.refresh();
     } catch (err) {
-      console.error(err);
       ErrorMessage("Submission failed");
     } finally {
-      router.refresh();
+      setLoading(false);
     }
   };
 
@@ -188,7 +188,7 @@ export default function Page({user,baseUrl}) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-             {user.LeaveDaysCount && (
+             {/* {user.LeaveDaysCount && ( */}
                <Button
                 type="submit"
                 className="flex-1 rounded-2xl h-12 text-base"
@@ -196,7 +196,7 @@ export default function Page({user,baseUrl}) {
               >
                 {loading ? "Submitting..." : "Submit Request"}
               </Button>
-            )}
+            {/* )} */}
             </div>
           </form>
         </CardContent>
