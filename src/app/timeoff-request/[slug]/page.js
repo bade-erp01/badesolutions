@@ -63,6 +63,7 @@ export default function Page({user,baseUrl}) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(user.tenantId)}`,
           access: `${Encrypt(user._id)}`,
+          "idempotency-key": `Timeout-${form.RefNo}`,
         },
         body: JSON.stringify(form),
       });
