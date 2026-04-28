@@ -5,8 +5,8 @@ import { Calendar } from "@/components/ui/calendar"
 
 export default function CalendarDemo({ LeaveData }) {
   const [date, setDate] = useState(new Date())
-  const [leaveArray] = useState(LeaveData)
-
+  const [leaveArray] = useState(LeaveData || []) 
+  
   // Generate all dates between startDate and endDate
   const getDateRange = (start, end) => {
     const range = []
@@ -25,9 +25,28 @@ export default function CalendarDemo({ LeaveData }) {
     return getDateRange(start, end)
   })
 
+  // Count total leave days across all leave entries
+  const totalLeaveDays = leaveArray.reduce((acc, leave) => {
+    const start = new Date(leave.startDate)
+    const end = new Date(leave.endDate)
+    const diffTime = end - start
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+    return acc + diffDays
+  }, 0)
+
   return (
     <div className="p-2">
       <p className="text-sm font-bold">Time Off Calendar</p>
+
+      {/* Employee Info */}
+      <div className="mb-2">
+        <p>Name: {employee.firstName} {employee.lastName}</p>
+        <p>Email: {employee.Email}</p>
+        <p>Telephone: {employee.telephone}</p>
+        <p className="font-semibold">Total Leave Days: {totalLeaveDays}</p>
+      </div>
+
+      {/* Calendar */}
       <Calendar
         mode="single"
         selected={date}
