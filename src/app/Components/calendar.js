@@ -5,8 +5,8 @@ import { Calendar } from "@/components/ui/calendar"
 
 export default function CalendarDemo({ LeaveData }) {
   const [date, setDate] = useState(new Date())
-  const [leaveArray] = useState(LeaveData || []) 
-  
+  const [leaveArray] = useState(LeaveData) 
+
   // Generate all dates between startDate and endDate
   const getDateRange = (start, end) => {
     const range = []
