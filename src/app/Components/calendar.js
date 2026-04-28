@@ -46,7 +46,7 @@ export default function CalendarDemo({ LeaveData }) {
         item.date.toDateString() === new Date(selectedDate).toDateString()
     )
     setSelectedLeaves(found.map((f) => f.leave))
-  }
+  } 
 
   return (
     <div className="p-2">
