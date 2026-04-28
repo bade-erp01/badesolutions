@@ -142,7 +142,6 @@ export default function Page({user,baseUrl}) {
                     {leaveType.map((element) => (
                       <SelectItem key={element} value={element}>{element}</SelectItem>
                     ))}
-
                   </SelectContent>
                 </Select>
               </div>
