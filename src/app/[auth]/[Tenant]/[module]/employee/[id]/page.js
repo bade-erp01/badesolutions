@@ -1369,7 +1369,7 @@ export default function SingleEmployeeView({
 
         {(user.isAdmin || user.isHRM) && (
           <div className="mt-6 flex items-center justify-end gap-x-6">
-           {(data.requestLeave || businessData.subscriptionplan !== "Basic") &&(
+           {( businessData.subscriptionplan !== "Basic") && data.requestLeave &&(
              <button
               type="button"
               onClick={() => SendTimeOutLink(data._id,businessInfo.tenantId,user._id,EXPRESS_PRIVATE_URL)}
