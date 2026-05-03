@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { PhotoIcon, UserPlusIcon} from "@heroicons/react/24/outline";
+import { PhotoIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import Swal from "sweetalert2";
 import Link from "next/link";
@@ -15,97 +15,99 @@ import {
   plsWait,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import {Encrypt,Dencrypt} from "../../../../../Functions/Functions"
+import { Encrypt, Dencrypt,pricelistSetter } from "../../../../../Functions/Functions";
+import { Badge } from "@/components/ui/badge";
 
-export default function BusinessDatas({ data, userInfo,baseUrl }) {
+export default function BusinessDatas({ data, userInfo, baseUrl }) {
   const navigation = useRouter();
   const [formData, setFormData] = useState(data);
   const [currencies] = useState(currency);
 
-    // Helper function to truncate text to 10 characters
-  const truncate = (str) => (str && str.length > 10 ? str.substring(0, 15) + "..." : str);
+  // Helper function to truncate text to 10 characters
+  const truncate = (str) =>
+    str && str.length > 10 ? str.substring(0, 15) + "..." : str;
 
   // upload
-   const uploadFiles = async (id,moduleList) => {
-      try {
-        const { value: file } = await Swal.fire({
-          title: "Select File",
-          input: "file",
-          inputAttributes: {
-            "accept": "image/*",
-            "aria-label": "Upload your File"
-          }
-        });
-        if (file) {
-          plsWait('Uploading...⌛')
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            // Resize image
-            const img = new window.Image();
-            img.onload = async () => {
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              const maxWidth = 800; // Set your desired max width
-              const maxHeight = 600; // Set your desired max height
-              let width = img.width;
-              let height = img.height;
-    
-              if (width > height) {
-                if (width > maxWidth) {
-                  height *= maxWidth / width;
-                  width = maxWidth;
-                }
-              } else {
-                if (height > maxHeight) {
-                  width *= maxHeight / height;
-                  height = maxHeight;
-                }
+  const uploadFiles = async (id, moduleList) => {
+    try {
+      const { value: file } = await Swal.fire({
+        title: "Select File",
+        input: "file",
+        inputAttributes: {
+          accept: "image/*",
+          "aria-label": "Upload your File",
+        },
+      });
+      if (file) {
+        plsWait("Uploading...⌛");
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          // Resize image
+          const img = new window.Image();
+          img.onload = async () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const maxWidth = 800; // Set your desired max width
+            const maxHeight = 600; // Set your desired max height
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
               }
-    
-              canvas.width = width;
-              canvas.height = height;
-              ctx.drawImage(img, 0, 0, width, height);
-              
-              const resizedImage = canvas.toDataURL('image/jpeg', 0.7); // Adjust quality as needed
-    
-              const request = await fetch(`${baseUrl}/api/images/upload?id=${id}&module=${moduleList}`, {
+            } else {
+              if (height > maxHeight) {
+                width *= maxHeight / height;
+                height = maxHeight;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const resizedImage = canvas.toDataURL("image/jpeg", 0.7); // Adjust quality as needed
+
+            const request = await fetch(
+              `${baseUrl}/api/images/upload?id=${id}&module=${moduleList}`,
+              {
                 method: "POST",
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
-                  'Content-Type': 'application/json',
-                  dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
-                  access:`${Encrypt(userInfo.user._id)}`
-                  
+                  "Content-Type": "application/json",
+                  dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+                  access: `${Encrypt(userInfo.user._id)}`,
                 },
-              });
-    
-              const response = await request.json();
-              if(response.message){
-                Swal.fire({
+              },
+            );
+
+            const response = await request.json();
+            if (response.message) {
+              Swal.fire({
                 title: "Your uploaded File",
                 imageUrl: resizedImage,
-                imageAlt: "The uploaded File"
+                imageAlt: "The uploaded File",
               });
-                location.reload();
-              }
-    
-            };
-            img.src = e.target.result;
+              location.reload();
+            }
           };
-          reader.readAsDataURL(file);
-        }
-      } catch (error) {
-        ErrorMessage('Error uploading file:', error.message);
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
       }
+    } catch (error) {
+      ErrorMessage("Error uploading file:", error.message);
     }
-
+  };
 
   // Use a single config object for axios
   const config = {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      access:`${Encrypt(userInfo.user._id)}`
+      access: `${Encrypt(userInfo.user._id)}`,
     },
   };
 
@@ -176,13 +178,13 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
           <div className="w-28 h-28 rounded-full overflow-hidden bg-linear-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
             {formData.companyLogo ? (
               <Image
-              width={200}
-              height={200}
-              quality={90}
-              src={formData.companyLogo}
-              priority
-              alt="Avatar"
-              className="w-full h-full object-cover"
+                width={200}
+                height={200}
+                quality={90}
+                src={formData.companyLogo}
+                priority
+                alt="Avatar"
+                className="w-full h-full object-cover"
               />
             ) : (
               <span className="text-gray-400 text-lg font-semibold">
@@ -210,21 +212,21 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
         <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
 
         {/* Attachment */}
-        
+
         <Link
           href={`/${data?.companyName
             .toLowerCase()
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-              userInfo?.user._id
-            )}/Module/Forms/employee`}
-            className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-            role="button"
-            tabIndex={0}
-            >
-                <UserPlusIcon class="h-6 w-6 text-gray-200"/>
-            Add user
-          </Link>
+            userInfo?.user._id,
+          )}/Module/Forms/employee`}
+          className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+          role="button"
+          tabIndex={0}
+        >
+          <UserPlusIcon class="h-6 w-6 text-gray-200" />
+          Add user
+        </Link>
       </div>
 
       {/* Quick Actions */}
@@ -238,9 +240,9 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
 
           {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
             <span
-            className="inline-flex items-center gap-2 bg-amber-300 text-black px-5 py-2.5 rounded-md shadow-md hover:bg-amber-500 transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-            role="button"
-            tabIndex={0}
+              className="inline-flex items-center gap-2 bg-amber-300 text-black px-5 py-2.5 rounded-md shadow-md hover:bg-amber-500 transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+              role="button"
+              tabIndex={0}
             >
               <svg
                 className="w-5 h-5"
@@ -258,7 +260,6 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
               Upgrade Plan
             </span>
           )}
-          
         </div>
       </Section>
 
@@ -338,7 +339,7 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
             {moment(formData.subscriptionEndDate).isValid() &&
             moment(formData.subscriptionEndDate).isAfter(moment())
               ? `Subscription ends in ${moment(
-                  formData.subscriptionEndDate
+                  formData.subscriptionEndDate,
                 ).diff(moment(), "days")} day(s)`
               : "Subscription has expired."}
           </h4>
@@ -383,7 +384,7 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
               onChange={(e) =>
                 handlecurrencyChange({
                   currency: currencies.find(
-                    (c) => c.CountryName === e.target.value
+                    (c) => c.CountryName === e.target.value,
                   ),
                 })
               }
@@ -422,66 +423,15 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
       {/* pricelist */}
       <Section title="Pricelists Management">
         <Grid>
-          <Input
-          name={"priceList1"}
-            label="PriceList 1"
-            value={formData.priceList1}
-            type="text"
-            required
-            onChange={handleChange}
-          />
-          <Input
-          name={"priceList2"}
-            label="PriceList 2"
-            type="text"
-            required
-            value={formData.priceList2}
-            onChange={handleChange}
-          />
-          {userInfo.business.subscriptionplan === "Standard" && (
-          <>
-          <Input
-          name={"priceList3"}
-            label="PriceList 3"
-            type="text"
-            required
-            value={formData.priceList3}
-            onChange={handleChange}
-          />
-          <Input
-          name={"priceList4"}
-            label="PriceList 4"
-            value={formData.priceList4}
-            type="text"
-            required
-            onChange={handleChange}
-          />
-          <Input
-          name={"priceList5"}
-            label="PriceList 5"
-            value={formData.priceList5}
-            type="text"
-            required
-            onChange={handleChange}
-          />
-          <Input
-            name={"priceList6"}
-            label="PriceList 6"
-            value={formData.priceList6}
-            type="text"
-            required
-            onChange={handleChange}
-          />
-          <Input
-          name={"priceList7"}
-            label="PriceList 7"
-            value={formData.priceList7}
-           type="text"
-            required
-            onChange={handleChange}
-          />
-          </>
-          )}
+          {userInfo.business.priceList.map((pl) => (
+            <Badge
+              variant="secondary"
+              title={pricelistSetter(pl.Name ?? "Unknown PriceList", userInfo.business)}
+              className="max-w-[140px] truncate lowercase text-sm font-semibold px-2 py-0.5"
+            >
+              {pricelistSetter(pl.Name ?? "Unknown PriceList", userInfo.business)}
+            </Badge>
+          ))}
         </Grid>
       </Section>
 
@@ -492,7 +442,7 @@ export default function BusinessDatas({ data, userInfo,baseUrl }) {
             <Checkbox
               label={`Send Daily Business Report to ${formData.email.substring(
                 0,
-                6
+                6,
               )}***.`}
               name="dailyReport"
               checked={formData.dailyReport}

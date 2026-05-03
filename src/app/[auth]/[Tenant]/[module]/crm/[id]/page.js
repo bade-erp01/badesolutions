@@ -1102,40 +1102,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     </option>
 
                     {/* Dynamic options based on subscription plan */}
-                    {userInfo.business.subscriptionplan === "Basic" ? (
-                      <>
-                        <option value="Pricelist1" title={`Basic Tier`}>
-                          {userInfo.business.priceList1}
-                        </option>
-                        <option value="Pricelist2" title={`Basic Tier`}>
-                          {userInfo.business.priceList2}
-                        </option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="Pricelist1" title={`Standard Tier`}>
-                          {userInfo.business.priceList1}
-                        </option>
-                        <option value="Pricelist2" title={`Standard Tier`}>
-                          {userInfo.business.priceList2}
-                        </option>
-                        <option value="Pricelist3" title={`Standard Tier`}>
-                          {userInfo.business.priceList3}
-                        </option>
-                        <option value="Pricelist4" title={`Standard Tier`}>
-                          {userInfo.business.priceList4}
-                        </option>
-                        <option value="Pricelist5" title={`Standard Tier`}>
-                          {userInfo.business.priceList5}
-                        </option>
-                        <option value="Pricelist6" title={`Standard Tier`}>
-                          {userInfo.business.priceList6}
-                        </option>
-                        <option value="Pricelist7" title={`Standard Tier`}>
-                          {userInfo.business.priceList7}
-                        </option>
-                      </>
-                    )}
+                    {userInfo.business.priceList.map((pl) =>(
+                      <option key={pl._id} value={pl.Name}>
+                        {pricelistSetter(pl.Name, userInfo.business)}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>

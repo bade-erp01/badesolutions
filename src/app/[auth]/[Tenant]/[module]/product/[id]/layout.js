@@ -90,10 +90,9 @@ export default async function layout({ params, children }) {
           className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
           style={{ overflowY: "auto" }}
         >
-          <h2 className="text-lg font-bold mb-4">Product Management</h2>
+            <BackButton/>
           <hr />
           <nav className="space-y-4">
-            <BackButton/>
             {userInfo?.user?.createProduct && (
               <Link
                 href={`/${userInfo.business.companyName
@@ -108,6 +107,23 @@ export default async function layout({ params, children }) {
                 <span className="text-xs">New Product</span>
               </Link>
             )}
+            {/* activity log */}
+            <div className="bg-gray-700 rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#4B5563 transparent' }}
+              >
+            <ul className="divide-y divide-gray-700">
+              {data.product.ActivityLog?.map((log, index) => {
+                return (
+                <li key={index} className="py-3 px-4 text-xs text-italic">
+                  <div className="flex justify-between items-center">
+                    <span className="text-italic text-xs">{log.logMsg}</span>
+                  </div>
+                  <hr className="border-gray-500" />
+                </li>
+                );
+              }) || <li className="py-3 px-4 text-sm">No audit logs.</li>}
+            </ul>
+          </div>
           </nav>
         </aside>
 

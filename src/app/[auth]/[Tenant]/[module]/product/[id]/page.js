@@ -1,8 +1,6 @@
 "use client";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import {
-  PhotoIcon,
-  UserCircleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
@@ -18,9 +16,8 @@ import { useEffect, Suspense } from "react";
 import Plotly from "plotly.js-dist-min";
 import {
   Encrypt,
-  DecryptBAckend,
   EXPRESS_PRIVATE_URL,
-  CryptoJSdecrypt,
+  pricelistSetter,
 } from "../../../../../../../Functions/Functions";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
@@ -31,6 +28,20 @@ import AutoreplenishReminder from "@/app/Components/AutoreplenishReminder";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Image from "next/image";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import { Card, CardContent,CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+
 
 export default function SingleProductpage({
   userInfo,
@@ -186,9 +197,10 @@ export default function SingleProductpage({
     try {
       e.preventDefault();
       plsWait("Updating Product...");
+      const { PriceLists, ...formDataWithoutPriceLists } = formData;
       const { data } = await axios.patch(
         `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
-        formData,
+        formDataWithoutPriceLists,
         { headers },
       );
 
@@ -211,11 +223,12 @@ export default function SingleProductpage({
             <h4 className="text-xl font-bold text-gray-800">
               {data.Name.charAt(0).toUpperCase() + data.Name.slice(1)}&apos;
             </h4>
-            <span
-              className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-gray-700 border-indigo-200`}
+            <Badge
+              variant="secondary"
+              className="max-w-[140px] truncate lowercase text-sm font-semibold px-2 py-0.5"
             >
               {formData.ADCcode || formData.ACDcode}
-            </span>
+            </Badge>
           </div>
 
           {/* Avatar & Attachment */}
@@ -659,261 +672,6 @@ export default function SingleProductpage({
                       />
                     </div>
                   </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="Pricelist1"
-                      className="block text-sm font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList1} Price
-                    </label>
-                    <div className="mt-2">
-                      <input
-                        value={formData.Pricelist1}
-                        id="Pricelist1"
-                        name="Pricelist1"
-                        type="number"
-                        step="any"
-                        onChange={handleChange}
-                        autoComplete="Pricelist-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                      />
-                    </div>
-                    <label
-                      htmlFor="VatpriceList1"
-                      className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                    >
-                      <input
-                        checked={formData.VatpriceList1 || false}
-                        onChange={handleChange}
-                        id="VatpriceList1"
-                        name="VatpriceList1"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />{" "}
-                      Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                      {businessInfo.priceList1}?
-                    </label>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="Pricelist2"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList2} Price
-                    </label>
-                    <div className="mt-2">
-                      <input
-                        value={formData.Pricelist2}
-                        onChange={handleChange}
-                        id="Pricelist2"
-                        name="Pricelist2"
-                        type="number"
-                        step="any"
-                        autoComplete="Pricelist2-code"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
-                    </div>
-                    <label
-                      htmlFor="VatpriceList2"
-                      className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                    >
-                      <input
-                        checked={formData.VatpriceList2 || false}
-                        onChange={handleChange}
-                        id="VatpriceList2"
-                        name="VatpriceList2"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                      />{" "}
-                      Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                      {businessInfo.priceList2}?
-                    </label>
-                  </div>
-
-                  {businessInfo.subscriptionplan === "Standard" && (
-                    <>
-                      <div className="sm:col-span-2 sm:col-start-1">
-                        <label
-                          htmlFor="Pricelist3"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList3} Price
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist3}
-                            id="Pricelist3"
-                            name="Pricelist3"
-                            onChange={handleChange}
-                            type="number"
-                            step="any"
-                            autoComplete="Pricelist-level2"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="VatpriceList3"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                        >
-                          <input
-                            checked={formData.VatpriceList3 || false}
-                            onChange={handleChange}
-                            id="VatpriceList3"
-                            name="VatpriceList3"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList3}?
-                        </label>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist4"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList4} Price
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist4}
-                            id="Pricelist4"
-                            name="Pricelist4"
-                            type="number"
-                            step="any"
-                            onChange={handleChange}
-                            autoComplete="Pricelist1-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="VatpriceList4"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                        >
-                          <input
-                            checked={formData.VatpriceList4 || false}
-                            onChange={handleChange}
-                            id="VatpriceList4"
-                            name="VatpriceList4"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList4}?
-                        </label>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist5"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList5} Price
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist5}
-                            onChange={handleChange}
-                            id="Pricelist5"
-                            name="Pricelist5"
-                            type="number"
-                            step="any"
-                            autoComplete="Pricelist1-code"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="VatpriceList5"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                        >
-                          <input
-                            checked={formData.VatpriceList5 || false}
-                            onChange={handleChange}
-                            id="VatpriceList5"
-                            name="VatpriceList5"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList5}?
-                        </label>
-                      </div>
-
-                      <div className="sm:col-span-2 sm:col-start-1">
-                        <label
-                          htmlFor="Pricelist6"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList6} Price
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist6}
-                            id="Pricelist6"
-                            name="Pricelist6"
-                            step="any"
-                            onChange={handleChange}
-                            type="number"
-                            autoComplete="Pricelist1-level2"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="VatpriceList6"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                        >
-                          <input
-                            checked={formData.VatpriceList6 || false}
-                            onChange={handleChange}
-                            id="VatpriceList6"
-                            name="VatpriceList6"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList6}?
-                        </label>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist7"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList7} Price
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist7}
-                            id="Pricelist7"
-                            name="Pricelist7"
-                            type="number"
-                            step="any"
-                            onChange={handleChange}
-                            autoComplete="Pricelist1-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="VatpriceList7"
-                          className="block font-medium text-gray-900  items-start justify-start text-start text-xs"
-                        >
-                          <input
-                            checked={formData.VatpriceList7 || false}
-                            onChange={handleChange}
-                            id="VatpriceList7"
-                            name="VatpriceList7"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1"
-                          />{" "}
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList7}?
-                        </label>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
             </div>
@@ -925,7 +683,7 @@ export default function SingleProductpage({
                 className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
               >
                 <h2 className="text-base/7 font-semibold text-gray-900">
-                  Promotions
+                  Rates & Discounts
                 </h2>
                 <svg
                   className={`w-5 h-5 transform transition-transform duration-300 ${
@@ -948,347 +706,13 @@ export default function SingleProductpage({
                   isOpen ? "block" : "hidden"
                 }`}
               >
-                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                  {/* promo section */}
-                  <div className="sm:col-span-2">
-                    {/* Label for Promo */}
-                    <label
-                      htmlFor="Pricelist1Promo"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList1} Promo
-                    </label>
+                {/* pricelist display */}
 
-                    {/* Promo input */}
-                    <div className="mt-2">
-                      <input
-                        value={formData.Pricelist1Promo}
-                        id="Pricelist1Promo"
-                        name="Pricelist1Promo"
-                        type="number"
-                        step="any"
-                        onChange={handleChange}
-                        autoComplete="Pricelist1-level1"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
-                    </div>
-
-                    {/* End Date label */}
-                    <label
-                      htmlFor="Pricelist1PromoDate"
-                      className="block text-sm/6 font-medium text-gray-900 mt-4"
-                    >
-                      {businessInfo.priceList1} Promo End Date
-                    </label>
-
-                    {/* End Date input */}
-                    <div className="mt-2">
-                      <input
-                        value={moment(formData.Pricelist1PromoDate).format(
-                          "YYYY-MM-DD",
-                        )}
-                        id="Pricelist1PromoDate"
-                        name="Pricelist1PromoDate"
-                        type="date"
-                        onChange={handleChange}
-                        autoComplete="Pricelist1PromoDate"
-                        min={new Date().toISOString().split("T")[0]}
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    {/* Label for Pricelist2 Promo */}
-                    <label
-                      htmlFor="Pricelist2Promo"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList2} Promo
-                    </label>
-
-                    {/* Promo input */}
-                    <div className="mt-2">
-                      <input
-                        value={formData.Pricelist2Promo}
-                        id="Pricelist2Promo"
-                        name="Pricelist2Promo"
-                        type="number"
-                        step="any"
-                        min={0}
-                        onChange={handleChange}
-                        autoComplete="Pricelist2Promo"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
-                    </div>
-
-                    {/* End Date label */}
-                    <label
-                      htmlFor="Pricelist2PromoDate"
-                      className="block text-sm/6 font-medium text-gray-900 mt-4"
-                    >
-                      {businessInfo.priceList2} Promo End Date
-                    </label>
-
-                    {/* End Date input */}
-                    <div className="mt-2">
-                      <input
-                        value={moment(formData.Pricelist2PromoDate).format(
-                          "YYYY-MM-DD",
-                        )}
-                        id="Pricelist2PromoDate"
-                        name="Pricelist2PromoDate"
-                        type="date"
-                        onChange={handleChange}
-                        min={new Date().toISOString().split("T")[0]}
-                        autoComplete="Pricelist2PromoDate"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 
-                 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 
-                 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      />
-                    </div>
-                  </div>
-
-                  {businessInfo.subscriptionplan === "Standard" && (
-                    <>
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist3Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList3} Promo
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist3Promo || 0}
-                            id="Pricelist3Promo"
-                            name="Pricelist3Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            onChange={handleChange}
-                            autoComplete="Pricelist3Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="Pricelist3PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList3} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist3PromoDate).format(
-                              "YYYY-MM-DD",
-                            )}
-                            id="Pricelist3PromoDate"
-                            name="Pricelist3PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            onChange={handleChange}
-                            autoComplete="Pricelist3PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist4Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList4} Promo
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist4Promo || 0}
-                            id="Pricelist4Promo"
-                            name="Pricelist4Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            onChange={handleChange}
-                            autoComplete="Pricelist4Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="Pricelist4PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList4} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist4PromoDate).format(
-                              "YYYY-MM-DD",
-                            )}
-                            id="Pricelist4PromoDate"
-                            name="Pricelist4PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            onChange={handleChange}
-                            autoComplete="Pricelist4PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist5Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList5} Promo
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist5Promo || 0}
-                            id="Pricelist5Promo"
-                            name="Pricelist5Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            onChange={handleChange}
-                            autoComplete="Pricelist5Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="Pricelist5PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList5} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist5PromoDate).format(
-                              "YYYY-MM-DD",
-                            )}
-                            id="Pricelist5PromoDate"
-                            name="Pricelist5PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            onChange={handleChange}
-                            autoComplete="Pricelist5PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist6Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList6} Promo
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist6Promo || 0}
-                            id="Pricelist6Promo"
-                            name="Pricelist6Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            onChange={handleChange}
-                            autoComplete="Pricelist6Promo"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="Pricelist6PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList6} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist6PromoDate).format(
-                              "YYYY-MM-DD",
-                            )}
-                            id="Pricelist6PromoDate"
-                            name="Pricelist6PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            onChange={handleChange}
-                            autoComplete="Pricelist6PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist7Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList7} Promo
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={formData.Pricelist7Promo || 0}
-                            id="Pricelist7Promo"
-                            name="Pricelist7Promo"
-                            type="number"
-                            step="any"
-                            min={0}
-                            onChange={handleChange}
-                            autoComplete="Pricelist7Promo-level1"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                        <label
-                          htmlFor="Pricelist7PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList7} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            value={moment(formData.Pricelist7PromoDate).format(
-                              "YYYY-MM-DD",
-                            )}
-                            id="Pricelist7PromoDate"
-                            name="Pricelist7PromoDate"
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            onChange={handleChange}
-                            autoComplete="Pricelist7PromoDate"
-                            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 
-                 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 
-                 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+                <ProductPriceList
+                  initialData={data}
+                  Biz={businessInfo}
+                  user={userInfo}
+                />
               </div>
             </div>
             <br />
@@ -1337,7 +761,9 @@ export default function SingleProductpage({
                             <div>
                               {comment.createdAt && (
                                 <p className="text-xs text-gray-500">
-                                  {new Date(comment.createdAt).toLocaleDateString()}
+                                  {new Date(
+                                    comment.createdAt,
+                                  ).toLocaleDateString()}
                                 </p>
                               )}
                             </div>
@@ -1348,7 +774,9 @@ export default function SingleProductpage({
                               <svg
                                 key={i}
                                 className={`h-4 w-4 ${
-                                  i < comment.rating ? "text-yellow-400" : "text-gray-300"
+                                  i < comment.rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
                                 }`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
@@ -1498,19 +926,21 @@ export default function SingleProductpage({
                       </tr>
                     </thead>
                     <tbody>
-                      {formData.ActivityLog?.map((log, index) => (
-                        <tr
-                          key={index}
-                          className="border-b border-gray-200 hover:bg-gray-100"
-                        >
-                          <td className="py-2 px-3">
-                            {new Date(log.date).toLocaleDateString()}
-                          </td>
-                          <td className="py-2 px-3">{log.message}</td>
-                          <td className="py-2 px-3">{log.difference}</td>
-                          <td className="py-2 px-3">{log.overallImpact}</td>
-                        </tr>
-                      ))}
+                      {formData.HistoricalBuyingPriceChange?.map(
+                        (log, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-gray-200 hover:bg-gray-100"
+                          >
+                            <td className="py-2 px-3">
+                              {new Date(log.date).toLocaleDateString()}
+                            </td>
+                            <td className="py-2 px-3">{log.message}</td>
+                            <td className="py-2 px-3">{log.difference}</td>
+                            <td className="py-2 px-3">{log.overallImpact}</td>
+                          </tr>
+                        ),
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -1765,4 +1195,226 @@ function useProductEditTour(product) {
       return () => clearTimeout(timeoutId);
     }
   }, [product]);
+}
+
+// diplay pricelist
+export function ProductPriceList({ initialData, Biz, user }) {
+  const [formData, setformData] = useState(initialData);
+  const [openModal, setOpenModal] = useState(null); // track which card’s modal is open
+  const [savingCard, setSavingCard] = useState(null); // track which card is saving
+  const router = useRouter();
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setformData((prev) => {
+      if (!prev || !Array.isArray(prev.PriceLists)) return prev;
+
+      const updatedPriceLists = prev.PriceLists.map((price) => {
+        if (name.startsWith("vat-")) {
+          const key = name.replace("vat-", "");
+          return price.Name === key ? { ...price, vat: Boolean(value) } : price;
+        }
+        if (name.startsWith("promo-")) {
+          const key = name.replace("promo-", "");
+          return price.Name === key ? { ...price, promo: value } : price;
+        }
+        if (name.startsWith("promoDate-")) {
+          const key = name.replace("promoDate-", "");
+          return price.Name === key ? { ...price, PromoDate: value } : price;
+        }
+        return price.Name === name ? { ...price, price: value } : price;
+      });
+
+      return {
+        ...prev,
+        PriceLists: updatedPriceLists,
+      };
+    });
+  };
+
+  const handleSave = async (cardName) => {
+    setSavingCard(cardName);
+    // find the pricelist that was updated and send to server
+    const update = formData.PriceLists.find(
+      (pl) => pl.Name === cardName,
+    );
+    
+    try {
+      const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/updatePriceLists/${Encrypt(initialData._id)}`, {
+        method: "PATCH",
+        headers: {
+           "Content-Type": "application/json",
+            Authorization:`Bearer ${Encrypt(user.tenantId)}`,
+            access: Encrypt(user._id)
+          },
+        body: JSON.stringify(update),
+      });
+
+      const response = await request.json()
+      if(!request.ok){
+        throw new Error(response.error)
+      }
+
+      SuccessToast(response.message);
+      setSavingCard(null);
+      router.refresh();
+    } catch (err) {
+      ErrorMessage(err.message);
+      setSavingCard(null); // re-enable if error
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
+      {formData.PriceLists.length > 0 ? (
+        formData.PriceLists.map((price, idx) => (
+          <Card
+            key={idx}
+            className="group w-full max-w-xs rounded-sm hover:shadow-md hover:border-border transition-all duration-300 bg-white"
+          >
+            <CardContent className="p-3 space-y-2">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-2">
+                <Badge
+                  variant="secondary"
+                  title={pricelistSetter(price.Name ?? "Unknown PriceList", Biz)}
+                  className="max-w-[140px] truncate lowercase text-xs font-semibold px-2 py-0.5"
+                >
+                  {pricelistSetter(price.Name ?? "Unknown PriceList", Biz)}
+                </Badge>
+
+                <p className="text-xs text-muted-foreground truncate">
+                  {price.vat
+                    ? `${formData.VAT.$numberDecimal}% VAT applied`
+                    : "VAT not applied"}
+                </p>
+              </div>
+
+              {/* Base Price */}
+              <div className="space-y-1">
+                <Label
+                  htmlFor={`price-${price.Name}`}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Base price
+                </Label>
+                <Input
+                  id={`price-${price.Name}`}
+                  name={price.Name}
+                  type="number"
+                  step="any"
+                  value={price.price || ""}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className="h-8 w-30 text-sm"
+                />
+              </div>
+
+              {/* Promo */}
+              <div className="space-y-1">
+                <Label
+                  htmlFor={`promo-${price.Name}`}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Discounts
+                </Label>
+                <Input
+                  id={`promo-${price.Name}`}
+                  name={`promo-${price.Name}`}
+                  type="number"
+                  step="any"
+                  value={price.promo || ""}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className="h-8 w-30 text-sm"
+                />
+              </div>
+
+              {/* Promo Date */}
+              <div className="space-y-1">
+                <Label
+                  htmlFor={`promoDate-${price.Name}`}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Discounts ends
+                </Label>
+                <Input
+                  id={`promoDate-${price.Name}`}
+                  name={`promoDate-${price.Name}`}
+                  type="date"
+                  value={moment(price.PromoDate).format("YYYY-MM-DD")}
+                  onChange={handleChange}
+                  className="h-8 w-30 text-xs"
+                />
+              </div>
+
+              <div className="pt-1 border-t" />
+
+              {/* Footer VAT Notice */}
+              <div className="flex items-center justify-between gap-2">
+                <Label
+                  htmlFor={`vat-${price.Name}`}
+                  className="text-[10px] text-muted-foreground cursor-pointer"
+                >
+                  <Checkbox
+                    id={`vat-${price.Name}`}
+                    name={`vat-${price.Name}`}
+                    checked={price.vat || false}
+                    onCheckedChange={(checked) =>
+                      handleChange({
+                        target: { name: `vat-${price.Name}`, value: checked },
+                      })
+                    }
+                    className="h-4 w-4"
+                  />
+                  Apply {formData.VAT.$numberDecimal}% VAT
+                </Label>
+                {user.editProduct && (<Button
+                  onClick={() => setOpenModal(price.Name)}
+                  type="button"
+                  disabled={savingCard === price.Name}
+                  className="bg-black text-white p-2 text-xs rounded"
+                >
+                  {savingCard === price.Name ? "Saving..." : "Save Changes"}
+                </Button>)}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <p className="font-italics text-xs">Nothing to show</p>
+      )}
+
+      {/* Confirmation Modal */}
+      <Dialog open={!!openModal} onOpenChange={() => setOpenModal(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Save</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to save changes for <strong>{openModal}</strong>?</p>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setOpenModal(null)}
+              disabled={savingCard === openModal}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setOpenModal(null);
+                handleSave(openModal);
+              }}
+              disabled={savingCard === openModal}
+              className="bg-green-600 text-white"
+            >
+              Yes, Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

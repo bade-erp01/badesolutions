@@ -9,8 +9,9 @@ import StockReportModal from "@/app/Components/Reports/StockReport";
 import StockandSalesReport from "@/app/Components/Reports/StockandSalesReport";
 import BulkUpdate from "@/app/Components/bulkUpdate";
 import { Encrypt } from "../../../../../../Functions/Functions";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
+import AddPriceListModal from "@/app/Components/PricelistCreate";
+import { Plus } from "lucide-react";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -65,7 +66,7 @@ export default async function Productlayout({ children, params }) {
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         access: `${Encrypt(userData.user._id)}`,
       },
-      next: { revalidate: 60 }, // cache for 1 minutes
+      next: { revalidate: 120 }, // cache for 1 minutes
     });
 
     if (!res.ok) throw new Error("Failed to fetch product data");
@@ -101,7 +102,7 @@ export default async function Productlayout({ children, params }) {
                     )}/${Encrypt(userData.user._id)}/Module/Forms/${moduleList.module.toLowerCase()}`}
                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                 >
-                  <PlusCircleIcon className="h-4 w-4 text-gray-100" />
+                  <Plus className="h-4 w-4" />
                   <span className="text-xs">New Product</span>
                 </Link>
               )}
@@ -173,11 +174,14 @@ export default async function Productlayout({ children, params }) {
               )}
               
               {userData?.user?.isAdmin && (
+                <>
                 <BulkUpdate
                   tenantId={userData}
                   collectionName="product"
                   WHID={userData?._id}
                 />
+                <AddPriceListModal baseUrl={baseUrl} userData={userData}/>
+                </>
               )}
             </nav>
           </aside>
