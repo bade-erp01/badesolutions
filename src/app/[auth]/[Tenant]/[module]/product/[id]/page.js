@@ -926,7 +926,7 @@ export default function SingleProductpage({
                       </tr>
                     </thead>
                     <tbody>
-                      {formData.HistoricalBuyingPriceChange?.map(
+                      {formData.HistoricalPrice?.map(
                         (log, index) => (
                           <tr
                             key={index}
