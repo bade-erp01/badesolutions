@@ -425,6 +425,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
         <Grid>
           {userInfo.business.priceList.map((pl) => (
             <Badge
+              key={pl._id}
               variant="secondary"
               title={pricelistSetter(pl.Name ?? "Unknown PriceList", userInfo.business)}
               className="max-w-[140px] truncate lowercase text-sm font-semibold px-2 py-0.5"
