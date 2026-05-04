@@ -1256,11 +1256,16 @@ export function ProductPriceList({ initialData, Biz, user }) {
       (pl) => pl.Name === cardName,
     );
 
+    if(update.promo === ""){
+     setSavingCard(null)
+     return ErrorMessage("Discount can't be empty.")
+    }
+
     if(update.promo > 0 && update.PromoDate === null){
      setSavingCard(null)
      return ErrorMessage("Discount must have an end date.")
     }
-    
+
     try {
       const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/updatePriceLists/${Encrypt(initialData._id)}`, {
         method: "PATCH",
