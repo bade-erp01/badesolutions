@@ -66,8 +66,10 @@ export default function SingleProductpage({
       Number(Backdata?.BuyingPrice) || Number(Backdata?.vendor_Price) || 0,
   });
 
+  
+  
   useProductEditTour(Backdata.Name); // for driver
-
+  
   const uploadFiles = async (id, module) => {
     try {
       const { value: file } = await Swal.fire({
@@ -149,7 +151,6 @@ export default function SingleProductpage({
   });
 
   const [formData, setFormData] = useState({ ...data });
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -197,10 +198,24 @@ export default function SingleProductpage({
     try {
       e.preventDefault();
       plsWait("Updating Product...");
-      const { PriceLists, ...formDataWithoutPriceLists } = formData;
+      const form = {
+          Name:formData.Name,
+          category:formData.category,
+          image:formData.image,
+          Vendor:formData.vendor,
+          UMO:formData.UMO,
+          color:formData.color,
+          Description:formData.Description,
+          Sellable:formData.Sellable,
+          Manufacturer:formData.Manufacturer,
+          VAT:formData.VAT.$numberDecimal,
+          Pieces:formData.Pieces,
+          Manufacture_code:formData.Manufacturer,
+          Vendor:formData.Vendor
+        };
       const { data } = await axios.patch(
         `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
-        formDataWithoutPriceLists,
+        form,
         { headers },
       );
 
@@ -661,7 +676,7 @@ export default function SingleProductpage({
                     </label>
                     <div className="mt-2">
                       <input
-                        value={formData.VAT.$numberDecimal}
+                        value={Number(formData.VAT.$numberDecimal)}
                         id="VAT"
                         name="VAT"
                         onChange={handleChange}
