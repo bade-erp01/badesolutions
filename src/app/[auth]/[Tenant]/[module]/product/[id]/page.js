@@ -1340,7 +1340,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   name={`promo-${price.Name}`}
                   type="number"
                   step="any"
-                  value={price.promo || ""}
+                  value={price.promo || 0}
                   onChange={handleChange}
                   placeholder="0.00"
                   className="h-8 w-30 text-sm"
