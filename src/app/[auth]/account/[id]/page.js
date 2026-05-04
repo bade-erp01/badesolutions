@@ -421,7 +421,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
       </Section>
 
       {/* pricelist */}
-      <Section title="Pricelists Management">
+      {/* <Section title="Pricelists Management">
         <Grid>
           {userInfo.business.priceList.map((pl) => (
             <Badge
@@ -434,7 +434,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
             </Badge>
           ))}
         </Grid>
-      </Section>
+      </Section> */}
 
       {/* Status Flags */}
       {userInfo.business.subscriptionplan === "Standard" && (
