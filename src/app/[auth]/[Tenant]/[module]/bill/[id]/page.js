@@ -773,9 +773,10 @@ export default function InvoicePage({
               <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-tight">
                 {Singlebill.WayBillNo}
               </h2>
-             <h2 className="mt-3 font-bold text-base mb-2 text-md text-gray-300 uppercase tracking-tight">
+             <Badge  variant="secondary"
+              className="max-w-[160px] lowercase text-sm font-semibold px-2 py-0.5">
                 Store: {Singlebill.whId?.WHName}
-              </h2>
+              </Badge>
             </div>
           </div>
 
