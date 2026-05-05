@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from "react";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
-import { setupCache } from "axios-cache-adapter";
 import Employee from "../../../../../../../models/Users";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Badge } from "@/components/ui/badge"
@@ -30,35 +29,22 @@ export default async function StoreLayout2({ params }) {
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    // Create a cache instance with 3 minutes (180000 ms) max age
-    const cache = setupCache({
-      maxAge: 3 * 60 * 1000 // 3 minutes
-    });
+    
+    const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+    access: `${Encrypt(userData.user._id)}`
+  };
 
-    // 2. Create an axios instance with the cache adapter
-    const api = axios.create({
-      adapter: cache.adapter
-    });
+  // Run both requests in parallel
+  const [res, request] = await Promise.all([
+    axios.get(`${baseUrl}/api/crm/${decoy.id}`, { headers }),
+    axios.get(`${baseUrl}/api/priceList`, { headers })
+  ]);
 
-    const res = await axios.get(`${baseUrl}/api/crm/${decoy.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-      },
-    });
-
-    // get pricelist
-    const request = await api.get(`${baseUrl}/api/crm/${decoy.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-      },
-    });
-
-    data = await res.data; // No need to await this
-    PriceList = await request.data
+  // Extract data
+   data = res.data;
+   PriceList = request.data;
 
   } catch (err) {
     return (
