@@ -37,6 +37,7 @@ import AgingReportDownloader from "@/app/Components/Reports/SingleAging";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceList }) {
+ 
   const router = useParams();
   const navigation = useRouter();
   const [States] = useState(data.AllStates || []);
@@ -1102,7 +1103,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                     </option>
 
                     {/* Dynamic options based on subscription plan */}
-                    {PriceList.map((pl) =>(
+                    {PriceList.data.map((pl) =>(
                       <option key={pl._id} value={pl.Name}>
                         {pricelistSetter(pl.Name, userInfo.business)}
                       </option>

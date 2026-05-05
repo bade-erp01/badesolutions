@@ -39,7 +39,7 @@ export default async function StoreLayout2({ params }) {
   // Run both requests in parallel
   const [res, request] = await Promise.all([
     axios.get(`${baseUrl}/api/crm/${decoy.id}`, { headers }),
-    axios.get(`${baseUrl}/api/priceList`, { headers })
+    axios.get(`${baseUrl}/api/priceLists`, { headers })
   ]);
 
   // Extract data
@@ -49,7 +49,7 @@ export default async function StoreLayout2({ params }) {
   } catch (err) {
     return (
       <div className="text-red-500 p-6">
-        Failed to load. Please try again later.
+        Failed to load. Please try again later.{err.message}
       </div>
     );
   }
@@ -161,7 +161,7 @@ export default async function StoreLayout2({ params }) {
                 data={data}
                 cust={data.result}
                 salesPerson={ParsedStaff}
-                PriceList={PriceList}
+                PriceList={PriceList || []}
               />
             </Suspense>
           </section>
