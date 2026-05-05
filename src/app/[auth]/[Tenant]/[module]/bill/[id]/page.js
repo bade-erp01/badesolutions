@@ -780,6 +780,7 @@ export default function InvoicePage({
               </Badge>
             </div>
           </div>
+          
 
           <div className="text-right text-sm text-gray-700 space-y-1 min-w-[220px]">
             <h3 className="text-lg font-bold text-gray-900 tracking-tight">
