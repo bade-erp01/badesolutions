@@ -45,7 +45,7 @@ const fetchUser = async () => {
     }
 
     const rawBusinessInfo = await Business.findOne({ tenantId: rawUserInfo.tenantId })
-      .select("-payStackApiKey")
+      .select("-payStackApiKey -priceList")
       .lean();
     if (!rawUserInfo || !rawBusinessInfo) {
       return { error: "User or Business information not found." };

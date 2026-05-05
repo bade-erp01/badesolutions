@@ -2,8 +2,10 @@ import React, { Suspense, lazy } from "react";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
+import { setupCache } from "axios-cache-adapter";
 import Employee from "../../../../../../../models/Users";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import { Badge } from "@/components/ui/badge"
 import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import Footer2 from "@/app/Components/Footer2";
@@ -12,8 +14,6 @@ import {
   PlusCircleIcon,TrashIcon
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge"
-import moment from "moment"
 
 const SingleCustomerpage = lazy(() => import("./page"));
 
@@ -21,6 +21,7 @@ export default async function StoreLayout2({ params }) {
   const userData = await fetchUser();
   const decoy = await params;
   let data = {};
+  let PriceList = [];
   const staffRaw = await Employee.findByTenant(userData.business.tenantId)
     .select("firstName lastName")
     .lean();
@@ -29,6 +30,15 @@ export default async function StoreLayout2({ params }) {
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+    // Create a cache instance with 3 minutes (180000 ms) max age
+    const cache = setupCache({
+      maxAge: 3 * 60 * 1000 // 3 minutes
+    });
+
+    // 2. Create an axios instance with the cache adapter
+    const api = axios.create({
+      adapter: cache.adapter
+    });
 
     const res = await axios.get(`${baseUrl}/api/crm/${decoy.id}`, {
       headers: {
@@ -38,7 +48,18 @@ export default async function StoreLayout2({ params }) {
       },
     });
 
+    // get pricelist
+    const request = await api.get(`${baseUrl}/api/crm/${decoy.id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
+      },
+    });
+
     data = await res.data; // No need to await this
+    PriceList = await request.data
+
   } catch (err) {
     return (
       <div className="text-red-500 p-6">
@@ -154,6 +175,7 @@ export default async function StoreLayout2({ params }) {
                 data={data}
                 cust={data.result}
                 salesPerson={ParsedStaff}
+                PriceList={PriceList}
               />
             </Suspense>
           </section>
