@@ -770,9 +770,10 @@ export default function InvoicePage({
                 {Singlebill.billStatus.toUpperCase()} /{" "}
                 {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
               </h2>
-              <h2 className=" mb-2 text-md font-bold text-indigo-700 tracking-tight">
+              <Badge  variant="secondary"
+              className="max-w-[160px] text-lg font-semibold px-2 py-0.5">
                 {Singlebill.WayBillNo}
-              </h2>
+              </Badge>
              <Badge  variant="secondary"
               className="max-w-[160px] lowercase text-sm font-semibold px-2 py-0.5">
                 Store: {Singlebill.whId?.WHName}
