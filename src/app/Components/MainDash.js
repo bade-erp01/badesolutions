@@ -876,19 +876,10 @@ export default function MainDash({ userData }) {
                     key={product._id}
                     className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
                   >
-                    {product.Name} Promo:{" "}
-                    {userData.business.currency?.currency.Symbol}
-                    {(
-                      product.Pricelist1Promo ??
-                      product.Pricelist2Promo ??
-                      product.Pricelist3Promo ??
-                      product.Pricelist4Promo ??
-                      product.Pricelist5Promo ??
-                      product.Pricelist6Promo ??
-                      product.Pricelist7Promo
-                    )?.toLocaleString()}
+                    {product.Name}
                   </span>
                 ))}
+
               </Marquee>
             </div>
           )}

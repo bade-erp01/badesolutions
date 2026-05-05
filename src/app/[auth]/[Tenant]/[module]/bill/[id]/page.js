@@ -2,7 +2,7 @@
 
 import { mutate } from "swr"; // make sure this is imported
 import QRCode from "qrcode";
-import { showDeliveryModal } from "@/app/Components/Delivery";
+import  DeliveryModal  from "@/app/Components/Delivery";
 import { React, useState } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
@@ -33,7 +33,7 @@ import {
   XMarkIcon
 } from "@heroicons/react/24/solid";
 import {pricelistSetter} from "../../../../../../../Functions/Functions"
-
+import { Badge } from "@/components/ui/badge";
 
 export default function InvoicePage({
   userInfo,
@@ -606,7 +606,7 @@ export default function InvoicePage({
       title: "Security Check point",
       input: "password",
       inputLabel: "Enter Ops Code to proceed",
-      inputPlaceholder: "Type in Ops code 🔐",
+      inputPlaceholder: "Input your security code 🔐",
       showCancelButton: true,
       confirmButtonText: "Submit",
     });
@@ -674,7 +674,7 @@ export default function InvoicePage({
       title: "Security Check point",
       input: "password",
       inputLabel: "Enter Ops Code to proceed",
-      inputPlaceholder: "Type in Ops code 🔐",
+      inputPlaceholder: "Input your security code 🔐",
       showCancelButton: true,
       confirmButtonText: "Submit",
     });
@@ -808,9 +808,10 @@ export default function InvoicePage({
               <span className="mr-1">🗓️</span>
               {new Date(Singlebill.startDate).toLocaleDateString()}
             </p>
-             <p className="p-2 rounded-full text-sm tracking-wide shadow-sm border bg-indigo-50 text-indigo-700 border-indigo-200">
+             <Badge  variant="secondary"
+              className="max-w-[160px] lowercase text-sm font-semibold px-2 py-0.5">
                Billed at: {pricelistSetter(Singlebill.priceList,userInfo.business)}
-            </p>
+            </Badge>
           </div>
         </div>
 
@@ -849,20 +850,11 @@ export default function InvoicePage({
             )}
 
           {Singlebill.billStatus?.toUpperCase() === "ORDER" && (
-            <button
-              title={`Convert ${Singlebill.billStatus} to Invoice and Generate WayBill`}
-              onClick={() =>
-                showDeliveryModal(
-                  Singlebill._id,
-                  userInfo.user,
-                  userInfo.business
-                )
-              }
-               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
-            >
-               <TruckIcon className="w-5 h-5 text-gray-100" />
-              <span>Generate WayBill</span>
-            </button>
+            < DeliveryModal 
+                id={Singlebill._id}
+                user={userInfo.user}
+                business={userInfo.business}
+            />
           )}
 
           {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus?.toUpperCase() === "RECALLED" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") && (

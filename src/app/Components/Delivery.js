@@ -1,117 +1,139 @@
 "use client";
-import Swal from 'sweetalert2'
-import { totalInWords, EXPRESS_PRIVATE_URL, Dencrypt } from "../../../Functions/Functions";
+
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { NewspaperIcon } from "@heroicons/react/24/outline";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
+import { EXPRESS_PRIVATE_URL, Dencrypt } from "../../../Functions/Functions";
 
-export const showDeliveryModal = (id, user, business) => {
-  Swal.fire({
-    title: `
-      <div class="flex items-center gap-2 justify-center">
-        <span class="text-2xl">📦</span>
-        <h2 class="text-2xl font-bold text-gray-900">Delivery Details</h2>
-      </div>
-    `,
-    html: `
-      <div class="space-y-4 text-left text-gray-700">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Delivery Date *</label>
-            <input type="date" id="deliveryDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Delivery Fee *</label>
-            <input type="number" id="deliveryFee" placeholder="0.00" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-          </div>
-        </div>
+export default function DeliveryModal({ id, user, business }) {
+  const [open, setOpen] = useState(false);
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Driver Name *</label>
-            <input type="text" id="driverName" placeholder="Enter full name" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Driver Contact *</label>
-            <input type="tel" id="driverNumber" placeholder="+1 (555) 000-0000" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-          </div>
-        </div>
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryFee, setDeliveryFee] = useState("");
+  const [driverName, setDriverName] = useState("");
+  const [driverNumber, setDriverNumber] = useState("");
+  const [plateNumber, setPlateNumber] = useState("");
+  const [deliveryRemarks, setDeliveryRemarks] = useState("");
 
-        <div>
-          <label class="block text-sm font-semibold text-gray-800 mb-2">Vehicle Plate Number *</label>
-          <input type="text" id="plateNumber" placeholder="e.g., ABC-1234" class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition uppercase">
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-gray-800 mb-2">Delivery Remarks</label>
-          <textarea id="deliveryRemarks" placeholder="Add any special instructions..." class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg resize-none h-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"></textarea>
-        </div>
-
-        <p class="text-xs text-gray-500 mt-3">* Required fields</p>
-      </div>
-    `,
-    confirmButtonText: `<span class="font-semibold">Generate WayBill</span>`,
-    cancelButtonText: `<span>Cancel</span>`,
-    customClass: {
-      popup: 'rounded-2xl shadow-2xl',
-      htmlContainer: 'text-left',
-      confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition duration-200 ease-in-out',
-      cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded-lg font-medium transition duration-200 ease-in-out'
-    },
-    width: '520px',
-    showCancelButton: true,
-    showCloseButton: true,
-    focusConfirm: false,
-    preConfirm: () => {
-      return {
-        deliveryDate: document.getElementById('deliveryDate').value,
-        driverName: document.getElementById('driverName').value,
-        driverNumber: document.getElementById('driverNumber').value,
-        deliveryFee: document.getElementById('deliveryFee').value,
-        plateNumber: document.getElementById('plateNumber').value,
-        deliveryRemarks: document.getElementById('deliveryRemarks').value
-      }
+  const handleSubmit = async () => {
+    if (!deliveryDate || !driverName || !driverNumber || !deliveryFee || !plateNumber) {
+      ErrorMessage("Please fill in all required fields.");
+      return;
     }
-  }).then((result) => {
-    if (result.isConfirmed) {
-      plsWait("Generating WayBill...");
-      const deliveryDetails = result.value;
-      if (!deliveryDetails.deliveryDate || !deliveryDetails.driverName || !deliveryDetails.driverNumber || !deliveryDetails.deliveryFee || !deliveryDetails.plateNumber) {
-        ErrorMessage("Please fill in all required fields.");
-        return;
-      }
 
-      const deliveryData = {
-        DELIVERYDATE: deliveryDetails.deliveryDate,
-        DriverName: deliveryDetails.driverName,
-        DriverNumber: deliveryDetails.driverNumber,
-        shippingFee: parseFloat(deliveryDetails.deliveryFee),
-        vehicleNumber: deliveryDetails.plateNumber,
-        DeliveryComment: deliveryDetails.deliveryRemarks,
-        billId: id,
-        userId: user._id,
-        WayBillNo: `WB${Math.floor(Math.random() * 12345)}${deliveryDetails.plateNumber.substring(0, 3)}`
-      };
+    plsWait("Generating Invoice...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/delivery/${id}/${user.firstName}`
+    const deliveryData = {
+      DELIVERYDATE: deliveryDate,
+      DriverName: driverName,
+      DriverNumber: driverNumber,
+      shippingFee: parseFloat(deliveryFee),
+      vehicleNumber: plateNumber,
+      DeliveryComment: deliveryRemarks,
+      billId: id,
+      userId: user._id,
+      WayBillNo: `WB${Math.floor(Math.random() * 12345)}${plateNumber.substring(0, 3)}`
+    };
 
-      fetch(url, {
-        method: 'PATCH',
+    const url = `${EXPRESS_PRIVATE_URL}/api/delivery/${id}/${user.firstName}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           dbConnect: `Bearer ${business.rustyRoof}`,
           Authorization: `Bearer ${business.tenantId}`,
-          // access: `${Dencrypt(user._id)}`,
         },
-        body: JSON.stringify(deliveryData)
-      }).then(response => {
-        if (response.ok) {
-          SuccessToast("WayBill generated successfully!");
-          window.location.reload();
-        } else {
-          ErrorMessage("Failed to generate WayBill.");
-        }
-      }).catch(error => {
-        ErrorMessage("An error occurred while generating WayBill.");
+        body: JSON.stringify(deliveryData),
       });
+
+      if (response.ok) {
+        SuccessToast("Invoice generated successfully!");
+        setOpen(false); // close modal after success
+        window.location.reload();
+      } else {
+        ErrorMessage("Failed to generate WayBill.");
+      }
+    } catch (error) {
+      ErrorMessage("An error occurred while generating WayBill.");
     }
-  })
+  };
+
+  return (
+    <>
+      {/* Trigger button */}
+      <button
+        title="Convert to Invoice and Generate WayBill"
+        onClick={() => setOpen(true)}
+        className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gray-200 hover:shadow-lg hover:border-gray-400 hover:text-white transition duration-200 ease-in-out mr-1"
+      >
+        <NewspaperIcon className="w-5 h-5 text-gray-100" />
+        <span>Generate Invoice</span>
+      </button>
+
+      {/* Modal */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-900">
+              Invoice Details
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 text-left text-gray-700">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="mb-2">Invoice Date *</Label>
+                <Input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} />
+              </div>
+              <div>
+                <Label className="mb-2">Delivery Fee *</Label>
+                <Input type="number" placeholder="0.00" value={deliveryFee} onChange={(e) => setDeliveryFee(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="mb-2">Driver Name *</Label>
+                <Input type="text" placeholder="Enter full name" value={driverName} onChange={(e) => setDriverName(e.target.value)} />
+              </div>
+              <div>
+                <Label className="mb-2">Driver Contact *</Label>
+                <Input type="tel" placeholder="+1 (555) 000-0000" value={driverNumber} onChange={(e) => setDriverNumber(e.target.value)} />
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-2">Vehicle Plate Number *</Label>
+              <Input type="text" placeholder="e.g., ABC-1234" className="uppercase" value={plateNumber} onChange={(e) => setPlateNumber(e.target.value)} />
+            </div>
+
+            <div>
+              <Label className="mb-2">Invoice Remarks</Label>
+              <Textarea placeholder="Add any special instructions..." value={deliveryRemarks} onChange={(e) => setDeliveryRemarks(e.target.value)} />
+            </div>
+
+            <p className="text-xs text-gray-500 mt-3">* Required fields</p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={handleSubmit}>Convert to Invoice</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
