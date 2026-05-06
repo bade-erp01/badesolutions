@@ -1,24 +1,36 @@
 "use client";
 
-import { termsAndConditions, Encrypt } from "../../../../Functions/Functions";
+import { termsAndConditions } from "../../../../Functions/Functions";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+
 import Nav1 from "@/app/Components/Nav1";
-import Footer1 from "@/app/Components/Footer1";
-import Link from "next/link";
 import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
+
+// shadcn components
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export default function SignUpPage() {
   const params = useSearchParams();
+  const router = useRouter();
   const plan = params.get("plan");
 
-  // check plan and ensure the match Basic or Standard
   useEffect(() => {
     if (plan !== "Basic" && plan !== "Standard") {
-      window.location.href = "/"; // Redirect to home if plan is invalid
+      router.replace("/");
     }
-  }, [plan]);
+  }, [plan, router]);
 
   const [formData, setFormData] = useState({
     CompayName: "",
@@ -41,113 +53,152 @@ export default function SignUpPage() {
   };
 
   return (
-    <div  style={{
-            backgroundImage: 'url("/adrian-sulyok-c_4eaGRDSVU-unsplash.jpg")',
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "grayscale(90%)",
-            zIndex: -2,
-          }}>
+    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
       <Nav1 />
-      <div className="min-h-screen flex items-center justify-center mb-1 shadow-lg animate__animated animate__zoomInDown">
 
-          <div className="w-120 bg-gray-300/80 p-4 shadow-lg rounded-sm border-lg animate__animated animate__fadeInUpBig animate__delay-2s">
-            <h1 className="text-2xl font-extrabold text-gray-800 mb-2 text-black">
-              Sign up~{formData.plan} License
-            </h1>
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-6xl grid lg:grid-cols-2 rounded-3xl overflow-hidden border border-zinc-800 shadow-xl">
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-              <input
-                type="text"
-                name="CompayName"
-                placeholder="Business Name"
-                value={formData.CompayName}
-                required
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Business Email"
-                value={formData.email}
-                required
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
-              />
-              <input
-                type="tel"
-                name="Tel"
-                placeholder="+234 123 456 7890"
-                value={formData.Tel}
-                required
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
-              />
+          {/* LEFT PANEL */}
+          <div className="relative hidden lg:block">
+            <Image
+              src="/original-9fb073b9c59cd90e574db1b12f7d769b.webp"
+              alt="Enterprise office"
+              fill
+              className="object-cover opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/90" />
 
+            <div className="relative z-10 p-10 flex flex-col justify-between h-full">
               <div>
-                <label className="block text-md font-bold text-gray-700 mb-1 text-black">
-                  Referal code
-                </label>
-                <input
-                  type="text"
-                  name="referalCode"
-                  placeholder="Referal Code"
-                  value={formData.referalCode}
-                  onChange={handleChange}
-                  className="w-full px-3 py-3 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 "
-                />
+                <h1 className="text-3xl font-semibold leading-tight">
+                  Business Automated Dynamic Enterprise
+                </h1>
+                <p className="mt-4 text-sm text-zinc-400 max-w-md">
+                  Structured automation, enterprise workflows, and scalable
+                  infrastructure designed for operational clarity.
+                </p>
               </div>
 
-              {formData.NumberOfUsers > 0 && (
-                <div className="text-md font-semibold text-black mt-2">
-                  <p className="text-gray-700 text-black">
-                    Total Due (incl. 7.5% VAT): ₦
-                    {formData.totalAmount.toLocaleString()} (
-                    {formData.NumberOfUsers} user access)
-                  </p>
-                </div>
-              )}
+              <p className="text-xs text-zinc-500">
+                © {new Date().getFullYear()} B.A.D.E
+              </p>
+            </div>
+          </div>
 
-              <div className="space-y-2">
-                <TermsAndConditionsLink BusinessPlan={formData.plan} />
+          {/* RIGHT PANEL */}
+          <div className="bg-white text-black flex items-center">
+            <Card className="w-full max-w-md mx-auto border-none shadow-none">
+              
+              <CardHeader>
+                <CardTitle className="text-2xl">
+                  Create account
+                </CardTitle>
+                <CardDescription>
+                  {formData.plan} plan
+                </CardDescription>
+              </CardHeader>
 
-                <div className="bg-gray-50 border border-gray-200 rounded-md p-2">
-                  <span className="text-gray-700">
-                    Subsequent renewal fee will be
-                  </span>
-                  <span className="ml-1 font-bold text-green-600 text-xl">
-                    ₦{formData.renewalFee.toLocaleString()} /Yearly
-                  </span>
-                </div>
-              </div>
-              {formData.NumberOfUsers > 0 && (
-                <>
-                  <button
-                    type="submit"
-                    className="w-full bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-semibold hover:transition-transform duration-500 hover:scale-100 hover:shadow-md"
-                  >
-                    Proceed to Pay ₦{formData.totalAmount.toLocaleString()}
-                  </button>
-                  <div className="text-center ">
-                    <p className="text-gray-500 font-semibold text-sm">
-                      Pay securely with
-                    </p>
-                    <Image
-                      height={60}
-                      width={120}
-                      src="/assets/paystack-logo-png_seeklogo-409509-removebg-preview.png"
-                      alt="Paystack Logo"
-                      className="mx-auto"
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-5">
+
+                  {/* BUSINESS NAME */}
+                  <div className="space-y-2">
+                    <Label htmlFor="CompayName">Business name</Label>
+                    <Input
+                      id="CompayName"
+                      name="CompayName"
+                      value={formData.CompayName}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
-                </>
-              )}
-            </form>
+
+                  {/* EMAIL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Business email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* PHONE */}
+                  <div className="space-y-2">
+                    <Label htmlFor="Tel">Phone number</Label>
+                    <Input
+                      id="Tel"
+                      type="tel"
+                      name="Tel"
+                      value={formData.Tel}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* REFERRAL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="referalCode">Referral code</Label>
+                    <Input
+                      id="referalCode"
+                      name="referalCode"
+                      value={formData.referalCode}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* PRICING */}
+                  <div className="rounded-xl border p-4 bg-zinc-50">
+                    <p className="text-xs text-zinc-500">Total due</p>
+                    <p className="text-xl font-semibold">
+                      ₦{formData.totalAmount.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      {formData.NumberOfUsers} users included
+                    </p>
+
+                    <p className="text-sm mt-2">
+                      Renewal:
+                      <span className="ml-1 font-medium">
+                        ₦{formData.renewalFee.toLocaleString()} / yearly
+                      </span>
+                    </p>
+                  </div>
+
+                  {/* TERMS */}
+                  <TermsAndConditionsLink BusinessPlan={formData.plan} />
+
+                  {/* BUTTON */}
+                  <Button className="w-full h-11">
+                    Continue to payment
+                  </Button>
+
+                  {/* PAYMENT */}
+                  <div className="text-center pt-2">
+                    <p className="text-xs text-zinc-500 mb-2">
+                      Secure payment via
+                    </p>
+
+                    <Image
+                      src="/assets/paystack-logo-png_seeklogo-409509-removebg-preview.png"
+                      alt="Paystack"
+                      width={90}
+                      height={30}
+                      className="mx-auto opacity-80"
+                    />
+                  </div>
+
+                </form>
+              </CardContent>
+            </Card>
           </div>
-        
-      </div>
-      <Footer1 />
+
+        </div>
+      </main>
     </div>
   );
 }

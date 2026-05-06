@@ -20,13 +20,20 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-zinc-800">
-
-      {/* Navigation */}
-      <Nav1/>
-
+    <div
+      className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-zinc-800">
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+      <section className="max-w-full sm:px-6  sm:py-6" 
+      style={{
+        backgroundImage: 'url("/josh-calabrese-Ca8r0PSWg9Q-unsplash.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        filter: "grayscale(60%)",
+        zIndex: -2,
+      }}>
+        {/* Navigation */}
+        <Nav1 />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 auto-rows-[220px] sm:auto-rows-[260px]">
           <div className="lg:col-span-2 rounded-3xl overflow-hidden relative group min-h-[420px] sm:min-h-[540px]">
             <Image
@@ -50,13 +57,21 @@ export default function LandingPage() {
                   Precision systems for modern business velocity.
                 </h2>
                 <p className="max-w-2xl text-zinc-200 text-sm sm:text-lg lg:text-xl leading-relaxed font-light">
-                  Architect scalable automation, operational intelligence, and enterprise-grade workflows with design language built for authority.
+                  Architect scalable automation, operational intelligence, and
+                  enterprise-grade workflows with design language built for
+                  authority.
                 </p>
                 <div className="pt-2 flex flex-col sm:flex-row gap-4">
-                  <button onClick={()=>redirect('/Pricing')} className="rounded-full bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:scale-105 transition">
+                  <button
+                    onClick={() => redirect("/Pricing")}
+                    className="rounded-full bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:scale-105 transition"
+                  >
                     Explore Infrastructure
                   </button>
-                  <button  onClick={()=>redirect('/SalesPortal')} className="rounded-full border border-zinc-500/60 backdrop-blur px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition">
+                  <button
+                    onClick={() => redirect("/SalesPortal")}
+                    className="rounded-full border border-zinc-500/60 backdrop-blur px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition"
+                  >
                     Sales Portal
                   </button>
                 </div>
@@ -66,9 +81,14 @@ export default function LandingPage() {
 
           <div className="rounded-3xl bg-zinc-900 border border-zinc-800 p-6 flex flex-col justify-between">
             <div>
-              <p className="text-zinc-400 text-sm uppercase tracking-widest">Performance</p>
+              <p className="text-zinc-400 text-sm uppercase tracking-widest">
+                Performance
+              </p>
               <h3 className="text-5xl font-semibold mt-4">94%</h3>
-              <p className="text-zinc-400 mt-2">Operational efficiency increase across integrated enterprise systems.</p>
+              <p className="text-zinc-400 mt-2">
+                Operational efficiency increase across integrated enterprise
+                systems.
+              </p>
             </div>
             <div className="h-2 bg-zinc-800 rounded-full mt-6 overflow-hidden">
               <div className="h-full w-[94%] bg-zinc-200 rounded-full" />
@@ -76,9 +96,12 @@ export default function LandingPage() {
           </div>
 
           <div className="rounded-3xl bg-zinc-900 border border-zinc-800 p-6">
-            <h3 className="text-xl font-medium mb-4">Infrastructure Intelligence</h3>
+            <h3 className="text-xl font-medium mb-4">
+              Infrastructure Intelligence
+            </h3>
             <p className="text-zinc-400 mb-6">
-              Adaptive workflow orchestration, analytics, and process synchronization.
+              Adaptive workflow orchestration, analytics, and process
+              synchronization.
             </p>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="bg-zinc-800 rounded-2xl p-4">Automation</div>
@@ -89,20 +112,24 @@ export default function LandingPage() {
           </div>
 
           <div className="lg:col-span-2 rounded-3xl overflow-hidden relative">
-            <Image src={images.dashboard}
+            <Image
+              src={images.dashboard}
               alt="Dashboard"
               fill
               quality={100}
               priority
               loading="eager"
               sizes="(max-width: 760px) 100vw, 50vw"
-              className="object-cover" 
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-black/55" />
             <div className="relative p-6 sm:p-8 h-full flex flex-col justify-end">
-              <h3 className="text-3xl font-semibold">Command Center Visibility</h3>
+              <h3 className="text-3xl font-semibold">
+                Command Center Visibility
+              </h3>
               <p className="text-zinc-300 mt-3 max-w-lg">
-                Unified executive dashboards delivering strategic oversight in real time.
+                Unified executive dashboards delivering strategic oversight in
+                real time.
               </p>
             </div>
           </div>
@@ -110,14 +137,29 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-20">
+      <section
+        id="features"
+        className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-20"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            ["Operational Automation", "Replace fragmented manual systems with coordinated enterprise logic."],
-            ["Scalable Architecture", "Infrastructure engineered for global deployment and resilience."],
-            ["Executive Control", "Governance-ready systems with measurable strategic outputs."],
+            [
+              "Operational Automation",
+              "Replace fragmented manual systems with coordinated enterprise logic.",
+            ],
+            [
+              "Scalable Architecture",
+              "Infrastructure engineered for global deployment and resilience.",
+            ],
+            [
+              "Executive Control",
+              "Governance-ready systems with measurable strategic outputs.",
+            ],
           ].map(([title, desc]) => (
-            <div key={title} className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8 hover:border-zinc-700 transition">
+            <div
+              key={title}
+              className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8 hover:border-zinc-700 transition"
+            >
               <h3 className="text-2xl font-semibold mb-4">{title}</h3>
               <p className="text-zinc-400 leading-relaxed">{desc}</p>
             </div>
@@ -126,27 +168,33 @@ export default function LandingPage() {
       </section>
 
       {/* Enterprise Section */}
-      <section id="enterprise" className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
+      <section
+        id="enterprise"
+        className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="relative w-full h-[520px] rounded-3xl overflow-hidden">
-              <Image
-                src={images.team}
-                alt="Team collaboration"
-                fill
-                quality={100}
-                priority
-                loading="eager"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </div>
+            <Image
+              src={images.team}
+              alt="Team collaboration"
+              fill
+              quality={100}
+              priority
+              loading="eager"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
           <div className="rounded-3xl bg-zinc-900 border border-zinc-800 p-8 sm:p-12 flex flex-col justify-center">
-            <p className="uppercase tracking-[0.3em] text-zinc-500 text-sm">Enterprise Design</p>
+            <p className="uppercase tracking-[0.3em] text-zinc-500 text-sm">
+              Enterprise Design
+            </p>
             <h2 className="text-4xl sm:text-5xl font-semibold mt-4 leading-tight">
               Built for leadership teams demanding execution at scale.
             </h2>
             <p className="text-zinc-400 mt-6 text-lg leading-relaxed">
-              From systems modernization to dynamic business orchestration, this platform positions organizations for strategic acceleration.
+              From systems modernization to dynamic business orchestration, this
+              platform positions organizations for strategic acceleration.
             </p>
             <button className="mt-8 w-fit rounded-full bg-zinc-100 text-zinc-950 px-6 py-3 font-medium hover:scale-105 transition">
               Request Strategy Session
@@ -156,7 +204,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="relative border-t border-zinc-800 mt-16 bg-zinc-950 overflow-hidden">
+      <footer
+        id="contact"
+        className="relative border-t border-zinc-800 mt-16 bg-zinc-950 overflow-hidden"
+      >
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-900/40 to-zinc-950" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16">
@@ -169,7 +220,8 @@ export default function LandingPage() {
                 Enterprise systems engineered for decisive scale.
               </h3>
               <p className="text-zinc-400 max-w-lg leading-relaxed">
-                Subscribe for strategic insights, infrastructure innovation, and operational intelligence designed for modern enterprises.
+                Subscribe for strategic insights, infrastructure innovation, and
+                operational intelligence designed for modern enterprises.
               </p>
 
               <form className="max-w-xl pt-2">
@@ -194,33 +246,46 @@ export default function LandingPage() {
                 Navigation
               </h4>
               <div className="space-y-3 text-zinc-400">
-                <Link href="#features" className="block hover:text-white transition">Solutions</Link>
-                <Link href="#enterprise" className="block hover:text-white transition">Enterprise</Link>
-                <Link href="#contact" className="block hover:text-white transition">Contact</Link>
+                <Link
+                  href="#features"
+                  className="block hover:text-white transition"
+                >
+                  Solutions
+                </Link>
+                <Link
+                  href="#enterprise"
+                  className="block hover:text-white transition"
+                >
+                  Enterprise
+                </Link>
+                <Link
+                  href="#contact"
+                  className="block hover:text-white transition"
+                >
+                  Contact
+                </Link>
               </div>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-zinc-800">
             <div className="flex gap-4">
-              {[
-                "Facebook",
-                "Twitter",
-                "LinkedIn",
-                "Instagram",
-              ].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  className="h-11 w-11 rounded-full border border-zinc-800 bg-zinc-900 flex items-center justify-center text-sm text-zinc-400 hover:text-white hover:border-zinc-600 transition"
-                >
-                  {social.charAt(0)}
-                </a>
-              ))}
+              {["Facebook", "Twitter", "LinkedIn", "Instagram"].map(
+                (social) => (
+                  <a
+                    key={social}
+                    href="#"
+                    className="h-11 w-11 rounded-full border border-zinc-800 bg-zinc-900 flex items-center justify-center text-sm text-zinc-400 hover:text-white hover:border-zinc-600 transition"
+                  >
+                    {social.charAt(0)}
+                  </a>
+                ),
+              )}
             </div>
 
             <div className="text-sm text-zinc-500 text-center md:text-right">
-              © {new Date().getFullYear()} Business Automated Dynamic Enterprise. All rights reserved.
+              © {new Date().getFullYear()} Business Automated Dynamic
+              Enterprise. All rights reserved.
             </div>
           </div>
         </div>

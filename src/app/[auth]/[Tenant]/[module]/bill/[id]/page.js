@@ -771,11 +771,11 @@ export default function InvoicePage({
                 {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
               </h2>
               <Badge  variant="secondary"
-              className="max-w-[160px] text-lg font-semibold px-2 py-0.5">
+              className="max-w-40 text-lg font-semibold px-2 py-0.5">
                 {Singlebill.WayBillNo}
               </Badge>
              <Badge  variant="secondary"
-              className="max-w-[160px] lowercase text-sm font-semibold px-2 py-0.5">
+              className="max-w-40 lowercase text-sm font-semibold px-2 py-0.5">
                 Store: {Singlebill.whId?.WHName}
               </Badge>
             </div>
