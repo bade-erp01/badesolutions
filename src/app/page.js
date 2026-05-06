@@ -51,13 +51,13 @@ export default function LandingPage() {
             <div className="relative z-10 p-6 sm:p-10 lg:p-14 h-full flex flex-col justify-end">
               <div className="max-w-4xl space-y-4 sm:space-y-6">
                 <p className="text-blue-400 text-xs sm:text-sm mb-2 tracking-[0.35em] uppercase font-semibold">
-                  Business automated dynamic enterprise
+                  Precision systems for modern business velocity.
                 </p>
                 <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold leading-[0.95] max-w-4xl bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent drop-shadow-2xl">
-                  Precision systems for modern business velocity.
+                  Business automated dynamic enterprise
                 </h2>
                 <p className="max-w-2xl text-zinc-200 text-sm sm:text-lg lg:text-xl leading-relaxed font-light">
-                  Architect scalable automation, operational intelligence, and
+                  Scalable automation, operational intelligence, and
                   enterprise-grade workflows with design language built for
                   authority.
                 </p>
@@ -66,7 +66,7 @@ export default function LandingPage() {
                     onClick={() => redirect("/Pricing")}
                     className="rounded-full bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:scale-105 transition"
                   >
-                    Explore Infrastructure
+                    Pricing
                   </button>
                   <button
                     onClick={() => redirect("/SalesPortal")}
