@@ -23,13 +23,6 @@ export default function ProductForm({
     Name: "",
     UOM: "",
     category: "",
-    Pricelist1: 1,
-    Pricelist2: 1,
-    Pricelist3: 1,
-    Pricelist4: 1,
-    Pricelist5: 1,
-    Pricelist6: 1,
-    Pricelist7: 1,
     Vendor: "",
     color: "",
     Description: "",
@@ -70,13 +63,6 @@ export default function ProductForm({
           Name: "",
           UOM: "",
           category: "",
-          Pricelist1: 1,
-          Pricelist2: 1,
-          Pricelist3: 1,
-          Pricelist4: 1,
-          Pricelist5: 1,
-          Pricelist6: 1,
-          Pricelist7: 1,
           Vendor: "",
           color: "",
           Description: "",
@@ -303,34 +289,6 @@ export default function ProductForm({
                     </span>
                   </label>
                 </div>
-              </div>
-            </div>
-
-            {/* Price Lists Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                Price Lists
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[1, 2, 3, 4, 5, 6, 7].map((num) =>
-                  businessData.subscriptionplan === "Standard" || num <= 2 ? (
-                    <div key={num}>
-                      <label htmlFor={`Pricelist${num}`} className={labelClass}>
-                        {business[`priceList${num}`]} price
-                      </label>
-                      <input
-                        id={`Pricelist${num}`}
-                        name={`Pricelist${num}`}
-                        type="number"
-                        step="any"
-                        defaultValue={formData[`Pricelist${num}`] || 0}
-                        onChange={handleChange}
-                        className={inputClass}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  ) : null,
-                )}
               </div>
             </div>
 
