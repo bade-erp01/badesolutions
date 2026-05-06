@@ -4,10 +4,16 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Nav1 from "./Components/Nav1";
-import Footer from "@/app/Components/Footer1"
+import Footer from "@/app/Components/Footer1";
 
 // shadcn
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -21,7 +27,7 @@ export default function LandingPage() {
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-4 py-20 text-center">
         <Badge className="mb-4">ERP Platform</Badge>
-        
+
         <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-tight">
           Control your business from{" "}
           <span className="text-blue-600">one system</span>
@@ -52,10 +58,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* BENTO GRID */}
+      {/* BENTO GRID  */}
       <section className="max-w-6xl mx-auto px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[220px]">
-
           {/* DASHBOARD */}
           <Card className="md:col-span-2 md:row-span-2 overflow-hidden relative">
             <Image
@@ -67,9 +72,7 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-black/40" />
 
             <CardContent className="relative z-10 text-white p-6">
-              <h3 className="text-2xl font-semibold">
-                Real-time dashboard
-              </h3>
+              <h3 className="text-2xl font-semibold">Real-time dashboard</h3>
               <p className="text-sm mt-2 text-zinc-200 max-w-md">
                 Monitor operations, financials, and inventory from a unified
                 command center.
@@ -78,51 +81,100 @@ export default function LandingPage() {
           </Card>
 
           {/* FINANCE */}
-          <Card>
-            <CardHeader>
+          <Card
+            style={{
+              backgroundImage: `url("/WhatsApp Image 2026-05-06 at 10.22.19 PM.jpeg")`,
+              backgroundSize: "cover", // ensures the image covers the card
+              backgroundPosition: "center", // centers the image
+              backgroundRepeat: "no-repeat", // prevents tiling
+            }}
+            className="relative overflow-hidden text-white"
+          >
+            <div className="absolute inset-0 bg-black/40" />
+
+            <CardHeader className="relative z-10">
               <CardTitle>Finance</CardTitle>
-              <CardDescription>
+              <CardDescription className={"text-white"}>
                 Invoices, expenses, reporting, payment, vendors
               </CardDescription>
             </CardHeader>
           </Card>
 
           {/* INVENTORY */}
-          <Card>
-            <CardHeader>
+          <Card
+            style={{
+              backgroundImage: `url("/image.png")`,
+              backgroundSize: "cover", // ensures the image covers the card
+              backgroundPosition: "center", // centers the image
+              backgroundRepeat: "no-repeat", // prevents tiling
+            }}
+            className="relative overflow-hidden text-white"
+          >
+            <div className="absolute inset-0 bg-black/40" />
+
+            <CardHeader className="relative z-10">
               <CardTitle>Inventory</CardTitle>
-              <CardDescription>
+              <CardDescription className={"text-white"}>
                 Stock, warehouses, supply chain
               </CardDescription>
             </CardHeader>
           </Card>
 
           {/* HR */}
-          <Card>
-            <CardHeader>
+          <Card
+            style={{
+              backgroundImage: `url("/christina-wocintechchat-com-m-vzfgh3RAPzM-unsplash.jpg")`,
+              backgroundSize: "cover", // ensures the image covers the card
+              backgroundPosition: "center", // centers the image
+              backgroundRepeat: "no-repeat", // prevents tiling
+            }}
+            className="relative overflow-hidden text-white"
+          >
+            <div className="absolute inset-0 bg-black/40" />
+
+            <CardHeader className="relative z-10">
               <CardTitle>HR & Payroll</CardTitle>
-              <CardDescription>
-                Staff, attendance, salaries
+              <CardDescription className={"text-white"}>
+                Staff, attendance, salaries, Time-off
               </CardDescription>
             </CardHeader>
           </Card>
 
           {/* SALES */}
-          <Card>
-            <CardHeader>
+          <Card
+            style={{
+              backgroundImage: `url("/markus-winkler-IrRbSND5EUc-unsplash.jpg")`,
+              backgroundSize: "cover", // ensures the image covers the card
+              backgroundPosition: "center", // centers the image
+              backgroundRepeat: "no-repeat", // prevents tiling
+            }}
+            className="relative overflow-hidden text-white"
+          >
+            <div className="absolute inset-0 bg-black/40" />
+
+            <CardHeader className="relative z-10">
               <CardTitle>Sales</CardTitle>
-              <CardDescription>
+              <CardDescription className={"text-white"}>
                 Customers, invoices, lifecycle
               </CardDescription>
             </CardHeader>
           </Card>
 
+          <Card
+            style={{
+              backgroundImage: `url("/image copy.png")`,
+              backgroundSize: "cover", // ensures the image covers the card
+              backgroundPosition: "center", // centers the image
+              backgroundRepeat: "no-repeat", // prevents tiling
+            }}
+            className="relative overflow-hidden text-white"
+          >
+            <div className="absolute inset-0 bg-black/40" />
 
-          <Card>
-            <CardHeader>
+            <CardHeader className="relative z-10">
               <CardTitle>Personalization</CardTitle>
-              <CardDescription>
-                Get an application tailored specifically to how your business works.
+              <CardDescription className={"text-white"}>
+               Get an application tailored specifically to how your business works.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -130,16 +182,13 @@ export default function LandingPage() {
           {/* ANALYTICS */}
           <Card className="md:col-span-2 flex items-center">
             <CardContent>
-              <h3 className="text-xl font-semibold">
-                Built-in analytics
-              </h3>
+              <h3 className="text-xl font-semibold">Built-in analytics</h3>
               <p className="text-zinc-500 mt-2 max-w-xl">
                 Gain insight across all modules with real-time reports that
                 support better decision-making.
               </p>
             </CardContent>
           </Card>
-
         </div>
       </section>
 
@@ -155,7 +204,6 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-12 grid md:grid-cols-3 gap-6 text-left">
-
             <Card>
               <CardHeader>
                 <CardTitle>Centralized system</CardTitle>
@@ -168,21 +216,16 @@ export default function LandingPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Scalable architecture</CardTitle>
-                <CardDescription>
-                  Built for growing businesses
-                </CardDescription>
+                <CardDescription>Built for growing businesses</CardDescription>
               </CardHeader>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle>Secure infrastructure</CardTitle>
-                <CardDescription>
-                  Enterprise-grade reliability
-                </CardDescription>
+                <CardDescription>Enterprise-grade reliability</CardDescription>
               </CardHeader>
             </Card>
-
           </div>
         </div>
       </section>
@@ -207,7 +250,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-     <Footer/>
+      <Footer />
     </div>
   );
 }
