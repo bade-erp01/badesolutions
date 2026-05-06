@@ -46,13 +46,10 @@ export default function LandingPage() {
               alt="Enterprise office"
               className="absolute inset-0 h-full w-full object-cover object-center group-hover:scale-110 transition duration-1000 ease-out"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/55 to-black/90" />
+            {/* <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/55 to-black/90" /> */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             <div className="relative z-10 p-6 sm:p-10 lg:p-14 h-full flex flex-col justify-end">
               <div className="max-w-4xl space-y-4 sm:space-y-6">
-                <p className="text-blue-400 text-xs sm:text-sm mb-2 tracking-[0.35em] uppercase font-semibold">
-                  Precision systems for modern business velocity.
-                </p>
                 <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold leading-[0.95] max-w-4xl bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent drop-shadow-2xl">
                   Business automated dynamic enterprise
                 </h2>
@@ -66,13 +63,13 @@ export default function LandingPage() {
                     onClick={() => redirect("/Pricing")}
                     className="rounded-full bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:scale-105 transition"
                   >
-                    Pricing
+                    See pricing
                   </button>
                   <button
                     onClick={() => redirect("/SalesPortal")}
                     className="rounded-full border border-zinc-500/60 backdrop-blur px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition"
                   >
-                    Sales Portal
+                    Access sales portal
                   </button>
                 </div>
               </div>
@@ -124,9 +121,9 @@ export default function LandingPage() {
             />
             <div className="absolute inset-0 bg-black/55" />
             <div className="relative p-6 sm:p-8 h-full flex flex-col justify-end">
-              <h3 className="text-3xl font-semibold">
+              {/* <h3 className="text-3xl font-semibold">
                 Command Center Visibility
-              </h3>
+              </h3> */}
               <p className="text-zinc-300 mt-3 max-w-lg">
                 Unified executive dashboards delivering strategic oversight in
                 real time.
