@@ -81,7 +81,7 @@ export default function Footer2() {
       </form>
 
       {/* Copyright */}
-      <div className="text-center text-sm text-gray-500">
+      <div className="text-center text-sm text-gray-200">
         &copy; {new Date().getFullYear()} Business Automated Dynamic Enterprise. All rights reserved.
       </div>
     </footer>

@@ -160,7 +160,7 @@ export default function Nav1({ page, Module, user, business }) {
             >
               <Squares2X2Icon className="h-6 w-6 text-gray-800 mr-2 -mt-1 hover:text-gray-900 hover:scale-110 hover:drop-shadow-md transition-all duration-300 font-bold" />
               <span className="font-bold text-sm text-gray-900">
-                {page ? page.toUpperCase() : "BADE"}
+                {page ? page.toUpperCase() : "Business Automated Dynamic Enterprise"}
               </span>
             </Link>
 
@@ -190,9 +190,9 @@ export default function Nav1({ page, Module, user, business }) {
             {!business || !user ? (
               <div className="hidden md:flex gap-6 items-center">
                 <Link
-                  href="#"
+                  href="why-bade"
                   className={`text-sm font-medium transition hover:text-blue-600 ${
-                    pathName === "/Why_Bade" ? "text-blue-600" : "text-gray-700"
+                    pathName === "/why-bade" ? "text-blue-600" : "text-gray-700"
                   }`}
                 >
                   Why Bade?
@@ -203,7 +203,7 @@ export default function Nav1({ page, Module, user, business }) {
                     pathName === "/Pricing" ? "text-blue-600" : "text-gray-700"
                   }`}
                 >
-                  Discover More
+                  Pricing
                 </Link>
                 <Link
                   href="/Marketers"
