@@ -336,7 +336,7 @@ export default function Nav1({ page, Module, user, business }) {
                 </>
               ) : (
                 <Button asChild variant="default">
-                  <Link href="/Login">Get started →</Link>
+                  <Link href="/Login">Login →</Link>
                 </Button>
               )}
             </div>
