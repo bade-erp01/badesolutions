@@ -30,29 +30,7 @@ export default function Pricing() {
     "/logo.webp",
   ];
 
-  const testimonials = [
-    {
-      text: "B.A.D.E transformed how we manage inventory and sales. What used to take hours now takes minutes.",
-      name: "Chinedu Okafor",
-      role: "Operations Manager",
-      img: "/person.png",
-      metric: "+38% efficiency",
-    },
-    {
-      text: "The automation alone paid for itself in the first month. Reporting is now instant and accurate.",
-      name: "Aisha Bello",
-      role: "Finance Lead",
-      img: "/person.png",
-      metric: "4x faster reporting",
-    },
-    {
-      text: "We scaled from one store to three without operational chaos. That’s the real value.",
-      name: "Tunde Adebayo",
-      role: "Business Owner",
-      img: "/person.png",
-      metric: "3x scale growth",
-    },
-  ];
+  
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] text-zinc-900 flex flex-col">
@@ -101,61 +79,6 @@ export default function Pricing() {
               </motion.div>
             ))}
           </div>
-        </section>
-
-        {/* TESTIMONIALS */}
-        <section className="max-w-full mb-28 overflow-hidden">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-center mb-14"
-          >
-            <h2 className="text-3xl font-semibold tracking-tight">
-              What our clients say
-            </h2>
-            <p className="text-zinc-500 mt-3 text-sm">
-              Real businesses. Measurable outcomes.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="flex gap-6"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              repeat: Infinity,
-              duration: 22,
-              ease: "linear",
-            }}
-          >
-            {[...testimonials, ...testimonials].map((t, i) => (
-              <div
-                key={i}
-                className="min-w-[300px] md:min-w-[360px] bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm"
-              >
-                <p className="text-sm text-zinc-600 leading-relaxed">
-                  “{t.text}”
-                </p>
-
-                <div className="mt-4 text-xs font-semibold text-green-600">
-                  {t.metric}
-                </div>
-
-                <div className="mt-6 flex items-center gap-3">
-                  <Image
-                    src={t.img}
-                    alt={t.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                  <div>
-                    <p className="text-sm font-medium">{t.name}</p>
-                    <p className="text-xs text-zinc-500">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </motion.div>
         </section>
 
         {/* PRICING */}
