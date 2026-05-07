@@ -1,6 +1,7 @@
 "use client";
 
 import { termsAndConditions } from "../../../../Functions/Functions";
+import { SuccessToast, ErrorMessage } from "../../../../Functions/Mics";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -49,7 +50,9 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await termsAndConditions(formData);
+    const res = await termsAndConditions(formData);
+    res.data ? SuccessToast(res.data) : ErrorMessage(res.error)
+    setFormData({})
   };
 
   return (
@@ -142,7 +145,7 @@ export default function SignUpPage() {
 
                   {/* REFERRAL */}
                   <div className="space-y-2">
-                    <Label htmlFor="referalCode">Referral code</Label>
+                    <Label htmlFor="referalCode">Referal Code</Label>
                     <Input
                       id="referalCode"
                       name="referalCode"
@@ -174,7 +177,7 @@ export default function SignUpPage() {
 
                   {/* BUTTON */}
                   <Button className="w-full h-11">
-                    Continue to payment
+                    Signup
                   </Button>
 
                   {/* PAYMENT */}

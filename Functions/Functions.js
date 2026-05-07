@@ -39,7 +39,7 @@ async function termsAndConditions(payload) {
   });
 
   if (accept) {
-    plsWait(`You've agreed with T&C for ${payload.plan} plan ✅`);
+    plsWait(`You've agreed with T&C for ${payload.plan} plan.`);
     // Simulate a delay for the sake of example
     await new Promise((resolve) => setTimeout(resolve, 3000));
     //make post request to server using axios for payment collection
@@ -50,7 +50,7 @@ async function termsAndConditions(payload) {
       const { data } = await axios.post(url, payload);
 
       if (data.data) {
-        window.location.href = data.data;
+        return data
       }
       // Handle success
     } catch (error) {
