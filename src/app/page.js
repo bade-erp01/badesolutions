@@ -45,7 +45,7 @@ export default function LandingPage() {
             onClick={() => router.push("/Pricing")}
             className="rounded-xl"
           >
-            Sign-Up
+            Create Account
           </Button>
 
           <Button
