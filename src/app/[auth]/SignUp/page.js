@@ -51,8 +51,21 @@ export default function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await termsAndConditions(formData);
-    res.data ? SuccessToast(res.data) : ErrorMessage(res.error)
-    setFormData({})
+    if (res.data){
+      SuccessToast(res.data) 
+      setFormData({
+        CompayName: "",
+        email: "",
+        Tel: "",
+        referalCode: "",
+      })
+
+      router.push("/onboarding-success")
+    }else{
+       ErrorMessage(res.error)
+       router.push("/onbarding-error")
+    }
+    
   };
 
   return (
