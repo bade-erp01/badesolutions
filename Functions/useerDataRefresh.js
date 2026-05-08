@@ -1,5 +1,8 @@
 import { cookies } from "next/headers";
 import { Dencrypt,Encrypt } from "./Functions";
+import User from "../models/Users";
+import Business from "../models/Business";
+import dbConnect from "../lib/mongoose";
 import { NextResponse } from "next/server";
 
 const fetchUser = async () => {
@@ -26,34 +29,31 @@ const fetchUser = async () => {
       return { error: "Invalid session tokens, please log in again." };
     }
 
-    const request  = await fetch(`${process.env.EXPRESS_PRIVATE_URL}/api/userData/${userToken}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-         access: `${Encrypt(decodedUser)}`, 
-      },
-      next: {
-        revalidate: 60,
-      },
-    });
-
-    const response = await request.json();
-    const userData = Dencrypt(response.data)
-
-    const rawUserInfo = userData.user;
-    const rawBusinessInfo = userData.Biz;
+    await dbConnect("BadeAdmin"); // Ensure database connection
+    // Fetch user & business details
+    const rawUserInfo = await User.findById(decodedUser)
+    .select("-password -__v -createdAt -updatedAt -opsCode")
+    .populate({
+      path: "toogledTenants.tenantIds", // drill down into the subdocument field
+      model: "Business",            // explicitly tell Mongoose which model to use
+      select: "tenantId companyName _id email"
+    }).lean();
 
     if (!rawUserInfo) {
       return { error: "User information not found." };
     }
 
+    const rawBusinessInfo = await Business.findOne({ tenantId: rawUserInfo.tenantId })
+      .select("-payStackApiKey -priceList")
+      .lean();
     if (!rawUserInfo || !rawBusinessInfo) {
       return { error: "User or Business information not found." };
     }
 
+    // Convert data to plain objects
     return {
-      user: rawUserInfo,
-      business: rawBusinessInfo,
+      user: JSON.parse(JSON.stringify(rawUserInfo)),
+      business: JSON.parse(JSON.stringify(rawBusinessInfo)),
       SessionId: decodedSessionId
     };
     
