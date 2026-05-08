@@ -116,7 +116,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>Inventory</CardTitle>
               <CardDescription className={"text-white"}>
-                Stock, warehouses, supply chain, Manufacturing
+                Stock, warehouses, supply chain, Manufacturing.
               </CardDescription>
             </CardHeader>
           </Card>
