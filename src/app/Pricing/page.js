@@ -22,16 +22,6 @@ import { Badge } from "@/components/ui/badge";
 export default function Pricing() {
   const router = useRouter();
 
-  const logos = [
-    "/logo.jpg",
-    "/logo2.jpg",
-    "/logo3.jpg",
-    "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg",
-    "/logo.webp",
-  ];
-
-  
-
   return (
     <div className="min-h-screen bg-[#f8f9fb] text-zinc-900 flex flex-col">
       <Nav1 />
@@ -47,39 +37,6 @@ export default function Pricing() {
             Built for businesses that demand structure, clarity, and growth.
           </p>
         </div>
-
-        {/* TRUST SECTION */}
-        <section className="max-w-6xl mx-auto mb-10">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-center text-sm text-zinc-500 mb-5"
-          >
-            Trusted by growing businesses
-          </motion.p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-            {logos.map((src, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="flex items-center justify-center bg-white border border-zinc-200 rounded-2xl h-16 shadow-sm hover:shadow-md transition"
-              >
-                <Image
-                  src={src}
-                  alt="client"
-                  width={50}
-                  height={30}
-                  quality={"100px"}
-                  loading="lazy"
-                  className="object-contain grayscale opacity90 hover:grayscale-0 hover:opacity-100 transition"
-                />
-              </motion.div>
-            ))}
-          </div>
-        </section>
 
         {/* PRICING */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">

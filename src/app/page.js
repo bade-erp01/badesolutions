@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Nav1 from "./Components/Nav1";
 import Footer from "@/app/Components/Footer1";
+import Autoplay from "embla-carousel-autoplay";
 
 // shadcn
 import {
@@ -192,6 +193,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* User section */}
+      <TrustedBusinessesSection />
+
       {/* VALUE SECTION */}
       <section className="bg-zinc-50 py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -202,31 +206,7 @@ export default function LandingPage() {
           <p className="mt-4 text-zinc-500 max-w-2xl mx-auto">
             Everything you need to run and scale your business efficiently.
           </p>
-
-          <div className="mt-12 grid md:grid-cols-3 gap-6 text-left">
-            <Card>
-              <CardHeader>
-                <CardTitle>Centralized system</CardTitle>
-                <CardDescription>
-                  All operations in one platform
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Scalable architecture</CardTitle>
-                <CardDescription>Built for growing businesses</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Secure infrastructure</CardTitle>
-                <CardDescription>Enterprise-grade reliability</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
+          
         </div>
       </section>
 
@@ -252,5 +232,134 @@ export default function LandingPage() {
       {/* FOOTER */}
       <Footer />
     </div>
+  );
+}
+
+
+
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+
+const logos = [
+  "/logo.jpg",
+  "/logo2.jpg",
+  "/logo3.jpg",
+  "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg",
+  "/logo.webp",
+];
+
+export function TrustedBusinessesSection() {
+  return (
+    <section className="bg-zinc-50 py-20">
+      <div className="max-w-6xl mx-auto px-4">
+
+        {/* Heading */}
+        <div className="text-center">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
+            Trusted by growing businesses
+          </h2>
+
+          <p className="mt-4 text-zinc-500 max-w-2xl mx-auto">
+            Businesses across retail, logistics, distribution, and operations
+            trust BADE to manage daily workflows efficiently.
+          </p>
+        </div>
+
+        {/* Main Layout */}
+        <div className="mt-14 grid lg:grid-cols-3 gap-6">
+
+          {/* LOGO CAROUSEL */}
+          <Card className="lg:col-span-2 rounded-3xl border border-zinc-200 shadow-sm overflow-hidden bg-white">
+            <CardHeader>
+              <CardTitle>Organizations using BADE</CardTitle>
+
+              <CardDescription>
+                Enterprise software infrastructure built for modern operations.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
+
+              <Carousel
+                plugins={[
+                  Autoplay({
+                    delay: 4500,
+                  }),
+                ]}
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent>
+
+                  {logos.map((logo, index) => (
+                    <CarouselItem
+                      key={index}
+                      className="basis-1/2 md:basis-1/3 lg:basis-1/4"
+                    >
+                      <div className="p-2">
+                        <div className="h-32 rounded-2xl border border-zinc-200 bg-white hover:shadow-md transition flex items-center justify-center">
+
+                          <Image
+                            src={logo}
+                            alt={`Client logo ${index + 1}`}
+                            width={90}
+                            height={90}
+                            className="object-contain max-h-20 w-auto"
+                          />
+
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+
+                </CarouselContent>
+              </Carousel>
+
+            </CardContent>
+          </Card>
+
+          {/* SIDE INFO */}
+          <div className="space-y-6">
+
+            <Card className="rounded-3xl border border-zinc-200 shadow-sm">
+              <CardHeader>
+                <CardTitle>Centralized system</CardTitle>
+
+                <CardDescription>
+                  Manage finance, inventory, HR, procurement, and sales from one platform.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="rounded-3xl border border-zinc-200 shadow-sm">
+              <CardHeader>
+                <CardTitle>Scalable architecture</CardTitle>
+
+                <CardDescription>
+                  Built to support growing teams, multiple branches, and expanding operations.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="rounded-3xl border border-zinc-200 shadow-sm">
+              <CardHeader>
+                <CardTitle>Secure infrastructure</CardTitle>
+
+                <CardDescription>
+                  Enterprise-grade cloud deployment with controlled access and protected data.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
