@@ -53,13 +53,6 @@ export default function SignUpPage() {
     const res = await termsAndConditions(formData);
     if (res.data){
       SuccessToast(res.data) 
-      setFormData({
-        CompayName: "",
-        email: "",
-        Tel: "",
-        referalCode: "",
-      })
-
       router.push("/onboarding-success")
     }else{
        ErrorMessage(res.error)
