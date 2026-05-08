@@ -51,10 +51,10 @@ export default function LandingPage() {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => router.push("/SalesPortal")}
+            onClick={() => router.push("/Marketers")}
             className="rounded-xl"
           >
-            Access Portal
+           Refer & Earn
           </Button>
         </div>
       </section>
