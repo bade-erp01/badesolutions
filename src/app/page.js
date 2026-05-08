@@ -175,19 +175,41 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>Personalization</CardTitle>
               <CardDescription className={"text-white"}>
-               Get an application tailored specifically to how your business works.
+                Get an application tailored specifically to how your business
+                works.
               </CardDescription>
             </CardHeader>
           </Card>
 
           {/* ANALYTICS */}
-          <Card className="md:col-span-2 flex items-center">
-            <CardContent>
-              <h3 className="text-xl font-semibold">Built-in analytics</h3>
-              <p className="text-zinc-500 mt-2 max-w-xl">
-                Gain insight across all modules with real-time reports that
-                support better decision-making.
-              </p>
+          <Card className="md:col-span-2 overflow-hidden border border-zinc-200 bg-gradient-to-br from-white via-zinc-50 to-zinc-100 shadow-sm hover:shadow-md transition-all duration-300">
+            <CardContent className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+              {/* LEFT CONTENT */}
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 shadow-sm">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Cloud Infrastructure
+                </div>
+
+                <h3 className="mt-5 text-3xl font-semibold tracking-tight text-zinc-900">
+                  Cloud-based ERP Software
+                </h3>
+
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  {[
+                    "Real-time reporting",
+                    "Multi-user access",
+                    "Automated workflows",
+                    "Enterprise security",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-zinc-700">
+                        * {item}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -206,7 +228,6 @@ export default function LandingPage() {
           <p className="mt-4 text-zinc-500 max-w-2xl mx-auto">
             Everything you need to run and scale your business efficiently.
           </p>
-          
         </div>
       </section>
 
@@ -235,8 +256,6 @@ export default function LandingPage() {
   );
 }
 
-
-
 import {
   Carousel,
   CarouselContent,
@@ -255,7 +274,6 @@ export function TrustedBusinessesSection() {
   return (
     <section className="bg-zinc-50 py-20">
       <div className="max-w-6xl mx-auto px-4">
-
         {/* Heading */}
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
@@ -270,7 +288,6 @@ export function TrustedBusinessesSection() {
 
         {/* Main Layout */}
         <div className="mt-14 grid lg:grid-cols-3 gap-6">
-
           {/* LOGO CAROUSEL */}
           <Card className="lg:col-span-2 rounded-3xl border border-zinc-200 shadow-sm overflow-hidden bg-white">
             <CardHeader>
@@ -282,7 +299,6 @@ export function TrustedBusinessesSection() {
             </CardHeader>
 
             <CardContent>
-
               <Carousel
                 plugins={[
                   Autoplay({
@@ -296,7 +312,6 @@ export function TrustedBusinessesSection() {
                 className="w-full"
               >
                 <CarouselContent>
-
                   {logos.map((logo, index) => (
                     <CarouselItem
                       key={index}
@@ -304,7 +319,6 @@ export function TrustedBusinessesSection() {
                     >
                       <div className="p-2">
                         <div className="h-32 rounded-2xl border border-zinc-200 bg-white hover:shadow-md transition flex items-center justify-center">
-
                           <Image
                             src={logo}
                             alt={`Client logo ${index + 1}`}
@@ -312,27 +326,24 @@ export function TrustedBusinessesSection() {
                             height={90}
                             className="object-contain max-h-20 w-auto"
                           />
-
                         </div>
                       </div>
                     </CarouselItem>
                   ))}
-
                 </CarouselContent>
               </Carousel>
-
             </CardContent>
           </Card>
 
           {/* SIDE INFO */}
           <div className="space-y-6">
-
             <Card className="rounded-3xl border border-zinc-200 shadow-sm">
               <CardHeader>
                 <CardTitle>Centralized system</CardTitle>
 
                 <CardDescription>
-                  Manage finance, inventory, HR, procurement, and sales from one platform.
+                  Manage finance, inventory, HR, procurement, and sales from one
+                  platform.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -342,7 +353,8 @@ export function TrustedBusinessesSection() {
                 <CardTitle>Scalable architecture</CardTitle>
 
                 <CardDescription>
-                  Built to support growing teams, multiple branches, and expanding operations.
+                  Built to support growing teams, multiple branches, and
+                  expanding operations.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -352,11 +364,11 @@ export function TrustedBusinessesSection() {
                 <CardTitle>Secure infrastructure</CardTitle>
 
                 <CardDescription>
-                  Enterprise-grade cloud deployment with controlled access and protected data.
+                  Enterprise-grade cloud deployment with controlled access and
+                  protected data.
                 </CardDescription>
               </CardHeader>
             </Card>
-
           </div>
         </div>
       </div>
