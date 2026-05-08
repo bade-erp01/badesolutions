@@ -156,7 +156,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>Sales</CardTitle>
               <CardDescription className={"text-white"}>
-                Customers, invoices, lifecycle
+                CRM, invoices, lifecycle
               </CardDescription>
             </CardHeader>
           </Card>
