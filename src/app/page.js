@@ -136,7 +136,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>HR & Payroll</CardTitle>
               <CardDescription className={"text-white"}>
-                Staff, attendance, salaries, Help desk, Time-off.
+                Staff, attendance, salaries, Help desk,staff Appraisal, Time-off.
               </CardDescription>
             </CardHeader>
           </Card>
