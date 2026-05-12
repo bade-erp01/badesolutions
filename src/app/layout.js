@@ -19,6 +19,7 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
 
   description:
     "B.A.D.E is a cloud-based ERP platform for Nigerian and African businesses. Manage inventory, accounting, HR, payroll, sales, CRM, warehouses, and operations from one secure enterprise system.",
+  manifest: "/public/manifest.json",
 
   keywords: [
     "ERP software Nigeria",
@@ -44,7 +45,7 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
     },
   ],
 
-  creator: "Business Automated Dynamic Enterprise",
+  creator: "Bernard fidelis",
   publisher: "Business Automated Dynamic Enterprise",
 
   category: "technology",
@@ -120,6 +121,10 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
     "theme-color": "#ffffff",
     "color-scheme": "light",
   },
+};
+
+export const viewport = {
+  themeColor: "#0f172a",
 };
 
 
