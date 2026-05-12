@@ -80,7 +80,7 @@ export default async function TenantPage({ params }) {
 
       <div className="flex flex-2 min-h-[83dvh] overflow-y-hidden">
         {/* PROFESSIONAL SIDEBAR */}
-        <aside className="w-72 h-[83dvh] sticky top-0 bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617] border-r border-white/10 text-white flex flex-col overflow-hidden">
+       <aside className="hidden lg:flex w-72 h-[83dvh] sticky top-0 bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617] border-r border-white/10 text-white flex-col overflow-hidden">
            {/* HEADER */}
           <div className="px-5 py-5 border-b border-white/10 backdrop-blur-xl bg-white/5">
           <div className="flex items-center justify-between">
