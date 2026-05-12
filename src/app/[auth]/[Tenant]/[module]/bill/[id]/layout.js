@@ -116,7 +116,8 @@ async function StoreLayoutContent({ params }) {
     {/* Main Content Area */}
     <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
      {/* Aside (Left Sidebar) */}
-     <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-hidden">
+     <aside aside
+          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300">
       <BackButton />
       <hr className="my-4 border-gray-700" />
       <nav className="grow">

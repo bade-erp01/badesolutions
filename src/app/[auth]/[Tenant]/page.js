@@ -76,6 +76,7 @@ export default async function TenantPage({ params }) {
         user={userData?.user}
         business={userData?.business}
         page={`${userData?.business?.companyName}!`}
+        IconArray={[]}
       />
 
       <div className="flex flex-2 min-h-[83dvh] overflow-y-hidden">

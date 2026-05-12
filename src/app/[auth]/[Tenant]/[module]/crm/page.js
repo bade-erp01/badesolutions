@@ -68,7 +68,8 @@ export default async function crmLayout({ params }) {
 
       <div className="flex flex-1 overflow-hidden text-white">
         {/* Sidebar */}
-        <aside className="bg-[#1e1e20]/70 backdrop-blur-md w-72 px-4 py-6 overflow-hidden">
+        <aside aside
+          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300">
           <BackButton />
           <hr />
           <nav className="space-y-4">

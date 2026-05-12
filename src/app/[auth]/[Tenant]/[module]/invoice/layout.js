@@ -58,8 +58,8 @@ export default async function Employeelayout({ children, params }) {
       />
 
       <div className="flex flex-1 text-white bt-2 ">
-        <aside  className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
+        <aside aside
+          className="hidden lg:blockmax-h-[83dvh] text-white overflow-y-auto bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300" 
           style={{ overflowY: "auto" }}>
           <BackButton />
           <hr />

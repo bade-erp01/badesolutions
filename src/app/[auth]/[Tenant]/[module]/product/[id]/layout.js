@@ -87,7 +87,7 @@ export default async function layout({ params, children }) {
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar */}
         <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
+          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300"
           style={{ overflowY: "auto" }}
         >
             <BackButton/>

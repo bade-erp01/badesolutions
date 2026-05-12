@@ -85,8 +85,7 @@ export default async function Productlayout({ children, params }) {
         <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
           {/* Sidebar */}
           <aside
-            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block "
-            style={{ overflowY: "auto" }}
+           className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300" style={{ overflowY: "auto" }}
           >
             <h2 className="text-lg font-bold mb-4">Product Management</h2>
             <hr />
