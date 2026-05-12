@@ -350,7 +350,7 @@ export default function Nav1({
               </div>
             )}
 
-              <div className="hidden sm:block">
+              <div className="">
                 <h2 className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}>
                   {business
                     ? page.toUpperCase()

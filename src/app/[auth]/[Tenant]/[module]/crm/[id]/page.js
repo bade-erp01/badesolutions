@@ -601,7 +601,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border space-y-8 text-xs"
+      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border space-y-8 text-xs items-center"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

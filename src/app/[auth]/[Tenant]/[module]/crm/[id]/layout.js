@@ -62,7 +62,7 @@ export default async function StoreLayout2({ params }) {
         page={data.result.Username}
       />
 
-      <div className="flex flex-1 text-white bt-2">
+      <div className="flex flex-1 text-white bt-2 item-center">
         {/* Sidebar */}
         <aside
           aside
@@ -151,7 +151,7 @@ export default async function StoreLayout2({ params }) {
 
         {/* Main Content */}
         <main className="flex-1">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-7 relative z-10 max-h-[83dvh] overflow-y-auto">
+          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-7 relative z-10 max-h-[83dvh] overflow-y-auto item-center">
             <Suspense
               fallback={
                 <SuspenenseFallBack pagedata={`${data.result?.Username}`} />
