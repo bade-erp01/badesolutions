@@ -21,6 +21,7 @@ import {
   CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
 import DaySelector from "@/app/Components/Datepicker";
+import BackButton from "@/app/Components/BackBotton"
 
 import {
   plsWait,
@@ -605,10 +606,13 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h4 className="text-xl font-bold text-gray-800">
+          <h4 className="text-xl font-bold text-gray-800 hidden lg:block">
             {cust.Username.charAt(0).toUpperCase() + cust.Username.slice(1)}
             &apos;s profile
           </h4>
+          <span className="block lg:hidden bg-gray-300 w-50 rounded-sm">
+            < BackButton />
+          </span>
           <br />
           <span className="text-sm text-gray-600 italic">
             Registration Date:{" "}
@@ -671,7 +675,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
         <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
 
         {/* Attachment */}
-        <div className="flex-1 min-w-[220px]">
+        <div className="flex-1 min-w-[220px] hidden lg:block">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Attach Document
           </label>
