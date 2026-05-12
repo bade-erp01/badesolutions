@@ -137,6 +137,8 @@ export default async function TenantPage({ params }) {
                         width={20}
                         height={20}
                         alt={app.Name}
+                        priority
+                        quality={100}
                         className="object-contain"
                       />
                     </div>

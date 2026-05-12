@@ -50,6 +50,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import BackButton from "./BackBotton";
 
 export default function Nav1({
   page,
@@ -226,7 +227,7 @@ export default function Nav1({
       <header className="sticky top-0 z-50 w-full px-1 py-1 text-xs">
         <nav className=" flex w-full items-center justify-between border border-white/20 bg-white/75 px-4 py-3 shadow-xl backdrop-blur-2xl">
           {/* LEFT */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 p-2">
             {/* MOBILE MENU */}
             <Sheet
               open={mobileMenuOpen}
@@ -288,7 +289,8 @@ export default function Nav1({
 
                   {/* PUBLIC LINKS */}
                   {!business || !user ? (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 p-3">
+                      <BackButton />
                       <Link
                         href="/why-bade"
                         className="rounded-2xl px-4 py-3 text-sm font-medium hover:bg-zinc-100"
@@ -342,20 +344,28 @@ export default function Nav1({
               href={href}
               className="group flex items-center gap-3 transition"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-md transition-all duration-300 group-hover:scale-105">
+              {business && (
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-md transition-all duration-300 group-hover:scale-105">
                 <Squares2X2Icon className="h-5 w-5" />
               </div>
+            )}
 
               <div className="hidden sm:block">
-                <h2 className="text-sm font-semibold tracking-tight text-zinc-900">
-                  {page
+                <h2 className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}>
+                  {business
                     ? page.toUpperCase()
                     : "B.A.D.E"}
                 </h2>
 
-                <p className="text-xs text-zinc-500">
-                  Enterprise Platform
-                </p>
+                <Badge 
+                  variant="secondary"
+                  className="rounded-xl text-xs text-zinc-500">
+                  {business ? (
+                    `${business?.subscriptionplan.toLowerCase()} plan`
+                  ) : (
+                    "Enterprise Platform"
+                  )}
+                </Badge>
               </div>
             </Link>
           </div>
@@ -428,15 +438,17 @@ export default function Nav1({
                   </Link>
                 </div>
 
+              {(!business && !user) && (
                 <Button
                   asChild
                   className="shadow-md"
                   variant="default"
                 >
-                  <Link href="/Login">
-                    Login →
+                  <Link href={`${pathName === "/Login" ? "/Pricing" : "/Login"}`}>
+                   {pathName === "/Login" ? "Signup →" : "Login →"}
                   </Link>
                 </Button>
+              )}
               </>
             ) : (
               <>
@@ -495,6 +507,7 @@ export default function Nav1({
                             width={52}
                             height={52}
                             alt="user"
+                            priority
                             className="rounded-2xl border border-white/10 object-cover"
                           />
 
