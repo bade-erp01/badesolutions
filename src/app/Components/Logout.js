@@ -1,25 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+
 import { logout as logoutAction } from "../../../lib/User";
-import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
+import { SuccessToast, ErrorMessage } from "../../../Functions/Mics";
+
+import { Button } from "@/components/ui/button";
+import { Loader2, LogOut } from "lucide-react";
 
 export default function Logout({ userData }) {
   const dispatch = useDispatch();
   const router = useRouter();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const logout = async () => {
     try {
       setIsLoggingOut(true);
+
       SuccessToast("Signing out...");
 
-      await dispatch(logoutAction()); // Await if it's async
+      await dispatch(logoutAction());
 
       SuccessToast("You have been logged out successfully.");
+
       router.push("/");
     } catch (e) {
       ErrorMessage("Logout failed. Please try again.");
@@ -36,41 +42,21 @@ export default function Logout({ userData }) {
   const accountUrl = `/${companySlug}/account/${userData?.business?._id}`;
 
   return (
-    <button
+    <Button
       onClick={logout}
       disabled={isLoggingOut}
-      className={`flex items-center text-xs gap-3 px-4 py-2 w-full mt-2 rounded-md transition-colors ${
-        isLoggingOut ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-700"
-      }`}
-      aria-label="Logout"
+      variant="destructive"
+      className="w-full justify-start gap-2 text-sm"
     >
       {isLoggingOut ? (
-        <svg
-          className="animate-spin h-5 w-5 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          ></path>
-        </svg>
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <ArrowRightStartOnRectangleIcon className="h-6 w-6 text-white" />
+        <LogOut className="h-4 w-4" />
       )}
-      <span className="text-sm text-white font-medium">
+
+      <span>
         {isLoggingOut ? "Logging out..." : "Logout"}
       </span>
-    </button>
+    </Button>
   );
 }

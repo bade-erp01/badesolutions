@@ -1,18 +1,31 @@
 "use client";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Nav2 from "@/app/Components/Nav2";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { PresentationChartLineIcon,UserGroupIcon,MapIcon,CubeIcon,UserPlusIcon,BuildingStorefrontIcon,QueueListIcon,Square3Stack3DIcon } from "@heroicons/react/24/outline";
+import {
+  PresentationChartLineIcon,
+  UserGroupIcon,
+  MapIcon,
+  CubeIcon,
+  UserPlusIcon,
+  BuildingStorefrontIcon,
+  QueueListIcon,
+  Square3Stack3DIcon,
+} from "@heroicons/react/24/outline";
 import "animate.css";
-import { Encrypt,EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import { Encrypt, EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import { useParams } from "next/navigation";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -22,14 +35,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { plsWait, SuccessToast,ErrorMessage } from "../../../Functions/Mics";
-import axios from "axios"
-
-
+} from "@/components/ui/dialog";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
+import axios from "axios";
 
 export default function NavWrapper({ userData, data, navtitle }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,21 +52,24 @@ export default function NavWrapper({ userData, data, navtitle }) {
   let filteredData = [];
 
   // Filter logic
-  if(navtitle === "Requisitions"){
-    filteredData = Data.filter(
-    (item) =>
-      item?.billStatus?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.billReferenceNo?.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }else if (navtitle === "Reports"){
+  if (navtitle === "Requisitions") {
     filteredData = Data.filter(
       (item) =>
-        item?.Ref?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.status?.toLowerCase().includes(searchTerm.toLowerCase()),
+        item?.billStatus?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item?.billReferenceNo?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }else{
+  } else if (navtitle === "Reports") {
     filteredData = Data.filter(
-     (item) =>
-       item?.Name?.toLowerCase().includes(searchTerm.toLowerCase()) || item?.Username?.toLowerCase().includes(searchTerm.toLowerCase()),
-     ).sort((a, b) => a.Name?.trim().localeCompare(b.Name?.trim()));
+      (item) =>
+        item?.Ref?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item?.status?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  } else {
+    filteredData = Data.filter(
+      (item) =>
+        item?.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item?.Username?.toLowerCase().includes(searchTerm.toLowerCase()),
+    ).sort((a, b) => a.Name?.trim().localeCompare(b.Name?.trim()));
   }
 
   return (
@@ -78,16 +92,18 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
           {/* Navigation links bg-gray-200/50*/}
           <nav className="w-full space-y-2">
-          {userData.user.c_levelDash && (
-            <Link
-              href={`/SalesPortal/Dashboard`}
-              className={"flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "}
-            >
-              <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Dashboard</span>
-            </Link>
-          )}
-          
+            {userData.user.c_levelDash && (
+              <Link
+                href={`/SalesPortal/Dashboard`}
+                className={
+                  "flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition "
+                }
+              >
+                <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
+                <span className="text-xs">Dashboard</span>
+              </Link>
+            )}
+
             <Link
               href="/SalesPortal/Products"
               className={`flex items-center gap-3 p-3 rounded-md transition 
@@ -116,7 +132,10 @@ export default function NavWrapper({ userData, data, navtitle }) {
             </Link>
 
             {navtitle === "Customers" && (
-              <DialogDemo userData={userData} EXPRESS_PRIVATE_URL={EXPRESS_PRIVATE_URL}/>
+              <DialogDemo
+                userData={userData}
+                EXPRESS_PRIVATE_URL={EXPRESS_PRIVATE_URL}
+              />
             )}
 
             <Link
@@ -139,15 +158,14 @@ export default function NavWrapper({ userData, data, navtitle }) {
 
             {userData.user.workLocation && (
               <Link
-              href="/SalesPortal/Inventory"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
+                href="/SalesPortal/Inventory"
+                className={`flex items-center gap-3 p-3 rounded-md transition 
                             ${navtitle === "Inventory" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Inventory</span>
-            </Link>
-          )}
-            
+              >
+                <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
+                <span className="text-xs">Inventory</span>
+              </Link>
+            )}
           </nav>
 
           {/* Logout pinned at bottom */}
@@ -211,8 +229,6 @@ export default function NavWrapper({ userData, data, navtitle }) {
     </div>
   );
 }
-
-
 
 export function DialogDemo({ userData }) {
   const [formData, setFormData] = useState({ salesPerson: userData.user._id });
@@ -292,7 +308,7 @@ export function DialogDemo({ userData }) {
       const response = await axios.post(
         `${process.env.EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
         formData,
-        config
+        config,
       );
 
       SuccessToast(response.data?.message || "Customer created successfully!");
@@ -302,102 +318,195 @@ export function DialogDemo({ userData }) {
       ErrorMessage(
         error.response?.data?.message ||
           error.message ||
-          "Failed to create customer. Please try again."
+          "Failed to create customer. Please try again.",
       );
     }
   };
 
   return (
     <Dialog>
-      <form onSubmit={handleSubmit}>
-        <DialogTrigger asChild>
-          <Button variant="default" className="flex items-center gap-3 p-3 rounded-md transition">
-            <UserPlusIcon className="h-4 w-4 text-gray-200" />
-            Add a new Lead
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Register customer profile</DialogTitle>
-            <DialogDescription>
-              Creating a prospecting customer profile is as simple as ABC... just click save when you&apos;re done.
-            </DialogDescription>
+      <DialogTrigger asChild>
+        <Button
+          variant="default"
+          className="group h-11 rounded-2xl px-5 shadow-lg transition-all duration-300 hover:scale-[1.02]"
+        >
+          <UserPlusIcon className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+          Add New Lead
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-2xl overflow-hidden rounded-[2rem] border-0 p-0 shadow-2xl">
+        {/* TOP HEADER */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 px-8 py-8 text-white">
+          {/* glow */}
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+
+          {/* background grid */}
+          <div className="absolute inset-0 opacity-10 bg-[url('/grid.svg')]" />
+
+          <DialogHeader className="relative z-10 space-y-3 text-left">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10">
+                <UserPlusIcon className="h-7 w-7 text-white" />
+              </div>
+
+              <div>
+                <DialogTitle className="text-2xl font-semibold tracking-tight">
+                  Register Customer Lead
+                </DialogTitle>
+
+                <DialogDescription className="mt-1 text-sm text-zinc-300 leading-relaxed">
+                  Create a prospect profile to manage customer engagement,
+                  follow-ups, and conversion opportunities in one place.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="name-1">Business Name</Label>
+        </div>
+
+        {/* FORM */}
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-6 px-8 py-8 bg-white">
+            {/* BUSINESS NAME */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="name-1"
+                className="text-sm font-medium text-zinc-800"
+              >
+                Business Name
+              </Label>
+
               <Input
                 required
                 id="name-1"
                 name="Username"
                 type="text"
-                placeholder="ABC enterprises..."
+                placeholder="ABC Enterprises Ltd."
                 onChange={handleChange}
                 value={formData.Username || ""}
+                className="h-12 rounded-2xl border-zinc-200 bg-zinc-50/70 focus-visible:ring-1"
               />
-            </Field>
-            <Field>
-            <Label htmlFor="billingAddress">Office Address</Label>
-            <Textarea
-              required
-              placeholder="123 Main Street..."
-              id="billingAddress"
-              name="billingAddress"
-              onChange={handleChange}
-              value={formData.billingAddress || ""}
-            />
-            </Field>
-            <Field>
-              <Label htmlFor="Email">Email</Label>
-              <Input
-                id="Email"
-                name="Email"
-                type="email"
-                placeholder="Abc@xyz.com"
-                onChange={handleChange}
-                value={formData.Email || ""}
-              />
-            </Field>
-            <Field>
-              <Label htmlFor="phone">Telephone</Label>
-              <Input
-                required
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="+234 1234567"
-                onChange={handleChange}
-                value={formData.phone || ""}
-              />
-            </Field>
-            <Field>
-              <Label htmlFor="ContactPerson">Contact person</Label>
+            </div>
+
+            {/* GRID */}
+            <div className="grid gap-5 md:grid-cols-2">
+              {/* EMAIL */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="Email"
+                  className="text-sm font-medium text-zinc-800"
+                >
+                  Email Address
+                </Label>
+
+                <Input
+                  id="Email"
+                  name="Email"
+                  type="email"
+                  placeholder="company@example.com"
+                  onChange={handleChange}
+                  value={formData.Email || ""}
+                  className="h-12 rounded-2xl border-zinc-200 bg-zinc-50/70"
+                />
+              </div>
+
+              {/* PHONE */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="phone"
+                  className="text-sm font-medium text-zinc-800"
+                >
+                  Telephone
+                </Label>
+
+                <Input
+                  required
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="+234 801 234 5678"
+                  onChange={handleChange}
+                  value={formData.phone || ""}
+                  className="h-12 rounded-2xl border-zinc-200 bg-zinc-50/70"
+                />
+              </div>
+            </div>
+
+            {/* CONTACT PERSON */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="ContactPerson"
+                className="text-sm font-medium text-zinc-800"
+              >
+                Contact Person
+              </Label>
+
               <Input
                 required
                 id="ContactPerson"
                 name="ContactPerson"
-                placeholder="Pedro Duarte"
+                placeholder="John Doe"
                 onChange={handleChange}
                 value={formData.ContactPerson || ""}
+                className="h-12 rounded-2xl border-zinc-200 bg-zinc-50/70"
               />
-            </Field>
-          </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit">Save changes</Button>
+            </div>
+
+            {/* ADDRESS */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="billingAddress"
+                className="text-sm font-medium text-zinc-800"
+              >
+                Office Address
+              </Label>
+
+              <Textarea
+                required
+                placeholder="123 Main Street, Abuja..."
+                id="billingAddress"
+                name="billingAddress"
+                onChange={handleChange}
+                value={formData.billingAddress || ""}
+                className="min-h-[120px] rounded-2xl border-zinc-200 bg-zinc-50/70 resize-none"
+              />
+            </div>
+
+            {/* INFO BOX */}
+            <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+              <p className="text-sm leading-relaxed text-blue-900">
+                Leads created here can later be converted into full customer
+                accounts with complete transaction history, CRM tracking, and
+                automated engagement workflows.
+              </p>
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <DialogFooter className="border-t bg-zinc-50 px-8 py-5">
+            <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 rounded-2xl px-6"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+
+              <Button type="submit" className="h-11 rounded-2xl px-6 shadow-md">
+                Save Lead
+              </Button>
+            </div>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
 
-
-
-
-export function Card ({ data, module }) {
+export function Card({ data, module }) {
   const { auth, Tenant } = useParams();
 
   const truncate = (str, length = 20) =>
@@ -432,7 +541,11 @@ export function Card ({ data, module }) {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Link href={linkHref} className="block w-full h-full text-xs" style={{ textDecoration: "none" }}>
+        <Link
+          href={linkHref}
+          className="block w-full h-full text-xs"
+          style={{ textDecoration: "none" }}
+        >
           <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-20 w-full h-full">
             <Image
               src={imageSrc}
@@ -444,8 +557,12 @@ export function Card ({ data, module }) {
               priority={true}
             />
             <div className="flex flex-col justify-center w-full">
-              <p className="font-semibold text-gray-800 truncate text-xs">{truncate(title)}</p>
-              <small className="text-gray-500 mt-1 text-xs">{truncate(subtitle)}</small>
+              <p className="font-semibold text-gray-800 truncate text-xs">
+                {truncate(title)}
+              </p>
+              <small className="text-gray-500 mt-1 text-xs">
+                {truncate(subtitle)}
+              </small>
             </div>
           </div>
         </Link>
@@ -458,7 +575,4 @@ export function Card ({ data, module }) {
       </HoverCardContent>
     </HoverCard>
   );
-};
-
-
-
+}

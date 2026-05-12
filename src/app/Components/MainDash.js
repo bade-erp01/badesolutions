@@ -30,6 +30,8 @@ import Link from "next/link";
 import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import { Badge } from "@/components/ui/badge";
+
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -286,111 +288,147 @@ export default function MainDash({ userData }) {
             scrollbarColor: "#453d46ff transparent",
           }}
         >
-          {/* KPI cards */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
-              <div className="flex items-center justify-between">
+          {/* KPI */}
+          <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-6">
+            {/* SALES */}
+            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-2xl">
+              <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
+
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
-                  <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
-                  <p className="text-2xl text-green-600 font-bold mt-1">
-                    {/* total sales */}
+                  <CardDescription className="text-emerald-100">
+                    Today's Sales
+                  </CardDescription>
+
+                  <CardTitle className="mt-3 text-4xl font-white">
                     <TodaySaleTotal
                       tenantData={tenantData}
                       userData={userData}
                     />
-                  </p>
-                  <p
-                    className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
-                      Number(tenantData.TodaySale) > Number(tenantData.yesterdaySale)
-                        ? "text-green-600"
-                        : Number(tenantData.TodaySale) < Number(tenantData.yesterdaySale)
-                          ? "text-red-600"
-                          : "text-gray-500"
-                    }`}
-                  >
-                    {(() => {
-                      const today = Number(tenantData.TodaySale) || 0;
-                      const yesterday = Number(tenantData.yesterdaySale) || 0;
-                      const diff = today - yesterday;
-                      let percentage;
-                      if (yesterday > 0) {
-                        percentage = ((diff / yesterday) * 100).toFixed(2);
-                      } else {
-                        percentage = "100"; 
-                      }
-
-                      if (today > yesterday) {
-                        return (
-                          <>
-                            <ArrowTrendingUpIcon className="w-4 h-4" />
-                            {`Up ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
-                          </>
-                        );
-                      } else if (today < yesterday) {
-                        return (
-                          <>
-                            <ArrowTrendingDownIcon className="w-4 h-4" />
-                            {`Down ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
-                          </>
-                        );
-                      } else {
-                        return `No change from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`;
-                      }
-                    })()}
-                  </p>
+                  </CardTitle>
                 </div>
-                <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
-                  <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
-                </div>
-              </div>
-            </div>
 
-            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
-              <div className="flex items-center justify-between">
+                <div className="rounded-2xl bg-white/20 p-3 backdrop-blur-md">
+                  <ArrowTrendingUpIcon className="h-7 w-7" />
+                </div>
+              </CardHeader>
+
+              <CardContent>
+                <div
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs ${
+                    Number(tenantData.TodaySale) >
+                    Number(tenantData.yesterdaySale)
+                      ? "bg-white/20"
+                      : "bg-red-300/20"
+                  }`}
+                >
+                  {(() => {
+                    const today = Number(tenantData.TodaySale) || 0;
+                    const yesterday = Number(tenantData.yesterdaySale) || 0;
+                    const diff = today - yesterday;
+                    let percentage;
+                    if (yesterday > 0) {
+                      percentage = ((diff / yesterday) * 100).toFixed(2);
+                    } else {
+                      percentage = "100";
+                    }
+
+                    if (today > yesterday) {
+                      return (
+                        <>
+                          <ArrowTrendingUpIcon className="w-4 h-4" />
+                          {`Up ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
+                        </>
+                      );
+                    } else if (today < yesterday) {
+                      return (
+                        <>
+                          <ArrowTrendingDownIcon className="w-4 h-4" />
+                          {`Dipped ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
+                        </>
+                      );
+                    } else {
+                      return `No change from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`;
+                    }
+                  })()}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* REVENUE */}
+            <Card className="border-0 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <h3 className="text-sm text-gray-500">Revenue</h3>
-                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                  <CardDescription>Revenue</CardDescription>
+
+                  <CardTitle className="mt-3 text-4xl font-black">
                     <TodaySRevenueTotal
                       tenantData={tenantData}
                       userData={userData}
                     />
-                  </p>
+                  </CardTitle>
                 </div>
-                <div className="p-3 rounded-full bg-[#ddd6ff] text-white shadow-md">
-                  <BanknotesIcon className="h-6 w-6 text-gray-500" />
-                </div>
-              </div>
-            </div>
 
-            <div className="bg-white p-5 rounded shadow-md animate__animated animate__flipInY">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-500">Purchase</h3>
-                  {/* purchase value */}
-                  <PurchaseOrderTotal
-                    tenantData={tenantData}
-                    userData={userData}
-                  />
+                <div className="rounded-2xl bg-violet-100 p-3">
+                  <BanknotesIcon className="h-7 w-7 text-violet-700" />
                 </div>
-                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
-                  <ShoppingBagIcon className="h-6 w-6 text-gray-900" />
-                </div>
-              </div>
-            </div>
+              </CardHeader>
 
-            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
-              <div className="flex items-center justify-between">
+              <CardContent>
+                <Badge variant="secondary" className="text-sm text-muted-foreground">
+                  Total posted revenue
+                </Badge>
+              </CardContent>
+            </Card>
+
+            {/* PURCHASE */}
+            <Card className="border-0 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <h3 className="text-sm text-gray-500">Expenses</h3>
-                  <p className="text-2xl text-red-500 font-bold mt-1">
+                  <CardDescription>Purchases</CardDescription>
+
+                  <CardTitle className="mt-3 text-4xl font-black">
+                    <PurchaseOrderTotal
+                      tenantData={tenantData}
+                      userData={userData}
+                    />
+                  </CardTitle>
+                </div>
+
+                <div className="rounded-2xl bg-amber-100 p-3">
+                  <ShoppingBagIcon className="h-7 w-7 text-amber-700" />
+                </div>
+              </CardHeader>
+
+              <CardContent>
+                <Badge variant="secondary" className="text-sm text-muted-foreground">
+                  Total purchase orders
+                </Badge>
+              </CardContent>
+            </Card>
+
+            {/* EXPENSE */}
+            <Card className="border-0 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardDescription>Expenses</CardDescription>
+
+                  <CardTitle className="mt-3 text-4xl font-black text-rose-600">
                     <ExpenseTotal tenantData={tenantData} userData={userData} />
-                  </p>
+                  </CardTitle>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
-                  <ArrowTrendingDownIcon className="h-6 w-6 text-red-400" />
+
+                <div className="rounded-2xl bg-rose-100 p-3">
+                  <ArrowTrendingDownIcon className="h-7 w-7 text-rose-700" />
                 </div>
-              </div>
-            </div>
+              </CardHeader>
+
+              <CardContent>
+                <Badge variant="secondary" className="text-sm text-muted-foreground">
+                  Operational expenses
+                </Badge>
+              </CardContent>
+            </Card>
           </section>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -879,7 +917,6 @@ export default function MainDash({ userData }) {
                     {product.Name}
                   </span>
                 ))}
-
               </Marquee>
             </div>
           )}
@@ -908,15 +945,19 @@ export default function MainDash({ userData }) {
             )}
         </div>
       ) : (
-        <main className="flex-1" style={{
-          backgroundImage: `url("/business-report-graphs-charts-business-reports-pile-documents-business-concept.jpg")`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}>
+        <main
+          className="flex-1"
+          style={{
+            backgroundImage: `url("/business-report-graphs-charts-business-reports-pile-documents-business-concept.jpg")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <section className="w-full max-w-4xl p-9">
             <div className="text-center space-y-6">
               <p className="text-gray-600 max-w-2xl mx-auto text-md">
-                Track your sales performance, manage customer relationships, and monitor your daily activities all in one place.
+                Track your sales performance, manage customer relationships, and
+                monitor your daily activities all in one place.
               </p>
               <div className="flex justify-center pt-4">
                 <Image
@@ -928,13 +969,15 @@ export default function MainDash({ userData }) {
                 />
               </div>
               <p className="text-gray-500 text-sm pt-6">
-                Navigate through the menu to explore your dashboard features and gain valuable insights into your business operations.
+                Navigate through the menu to explore your dashboard features and
+                gain valuable insights into your business operations.
               </p>
             </div>
           </section>
-            <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
-              © <span id="year">{moment().format("YYYY")}</span> Business Automated Dynamic Enterprise — All rights reserved.
-            </footer>
+          <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
+            © <span id="year">{moment().format("YYYY")}</span> Business
+            Automated Dynamic Enterprise — All rights reserved.
+          </footer>
         </main>
       )}
     </>
@@ -970,7 +1013,7 @@ const TodaySaleTotal = ({ tenantData, userData }) => {
   const total = tenantData?.TodaySale;
 
   return (
-    <p className="text-2xl text-gray-500 font-bold mt-1">
+    <p className="text-2xl text-gray-100 font-bold mt-1">
       {userData.business.currency?.currency.Symbol}
       {formatNumberShort(total)}
     </p>
