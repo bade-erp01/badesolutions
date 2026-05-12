@@ -15,16 +15,9 @@ import {
 
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import {
-  Encrypt,
-  EXPRESS_PRIVATE_URL,
-} from "../../../Functions/Functions";
+import { Encrypt, EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 
-import {
-  plsWait,
-  SuccessToast,
-  ErrorMessage,
-} from "../../../Functions/Mics";
+import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 
 import { useRouter } from "next/navigation";
 import moment from "moment";
@@ -52,30 +45,21 @@ import {
 } from "@/components/ui/sheet";
 import BackButton from "./BackBotton";
 
-export default function Nav1({
-  page,
-  Module,
-  user,
-  business,
-}) {
+export default function Nav1({ page, Module, user, business }) {
   const pathName = usePathname();
   const router = useRouter();
 
-  const [isDropdownOpen, setIsDropdownOpen] =
-    useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [hydrated, setHydrated] = useState(false);
 
   const [time, setTime] = useState("");
 
-  const [location, setLocation] = useState(
-    "Loading location...",
-  );
+  const [location, setLocation] = useState("Loading location...");
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [mobileMenuOpen, setMobileMenuOpen] =
-    useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleTenantSwitch = async (tenantId) => {
     const result = await Swal.fire({
@@ -90,22 +74,16 @@ export default function Nav1({
     });
 
     if (result.isConfirmed) {
-      plsWait(
-        "Please wait while we switch your tenant...",
-      );
+      plsWait("Please wait while we switch your tenant...");
 
       try {
         const response = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(
-            user._id,
-          )}`,
+          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(user._id)}`,
           {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(
-                business.tenantId,
-              )}`,
+              Authorization: `Bearer ${Encrypt(business.tenantId)}`,
               access: `${Encrypt(user._id)}`,
             },
             body: JSON.stringify({ tenantId }),
@@ -113,21 +91,14 @@ export default function Nav1({
         );
 
         if (!response.ok) {
-          throw new Error(
-            "Failed to switch tenant.",
-          );
+          throw new Error("Failed to switch tenant.");
         }
 
-        SuccessToast(
-          response.message ||
-            "Tenant switched successfully.",
-        );
+        SuccessToast(response.message || "Tenant switched successfully.");
 
         router.refresh();
       } catch (error) {
-        ErrorMessage(
-          "An error occurred while switching tenant.",
-        );
+        ErrorMessage("An error occurred while switching tenant.");
       }
     }
   };
@@ -175,22 +146,16 @@ export default function Nav1({
     const trimmedTerm = searchTerm.trim();
 
     if (!trimmedTerm) {
-      ErrorMessage(
-        "Please enter a search word",
-      );
+      ErrorMessage("Please enter a search word");
 
       return;
     }
 
-    plsWait(
-      `Searching for "${trimmedTerm}" in the ${page} list...`,
-    );
+    plsWait(`Searching for "${trimmedTerm}" in the ${page} list...`);
 
     setTimeout(() => {
       router.push(
-        `/Search/${encodeURIComponent(
-          page,
-        )}?search=${encodeURIComponent(
+        `/Search/${encodeURIComponent(page)}?search=${encodeURIComponent(
           trimmedTerm,
         )}`,
       );
@@ -209,18 +174,13 @@ export default function Nav1({
     );
   }
 
-  const sanitizedCompanyName =
-    business?.companyName
-      ?.toLowerCase()
-      ?.replace(/\s+/g, "-")
-      ?.replace(/[^a-z0-9-]/g, "");
+  const sanitizedCompanyName = business?.companyName
+    ?.toLowerCase()
+    ?.replace(/\s+/g, "-")
+    ?.replace(/[^a-z0-9-]/g, "");
 
   const href =
-    business && user
-      ? `/${sanitizedCompanyName}/${Encrypt(
-          user._id,
-        )}`
-      : "/";
+    business && user ? `/${sanitizedCompanyName}/${Encrypt(user._id)}` : "/";
 
   return (
     <>
@@ -229,10 +189,7 @@ export default function Nav1({
           {/* LEFT */}
           <div className="flex items-center gap-3 p-2">
             {/* MOBILE MENU */}
-            <Sheet
-              open={mobileMenuOpen}
-              onOpenChange={setMobileMenuOpen}
-            >
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   size="icon"
@@ -248,49 +205,34 @@ export default function Nav1({
                 className="w-[300px] border-0 bg-white/95 backdrop-blur-2xl"
               >
                 <SheetHeader>
-                  <SheetTitle className="text-left">
-                    Navigation
-                  </SheetTitle>
+                  <SheetTitle className="text-left">Navigation</SheetTitle>
                 </SheetHeader>
 
                 <div className="mt-8 flex flex-col gap-4">
                   {/* SEARCH */}
-                  {business &&
-                    user &&
-                    Module?.length > 0 && (
-                      <form
-                        onSubmit={handleSearch}
-                        className="space-y-3"
-                      >
-                        <div className="relative">
-                          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  {business && user && Module?.length > 0 && (
+                    <form onSubmit={handleSearch} className="space-y-3">
+                      <div className="relative">
+                        <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
 
-                          <Input
-                            type="search"
-                            placeholder={`Search ${page}...`}
-                            value={searchTerm}
-                            onChange={(e) =>
-                              setSearchTerm(
-                                e.target.value,
-                              )
-                            }
-                            className="h-11 rounded-2xl pl-10"
-                          />
-                        </div>
+                        <Input
+                          type="search"
+                          placeholder={`Search ${page}...`}
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="h-11 rounded-2xl pl-10"
+                        />
+                      </div>
 
-                        <Button
-                          type="submit"
-                          className="w-full rounded-sm"
-                        >
-                          Search
-                        </Button>
-                      </form>
-                    )}
+                      <Button type="submit" className="w-full rounded-sm">
+                        Search
+                      </Button>
+                    </form>
+                  )}
 
                   {/* PUBLIC LINKS */}
                   {!business || !user ? (
                     <div className="flex flex-col gap-2 p-3">
-                      <BackButton />
                       <Link
                         href="/why-bade"
                         className="rounded-2xl px-4 py-3 text-sm font-medium hover:bg-zinc-100"
@@ -313,25 +255,136 @@ export default function Nav1({
                       </Link>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <div className="rounded-2xl bg-zinc-100 p-4">
-                        <p className="text-xs text-zinc-500">
-                          Current Time
-                        </p>
+                    <div className="flex-1 overflow-y-auto px-3 pb-4 bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617]"
+                      style={{
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#334155 transparent",
+                      }}
+                    >
+                      <div className="space-y-1">
+                        {user?.Apps.map((app, index) => {
+                          const appHref = `/${business?.companyName
+                            ?.toLowerCase()
+                            .replace(/\s+/g, "-")
+                            .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                            user._id,
+                          )}/${app.url.toLowerCase().replace(/\s+/g, "")}/${app.url
+                            .toLowerCase()
+                            .replace(/\s+/g, "")}`;
 
-                        <p className="mt-1 font-semibold">
-                          🕒 {time}
-                        </p>
-                      </div>
+                          return (
+                            <Link
+                              key={index}
+                              href={appHref}
+                              title={app.Description || ""}
+                              className="group relative flex items-center gap-3 rounded-xl px-1 py-1 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
+                            >
+                              {/* ACTIVE GLOW */}
+                              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                      <div className="rounded-2xl bg-zinc-100 p-4">
-                        <p className="text-xs text-zinc-500">
-                          Current Location
-                        </p>
+                              {/* ICON */}
+                              <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300 shadow-lg">
+                                <Image
+                                  src={
+                                    app.icon ||
+                                    "https://img.icons8.com/deco/48/open-box.png"
+                                  }
+                                  width={20}
+                                  height={20}
+                                  alt={app.Name}
+                                  priority
+                                  quality={100}
+                                  className="object-contain"
+                                />
+                              </div>
 
-                        <p className="mt-1 font-semibold">
-                          📍 {location}
-                        </p>
+                              {/* TEXT */}
+                              <div className="flex-1 min-w-0 relative">
+                                <p className="text-xs font-medium text-gray-100 truncate">
+                                  {app.Name}
+                                </p>
+
+                                <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                                  {app.Description?.slice(0, 45) ||
+                                    "Business module"}
+                                </p>
+                              </div>
+                            </Link>
+                          );
+                        })}
+
+                        {/* SPECIAL APPS */}
+                        {user?.Email.trim() ===
+                          "tobenna970@gmail.com" && (
+                          <>
+                            {[
+                              {
+                                name: "CRM",
+                                url: "crm",
+                                icon: "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
+                                description:
+                                  "Customer relationship management.",
+                              },
+                              {
+                                name: "Employee Management",
+                                url: "employee",
+                                icon: "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
+                                description:
+                                  "Manage employee operations efficiently.",
+                              },
+                              {
+                                name: "Product Management",
+                                url: "product",
+                                icon: "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
+                                description: "Centralized product operations.",
+                              },
+                              {
+                                name: "Cash Register",
+                                url: "payment",
+                                icon: "https://img.icons8.com/dusk/64/cash-register.png",
+                                description:
+                                  "Process transactions and payments.",
+                              },
+                              {
+                                name: "Stores Operations",
+                                url: "store",
+                                icon: "https://img.icons8.com/arcade/64/garage-closed.png",
+                                description:
+                                  "Warehouse and inventory management.",
+                              },
+                            ].map((item, i) => (
+                              <Link
+                                key={i}
+                                href={`/${business?.companyName
+                                  ?.toLowerCase()
+                                  .replace(/\s+/g, "-")
+                                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                                  user._id,
+                                )}/${item.url}/${item.url}`}
+                                className="group relative flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
+                              >
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10">
+                                  <Image
+                                    src={item.icon}
+                                    width={24}
+                                    height={24}
+                                    alt={item.name}
+                                  />
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-100 truncate">
+                                    {item.name}
+                                  </p>
+
+                                  <p className="text-[11px] text-gray-400 truncate">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </Link>
+                            ))}
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -346,57 +399,52 @@ export default function Nav1({
             >
               {business && (
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-md transition-all duration-300 group-hover:scale-105">
-                <Squares2X2Icon className="h-5 w-5" />
-              </div>
-            )}
+                  <Squares2X2Icon className="h-5 w-5" />
+                </div>
+              )}
 
               <div className="">
-                <h2 className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}>
-                  {business
-                    ? page.toUpperCase()
-                    : "B.A.D.E"}
+                <h2
+                  className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}
+                >
+                  {business ? page.toUpperCase() : "B.A.D.E"}
                 </h2>
 
-                <Badge 
+                <Badge
                   variant="secondary"
-                  className="rounded-xl text-xs text-zinc-500">
-                  {business ? (
-                    `${business?.subscriptionplan.toLowerCase()} plan`
-                  ) : (
-                    "Enterprise Platform"
-                  )}
+                  className="rounded-xl text-xs text-zinc-500"
+                >
+                  {business
+                    ? `${business?.subscriptionplan.toLowerCase()} plan`
+                    : "Enterprise Platform"}
                 </Badge>
               </div>
             </Link>
           </div>
 
           {/* CENTER SEARCH */}
-          {business &&
-            user &&
-            Module?.length > 0 && (
-              <form
-                onSubmit={handleSearch}
-                className="hidden lg:flex flex-1 items-center mx-8 max-w-md"
-              >
-                <div className="relative w-full mr-1">
-                  <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          {business && user && Module?.length > 0 && (
+            <form
+              onSubmit={handleSearch}
+              className="hidden lg:flex flex-1 items-center mx-8 max-w-md"
+            >
+              <div className="relative w-full mr-1">
+                <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
 
-                  <Input
-                    type="search"
-                    placeholder={`Search ${page}...`}
-                    value={searchTerm}
-                    onChange={(e) =>
-                      setSearchTerm(e.target.value)
-                    }
-                   className="pl-10"
-                  />
-                </div>
+                <Input
+                  type="search"
+                  placeholder={`Search ${page}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
 
-                <Button type="submit" size="sm" variant="default">
-                  Search
-                </Button>
-              </form>
-            )}
+              <Button type="submit" size="sm" variant="default">
+                Search
+              </Button>
+            </form>
+          )}
 
           {/* RIGHT */}
           <div className="flex items-center gap-3">
@@ -438,53 +486,36 @@ export default function Nav1({
                   </Link>
                 </div>
 
-              {(!business && !user) && (
-                <Button
-                  asChild
-                  className="shadow-md"
-                  variant="default"
-                >
-                  <Link href={`${pathName === "/Login" ? "/Pricing" : "/Login"}`}>
-                   {pathName === "/Login" ? "Signup →" : "Login →"}
-                  </Link>
-                </Button>
-              )}
+                {!business && !user && (
+                  <Button asChild className="shadow-md" variant="default">
+                    <Link
+                      href={`${pathName === "/Login" ? "/Pricing" : "/Login"}`}
+                    >
+                      {pathName === "/Login" ? "Signup →" : "Login →"}
+                    </Link>
+                  </Button>
+                )}
               </>
             ) : (
               <>
                 {/* TIME + LOCATION */}
                 <div className="hidden xl:flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="rounded-xl px-3 py-1"
-                  >
+                  <Badge variant="secondary" className="rounded-xl px-3 py-1">
                     🕒 {time}
                   </Badge>
 
-                  <Badge
-                    variant="secondary"
-                    className="rounded-xl px-3 py-1"
-                  >
+                  <Badge variant="secondary" className="rounded-xl px-3 py-1">
                     📍 {location}
                   </Badge>
                 </div>
 
                 {/* USER MENU */}
-                <Popover
-                  open={isDropdownOpen}
-                  onOpenChange={setIsDropdownOpen}
-                >
+                <Popover open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="h-auto rounded-full p-0"
-                    >
+                    <Button variant="ghost" className="h-auto rounded-full p-0">
                       <Image
-                        src={
-                          user?.image ||
-                          "/person.png"
-                        }
-                         className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
+                        src={user?.image || "/person.png"}
+                        className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover"
                         priority
                         quality={100}
                         width={30}
@@ -500,10 +531,7 @@ export default function Nav1({
                       <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 p-5 text-white">
                         <div className="flex items-center gap-4">
                           <Image
-                            src={
-                              business.companyLogo ||
-                              "/person.png"
-                            }
+                            src={business.companyLogo || "/person.png"}
                             width={52}
                             height={52}
                             alt="user"
@@ -525,12 +553,14 @@ export default function Nav1({
 
                       {/* BODY */}
                       <div className="space-y-2 p-4 ">
-                        {user.toogledTenants
-                          ?.length > 0 && (
-                          <div className="rounded-2xl border p-2 h-50 overflow-y-scroll" style={{
-                            scrollbarWidth: "thin",
-                            scrollbarColor: "#453d46ff transparent",
-                          }}>
+                        {user.toogledTenants?.length > 0 && (
+                          <div
+                            className="rounded-2xl border p-2 h-50 overflow-y-scroll"
+                            style={{
+                              scrollbarWidth: "thin",
+                              scrollbarColor: "#453d46ff transparent",
+                            }}
+                          >
                             <p className="mb-2 px-2 text-xs font-medium text-zinc-500">
                               Switch Tenant
                             </p>
@@ -538,46 +568,23 @@ export default function Nav1({
                             {user.toogledTenants
                               .filter(
                                 (tenant) =>
-                                  tenant
-                                    .tenantIds
-                                    ?.tenantId
-                                    .toString() !==
+                                  tenant.tenantIds?.tenantId.toString() !==
                                   user.tenantId.toString(),
                               )
-                              .map(
-                                (
-                                  tenant,
-                                  index,
-                                ) => (
-                                  <button
-                                    key={
-                                      tenant
-                                        .tenantIds
-                                        ?._id ||
-                                      index
-                                    }
-                                    onClick={() =>
-                                      handleTenantSwitch(
-                                        Encrypt(
-                                          tenant
-                                            .tenantIds
-                                            ?._id,
-                                        ),
-                                      )
-                                    }
-                                    className="flex w-full items-center rounded-xl px-3 py-2 text-left text-xs transition hover:bg-zinc-100"
-                                  >
-                                    <PowerIcon className="mr-2 h-4 w-4 text-blue-600" />
-
-                                    Switch to{" "}
-                                    {
-                                      tenant
-                                        .tenantIds
-                                        ?.companyName
-                                    }
-                                  </button>
-                                ),
-                              )}
+                              .map((tenant, index) => (
+                                <button
+                                  key={tenant.tenantIds?._id || index}
+                                  onClick={() =>
+                                    handleTenantSwitch(
+                                      Encrypt(tenant.tenantIds?._id),
+                                    )
+                                  }
+                                  className="flex w-full items-center rounded-xl px-3 py-2 text-left text-xs transition hover:bg-zinc-100"
+                                >
+                                  <PowerIcon className="mr-2 h-4 w-4 text-blue-600" />
+                                  Switch to {tenant.tenantIds?.companyName}
+                                </button>
+                              ))}
                           </div>
                         )}
 
@@ -592,11 +599,8 @@ export default function Nav1({
                           </Link>
                         )}
 
-                        {user?.Notification
-                          ?.length > 0 && (
-                          <UserNotification
-                            user={user}
-                          />
+                        {user?.Notification?.length > 0 && (
+                          <UserNotification user={user} />
                         )}
 
                         <div className="pt-2">
