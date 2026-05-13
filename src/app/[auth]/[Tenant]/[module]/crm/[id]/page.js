@@ -36,6 +36,37 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { useEffect } from "react";
 import AgingReportDownloader from "@/app/Components/Reports/SingleAging";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { Button } from "@/components/ui/button";
+
+import { Badge } from "@/components/ui/badge";
+
+import {
+  Alert,
+  AlertDescription,
+} from "@/components/ui/alert";
+
+
+
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceList }) {
  
@@ -1385,126 +1416,197 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
         >
           {/* Recent Transactions */}
           <Section title="">
-            <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
+          <Card className="border-0 shadow-xl">
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="text-lg font-bold">
+                  Transaction History
+                </CardTitle>
+
+                <CardDescription>
+                  Customer account transactions and balances
+                </CardDescription>
+              </div>
+
+              <ExcelDownloadBtn
+                data={data?.transcations || []}
+                page={`${cust.Username.substring(0, 8)} transaction`}
+              />
+            </CardHeader>
+
+            <CardContent>
               {data && data.transcations.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm text-gray-700">
-                    <thead>
-                      <tr className="bg-gray-100 text-left">
-                        <th className="px-2 py-1">Ref No</th>
-                        <th className="px-2 py-1">Date</th>
-                        <th className="px-2 py-1">Credit</th>
-                        <th className="px-2 py-1">Debit</th>
-                        <th className="px-2 py-1">Balance</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 text-xs">
-                      {currentRows.map((tx, idx) => (
-                        <tr key={idx} title={tx.ReferenceNo}>
-                          <td className="px-2 py-1">
-                            {tx.ReferenceNo.length > 50
-                              ? `${tx.ReferenceNo?.substring(0, 50)}...`
-                              : tx.ReferenceNo}
-                          </td>
-                          <td className="px-2 py-1">
-                            {moment(tx.Date).format("MMM D, YYYY")}
-                          </td>
-                          <td className="px-2 py-1">
-                            <span
-                              className={`inline-block px-2 py-0.5  text-black ${
-                                tx.CreditAmount > 0
-                                  ? " text-xs rounded-full bg-green-500/30"
-                                  : ""
-                              }`}
-                            >
-                              CR: {tx.CreditAmount?.toLocaleString()}
-                            </span>
-                          </td>
-                          <td className="px-2 py-1">
-                            <span
-                              className={`inline-block px-2 py-0.5  text-black ${
-                                tx.DebitAmount > 0
-                                  ? " text-xs rounded-full bg-red-500/30"
-                                  : ""
-                              }`}
-                            >
-                              DR: {tx.DebitAmount?.toLocaleString()}
-                            </span>
-                          </td>
-                          <td
-                            className={`px-2 py-1 ${
-                              tx.Balance < 0 ? "text-green-700" : "text-black"
-                            } font-bold text-sm`}
+                <>
+                  {/* TABLE */}
+                  <div className="overflow-hidden rounded-2xl border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          <TableHead>Ref No</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Credit</TableHead>
+                          <TableHead>Debit</TableHead>
+                          <TableHead className="text-right">
+                            Balance
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+
+                      <TableBody>
+                        {currentRows.map((tx, idx) => (
+                          <TableRow
+                            key={idx}
+                            className="hover:bg-muted/40 transition-colors"
                           >
-                            {tx.Balance?.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <caption>
-                      <div className="space-y-2 mt-2">
-                        {cust.Debt < 0 ? (
-                          <p className="text-sm text-yellow-700 bg-purple-300 border border-purple-600 rounded-md px-4 py-2">
-                            💡 Kindly Note that {userInfo.business.companyName}{" "}
-                            owes {cust.Username} <strong>{cust.Debt}</strong>.
-                          </p>
-                        ) : (
-                          <p className="text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2">
-                            ⚠️ Kindly Note that {cust.Username} owes your
-                            Business <strong>{cust.Debt}</strong>.
-                          </p>
-                        )}
-                      </div>
-                    </caption>
-                    <tfoot>
-                      <tr>
-                        <td colSpan="5" className="px-2 py-1 text-white">
-                          <ExcelDownloadBtn
-                            data={data.transcations}
-                            page={`${cust.Username.substring(
-                              0,
-                              8,
-                            )} transaction`}
-                          />
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                            {/* REF */}
+                            <TableCell
+                              className="max-w-[250px] truncate font-medium"
+                              title={tx.ReferenceNo}
+                            >
+                              {tx.ReferenceNo.length > 50
+                                ? `${tx.ReferenceNo.substring(0, 50)}...`
+                                : tx.ReferenceNo}
+                            </TableCell>
 
-                  {/* Pagination Controls */}
-                  <div className="flex justify-between items-center mt-4 text-sm">
-                    <span
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="px-3 py-1 bg-gray-400 rounded disabled:opacity-50"
-                    >
-                      Previous
-                    </span>
+                            {/* DATE */}
+                            <TableCell>
+                              {moment(tx.Date).format("MMM D, YYYY")}
+                            </TableCell>
 
-                    <span className="text-xs text-black font-bold">
-                      Page {currentPage} of {totalPages}
-                    </span>
+                            {/* CREDIT */}
+                            <TableCell>
+                              {tx.CreditAmount > 0 ? (
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20"
+                                >
+                                  CR:{" "}
+                                  {tx.CreditAmount?.toLocaleString()}
+                                </Badge>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
 
-                    <span
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                      }
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-1 bg-gray-500 rounded disabled:opacity-50"
-                    >
-                      Next
-                    </span>
+                            {/* DEBIT */}
+                            <TableCell>
+                              {tx.DebitAmount > 0 ? (
+                                <Badge
+                                  variant="destructive"
+                                  className="bg-rose-500/10 text-rose-700 hover:bg-rose-500/20"
+                                >
+                                  DR:{" "}
+                                  {tx.DebitAmount?.toLocaleString()}
+                                </Badge>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+
+                            {/* BALANCE */}
+                            <TableCell
+                              className={`text-right text-sm font-bold ${
+                                tx.Balance < 0
+                                  ? "text-emerald-600"
+                                  : "text-foreground"
+                              }`}
+                            >
+                              {tx.Balance?.toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                </div>
+
+                  {/* ALERT */}
+                  <div className="mt-6">
+                    {cust.Debt < 0 ? (
+                      <Alert className="border-purple-300 bg-purple-50">
+                        <AlertCircle className="h-4 w-4 text-purple-700" />
+
+                        <AlertTitle className="text-purple-800">
+                          Business Debt Notice
+                        </AlertTitle>
+
+                        <AlertDescription className="text-purple-700">
+                          Kindly note that{" "}
+                          <strong>
+                            {userInfo.business.companyName}
+                          </strong>{" "}
+                          owes{" "}
+                          <strong>{cust.Username}</strong>{" "}
+                          <strong>
+                            {cust.Debt?.toLocaleString()}
+                          </strong>
+                          .
+                        </AlertDescription>
+                      </Alert>
+                    ) : (
+                      <Alert className="border-yellow-300 bg-yellow-50">
+                        <AlertCircle className="h-4 w-4 text-yellow-700" />
+
+                        <AlertTitle className="text-yellow-800">
+                          Outstanding Debt
+                        </AlertTitle>
+
+                        <AlertDescription className="text-yellow-700">
+                          Kindly note that{" "}
+                          <strong>{cust.Username}</strong>{" "}
+                          owes your business{" "}
+                          <strong>
+                            {cust.Debt?.toLocaleString()}
+                          </strong>
+                          .
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
+                  {/* PAGINATION */}
+                  <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.max(prev - 1, 1),
+                          )
+                        }
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages),
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                </>
               ) : (
-                <p className="text-gray-500 italic">
-                  No recent transactions found.
-                </p>
+                <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed">
+                  <p className="text-sm italic text-muted-foreground">
+                    No recent transactions found.
+                  </p>
+                </div>
               )}
-            </div>
-          </Section>
+            </CardContent>
+          </Card>
+        </Section>
         </div>
       </div>
 

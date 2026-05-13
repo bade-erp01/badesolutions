@@ -65,7 +65,6 @@ export default async function StoreLayout2({ params }) {
       <div className="flex flex-1 text-white bt-2 item-center">
         {/* Sidebar */}
         <aside
-          aside
           className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300"
           style={{ overflowY: "auto",scrollbarWidth: "thin",scrollbarColor: "#453d46ff transparent", }}
         >
