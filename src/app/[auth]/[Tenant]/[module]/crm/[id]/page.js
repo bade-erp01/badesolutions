@@ -1572,6 +1572,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
+                        type="button"
                         size="sm"
                         onClick={() =>
                           setCurrentPage((prev) =>
@@ -1585,6 +1586,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
 
                       <Button
                         size="sm"
+                        type="button"
                         onClick={() =>
                           setCurrentPage((prev) =>
                             Math.min(prev + 1, totalPages),
