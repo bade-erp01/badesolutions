@@ -63,10 +63,9 @@ import { Badge } from "@/components/ui/badge";
 import {
   Alert,
   AlertDescription,
-  AlertCircle,
   AlertTitle
 } from "@/components/ui/alert";
-
+import { AlertCircle } from "lucide-react";
 
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceList }) {
