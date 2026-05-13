@@ -1410,7 +1410,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+          className={`w-full px-4 py-3 text-gray-600 transition-all duration-300 ${
             isOpen2 ? "block" : "hidden"
           }`}
         >
