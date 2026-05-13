@@ -70,7 +70,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
         setTotalInvoices(data.totalInvoices);
         setCurrentPage(data.currentPage);
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       } finally {
         setIsLoading(false);
       }

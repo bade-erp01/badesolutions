@@ -60,13 +60,14 @@ export default async function AccountingPage({ children, params }) {
 
   try {
    const MenuItems = [
-  { label: "Balance Sheet", icon: DocumentChartBarIcon, url: 'BalanceSheet' },
-  { label: "Account Receivable", icon: DocumentTextIcon, url: 'Receivables' },
-  { label: "Account Payables", icon: BanknotesIcon, url: 'Payables' },
-  { label: "Income Statement", icon: PresentationChartLineIcon, url: 'P&L' },
-  { label: "Bank Accounts", icon: BuildingLibraryIcon, url: 'Bank-Accounts' },
-  { label: "Chart of Accounts", icon: TableCellsIcon, url: 'Chart-Of-Accounts' },
-  { label: "Equity", icon: CalculatorIcon, url: 'Equity' },
+  { label: "Balance Sheet", icon: DocumentChartBarIcon, url: 'BalanceSheet'},
+  { label: "Account Receivable", icon: DocumentTextIcon, url: 'Receivables'},
+  { label: "Account Payables", icon: BanknotesIcon, url: 'Payables'},
+  { label: "Income Statement", icon: PresentationChartLineIcon, url: 'P&L'},
+  { label: "Bank Accounts", icon: BuildingLibraryIcon, url: 'Bank-Accounts'},
+  { label: "Chart of Accounts", icon: TableCellsIcon, url: 'Chart-Of-Accounts'},
+  { label: "Equity", icon: CalculatorIcon, url: 'Equity'},
+  { label: "cash flow statement", icon: CubeIcon, url: 'cash-flow-statement'},
 ];
 
     return (

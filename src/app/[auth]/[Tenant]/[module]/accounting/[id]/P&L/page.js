@@ -1,23 +1,49 @@
 "use client";
+
+import { useState } from "react";
+import moment from "moment";
+
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import Swal from "sweetalert2/dist/sweetalert2.js";
+
 import {
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../../../Functions/Mics";
-import {pricelistSetter} from "../../../../../../../../Functions/Functions"
-import moment from "moment";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+import { pricelistSetter } from "../../../../../../../../Functions/Functions";
+
+import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { Loader2 } from "lucide-react";
+
+/* shadcn/ui */
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+
 import {
   Table,
   TableHeader,
@@ -26,383 +52,317 @@ import {
   TableCell,
   TableBody,
 } from "@/components/ui/table";
+
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 export default function Page({ Data, userData }) {
-  const [initialData, setInitialData] = useState(Data);
-  const [SALES, setSALES] = useState(0);
-  const [Return, setReturn] = useState(0);
-  const [OpeningInventory, setOpeningInventory] = useState(0);
-  const [NetPurchase, setNetPurchase] = useState(0);
-  const [closingInv, setClosingInv] = useState(0);
-  const [COGS, setCOGS] = useState(0);
-  const [DirectExpense, setDirectExpenses] = useState(0); //direct expense
-  const [indirectExpenses, setindirectExpenses] = useState(0); ////indirect expense
-  const [NetProfit, setNetProfit] = useState(0);
-  const [Taxes, setTaxes] = useState(0);
-  const [currency] = useState(userData.business.currency?.currency.Symbol);
-  const [EBIT,setEBIT] = useState(0)
-   console.log(initialData.COAs)
+  const [report, setReport] = useState({
+    SALES: 0,
+    Return: 0,
+    OpeningInventory: 0,
+    NetPurchase: 0,
+    closingInv: 0,
+    DirectExpense: 0,
+    indirectExpenses: 0,
+    Taxes: 0,
+    EBIT: 0,
+    NetProfit: 0,
+  });
 
-  const generateDates = (end, start) => {
-    const dates = [];
-    let currentDate = moment(start);
-    while (currentDate <= moment(end)) {
-      dates.push(currentDate.format("YYYY-MM"));
-      currentDate = currentDate.add(1, "days");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [dates, setDates] = useState({
+    startDate: "",
+    endDate: "",
+  });
+
+  const coa = Data?.COAs?.[0];
+
+  const currency =
+    userData?.business?.currency?.currency?.Symbol || "₦";
+
+  const generateDates = (start, end) => {
+    const arr = [];
+    let cur = moment(start).startOf("month");
+    const last = moment(end).endOf("month");
+
+    while (cur <= last) {
+      arr.push(cur.format("YYYY-MM"));
+      cur.add(1, "month");
     }
-    return dates;
+
+    return arr;
   };
 
+  const sumBalances = (list = [], dates, field = "openingBalance") =>
+    list
+      .filter((i) =>
+        dates.includes(moment(i.month).format("YYYY-MM"))
+      )
+      .reduce((a, b) => a + (Number(b[field]) || 0), 0);
+
   async function GeneratePNLSummary() {
-    const { value: formValues } = await Swal.fire({
-      title: "Generate income Statement",
-      html: `
-        <input id="report-start" type="date" class="swal2-input" placeholder="Start Date"/>
-        <input id="report-end" type="date" class="swal2-input" placeholder="End Date"/>
-      `,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: "Generate",
-      preConfirm: () => {
-        const startDate = document.getElementById("report-start").value;
-        const endDate = document.getElementById("report-end").value;
-        if (!startDate || !endDate) {
-          Swal.showValidationMessage("Please select both dates");
-        }
-        return { startDate, endDate };
-      },
-    });
-
-    if (!formValues) return;
-
-    Swal.fire({
-      title: "Computing income statement...",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
-
     try {
-      const { startDate, endDate } = formValues;
-      const dates = generateDates(endDate, startDate);
+      const { startDate, endDate } = dates;
 
-      // do the filters here and update the initialData state with the new values to update the UI
-      // get sales snapshot from COA
-      setSALES(
-        initialData.COAs[0].Revenue.Revenue.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      if (!startDate || !endDate) {
+        return ErrorMessage("Select start and end dates");
+      }
+
+      setLoading(true);
+
+      const range = generateDates(startDate, endDate);
+
+      const SALES = sumBalances(
+        coa?.Revenue?.Revenue?.monthlyBalances,
+        range
       );
 
-      // GET RETURNS SNAPSHOTS FROM COA
-      setReturn(
-        initialData.COAs[0].Revenue.Sales_Returns_Allowance.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      const Return = sumBalances(
+        coa?.Revenue?.Sales_Returns_Allowance?.monthlyBalances,
+        range
       );
 
-      // CALCULATE C.O.S
-      // CATPTURE CLOSING INVENTORY FOR LAST MONTH AS OPENING INVENTORY FOR CURRENT MONTH
-      setOpeningInventory(
-        initialData.COAs[0].Asset.inventory.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month)
-              .subtract(1, "month")
-              .format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      const OpeningInventory = sumBalances(
+        coa?.Asset?.inventory?.monthlyBalances,
+        range
       );
 
-      // CAPTURE NET PURCHASE
-      setNetPurchase(
-        initialData.COAs[0].Expense.Purchases.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      const NetPurchase = sumBalances(
+        coa?.Expense?.Purchases?.monthlyBalances,
+        range
       );
 
-      // CAPTURE setClosingInv
-      setClosingInv(
-        initialData.COAs[0].Asset.inventory.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.closingBalance, 0),
+      const closingInv = sumBalances(
+        coa?.Asset?.inventory?.monthlyBalances,
+        range,
+        "closingBalance"
       );
 
-      // CAPTURE EXPENSE
-      setDirectExpenses(
-        initialData.COAs[0].Expense.Direct_Expense.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      const DirectExpense = sumBalances(
+        coa?.Expense?.Direct_Expense?.monthlyBalances,
+        range
       );
 
-      // CAPTURE `COGS
-      setCOGS(
-        initialData.COAs[0].Expense.COGS.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      const indirectExpenses = sumBalances(
+        coa?.Expense?.Indirect_Expense?.monthlyBalances,
+        range
       );
 
-
-      
-      // capture indirectExpenses
-      setindirectExpenses(
-        initialData.COAs[0].Expense.Indirect_Expense.monthlyBalances
-        .filter((entry) => {
-          const formattedDate = moment(entry.month).format("YYYY-MM");
-          return dates.includes(formattedDate);
-        })
-        .reduce((acc, entry) => acc + entry.openingBalance, 0),
+      const Taxes = sumBalances(
+        coa?.Liability?.Tax_payable?.monthlyBalances,
+        range
       );
 
-      // Operating incom
-      setEBIT(
-        (SALES - Return) 
-        - ((OpeningInventory + NetPurchase) - closingInv) 
-        - DirectExpense 
-        - indirectExpenses
-      );
+      const COGS =
+        OpeningInventory + NetPurchase - closingInv;
 
-      // CAPTURE setTaxes
-      setTaxes(
-        initialData.COAs[0].Liability.Tax_payable.monthlyBalances
-          .filter((entry) => {
-            const formattedDate = moment(entry.month).format("YYYY-MM");
-            return dates.includes(formattedDate);
-          })
-          .reduce((acc, entry) => acc + entry.openingBalance, 0),
-      );
-      
-      // compute net profit after tax
-      setNetProfit(
-        ((SALES - Return) - ((OpeningInventory + NetPurchase) - closingInv))
-        - DirectExpense
-        - indirectExpenses
-        - Taxes
-      );
+      const GrossProfit =
+        SALES - Return - COGS;
 
+      const EBIT =
+        GrossProfit - DirectExpense - indirectExpenses;
 
-      SuccessToast("Income statement updated.");
+      const NetProfit =
+        EBIT - Taxes;
+
+      setReport({
+        SALES,
+        Return,
+        OpeningInventory,
+        NetPurchase,
+        closingInv,
+        DirectExpense,
+        indirectExpenses,
+        Taxes,
+        EBIT,
+        NetProfit,
+      });
+
+      SuccessToast("Income statement generated");
+      setOpenDialog(false);
     } catch (err) {
       ErrorMessage(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
- return (
-  <div className="flex flex-col min-h-screen">
-    <Nav1
-      user={userData.user}
-      business={userData.business}
-      page="Income Statement"
-    />
+  const GrossProfit =
+    report.SALES - report.Return -
+    (report.OpeningInventory + report.NetPurchase - report.closingInv);
 
-    <div className="flex flex-1 text-white bt-2 ">
-        {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
-          style={{ overflowY: "auto" }}
-        >
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+
+      <Nav1
+        user={userData.user}
+        business={userData.business}
+        page="Income Statement"
+      />
+
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* BLACK SIDEBAR */}
+        <aside className="hidden md:flex w-72 bg-[#1e1e20]/80 backdrop-blur-lg
+          text-white text-white p-5 flex-col gap-4">
           <BackButton />
-          <hr />
-          <nav className="space-y-4">
-            {/* show modal button */}
-            <button onClick={GeneratePNLSummary} className="text-xs w-full flex items-center gap-3 p-3 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out">
-              <CalendarDaysIcon className="h-5 w-5 text-gray-100" />
-              <span className="text-xs md:text-base">Select Statement period</span>
-            </button>
-          </nav>
-        </aside>{" "}
 
-      {/* Main Content */}
-      <main className="flex-1">
-        <section className="w-full mx-auto p-6 h-[83vh] overflow-y-auto">
-          <Card>
+          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <DialogTrigger asChild>
+              <Button className="w-full flex gap-2 bg-white text-black hover:bg-gray-200">
+                <CalendarDaysIcon className="h-5 w-5" />
+                Select Period
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  Generate Income Statement
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div>
+                  <Label>Start Date</Label>
+                  <Input
+                    type="date"
+                    value={dates.startDate}
+                    onChange={(e) =>
+                      setDates({
+                        ...dates,
+                        startDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>End Date</Label>
+                  <Input
+                    type="date"
+                    value={dates.endDate}
+                    onChange={(e) =>
+                      setDates({
+                        ...dates,
+                        endDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  onClick={GeneratePNLSummary}
+                  disabled={loading}
+                  className="w-full"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    "Generate"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </aside>
+
+        {/* MAIN */}
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">
+              <CardTitle>
                 Income Statement — {userData.business.companyName}
               </CardTitle>
             </CardHeader>
+
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-2/3">Heads</TableHead>
-                    <TableHead className="text-right">Accum.</TableHead>
+                    <TableHead>Heads</TableHead>
+                    <TableHead className="text-right">
+                      Amount
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
-                  {/* SALES */}
+
                   <TableRow>
-                    <TableCell>
-                      <Accordion type="single" collapsible>
-                        <AccordionItem value="sales">
-                          <AccordionTrigger>Sales</AccordionTrigger>
-                          <AccordionContent>
-                            <p>All Pricelist</p>
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList1,userData.business)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList2,userData.business)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList3,userData.business)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList4,userData.business)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList5,userData.business)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList6,userData.business)}
-                            </Badge>
-
-                            <Badge variant="secondary">
-                            {pricelistSetter(userData.business.priceList7,userData.business)}
-                            </Badge>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    </TableCell>
-                    <TableCell className="text-right">{currency}{SALES}</TableCell>
-                  </TableRow>
-
-                  {/* NET SALES */}
-                  <TableRow>
-                    <TableCell>Net Sales ~ [Sales - Return] [A]</TableCell>
-                    <TableCell className="text-right">{currency}{SALES - Return}</TableCell>
-                  </TableRow>
-
-                  {/* COST OF SALES */}
-                  <TableRow>
-                    <TableCell>
-                      <Accordion type="single" collapsible>
-                        <AccordionItem value="cos">
-                          <AccordionTrigger>Cost of Sales [B]</AccordionTrigger>
-                          <AccordionContent className="space-y-1 text-sm text-gray-600">
-                            <p>Opening inventory: {currency}{OpeningInventory}</p>
-                            <p>+ Net purchase: {currency}{NetPurchase}</p>
-                            <p>COGAS: {currency}{OpeningInventory + NetPurchase}</p>
-                            <p>- Closing inventory: {currency}{closingInv}</p>
-                            <p>COGS: {currency}{Math.round(COGS)}</p>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    </TableCell>
-                    <TableCell className="text-right">{currency}{(OpeningInventory + NetPurchase) - closingInv}</TableCell>
-                  </TableRow>
-
-                  {/* DIRECT EXPENSE */}
-                  <TableRow>
-                    <TableCell>
-                      <Accordion type="single" collapsible>
-                        <AccordionItem value="direct-expense">
-                          <AccordionTrigger>Direct Expense [C]</AccordionTrigger>
-                          <AccordionContent className="space-y-1 text-sm text-gray-600">
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Direct")
-                              .slice(0,8)
-                              .map((cat, idx) => (
-                                <Badge variant="secondary" className="gap-1" key={idx}>{cat.NAME}</Badge>
-                              ))}
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length > 8 && (
-                              <Badge variant="secondary">
-                                + {initialData.ExpenseCats.filter(cat => cat.type === "Direct").length - 8} More
-                              </Badge>
-                            )}
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    </TableCell>
-                    <TableCell className="text-right">{currency}{DirectExpense}</TableCell>
-                  </TableRow>
-
-                  {/* GROSS PROFIT */}
-                  <TableRow>
-                    <TableCell className="font-medium">Gross Profit [D]</TableCell>
-                    <TableCell className="text-right font-medium">
-                      {currency}{Math.round(SALES - Return) - COGS}
+                    <TableCell>Sales</TableCell>
+                    <TableCell className="text-right">
+                      {currency}{report.SALES}
                     </TableCell>
                   </TableRow>
 
-                  {/* INDIRECT EXPENSE */}
                   <TableRow>
-                    <TableCell>
-                      <Accordion type="single" collapsible>
-                        <AccordionItem value="indirect-expense">
-                          <AccordionTrigger>Indirect Expense [E]</AccordionTrigger>
-                          <AccordionContent className="space-y-1 text-sm text-gray-600">
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect")
-                              .slice(0,8)
-                              .map((cat, idx) => (
-                                <Badge variant="secondary" className="gap-1" key={idx}>{cat.NAME}</Badge>
-                              ))}
-                            {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length > 8 && (
-                              <Badge variant="outline">
-                                + {initialData.ExpenseCats.filter(cat => cat.type === "Indirect").length - 8} More
-                              </Badge>
-                            )}
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    </TableCell>
-                    <TableCell className="text-right">{currency}{indirectExpenses}</TableCell>
-                  </TableRow>
-
-                  {/* OPERATING INCOME */}
-                  <TableRow>
-                    <TableCell className="font-medium">Operating Income [EBIT]</TableCell>
-                    <TableCell className="text-right font-medium">
-                      {currency}{EBIT}
+                    <TableCell>Net Sales</TableCell>
+                    <TableCell className="text-right">
+                      {currency}{report.SALES - report.Return}
                     </TableCell>
                   </TableRow>
 
-                  {/* TAXES */}
+                  <TableRow>
+                    <TableCell>Gross Profit</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {currency}{GrossProfit}
+                    </TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>Direct Expenses</TableCell>
+                    <TableCell className="text-right">
+                      {currency}{report.DirectExpense}
+                    </TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>Indirect Expenses</TableCell>
+                    <TableCell className="text-right">
+                      {currency}{report.indirectExpenses}
+                    </TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>EBIT</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {currency}{report.EBIT}
+                    </TableCell>
+                  </TableRow>
+
                   <TableRow>
                     <TableCell>Taxes</TableCell>
-                    <TableCell className="text-right">{currency}{Taxes}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}{report.Taxes}
+                    </TableCell>
                   </TableRow>
 
-                  {/* NET INCOME */}
                   <TableRow>
-                    <TableCell className="font-bold text-lg">Net Income</TableCell>
-                    <TableCell className="text-right font-bold text-lg">{currency}{NetProfit}</TableCell>
+                    <TableCell className="font-bold text-lg">
+                      Net Profit
+                    </TableCell>
+                    <TableCell className="text-right font-bold text-lg">
+                      {currency}{report.NetProfit}
+                    </TableCell>
                   </TableRow>
+
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
-        </section>
-      </main>
+        </main>
+      </div>
+
+      <Footer2 />
     </div>
-
-    <Footer2 />
-  </div>
-)
-
+  );
 }
