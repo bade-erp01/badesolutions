@@ -1424,13 +1424,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                 </CardTitle>
 
                 <CardDescription>
-                  <ExcelDownloadBtn
-                    data={data?.transcations || []}
-                    page={`${cust.Username.substring(0, 8)} transaction`}
-                  />
+                  Customer account transactions and balances
                 </CardDescription>
               </div>
 
+              <ExcelDownloadBtn
+                data={data?.transcations || []}
+                page={`${cust.Username.substring(0, 8)} transaction`}
+              />
             </CardHeader>
 
             <CardContent>
