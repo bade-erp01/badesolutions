@@ -23,10 +23,23 @@ import {
   ErrorMessage,
   SuccessToast,
   plsWait,
-  sendInvite,
   SendTimeOutLink,
 } from "../../../../../../../Functions/Mics";
 import AccessControl from "@/app/Components/Access";
+import { Mail, Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { KeyRound } from "lucide-react";
 
 export default function SingleEmployeeView({
   userInfo,
@@ -1379,38 +1392,25 @@ export default function SingleEmployeeView({
             </button>
            )}
 
-            {!data.firstTimeOnboard ? (
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  onClick={() =>
-                    sendInvite(
-                      Encrypt(data._id),
-                      `${EXPRESS_PRIVATE_URL}`,
-                      Encrypt(userInfo._id),
-                      Encrypt(businessInfo.tenantId),
-                    )
-                  }
-                  className="inline-flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-400 transition"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>Send Invitation</span>
-                </button>
-              </div>
-            ) : (
+            {(!data.firstTimeOnboard && businessInfo.Pendinglicense > 0 ) && (
+              <>
+               <SendInviteButton
+                id={Encrypt(String(data._id))} 
+                url={EXPRESS_PRIVATE_URL}
+                user={Encrypt(String(userInfo._id))}
+                biz={Encrypt(String(businessInfo.tenantId))}
+              />
+              
+               <AssignLicenceButton
+                id={Encrypt(String(data._id))} 
+                url={EXPRESS_PRIVATE_URL}
+                user={Encrypt(String(userInfo._id))}
+                biz={Encrypt(String(businessInfo.tenantId))}
+              />
+              </>
+            )}
+            
+            {data.firstTimeOnboard & (
               <button
                 type="submit"
                 onClick={() => DeactivateUser(Encrypt(data._id))}
@@ -1562,3 +1562,210 @@ function SalePersonChart({ customerId, customerName, business }) {
     </>
   );
 }
+
+
+export function SendInviteButton({ id, url, user, biz }) {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleInvite = async () => {
+    try {
+      setLoading(true);
+      setMessage("");
+
+      const response = await fetch(`${url}/api/onboard/invite/${id}`, {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${biz}`,
+          access: `${user}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to send invite");
+      }
+
+      setMessage(data?.message || "Invite sent successfully");
+      SuccessToast(data?.message || "Invite sent successfully");
+      
+      setTimeout(() => {
+        setOpen(false);
+      }, 2000);
+    } catch (error) {
+      setMessage(error.message || "Unable to send invite. Please try again.");
+      // ErrorMessage(error.message || "Unable to send invite. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button className="gap-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition-all duration-200 px-4 py-2 shadow-md hover:shadow-lg">
+          <Mail className="h-4 w-4" />
+          <span className="font-semibold">Send Invite</span>
+        </Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent className="sm:max-w-md rounded-lg border border-gray-200 shadow-xl bg-white">
+        <AlertDialogHeader>
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 shadow-sm">
+              <Mail className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+
+          <AlertDialogTitle className="text-center text-lg font-bold text-gray-900">
+            Send Onboarding Invite
+          </AlertDialogTitle>
+
+          <AlertDialogDescription className="text-center text-sm text-gray-600 mt-3">
+            This will send an onboarding invitation email to the user. They will receive instructions to complete their account setup.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        {message && (
+          <div className={`mt-4 p-3 rounded-lg text-sm font-medium ${
+            loading || message.includes("successfully") 
+              ? "bg-green-50 text-green-700 border border-green-200" 
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}>
+            {message}
+          </div>
+        )}
+
+        <AlertDialogFooter className="mt-6 flex justify-end gap-3">
+          <AlertDialogCancel
+            className="rounded-lg px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+            disabled={loading}
+          >
+            Cancel
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              handleInvite();
+            }}
+            disabled={loading}
+            className="rounded-lg px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 flex items-center gap-2 font-semibold disabled:opacity-60 shadow-md hover:shadow-lg"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Sending...</span>
+              </>
+            ) : (
+              <>
+                <Mail className="h-4 w-4" />
+                <span>Send Invite</span>
+              </>
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+
+export function AssignLicenceButton({ id, url, userToken, bizToken }) {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const handleAssign = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`${url}/api/licence/assign/${id}`, {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${bizToken}`,
+          access: userToken,
+          "idempotencey-key": `Assign-Licence-${id}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to assign licence");
+      }
+
+      SuccessToast(data?.message || "Licence assigned successfully");
+      setOpen(false);
+    } catch (error) {
+      ErrorMessage("Unable to assign licence. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="outline"
+          className="gap-2 rounded-xl border border-zinc-300 bg-zinc-100 transition-colors px-4 py-2"
+        >
+          <KeyRound className="h-4 w-4 text-zinc-600" />
+          <span className="font-medium text-zinc-600">Assign Licence</span>
+        </Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent className="sm:max-w-md rounded-2xl border border-zinc-200 shadow-lg bg-white">
+        <AlertDialogHeader>
+          <div className="flex justify-center mb-4">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-zinc-100 shadow-inner">
+              <KeyRound className="h-8 w-8 text-zinc-700" />
+            </div>
+          </div>
+
+          <AlertDialogTitle className="text-center text-xl font-semibold text-zinc-800">
+            Assign Licence
+          </AlertDialogTitle>
+
+          <AlertDialogDescription className="text-center text-sm text-zinc-500 mt-2">
+            This will assign a licence to the selected user.Note that this action cannot be reversed once completed
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter className="mt-6 flex justify-end gap-3">
+          <AlertDialogCancel
+            className="rounded-xl px-4 py-2 border border-zinc-300 hover:bg-zinc-100 transition-colors"
+            disabled={loading}
+          >
+            Cancel
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              handleAssign();
+            }}
+            disabled={loading}
+            className="rounded-xl px-4 py-2 bg-black text-white hover:bg-zinc-800 transition-colors flex items-center gap-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Assigning...</span>
+              </>
+            ) : (
+              "Assign Licence"
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+

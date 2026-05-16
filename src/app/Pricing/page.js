@@ -50,8 +50,8 @@ export default function Pricing() {
 
             <CardContent className="space-y-6">
               <div>
-                <p className="text-3xl font-semibold">₦2,500</p>
-                <p className="text-sm text-zinc-500">per user / month</p>
+                <p className="text-3xl font-semibold">₦139,750</p>
+                <p className="text-sm text-zinc-500"> Yearly</p>
               </div>
 
               <Button
@@ -83,8 +83,8 @@ export default function Pricing() {
 
             <CardContent className="space-y-6">
               <div>
-                <p className="text-3xl font-semibold">₦4,000</p>
-                <p className="text-sm text-zinc-500">per user / month</p>
+                <p className="text-3xl font-semibold">₦332,820</p>
+                <p className="text-sm text-zinc-500">Yearly</p>
               </div>
 
               <Button

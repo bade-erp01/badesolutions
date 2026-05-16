@@ -170,7 +170,7 @@ export default function NewEmployeeForm({userData,baseUrl}) {
 
   useEffect(() => {
     const numberOfUsers = parseInt(1);
-    const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
+    const baseAmount = formData.plan === "Basic" ? 900 : 1200;
     const vat = baseAmount * numberOfUsers * 0.075;
     const total = (baseAmount * numberOfUsers + vat) * 12;
     setFormText(total);
@@ -357,7 +357,7 @@ export function PurchaseLicenseButton({
       return ErrorMessage("Please enter a valid number");
     }
 
-    const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
+    const baseAmount = formData.plan === "Basic" ? 900 : 1200;
 
     const vat = baseAmount * numberOfUsers * 0.075;
 

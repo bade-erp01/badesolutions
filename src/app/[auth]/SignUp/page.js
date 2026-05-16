@@ -38,9 +38,9 @@ export default function SignUpPage() {
     email: "",
     Tel: "",
     plan: plan,
-    NumberOfUsers: plan === "Basic" ? 4 : 6,
-    renewalFee: plan === "Basic" ? 129000 : 309600,
-    totalAmount: plan === "Basic" ? 129000 : 379600,
+    NumberOfUsers: plan === "Basic" ? 4 : 6 ,
+    renewalFee: plan === "Basic" ? 139750 : 332820,
+    totalAmount: plan === "Basic" ? 139750 : 332820,
     referalCode: "",
   });
 
@@ -162,19 +162,19 @@ export default function SignUpPage() {
 
                   {/* PRICING */}
                   <div className="rounded-xl border p-4 bg-zinc-50">
-                    <p className="text-xs text-zinc-500">Total due</p>
-                    <p className="text-xl font-semibold">
-                      ₦{formData.totalAmount.toLocaleString()}
-                    </p>
+                    
                     <p className="text-xs text-zinc-500">
                       {formData.NumberOfUsers} users included
                     </p>
 
                     <p className="text-sm mt-2">
-                      Renewal:
-                      <span className="ml-1 font-medium">
-                        ₦{formData.renewalFee.toLocaleString()} / yearly
-                      </span>
+                      7.5% VAT included.
+                    </p>
+                    <br/>
+
+                    <p className="text-xs text-zinc-500">Total due</p>
+                    <p className="text-xl font-semibold">
+                      ₦{formData.totalAmount.toLocaleString()}
                     </p>
                   </div>
 

@@ -131,86 +131,6 @@ export function Encrypt(arg) {
   );
 }
 
-export async function sendInvite(id,url,user,biz) {
-  const { isConfirmed } = await Swal.fire({
-    title: "Invite User?",
-    html: `
-      <style>
-        @keyframes flap {
-          0%, 100% { transform: rotateX(0deg); }
-          50% { transform: rotateX(-50deg); }
-        }
-        .envelope-container {
-          width: 64px;
-          height: 48px;
-          perspective: 800px;
-          margin-bottom: 0.75rem;
-        }
-        .envelope {
-          transform-style: preserve-3d;
-          animation: flap 2s ease-in-out infinite;
-        }
-        .envelope svg {
-          width: 64px;
-          height: 48px;
-          display: block;
-        }
-      </style>
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <div class="envelope-container">
-          <div class="envelope">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2" ry="2" fill="#E0E7FF" />
-              <polyline points="2,4 12,13 22,4" fill="#C7D2FE" />
-            </svg>
-          </div>
-        </div>
-        <p>This will send an invitation to onboard.</p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: "#4F46E5",
-    cancelButtonColor: "#9CA3AF",
-    confirmButtonText: "Yes, Send it!",
-    cancelButtonText: "Cancel",
-    reverseButtons: true,
-    focusCancel: true,
-  });
-
-  if (!isConfirmed) return;
-
-  Swal.fire({
-    title: "Sending Invite...",
-    text: "Please wait while we check user status.",
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    didOpen: () => Swal.showLoading(),
-  });
-
-  try {
-    const response = await fetch(`${url}/api/onboard/invite/${id}`, {
-      method: "PATCH",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${biz}`,
-        access: `${user}`,
-      },
-    });
-
-    const data = await response.json();
-
-    if (data?.message) {
-      SuccessToast(data.message);
-    } else {
-      throw new Error(data.error );
-    }
-  } catch (error) {
-    ErrorMessage(error.message);
-  }
-}
-
-
 
 export const SendTimeOutLink = async (id,Business,user,url) => {
   const { isConfirmed } = await Swal.fire({
@@ -262,7 +182,6 @@ module.export = {
     plsWait,
     AppDescription,
     Encrypt,
-    sendInvite,
     SendTimeOutLink,
     
 }
