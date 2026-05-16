@@ -9,8 +9,20 @@ import {
 import {React,useState,useEffect} from "react";
 import { Encrypt, ErrorMessage,SuccessToast,plsWait,} from "../../../../../../../Functions/Mics";
 import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
-import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+
 
 export default function NewEmployeeForm({userData,baseUrl}) {
   const states = NaijaStates.states();
@@ -58,103 +70,103 @@ export default function NewEmployeeForm({userData,baseUrl}) {
     }
   };
 
-  const handlePurchaseLicenses = (formData) => {
-    Swal.fire({
-      title: "Purchase User Licenses",
-      html: `
-        <div class="text-left">
-          <p class="text-gray-700 mb-4">How many licenses would you like to purchase?</p>
-          <input 
-            id="licenseInput" 
-            type="number" 
-            min="1" 
-            step="1" 
-            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-            placeholder="Enter number of licenses"
-          />
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: "Calculate Price",
-      confirmButtonColor: "#4f46e5",
-      cancelButtonColor: "#6b7280",
-      preConfirm: () => {
-        const inputValue = document.getElementById("licenseInput").value;
-        const numberOfUsers = parseInt(inputValue);
-        if (isNaN(numberOfUsers) || numberOfUsers < 1) {
-          Swal.showValidationMessage("Please enter a valid number (minimum 1)");
-          return false;
-        }
-        const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
-        const vat = baseAmount * numberOfUsers * 0.075;
-        const total = (baseAmount * numberOfUsers + vat) * 12;
-        return { numberOfUsers, baseAmount, vat, total };
-      },
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        const { numberOfUsers, baseAmount, vat, total } = result.value;
-        Swal.fire({
-          icon: "info",
-          title: "Payment Summary",
-          html: `
-            <div class="text-left bg-gray-50 p-6 rounded-lg">
-              <div class="space-y-4">
-                <div class="flex justify-between border-b pb-2">
-                  <span class="text-gray-600">Number of Licenses:</span>
-                  <span class="font-semibold text-gray-900">${numberOfUsers}</span>
-                </div>
-                <div class="flex justify-between border-b pb-2">
-                  <span class="text-gray-600">Base Amount (per license):</span>
-                  <span class="font-semibold text-gray-900">₦${baseAmount.toLocaleString()}</span>
-                </div>
-                <div class="flex justify-between border-b pb-2">
-                  <span class="text-gray-600">Subtotal:</span>
-                  <span class="font-semibold text-gray-900">₦${(baseAmount * numberOfUsers).toLocaleString()}</span>
-                </div>
-                <div class="flex justify-between pb-4">
-                  <span class="text-gray-600">VAT (7.5%):</span>
-                  <span class="font-semibold text-orange-600">₦${vat.toLocaleString()}</span>
-                </div>
-                <div class="flex justify-between bg-indigo-50 p-3 rounded border border-indigo-200">
-                  <span class="font-bold text-indigo-900">Total (12 months):</span>
-                  <span class="font-bold text-indigo-600 text-lg">₦${total.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          `,
-          showCancelButton: true,
-          confirmButtonText: "Proceed to Payment",
-          confirmButtonColor: "#059669",
-          cancelButtonColor: "#6b7280",
-        }).then((paymentResult) => {
-          if (paymentResult.isConfirmed) {
-            plsWait("Processing payment...");
-            fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Encrypt(userData.business._id)}`,
-              },
-              body: JSON.stringify({
-                numberOfUsers,
-                plan: formData.plan,
-                totalAmount: total,
-              }),
-            })
-              .then((response) => {
-                if (!response.ok) throw new Error("Payment request failed");
-                return response.json();
-              })
-              .then((data) => {
-                router.push(data.data);
-                SuccessToast("Redirecting to payment...");
-              })
-              .catch((error) => ErrorMessage(error.message));
-          }
-        });
-      }
-    });
-  };
+  // const handlePurchaseLicenses = (formData) => {
+  //   Swal.fire({
+  //     title: "Purchase User Licenses",
+  //     html: `
+  //       <div class="text-left">
+  //         <p class="text-gray-700 mb-4">How many licenses would you like to purchase?</p>
+  //         <input 
+  //           id="licenseInput" 
+  //           type="number" 
+  //           min="1" 
+  //           step="1" 
+  //           class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+  //           placeholder="Enter number of licenses"
+  //         />
+  //       </div>
+  //     `,
+  //     showCancelButton: true,
+  //     confirmButtonText: "Calculate Price",
+  //     confirmButtonColor: "#4f46e5",
+  //     cancelButtonColor: "#6b7280",
+  //     preConfirm: () => {
+  //       const inputValue = document.getElementById("licenseInput").value;
+  //       const numberOfUsers = parseInt(inputValue);
+  //       if (isNaN(numberOfUsers) || numberOfUsers < 1) {
+  //         Swal.showValidationMessage("Please enter a valid number (minimum 1)");
+  //         return false;
+  //       }
+  //       const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
+  //       const vat = baseAmount * numberOfUsers * 0.075;
+  //       const total = (baseAmount * numberOfUsers + vat) * 12;
+  //       return { numberOfUsers, baseAmount, vat, total };
+  //     },
+  //   }).then((result) => {
+  //     if (result.isConfirmed && result.value) {
+  //       const { numberOfUsers, baseAmount, vat, total } = result.value;
+  //       Swal.fire({
+  //         icon: "info",
+  //         title: "Payment Summary",
+  //         html: `
+  //           <div class="text-left bg-gray-50 p-6 rounded-lg">
+  //             <div class="space-y-4">
+  //               <div class="flex justify-between border-b pb-2">
+  //                 <span class="text-gray-600">Number of Licenses:</span>
+  //                 <span class="font-semibold text-gray-900">${numberOfUsers}</span>
+  //               </div>
+  //               <div class="flex justify-between border-b pb-2">
+  //                 <span class="text-gray-600">Base Amount (per license):</span>
+  //                 <span class="font-semibold text-gray-900">₦${baseAmount.toLocaleString()}</span>
+  //               </div>
+  //               <div class="flex justify-between border-b pb-2">
+  //                 <span class="text-gray-600">Subtotal:</span>
+  //                 <span class="font-semibold text-gray-900">₦${(baseAmount * numberOfUsers).toLocaleString()}</span>
+  //               </div>
+  //               <div class="flex justify-between pb-4">
+  //                 <span class="text-gray-600">VAT (7.5%):</span>
+  //                 <span class="font-semibold text-orange-600">₦${vat.toLocaleString()}</span>
+  //               </div>
+  //               <div class="flex justify-between bg-indigo-50 p-3 rounded border border-indigo-200">
+  //                 <span class="font-bold text-indigo-900">Total (12 months):</span>
+  //                 <span class="font-bold text-indigo-600 text-lg">₦${total.toLocaleString()}</span>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         `,
+  //         showCancelButton: true,
+  //         confirmButtonText: "Proceed to Payment",
+  //         confirmButtonColor: "#059669",
+  //         cancelButtonColor: "#6b7280",
+  //       }).then((paymentResult) => {
+  //         if (paymentResult.isConfirmed) {
+  //           plsWait("Processing payment...");
+  //           fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
+  //             method: "POST",
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //               Authorization: `Bearer ${Encrypt(userData.business._id)}`,
+  //             },
+  //             body: JSON.stringify({
+  //               numberOfUsers,
+  //               plan: formData.plan,
+  //               totalAmount: total,
+  //             }),
+  //           })
+  //             .then((response) => {
+  //               if (!response.ok) throw new Error("Payment request failed");
+  //               return response.json();
+  //             })
+  //             .then((data) => {
+  //               router.push(data.data);
+  //               SuccessToast("Redirecting to payment...");
+  //             })
+  //             .catch((error) => ErrorMessage(error.message));
+  //         }
+  //       });
+  //     }
+  //   });
+  // };
 
   useEffect(() => {
     const numberOfUsers = parseInt(1);
@@ -165,7 +177,7 @@ export default function NewEmployeeForm({userData,baseUrl}) {
   }, [formData.plan]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 m-2">
       <div className="mx-auto">
         <div className="bg-white shadow-lg overflow-hidden">
           {/* Header */}
@@ -316,17 +328,206 @@ export default function NewEmployeeForm({userData,baseUrl}) {
                 Register New User
               </button>
 
-              <button
-                type="button"
-                onClick={() => handlePurchaseLicenses(formData)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-200 shadow-md hover:shadow-lg"
-              >
-                Purchase User Licenses
-              </button>
+              <PurchaseLicenseButton formData={formData} userData={userData} />
             </div>
           </form>
         </div>
       </div>
     </div>
+  );
+}
+
+
+
+
+export function PurchaseLicenseButton({
+  formData,
+  userData,
+}) {
+  const router = useRouter();
+
+  const [open, setOpen] = useState(false);
+  const [licenses, setLicenses] = useState("");
+  const [summary, setSummary] = useState(null);
+
+  const calculatePrice = () => {
+    const numberOfUsers = parseInt(licenses);
+
+    if (!numberOfUsers || numberOfUsers < 1) {
+      return ErrorMessage("Please enter a valid number");
+    }
+
+    const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
+
+    const vat = baseAmount * numberOfUsers * 0.075;
+
+    const total = (baseAmount * numberOfUsers + vat) * 12;
+
+    setSummary({
+      numberOfUsers,
+      baseAmount,
+      vat,
+      total,
+    });
+  };
+
+  const proceedPayment = async () => {
+    try {
+      plsWait("Processing payment...");
+
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/purchase/License`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business._id)}`,
+          },
+          body: JSON.stringify({
+            numberOfUsers: summary.numberOfUsers,
+            plan: formData.plan,
+            totalAmount: summary.total,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Payment request failed");
+      }
+
+      const data = await response.json();
+
+      SuccessToast("Redirecting to payment...");
+
+      router.push(data.data);
+    } catch (error) {
+      ErrorMessage(error.message);
+    }
+  };
+
+  return (
+    <>
+      <Button
+      type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white shadow-sm"
+      >
+        Purchase Licenses
+      </Button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg border-zinc-200 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-zinc-900">
+              Purchase User Licenses
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            <div className="space-y-2">
+              <p className="text-sm text-zinc-500">
+                Enter the number of licenses you want to purchase.
+              </p>
+
+              <Input
+                type="number"
+                min={1}
+                value={licenses}
+                onChange={(e) => setLicenses(e.target.value)}
+                placeholder="Enter number of licenses"
+                className="h-11 rounded-xl"
+              />
+            </div>
+
+            <Button
+              onClick={calculatePrice}
+              className="w-full rounded-xl bg-zinc-900 hover:bg-zinc-800"
+            >
+              Calculate Price
+            </Button>
+
+            {summary && (
+              <Card className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 shadow-none">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-zinc-500">
+                      Number of Licenses
+                    </span>
+
+                    <span className="font-medium text-zinc-900">
+                      {summary.numberOfUsers}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-zinc-500">
+                      Base Amount
+                    </span>
+
+                    <span className="font-medium text-zinc-900">
+                      ₦{summary.baseAmount.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-zinc-500">
+                      Subtotal
+                    </span>
+
+                    <span className="font-medium text-zinc-900">
+                      ₦
+                      {(
+                        summary.baseAmount *
+                        summary.numberOfUsers
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-zinc-500">
+                      VAT (7.5%)
+                    </span>
+
+                    <span className="font-medium text-amber-600">
+                      ₦{summary.vat.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-semibold text-zinc-900">
+                      Total (12 months)
+                    </span>
+
+                    <span className="text-lg font-bold text-zinc-900">
+                      ₦{summary.total.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="rounded-xl"
+            >
+              Cancel
+            </Button>
+
+            <Button
+              disabled={!summary}
+              onClick={proceedPayment}
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+            >
+              Proceed to Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -151,7 +151,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8 text-xs"
+      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8 text-xs m-2"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h4 className="text-xl font-bold text-gray-800">
@@ -193,9 +193,6 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
             )}
           </div>
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-1">
-              {formData.subscriptionplan} Plan
-            </label>
             <span
               onClick={() => {
                 uploadFiles(Encrypt(formData._id), "Business");
