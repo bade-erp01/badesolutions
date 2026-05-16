@@ -40,6 +40,20 @@ import {Dialog,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 
 
@@ -836,96 +850,133 @@ export default function SingleProductpage({
                 />
               </div>
 
-              {/* only show table if storeProduct is more than 0 */}
-              {StoreProduct.length > 0 && (
-                <table className="w-full text-left text-xs text-black border border-gray-300">
-                  <caption className="text-start font-bold text-sm text-gray-600">
-                    {data.Name} In Store Inventory
-                  </caption>
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="border border-gray-300 px-2 py-1">#</th>
-                      <th className="border border-gray-300 px-2 py-1">
-                        Store
-                      </th>
-                      <th className="border border-gray-300 px-2 py-1">
-                        Product
-                      </th>
-                      <th className="border border-gray-300 px-2 py-1">
-                        Quantity in store
-                      </th>
-                      <th className="border border-gray-300 px-2 py-1">
-                        Download
-                      </th>
-                      {userInfo?.isAdmin && (
-                        <th className="border border-gray-300 px-2 py-1">
-                          Monitor
-                        </th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {StoreProduct?.map((log, index) =>
-                      log.products.map((product, pIndex) => (
-                        <tr
-                          key={`${index}-${pIndex}`}
-                          className="border border-gray-300"
-                        >
-                          <td className="border border-gray-300 px-2 py-1">
-                            {index + 1}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1">
-                            <Link
-                              className="text-blue-600 hover:underline visited:text-purple-600"
-                              href={`/${navigation.auth}/${
-                                navigation.Tenant
-                              }/inventory/inventory/${Encrypt(
-                                product._id,
-                              )}?Modules=inventory`}
-                            >
-                              {log.warehouseName}
-                            </Link>
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1">
-                            {product.productName}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1">
-                            Case:{product.currentQty}, Pcs:{product.pcs}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
-                            <ExcelDownloadBtn
-                              data={[
-                                {
-                                  Store: log.warehouseName,
-                                  Product: product.productName,
-                                  Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
-                                },
-                              ]}
-                              page={`${
-                                log.warehouseName.substring(0, 4) || "store"
-                              }-${
-                                product.productName.substring(0, 4) || "product"
-                              }`}
-                            />
-                          </td>
-                          {userInfo?.isAdmin && (
-                            <td className="border border-gray-300 px-2 py-1 w-40 text-white ">
-                              <AutoreplenishReminder
-                                storeProduct={product}
-                                business={businessInfo}
-                                user={userInfo}
-                                baseUrl={EXPRESS_PRIVATE_URL}
-                              />
-                            </td>
-                          )}
-                        </tr>
-                      )),
-                    )}
-                  </tbody>
-                </table>
-              )}
+              {/* /* only show table if storeProduct is more than 0 */} 
+                      {StoreProduct.length > 0 && (
+                      <Card className="border shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                          <CardTitle className="text-lg font-semibold">
+                          {data.Name} In Store Inventory
+                          </CardTitle>
 
-              {/* Price change */}
+                          <CardDescription>
+                          Warehouse inventory distribution and monitoring
+                          </CardDescription>
+                        </div>
+
+                        <Badge variant="secondary">
+                          {StoreProduct.reduce(
+                          (acc, item) => acc + item.products.length,
+                          0,
+                          )}{" "}
+                          Stores
+                        </Badge>
+                        </CardHeader>
+
+                        <CardContent>
+                        <div className="rounded-xl border overflow-hidden">
+                          <Table>
+                          <TableHeader className="bg-muted/50">
+                            <TableRow>
+                            <TableHead className="w-[60px]">#</TableHead>
+
+                            <TableHead>Store</TableHead>
+
+                            <TableHead>Inventory Level</TableHead>
+
+                            <TableHead className="w-[140px]">
+                              Download
+                            </TableHead>
+
+                            {userInfo?.isAdmin && (
+                              <TableHead className="w-[140px]">
+                              Monitor
+                              </TableHead>
+                            )}
+                            </TableRow>
+                          </TableHeader>
+
+                          <TableBody>
+                            {StoreProduct?.map((log, index) =>
+                            log.products.map((product, pIndex) => (
+                              <TableRow
+                              key={`${index}-${pIndex}`}
+                              className="hover:bg-muted/40 transition-colors"
+                              >
+                              <TableCell className="font-medium">
+                                {index + 1}
+                              </TableCell>
+
+                              <TableCell>
+                                <Link
+                                className="font-medium text-indigo-700 hover:underline visited:text-purple-600"
+                                href={`/${navigation.auth}/${
+                                  navigation.Tenant
+                                }/inventory/inventory/${Encrypt(
+                                  product._id,
+                                )}?Modules=inventory`}
+                                >
+                                View Product Inventory Record in {log.warehouseName.toLowerCase()}
+                                </Link>
+                              </TableCell>
+
+                              <TableCell>
+                                <div className="flex flex-wrap gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className="rounded-full"
+                                >
+                                  Case: {product.currentQty}
+                                </Badge>
+
+                                <Badge
+                                  variant="secondary"
+                                  className="rounded-full"
+                                >
+                                  Pcs: {product.pcs}
+                                </Badge>
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="max-w-[140px]">
+                                <div className="flex flex-wrap break-words whitespace-normal">
+                                <ExcelDownloadBtn
+                                  data={[
+                                  {
+                                    Store: log.warehouseName,
+
+                                    Product: product.productName,
+
+                                    Qty: `Case:${product.currentQty}, Pcs:${product.pcs}`,
+                                  },
+                                  ]}
+                                  page={`${
+                                  log.warehouseName.substring(0, 4) || "store"
+                                  }`}
+                                />
+                                </div>
+                              </TableCell>
+                              {userInfo?.isAdmin && (
+                                <TableCell className="w-40">
+                                <AutoreplenishReminder
+                                  storeProduct={product}
+                                  business={businessInfo}
+                                  user={userInfo}
+                                  baseUrl={EXPRESS_PRIVATE_URL}
+                                />
+                                </TableCell>
+                              )}
+                              </TableRow>
+                            )),
+                            )}
+                          </TableBody>
+                          </Table>
+                        </div>
+                        </CardContent>
+                      </Card>
+                      )}
+
+                      {/* Price change */}
               <div className="mt-10">
                 <h3 className="text-sm font-semibold text-gray-800 mb-3">
                   Historical Price Change
