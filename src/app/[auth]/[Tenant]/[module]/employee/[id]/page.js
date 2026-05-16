@@ -1410,7 +1410,7 @@ export default function SingleEmployeeView({
               </>
             )}
             
-            {data.firstTimeOnboard & (
+            {data.firstTimeOnboard === true & (
               <button
                 type="submit"
                 onClick={() => DeactivateUser(Encrypt(data._id))}
