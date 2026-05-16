@@ -177,7 +177,7 @@ export default function NewEmployeeForm({userData,baseUrl}) {
   }, [formData.plan]);
 
   return (
-    <div className="min-h-screen bg-gray-100 m-2">
+    <div className="min-h-screen bg-gray-100">
       <div className="mx-auto">
         <div className="bg-white shadow-lg overflow-hidden">
           {/* Header */}
