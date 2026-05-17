@@ -246,41 +246,93 @@ const generateQRCode = async (text) => {
 
 
 //convert numbeers to words 
-const totalInWords = (amount, currency ) => {
+export const totalInWords = (amount, currency) => {
+  if (!Number.isFinite(amount) || amount < 0) {
+    return "Invalid amount";
+  }
 
-  if (typeof amount !== "number" || amount < 0) return "Invalid amount";
+  const ONES = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+  ];
 
-  const ones = [
-    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"
-  ];
-  const teens = [
-    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
-    "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
-  ];
-  const tens = [
-    "", "", "Twenty", "Thirty", "Forty", "Fifty",
-    "Sixty", "Seventy", "Eighty", "Ninety"
+  const TEENS = [
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
   ];
 
-  const convert = (num) => {
+  const TENS = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  const SCALES = [
+    ["Billion", 1_000_000_000],
+    ["Million", 1_000_000],
+    ["Thousand", 1_000],
+    ["Hundred", 100],
+  ];
+
+  const toWords = (num) => {
     if (num === 0) return "Zero";
-    if (num < 10) return ones[num];
-    if (num < 20) return teens[num - 10];
-    if (num < 100) return `${tens[Math.floor(num / 10)]} ${ones[num % 10]}`.trim();
-    if (num < 1000) {
-      return `${ones[Math.floor(num / 100)]} Hundred ${convert(num % 100)}`.trim();
+
+    if (num < 10) return ONES[num];
+
+    if (num < 20) return TEENS[num - 10];
+
+    if (num < 100) {
+      return `${TENS[Math.floor(num / 10)]} ${
+        ONES[num % 10]
+      }`.trim();
     }
-    if (num < 1_000_000) {
-      return `${convert(Math.floor(num / 1000))} Thousand ${convert(num % 1000)}`.trim();
+
+    for (const [label, value] of SCALES) {
+      if (num >= value) {
+        const major = Math.floor(num / value);
+        const remainder = num % value;
+
+        return `${toWords(major)} ${label} ${
+          remainder ? toWords(remainder) : ""
+        }`.trim();
+      }
     }
-    if (num < 1_000_000_000) {
-      return `${convert(Math.floor(num / 1_000_000))} Million ${convert(num % 1_000_000)}`.trim();
-    }
-    return `${convert(Math.floor(num / 1_000_000_000))} Billion ${convert(num % 1_000_000_000)}`.trim();
+
+    return "";
   };
 
-  const words = convert(Math.floor(amount));
-  return `${words} ${currency?.Currency.charAt(0).toUpperCase() + currency?.Currency.slice(1)} Only`;
+  const wholeNumber = Math.floor(amount);
+
+  const currencyName =
+    currency?.Currency
+      ? currency.Currency.charAt(0).toUpperCase() +
+        currency.Currency.slice(1).toLowerCase()
+      : "Currency";
+
+  return `${toWords(wholeNumber)} ${currencyName} Only`;
 };
 
 
