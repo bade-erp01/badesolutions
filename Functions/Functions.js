@@ -246,7 +246,7 @@ const generateQRCode = async (text) => {
 
 
 //convert numbeers to words 
-export const totalInWords = (amount, currency) => {
+const totalInWords = (amount, currency) => {
   if (!Number.isFinite(amount) || amount < 0) {
     return "Invalid amount";
   }
