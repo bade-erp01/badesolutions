@@ -25,10 +25,11 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Empty,
-  EmptyIcon,
   EmptyTitle,
   EmptyDescription,
 } from "@/components/ui/empty";
+import { EmptyIcon } from "lucide-react";
+
 import { Separator } from "@/components/ui/separator"
 
 export default function InvoiceLandingPage({ baseUrl, userData }) {
@@ -77,6 +78,15 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
     };
 
     fetchBills();
+
+    // 🔹 Set interval to refresh every 2 minutes (120000 ms)
+      const intervalId = setInterval(() => {
+        fetchBills();
+      }, 120000);
+
+      // 🔹 Cleanup on unmount
+      return () => clearInterval(intervalId);
+
   }, [currentPage, searchRef, startDate, endDate]);
 
   return (
