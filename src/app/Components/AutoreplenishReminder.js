@@ -126,7 +126,7 @@ export default function ReplenishFeature({
           className={`gap-2 rounded-sm ${
             isReplenishing
               ? "bg-green-600 hover:bg-green-700 text-white"
-              : "bg-red-100 hover:bg-red-200 text-red-700"
+              : "bg-gray-700 hover:bg-gray-900 text-white"
           }`}
         >
           {isReplenishing && (
