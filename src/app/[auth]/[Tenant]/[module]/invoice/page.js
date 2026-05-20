@@ -80,7 +80,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
     }
   };
 
-  // 🔹 Auto-refresh effect
+  //  Auto-refresh effect
   useEffect(() => {
     let intervalId;
 
@@ -94,7 +94,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    handleVisibilityChange();
+    
+    billList.length === itemsPerPage && handleVisibilityChange() // start auto-refresh if we have a full page of invoices
 
     return () => {
       clearInterval(intervalId);
