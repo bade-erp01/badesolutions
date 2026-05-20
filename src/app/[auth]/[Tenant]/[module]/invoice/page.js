@@ -81,29 +81,57 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   };
 
   //  Auto-refresh effect
-  useEffect(() => {
-    let intervalId;
+ useEffect(() => {
+  let intervalId;
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        fetchBills(false); // refresh immediately
-        intervalId = setInterval(() => fetchBills(false), 120000); // every 2 minutes
-      } else {
-        clearInterval(intervalId);
-      }
-    };
+  const startPolling = () => {
+    fetchBills(false);
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    
-    billList.length === itemsPerPage && handleVisibilityChange() // start auto-refresh if we have a full page of invoices
+    intervalId = setInterval(() => {
+      fetchBills(false);
+    }, 120000); // 2 mins
+  };
 
-    return () => {
+  const stopPolling = () => {
+    if (intervalId) {
       clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [searchRef, startDate, endDate]);
+    }
+  };
 
-  // 🔹 Load More handler
+  const handleVisibilityChange = () => {
+    // only monitor when bill list is exactly 20
+    if (billList.length !== 20) {
+      stopPolling();
+      return;
+    }
+
+    if (document.visibilityState === "visible") {
+      stopPolling(); // prevent duplicate intervals
+      startPolling();
+    } else {
+      stopPolling();
+    }
+  };
+
+  document.addEventListener(
+    "visibilitychange",
+    handleVisibilityChange
+  );
+
+  // initial run
+  handleVisibilityChange();
+
+  return () => {
+    stopPolling();
+
+    document.removeEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+  };
+}, [billList.length, searchRef, startDate, endDate]);
+
+  //  Load More handler
   const handleLoadMore = () => {
     if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
