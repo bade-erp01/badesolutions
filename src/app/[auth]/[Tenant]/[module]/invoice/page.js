@@ -30,7 +30,7 @@ import {
   EmptyDescription,
 } from "@/components/ui/empty";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator";
 
 export default function InvoiceLandingPage({ baseUrl, userData }) {
   const [searchRef, setSearchRef] = useState("");
@@ -45,62 +45,71 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   const params = useParams();
   const itemsPerPage = 20;
 
+  // 🔹 Fetch function lifted out of useEffect
+  const fetchBills = async (append = false, page = currentPage) => {
+    setIsLoading(true);
+    try {
+      const query = new URLSearchParams({
+        page: page.toString(),
+        itemsPerPage: itemsPerPage.toString(),
+        searchRef,
+        startDate,
+        endDate,
+      }).toString();
+
+      const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: `${Encrypt(userData.user._id)}`,
+        },
+      });
+
+      const data = response.data;
+
+      setBillList(prev =>
+        append ? [...prev, ...(data.invoices || [])] : (data.invoices || [])
+      );
+      setTotalPages(data.totalPages);
+      setTotalInvoices(data.totalInvoices);
+      setCurrentPage(data.currentPage);
+    } catch (error) {
+      // console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 🔹 Auto-refresh effect
   useEffect(() => {
-      let intervalId;
+    let intervalId;
 
-      const fetchBills = async () => {
-        setIsLoading(true);
-        try {
-          const query = new URLSearchParams({
-            page: currentPage.toString(),
-            itemsPerPage: itemsPerPage.toString(),
-            searchRef,
-            startDate,
-            endDate,
-          }).toString();
-
-          const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              access: `${Encrypt(userData.user._id)}`,
-            },
-          });
-
-          const data = response.data;
-          setBillList(data.invoices || []);
-          setTotalPages(data.totalPages);
-          setTotalInvoices(data.totalInvoices);
-          setCurrentPage(data.currentPage);
-        } catch (error) {
-          // console.error(error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      const handleVisibilityChange = () => {
-        // 🔹 Only run auto-refresh if tab is visible AND page is 1
-        if (document.visibilityState === "visible" && currentPage === 1) {
-          fetchBills(); // refresh immediately
-          intervalId = setInterval(fetchBills, 120000); // every 2 minutes
-        } else {
-          clearInterval(intervalId);
-        }
-      };
-
-      // Attach listener
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-
-      // Run once on mount
-      handleVisibilityChange();
-
-      // Cleanup
-      return () => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchBills(false); // refresh immediately
+        intervalId = setInterval(() => fetchBills(false), 120000); // every 2 minutes
+      } else {
         clearInterval(intervalId);
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-      };
-    }, [currentPage, searchRef, startDate, endDate]);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    handleVisibilityChange();
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [searchRef, startDate, endDate]);
+
+  // 🔹 Load More handler
+  const handleLoadMore = () => {
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchBills(true, nextPage); // append new invoices
+    }
+  };
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Invoice List"} />}>
@@ -111,9 +120,9 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
             Auto refresh is enabled
           </Badge>
         </CardHeader>
-          <Separator/>
+        <Separator />
         <CardContent>
-          {isLoading ? (
+          {isLoading && billList.length === 0 ? (
             <SuspenenseFallBack pagedata={"Invoice List"} />
           ) : billList.length > 0 ? (
             <>
@@ -155,8 +164,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                         </TableCell>
                         <TableCell>{bill.customerName}</TableCell>
                         <TableCell>{bill.startDate}</TableCell>
-                         <TableCell>{bill.whId.WHName}</TableCell>
-                          <TableCell>{pricelistSetter(bill.priceList,userData.business)}</TableCell>
+                        <TableCell>{bill.whId.WHName}</TableCell>
+                        <TableCell>{pricelistSetter(bill.priceList,userData.business)}</TableCell>
                         <TableCell>
                           {bill.memoId && (
                             <Paperclip className="h-4 w-4 text-gray-400" />
@@ -190,34 +199,19 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                 </TableBody>
               </Table>
 
-              {/* Pagination Buttons */}
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <div className="flex gap-2">
+              {/* Load More Button */}
+              {currentPage < totalPages && (
+                <div className="flex justify-center mt-4">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
+                    onClick={handleLoadMore}
+                    disabled={isLoading}
                   >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
+                    {isLoading ? "Loading..." : "Load More"}
                   </Button>
                 </div>
-              </div>
+              )}
             </>
           ) : (
             <Empty>
