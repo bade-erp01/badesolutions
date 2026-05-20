@@ -81,48 +81,51 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   };
 
   //  Auto-refresh effect
- useEffect(() => {
+// Auto refresh ONLY when exactly 20 invoices are loaded
+useEffect(() => {
   let intervalId;
 
-  const startPolling = () => {
+  // stop completely if invoices are more than 20
+  if (billList.length > 20) {
+    return;
+  }
+
+  const startAutoRefresh = () => {
+    // refresh immediately
     fetchBills(false);
+
+    // clear previous interval before creating new one
+    clearInterval(intervalId);
 
     intervalId = setInterval(() => {
       fetchBills(false);
     }, 120000); // 2 mins
   };
 
-  const stopPolling = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-    }
+  const stopAutoRefresh = () => {
+    clearInterval(intervalId);
   };
 
   const handleVisibilityChange = () => {
-    // only monitor when bill list is exactly 20
-    if (billList.length !== 20) {
-      stopPolling();
-      return;
-    }
-
     if (document.visibilityState === "visible") {
-      stopPolling(); // prevent duplicate intervals
-      startPolling();
+      startAutoRefresh();
     } else {
-      stopPolling();
+      stopAutoRefresh();
     }
   };
+
+  // start only if page is visible
+  if (document.visibilityState === "visible") {
+    startAutoRefresh();
+  }
 
   document.addEventListener(
     "visibilitychange",
     handleVisibilityChange
   );
 
-  // initial run
-  handleVisibilityChange();
-
   return () => {
-    stopPolling();
+    stopAutoRefresh();
 
     document.removeEventListener(
       "visibilitychange",
@@ -131,7 +134,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   };
 }, [billList.length, searchRef, startDate, endDate]);
 
-  //  Load More handler
+  // 🔹 Load More handler
   const handleLoadMore = () => {
     if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
