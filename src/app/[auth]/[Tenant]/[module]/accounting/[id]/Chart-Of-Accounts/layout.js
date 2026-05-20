@@ -66,8 +66,7 @@ export default async function AccountingPage({ children, params }) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
+      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
       access: `${Encrypt(userData.user._id)}`,
     },
   });
@@ -94,13 +93,14 @@ export default async function AccountingPage({ children, params }) {
             <nav className="space-y-2">
               <BackButton />
             </nav>
+            <hr className="text-gray-300"/>
           </aside>
 
           {/* Main Content */}
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               {/* display Charts of accounts */}
-              <FinancialOverview data={data.COA} Store={data.Store}/>
+              <FinancialOverview data={data.COA} url={baseUrl} userData={userData}/>
             </section>
           </main>
         </div>

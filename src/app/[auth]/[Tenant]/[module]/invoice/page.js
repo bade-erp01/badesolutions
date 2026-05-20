@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { Encrypt } from "../../../../../../Functions/Mics";
+import { pricelistSetter } from "../../../../../../Functions/Functions";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Paperclip, ShoppingCart } from "lucide-react";
 
@@ -28,8 +29,7 @@ import {
   EmptyTitle,
   EmptyDescription,
 } from "@/components/ui/empty";
-import { EmptyIcon } from "lucide-react";
-
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator"
 
 export default function InvoiceLandingPage({ baseUrl, userData }) {
@@ -46,56 +46,72 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   const itemsPerPage = 20;
 
   useEffect(() => {
-    const fetchBills = async () => {
-      setIsLoading(true);
-      try {
-        const query = new URLSearchParams({
-          page: currentPage.toString(),
-          itemsPerPage: itemsPerPage.toString(),
-          searchRef,
-          startDate,
-          endDate,
-        }).toString();
+      let intervalId;
 
-        const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-          },
-        });
+      const fetchBills = async () => {
+        setIsLoading(true);
+        try {
+          const query = new URLSearchParams({
+            page: currentPage.toString(),
+            itemsPerPage: itemsPerPage.toString(),
+            searchRef,
+            startDate,
+            endDate,
+          }).toString();
 
-        const data = await response.data;
-        setBillList(data.invoices || []);
-        setTotalPages(data.totalPages);
-        setTotalInvoices(data.totalInvoices);
-        setCurrentPage(data.currentPage);
-      } catch (error) {
-        // console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              access: `${Encrypt(userData.user._id)}`,
+            },
+          });
 
-    fetchBills();
+          const data = response.data;
+          setBillList(data.invoices || []);
+          setTotalPages(data.totalPages);
+          setTotalInvoices(data.totalInvoices);
+          setCurrentPage(data.currentPage);
+        } catch (error) {
+          // console.error(error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-    // 🔹 Set interval to refresh every 2 minutes (120000 ms)
-      const intervalId = setInterval(() => {
-        fetchBills();
-      }, 120000);
+      const handleVisibilityChange = () => {
+        // 🔹 Only run auto-refresh if tab is visible AND page is 1
+        if (document.visibilityState === "visible" && currentPage === 1) {
+          fetchBills(); // refresh immediately
+          intervalId = setInterval(fetchBills, 120000); // every 2 minutes
+        } else {
+          clearInterval(intervalId);
+        }
+      };
 
-      // 🔹 Cleanup on unmount
-      return () => clearInterval(intervalId);
+      // Attach listener
+      document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  }, [currentPage, searchRef, startDate, endDate]);
+      // Run once on mount
+      handleVisibilityChange();
+
+      // Cleanup
+      return () => {
+        clearInterval(intervalId);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      };
+    }, [currentPage, searchRef, startDate, endDate]);
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Invoice List"} />}>
       <Card>
-        <CardHeader>
+        <CardHeader className="flex justify-between gap-2">
           <CardTitle>Sales Management</CardTitle>
-          <Separator/>
+          <Badge variant="secondary" className="text-xs">
+            Auto refresh is enabled
+          </Badge>
         </CardHeader>
+          <Separator/>
         <CardContent>
           {isLoading ? (
             <SuspenenseFallBack pagedata={"Invoice List"} />
@@ -107,6 +123,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                     <TableHead>Ref No</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Order Date</TableHead>
+                    <TableHead>Store</TableHead>
+                    <TableHead>Pricelist</TableHead>
                     <TableHead>Alt</TableHead>
                     <TableHead>
                       <ShoppingCart className="h-4 w-4" />
@@ -137,6 +155,8 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                         </TableCell>
                         <TableCell>{bill.customerName}</TableCell>
                         <TableCell>{bill.startDate}</TableCell>
+                         <TableCell>{bill.whId.WHName}</TableCell>
+                          <TableCell>{pricelistSetter(bill.priceList,userData.business)}</TableCell>
                         <TableCell>
                           {bill.memoId && (
                             <Paperclip className="h-4 w-4 text-gray-400" />
@@ -201,7 +221,6 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
             </>
           ) : (
             <Empty>
-              <EmptyIcon />
               <EmptyTitle>No sales registered yet</EmptyTitle>
               <EmptyDescription>
                 You haven&apos;t created any order yet. Get started by recording your first sales.

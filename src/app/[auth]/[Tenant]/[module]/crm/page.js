@@ -6,6 +6,7 @@ import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
 import Users from "../../../../../../models/Users";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../Functions/Mics";
+import { pricelistSetter } from "../../../../../../Functions/Functions";
 import CustomerCategoryPieChart from "@/app/Components/CustomerCategory";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
@@ -27,6 +28,15 @@ export default async function crmLayout({ params }) {
   const parsedUsers = JSON.parse(StringedUser);
 
   let customerList = [];
+
+  const FilterSaLePerson = (id) => {
+    try {
+      const SP = parsedUsers.find((user) => user._id === id);
+      return `${SP.firstName} ${SP.lastName}` || "N/A";
+    } catch (err) {
+      return "N/A";
+    }
+  };
 
   try {
     const AppFinder = userData.user.Apps.find((app) => app.Name === "CRM");
@@ -111,7 +121,20 @@ export default async function crmLayout({ params }) {
                 />
                 {customerList.length > 0 && (
                   <ExcelDownloadBtn
-                    data={customerList}
+                    data={customerList.map((customer) => ({
+                      Name: customer.Username,
+                      Email: customer.Email,
+                      Phone: customer.phone,
+                      Code: customer.CustomerCode,
+                      state: customer.State,
+                      Rep: FilterSaLePerson(customer.salesPerson),
+                      Manager: FilterSaLePerson( customer.Manager || customer.accountManager),
+                      creditLimit: customer.creditLimit,
+                      balance: customer.Debt,
+                      priceList: pricelistSetter(customer.priceList,userData.business),
+                      lastTransactionDate: customer.lastPayDate,
+                      Tags: customer.category,
+                    }))}
                     page="CRM list"
                   />
                 )}

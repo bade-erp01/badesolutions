@@ -1,273 +1,335 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
-import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import moment from "moment";
 
-const FinancialOverview = ({ data }) => {
+import { useState, useEffect, Suspense, useMemo } from "react";
+import moment from "moment";
+import Link from "next/link";
+import { Encrypt } from "../../../../../../../../Functions/Mics";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { Card, CardContent } from "@/components/ui/card";
+
+import { Input } from "@/components/ui/input";
+
+import { Badge } from "@/components/ui/badge";
+
+import { Search, Wallet, Landmark, ReceiptText, Scale } from "lucide-react";
+
+const FinancialOverview = ({ data, url, userData }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [transactionPages, setTransactionPages] = useState({});
-  const itemsPerTransactionPage = 10;
+
+  const [COAData, setCOAData] = useState(data || []);
+
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    setIsLoading(false);
+    let isMounted = true;
+    let intervalId;
+
+    const fetchCOA = async () => {
+      try {
+        const response = await fetch(`${url}/api/COA`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch COA data");
+        }
+
+        const result = await response.json();
+
+        if (isMounted) {
+          setCOAData(Array.isArray(result?.data.COA) ? result.data : []);
+        }
+      } catch (error) {
+        // console.error(error.message);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchCOA(); // refresh immediately when tab becomes visible
+        intervalId = setInterval(fetchCOA, 3 * 60 * 1000); // every 3 minutes
+      } else {
+        clearInterval(intervalId);
+      }
+    };
+
+    // Initial fetch
+    fetchCOA();
+
+    // Attach listener
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Run once on mount
+    handleVisibilityChange();
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
-  if (!data || typeof data !== "object") {
-    return <p className="text-red-500">No financial data provided.</p>;
+  const filteredData = useMemo(() => {
+    return COAData.filter((entry) => {
+      const value = search.toLowerCase();
+
+      return (
+        entry?.name?.toLowerCase().includes(value) ||
+        entry?.code?.toLowerCase().includes(value) ||
+        entry?.type?.toLowerCase().includes(value)
+      );
+    });
+  }, [COAData, search]);
+
+  const totals = useMemo(() => {
+    let assets = 0;
+    let liabilities = 0;
+    let revenue = 0;
+    let expenses = 0;
+
+    COAData.forEach((acc) => {
+      const balance = Number(acc.balance || 0);
+
+      if (acc.type === "Asset") assets += balance;
+
+      if (acc.type === "Liability") liabilities += balance;
+
+      if (acc.type === "Revenue") revenue += balance;
+
+      if (acc.type === "Expense") expenses += balance;
+    });
+
+    return {
+      assets,
+      liabilities,
+      revenue,
+      expenses,
+    };
+  }, [COAData]);
+
+  if (!Array.isArray(COAData) || COAData.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px] border border-zinc-800 rounded-3xl bg-zinc-950">
+        <div className="text-center space-y-3">
+          <div className="mx-auto h-14 w-14 rounded-2xl bg-zinc-900 flex items-center justify-center border border-zinc-800">
+            <ReceiptText className="h-6 w-6 text-zinc-500" />
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-white">
+              No Financial Records
+            </h2>
+
+            <p className="text-sm text-zinc-500 mt-1">
+              No chart of account data available.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const allAccounts = Object.entries(data)
-    .filter(([key]) => key !== "accountCode")
-    .flatMap(([_, category]) =>
-      Object.entries(category)
-        .filter(([key]) =>
-          [
-            "Asset",
-            "Liability",
-            "Equity",
-            "Revenue",
-            "Expense",
-            "Non_current_liabilities",
-            "Non_current_assets",
-            "Cost_of_sales",
-          ].includes(key),
-        )
-        .map(([_, account]) => account),
-    );
-
-  const accs = allAccounts.flatMap((category) =>
-    Object.entries(category)
-      .filter(([key]) => key !== "accountCode")
-      .map(([_, account]) => account),
-  );
-
-  const handleTransactionPageChange = (accountCode, direction, totalPages) => {
-    setTransactionPages((prev) => {
-      const current = prev[accountCode] || 1;
-      const nextPage =
-        direction === "next"
-          ? Math.min(current + 1, totalPages)
-          : Math.max(current - 1, 1);
-      return { ...prev, [accountCode]: nextPage };
-    });
-  };
-
   return (
-    <Suspense fallback={<SuspenenseFallBack pagedata={"Charts of account"} />}>
-      <div className="text-white text-xs">
-        <div className="mx-auto">
-          <div className="border border-white/10 bg-gradient-to-br from-[#6c6c6e] to-[#78787a] p-4 shadow-xl">
-            <div className="border-b pb-4 mb-6">
-              <h1 className="text-2xl font-bold text-gray-200">
-                Accounting Entries
-              </h1>
+    <Suspense fallback={<SuspenenseFallBack pagedata={"Charts of Account"} />}>
+      <div className="bg-[#09090B] text-zinc-100 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-8">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_35%)]" />
+
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="space-y-3">
+                <Badge className="bg-zinc-800 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-4 py-1 rounded-full">
+                  Financial Management
+                </Badge>
+
+                <div>
+                  <h1 className="text-2xl md:text-md font-bold tracking-tight text-white">
+                    Chart of Accounts
+                  </h1>
+
+                  <p className="text-zinc-400 mt-2 max-w-2xl text-sm">
+                    Structured accounting overview with categorized balances,
+                    account tracking, and financial visibility.
+                  </p>
+                </div>
+              </div>
+
+              <div className="w-full lg:w-[340px] relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search account..."
+                  className="pl-11 h-12 rounded-2xl border-zinc-800 bg-zinc-900/80 text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:border-zinc-700"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="bg-gray-600 shadow-lg border border-white/10">
-            {isLoading ? (
-              <SuspenenseFallBack pagedata={"Charts of Account"} />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm text-gray-800 border border-gray-200 shadow-md rounded-lg overflow-hidden">
-                  <thead className="bg-gray-600 text-white uppercase text-xs sticky top-0 z-10">
-                    <tr>
-                      <th className="px-4 py-3 ">Code</th>
-                      <th className="px-4 py-3 ">Description</th>
-                      <th className="px-4 py-3 ">Account Type</th>
-                      <th className="px-4 py-3 ">Financial Statement</th>
-                      <th className="px-4 py-3 ">GL Bal</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y bg-gray-50">
-                    {accs
-                      .sort((a, b) => a.code.localeCompare(b.code))
-                      .map((account, index) => {
-                        const currentPage = transactionPages[account.code] || 1;
-                        const totalPages = Math.ceil(
-                          (account.transactions?.length || 0) /
-                            itemsPerTransactionPage,
-                        );
-                        const paginatedTransactions = account.transactions
-                          ? account.transactions.slice(
-                              (currentPage - 1) * itemsPerTransactionPage,
-                              currentPage * itemsPerTransactionPage,
-                            )
-                          : [];
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <MetricCard
+              title="Assets"
+              value={totals.assets}
+              icon={<Wallet className="h-5 w-5" />}
+            />
 
-                        return (
-                          <>
-                          <tr
-                            key={index}
-                            className="hover:bg-gray-100 transition-colors"
-                          >
-                            <td colSpan={5} className="p-0">
-                              <details className="group">
-                                <summary className="flex items-center justify-between cursor-pointer bg-gray-800 hover:bg-gray-900 text-xs text-white transition-colors px-4 py-2">
-                                  <div className="grid grid-cols-5 gap-4 w-full">
-                                    <span>{account.code}</span>
-                                    <span className="truncate">
-                                      {account.description}
-                                    </span>
-                                    <span className="italic">
-                                      {account.AccountType}
-                                    </span>
-                                    <span>{account.reportsTo}</span>
-                                    <span>
-                                      {account?.Balance?.toLocaleString() ||
-                                        0.0}
-                                    </span>
-                                  </div>
-                                  <span className="text-gray-400 group-open:rotate-180 transition-transform duration-300">
-                                    ▼
-                                  </span>
-                                </summary>
+            <MetricCard
+              title="Liabilities"
+              value={totals.liabilities}
+              icon={<Landmark className="h-5 w-5" />}
+            />
 
-                                <div className="text-white bg-gray-800">
-                                  {paginatedTransactions.length > 0 ? (
-                                    <>
-                                      <div className="overflow-x-auto p-3 bg-gray-800">
-                                        <table className="min-w-full text-white bg-gray-800 rounded">
-                                          <thead className="bg-gray-700 text-white uppercase text-xs sticky top-0 z-10">
-                                            <tr>
-                                              <th className="text-left px-2 py-1">
-                                                Date
-                                              </th>
-                                              <th className="text-left px-2 py-1">
-                                                Amount
-                                              </th>
-                                              <th className="text-left px-2 py-1">
-                                                Type
-                                              </th>
-                                              <th className="text-left px-2 py-1">
-                                                Description
-                                              </th>
-                                              <th className="text-left px-2 py-1">
-                                                Reference
-                                              </th>
-                                              <th className="text-left px-2 py-1">
-                                                GL Bal
-                                              </th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            {paginatedTransactions.map(
-                                              (entry, idx) => (
-                                                <tr
-                                                  key={idx}
-                                                  className="text-xs"
-                                                >
-                                                  <td>
-                                                    {moment(entry.date).format(
-                                                      "YYYY-MM",
-                                                    )}
-                                                  </td>
-                                                  <td>{entry.amount}</td>
-                                                  <td className="capitalize italic">
-                                                    {entry.type}
-                                                  </td>
-                                                  <td>{entry.description}</td>
-                                                  <td>{entry.reference}</td>
-                                                  <td>{entry.Balance}</td>
-                                                </tr>
-                                              ),
-                                            )}
-                                          </tbody>
-                                        </table>
-                                      </div>
+            <MetricCard
+              title="Revenue"
+              value={totals.revenue}
+              icon={<Scale className="h-5 w-5" />}
+            />
 
-                                      {/* Pagination */}
-                                      <div className="flex justify-center items-center gap-2 text-xs py-2">
-                                        <button
-                                          onClick={() =>
-                                            handleTransactionPageChange(
-                                              account.code,
-                                              "prev",
-                                              totalPages,
-                                            )
-                                          }
-                                          disabled={currentPage === 1}
-                                          className="px-2 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:opacity-50"
-                                        >
-                                          Prev
-                                        </button>
-                                        <span className="text-white">
-                                          Page {currentPage} of {totalPages}
-                                        </span>
-                                        <button
-                                          onClick={() =>
-                                            handleTransactionPageChange(
-                                              account.code,
-                                              "next",
-                                              totalPages,
-                                            )
-                                          }
-                                          disabled={currentPage === totalPages}
-                                          className="px-2 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:opacity-50"
-                                        >
-                                          Next
-                                        </button>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <div className="p-4 text-sm text-gray-300">
-                                      No transactions available.
-                                    </div>
-                                  )}
-                                  {/* // snashot for monthly transaction capture */}
-                                  <div className="p-4 text-xs text-gray-300">
-                                      monthly transaction snapshots
-                                  </div>
-                                  {account.monthlyBalances.length > 0 ? (
-                                    <>
-                                      <div className="overflow-x-auto p-3 bg-gray-800">
-                                        <table className="min-w-full text-white bg-gray-800 rounded">
-                                          <thead className="bg-gray-700 text-white uppercase text-xs sticky top-0 z-10">
-                                            <tr>
-                                              <th className="text-left px-2 py-1">
-                                                Date
-                                              </th>
-                                              <th className="text-left px-2 py-1">
-                                                Snapshot
-                                              </th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            {account.monthlyBalances.map(
-                                              (entry, idx) => (
-                                                <tr
-                                                  key={idx}
-                                                  className="text-xs"
-                                                >
-                                                  <td>
-                                                    {moment(entry.month).format(
-                                                      "YYYY-MM",
-                                                    )}
-                                                  </td>
-                                                  <td>{entry.openingBalance}</td>
-                                                </tr>
-                                              ),
-                                            )}
-                                          </tbody>
-                                        </table>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <div className="p-4 text-sm text-gray-300">
-                                      No Monthly Snaps available.
-                                    </div>
-                                  )}
-                                </div>
-                              </details>
-                            </td>
-                          </tr>
-                          </>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <MetricCard
+              title="Expenses"
+              value={totals.expenses}
+              icon={<ReceiptText className="h-5 w-5" />}
+            />
+          </div>
+
+          <Card className="border-zinc-800 bg-zinc-950 shadow-2xl rounded-3xl overflow-hidden">
+            <CardContent className="p-0">
+              {isLoading ? (
+                <SuspenenseFallBack
+                  pagedata={"Charts of Account"}
+                  className="text-white"
+                />
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader className="bg-zinc-900/80">
+                      <TableRow className="border-zinc-800 hover:bg-transparent">
+                        <TableHead className="h-14 px-6 text-zinc-400 font-medium">
+                          Account Code
+                        </TableHead>
+
+                        <TableHead className="text-zinc-400 font-medium">
+                          Description
+                        </TableHead>
+
+                        <TableHead className="text-zinc-400 font-medium">
+                          Type
+                        </TableHead>
+
+                        <TableHead className="text-right pr-8 text-zinc-400 font-medium">
+                          Balance
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                      {filteredData.map((entry) => (
+                        <TableRow
+                          key={entry._id}
+                          className="border-zinc-800 hover:bg-zinc-900/50 transition-colors text-xs"
+                        >
+                          <TableCell className="px-6 py-5">
+                            <Link
+                              href={`#`}
+                              className="font-semibold text-white hover:text-zinc-300 transition"
+                            >
+                              {entry.code}
+                            </Link>
+                          </TableCell>
+
+                          <TableCell className="text-zinc-300 font-medium">
+                            {entry.name}
+                          </TableCell>
+
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={`
+                                rounded-full px-3 py-1 border
+                                ${
+                                  entry.type === "Asset"
+                                    ? "border-emerald-800 bg-emerald-950/40 text-emerald-300"
+                                    : ""
+                                }
+
+                                ${
+                                  entry.type === "Liability"
+                                    ? "border-orange-800 bg-orange-950/40 text-orange-300"
+                                    : ""
+                                }
+
+                                ${
+                                  entry.type === "Revenue"
+                                    ? "border-blue-800 bg-blue-950/40 text-blue-300"
+                                    : ""
+                                }
+
+                                ${
+                                  entry.type === "Expense"
+                                    ? "border-red-800 bg-red-950/40 text-red-300"
+                                    : ""
+                                }
+
+                                ${
+                                  entry.type === "Equity"
+                                    ? "border-purple-800 bg-purple-950/40 text-purple-300"
+                                    : ""
+                                }
+                              `}
+                            >
+                              {entry.type}
+                            </Badge>
+                          </TableCell>
+
+                          <TableCell className="text-right pr-8 text-md">
+                            <div className="flex flex-col items-end">
+                              <span className="font-semibold text-white">
+                                <span className="text-xs text-zinc-500">
+                                  {entry.currency}
+                                </span>{" "}
+                                {Number(entry.balance || 0).toLocaleString()}
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm text-zinc-500 px-1">
+            <p>
+              Showing{" "}
+              <span className="text-zinc-300 font-medium">
+                {filteredData.length}
+              </span>{" "}
+              account entries
+            </p>
+
+            <p>Generated {moment().format("MMMM Do YYYY, h:mm:ss a")}</p>
           </div>
         </div>
       </div>
@@ -276,3 +338,25 @@ const FinancialOverview = ({ data }) => {
 };
 
 export default FinancialOverview;
+
+function MetricCard({ title, value, icon }) {
+  return (
+    <Card className="border-zinc-800 bg-zinc-950 rounded-3xl overflow-hidden">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <p className="text-sm text-zinc-500">{title}</p>
+
+            <h3 className="text-xl font-bold text-white tracking-tight">
+              ₦{Number(value || 0).toLocaleString()}
+            </h3>
+          </div>
+
+          <div className="h-11 w-11 rounded-2xl border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-300">
+            {icon}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
