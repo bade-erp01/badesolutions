@@ -5,6 +5,7 @@ import moment from "moment";
 import Link from "next/link";
 import { Encrypt } from "../../../../../../../../Functions/Mics";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+
 import {
   Table,
   TableBody,
@@ -20,7 +21,13 @@ import { Input } from "@/components/ui/input";
 
 import { Badge } from "@/components/ui/badge";
 
-import { Search, Wallet, Landmark, ReceiptText, Scale } from "lucide-react";
+import {
+  Search,
+  Wallet,
+  Landmark,
+  ReceiptText,
+  Scale,
+} from "lucide-react";
 
 const FinancialOverview = ({ data, url, userData }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +58,11 @@ const FinancialOverview = ({ data, url, userData }) => {
         const result = await response.json();
 
         if (isMounted) {
-          setCOAData(Array.isArray(result?.data.COA) ? result.data : []);
+          setCOAData(
+            Array.isArray(result?.data?.COA)
+              ? result.data.COA
+              : []
+          );
         }
       } catch (error) {
         // console.error(error.message);
@@ -64,27 +75,32 @@ const FinancialOverview = ({ data, url, userData }) => {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        fetchCOA(); // refresh immediately when tab becomes visible
-        intervalId = setInterval(fetchCOA, 3 * 60 * 1000); // every 3 minutes
+        fetchCOA();
+
+        intervalId = setInterval(fetchCOA, 3 * 60 * 1000);
       } else {
         clearInterval(intervalId);
       }
     };
 
-    // Initial fetch
     fetchCOA();
 
-    // Attach listener
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
 
-    // Run once on mount
     handleVisibilityChange();
 
-    // Cleanup
     return () => {
       isMounted = false;
+
       clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
     };
   }, []);
 
@@ -128,14 +144,14 @@ const FinancialOverview = ({ data, url, userData }) => {
 
   if (!Array.isArray(COAData) || COAData.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[300px] border border-zinc-800 rounded-3xl bg-zinc-950">
+      <div className="flex items-center justify-center min-h-[300px] border border-zinc-200 rounded-3xl bg-white">
         <div className="text-center space-y-3">
-          <div className="mx-auto h-14 w-14 rounded-2xl bg-zinc-900 flex items-center justify-center border border-zinc-800">
+          <div className="mx-auto h-14 w-14 rounded-2xl bg-zinc-100 flex items-center justify-center border border-zinc-200">
             <ReceiptText className="h-6 w-6 text-zinc-500" />
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold text-zinc-900">
               No Financial Records
             </h2>
 
@@ -150,23 +166,27 @@ const FinancialOverview = ({ data, url, userData }) => {
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Charts of Account"} />}>
-      <div className="bg-[#09090B] text-zinc-100 p-4 md:p-6">
+      <div className="bg-[#f5f7fb] text-zinc-900 p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-6">
-          <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-8">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_35%)]" />
+
+          {/* HERO */}
+          <div className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-zinc-50 to-zinc-100 p-8 shadow-sm">
+
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,0,0,0.04),transparent_35%)]" />
 
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
               <div className="space-y-3">
-                <Badge className="bg-zinc-800 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-4 py-1 rounded-full">
+                <Badge className="bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100 px-4 py-1 rounded-full shadow-sm">
                   Financial Management
                 </Badge>
 
                 <div>
-                  <h1 className="text-2xl md:text-md font-bold tracking-tight text-white">
+                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900">
                     Chart of Accounts
                   </h1>
 
-                  <p className="text-zinc-400 mt-2 max-w-2xl text-sm">
+                  <p className="text-zinc-600 mt-2 max-w-2xl text-sm">
                     Structured accounting overview with categorized balances,
                     account tracking, and financial visibility.
                   </p>
@@ -174,19 +194,22 @@ const FinancialOverview = ({ data, url, userData }) => {
               </div>
 
               <div className="w-full lg:w-[340px] relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
 
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search account..."
-                  className="pl-11 h-12 rounded-2xl border-zinc-800 bg-zinc-900/80 text-white placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:border-zinc-700"
+                  type="search"
+                  className="pl-11 h-12 rounded-2xl border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-300 shadow-sm"
                 />
               </div>
             </div>
           </div>
 
+          {/* METRICS */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
             <MetricCard
               title="Assets"
               value={totals.assets}
@@ -212,33 +235,37 @@ const FinancialOverview = ({ data, url, userData }) => {
             />
           </div>
 
-          <Card className="border-zinc-800 bg-zinc-950 shadow-2xl rounded-3xl overflow-hidden">
+          {/* TABLE */}
+          <Card className="border-zinc-200 bg-white shadow-sm rounded-3xl overflow-hidden">
             <CardContent className="p-0">
               {isLoading ? (
                 <SuspenenseFallBack
                   pagedata={"Charts of Account"}
-                  className="text-white"
                 />
               ) : (
                 <div className="overflow-x-auto">
+
                   <Table>
-                    <TableHeader className="bg-zinc-900/80">
-                      <TableRow className="border-zinc-800 hover:bg-transparent">
-                        <TableHead className="h-14 px-6 text-zinc-400 font-medium">
+
+                    <TableHeader className="bg-zinc-50">
+                      <TableRow className="border-zinc-200 hover:bg-transparent">
+
+                        <TableHead className="h-14 px-6 text-zinc-500 font-medium">
                           Account Code
                         </TableHead>
 
-                        <TableHead className="text-zinc-400 font-medium">
+                        <TableHead className="text-zinc-500 font-medium">
                           Description
                         </TableHead>
 
-                        <TableHead className="text-zinc-400 font-medium">
+                        <TableHead className="text-zinc-500 font-medium">
                           Type
                         </TableHead>
 
-                        <TableHead className="text-right pr-8 text-zinc-400 font-medium">
+                        <TableHead className="text-right pr-8 text-zinc-500 font-medium">
                           Balance
                         </TableHead>
+
                       </TableRow>
                     </TableHeader>
 
@@ -246,18 +273,19 @@ const FinancialOverview = ({ data, url, userData }) => {
                       {filteredData.map((entry) => (
                         <TableRow
                           key={entry._id}
-                          className="border-zinc-800 hover:bg-zinc-900/50 transition-colors text-xs"
+                          className="border-zinc-100 hover:bg-zinc-50 transition-colors text-xs"
                         >
+
                           <TableCell className="px-6 py-5">
                             <Link
                               href={`#`}
-                              className="font-semibold text-white hover:text-zinc-300 transition"
+                              className="font-semibold text-zinc-900 hover:text-zinc-600 transition"
                             >
                               {entry.code}
                             </Link>
                           </TableCell>
 
-                          <TableCell className="text-zinc-300 font-medium">
+                          <TableCell className="text-zinc-700 font-medium">
                             {entry.name}
                           </TableCell>
 
@@ -266,33 +294,34 @@ const FinancialOverview = ({ data, url, userData }) => {
                               variant="outline"
                               className={`
                                 rounded-full px-3 py-1 border
+
                                 ${
                                   entry.type === "Asset"
-                                    ? "border-emerald-800 bg-emerald-950/40 text-emerald-300"
+                                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                                     : ""
                                 }
 
                                 ${
                                   entry.type === "Liability"
-                                    ? "border-orange-800 bg-orange-950/40 text-orange-300"
+                                    ? "border-orange-200 bg-orange-50 text-orange-700"
                                     : ""
                                 }
 
                                 ${
                                   entry.type === "Revenue"
-                                    ? "border-blue-800 bg-blue-950/40 text-blue-300"
+                                    ? "border-blue-200 bg-blue-50 text-blue-700"
                                     : ""
                                 }
 
                                 ${
                                   entry.type === "Expense"
-                                    ? "border-red-800 bg-red-950/40 text-red-300"
+                                    ? "border-red-200 bg-red-50 text-red-700"
                                     : ""
                                 }
 
                                 ${
                                   entry.type === "Equity"
-                                    ? "border-purple-800 bg-purple-950/40 text-purple-300"
+                                    ? "border-purple-200 bg-purple-50 text-purple-700"
                                     : ""
                                 }
                               `}
@@ -303,34 +332,43 @@ const FinancialOverview = ({ data, url, userData }) => {
 
                           <TableCell className="text-right pr-8 text-md">
                             <div className="flex flex-col items-end">
-                              <span className="font-semibold text-white">
-                                <span className="text-xs text-zinc-500">
+                              <span className="font-semibold text-zinc-900">
+                                <span className="text-xs text-zinc-400">
                                   {entry.currency}
                                 </span>{" "}
                                 {Number(entry.balance || 0).toLocaleString()}
                               </span>
                             </div>
                           </TableCell>
+
                         </TableRow>
                       ))}
                     </TableBody>
+
                   </Table>
+
                 </div>
               )}
             </CardContent>
           </Card>
 
+          {/* FOOTER */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm text-zinc-500 px-1">
+
             <p>
               Showing{" "}
-              <span className="text-zinc-300 font-medium">
+              <span className="text-zinc-800 font-medium">
                 {filteredData.length}
               </span>{" "}
               account entries
             </p>
 
-            <p>Generated {moment().format("MMMM Do YYYY, h:mm:ss a")}</p>
+            <p>
+              Generated {moment().format("MMMM Do YYYY, h:mm:ss a")}
+            </p>
+
           </div>
+
         </div>
       </div>
     </Suspense>
@@ -341,18 +379,23 @@ export default FinancialOverview;
 
 function MetricCard({ title, value, icon }) {
   return (
-    <Card className="border-zinc-800 bg-zinc-950 rounded-3xl overflow-hidden">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm text-zinc-500">{title}</p>
+    <Card className="border-zinc-200 bg-white rounded-3xl overflow-hidden shadow-sm">
 
-            <h3 className="text-xl font-bold text-white tracking-tight">
+      <CardContent className="p-5">
+
+        <div className="flex items-start justify-between">
+
+          <div className="space-y-2">
+            <p className="text-sm text-zinc-500">
+              {title}
+            </p>
+
+            <h3 className="text-xl font-bold text-zinc-900 tracking-tight">
               ₦{Number(value || 0).toLocaleString()}
             </h3>
           </div>
 
-          <div className="h-11 w-11 rounded-2xl border border-zinc-800 bg-zinc-900 flex items-center justify-center text-zinc-300">
+          <div className="h-11 w-11 rounded-2xl border border-zinc-200 bg-zinc-50 flex items-center justify-center text-zinc-700">
             {icon}
           </div>
         </div>
