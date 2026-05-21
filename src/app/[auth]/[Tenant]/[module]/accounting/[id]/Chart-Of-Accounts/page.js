@@ -236,7 +236,7 @@ const FinancialOverview = ({ data, url, userData }) => {
                           <TableCell className="text-right pr-8 text-md">
                             <div className="flex flex-col items-end">
                               <span className="font-semibold text-zinc-900">
-                                <span className="text-xs text-zinc-400">
+                                <span className="text-sm text-zinc-400">
                                   {entry.currency}
                                 </span>{" "}
                                 {Number(entry.balance || 0).toLocaleString()}

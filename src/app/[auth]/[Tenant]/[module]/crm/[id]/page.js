@@ -1424,16 +1424,12 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                 </CardTitle>
 
                 <CardDescription>
-                  Customer account transactions and balances
+                  {cust.Username} account transactions and balances
                 </CardDescription>
               </div>
 
-              <ExcelDownloadBtn
-                data={data?.transcations || []}
-                page={`${cust.Username.substring(0, 8)} transaction`}
-              />
             </CardHeader>
-
+            
             <CardContent>
               {data && data.transcations.length > 0 ? (
                 <>
@@ -1518,7 +1514,10 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                       </TableBody>
                     </Table>
                   </div>
-
+                  <ExcelDownloadBtn
+                data={data?.transcations || []}
+                page={`${cust.Username.substring(0, 8)} transaction`}
+              />
                   {/* ALERT */}
                   <div className="mt-6">
                     {cust.Debt < 0 ? (
