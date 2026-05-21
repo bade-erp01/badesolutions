@@ -63,11 +63,13 @@ export default async function AccountingPage({ children, params }) {
   { label: "Balance Sheet", icon: DocumentChartBarIcon, url: 'BalanceSheet'},
   { label: "Account Receivable", icon: DocumentTextIcon, url: 'Receivables'},
   { label: "Account Payables", icon: BanknotesIcon, url: 'Payables'},
-  { label: "Income Statement", icon: PresentationChartLineIcon, url: 'P&L'},
+  { label: "Income Statement", icon: CurrencyDollarIcon, url: 'P&L'},
   { label: "Bank Accounts", icon: BuildingLibraryIcon, url: 'Bank-Accounts'},
-  { label: "Chart of Accounts", icon: TableCellsIcon, url: 'Chart-Of-Accounts'},
+  { label: "Chart of Accounts", icon: ChartBarIcon, url: 'Chart-Of-Accounts'},
   { label: "Equity", icon: CalculatorIcon, url: 'Equity'},
   { label: "cash flow statement", icon: CubeIcon, url: 'cash-flow-statement'},
+  { label: "Trial Balance", icon: PresentationChartLineIcon, url: 'trial_Balance'},
+  { label:"General Ledger", icon: TableCellsIcon, url:"general_Ledger"}
 ];
 
     return (
@@ -84,15 +86,15 @@ export default async function AccountingPage({ children, params }) {
             className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-3 py-3 transition-all duration-300 max-h-[84dvh] md:block"
             style={{ overflowY: "auto" }}
           >
-            {/* <h2 className="text-lg font-bold mb-4">Accounting</h2>
-            <hr className="border-gray-100 mb-4" /> */}
+            <h2 className="text-lg font-bold mb-4">Financial Reports</h2>
+            <hr className="border-gray-100 mb-4" />
             <nav className="space-y-2">
               <SalesRportModal
                 business={userData.business}
                 baseUrl={baseUrl}
                 user={parsedUser}
               />
-              {userData?.user?.ReportUser && (<ExpenseReportModal userData={userData} baseUrl={baseUrl} />)}
+              {/* {userData?.user?.ReportUser && (<ExpenseReportModal userData={userData} baseUrl={baseUrl} />)} */}
               {MenuItems.map(({ label, icon: Icon, url }, index) => (
                 <Link
                   key={index}
