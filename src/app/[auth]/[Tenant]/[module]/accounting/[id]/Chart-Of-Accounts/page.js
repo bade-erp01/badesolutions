@@ -29,10 +29,10 @@ import {
   Scale,
 } from "lucide-react";
 
-const FinancialOverview = ({ data, url, userData }) => {
+const FinancialOverview = ({ url, userData }) => {
   const [isLoading, setIsLoading] = useState(true);
 
-  const [COAData, setCOAData] = useState(data || []);
+  const [COAData, setCOAData] = useState([]);
 
   const [search, setSearch] = useState("");
 

@@ -60,19 +60,6 @@ export default async function AccountingPage({ children, params }) {
     return notFound();
   }
 
-  // fetch all credit payment from all bank account
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/COA`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-  });
-
-  const data = await res.json();
-
   try {
     return (
       <div className="flex flex-col min-h-screen overflow-hidden">
@@ -100,7 +87,7 @@ export default async function AccountingPage({ children, params }) {
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
               {/* display Charts of accounts */}
-              <FinancialOverview data={data.COA} url={baseUrl} userData={userData}/>
+              <FinancialOverview url={baseUrl} userData={userData}/>
             </section>
           </main>
         </div>
