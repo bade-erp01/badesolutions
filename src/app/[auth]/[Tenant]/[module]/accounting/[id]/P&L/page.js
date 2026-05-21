@@ -226,7 +226,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell className="text-right">{currency}{report?.totals?.revenue || 0}</TableCell>
                   </TableRow>
 
-                   <TableRow>
+                   <TableRow className={`text-red-700`}>
                     <TableCell>Returns [less]</TableCell>
                     <TableCell className="text-right">- {currency}{report?.totals?.salesReturns || 0}</TableCell>
                   </TableRow>
