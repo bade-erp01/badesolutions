@@ -52,20 +52,9 @@ export const metadata = {
 
 export default async function layout({params}) {
   const userData = await fetchUser();
-  
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const res = await fetch(`${baseUrl}/api/Generate/profitandLoss`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-      },
-       next: { revalidate: 60 } // cache for 1 minutes
-    });
-
-    const data = await res.json()
+   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+ 
   return (
-    <Page userData={userData} Data={data} />
+    <Page userData={userData} baseUrl={baseUrl} />
   )
 }

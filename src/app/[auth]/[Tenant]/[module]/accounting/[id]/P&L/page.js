@@ -12,7 +12,7 @@ import {
   SuccessToast,
 } from "../../../../../../../../Functions/Mics";
 
-import { pricelistSetter } from "../../../../../../../../Functions/Functions";
+import {Dencrypt } from "../../../../../../../../Functions/Functions";
 
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
@@ -30,12 +30,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import {
   Accordion,
@@ -52,23 +47,12 @@ import {
   TableCell,
   TableBody,
 } from "@/components/ui/table";
+import { Encrypt } from "../../../../../../../../Functions/Mics";
 
 import { Badge } from "@/components/ui/badge";
 
-export default function Page({ Data, userData }) {
-  const [report, setReport] = useState({
-    SALES: 0,
-    Return: 0,
-    OpeningInventory: 0,
-    NetPurchase: 0,
-    closingInv: 0,
-    DirectExpense: 0,
-    indirectExpenses: 0,
-    Taxes: 0,
-    EBIT: 0,
-    NetProfit: 0,
-  });
-
+export default function Page({ baseUrl, userData }) {
+  const [report, setReport] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -77,10 +61,7 @@ export default function Page({ Data, userData }) {
     endDate: "",
   });
 
-  const coa = Data?.COAs?.[0];
-
-  const currency =
-    userData?.business?.currency?.currency?.Symbol || "₦";
+  const currency = userData?.business?.currency?.currency?.Symbol || "₦";
 
   const generateDates = (start, end) => {
     const arr = [];
@@ -95,90 +76,30 @@ export default function Page({ Data, userData }) {
     return arr;
   };
 
-  const sumBalances = (list = [], dates, field = "openingBalance") =>
-    list
-      .filter((i) =>
-        dates.includes(moment(i.month).format("YYYY-MM"))
-      )
-      .reduce((a, b) => a + (Number(b[field]) || 0), 0);
-
   async function GeneratePNLSummary() {
     try {
       const { startDate, endDate } = dates;
+      setOpenDialog(true);
 
       if (!startDate || !endDate) {
-        return ErrorMessage("Select start and end dates");
+        throw new Error("Please select both start and end dates.");
       }
-
+      
       setLoading(true);
-
-      const range = generateDates(startDate, endDate);
-
-      const SALES = sumBalances(
-        coa?.Revenue?.Revenue?.monthlyBalances,
-        range
-      );
-
-      const Return = sumBalances(
-        coa?.Revenue?.Sales_Returns_Allowance?.monthlyBalances,
-        range
-      );
-
-      const OpeningInventory = sumBalances(
-        coa?.Asset?.inventory?.monthlyBalances,
-        range
-      );
-
-      const NetPurchase = sumBalances(
-        coa?.Expense?.Purchases?.monthlyBalances,
-        range
-      );
-
-      const closingInv = sumBalances(
-        coa?.Asset?.inventory?.monthlyBalances,
-        range,
-        "closingBalance"
-      );
-
-      const DirectExpense = sumBalances(
-        coa?.Expense?.Direct_Expense?.monthlyBalances,
-        range
-      );
-
-      const indirectExpenses = sumBalances(
-        coa?.Expense?.Indirect_Expense?.monthlyBalances,
-        range
-      );
-
-      const Taxes = sumBalances(
-        coa?.Liability?.Tax_payable?.monthlyBalances,
-        range
-      );
-
-      const COGS =
-        OpeningInventory + NetPurchase - closingInv;
-
-      const GrossProfit =
-        SALES - Return - COGS;
-
-      const EBIT =
-        GrossProfit - DirectExpense - indirectExpenses;
-
-      const NetProfit =
-        EBIT - Taxes;
-
-      setReport({
-        SALES,
-        Return,
-        OpeningInventory,
-        NetPurchase,
-        closingInv,
-        DirectExpense,
-        indirectExpenses,
-        Taxes,
-        EBIT,
-        NetProfit,
+      const res = await fetch(`${baseUrl}/api/Generate/profitandLoss?startDate=${dates.startDate}&endDate=${dates.endDate}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: `${Encrypt(userData.user._id)}`,
+        },
+        cache: "force-cache", // Try cache first
+        next: { revalidate: 60 }, // cache for 1 minutes
       });
+
+      const {data} = await res.json();
+      
+      setReport(Dencrypt(data));
 
       SuccessToast("Income statement generated");
       setOpenDialog(false);
@@ -189,13 +110,8 @@ export default function Page({ Data, userData }) {
     }
   }
 
-  const GrossProfit =
-    report.SALES - report.Return -
-    (report.OpeningInventory + report.NetPurchase - report.closingInv);
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-
       <Nav1
         user={userData.user}
         business={userData.business}
@@ -203,10 +119,11 @@ export default function Page({ Data, userData }) {
       />
 
       <div className="flex flex-1 overflow-hidden">
-
         {/* BLACK SIDEBAR */}
-        <aside className="hidden md:flex w-72 bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white text-white p-5 flex-col gap-4">
+        <aside
+          className="hidden md:flex w-72 bg-[#1e1e20]/80 backdrop-blur-lg
+          text-white text-white p-5 flex-col gap-4"
+        >
           <BackButton />
 
           <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -219,9 +136,7 @@ export default function Page({ Data, userData }) {
 
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>
-                  Generate Income Statement
-                </DialogTitle>
+                <DialogTitle>Generate Income Statement</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4">
@@ -276,11 +191,15 @@ export default function Page({ Data, userData }) {
 
         {/* MAIN */}
         <main className="flex-1 p-4 md:p-6 overflow-y-auto">
-
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle>
-                Income Statement — {userData.business.companyName}
+                <Badge variant="outline" className="text-sm">
+                  {report.period
+                    ? `P&L Summary for ${report.period.startDate} to ${report.period.endDate}`
+                    : "P&L Summary"}{" "}
+                     — {userData.business.companyName}
+                </Badge>
               </CardTitle>
             </CardHeader>
 
@@ -288,61 +207,61 @@ export default function Page({ Data, userData }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Heads</TableHead>
+                    <TableHead>
+                      <Badge variant="outline" className="text-sm">
+                      Heads
+                      </Badge>
+                    </TableHead>
                     <TableHead className="text-right">
+                      <Badge variant="outline" className="text-sm">
                       Amount
+                      </Badge>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
-
                   <TableRow>
-                    <TableCell>Sales</TableCell>
-                    <TableCell className="text-right">
-                      {currency}{report.SALES}
-                    </TableCell>
+                    <TableCell>Revenue</TableCell>
+                    <TableCell className="text-right">{currency}{report?.totals?.revenue || 0}</TableCell>
+                  </TableRow>
+
+                   <TableRow>
+                    <TableCell>Returns [less]</TableCell>
+                    <TableCell className="text-right">- {currency}{report?.totals?.salesReturns || 0}</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>Net Sales</TableCell>
-                    <TableCell className="text-right">
-                      {currency}{report.SALES - report.Return}
-                    </TableCell>
+                    <TableCell>C.O.G.S</TableCell>
+                    <TableCell className="text-right">{currency}{report?.totals?.cogs || 0}</TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Gross Profit</TableCell>
+                    <TableCell className="text-right">{currency}{report?.totals?.grossProfit || 0}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>Operating Expenses</TableCell>
                     <TableCell className="text-right font-semibold">
-                      {currency}{GrossProfit}
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>Direct Expenses</TableCell>
-                    <TableCell className="text-right">
-                      {currency}{report.DirectExpense}
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>Indirect Expenses</TableCell>
-                    <TableCell className="text-right">
-                      {currency}{report.indirectExpenses}
+                      {currency}{report?.totals?.operatingExpenses || 0}
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>EBIT</TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {currency}{report.EBIT}
-                    </TableCell>
+                    <TableCell className="text-right">{currency}{report?.totals?.ebit || 0}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>Interest</TableCell>
+                    <TableCell className="text-right">{currency}{report?.totals?.interest || 0}</TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Taxes</TableCell>
-                    <TableCell className="text-right">
-                      {currency}{report.Taxes}
+                    <TableCell className="text-right font-semibold">
+                      {currency}{report?.totals?.taxes || 0}
                     </TableCell>
                   </TableRow>
 
@@ -351,10 +270,9 @@ export default function Page({ Data, userData }) {
                       Net Profit
                     </TableCell>
                     <TableCell className="text-right font-bold text-lg">
-                      {currency}{report.NetProfit}
+                      {currency}{report?.totals?.netIncome || 0 }
                     </TableCell>
                   </TableRow>
-
                 </TableBody>
               </Table>
             </CardContent>
