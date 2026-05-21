@@ -29,79 +29,15 @@ import {
   Scale,
 } from "lucide-react";
 
-const FinancialOverview = ({ url, userData }) => {
+const FinancialOverview = ({ data, url, userData }) => {
   const [isLoading, setIsLoading] = useState(true);
 
-  const [COAData, setCOAData] = useState([]);
+  const [COAData, setCOAData] = useState(data || []);
 
   const [search, setSearch] = useState("");
-
+  
   useEffect(() => {
-    let isMounted = true;
-    let intervalId;
-
-    const fetchCOA = async () => {
-      try {
-        const response = await fetch(`${url}/api/COA`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch COA data");
-        }
-
-        const result = await response.json();
-
-        if (isMounted) {
-          setCOAData(
-            Array.isArray(result?.data?.COA)
-              ? result.data.COA
-              : []
-          );
-        }
-      } catch (error) {
-        // console.error(error.message);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        fetchCOA();
-
-        intervalId = setInterval(fetchCOA, 3 * 60 * 1000);
-      } else {
-        clearInterval(intervalId);
-      }
-    };
-
-    fetchCOA();
-
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibilityChange
-    );
-
-    handleVisibilityChange();
-
-    return () => {
-      isMounted = false;
-
-      clearInterval(intervalId);
-
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityChange
-      );
-    };
+    setIsLoading(false);
   }, []);
 
   const filteredData = useMemo(() => {
