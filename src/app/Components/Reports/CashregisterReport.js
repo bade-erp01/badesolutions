@@ -5,7 +5,7 @@ import { useState } from "react";
 import {downloadExcel} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
-export default function PaymentTableModal({ dataArray, banks, customers }) {
+export default function PaymentTableModal({ dataArray, banks, customers, Employees }) {
 
   const data = dataArray;
   const [filteredData, setFilteredData] = useState(
@@ -13,10 +13,26 @@ export default function PaymentTableModal({ dataArray, banks, customers }) {
     );
   const [bankList] = useState(banks || []);
   const [customersList] = useState(customers.sort((a, b) => a.Username.trim().localeCompare(b.Username.trim())));
-
+  const [employeeList] = useState(Employees)
   const getCustomer = (id) => {
     const selectedCustomer = customersList.find((cust) => cust._id === id);
     return selectedCustomer?.Username || "";
+  };
+
+  // get employee name
+   const FilterSaLePerson = (id) => {
+        try {
+          const SP = employeeList.find((user) => user._id === id);
+          return `${SP.firstName} ${SP.lastName}` || "N/A";
+        } catch (err) {
+          return "N/A";
+        }
+      };
+
+  // returns full customer acc
+  const getCustomerAcc = (id) => {
+    const selectedCustomer = customersList.find((cust) => cust._id === id);
+    return selectedCustomer|| {};
   };
 
   const getBankAccount = (id) => {
@@ -177,13 +193,14 @@ export default function PaymentTableModal({ dataArray, banks, customers }) {
               button.onclick = () => {
                 const clean = []
                 filtered.forEach(entry =>{
+                  const customerAcc = getCustomerAcc(entry.customer)
                   clean.push({
                     "Ref":entry.paymentReferenceNo,
                     "Accountant":entry.Accountant,
                     "Customer":getCustomer(entry.customer),
-                    "Rep":"",
-                    "Manager":"",
-                    "state":"",
+                    "Rep": FilterSaLePerson(customerAcc.salesPerson),
+                    "Manager": FilterSaLePerson(customerAcc.Manager || customerAcc.accountManager),
+                    "state": customerAcc.State,
                     "status":entry.status,
                     "Date":entry.PaymentDate,
                     "Journal":getBankAccount(entry.bankAccount),

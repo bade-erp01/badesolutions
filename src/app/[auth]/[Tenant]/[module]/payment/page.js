@@ -5,6 +5,8 @@ import { Encrypt } from "../../../../../../Functions/Mics";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
+import Users from "../../../../../../models/Users";
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -67,6 +69,11 @@ export default async function paymentlayout({ children, params }) {
 
   const data = await res.json()
 
+  // get sales rep names and manager 
+    const RawUsers = await Users.findByTenant(userData.business.tenantId).select("firstName lastName").lean();
+    const StringedUser = JSON.stringify(RawUsers);
+    const parsedUsers = JSON.parse(StringedUser);
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Nav1
@@ -91,6 +98,7 @@ export default async function paymentlayout({ children, params }) {
                 dataArray={data.Payments}
                 banks={data.Accounts}
                 customers={data.Customers}
+                Employees={parsedUsers}
               />
             )}
           </nav>

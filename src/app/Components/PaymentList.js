@@ -143,7 +143,7 @@ export default function PaymentListpage({
           </div>
 
           <div className="flex justify-end mt-6 pt-4 border-t">
-            <Button variant="outline" onClick={resetFilters}>
+            <Button variant="default" onClick={resetFilters}>
               Reset Filters
             </Button>
           </div>
