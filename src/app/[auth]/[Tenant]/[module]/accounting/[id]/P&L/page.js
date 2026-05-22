@@ -93,8 +93,8 @@ export default function Page({ baseUrl, userData }) {
           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
           access: `${Encrypt(userData.user._id)}`,
         },
-        cache: "force-cache", // Try cache first
-        next: { revalidate: 60 }, // cache for 1 minutes
+        // cache: "force-cache", // Try cache first
+        // next: { revalidate: 60 }, // cache for 1 minutes
       });
 
       const {data} = await res.json();
