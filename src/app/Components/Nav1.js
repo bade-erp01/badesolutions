@@ -200,7 +200,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                     className="
             lg:hidden
             fixed
-            bottom-9
+            bottom-6
             right-6
             z-50
             h-14
