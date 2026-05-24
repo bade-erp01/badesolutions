@@ -26,8 +26,7 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
   const [location, setLocation] = useState("Loading location...");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showSplash, setShowSplash] = useState(false);
-  const [dashUrl,setDashUrl] = useState('')
-
+  const [loading,setLoading] = useState(false)
 
   useEffect(() => {
     const now = new Date();
@@ -82,8 +81,6 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
   const handleChange = async (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value,location });
   };
-
-  // const handleSubmit = async (e) => {
   //   e.preventDefault();
   //   // const token = await recaptchaRef.current.executeAsync();
   //   // recaptchaRef.current.reset();
@@ -135,12 +132,10 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     return ErrorMessage("Email and password are required");
   }
 
-  plsWait("Verifying Credentials. Please wait...");
-
   try {
     // const token = await recaptchaRef.current.executeAsync();
     // recaptchaRef.current.reset();
-
+    setLoading(true);
     const response = await fetch(`${url}/api/v1/Login`, {
       method: "POST",
       headers: {
@@ -177,12 +172,10 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
         SessionId: data.SessionId,
       })
     );
-
-    SuccessToast("Login successful");
-
-    plsWait("Login successful, Redirecting...");
-
     
+     // show splash ONLY after successful login
+     setShowSplash(true);
+
     // reset form
     setFormData({
       email: "",
@@ -202,14 +195,13 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     
     setTimeout(() => {
       // wait for splash animation before redirect
-      // show splash ONLY after successful login
-      setShowSplash(true);
-      setDashUrl(dashboardUrl);
+      setLoading(false);
+      router.push(dashboardUrl)
     }, 5000);
 
   } catch (error) {
     setShowSplash(false);
-
+    setLoading(false);
     setFormData({
       email: "",
       password: "",
@@ -233,7 +225,7 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
       }}
     >
         {showSplash && (
-          <BadeSplashScreen timeout={5000} redirectTo={dashUrl}/>
+          <BadeSplashScreen/>
         )}
 
       <Nav1
@@ -321,9 +313,44 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
                   </Link>
                 </div>
                 <div className="flex items-center justify-between mt-2">
-                  <button className="bg-black text-white rounded p-2 ml-2 shadow-md">
-                    Login
-                  </button>
+                 <button
+                    type="submit"
+                    disabled={loading}
+                    className={`rounded p-2 ml-2 shadow-md transition-all duration-200 min-w-[110px]
+                      ${
+                        loading
+                          ? "bg-gray-700 text-gray-300 cursor-not-allowed"
+                          : "bg-black text-white hover:bg-gray-900"
+                      }`}
+                  >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg
+                            className="animate-spin h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
+                          </svg>
+                          Logging in...
+                        </span>
+                      ) : (
+                        "Login"
+                      )}
+                    </button>
                 </div>
               </form>
               {/* Event Card */}
@@ -397,12 +424,10 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
 
 
 // demo screen brfore login
-export function BadeSplashScreen({
-  redirectTo,
-  timeout,
-}) {
+export function BadeSplashScreen() {
   const [visible, setVisible] = useState(true);
   const [glow, setGlow] = useState(false);
+  const timeout = 10000
 
   useEffect(() => {
     const glowTimer = setTimeout(() => {
@@ -413,12 +438,6 @@ export function BadeSplashScreen({
 
     const redirectTimer = setTimeout(() => {
       setVisible(false);
-
-      navigationTimer = setTimeout(() => {
-        if (typeof window !== "undefined") {
-          window.location.href = redirectTo;
-        }
-      }, 700);
     }, timeout);
 
     return () => {
@@ -429,7 +448,7 @@ export function BadeSplashScreen({
         clearTimeout(navigationTimer);
       }
     };
-  }, [redirectTo, timeout]);
+  }, []);
 
   return (
     <AnimatePresence>
