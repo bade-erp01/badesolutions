@@ -197,28 +197,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="
-            lg:hidden
-            fixed
-            bottom-6
-            right-6
-            z-50
-            h-14
-            w-14
-            rounded-sm
-            bg-[#1e1e20]
-            text-white
-            shadow-2xl
-            border
-            border-white/10
-            flex
-            items-center
-            justify-center
-            hover:scale-105
-            active:scale-95
-            transition-all
-            duration-300
-          "
+                    className="lg:hidden rounded-2xl"
                   >
                     <Bars3Icon className="h-6 w-6" />
                   </Button>
@@ -304,22 +283,39 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                     </div>
                   ) : (
                     <div
-                      className="flex-1 overflow-y-auto px-3 pb-4 bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617] h-screen"
-                      style={{
-                        scrollbarWidth: "thin",
-                        scrollbarColor: "#334155 transparent",
-                      }}
+                      className="
+                      flex-1
+                      overflow-hidden
+                      bg-gradient-to-b
+                      from-[#0f172a]
+                      via-[#111827]
+                      to-[#020617]
+                    "
                     >
-                      {/* only show if the page is dashboard */}
                       {IconArray && (
-                        <div className="space-y-1 overflow-y-auto h-screen p-1">
+                        <div
+                          className="
+                          h-full
+                          overflow-y-auto
+                          px-3
+                          pb-24
+                          pt-2
+                          space-y-1
+                        "
+                          style={{
+                            scrollbarWidth: "thin",
+                            scrollbarColor: "#334155 transparent",
+                          }}
+                        >
                           {user?.Apps.map((app, index) => {
                             const appHref = `/${business?.companyName
                               ?.toLowerCase()
                               .replace(/\s+/g, "-")
                               .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                               user._id,
-                            )}/${app.url.toLowerCase().replace(/\s+/g, "")}/${app.url
+                            )}/${app.url
+                              .toLowerCase()
+                              .replace(/\s+/g, "")}/${app.url
                               .toLowerCase()
                               .replace(/\s+/g, "")}`;
 
@@ -328,13 +324,28 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                                 key={index}
                                 href={appHref}
                                 title={app.Description || ""}
-                                className="group relative flex items-center gap-3 rounded-xl px-1 py-1 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
+                                className="
+                                group
+                                relative
+                                flex
+                                items-center
+                                gap-3
+                                rounded-xl
+                                px-2
+                                py-2
+                                transition-all
+                                duration-300
+                                hover:bg-white/8
+                                border
+                                border-transparent
+                                hover:border-white/10
+                              "
                               >
                                 {/* ACTIVE GLOW */}
                                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                                 {/* ICON */}
-                                <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300 shadow-lg">
+                                <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300 shadow-lg shrink-0">
                                   <Image
                                     src={
                                       app.icon ||
@@ -412,9 +423,24 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                                     .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                                     user._id,
                                   )}/${item.url}/${item.url}`}
-                                  className="group relative flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
+                                  className="
+                                    group
+                                    relative
+                                    flex
+                                    items-center
+                                    gap-3
+                                    rounded-2xl
+                                    px-3
+                                    py-3
+                                    transition-all
+                                    duration-300
+                                    hover:bg-white/8
+                                    border
+                                    border-transparent
+                                    hover:border-white/10
+                                  "
                                 >
-                                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10">
+                                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10 shrink-0">
                                     <Image
                                       src={item.icon}
                                       width={24}
@@ -445,33 +471,54 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
             </Sheet>
 
             {/* LOGO */}
-            <Link
-              href={href}
-              className="group flex items-center gap-3 transition"
-            >
-              {business && (
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-md transition-all duration-300 group-hover:scale-105">
-                  <Squares2X2Icon className="h-5 w-5" />
+            {IconArray ? (
+              <div className="group flex items-center gap-3 transition">
+                <div className="">
+                  <h2
+                    className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}
+                  >
+                    {business ? page.toUpperCase() : "B.A.D.E"}
+                  </h2>
+
+                  <Badge
+                    variant="secondary"
+                    className="rounded-xl text-xs text-zinc-500"
+                  >
+                    {business
+                      ? `${business?.subscriptionplan.toLowerCase()} plan`
+                      : "Enterprise Platform"}
+                  </Badge>
                 </div>
-              )}
-
-              <div className="">
-                <h2
-                  className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}
-                >
-                  {business ? page.toUpperCase() : "B.A.D.E"}
-                </h2>
-
-                <Badge
-                  variant="secondary"
-                  className="rounded-xl text-xs text-zinc-500"
-                >
-                  {business
-                    ? `${business?.subscriptionplan.toLowerCase()} plan`
-                    : "Enterprise Platform"}
-                </Badge>
               </div>
-            </Link>
+            ) : (
+              <Link
+                href={href}
+                className="group flex items-center gap-3 transition"
+              >
+                {business && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-md transition-all duration-300 group-hover:scale-105">
+                    <Squares2X2Icon className="h-5 w-5" />
+                  </div>
+                )}
+
+                <div className="">
+                  <h2
+                    className={`${business ? "text-sm font-semibold" : "text-sm font-bold"} tracking-tight text-zinc-900`}
+                  >
+                    {business ? page.toUpperCase() : "B.A.D.E"}
+                  </h2>
+
+                  <Badge
+                    variant="secondary"
+                    className="rounded-xl text-xs text-zinc-500"
+                  >
+                    {business
+                      ? `${business?.subscriptionplan.toLowerCase()} plan`
+                      : "Enterprise Platform"}
+                  </Badge>
+                </div>
+              </Link>
+            )}
           </div>
 
           {/* CENTER SEARCH */}
