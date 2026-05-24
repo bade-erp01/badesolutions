@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {Encrypt,Dencrypt} from "../../../Functions/Functions"
 import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+
 // import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Login({userInfo,businessInfo,url,SessionId}) {
@@ -23,6 +25,9 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("Loading location...");
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showSplash, setShowSplash] = useState(false);
+  const [dashUrl,setDashUrl] = useState('')
+
 
   useEffect(() => {
     const now = new Date();
@@ -78,46 +83,145 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     setFormData({ ...formData, [e.target.name]: e.target.value,location });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   // const token = await recaptchaRef.current.executeAsync();
+  //   // recaptchaRef.current.reset();
+  //   plsWait("Verifying Credentials. Please wait...");
+
+  //   try {
+  //     const response = await fetch(`${url}/api/v1/Login`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({formData:Encrypt(formData)}),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok && data.Newcustomer) {
+  //       dispatch(loginSuccess({ user: Dencrypt(data.Newcustomer), business: data.Tenant, SessionId:data.SessionId}));
+  //       // reset the form
+  //       SuccessToast('Login successful')
+
+  //       // settime out display bade on dark background 
+
+  //       plsWait("Login successful, Redirecting...");
+
+  //       // Reset the form
+  //       setFormData({ email: "", password: "" }); // or setFormData(initialState)
+
+  //       const sanitizedCompanyName = data.Tenant.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+
+  //       const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(data.Newcustomer._id)}`;
+  //       // Redirect using Next.js router
+  //       router.push(dashboardUrl);
+  //     } else if (data.error) {
+  //       throw new Error(data.error);
+  //     }
+  //   } catch (error) {
+  //     setFormData({ email: "", password: "" });
+  //     ErrorMessage(error.message);
+  //     dispatch(loginFailure(error.message));
+  //   }
+  // };
+
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+
+  if (!formData.email || !formData.password) {
+    return ErrorMessage("Email and password are required");
+  }
+
+  plsWait("Verifying Credentials. Please wait...");
+
+  try {
     // const token = await recaptchaRef.current.executeAsync();
     // recaptchaRef.current.reset();
-    plsWait("Verifying Credentials. Please wait...");
+
+    const response = await fetch(`${url}/api/v1/Login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        formData: Encrypt(formData),
+      }),
+    });
+
+    let data;
 
     try {
-      const response = await fetch(`${url}/api/v1/Login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({formData:Encrypt(formData)}),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.Newcustomer) {
-        dispatch(loginSuccess({ user: Dencrypt(data.Newcustomer), business: data.Tenant, SessionId:data.SessionId}));
-        // reset the form
-        SuccessToast('Login successful')
-        plsWait("Login successful, Redirecting...");
-
-        // Reset the form
-        setFormData({ email: "", password: "" }); // or setFormData(initialState)
-
-        const sanitizedCompanyName = data.Tenant.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-
-        const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(data.Newcustomer._id)}`;
-        // Redirect using Next.js router
-        router.push(dashboardUrl);
-      } else if (data.error) {
-        throw new Error(data.error);
-      }
-    } catch (error) {
-      setFormData({ email: "", password: "" });
-      ErrorMessage(error.message);
-      dispatch(loginFailure(error.message));
+      data = await response.json();
+    } catch {
+      throw new Error("Invalid server response");
     }
-  };
+
+    if (!response.ok) {
+      throw new Error(data?.error || "Login failed");
+    }
+
+    if (!data?.Newcustomer || !data?.Tenant) {
+      throw new Error("Invalid login response");
+    }
+
+    // decrypt once
+    const decryptedUser = Dencrypt(data.Newcustomer);
+
+    dispatch(
+      loginSuccess({
+        user: decryptedUser,
+        business: data.Tenant,
+        SessionId: data.SessionId,
+      })
+    );
+
+    SuccessToast("Login successful");
+
+    plsWait("Login successful, Redirecting...");
+
+    
+    // reset form
+    setFormData({
+      email: "",
+      password: "",
+    });
+    
+    const sanitizedCompanyName = data.Tenant
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+    
+    const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(
+      decryptedUser._id
+    )}`;
+    
+    
+    setTimeout(() => {
+      // wait for splash animation before redirect
+      // show splash ONLY after successful login
+      setShowSplash(true);
+      setDashUrl(dashboardUrl);
+    }, 5000);
+
+  } catch (error) {
+    setShowSplash(false);
+
+    setFormData({
+      email: "",
+      password: "",
+    });
+
+    ErrorMessage(error.message || "Something went wrong");
+
+    dispatch(
+      loginFailure(error.message || "Login failed")
+    );
+  }
+};
 
   return (
     <div
@@ -128,6 +232,10 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
         backgroundSize: "cover",
       }}
     >
+        {showSplash && (
+          <BadeSplashScreen timeout={5000} redirectTo={dashUrl}/>
+        )}
+
       <Nav1
         user={userInfo}
         business={businessInfo}
@@ -285,3 +393,104 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     </div>
   );
 }
+
+
+
+// demo screen brfore login
+export function BadeSplashScreen({
+  redirectTo,
+  timeout,
+}) {
+  const [visible, setVisible] = useState(true);
+  const [glow, setGlow] = useState(false);
+
+  useEffect(() => {
+    const glowTimer = setTimeout(() => {
+      setGlow(true);
+    }, 1800);
+
+    let navigationTimer;
+
+    const redirectTimer = setTimeout(() => {
+      setVisible(false);
+
+      navigationTimer = setTimeout(() => {
+        if (typeof window !== "undefined") {
+          window.location.href = redirectTo;
+        }
+      }, 700);
+    }, timeout);
+
+    return () => {
+      clearTimeout(glowTimer);
+      clearTimeout(redirectTimer);
+
+      if (navigationTimer) {
+        clearTimeout(navigationTimer);
+      }
+    };
+  }, [redirectTo, timeout]);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_60%)]" />
+
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative flex flex-col items-center"
+          >
+            <div className="absolute inset-0 rounded-full bg-white/10 blur-3xl" />
+
+            <motion.h1
+              animate={{
+                textShadow: glow
+                  ? [
+                      "0 0 10px rgba(255,255,255,0.5)",
+                      "0 0 25px rgba(255,255,255,0.8)",
+                      "0 0 50px rgba(255,255,255,1)",
+                    ]
+                  : "0 0 0px rgba(255,255,255,0)",
+                scale: glow ? [1, 1.03, 1] : 1,
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: glow ? Infinity : 0,
+                ease: "easeInOut",
+              }}
+              className="relative text-xl font-black uppercase tracking-[0.4em] text-white md:text-md"
+            >
+              B.A.D.E
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-4 text-center text-sm uppercase tracking-[0.3em] text-zinc-500"
+            >
+              Business Automated Dynamic Enterprise
+            </motion.p>
+
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "220px" }}
+              transition={{ duration: timeout / 1000, ease: "linear" }}
+              className="mt-8 h-[2px] rounded-full bg-white/70"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+
