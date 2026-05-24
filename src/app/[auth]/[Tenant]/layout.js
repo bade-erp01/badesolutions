@@ -2,7 +2,7 @@ import CookiesPolicyAlert from "@/app/Components/Cookies";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
 import { redirect } from "next/navigation";
 import moment from "moment";
-import{Dencrypt} from "../../../../Functions/Functions";
+import PrivacyIdleOverlay from "@/app/Components/PrivacyOverlay"
 import RenewSubscription from "@/app/Components/RenewSubcription"; 
 // hypothetical component
 
@@ -46,9 +46,9 @@ export default async function Layout({ children }) {
   }
 
   return (
-    <div style={{ overflowY: "hidden" }}>
+    <PrivacyIdleOverlay idleTimeMs={120000} style={{ overflowY: "hidden" }}>
       <CookiesPolicyAlert />
       {children}
-    </div>
+    </PrivacyIdleOverlay>
   );
 }
