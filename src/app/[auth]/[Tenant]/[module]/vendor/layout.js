@@ -8,6 +8,10 @@ import {  PlusCircleIcon,ShoppingCartIcon,ClipboardDocumentCheckIcon  } from "@h
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
+
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -75,10 +79,7 @@ export default async function layout({children,params}) {
         
               <div className="flex flex-1 text-white bt-2">
                 {/* Sidebar (collapsible on mobile) */}
-                <aside
-                   className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
-                   style={{ overflowY: "auto" }}
-                >
+                <SideNavWrapper>
                  <BackButton />
                   <hr />
                   <nav className="space-y-4">
@@ -119,7 +120,7 @@ export default async function layout({children,params}) {
         
                   {/* Bottom Section with Settings Link */}
                  
-                </aside>{" "}
+                </SideNavWrapper>{" "}
                 {/* Main Content Area */}
                 <main className="flex-1 ">
                   <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[82dvh] overflow-y-auto">

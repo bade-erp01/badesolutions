@@ -5,6 +5,8 @@ import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
 import DraftPurchasePage from "./page";
 import { notFound } from "next/navigation"; // Import the notFound function
 import BackButton from "@/app/Components/BackBotton";
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -80,10 +82,7 @@ export default async function storelayout({ params }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar */}
-        <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
-          style={{ overflowY: "auto" }}
-        >
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-4">
@@ -102,7 +101,7 @@ export default async function storelayout({ params }) {
               </ul>
             </div>
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         {/* Main Content */}
         <main className="flex-1">

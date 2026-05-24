@@ -7,6 +7,8 @@ import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import CalendarDemo from "@/app/Components/calendar"
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
+
 
 export default async function layout({ children, params }) {
   const Params = await params;
@@ -66,10 +68,7 @@ export default async function layout({ children, params }) {
       />
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className="w-85 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
-          style={{ overflowY: "auto" }}
-        >
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-5  max-h-[83dvh] overflow-y-hidden ">
@@ -80,7 +79,7 @@ export default async function layout({ children, params }) {
             </>
            )}
           </nav>
-        </aside>{" "}
+        </SideNavWrapper>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg  relative z-10 max-h-[82dvh] overflow-y-auto">

@@ -13,6 +13,7 @@ import {
   PlusCircleIcon,TrashIcon
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
 
 const SingleCustomerpage = lazy(() => import("./page"));
 
@@ -64,10 +65,7 @@ export default async function StoreLayout2({ params }) {
 
       <div className="flex flex-1 text-white bt-2 item-center">
         {/* Sidebar */}
-        <aside
-          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300"
-          style={{ overflowY: "auto",scrollbarWidth: "thin",scrollbarColor: "#453d46ff transparent", }}
-        >
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-4">
@@ -88,10 +86,10 @@ export default async function StoreLayout2({ params }) {
 
             {userData?.user?.raiseInvoice && (
               <Link
-                href={`/${userData.business.companyName
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+              href={`/${userData.business.companyName
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
                   userData.user._id,
                 )}/invoice/invoice`}
                 className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
@@ -109,7 +107,7 @@ export default async function StoreLayout2({ params }) {
                 scrollbarWidth: "thin",
                 scrollbarColor: "#4B5563 transparent",
               }}
-             >
+              >
               <ul className="divide-y divide-gray-700">
                 {data.result?.AuditLog?.map((log, index) => {
                   return (
@@ -146,7 +144,7 @@ export default async function StoreLayout2({ params }) {
               </>
             )}
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         {/* Main Content */}
         <main className="flex-1">

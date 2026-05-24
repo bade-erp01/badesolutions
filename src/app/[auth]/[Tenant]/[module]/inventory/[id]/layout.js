@@ -6,6 +6,8 @@ import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import Link from "next/link";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
+
 
 export default async function StoreLayout({ params }) {
   try {
@@ -33,10 +35,7 @@ export default async function StoreLayout({ params }) {
 
         <div className="flex flex-1 text-white bt-2">
           {/* Sidebar */}
-          <aside
-            className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
-            style={{ overflowY: "auto" }}
-          >
+          <SideNavWrapper>
             <BackButton />
             <hr />
             <nav className="space-y-4">
@@ -73,7 +72,7 @@ export default async function StoreLayout({ params }) {
                 </ul>
               </div>
             </nav>
-          </aside>
+          </SideNavWrapper>
 
           {/* Main Content */}
           <main className="flex-1">

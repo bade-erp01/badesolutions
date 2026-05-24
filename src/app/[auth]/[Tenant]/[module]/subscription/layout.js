@@ -5,7 +5,7 @@ import BackButton from "@/app/Components/BackBotton";
 import Page from "./page";
 import EMPLOYEES from "../../../../../../models/Users";
 import { Encrypt } from "../../../../../../Functions/Functions";
-
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
 
 
 export const metadata = {
@@ -51,15 +51,13 @@ export default async function Employeelayout({ children, params }) {
       />
 
       <div className="flex flex-1 text-white bt-2 ">
-        <aside  className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
-          style={{ overflowY: "auto" }}>
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-4">
             
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         <main className="flex-1">
          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">

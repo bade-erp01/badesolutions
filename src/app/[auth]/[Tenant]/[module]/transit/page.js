@@ -8,6 +8,10 @@ import {UserGroupIcon, FunnelIcon, BackwardIcon, ForwardIcon, ArrowPathIcon, Cal
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import {Encrypt} from "../../../../../../Functions/Functions"
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
+
+
 
 export default function TransferPage({ purchaseList, userData, VendorList,Store,baseUrl }) {
   const Params = useParams();
@@ -75,7 +79,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
 
       <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
         {/* Sidebar Filters */}
-       <aside className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:block ">
+       <SideNavWrapper>
           <BackButton />
           <hr className=" border-white/10" />
           {/* link to vendors */}
@@ -184,7 +188,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
             </div>
           </div>
 
-        </aside>
+        </SideNavWrapper>
 
         {/* Main content */}
         <main className="flex-1 min-h-[80dvh] p-3">

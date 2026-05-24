@@ -7,6 +7,9 @@ import Footer2 from "@/app/Components/Footer2";
 import Link from "next/link";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import BackButton from "@/app/Components/BackBotton";
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -86,10 +89,7 @@ export default async function layout({ params, children }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar */}
-        <aside
-          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300"
-          style={{ overflowY: "auto" }}
-        >
+        <SideNavWrapper>
             <BackButton/>
           <hr />
           <nav className="space-y-4">
@@ -125,7 +125,7 @@ export default async function layout({ params, children }) {
             </ul>
           </div>
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         {/* Main Content */}
         <main className="flex-1">

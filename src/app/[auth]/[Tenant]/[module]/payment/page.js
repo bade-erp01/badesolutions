@@ -6,7 +6,7 @@ import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
 import Users from "../../../../../../models/Users";
-
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -85,7 +85,7 @@ export default async function paymentlayout({ children, params }) {
 
       <div className="flex flex-1 text-white bt-2 ">
         {/* Sidebar (collapsible on mobile) */}
-        <aside
+        <SideNavWrapper
           className={`bg-[#1e1e20]/80 backdrop-blur-lg
           text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
           style={{ overflowY: "auto" }}
@@ -102,7 +102,7 @@ export default async function paymentlayout({ children, params }) {
               />
             )}
           </nav>
-        </aside>{" "}
+        </SideNavWrapper>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">

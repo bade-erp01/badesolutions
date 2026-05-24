@@ -11,6 +11,9 @@ import Footer2 from "@/app/Components/Footer2";
 import MailAndWhatsapp from "@/app/Components/MailAndWhatsapp";
 import ShareInvToStore from "@/app/Components/ShareInvToStore"
 import PartialInvoiceDisplay from "@/app/Components/PartialInvoiceDisplay";
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
+
+
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -116,8 +119,7 @@ async function StoreLayoutContent({ params }) {
     {/* Main Content Area */}
     <div className="flex flex-2 max-h-[83vh] overflow-y-hidden">
      {/* Aside (Left Sidebar) */}
-     <aside aside
-          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300">
+     <SideNavWrapper>
       <BackButton />
       <hr className="my-4 border-gray-700" />
       <nav className="grow">
@@ -160,7 +162,7 @@ async function StoreLayoutContent({ params }) {
         </div>
         <br />
       </nav>
-     </aside>
+     </SideNavWrapper>
 
      {/* Main Content (Right Side) */}
      <main className="flex-1 overflow-hidden">

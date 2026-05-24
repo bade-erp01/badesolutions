@@ -6,7 +6,7 @@ import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import {ChartPieIcon, ShoppingBagIcon, UserGroupIcon,ShoppingCartIcon,ClipboardDocumentCheckIcon,PlusCircleIcon } from "@heroicons/react/24/outline";
-
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -82,10 +82,7 @@ export default async function storelayout({ children, params }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
-       <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
-          style={{ overflowY: "auto" }}
-        >
+       <SideNavWrapper>
           <h2 className="text-lg text-white font-bold mb-4">
             Store Management
           </h2>
@@ -176,7 +173,7 @@ export default async function storelayout({ children, params }) {
                 )}
           </nav>
 
-        </aside>{" "}
+        </SideNavWrapper>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-screen-xl p-1 mx-auto flex flex-col gap-6 rounded-lg  relative z-10 h-[500px] overflow-y-auto">

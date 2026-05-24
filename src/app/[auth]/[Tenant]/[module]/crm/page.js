@@ -20,6 +20,7 @@ import {
 import React, { Suspense } from "react";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import CustomerGrid from "./CustomerGrid"
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
 
 export default async function crmLayout({ params }) {
   const userData = await fetchUser(); // Fetch user data
@@ -78,8 +79,8 @@ export default async function crmLayout({ params }) {
 
       <div className="flex flex-1 overflow-hidden text-white">
         {/* Sidebar */}
-        <aside
-          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300">
+        <SideNavWrapper>
+        
           <BackButton />
           <hr />
           <nav className="space-y-4">
@@ -153,7 +154,7 @@ export default async function crmLayout({ params }) {
             )}
            
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">

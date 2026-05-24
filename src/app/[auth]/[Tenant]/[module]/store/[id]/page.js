@@ -20,6 +20,10 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import BulkUpdate from "@/app/Components/bulkUpdate"
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
+
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -94,7 +98,7 @@ export default async function storelayout({ children, params }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar */}
-        <aside
+        <SideNavWrapper
           className="w-70 bg-[#1e1e20]/70 backdrop-blur-md 
           text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block"
         >
@@ -155,7 +159,7 @@ export default async function storelayout({ children, params }) {
               />
             )}
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         {/* Main Content */}
         <main className="flex-1">

@@ -43,14 +43,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Card } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { Card } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 export default function Nav1({ page, Module, user, business, IconArray }) {
   const pathName = usePathname();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [hydrated, setHydrated] = useState(false);
@@ -161,7 +161,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
           trimmedTerm,
         )}`,
       );
-      setLoading(false)
+      setLoading(false);
       Swal.close();
 
       setSearchTerm("");
@@ -192,15 +192,38 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
           <div className="flex items-center gap-3 p-2">
             {/* MOBILE MENU */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="lg:hidden rounded-2xl"
-                >
-                  <Bars3Icon className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
+              {IconArray && (
+                <SheetTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="
+            lg:hidden
+            fixed
+            bottom-9
+            right-6
+            z-50
+            h-14
+            w-14
+            rounded-sm
+            bg-[#1e1e20]
+            text-white
+            shadow-2xl
+            border
+            border-white/10
+            flex
+            items-center
+            justify-center
+            hover:scale-105
+            active:scale-95
+            transition-all
+            duration-300
+          "
+                  >
+                    <Bars3Icon className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+              )}
 
               <SheetContent
                 side="left"
@@ -213,48 +236,46 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                 <div className="mt-8 flex flex-col gap-4">
                   {/* SEARCH */}
                   {business && user && Module?.length > 0 && (
-                     <Card className="p-3 shadow-sm m-1">
-                        <form onSubmit={handleSearch} className="space-y-4">
-                          <div className="relative">
-                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" />
+                    <Card className="p-3 shadow-sm m-1">
+                      <form onSubmit={handleSearch} className="space-y-4">
+                        <div className="relative">
+                          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" />
 
-                            <Input
-                              type="search"
-                              placeholder={`Search ${page}...`}
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                              className="h-12 rounded-xl pl-10 pr-10 border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                            />
+                          <Input
+                            type="search"
+                            placeholder={`Search ${page}...`}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="h-12 rounded-xl pl-10 pr-10 border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                          />
 
-                            {searchTerm && (
-                              <button
-                                type="button"
-                                onClick={() => setSearchTerm("")}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
-                              >
-                                <XMarkIcon className="h-5 w-5" />
-                              </button>
-                            )}
-                          </div>
+                          {searchTerm && (
+                            <button
+                              type="button"
+                              onClick={() => setSearchTerm("")}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                            >
+                              <XMarkIcon className="h-5 w-5" />
+                            </button>
+                          )}
+                        </div>
 
-                          <Button
-                            type="submit"
-                            className="w-full rounded-xl bg-gray-500 text-white font-semibold shadow-md transition flex items-center justify-center gap-2"
-                            disabled={loading}
-                          >
-                            {loading ? (
-                              <>
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                Searching...
-                              </>
-                            ) : (
-                              <>
-                                Search {page}
-                              </>
-                            )}
-                          </Button>
-                        </form>
-                      </Card>
+                        <Button
+                          type="submit"
+                          className="w-full rounded-xl bg-gray-500 text-white font-semibold shadow-md transition flex items-center justify-center gap-2"
+                          disabled={loading}
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                              Searching...
+                            </>
+                          ) : (
+                            <>Search {page}</>
+                          )}
+                        </Button>
+                      </form>
+                    </Card>
                   )}
 
                   {/* PUBLIC LINKS */}
@@ -290,131 +311,132 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                       }}
                     >
                       {/* only show if the page is dashboard */}
-                     {IconArray && (
-                      <div className="space-y-1 overflow-y-auto h-screen p-1">
-                        {user?.Apps.map((app, index) => {
-                          const appHref = `/${business?.companyName
-                            ?.toLowerCase()
-                            .replace(/\s+/g, "-")
-                            .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                            user._id,
-                          )}/${app.url.toLowerCase().replace(/\s+/g, "")}/${app.url
-                            .toLowerCase()
-                            .replace(/\s+/g, "")}`;
+                      {IconArray && (
+                        <div className="space-y-1 overflow-y-auto h-screen p-1">
+                          {user?.Apps.map((app, index) => {
+                            const appHref = `/${business?.companyName
+                              ?.toLowerCase()
+                              .replace(/\s+/g, "-")
+                              .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                              user._id,
+                            )}/${app.url.toLowerCase().replace(/\s+/g, "")}/${app.url
+                              .toLowerCase()
+                              .replace(/\s+/g, "")}`;
 
-                          return (
-                            <Link
-                              key={index}
-                              href={appHref}
-                              title={app.Description || ""}
-                              className="group relative flex items-center gap-3 rounded-xl px-1 py-1 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
-                            >
-                              {/* ACTIVE GLOW */}
-                              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                              {/* ICON */}
-                              <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300 shadow-lg">
-                                <Image
-                                  src={
-                                    app.icon ||
-                                    "https://img.icons8.com/deco/48/open-box.png"
-                                  }
-                                  width={20}
-                                  height={20}
-                                  alt={app.Name}
-                                  priority
-                                  quality={100}
-                                  className="object-contain"
-                                />
-                              </div>
-
-                              {/* TEXT */}
-                              <div className="flex-1 min-w-0 relative">
-                                <p className="text-xs font-medium text-gray-100 truncate">
-                                  {app.Name}
-                                </p>
-
-                                <p className="text-[11px] text-gray-400 truncate mt-0.5">
-                                  {app.Description?.slice(0, 45) ||
-                                    "Business module"}
-                                </p>
-                              </div>
-                            </Link>
-                          );
-                        })}
-
-                        {/* SPECIAL APPS */}
-                        {user?.Email.trim() === "tobenna970@gmail.com" && (
-                          <>
-                            {[
-                              {
-                                name: "CRM",
-                                url: "crm",
-                                icon: "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
-                                description:
-                                  "Customer relationship management.",
-                              },
-                              {
-                                name: "Employee Management",
-                                url: "employee",
-                                icon: "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
-                                description:
-                                  "Manage employee operations efficiently.",
-                              },
-                              {
-                                name: "Product Management",
-                                url: "product",
-                                icon: "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
-                                description: "Centralized product operations.",
-                              },
-                              {
-                                name: "Cash Register",
-                                url: "payment",
-                                icon: "https://img.icons8.com/dusk/64/cash-register.png",
-                                description:
-                                  "Process transactions and payments.",
-                              },
-                              {
-                                name: "Stores Operations",
-                                url: "store",
-                                icon: "https://img.icons8.com/arcade/64/garage-closed.png",
-                                description:
-                                  "Warehouse and inventory management.",
-                              },
-                            ].map((item, i) => (
+                            return (
                               <Link
-                                key={i}
-                                href={`/${business?.companyName
-                                  ?.toLowerCase()
-                                  .replace(/\s+/g, "-")
-                                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                                  user._id,
-                                )}/${item.url}/${item.url}`}
-                                className="group relative flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
+                                key={index}
+                                href={appHref}
+                                title={app.Description || ""}
+                                className="group relative flex items-center gap-3 rounded-xl px-1 py-1 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
                               >
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10">
+                                {/* ACTIVE GLOW */}
+                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                {/* ICON */}
+                                <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300 shadow-lg">
                                   <Image
-                                    src={item.icon}
-                                    width={24}
-                                    height={24}
-                                    alt={item.name}
+                                    src={
+                                      app.icon ||
+                                      "https://img.icons8.com/deco/48/open-box.png"
+                                    }
+                                    width={20}
+                                    height={20}
+                                    alt={app.Name}
+                                    priority
+                                    quality={100}
+                                    className="object-contain"
                                   />
                                 </div>
 
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-100 truncate">
-                                    {item.name}
+                                {/* TEXT */}
+                                <div className="flex-1 min-w-0 relative">
+                                  <p className="text-xs font-medium text-gray-100 truncate">
+                                    {app.Name}
                                   </p>
 
-                                  <p className="text-[11px] text-gray-400 truncate">
-                                    {item.description}
+                                  <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                                    {app.Description?.slice(0, 45) ||
+                                      "Business module"}
                                   </p>
                                 </div>
                               </Link>
-                            ))}
-                          </>
-                        )}
-                      </div>
+                            );
+                          })}
+
+                          {/* SPECIAL APPS */}
+                          {user?.Email.trim() === "tobenna970@gmail.com" && (
+                            <>
+                              {[
+                                {
+                                  name: "CRM",
+                                  url: "crm",
+                                  icon: "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
+                                  description:
+                                    "Customer relationship management.",
+                                },
+                                {
+                                  name: "Employee Management",
+                                  url: "employee",
+                                  icon: "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
+                                  description:
+                                    "Manage employee operations efficiently.",
+                                },
+                                {
+                                  name: "Product Management",
+                                  url: "product",
+                                  icon: "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
+                                  description:
+                                    "Centralized product operations.",
+                                },
+                                {
+                                  name: "Cash Register",
+                                  url: "payment",
+                                  icon: "https://img.icons8.com/dusk/64/cash-register.png",
+                                  description:
+                                    "Process transactions and payments.",
+                                },
+                                {
+                                  name: "Stores Operations",
+                                  url: "store",
+                                  icon: "https://img.icons8.com/arcade/64/garage-closed.png",
+                                  description:
+                                    "Warehouse and inventory management.",
+                                },
+                              ].map((item, i) => (
+                                <Link
+                                  key={i}
+                                  href={`/${business?.companyName
+                                    ?.toLowerCase()
+                                    .replace(/\s+/g, "-")
+                                    .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                                    user._id,
+                                  )}/${item.url}/${item.url}`}
+                                  className="group relative flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-300 hover:bg-white/8 border border-transparent hover:border-white/10"
+                                >
+                                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 border border-white/10">
+                                    <Image
+                                      src={item.icon}
+                                      width={24}
+                                      height={24}
+                                      alt={item.name}
+                                    />
+                                  </div>
+
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-100 truncate">
+                                      {item.name}
+                                    </p>
+
+                                    <p className="text-[11px] text-gray-400 truncate">
+                                      {item.description}
+                                    </p>
+                                  </div>
+                                </Link>
+                              ))}
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}
@@ -632,29 +654,29 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
                             {/* app store on mobile screen */}
                             {business.subscriptionplan === "Standard" && (
                               <Link
-                              href={`/auth/Apps`}
-                              className="flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition bg-black  hover:bg-zinc-400 md:hidden"
-                            >
-                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 border border-white/10">
-                                <Image
-                                  src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
-                                  width={22}
-                                  height={22}
-                                  priority
-                                  quality={100}
-                                  alt="App Store"
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-white">
-                                  App Store
-                                </p>
+                                href={`/auth/Apps`}
+                                className="flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition bg-black  hover:bg-zinc-400 md:hidden"
+                              >
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 border border-white/10">
+                                  <Image
+                                    src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
+                                    width={22}
+                                    height={22}
+                                    priority
+                                    quality={100}
+                                    alt="App Store"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-white">
+                                    App Store
+                                  </p>
 
-                                <p className="text-[11px] text-blue-200">
-                                  Install more modules
-                                </p>
-                              </div>
-                            </Link>
+                                  <p className="text-[11px] text-blue-200">
+                                    Install more modules
+                                  </p>
+                                </div>
+                              </Link>
                             )}
                           </>
                         )}

@@ -9,6 +9,7 @@ import { Encrypt } from "../../../../../../Functions/Mics";
 import ExpenseCategoryModal from "@/app/Components/CreateExpenseCat";
 import ExpenseCategoriesModal from "@/app/Components/expensecateTable";
 import ExpenseReportModal from "@/app/Components/ExpenseReport"
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -92,10 +93,7 @@ export default async function ExpenseLayout({ children, params }) {
 
         <div className="flex flex-1 text-white bt-2 overflow-hidden">
           {/* Sidebar */}
-          <aside
-            className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
-            style={{ overflowY: "auto" }}
-          >
+          <SideNavWrapper>
             {/* <h2 className="text-lg font-bold mb-4">{moduleList.id}</h2>  */}
             <nav className="space-y-2">
               <BackButton />
@@ -128,7 +126,7 @@ export default async function ExpenseLayout({ children, params }) {
               {userData?.user?.ReportUser && (<ExpenseReportModal userData={userData} baseUrl={baseUrl} />)}
 
             </nav>
-          </aside>
+          </SideNavWrapper>
 
           {/* Main Content */}
           <main className="flex-1">

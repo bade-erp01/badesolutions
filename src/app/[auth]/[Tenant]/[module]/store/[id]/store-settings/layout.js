@@ -6,6 +6,10 @@ import Users from '../../../../../../../../models/Users'
 import Page from './page'
 import BackButton from "@/app/Components/BackBotton";
 import { Encrypt } from "../../../../../../../../Functions/Mics";
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
+
+
 
 export const metadata = {
   title: "Stores Settings | B.A.D.E ERP Platform",
@@ -89,13 +93,13 @@ export default async function storelayout({ params }) {
       />
 
       <div className="flex flex-1 text-white bt-2">
-        <aside className="w-72 bg-[#1e2939] text-white px-4 py-4 overflow-hidden">
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-4">
             
           </nav>
-        </aside>
+        </SideNavWrapper>
 
         <main className="flex-1">
           <section className="w-full max-w-7xl p-1 mx-auto flex flex-col gap-6 rounded-lg relative z-10 h-[500px] overflow-y-auto">

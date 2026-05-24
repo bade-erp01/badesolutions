@@ -6,10 +6,10 @@ import BackButton from "@/app/Components/BackBotton";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import Card from "@/app/Components/Card";
 import TaskAssigner from "@/app/Components/TaskAssigner"
+import SideNavWrapper from "@/app/Components/sideNavWrapper"
 
 
-
-// ✅ Dynamic Metadata for SEO
+//Dynamic Metadata for SEO
 export async function generateMetadata() {
   const userData = await fetchUser();
   const businessInfo = userData.business;
@@ -28,7 +28,6 @@ export async function generateMetadata() {
     author: businessInfo.companyName,
     robots: "index, follow",
     viewport: "width=device-width, initial-scale=1",
-    themeColor: "#f4a8ff",
     openGraph: {
       title: `${businessInfo.companyName} | Next-Level Automation`,
       description: `Streamline your business with AI-driven automation, real-time insights, and scalability`,
@@ -46,7 +45,7 @@ export async function generateMetadata() {
   };
 }
 
-// ✅ Page Component
+// Page Component
 export default async function EmployeeListpage({ params }) {
   const userData = await fetchUser();
   const moduleList = await params;
@@ -73,10 +72,7 @@ export default async function EmployeeListpage({ params }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300"
-          style={{ overflowY: "auto" }}
-        >
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-4  max-h-[83dvh] overflow-y-hidden ">
@@ -85,7 +81,7 @@ export default async function EmployeeListpage({ params }) {
             )}
             <TaskAssigner users={EmployeeList.data} userInfo={userData}  EXPRESS_PRIVATE_URL={baseUrl}/>
           </nav>
-        </aside>{" "}
+        </SideNavWrapper>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
           <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6 relative z-10 max-h-[82dvh] overflow-y-auto">

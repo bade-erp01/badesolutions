@@ -12,6 +12,9 @@ import { Encrypt } from "../../../../../../Functions/Functions";
 import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
 import AddPriceListModal from "@/app/Components/PricelistCreate";
 import { Plus } from "lucide-react";
+import SideNavWrapper from "@/app/Components/sideNavWrapper";
+
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -84,9 +87,7 @@ export default async function Productlayout({ children, params }) {
 
         <div className="flex flex-1 text-white bt-2 max-h-[82dvh] overflow-hidden">
           {/* Sidebar */}
-          <aside
-           className="hidden lg:block w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300" style={{ overflowY: "auto" }}
-          >
+          <SideNavWrapper>
             <h2 className="text-lg font-bold mb-4">Product Management</h2>
             <hr />
             <nav className="space-y-4">
@@ -135,7 +136,7 @@ export default async function Productlayout({ children, params }) {
                 </>
               )}
             </nav>
-          </aside>
+          </SideNavWrapper>
 
           {/* Main Content */}
           <main className="flex-1">
