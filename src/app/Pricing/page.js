@@ -49,11 +49,56 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <div>
-                <p className="text-3xl font-semibold">₦139,750</p>
-                <p className="text-sm text-zinc-500"> Yearly</p>
-              </div>
+              {/* <div> */}
+                {/* <p className="text-3xl font-semibold">₦139,750</p> */}
+                {/* <p className="text-3xl font-semibold">₦420,000 </p>
+                <p className="text-sm text-zinc-500"> current promo :10% off </p>
+              </div> */}
 
+              {/* promo div */}
+              <div className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100/60 p-5 shadow-sm">
+                {/* Glow */}
+                <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-emerald-300/20 blur-3xl" />
+
+                <div className="relative flex items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+                      🎉 Limited Promo Active
+                    </div>
+
+                    <div className="space-y-1">
+                      {/* Old price */}
+                      <p className="text-sm text-zinc-400 line-through">
+                        ₦420,667
+                      </p>
+
+                      {/* Promo price */}
+                      <h2 className="text-4xl font-bold tracking-tight text-zinc-900">
+                        ₦378,600
+                      </h2>
+
+                      <p className="text-sm text-zinc-600">
+                        Save <span className="font-semibold text-emerald-700">10%[₦42,066.7]</span> on Basic plan.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Promo badge */}
+                  <div className="rounded-2xl bg-emerald-600 px-4 py-3 text-center text-white shadow-lg">
+                    <p className="text-xs uppercase tracking-wider opacity-80">
+                      Promo
+                    </p>
+
+                    <p className="text-2xl font-bold leading-none">
+                      10%
+                    </p>
+
+                    <p className="text-xs opacity-80 mt-1">
+                      OFF
+                    </p>
+                  </div>
+                </div>
+              </div>
               <Button
                 className="w-full rounded-xl"
                 onClick={() => router.push("/auth/SignUp?plan=Basic")}
@@ -83,13 +128,14 @@ export default function Pricing() {
 
             <CardContent className="space-y-6">
               <div>
-                <p className="text-3xl font-semibold">₦332,820</p>
+                <p className="text-3xl font-semibold">₦1,332,820</p>
                 <p className="text-sm text-zinc-500">Yearly</p>
               </div>
 
               <Button
+              disabled
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
-                onClick={() => router.push("/auth/SignUp?plan=Standard")}
+                // onClick={() => router.push("/auth/SignUp?plan=Standard")}
               >
                 Start scaling
               </Button>

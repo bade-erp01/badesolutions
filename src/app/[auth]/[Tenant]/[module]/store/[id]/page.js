@@ -9,7 +9,6 @@ import {
 import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import Card from "@/app/Components/Card";
 import Link from "next/link";
 import Footer2 from "@/app/Components/Footer2";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
@@ -98,10 +97,7 @@ export default async function storelayout({ children, params }) {
 
       <div className="flex flex-1 text-white bt-2">
         {/* Sidebar */}
-        <SideNavWrapper
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md 
-          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block"
-        >
+        <SideNavWrapper>
           <BackButton />
           <hr />
           <nav className="space-y-4">

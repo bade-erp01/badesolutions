@@ -2,7 +2,7 @@
 
 import { termsAndConditions } from "../../../../Functions/Functions";
 import { SuccessToast, ErrorMessage } from "../../../../Functions/Mics";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -33,6 +33,10 @@ export default function SignUpPage() {
     }
   }, [plan, router]);
 
+
+  
+  
+  
   const [formData, setFormData] = useState({
     CompayName: "",
     email: "",
@@ -40,10 +44,55 @@ export default function SignUpPage() {
     plan: plan,
     NumberOfUsers: plan === "Basic" ? 4 : 6 ,
     renewalFee: plan === "Basic" ? 139750 : 332820,
-    totalAmount: plan === "Basic" ? 139750 : 332820,
-    referalCode: "",
+    totalAmount: plan === "Basic" ? 378600 : 1332820,
+    referalCode: "so-far-so-good",
   });
 
+
+  // scrap user data 
+const hasCapturedLead = useRef(false);
+
+useEffect(() => {
+  const saveDraft = async () => {
+    if (hasCapturedLead.current) return;
+    if (!formData.email && !formData.Tel) return;
+
+    try {
+      const res = await fetch(
+        "https://api.badesolutions.com.ng/api/lead-capture",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            phone: formData.Tel,
+            company: formData.CompayName,
+            plan: formData.plan,
+            source: "signup-page",
+            capturedAt: new Date(),
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data?.success) {
+        hasCapturedLead.current = true;
+      }
+    } catch (err) {
+      // console.error(err.message);
+    }
+  };
+
+  const interval = setInterval(saveDraft, 20000);
+
+  return () => clearInterval(interval);
+}, [formData]);
+
+
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -155,7 +204,8 @@ export default function SignUpPage() {
                     <Input
                       id="referalCode"
                       name="referalCode"
-                      value={formData.referalCode}
+                      value={plan === "Basic" ? "so-far-so-good" : formData.referalCode}
+                      disabled={plan === "Basic"}
                       onChange={handleChange}
                     />
                   </div>
@@ -177,6 +227,10 @@ export default function SignUpPage() {
                       ₦{formData.totalAmount.toLocaleString()}
                     </p>
                   </div>
+
+                  <p className="text-[11px] text-zinc-500">
+                    We may securely save your signup progress to help complete onboarding.
+                  </p>
 
                   {/* TERMS */}
                   <TermsAndConditionsLink BusinessPlan={formData.plan} />
