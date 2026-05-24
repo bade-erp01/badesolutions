@@ -43,12 +43,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import BackButton from "./BackBotton";
+import { Card } from "@/components/ui/card"
+import { Loader2 } from "lucide-react"
 
-export default function Nav1({ page, Module, user, business }) {
+export default function Nav1({ page, Module, user, business, IconArray }) {
   const pathName = usePathname();
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [hydrated, setHydrated] = useState(false);
@@ -159,7 +161,7 @@ export default function Nav1({ page, Module, user, business }) {
           trimmedTerm,
         )}`,
       );
-
+      setLoading(false)
       Swal.close();
 
       setSearchTerm("");
@@ -205,29 +207,54 @@ export default function Nav1({ page, Module, user, business }) {
                 className="w-[300px] border-0 bg-white/95 backdrop-blur-2xl"
               >
                 <SheetHeader>
-                  <SheetTitle className="text-left">Navigation</SheetTitle>
+                  <SheetTitle className="text-left">Menu</SheetTitle>
                 </SheetHeader>
 
                 <div className="mt-8 flex flex-col gap-4">
                   {/* SEARCH */}
                   {business && user && Module?.length > 0 && (
-                    <form onSubmit={handleSearch} className="space-y-3">
-                      <div className="relative">
-                        <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                     <Card className="p-3 shadow-sm m-1">
+                        <form onSubmit={handleSearch} className="space-y-4">
+                          <div className="relative">
+                            <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400" />
 
-                        <Input
-                          type="search"
-                          placeholder={`Search ${page}...`}
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="h-11 rounded-2xl pl-10"
-                        />
-                      </div>
+                            <Input
+                              type="search"
+                              placeholder={`Search ${page}...`}
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              className="h-12 rounded-xl pl-10 pr-10 border border-zinc-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                            />
 
-                      <Button type="submit" className="w-full rounded-sm">
-                        Search
-                      </Button>
-                    </form>
+                            {searchTerm && (
+                              <button
+                                type="button"
+                                onClick={() => setSearchTerm("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                              >
+                                <XMarkIcon className="h-5 w-5" />
+                              </button>
+                            )}
+                          </div>
+
+                          <Button
+                            type="submit"
+                            className="w-full rounded-xl bg-gray-500 text-white font-semibold shadow-md transition flex items-center justify-center gap-2"
+                            disabled={loading}
+                          >
+                            {loading ? (
+                              <>
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                Searching...
+                              </>
+                            ) : (
+                              <>
+                                Search {page}
+                              </>
+                            )}
+                          </Button>
+                        </form>
+                      </Card>
                   )}
 
                   {/* PUBLIC LINKS */}
@@ -255,13 +282,16 @@ export default function Nav1({ page, Module, user, business }) {
                       </Link>
                     </div>
                   ) : (
-                    <div className="flex-1 overflow-y-auto px-3 pb-4 bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617]"
+                    <div
+                      className="flex-1 overflow-y-auto px-3 pb-4 bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617] h-screen"
                       style={{
                         scrollbarWidth: "thin",
                         scrollbarColor: "#334155 transparent",
                       }}
                     >
-                      <div className="space-y-1">
+                      {/* only show if the page is dashboard */}
+                     {IconArray && (
+                      <div className="space-y-1 overflow-y-auto h-screen p-1">
                         {user?.Apps.map((app, index) => {
                           const appHref = `/${business?.companyName
                             ?.toLowerCase()
@@ -314,8 +344,7 @@ export default function Nav1({ page, Module, user, business }) {
                         })}
 
                         {/* SPECIAL APPS */}
-                        {user?.Email.trim() ===
-                          "tobenna970@gmail.com" && (
+                        {user?.Email.trim() === "tobenna970@gmail.com" && (
                           <>
                             {[
                               {
@@ -386,6 +415,7 @@ export default function Nav1({ page, Module, user, business }) {
                           </>
                         )}
                       </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -562,7 +592,7 @@ export default function Nav1({ page, Module, user, business }) {
                             }}
                           >
                             <p className="mb-2 px-2 text-xs font-medium text-zinc-500">
-                              Switch Tenant
+                              Switch Business
                             </p>
 
                             {user.toogledTenants
@@ -589,14 +619,44 @@ export default function Nav1({ page, Module, user, business }) {
                         )}
 
                         {user?.isAdmin && (
-                          <Link
-                            href={`/${sanitizedCompanyName}/account/${Encrypt(
-                              business._id,
-                            )}`}
-                            className="flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition hover:bg-zinc-100"
-                          >
-                            ⚙️ Account settings
-                          </Link>
+                          <>
+                            <Link
+                              href={`/${sanitizedCompanyName}/account/${Encrypt(
+                                business._id,
+                              )}`}
+                              className="flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition hover:bg-zinc-100"
+                            >
+                              ⚙️ Account settings
+                            </Link>
+
+                            {/* app store on mobile screen */}
+                            {business.subscriptionplan === "Standard" && (
+                              <Link
+                              href={`/auth/Apps`}
+                              className="flex items-center rounded-2xl px-4 py-3 text-sm font-medium transition bg-black  hover:bg-zinc-400 md:hidden"
+                            >
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 border border-white/10">
+                                <Image
+                                  src="https://img.icons8.com/avantgarde/100/apple-app-store.png"
+                                  width={22}
+                                  height={22}
+                                  priority
+                                  quality={100}
+                                  alt="App Store"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-white">
+                                  App Store
+                                </p>
+
+                                <p className="text-[11px] text-blue-200">
+                                  Install more modules
+                                </p>
+                              </div>
+                            </Link>
+                            )}
+                          </>
                         )}
 
                         {user?.Notification?.length > 0 && (
