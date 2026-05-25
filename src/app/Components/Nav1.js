@@ -145,7 +145,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
   const handleSearch = async (e) => {
     e.preventDefault();
 
-    const trimmedTerm = searchTerm.trim();
+    const trimmedTerm = searchTerm.trim().replace(/\s/g, "%");
 
     if (!trimmedTerm) {
       ErrorMessage("Please enter a search word");
@@ -157,9 +157,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
 
     setTimeout(() => {
       router.push(
-        `/Search/${encodeURIComponent(page)}?search=${encodeURIComponent(
-          trimmedTerm,
-        )}`,
+        `/Search/${encodeURIComponent(page)}?search=${trimmedTerm}`,
       );
       setLoading(false);
       Swal.close();

@@ -6,6 +6,7 @@ import BackButton from '@/app/Components/BackBotton';
 import Footer2 from '@/app/Components/Footer2';
 import SearchResultPage from './page'
 import axios from "axios"
+import { redirect,useRouter } from "next/navigation";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -29,6 +30,11 @@ export const metadata = {
 export default async function searchLayout({children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
+  const router = useRouter();
+
+  if (!userData) {
+    router.push("/");
+  }
 
   // Use a single config object for axios
   const config = {
