@@ -55,7 +55,7 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
     ) => {
         if (!sales || sales.length === 0) return [];
         const filteredExport = [];
-
+        
         sales.forEach((sale) => {
             const saleDate = new Date(sale.startDate || sale.createdAt || sale.OrderDate || null);
             const start = activeFilters.startDate ? new Date(activeFilters.startDate) : null;
@@ -88,6 +88,7 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
                         "Exp Date": order.ExpDate || "N/A",
                         Supplier: getVendorName(order?.item?.Vendor),
                         "Rec Date": sale.recievedDate || sale.recievedDate || "N/A",
+                        "Dis. Rec":sale.discount || 0,
                         "PO Sub": sale.subTotal || 0,
                         "PO Total": sale.grandTotal || 0,
                         Month: sale.recievedDate ? new Date(sale.recievedDate).toLocaleString("default", { month: "short" }) : "N/A",
