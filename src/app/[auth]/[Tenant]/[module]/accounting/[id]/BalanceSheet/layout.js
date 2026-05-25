@@ -2,14 +2,17 @@ import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import { Separator } from "@/components/ui/separator";
-import {Encrypt} from "../../../../../../../../Functions/Mics"
-import { notFound } from 'next/navigation';
+import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { notFound } from "next/navigation";
 import BackButton from "@/app/Components/BackBotton";
+import BalanceSheet from "./page";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
   description: "Automate, Optimize, and Scale Your Business Operations",
-  keywords: [/* ...keywords omitted for brevity... */],
+  keywords: [
+    /* ...keywords omitted for brevity... */
+  ],
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
   viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
@@ -27,18 +30,35 @@ export const metadata = {
 export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
-  
-    // check if user has access to crm and cash register
-    const AccountingFinder = userData.user.Apps.find(app=>{
-      return app.Name === "Accounting"
-    })
-  
-    if(!AccountingFinder){
-      return notFound()
-    }
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+
+  // check if user has access to crm and cash register
+  const AccountingFinder = userData.user.Apps.find((app) => {
+    return app.Name === "Accounting";
+  });
+
+  if (!AccountingFinder) {
+    return notFound();
+  }
 
   try {
-  
+    const res = await fetch(`${baseUrl}/api/Generate/BalanceSheet`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
+      },
+      // cache: "force-cache",
+      // next: { revalidate: 60 },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch balance data");
+    }
+
+    const response = await res.json();
+
     return (
       <div className="flex flex-col min-h-screen overflow-hidden">
         <Nav1
@@ -54,15 +74,15 @@ export default async function AccountingPage({ children, params }) {
             style={{ overflowY: "auto" }}
           >
             <nav className="">
-             <BackButton/>
-             <Separator className="my-2" />
+              <BackButton />
+              <Separator className="my-2" />
             </nav>
           </aside>
 
           {/* Main Content */}
           <main className="flex-1">
             <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
-              {children}
+              <BalanceSheet baseUrl={baseUrl} userData={userData} data={response}/>
             </section>
           </main>
         </div>

@@ -15,25 +15,13 @@ import {
 } from "recharts";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import { Separator } from "@/components/ui/separator";
+import {Encrypt,Dencrypt} from "../../../../../../../../Functions/Functions"
 
-export default function BalanceSheet() {
-  const [balanceData, setBalanceData] = useState({
-    assets: 200000,
-    liabilities: 80000,
-    equity: 120000,
-  });
+export default function BalanceSheet({data}) {
+  const [balanceData] = useState(Dencrypt(data.data));
+  const [inventoryData] = useState(data.inventoryValue);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBalanceData((prev) => ({
-        assets: prev.assets + Math.floor(Math.random() * 5000),
-        liabilities: prev.liabilities + Math.floor(Math.random() * 3000),
-        equity: prev.assets - prev.liabilities,
-      }));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+ 
 
   const handleExport = () => {
     const data = JSON.stringify(balanceData, null, 2);
@@ -44,17 +32,7 @@ export default function BalanceSheet() {
     a.click();
   };
 
-  const chartData = [
-    { quarter: "Q1", assets: 180000, liabilities: 70000, equity: 110000 },
-    { quarter: "Q2", assets: 190000, liabilities: 75000, equity: 115000 },
-    { quarter: "Q3", assets: 200000, liabilities: 80000, equity: 120000 },
-    {
-      quarter: "Q4",
-      assets: balanceData.assets,
-      liabilities: balanceData.liabilities,
-      equity: balanceData.equity,
-    },
-  ];
+  const chartData = [{ quarter: balanceData.quarter, assets: balanceData.totals.assets, liabilities: balanceData.totals.liabilities, equity: balanceData.totals.equity },];
 
   return (
     <div className="w-full p-6  min-h-screen">
@@ -73,7 +51,10 @@ export default function BalanceSheet() {
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-bold text-purple-400">
-                  {balanceData.assets.toLocaleString()}
+                  {Math.round(balanceData.totals.assets + inventoryData).toLocaleString()}
+                  
+                  {/* {inventoryData > 0 &&
+                    ` (Includes Inventory: ${inventoryData.toLocaleString()})`} */}
                 </p>
               </CardContent>
             </Card>
@@ -83,7 +64,7 @@ export default function BalanceSheet() {
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-bold text-red-400">
-                  {balanceData.liabilities.toLocaleString()}
+                  {balanceData.totals.liabilities.toLocaleString()}
                 </p>
               </CardContent>
             </Card>
@@ -93,7 +74,7 @@ export default function BalanceSheet() {
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-bold text-green-400">
-                  {balanceData.equity.toLocaleString()}
+                  {balanceData.totals.equity.toLocaleString()}
                 </p>
               </CardContent>
             </Card>
