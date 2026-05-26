@@ -133,9 +133,8 @@ export default function Pricing() {
               </div>
 
               <Button
-              disabled
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
-                // onClick={() => router.push("/auth/SignUp?plan=Standard")}
+                onClick={() => router.push("/auth/SignUp?plan=Standard")}
               >
                 Start scaling
               </Button>
