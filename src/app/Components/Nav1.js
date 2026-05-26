@@ -145,7 +145,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
   const handleSearch = async (e) => {
     e.preventDefault();
 
-    const trimmedTerm = searchTerm.trim().replace(/\s/g, "%");
+    const trimmedTerm = searchTerm.trim();
 
     if (!trimmedTerm) {
       ErrorMessage("Please enter a search word");
