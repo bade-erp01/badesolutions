@@ -44,8 +44,8 @@ export default function SignUpPage() {
     plan: plan,
     NumberOfUsers: plan === "Basic" ? 4 : 6 ,
     renewalFee: plan === "Basic" ? 139750 : 332820,
-    totalAmount: plan === "Basic" ? 378600 : 1332820,
-    referalCode: "so-far-so-good",
+    totalAmount: plan === "Basic" ? 139750 : 332820,
+    referalCode: "",
   });
 
 
@@ -204,8 +204,7 @@ useEffect(() => {
                     <Input
                       id="referalCode"
                       name="referalCode"
-                      value={plan === "Basic" ? "so-far-so-good" : formData.referalCode}
-                      disabled={plan === "Basic"}
+                      value={formData.referalCode}
                       onChange={handleChange}
                     />
                   </div>

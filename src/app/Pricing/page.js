@@ -69,16 +69,16 @@ export default function Pricing() {
                     <div className="space-y-1">
                       {/* Old price */}
                       <p className="text-sm text-zinc-400 line-through">
-                        ₦420,667
+                        ₦153,725
                       </p>
 
                       {/* Promo price */}
                       <h2 className="text-4xl font-bold tracking-tight text-zinc-900">
-                        ₦378,600
+                        ₦139,750
                       </h2>
 
                       <p className="text-sm text-zinc-600">
-                        Save <span className="font-semibold text-emerald-700">10%[₦42,066.7]</span> on Basic plan.
+                        Save <span className="font-semibold text-emerald-700">10%[₦13,975]</span> on Basic plan.
                       </p>
                     </div>
                   </div>
@@ -128,7 +128,7 @@ export default function Pricing() {
 
             <CardContent className="space-y-6">
               <div>
-                <p className="text-3xl font-semibold">₦1,332,820</p>
+                <p className="text-3xl font-semibold">₦332,820</p>
                 <p className="text-sm text-zinc-500">Yearly</p>
               </div>
 
