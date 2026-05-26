@@ -15,13 +15,11 @@ import {
 } from "recharts";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import { Separator } from "@/components/ui/separator";
-import {Encrypt,Dencrypt} from "../../../../../../../../Functions/Functions"
+import {Badge} from "@/components/ui/badge";
+import {Dencrypt} from "../../../../../../../../Functions/Functions"
 
 export default function BalanceSheet({data}) {
   const [balanceData] = useState(Dencrypt(data.data));
-  const [inventoryData] = useState(data.inventoryValue);
-
- 
 
   const handleExport = () => {
     const data = JSON.stringify(balanceData, null, 2);
@@ -38,7 +36,7 @@ export default function BalanceSheet({data}) {
     <div className="w-full p-6  min-h-screen">
       <Card className="bg-gray-900 border-gray-800 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center text-white">
+          <CardTitle className="text-xl font-bold text-center text-white">
             Balance Sheet Overview
           </CardTitle>
         </CardHeader>
@@ -50,12 +48,9 @@ export default function BalanceSheet({data}) {
                 <CardTitle className="text-white text-md">Assets</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl font-bold text-purple-400">
-                  {Math.round(balanceData.totals.assets + inventoryData).toLocaleString()}
-                  
-                  {/* {inventoryData > 0 &&
-                    ` (Includes Inventory: ${inventoryData.toLocaleString()})`} */}
-                </p>
+                  <Badge variant="default" className="text-xl font-bold text-purple-400">
+                  {Math.round(balanceData.totals.assets).toLocaleString()}
+                  </Badge>
               </CardContent>
             </Card>
             <Card className="bg-gray-800 border-gray-700">
@@ -63,9 +58,9 @@ export default function BalanceSheet({data}) {
                 <CardTitle className="text-white text-md">Liabilities</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl font-bold text-red-400">
+                <Badge variant="default" className="text-xl font-bold text-red-400">
                   {balanceData.totals.liabilities.toLocaleString()}
-                </p>
+                </Badge>
               </CardContent>
             </Card>
             <Card className="bg-gray-800 border-gray-700">
@@ -73,9 +68,9 @@ export default function BalanceSheet({data}) {
                 <CardTitle className="text-white text-md">Equity</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl font-bold text-green-400">
+                <Badge variant="default" className="text-xl font-bold text-green-400">
                   {balanceData.totals.equity.toLocaleString()}
-                </p>
+                </Badge>
               </CardContent>
             </Card>
           </div>
