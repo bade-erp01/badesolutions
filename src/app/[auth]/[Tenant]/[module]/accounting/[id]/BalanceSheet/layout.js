@@ -1,11 +1,10 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
-import { Separator } from "@/components/ui/separator";
 import { Encrypt } from "../../../../../../../../Functions/Mics";
 import { notFound } from "next/navigation";
-import BackButton from "@/app/Components/BackBotton";
 import BalanceSheet from "./page";
+import moment from "moment"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -42,7 +41,7 @@ export default async function AccountingPage({ children, params }) {
   }
 
   try {
-    const res = await fetch(`${baseUrl}/api/Generate/BalanceSheet`, {
+    const res = await fetch(`${baseUrl}/api/Generate/BalanceSheet?period=${moment().year()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -60,35 +59,12 @@ export default async function AccountingPage({ children, params }) {
     const response = await res.json();
 
     return (
-      <div className="flex flex-col min-h-screen overflow-hidden">
-        <Nav1
-          user={userData.user}
-          business={userData.business}
-          page={`${moduleList.id}`}
-        />
-
-        <div className="flex flex-1 text-white bt-2">
-          {/* Sidebar */}
-          <aside
-            className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[90dvh] md:block"
-            style={{ overflowY: "auto" }}
-          >
-            <nav className="">
-              <BackButton />
-              <Separator className="my-2" />
-            </nav>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
-              <BalanceSheet baseUrl={baseUrl} userData={userData} data={response}/>
-            </section>
-          </main>
-        </div>
-
-        <Footer2 />
-      </div>
+     <>
+       <Nav1 user={userData.user} business={userData.business} page={`Balance sheet
+        `} />
+      <BalanceSheet baseUrl={baseUrl} userData={userData} data={response}/>
+      <Footer2 />
+     </>
     );
   } catch (err) {
     return (
