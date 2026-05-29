@@ -63,14 +63,14 @@ export default function PrivacyIdleOverlay({
         {locked && (
           <motion.div
             initial={{ y: "-100%", opacity: 0 }}
-            animate={{ y: 0, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             exit={{ y: "-100%", opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/35 backdrop-blur-md"
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/95 backdrop-blur-md"
           >
             <div className="text-center text-white space-y-4">
               <h1 className="text-2xl font-bold tracking-widest uppercase">
-                Privacy Mode
+                Privacy Mode.
               </h1>
               <p className="text-sm text-gray-400">
                 We locked your session due to inactivity
