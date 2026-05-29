@@ -11,11 +11,11 @@ export default function Footer2() {
         className="px-4"
       >
         <span className="text-xs md:text-base text-gray-200">
-          📢 Get a professional business email that reflects your brand identity.{" "}
-        </span> 
-        {" "} |  {" "}
+           Elevate your brand with a professional business email.
+        </span>
+        {" "} | {" "}
         <span className="text-xs md:text-base text-gray-200">
-          📢 Promote your businesses within the BADE ecosystem by giving them visibility to other active users.{" "}
+           Gain visibility in the BADE ecosystem and attract new opportunities.
         </span>
         {" "} |  {" "}
        <span>Whatsapp Support on +234 704 4889 034</span>
