@@ -46,7 +46,7 @@ export default async function Layout({ children }) {
   }
 
   return (
-    <PrivacyIdleOverlay idleTimeMs={120000} style={{ overflowY: "hidden" }}>
+    <PrivacyIdleOverlay idleTimeMs={120000} style={{ overflowY: "hidden" }} userData={userData} SessionId={SessionId}>
       <CookiesPolicyAlert />
       {children}
     </PrivacyIdleOverlay>

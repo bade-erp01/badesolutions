@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {useRouter} from "next/navigation"
+import { ErrorMessage, plsWait } from "../../../Functions/Mics";
 
 /**
  * PrivacyIdleOverlay
@@ -13,8 +15,17 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function PrivacyIdleOverlay({
   idleTimeMs = 60_000, // default 1 minute
   onLock,
+  userData,
+  SessionId,
   children,
 }) {
+  const router = useRouter()
+  // Redirect if either user OR business is missing 
+  if (userData.user.SessionId !== SessionId) {
+      ErrorMessage("Your account has been logged in else where.")
+      router.push("/Login");
+  }
+
   const [locked, setLocked] = useState(false);
   const timerRef = useRef(null);
 
