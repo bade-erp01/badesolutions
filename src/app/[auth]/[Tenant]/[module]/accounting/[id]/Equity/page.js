@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { Loader2 } from "lucide-react";
 import {
   ErrorMessage,
   SuccessToast,
@@ -55,6 +55,13 @@ export default function Page({
   const [selectedAction, setSelectedAction] = useState(null);
 
   const [loading, setLoading] = useState(false);
+  const [loadingId, setLoadingId] = useState(null);
+
+  const isRowLoading = (id, action) =>
+  loading &&
+  selectedAction?.id === id &&
+  selectedAction?.action === action;
+
 
   const itemsPerPage = 50;
 
@@ -76,6 +83,7 @@ export default function Page({
     if (!selectedAction) return;
 
     try {
+      setLoadingId(selectedAction.id);
       setLoading(true);
 
       const response = await fetch(
@@ -90,6 +98,7 @@ export default function Page({
               userData.business.tenantId
             )}`,
             access: `${Encrypt(userData.user._id)}`,
+            "idempotency-key": `Equity-${selectedAction.action}-${selectedAction.id}`,
           },
           body: JSON.stringify({
             status: selectedAction.action,
@@ -109,6 +118,7 @@ export default function Page({
     } catch (error) {
       ErrorMessage(error.message);
     } finally {
+      setLoadingId(null);
       setLoading(false);
       setDialogOpen(false);
       setSelectedAction(null);
@@ -222,27 +232,33 @@ export default function Page({
                               <>
                                 <Button
                                   size="sm"
-                                  onClick={() =>
-                                    openActionDialog(
-                                      "Posted",
-                                      item._id
-                                    )
-                                  }
+                                  disabled={isRowLoading(item._id, "Posted")}
+                                  onClick={() => openActionDialog("Posted", item._id)}
                                 >
-                                  Post
+                                  {isRowLoading(item._id, "Posted") ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Posting...
+                                    </>
+                                  ) : (
+                                    "Post"
+                                  )}
                                 </Button>
 
                                 <Button
                                   size="sm"
                                   variant="destructive"
-                                  onClick={() =>
-                                    openActionDialog(
-                                      "delete",
-                                      item._id
-                                    )
-                                  }
+                                  disabled={isRowLoading(item._id, "delete")}
+                                  onClick={() => openActionDialog("delete", item._id)}
                                 >
-                                  Delete
+                                  {isRowLoading(item._id, "delete") ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Deleting...
+                                    </>
+                                  ) : (
+                                    "Delete"
+                                  )}
                                 </Button>
                               </>
                             )}
@@ -251,14 +267,17 @@ export default function Page({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() =>
-                                  openActionDialog(
-                                    "Reversed",
-                                    item._id
-                                  )
-                                }
+                                disabled={isRowLoading(item._id, "Reversed")}
+                                onClick={() => openActionDialog("Reversed", item._id)}
                               >
-                                Reverse
+                                {isRowLoading(item._id, "Reversed") ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Reversing...
+                                  </>
+                                ) : (
+                                  "Reverse"
+                                )}
                               </Button>
                             )}
                           </div>
