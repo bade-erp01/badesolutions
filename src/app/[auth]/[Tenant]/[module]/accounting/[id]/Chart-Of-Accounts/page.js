@@ -41,7 +41,7 @@ const FinancialOverview = ({ data, url, userData }) => {
   }, []);
 
   const filteredData = useMemo(() => {
-    return COAData.filter((entry) => {
+    return COAData.sort((a,b)=>{return a.code - b.code}).filter((entry) => {
       const value = search.toLowerCase();
 
       return (
