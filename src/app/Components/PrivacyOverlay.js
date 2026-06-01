@@ -139,7 +139,7 @@ export default function PrivacyIdleOverlay({
           >
             <div
               className="
-                bg-white/15
+                bg-gray-700
                 backdrop-blur-3xl
                 border border-white/20
                 rounded-3xl
