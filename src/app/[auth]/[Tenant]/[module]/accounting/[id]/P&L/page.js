@@ -254,6 +254,11 @@ export default function Page({ baseUrl, userData }) {
                   </TableRow>
 
                   <TableRow>
+                    <TableCell>Other income</TableCell>
+                    <TableCell className="text-right">{currency}{report?.totals?.ebit || 0}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
                     <TableCell>Interest</TableCell>
                     <TableCell className="text-right">{currency}{report?.totals?.interest || 0}</TableCell>
                   </TableRow>
