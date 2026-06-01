@@ -1,214 +1,355 @@
 "use client";
-import Swal from "sweetalert2";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+
 import {
-  plsWait,
   ErrorMessage,
   SuccessToast,
   Encrypt,
 } from "../../../../../../../../Functions/Mics";
 
-export default function Page({ data, EXPRESS_PRIVATE_URL, userData }) {
-  const Router = useRouter();
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { Button } from "@/components/ui/button";
+
+import { Badge } from "@/components/ui/badge";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+export default function Page({
+  data,
+  EXPRESS_PRIVATE_URL,
+  userData,
+}) {
+  const router = useRouter();
+
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [selectedAction, setSelectedAction] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
   const itemsPerPage = 50;
 
   const payments = data?.journals?.slice(0, 1050) || [];
 
   const totalPages = Math.ceil(payments.length / itemsPerPage);
-  const paginatedPayments = payments?.slice(
+
+  const paginatedPayments = payments.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const actionButton = async (action, id) => {
+  const openActionDialog = (action, id) => {
+    setSelectedAction({ action, id });
+    setDialogOpen(true);
+  };
+
+  const confirmAction = async () => {
+    if (!selectedAction) return;
+
     try {
-      const result = await Swal.fire({
-        title: "Do you want to proceed?",
-        text: ``,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "OK",
-        cancelButtonText: "Cancel",
-      });
+      setLoading(true);
 
-      if (result.isConfirmed) {
-        // Perform PATCH request if user clicks OK
-        plsWait("Updating...");
-        const response = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/Equity/journal/${Encrypt(id)}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              access: `${Encrypt(userData.user._id)}`,
-            },
-            body: JSON.stringify({ status: action }),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to update");
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/Equity/journal/${Encrypt(
+          selectedAction.id
+        )}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(
+              userData.business.tenantId
+            )}`,
+            access: `${Encrypt(userData.user._id)}`,
+          },
+          body: JSON.stringify({
+            status: selectedAction.action,
+          }),
         }
+      );
 
-        const data = await response.json();
+      const result = await response.json();
 
-        // show server message
-        SuccessToast(data.message);
-        // refresh page
-        Router.refresh();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update");
       }
-    } catch (err) {
-      //  show error message
-      ErrorMessage(err.message);
-      Router.refresh();
+
+      SuccessToast(result.message);
+
+      router.refresh();
+    } catch (error) {
+      ErrorMessage(error.message);
+    } finally {
+      setLoading(false);
+      setDialogOpen(false);
+      setSelectedAction(null);
     }
   };
 
+  const formatAmount = (amount) => {
+    const value =
+      amount?.$numberDecimal ??
+      amount ??
+      0;
+
+    return Number(value).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   return (
-    <div className="min-h-screen shadow-md">
-      {/* Header */}
-      <div className="mb-6 bg-gray-600 p-3">
-        <h1 className="text-2xl font-bold text-gray-100 mb-2">Equity Table</h1>
-        <span className="italic text-blue-100 text-xs">
-          Equity in business is the net worth of a company—what owners or
-          shareholders truly possess after debts are cleared. It’s both a
-          measure of financial strength and a foundation for growth..
-        </span>
-      </div>
+    <div className="w-full p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Equity Table</CardTitle>
 
-      {/* Table */}
-      <div className="rounded-lg overflow-hidden p-1 border">
-        <div className="overflow-hidden w-full bg-black">
-          <table className="w-full table-auto divide-y divide-gray-200 text-xs">
-            <thead className="bg-gray-600 sticky top-0 z-10">
-              <tr>
-                {[
-                  "Desc",
-                  "Type",
-                  "Status",
-                  "Raised-By",
-                  "Date",
-                  "Transaction",
-                  "Amount",
-                  "",
-                ].map((header) => (
-                  <th
-                    key={header}
-                    className="px-4 py-3 text-left font-medium  text-white uppercase tracking-wider"
-                  >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="bg-gray-400 divide-y divide-gray-200">
-              {paginatedPayments.map((item) => (
-                <tr
-                  key={item._id}
-                  className="hover:bg-gray-700/50 transition-colors"
-                >
-                  <td className="px-4 py-2 truncate" title={item?.description}>
-                    {item?.description?.slice(0, 12)}
-                  </td>
-                  <td className="px-4 py-2 truncate">
-                    <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {item.accountType}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 truncate">{item?.status}</td>
-                  <td className="px-4 py-2 truncate">{item?.raisedBy}</td>
-                  <td className="px-4 py-2 truncate">
-                    {new Date(item.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 font-medium">{item.debitCredit}</td>
-                  <td className="px-4 py-2 font-medium">
-                    {item.amount?.$numberDecimal.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td className="px-4 py-2 font-medium gap-2">
-                    {item.status === "Pending" && (
-                      <>
-                        <span
-                          title="Confirm Entry and update balance"
-                          onClick={() => actionButton("Posted", item._id)}
-                          className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-green-200 text-black cursor-pointer"
-                        >
-                          Post
-                        </span>
-                        <span
-                          title="Delete Entry"
-                          onClick={() => actionButton("delete", item._id)}
-                          className="px-2 mr-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-red-600 text-white cursor-pointer"
-                        >
-                          Delete
-                        </span>
-                      </>
-                    )}
+          <CardDescription>
+            Equity in business is the net worth of a company after
+            liabilities are deducted from assets. These journal
+            entries affect shareholder and owner equity balances.
+          </CardDescription>
+        </CardHeader>
 
-                    {item.status === "Posted" && (
-                      <span
-                        title="Cancel entry"
-                        onClick={() => actionButton("Reversed", item._id)}
-                        className="px-2 inline-flex text-xs font-semibold rounded-full border-amber-50 shadow bg-gray-700 text-white cursor-pointer"
+        <CardContent>
+          <div className="rounded-md border overflow-hidden">
+            <div className="max-h-[70vh] overflow-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-background z-20">
+                  <TableRow>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Raised By</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Transaction</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead className="w-[180px]">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {paginatedPayments.length > 0 ? (
+                    paginatedPayments.map((item) => (
+                      <TableRow key={item._id}>
+                        <TableCell
+                          className="max-w-[200px] truncate"
+                          title={item.description}
+                        >
+                          {item.description}
+                        </TableCell>
+
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {item.accountType}
+                          </Badge>
+                        </TableCell>
+
+                        <TableCell>
+                          {item.status === "Posted" && (
+                            <Badge className="bg-green-600">
+                              Posted
+                            </Badge>
+                          )}
+
+                          {item.status === "Pending" && (
+                            <Badge variant="outline">
+                              Pending
+                            </Badge>
+                          )}
+
+                          {item.status === "Reversed" && (
+                            <Badge variant="destructive">
+                              Reversed
+                            </Badge>
+                          )}
+                        </TableCell>
+
+                        <TableCell>
+                          {item.raisedBy}
+                        </TableCell>
+
+                        <TableCell>
+                          {new Date(
+                            item.date
+                          ).toLocaleDateString()}
+                        </TableCell>
+
+                        <TableCell>
+                          <Badge variant="outline">
+                            {item.debitCredit}
+                          </Badge>
+                        </TableCell>
+
+                        <TableCell className="font-semibold">
+                          ₦{formatAmount(item.amount)}
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex gap-2">
+                            {item.status === "Pending" && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    openActionDialog(
+                                      "Posted",
+                                      item._id
+                                    )
+                                  }
+                                >
+                                  Post
+                                </Button>
+
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() =>
+                                    openActionDialog(
+                                      "delete",
+                                      item._id
+                                    )
+                                  }
+                                >
+                                  Delete
+                                </Button>
+                              </>
+                            )}
+
+                            {item.status === "Posted" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  openActionDialog(
+                                    "Reversed",
+                                    item._id
+                                  )
+                                }
+                              >
+                                Reverse
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-8"
                       >
-                        Reverse
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                        No entry found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
 
-        {/* Pagination */}
-        <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200">
-          <div className="flex-1 flex justify-between sm:hidden">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="ml-3 px-4 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Next
-            </button>
-          </div>
-          <div className="hidden sm:flex sm:items-center sm:justify-between w-full">
-            <p className="text-sm text-gray-700">
-              Page <span className="font-medium">{currentPage}</span> of{" "}
-              <span className="font-medium">{totalPages}</span>
-            </p>
-            <div className="flex space-x-2">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`px-4 py-2 border rounded-md text-sm ${
-                    currentPage === i + 1
-                      ? "bg-indigo-50 border-indigo-500 text-indigo-600"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
+            {/* Pagination */}
+
+            <div className="flex items-center justify-between border-t p-4">
+              <div className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.max(prev - 1, 1)
+                    )
+                  }
                 >
-                  {i + 1}
-                </button>
-              ))}
+                  Previous
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.min(prev + 1, totalPages)
+                    )
+                  }
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Dialog */}
+
+      <AlertDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Confirm Action
+            </AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Are you sure you want to proceed with this
+              action?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>
+              Cancel
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              disabled={loading}
+              onClick={confirmAction}
+            >
+              {loading ? "Processing..." : "Continue"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

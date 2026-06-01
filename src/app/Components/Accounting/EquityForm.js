@@ -1,145 +1,328 @@
 "use client";
 
-import React from "react";
-import Swal from "sweetalert2";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {Encrypt} from "../../../../Functions/Functions"
+import { Encrypt } from "../../../../Functions/Functions";
 import {
-  plsWait,
   ErrorMessage,
   SuccessToast,
 } from "../../../../Functions/Mics";
 
-export default function EquityForm({ EXPRESS_PRIVATE_URL, user,Accounts,VendorsList} ) {
-  const Router = useRouter();
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-  async function EquityFormFunc() {
+import { Input } from "@/components/ui/input";
 
-    const BankOptions = Accounts
-      .map((c) => `<option value="${c._id}">${c.NAME}</option>`)
-      .join("");
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-    const vendorOptions = VendorsList
-        .map((c) => `<option value="${c._id}">${c.Name}</option>`)
-        .join("");
+import { Label } from "@/components/ui/label";
 
-    const { value: formValues } = await Swal.fire({
-      title: "New Journal Entry",
-      html: `
-      <style>
-        .swal2-input, .swal2-select {
-          padding: .5rem .75rem;
-          border: 1px solid #D1D5DB;
-          border-radius: .375rem;
-          font-size: .9rem;
-          width: 70%;
-          margin-top: .5rem;
-        }
-      </style>
+export default function EquityForm({
+  EXPRESS_PRIVATE_URL,
+  user,
+  Accounts,
+  VendorsList,
+}) {
+  const router = useRouter();
 
-      <div class="w-full p-1 justify-center overflow-hidden">
-        <input id="swal-amount" type="number" min="1" class="swal2-input" placeholder="Amount (₦)" required/>
-        <input id="swal-date" type="date" class="swal2-input" required/>
-        <input id="swal-desc" type="text" class="swal2-input" placeholder="Description" required/>
-        <select id="swal-accountType" class="swal2-select" required>
-          <option value="" disabled selected>Choose account type...</option>
-          <option value="ownersCapital">Owners Capital</option>
-          <option style="display:none" disabled readonly value="retainedEarnings">Retained earnings</option>
-          <option value="OtherIncome">Other Income</option>
-          <option value="drawings">Drawings</option>
-        </select>
-         <select id="bankDropdown" required class="swal2-select">
-          <option value="" >Choose Bank...</option>
-          ${BankOptions}
-        </select>
-        <select id="vendor" required class="swal2-select">
-          <option value="" >Choose vendor...</option>
-          ${vendorOptions}
-        </select>
-      </div>
-    `,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: "Submit",
-      preConfirm: () => {
-        const amount = document.getElementById("swal-amount").value;
-        const date = document.getElementById("swal-date").value;
-        const description = document.getElementById("swal-desc").value;
-        const accountType = document.getElementById("swal-accountType").value;
-        const bankDropdown = document.getElementById("bankDropdown").value;
-        const vendor = document.getElementById("vendor").value;
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-        if (!amount || !date || !accountType || !bankDropdown || !description) {
-          Swal.showValidationMessage(
-            "All fields are required"
-          );
-          return false;
-        }
+  const [formData, setFormData] = useState({
+    amount: "",
+    date: "",
+    description: "",
+    accountType: "",
+    bank: "",
+    vendor: "",
+  });
 
-        // Auto-assign debit/credit based on accountType
-        let debitCredit;
-        switch (accountType) {
-          case "ownersCapital":
-          case "retainedEarnings":
-          case "shareCapital":
-          case "reserves":
-          case "OtherIncome":
-            debitCredit = "credit"; // equity increases with credit
-            break;
-          case "drawings":
-            debitCredit = "debit"; // drawings reduce equity
-            break;
-          default:
-            debitCredit = "credit";
-        }
-
-        return { amount, date, description, accountType, debitCredit,bankDropdown ,vendor: vendor ?? null};
-      },
-    });
-
-    if (!formValues) return;
-
-    Swal.fire({
-      title: "Registering journal entry…",
-      didOpen: () => Swal.showLoading(),
-    });
-
+  const handleSubmit = async () => {
     try {
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/Equity/journal`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-        },
-        body: JSON.stringify({
-          accountType: formValues.accountType,
-          amount: formValues.amount,
-          debitCredit: formValues.debitCredit, // auto-computed
-          date: formValues.date,
-          description: formValues.description,
-          raisedBy: `${user.firstName} ${user.lastName}`,
-          bank:formValues.bankDropdown,
-          vendor:formValues.vendor ?? null
-        }),
-      });
+      const {
+        amount,
+        date,
+        description,
+        accountType,
+        bank,
+        vendor,
+      } = formData;
+
+      if (
+        !amount ||
+        !date ||
+        !description ||
+        !accountType ||
+        !bank
+      ) {
+        return ErrorMessage("All fields are required");
+      }
+
+      setLoading(true);
+
+      let debitCredit = "credit";
+
+      switch (accountType) {
+        case "drawings":
+          debitCredit = "debit";
+          break;
+
+        case "ownersCapital":
+        case "retainedEarnings":
+        case "shareCapital":
+        case "reserves":
+        case "OtherIncome":
+        default:
+          debitCredit = "credit";
+      }
+
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/Equity/journal`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(
+              user.tenantId
+            )}`,
+            access: Encrypt(user._id),
+          },
+          body: JSON.stringify({
+            accountType,
+            amount: Number(amount),
+            debitCredit,
+            date,
+            description,
+            raisedBy: `${user.firstName} ${user.lastName}`,
+            bank,
+            vendor: vendor || null,
+          }),
+        }
+      );
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong");
 
-      SuccessToast(data.message)
-      Router.refresh();
-    } catch (err) {
-       ErrorMessage(err.message);
-       Router.refresh();
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Failed to create entry"
+        );
+      }
+
+      SuccessToast(data.message);
+
+      setOpen(false);
+
+      setFormData({
+        amount: "",
+        date: "",
+        description: "",
+        accountType: "",
+        bank: "",
+        vendor: "",
+      });
+
+      router.refresh();
+    } catch (error) {
+      ErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
   return (
-    <button
-      onClick={() => EquityFormFunc()}
-      className="flex items-center gap-3 p-3 rounded-md bg-green-500 hover:bg-green-600 transition text-xs w-full"
-    >
-      Register Journal Entry
-    </button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="default"
+          className="
+            flex items-center gap-3
+            p-3 rounded-md
+            bg-gray-500
+            hover:bg-gray-600
+            transition
+            text-xs
+            w-full
+          "
+        >
+          Register  Entry
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[550px]">
+        <DialogHeader>
+          <DialogTitle>
+            New Entry
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div>
+            <Label>Amount</Label>
+            <Input
+              type="number"
+              min="1"
+              value={formData.amount}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  amount: e.target.value,
+                }))
+              }
+              placeholder="Amount (₦)"
+            />
+          </div>
+
+          <div>
+            <Label>Date</Label>
+            <Input
+              type="date"
+              value={formData.date}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  date: e.target.value,
+                }))
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Description</Label>
+            <Input
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              placeholder="Description"
+            />
+          </div>
+
+          <div>
+            <Label>Account Type</Label>
+
+            <Select
+              value={formData.accountType}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  accountType: value,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose account type" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="ownersCapital">
+                  Owners Capital
+                </SelectItem>
+
+                <SelectItem value="OtherIncome">
+                  Other Income
+                </SelectItem>
+
+                <SelectItem value="drawings">
+                  Drawings
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Bank Account</Label>
+
+            <Select
+              value={formData.bank}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  bank: value,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose Bank" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {Accounts.map((account) => (
+                  <SelectItem
+                    key={account._id}
+                    value={account._id}
+                  >
+                    {account.NAME}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Vendor (Optional)</Label>
+
+            <Select
+              value={formData.vendor}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  vendor: value,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose Vendor" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {VendorsList.map((vendor) => (
+                  <SelectItem
+                    key={vendor._id}
+                    value={vendor._id}
+                  >
+                    {vendor.Name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading
+              ? "Creating Entry..."
+              : "Create Entry"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
