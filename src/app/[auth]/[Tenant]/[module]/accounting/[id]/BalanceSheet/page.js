@@ -301,7 +301,6 @@ const months = [
 
 export function BalanceSheetExport({ chartData }) {
   const [selectedMonth, setSelectedMonth] = useState("");
-  console.log(chartData);
 
   const handleExport = (month) => {
     
