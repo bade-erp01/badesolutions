@@ -12,7 +12,7 @@ import {
   SuccessToast,
 } from "../../../../../../../../Functions/Mics";
 
-import {Dencrypt } from "../../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../../Functions/Functions";
 
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
@@ -84,23 +84,25 @@ export default function Page({ baseUrl, userData }) {
       if (!startDate || !endDate) {
         throw new Error("Please select both start and end dates.");
       }
-      
+
       setLoading(true);
-      const res = await fetch(`${baseUrl}/api/Generate/profitandLoss?startDate=${dates.startDate}&endDate=${dates.endDate}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
+      const res = await fetch(
+        `${baseUrl}/api/Generate/profitandLoss?startDate=${dates.startDate}&endDate=${dates.endDate}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
+          },
+          // cache: "force-cache", // Try cache first
+          // next: { revalidate: 60 }, // cache for 1 minutes
         },
-        // cache: "force-cache", // Try cache first
-        // next: { revalidate: 60 }, // cache for 1 minutes
-      });
+      );
 
-      const {data} = await res.json();
-      
+      const { data } = await res.json();
+
       setReport(Dencrypt(data));
-
       SuccessToast("Income statement generated");
       setOpenDialog(false);
     } catch (err) {
@@ -198,7 +200,7 @@ export default function Page({ baseUrl, userData }) {
                   {report.period
                     ? `P&L Summary for ${report.period.startDate} to ${report.period.endDate}`
                     : "P&L Summary"}{" "}
-                     — {userData.business.companyName}
+                  — {userData.business.companyName}
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -209,12 +211,12 @@ export default function Page({ baseUrl, userData }) {
                   <TableRow>
                     <TableHead>
                       <Badge variant="outline" className="text-sm">
-                      Heads
+                        Heads
                       </Badge>
                     </TableHead>
                     <TableHead className="text-right">
                       <Badge variant="outline" className="text-sm">
-                      Amount
+                        Amount
                       </Badge>
                     </TableHead>
                   </TableRow>
@@ -223,50 +225,102 @@ export default function Page({ baseUrl, userData }) {
                 <TableBody>
                   <TableRow>
                     <TableCell>Revenue</TableCell>
-                    <TableCell className="text-right">{currency}{report?.totals?.revenue || 0}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}
+                      {report?.totals?.revenue || 0}
+                    </TableCell>
                   </TableRow>
 
-                   <TableRow className={`text-red-700`}>
+                  <TableRow className={`text-red-700`}>
                     <TableCell>Returns [less]</TableCell>
-                    <TableCell className="text-right">- {currency}{report?.totals?.salesReturns || 0}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}
+                      {report?.totals?.salesReturns || 0}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>
+                    {/* First cell: the label */}
                     <TableCell>C.O.G.S</TableCell>
-                    <TableCell className="text-right">{currency}{report?.totals?.cogs || 0}</TableCell>
+
+                    {/* Second cell: accordion with value + expandable details */}
+                    <TableCell className="text-right">
+                      <Accordion type="single" collapsible>
+                        <AccordionItem value="cogs">
+                          <AccordionTrigger className="justify-end">
+                            {currency}
+                            {report?.totals?.cogs || 0}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-2 text-left">
+                              <p>
+                                Opening Inventory: {currency}
+                                {report?.totals?.OpeningInvntry || 0}
+                              </p>
+                              <p>
+                                Net Purchase: {currency}
+                                {report?.totals?.netPurchase || 0}
+                              </p>
+                              <p>
+                                Closing Inventory: {currency}
+                                {report?.totals?.closingInvntry || 0}
+                              </p>
+                              <p className="font-bold">
+                                COGAS: {currency}
+                                {report?.totals?.COGAS || 0}
+                              </p>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Gross Profit</TableCell>
-                    <TableCell className="text-right">{currency}{report?.totals?.grossProfit || 0}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}
+                      {report?.totals?.grossProfit || 0}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Operating Expenses</TableCell>
                     <TableCell className="text-right font-semibold">
-                      {currency}{report?.totals?.operatingExpenses || 0}
+                      {currency}
+                      {report?.totals?.operatingExpenses || 0}
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>EBIT</TableCell>
-                    <TableCell className="text-right">{currency}{report?.totals?.ebit || 0}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}
+                      {report?.totals?.ebit || 0}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Other income</TableCell>
-                    <TableCell className="text-right">{currency}{report?.totals?.ebit || 0}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}
+                      {report?.totals?.otherIncome || 0}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Interest</TableCell>
-                    <TableCell className="text-right">{currency}{report?.totals?.interest || 0}</TableCell>
+                    <TableCell className="text-right">
+                      {currency}
+                      {report?.totals?.interest || 0}
+                    </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>Taxes</TableCell>
                     <TableCell className="text-right font-semibold">
-                      {currency}{report?.totals?.taxes || 0}
+                      {currency}
+                      {report?.totals?.taxes || 0}
                     </TableCell>
                   </TableRow>
 
@@ -275,7 +329,8 @@ export default function Page({ baseUrl, userData }) {
                       Net Profit
                     </TableCell>
                     <TableCell className="text-right font-bold text-lg">
-                      {currency}{report?.totals?.netIncome || 0 }
+                      {currency}
+                      {report?.totals?.netIncome || 0}
                     </TableCell>
                   </TableRow>
                 </TableBody>
