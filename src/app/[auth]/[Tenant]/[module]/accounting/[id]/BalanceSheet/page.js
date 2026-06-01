@@ -333,7 +333,7 @@ export function BalanceSheetExport({ chartData }) {
       rows.push({ Notes: "Non-Current Assets", Value: "" });
         rows.push({
           Notes: `1300 - Property, plant and Equipment`,
-          Value: entry.PPE.balance || 0 ,
+          Value: entry.PPE?.balance || 0 ,
         });
 
       rows.push({ Notes: "Total Assets",Value:"", Total: entry.totals.assets });
