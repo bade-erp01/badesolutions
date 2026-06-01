@@ -310,6 +310,7 @@ export function BalanceSheetExport({ chartData }) {
 
     if(!entry){
       alert("No entry found for selected month.")
+      return;
     }
     // Prepare rows for Excel
     const rows = [
