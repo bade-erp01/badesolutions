@@ -1,10 +1,9 @@
-import React from 'react'
-import Page from "./page"
+import React from "react";
+import Page from "./page";
 import { notFound } from "next/navigation";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
-import moment from "moment"
-
+import moment from "moment";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -50,11 +49,29 @@ export const metadata = {
   facicon: "/favicon",
 };
 
-export default async function layout({params}) {
+export default async function layout({ params }) {
   const userData = await fetchUser();
-   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
- 
-  return (
-    <Page userData={userData} baseUrl={baseUrl} />
-  )
+  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+
+  const res = await fetch(
+    `${baseUrl}/api/Generate/profitandLoss?period=${moment().year()}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+        access: `${Encrypt(userData.user._id)}`,
+      },
+      // cache: "force-cache",
+      // next: { revalidate: 60 },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch balance data");
+  }
+
+  const response = await res.json();
+
+  return <Page userData={userData} baseUrl={baseUrl} data={response} />;
 }

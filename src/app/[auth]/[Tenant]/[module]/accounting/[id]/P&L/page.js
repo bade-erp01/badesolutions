@@ -51,43 +51,53 @@ import { Encrypt } from "../../../../../../../../Functions/Mics";
 
 import { Badge } from "@/components/ui/badge";
 
-export default function Page({ baseUrl, userData }) {
-  const [report, setReport] = useState({});
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select"; 
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+export default function Page({ baseUrl, userData, data }) {
+  const [report, setReport] = useState(data || []);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(null);
 
   const [dates, setDates] = useState({
-    startDate: "",
-    endDate: "",
+    period: "",
   });
 
   const currency = userData?.business?.currency?.currency?.Symbol || "₦";
 
-  const generateDates = (start, end) => {
-    const arr = [];
-    let cur = moment(start).startOf("month");
-    const last = moment(end).endOf("month");
-
-    while (cur <= last) {
-      arr.push(cur.format("YYYY-MM"));
-      cur.add(1, "month");
-    }
-
-    return arr;
-  };
-
   async function GeneratePNLSummary() {
     try {
-      const { startDate, endDate } = dates;
+      const { period } = dates;
       setOpenDialog(true);
 
-      if (!startDate || !endDate) {
-        throw new Error("Please select both start and end dates.");
+      if (!period) {
+        throw new Error("Please select a period.");
       }
 
       setLoading(true);
       const res = await fetch(
-        `${baseUrl}/api/Generate/profitandLoss?startDate=${dates.startDate}&endDate=${dates.endDate}`,
+        `${baseUrl}/api/Generate/profitandLoss?period=${period}`,
         {
           method: "GET",
           headers: {
@@ -143,28 +153,15 @@ export default function Page({ baseUrl, userData }) {
 
               <div className="space-y-4">
                 <div>
-                  <Label>Start Date</Label>
+                  <Label>Select year</Label>
                   <Input
-                    type="date"
-                    value={dates.startDate}
+                    type="number"
+                    min="2026"
+                    value={dates.period}
                     onChange={(e) =>
                       setDates({
                         ...dates,
-                        startDate: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label>End Date</Label>
-                  <Input
-                    type="date"
-                    value={dates.endDate}
-                    onChange={(e) =>
-                      setDates({
-                        ...dates,
-                        endDate: e.target.value,
+                        period: e.target.value,
                       })
                     }
                   />
@@ -176,6 +173,7 @@ export default function Page({ baseUrl, userData }) {
                   onClick={GeneratePNLSummary}
                   disabled={loading}
                   className="w-full"
+                  type="button"
                 >
                   {loading ? (
                     <>
@@ -189,6 +187,43 @@ export default function Page({ baseUrl, userData }) {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* months */}
+         {report.length > 0 && (
+           <div className="space-y-4 w-full bg-gray-100 rounded p-4">
+            <h2 className="text-sm text-black">Select P&L month</h2>
+            <Select
+              onValueChange={(value) => {
+
+                // Convert value to number (e.g. "6" → 6)
+                const monthNum = Number(value + 1); // Add 1 because month index is 0-based
+
+                // Find the matching report entry
+                const matchedEntry = report.find(
+                  (entry) => Number(entry.period) === monthNum
+                );
+
+                if (matchedEntry) {
+                  setSelectedMonth(matchedEntry); // set the actual report entry
+                } else {
+                  ErrorMessage("No snapshot for selected P&L month.");
+                }
+              }}
+              className="w-full bg-black text-black hover:bg-gray-200"
+            >
+              <SelectTrigger className="w-[200px] text-black">
+                <SelectValue placeholder="Select Month" />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((m, idx) => (
+                  <SelectItem key={m} value={idx}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         </aside>
 
         {/* MAIN */}
@@ -197,8 +232,8 @@ export default function Page({ baseUrl, userData }) {
             <CardHeader>
               <CardTitle>
                 <Badge variant="outline" className="text-sm">
-                  {report.period
-                    ? `P&L Summary for ${report.period.startDate} to ${report.period.endDate}`
+                  {selectedMonth?.period
+                    ? `P&L Summary for ${selectedMonth?.period}`
                     : "P&L Summary"}{" "}
                   — {userData.business.companyName}
                 </Badge>
@@ -227,7 +262,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Revenue</TableCell>
                     <TableCell className="text-right">
                       {currency}
-                      {report?.totals?.revenue || 0}
+                      {selectedMonth?.totals?.revenue || 0}
                     </TableCell>
                   </TableRow>
 
@@ -235,7 +270,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Returns [less]</TableCell>
                     <TableCell className="text-right">
                       {currency}
-                      {report?.totals?.salesReturns || 0}
+                      {selectedMonth?.totals?.salesReturns || 0}
                     </TableCell>
                   </TableRow>
 
@@ -249,25 +284,25 @@ export default function Page({ baseUrl, userData }) {
                         <AccordionItem value="cogs">
                           <AccordionTrigger className="justify-end">
                             {currency}
-                            {report?.totals?.cogs || 0}
+                            {selectedMonth?.totals?.cogs || 0}
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="space-y-2 text-left">
                               <p>
                                 Opening Inventory: {currency}
-                                {report?.totals?.OpeningInvntry || 0}
+                                {selectedMonth?.totals?.OpeningInvntry || 0}
                               </p>
                               <p>
-                               + Net Purchase: {currency}
-                                {report?.totals?.netPurchase || 0}
+                                + Net Purchase: {currency}
+                                {selectedMonth?.totals?.netPurchase || 0}
                               </p>
                               <p className="font-bold">
                                 C.O.G.A.S: {currency}
-                                {report?.totals?.COGAS || 0}
+                                {selectedMonth?.totals?.COGAS || 0}
                               </p>
                               <p>
-                               - Closing Inventory: {currency}
-                                {report?.totals?.closingInvntry || 0}
+                                - Closing Inventory: {currency}
+                                {selectedMonth?.totals?.closingInvntry || 0}
                               </p>
                             </div>
                           </AccordionContent>
@@ -280,7 +315,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Gross Profit</TableCell>
                     <TableCell className="text-right">
                       {currency}
-                      {report?.totals?.grossProfit || 0}
+                      {selectedMonth?.totals?.grossProfit || 0}
                     </TableCell>
                   </TableRow>
 
@@ -288,7 +323,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Operating Expenses</TableCell>
                     <TableCell className="text-right font-semibold">
                       {currency}
-                      {report?.totals?.operatingExpenses || 0}
+                      {selectedMonth?.totals?.operatingExpenses || 0}
                     </TableCell>
                   </TableRow>
 
@@ -296,7 +331,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>EBIT</TableCell>
                     <TableCell className="text-right">
                       {currency}
-                      {report?.totals?.ebit || 0}
+                      {selectedMonth?.totals?.ebit || 0}
                     </TableCell>
                   </TableRow>
 
@@ -304,7 +339,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Other income</TableCell>
                     <TableCell className="text-right">
                       {currency}
-                      {report?.totals?.otherIncome || 0}
+                      {selectedMonth?.totals?.otherIncome || 0}
                     </TableCell>
                   </TableRow>
 
@@ -312,7 +347,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Interest</TableCell>
                     <TableCell className="text-right">
                       {currency}
-                      {report?.totals?.interest || 0}
+                      {selectedMonth?.totals?.interest || 0}
                     </TableCell>
                   </TableRow>
 
@@ -320,7 +355,7 @@ export default function Page({ baseUrl, userData }) {
                     <TableCell>Taxes</TableCell>
                     <TableCell className="text-right font-semibold">
                       {currency}
-                      {report?.totals?.taxes || 0}
+                      {selectedMonth?.totals?.taxes || 0}
                     </TableCell>
                   </TableRow>
 
@@ -330,7 +365,7 @@ export default function Page({ baseUrl, userData }) {
                     </TableCell>
                     <TableCell className="text-right font-bold text-lg">
                       {currency}
-                      {report?.totals?.netIncome || 0}
+                      {selectedMonth?.totals?.netIncome || 0}
                     </TableCell>
                   </TableRow>
                 </TableBody>
