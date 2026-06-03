@@ -261,13 +261,13 @@ export default function Page({ baseUrl, userData }) {
                                + Net Purchase: {currency}
                                 {report?.totals?.netPurchase || 0}
                               </p>
-                              <p>
-                               - Closing Inventory: {currency}
-                                {report?.totals?.closingInvntry || 0}
-                              </p>
                               <p className="font-bold">
                                 C.O.G.A.S: {currency}
                                 {report?.totals?.COGAS || 0}
+                              </p>
+                              <p>
+                               - Closing Inventory: {currency}
+                                {report?.totals?.closingInvntry || 0}
                               </p>
                             </div>
                           </AccordionContent>
