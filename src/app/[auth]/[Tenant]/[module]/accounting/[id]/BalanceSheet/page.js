@@ -314,7 +314,7 @@ export function BalanceSheetExport({ chartData }) {
     }
     // Prepare rows for Excel
     const rows = [
-      { Notes: "Month", Value:  moment(month, "M").format("MMMM") },
+      { Notes: "Month", Value:  moment(month + 1, "M").format("MMMM") },
       { Notes: "Period", Value: entry.period },
       { Notes: "Quarter", Value: entry.quarter },
     ];
