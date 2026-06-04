@@ -36,7 +36,7 @@ export default function LandingPage() {
 
         <p className="mt-6 text-lg text-zinc-500 max-w-2xl mx-auto">
           Finance, inventory, HR, and sales — fully integrated into a single
-          enterprise platform built for structured operations.
+          enterprise platform built for structured operations regardless of your business sector.
         </p>
 
         <div className="mt-8 flex justify-center gap-4 flex-wrap">
@@ -45,8 +45,7 @@ export default function LandingPage() {
             onClick={() => router.push("/Pricing")}
             className="rounded-xl"
           >
-            Signup
-            {/* Create Account */}
+            Create Account
           </Button>
 
           <Button
@@ -76,7 +75,7 @@ export default function LandingPage() {
             <CardContent className="relative z-10 text-white p-6">
               <h3 className="text-2xl font-semibold">Real-time dashboard</h3>
               <p className="text-sm mt-2 text-zinc-200 max-w-md">
-                Monitor operations, financials, and inventory from a unified
+                Monitor Sales operations, financial reporting, and inventory from a unified
                 command center.
               </p>
             </CardContent>
@@ -97,7 +96,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>Finance</CardTitle>
               <CardDescription className={"text-white"}>
-                Invoices, expenses, reporting, payment, vendors
+                Asset management, Expenses, Reporting, Recievables, Payables, Budgeting,Equity, Income statement, trial Balance, Charts of account
               </CardDescription>
             </CardHeader>
           </Card>
@@ -137,7 +136,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>HR & Payroll</CardTitle>
               <CardDescription className={"text-white"}>
-                Staff, attendance, salaries, Help desk,staff Appraisal, Time-off.
+                Staff, attendance, Payroll, Help desk,staff Appraisal, Time-off.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -157,7 +156,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>Sales</CardTitle>
               <CardDescription className={"text-white"}>
-                CRM, invoices, lifecycle
+                CRM, invoice lifecycle, transaction ledgers
               </CardDescription>
             </CardHeader>
           </Card>

@@ -277,7 +277,7 @@ export function DialogDemo({ userData }) {
             }));
           }
         } catch (err) {
-          console.error("Error reverse geocoding:", err);
+          // console.error("Error reverse geocoding:", err);
           // fallback: just store lat/lon
           setFormData((prev) => ({
             ...prev,
@@ -468,18 +468,10 @@ export function DialogDemo({ userData }) {
                 name="billingAddress"
                 onChange={handleChange}
                 value={formData.billingAddress || ""}
-                className="min-h-[120px] rounded-2xl border-zinc-200 bg-zinc-50/70 resize-none"
+                className="min-h-[50px] rounded-2xl border-zinc-200 bg-zinc-50/70 resize-none"
               />
             </div>
 
-            {/* INFO BOX */}
-            <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
-              <p className="text-sm leading-relaxed text-blue-900">
-                Leads created here can later be converted into full customer
-                accounts with complete transaction history, CRM tracking, and
-                automated engagement workflows.
-              </p>
-            </div>
           </div>
 
           {/* FOOTER */}
