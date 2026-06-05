@@ -1508,10 +1508,10 @@ export function GeoButton({ userData, cust }) {
               address = geo.results[0].formatted;
             }
           } catch (geoError) {
-            console.log(
-              "Reverse geocoding failed:",
-              geoError.message
-            );
+            // console.log(
+            //   "Reverse geocoding failed:",
+            //   geoError.message
+            // );
           }
 
           await axios.patch(
