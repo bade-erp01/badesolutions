@@ -739,7 +739,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     href={`https://www.gps-coordinates.net/my-location`}
                     target="blank"
                   >
-                    Get My Geo‑coordinates
+                    Update Geo‑coordinates
                   </Link>
                 </div>
               </Grid>
