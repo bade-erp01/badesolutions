@@ -50,7 +50,20 @@ import axios from "axios";
 import moment from "moment";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
-import Link from "next/link";
+import { Loader2, MapPin } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+
+
 
 export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   const router = useParams();
@@ -733,14 +746,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     Ensure you are in {cust.Username}'s Location before using
                     this feature.
                   </Label>
-                  <Link
-                    variant="default"
-                    className="flex items-center gap-2 p-3 rounded-md transition bg-gray-600 w-full text-white"
-                    href={`https://www.gps-coordinates.net/my-location`}
-                    target="blank"
-                  >
-                    Update Geo‑coordinates
-                  </Link>
+                 {/* get geo codeing location */}
+                  <GeoButton userData={userInfo} cust={cust}/>
                 </div>
               </Grid>
             </Section>
@@ -1463,3 +1470,190 @@ export function MyComponent({ cust, userInfo }) {
 }
 
 
+
+
+export function GeoButton({ userData, cust }) {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+
+  const updateLocation = async () => {
+    if (!navigator.geolocation) {
+      ErrorMessage("Geolocation is not supported by this device.");
+      return;
+    }
+
+    setLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+
+          // Optional reverse geocoding
+          let address = "Unknown location";
+
+          try {
+            const apiKey =
+              "838e5f01c66d4d97a7334734fbd2e10a";
+
+            const geoResponse = await fetch(
+              `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&no_annotations=1`
+            );
+
+            const geo = await geoResponse.json();
+
+            if (geo.results?.length > 0) {
+              address = geo.results[0].formatted;
+            }
+          } catch (geoError) {
+            console.log(
+              "Reverse geocoding failed:",
+              geoError.message
+            );
+          }
+
+          await axios.patch(
+            `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
+              cust._id
+            )}`,
+            {
+              latitude,
+              longitude,
+              // address,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${Encrypt(
+                  userData.business.tenantId
+                )}`,
+                access: Encrypt(
+                  userData.user._id
+                ),
+              },
+            }
+          );
+
+          SuccessToast(
+            "Customer geo-coordinates updated successfully."
+          );
+
+          router.refresh();
+        } catch (err) {
+          ErrorMessage(
+            err?.response?.data?.error ||
+              err.message ||
+              "Failed to update location."
+          );
+        } finally {
+          setLoading(false);
+        }
+      },
+      (error) => {
+        setLoading(false);
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            ErrorMessage(
+              "Location permission was denied."
+            );
+            break;
+
+          case error.POSITION_UNAVAILABLE:
+            ErrorMessage(
+              "Location information is unavailable."
+            );
+            break;
+
+          case error.TIMEOUT:
+            ErrorMessage(
+              "Location request timed out."
+            );
+            break;
+
+          default:
+            ErrorMessage(
+              "Unable to retrieve your location."
+            );
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
+    );
+  };
+
+  return (
+    <>
+      <Button
+        type="button"
+        onClick={() => setOpenConfirm(true)}
+        disabled={loading}
+        className="flex items-center gap-2 p-3 rounded-md bg-gray-700 hover:bg-gray-800 text-white w-full"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Getting & Updating Location...
+          </>
+        ) : (
+          <>
+            <MapPin className="h-4 w-4" />
+            Update Geo-coordinates
+          </>
+        )}
+      </Button>
+
+      <AlertDialog
+        open={openConfirm}
+        onOpenChange={setOpenConfirm}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Update Customer Geo-coordinates?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Your current GPS coordinates will be
+              captured and saved as this customer's
+              location.
+              <br />
+              <br />
+              Please ensure you are physically present
+              at the customer's premises before
+              proceeding.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>
+              Cancel
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              disabled={loading}
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenConfirm(false);
+                updateLocation();
+              }}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Yes, Update Location"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
