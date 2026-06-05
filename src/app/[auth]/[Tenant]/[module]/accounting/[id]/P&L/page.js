@@ -49,7 +49,7 @@ import {
 import { Encrypt } from "../../../../../../../../Functions/Mics";
 
 import { Badge } from "@/components/ui/badge";
-
+import moment from "moment";
 import {
   Select,
   SelectTrigger,
@@ -232,7 +232,7 @@ export default function Page({ baseUrl, userData, data }) {
               <CardTitle>
                 <Badge variant="outline" className="text-sm">
                   {selectedMonth?.period
-                    ? `P&L Summary for ${selectedMonth?.period}`
+                    ? `P&L Summary for ${moment(selectedMonth?.generatedAt).month() + 1}-${moment(selectedMonth?.period).year()}`
                     : "P&L Summary"}{" "}
                   — {userData.business.companyName}
                 </Badge>
