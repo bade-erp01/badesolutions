@@ -353,7 +353,7 @@ export function DialogDemo({ userData }) {
 
               <div>
                 <DialogTitle className="text-2xl font-semibold tracking-tight">
-                  Register Customer Lead
+                  Register Lead
                 </DialogTitle>
 
                 <DialogDescription className="mt-1 text-sm text-zinc-300 leading-relaxed">

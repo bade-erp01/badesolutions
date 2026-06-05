@@ -12,6 +12,7 @@ import Plotly from "plotly.js-dist-min";
 import {
   Encrypt,
   EXPRESS_PRIVATE_URL,
+  pricelistSetter
 } from "../../../../../Functions/Functions";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
@@ -29,6 +30,10 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+
+
 
 export default function SingleProductpage({
   userInfo,
@@ -260,191 +265,6 @@ export default function SingleProductpage({
                       </h5>
                     </div>
                   </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="Pricelist1"
-                      className="block text-sm font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList1} Price
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 sm:text-sm">
-                        {formData.Pricelist1}
-                      </h5>
-                    </div>
-                    <label
-                      htmlFor="VatpriceList1"
-                      className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                    >
-                      Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                      {businessInfo.priceList1}?
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 sm:text-sm">
-                        {formData.VatpriceList1 ? "Yes" : "No"}
-                      </h5>
-                    </div>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="Pricelist2"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList2} Price
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Pricelist2}
-                      </h5>
-                    </div>
-                    <label
-                      htmlFor="VatpriceList2"
-                      className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                    >
-                      Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                      {businessInfo.priceList2}?
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.VatpriceList2 ? "Yes" : "No"}
-                      </h5>
-                    </div>
-                  </div>
-
-                  {businessInfo.subscriptionplan === "Standard" && (
-                    <>
-                      <div className="sm:col-span-2 sm:col-start-1">
-                        <label
-                          htmlFor="Pricelist3"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList3} Price
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist3}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="VatpriceList3"
-                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                        >
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList3}?
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.VatpriceList3 ? "Yes" : "No"}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist4"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList4} Price
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist4}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="VatpriceList4"
-                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                        >
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList4}?
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.VatpriceList4 ? "Yes" : "No"}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist5"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList5} Price
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist5}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="VatpriceList5"
-                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                        >
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList5}?
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.VatpriceList5 ? "Yes" : "No"}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2 sm:col-start-1">
-                        <label
-                          htmlFor="Pricelist6"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList6} Price
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist6}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="VatpriceList6"
-                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                        >
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList6}?
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.VatpriceList6 ? "Yes" : "No"}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist7"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList7} Price
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist7}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="VatpriceList7"
-                          className="block font-medium text-gray-900 items-start justify-start text-start text-xs mt-4"
-                        >
-                          Apply {data.VAT.$numberDecimal}% Vat on{" "}
-                          {businessInfo.priceList7}?
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.VatpriceList7 ? "Yes" : "No"}
-                          </h5>
-                        </div>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
             </div>
@@ -456,7 +276,7 @@ export default function SingleProductpage({
                 className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
               >
                 <h2 className="text-base/7 font-semibold text-gray-900">
-                  Promo Section
+                 Rates & Discounts
                 </h2>
                 <svg
                   className={`w-5 h-5 transform transition-transform duration-300 ${
@@ -479,229 +299,13 @@ export default function SingleProductpage({
                   isOpen ? "block" : "hidden"
                 }`}
               >
-                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                  {/* promo section */}
-                  <div className="sm:col-span-2">
-                    {/* Label for Promo */}
-                    <label
-                      htmlFor="Pricelist1Promo"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList1} Promo
-                    </label>
+                {/* pricelist display */}
 
-                    {/* Promo value */}
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Pricelist1Promo ?? ""}
-                      </h5>
-                    </div>
-
-                    {/* End Date label */}
-                    <label
-                      htmlFor="Pricelist1PromoDate"
-                      className="block text-sm/6 font-medium text-gray-900 mt-4"
-                    >
-                      {businessInfo.priceList1} Promo End Date
-                    </label>
-
-                    {/* End Date value */}
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Pricelist1PromoDate
-                          ? moment(formData.Pricelist1PromoDate).format(
-                              "YYYY-MM-DD",
-                            )
-                          : ""}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    {/* Label for Pricelist2 Promo */}
-                    <label
-                      htmlFor="Pricelist2Promo"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      {businessInfo.priceList2} Promo
-                    </label>
-
-                    {/* Promo value */}
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Pricelist2Promo ?? ""}
-                      </h5>
-                    </div>
-
-                    {/* End Date label */}
-                    <label
-                      htmlFor="Pricelist2PromoDate"
-                      className="block text-sm/6 font-medium text-gray-900 mt-4"
-                    >
-                      {businessInfo.priceList2} Promo End Date
-                    </label>
-
-                    {/* End Date value */}
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Pricelist2PromoDate
-                          ? moment(formData.Pricelist2PromoDate).format(
-                              "YYYY-MM-DD",
-                            )
-                          : ""}
-                      </h5>
-                    </div>
-                  </div>
-
-                  {businessInfo.subscriptionplan === "Standard" && (
-                    <>
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist3Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList3} Promo
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist3Promo ?? ""}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="Pricelist3PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList3} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist3PromoDate
-                              ? moment(formData.Pricelist3PromoDate).format(
-                                  "YYYY-MM-DD",
-                                )
-                              : ""}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist4Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList4} Promo
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist4Promo ?? ""}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="Pricelist4PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList4} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist4PromoDate
-                              ? moment(formData.Pricelist4PromoDate).format(
-                                  "YYYY-MM-DD",
-                                )
-                              : ""}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist5Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList5} Promo
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist5Promo ?? ""}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="Pricelist5PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList5} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist5PromoDate
-                              ? moment(formData.Pricelist5PromoDate).format(
-                                  "YYYY-MM-DD",
-                                )
-                              : ""}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist6Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList6} Promo
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist6Promo ?? ""}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="Pricelist6PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList6} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist6PromoDate
-                              ? moment(formData.Pricelist6PromoDate).format(
-                                  "YYYY-MM-DD",
-                                )
-                              : ""}
-                          </h5>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label
-                          htmlFor="Pricelist7Promo"
-                          className="block text-sm/6 font-medium text-gray-900"
-                        >
-                          {businessInfo.priceList7} Promo
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist7Promo ?? ""}
-                          </h5>
-                        </div>
-                        <label
-                          htmlFor="Pricelist7PromoDate"
-                          className="block text-sm/6 font-medium text-gray-900 mt-4"
-                        >
-                          {businessInfo.priceList7} Promo End Date
-                        </label>
-                        <div className="mt-2">
-                          <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                            {formData.Pricelist7PromoDate
-                              ? moment(formData.Pricelist7PromoDate).format(
-                                  "YYYY-MM-DD",
-                                )
-                              : ""}
-                          </h5>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+                <ProductPriceList
+                  initialData={data}
+                  Biz={businessInfo}
+                  user={userInfo}
+                />
               </div>
             </div>
           </div>
@@ -1009,5 +613,131 @@ export function CommentForm({ userData, product }) {
         </Button>
       </CardFooter>
     </Card>
+  );
+}
+
+
+// diplay pricelist
+export function ProductPriceList({ initialData, Biz, user }) {
+  const [formData] = useState(initialData);
+
+  const handleChange = (e) => {
+    ErrorMessage("Price editing is currently disabled to prevent accidental changes. Please contact your administrator to update product price from main ERP.");
+  };
+
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
+      {formData.PriceLists.length > 0 ? (
+        formData.PriceLists.map((price, idx) => (
+          <Card
+            key={idx}
+            className="group w-full max-w-xs rounded-sm hover:shadow-md hover:border-border transition-all duration-300 bg-white"
+          >
+            <CardContent className="p-3 space-y-2">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-2">
+                <Badge
+                  variant="secondary"
+                  title={pricelistSetter(price.Name ?? "Unknown PriceList", Biz)}
+                  className="max-w-[140px] truncate lowercase text-xs font-semibold px-2 py-0.5"
+                >
+                  {pricelistSetter(price.Name ?? "Unknown PriceList", Biz)}
+                </Badge>
+
+                <p className="text-xs text-muted-foreground truncate">
+                  {price.vat
+                    ? `${formData.VAT.$numberDecimal}% VAT applied`
+                    : "VAT not applied"}
+                </p>
+              </div>
+
+              {/* Base Price */}
+              <div className="space-y-1">
+                <Label
+                  htmlFor={`price-${price.Name}`}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Base price
+                </Label>
+                <Input
+                  id={`price-${price.Name}`}
+                  name={price.Name}
+                  type="number"
+                  step="any"
+                  value={price.price || ""}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className="h-8 w-30 text-sm"
+                />
+              </div>
+
+              {/* Promo */}
+              <div className="space-y-1">
+                <Label
+                  htmlFor={`promo-${price.Name}`}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Discounts
+                </Label>
+                <Input
+                  id={`promo-${price.Name}`}
+                  name={`promo-${price.Name}`}
+                  type="number"
+                  step="any"
+                  value={price.promo}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className="h-8 w-30 text-sm"
+                />
+              </div>
+
+              {/* Promo Date */}
+              <div className="space-y-1">
+                <Label
+                  htmlFor={`promoDate-${price.Name}`}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Discounts ends
+                </Label>
+                <Input
+                  id={`promoDate-${price.Name}`}
+                  name={`promoDate-${price.Name}`}
+                  type="date"
+                  value={moment(price.PromoDate).format("YYYY-MM-DD")}
+                  onChange={handleChange}
+                  className="h-8 w-30 text-xs"
+                />
+              </div>
+
+              <div className="pt-1 border-t" />
+
+              {/* Footer VAT Notice */}
+              <div className="flex items-center justify-between gap-2">
+                <Label
+                  htmlFor={`vat-${price.Name}`}
+                  className="text-[10px] text-muted-foreground cursor-pointer"
+                >
+                  <Checkbox
+                    id={`vat-${price.Name}`}
+                    name={`vat-${price.Name}`}
+                    checked={price.vat || false}
+                    // onCheckedChange={(checked) =>
+                    //   handleChange({
+                    //     target: { name: `vat-${price.Name}`, value: checked },
+                    //   })
+                    // }
+                    className="h-4 w-4"
+                  />
+                  Apply {formData.VAT.$numberDecimal}% VAT
+                </Label>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <p className="font-italics text-xs">Nothing to show</p>
+      )}
+    </div>
   );
 }
