@@ -1619,12 +1619,12 @@ export function GeoButton({ userData, cust }) {
 
             <AlertDialogDescription>
               Your current GPS coordinates will be
-              captured and saved as this customer's
+              captured and saved as {cust.Username}'s
               location.
               <br />
               <br />
               Please ensure you are physically present
-              at the customer's premises before
+              at {cust.Username}'s premises and your device GPS is active before
               proceeding.
             </AlertDialogDescription>
           </AlertDialogHeader>
