@@ -194,6 +194,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
                 <UserNotification user={userData} />
               </>
             )}
+            <br/>
             <Logout />
           </div>
         </aside>

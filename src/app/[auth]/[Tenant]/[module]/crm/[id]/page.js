@@ -1138,7 +1138,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                     </option>
 
                     {/* Dynamic options based on subscription plan */}
-                    {PriceList.data.map((pl) =>(
+                    {PriceList?.data?.map((pl) =>(
                       <option key={pl._id} value={pl.Name}>
                         {pricelistSetter(pl.Name, userInfo.business)}
                       </option>
