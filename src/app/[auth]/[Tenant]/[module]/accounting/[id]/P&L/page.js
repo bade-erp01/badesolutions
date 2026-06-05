@@ -199,7 +199,7 @@ export default function Page({ baseUrl, userData, data }) {
 
                 // Find the matching report entry
                 const matchedEntry = report.find(
-                  (entry) => Number(entry.period) === monthNum
+                  (entry) => Number(entry.generatedAt) === monthNum
                 );
 
                 if (matchedEntry) {
