@@ -1384,12 +1384,12 @@ export default function SingleEmployeeView({
                   </p>
 
                   <div className="mt-10 space-y-10 ">
-                    {/* <AccessControl
+                    <AccessControl
                       userInfo={userInfo}
                       TenantData={businessData}
                       businessInfo={businessInfo}
                       data={data}
-                    /> */}
+                    />
                   </div>
                 </div>
               </div>
