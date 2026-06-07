@@ -822,6 +822,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
         </div>
       </Section>
 
+      {/* dashboard*/}
       <Section  title={`🗿 Quick view for ${cust.Username}.`}
         className="lg:col-span-2">
         <div className="">
