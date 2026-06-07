@@ -67,7 +67,6 @@ import {
 } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-
 export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceList }) {
  
   const router = useParams();
@@ -820,6 +819,16 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
           )}
 
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
+        </div>
+      </Section>
+
+      <Section  title={`🗿 Quick view for ${cust.Username}.`}
+        className="lg:col-span-2">
+        <div className="">
+          <DashboardStats cust={cust} todaysSale={data.SandS.reduce(
+            (acc, item) => acc + Number(item.grandTotal || 0),
+            0
+          )}/>
         </div>
       </Section>
 
@@ -1913,3 +1922,62 @@ function Checkbox({ label, name, checked, onChange }) {
     </div>
   );
 }
+
+
+export function DashboardStats({ todaysSale,cust }) {
+  return (
+    <div className="grid grid-cols-3 gap-4 mb-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <Badge variant="outline" className="bg-green-500/10 text-green-700">
+              Total sales transaction
+            </Badge>
+            </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold">₦{formatNumberShort(todaysSale || 0)}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <Badge variant="outline" className="">
+             Last transaction Date
+            </Badge>
+            </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold">{cust.lastPayDate}</p>
+        </CardContent>
+      </Card>
+
+      {/* Another metric (optional) */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <Badge variant="outline" className="">
+            Current Balance
+            </Badge>
+            </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold">₦{formatNumberShort(cust.Debt)}</p>
+        </CardContent>
+      </Card>
+
+    </div>
+  )
+}
+
+const formatNumberShort = (num) => {
+  if (num >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(3) + " B"; // billions
+  } else if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(3) + " M"; // millions
+  } else if (num >= 1_000) {
+    return (num / 1_000).toFixed(3) + " K"; // thousands
+  }
+  return num.toString();
+};
