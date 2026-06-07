@@ -43,6 +43,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { KeyRound } from "lucide-react";
 
+const formatNumberShort = (num) => {
+  if (num >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(2) + " B"; // billions
+  } else if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(2) + " M"; // millions
+  } else if (num >= 1_000) {
+    return (num / 1_000).toFixed(2) + " K"; // thousands
+  }
+  return num.toString();
+};
+
 export default function SingleEmployeeView({
   userInfo,
   businessInfo,
@@ -1474,14 +1485,15 @@ function SalePersonChart({ customerId, customerName, business, custList }) {
           InvoiceDate: invoice.startDate,
           salesPerson: invoice.salesPerson,
         }));
+
+
         setTodaysSale(
-          data.filter(
+          response.invoice.filter(
             (item) =>
               item.salesPerson === customerId &&
-            moment(item.startDate).isSame(moment(), "day"),
+            item.startDate === moment().format("YYYY-MM-DD"),
           ).reduce((acc, curr) => acc + curr.grandTotal, 0),
         )
-        console.log(todaysSale)
         
         const productSales = data.filter(
           (item) => item.salesPerson === customerId,
@@ -1592,7 +1604,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
           <CardTitle>Today's Sales</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">₦{todaysSale}</p>
+          <p className="text-2xl font-bold">₦{formatNumberShort(todaysSale)}</p>
         </CardContent>
       </Card>
 
@@ -1602,7 +1614,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
           <CardTitle>Customers Assigned</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{custList.length}</p>
+          <p className="text-2xl font-bold">{formatNumberShort(custList.length)}</p>
         </CardContent>
       </Card>
 
@@ -1612,7 +1624,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
           <CardTitle>Total Debt</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">₦{custList.reduce((acc, curr) => acc + curr.Debt, 0)}</p>
+          <p className="text-2xl font-bold">₦{formatNumberShort(custList.reduce((acc, curr) => acc + curr.Debt, 0))}</p>
         </CardContent>
       </Card>
 
@@ -1622,7 +1634,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
           <CardTitle>Sales Target</CardTitle>
         </CardHeader>
         <CardContent>
-         <p className="text-lg font-bold">₦0/₦{Sales_Target}</p>
+         <p className="text-lg font-bold">0/{formatNumberShort(Number(Sales_Target))}</p>
         </CardContent>
       </Card>
     </div>
