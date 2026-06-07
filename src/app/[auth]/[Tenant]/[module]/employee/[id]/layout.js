@@ -33,6 +33,7 @@ export default async function layout({ children, params }) {
   const response = await userReq.json()
 
   const data = Dencrypt(response.employee);
+  const custList = Dencrypt(response.cust);
 
   // get all business data
   const RawBusiness = await Businesses.find({
@@ -92,6 +93,7 @@ export default async function layout({ children, params }) {
                 businessData={businessData}
                 storeList={StoreList}
                 // storeList={[]}
+                custList={custList || []}
               />
           </section>
         </main>

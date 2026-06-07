@@ -2,6 +2,8 @@
 import Plotly from "plotly.js-dist-min";
 import Swal from "sweetalert2";
 import { useParams, useSearchParams } from "next/navigation";
+import { MapPin } from "lucide-react";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
@@ -48,6 +50,7 @@ export default function SingleEmployeeView({
   module,
   businessData,
   storeList,
+  custList
 }) {
   const states = NaijaStates.states();
   let [user] = useState(userInfo || {});
@@ -457,8 +460,8 @@ export default function SingleEmployeeView({
             <div className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
               {Backdata.image ? (
                 <Image
-                  width={40}
-                  height={40}
+                  width={50}
+                  height={50}
                   src={
                     Backdata.image ||
                     "https://img.icons8.com/glyph-neue/64/gender-neutral-user.png"
@@ -488,13 +491,17 @@ export default function SingleEmployeeView({
             </div>
           </div>
 
+          {/* <NearbyBusinessesMap/> */}
           {/* chart  */}
           <SalePersonChart
             customerId={Backdata._id}
             customerName={Backdata.firstName}
             business={businessInfo}
+            custList={custList || []}
           />
           <br />
+          {/* dashboard for sales person */}
+          <LiveLocationMap userData={data}/>
           <div className="border rounded-lg overflow-hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -1366,12 +1373,12 @@ export default function SingleEmployeeView({
                   </p>
 
                   <div className="mt-10 space-y-10 ">
-                    <AccessControl
+                    {/* <AccessControl
                       userInfo={userInfo}
                       TenantData={businessData}
                       businessInfo={businessInfo}
                       data={data}
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
@@ -1432,11 +1439,12 @@ export default function SingleEmployeeView({
   );
 }
 
-function SalePersonChart({ customerId, customerName, business }) {
+function SalePersonChart({ customerId, customerName, business, custList }) {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [tottalSales, setTotalSales] = useState();
+  const [todaysSale, setTodaysSale] = useState(0);
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -1466,7 +1474,15 @@ function SalePersonChart({ customerId, customerName, business }) {
           InvoiceDate: invoice.startDate,
           salesPerson: invoice.salesPerson,
         }));
-
+        setTodaysSale(
+          data.filter(
+            (item) =>
+              item.salesPerson === customerId &&
+            moment(item.startDate).isSame(moment(), "day"),
+          ).reduce((acc, curr) => acc + curr.grandTotal, 0),
+        )
+        console.log(todaysSale)
+        
         const productSales = data.filter(
           (item) => item.salesPerson === customerId,
         );
@@ -1547,6 +1563,7 @@ function SalePersonChart({ customerId, customerName, business }) {
         </div>
       ) : (
         <div>
+          <DashboardStats Sales_Target={0} todaysSale={todaysSale} custList={custList}/>
           <h5 className="text-lg font-semibold text-gray-700 mb-1">
             📈 Month-on-Month Insight for {tottalSales}
             <br />
@@ -1561,6 +1578,55 @@ function SalePersonChart({ customerId, customerName, business }) {
       )}
     </>
   );
+}
+
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+
+export function DashboardStats({ Sales_Target,todaysSale,custList }) {
+  return (
+    <div className="grid grid-cols-4 gap-4 mb-6">
+      {/* Today's Sales */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Today's Sales</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold">₦{todaysSale}</p>
+        </CardContent>
+      </Card>
+
+      {/* Total Customers Assigned */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Customers Assigned</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold">{custList.length}</p>
+        </CardContent>
+      </Card>
+
+      {/* Another metric (optional) */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Total Debt</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold">₦{custList.reduce((acc, curr) => acc + curr.Debt, 0)}</p>
+        </CardContent>
+      </Card>
+
+      {/* Empty card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales Target</CardTitle>
+        </CardHeader>
+        <CardContent>
+         <p className="text-lg font-bold">₦0/₦{Sales_Target}</p>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
 
@@ -1766,6 +1832,262 @@ export function AssignLicenceButton({ id, url, userToken, bizToken }) {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+
+export  function LiveLocationMap({userData}) {
+  const [userInfo, setUserInfo] = useState(userData);
+  const [coords, setCoords] = useState({lat: userData.lat, lng: userData.long});
+
+  const fetchLocation = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported");
+      return;
+    }
+
+    // get theusers location
+    const Response = await fetch(
+      `${EXPRESS_PRIVATE_URL}/api/user/${Encrypt(userData._id)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
+          access: `${Encrypt(userData._id)}`,
+        },
+      }
+    );
+
+    console.log(Response);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({
+          lat: userInfo.lat,
+          lng: userInfo.long,
+        });
+
+      },
+      (error) => {
+        console.error(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetchLocation();
+
+    const interval = setInterval(() => {
+      fetchLocation();
+    }, 60000); // 1 minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!coords) {
+    return (
+      <div className="h-[500px] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Location Details */}
+      <div className="rounded-xl border p-4 bg-background">
+        <div className="flex items-center gap-2 font-medium text-black">
+          <MapPin className="h-5 w-5" />
+          Current Location
+        </div>
+
+          <p className="text-xs text-muted-foreground mt-2">
+            Auto Updates every 1min. Last fetched at: {new Date().toLocaleTimeString()}
+          </p>
+      </div>
+
+      {/* Google Map */}
+      <div className="overflow-hidden rounded-xl border">
+        <iframe
+          key={`${coords.lat}-${coords.lng}`}
+          width="100%"
+          height="500"
+          loading="lazy"
+          allowFullScreen
+          src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`}
+        />
+      </div>
+    </div>
+  );
+}
+
+
+import {
+  Navigation,
+  Building2,
+  RefreshCcw,
+} from "lucide-react";
+
+export function NearbyBusinessesMap() {
+  const [location, setLocation] = useState(null);
+  const [businesses, setBusinesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchNearbyBusinesses();
+  }, []);
+
+  const fetchNearbyBusinesses = () => {
+    if (!navigator.geolocation) {
+      setLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          setLocation({
+            latitude,
+            longitude,
+          });
+
+          const { data } = await axios.get(
+            "/api/business/nearby",
+            {
+              params: {
+                latitude,
+                longitude,
+                radius: 10,
+              },
+            }
+          );
+
+          setBusinesses(data || []);
+        } catch (err) {
+          console.log(err);
+        } finally {
+          setLoading(false);
+        }
+      },
+      () => {
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+      }
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="h-[500px] flex flex-col items-center justify-center gap-3">
+        <Loader2 className="h-10 w-10 animate-spin" />
+        <p>Finding nearby businesses...</p>
+      </div>
+    );
+  }
+
+  if (!location) {
+    return (
+      <div className="h-[400px] flex flex-col items-center justify-center gap-3">
+        <MapPin className="h-12 w-12" />
+        <p>Location permission denied</p>
+
+        <button
+          onClick={fetchNearbyBusinesses}
+          className="px-4 py-2 rounded-lg bg-black text-white"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid lg:grid-cols-3 gap-6">
+      {/* GOOGLE MAP */}
+      <div className="lg:col-span-2">
+        <div className="overflow-hidden rounded-2xl border shadow">
+          <iframe
+            width="100%"
+            height="650"
+            loading="lazy"
+            allowFullScreen
+            src={`https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=14&output=embed`}
+          />
+        </div>
+      </div>
+
+      {/* BUSINESS LIST */}
+      <div className="rounded-2xl border bg-white overflow-hidden shadow">
+        <div className="p-4 border-b flex justify-between items-center">
+          <h2 className="font-semibold">
+            Nearby Businesses
+          </h2>
+
+          <button
+            onClick={fetchNearbyBusinesses}
+            className="p-2 rounded-lg hover:bg-gray-100"
+          >
+            <RefreshCcw className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="max-h-[650px] overflow-y-auto">
+          {businesses.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              No nearby businesses found
+            </div>
+          ) : (
+            businesses.map((biz) => (
+              <div
+                key={biz._id}
+                className="border-b p-4 hover:bg-gray-50 transition"
+              >
+                <div className="flex items-start gap-3">
+                  <Building2 className="h-5 w-5 mt-1 text-blue-600" />
+
+                  <div className="flex-1">
+                    <h3 className="font-semibold">
+                      {biz.name}
+                    </h3>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                      {biz.address}
+                    </p>
+
+                    {biz.distance && (
+                      <p className="text-xs text-blue-600 mt-2">
+                        {Number(biz.distance).toFixed(2)} km away
+                      </p>
+                    )}
+
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${biz.latitude},${biz.longitude}`}
+                      className="inline-flex items-center gap-2 mt-3 text-sm font-medium text-green-600"
+                    >
+                      <Navigation className="h-4 w-4" />
+                      Navigate
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
