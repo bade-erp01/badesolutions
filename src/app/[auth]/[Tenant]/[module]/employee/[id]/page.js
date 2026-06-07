@@ -1859,7 +1859,8 @@ export  function LiveLocationMap({userData}) {
       }
     );
 
-    console.log(Response);
+    const request = await Response.json();
+    setUserInfo(Dencrypt(request.employee));
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
