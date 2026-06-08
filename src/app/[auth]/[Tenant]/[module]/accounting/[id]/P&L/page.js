@@ -296,7 +296,7 @@ export default function Page({ baseUrl, userData, data }) {
                                 {selectedMonth?.totals?.netPurchase || 0}
 
                                 + Goods in Transit: {currency}
-                                {selectedMonth?.totals?.}
+                                {selectedMonth?.totals?.gitTotal || 0}
                               </p>
                               <p className="font-bold">
                                 C.O.G.A.S: {currency}
