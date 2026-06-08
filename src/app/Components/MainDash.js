@@ -986,11 +986,11 @@ export default function MainDash({ userData }) {
 
 const formatNumberShort = (num) => {
   if (num >= 1_000_000_000) {
-    return (num / 1_000_000_000).toFixed(3) + " B"; // billions
+    return (num / 1_000_000_000).toFixed(2) + " B"; // billions
   } else if (num >= 1_000_000) {
-    return (num / 1_000_000).toFixed(3) + " M"; // millions
+    return (num / 1_000_000).toFixed(2) + " M"; // millions
   } else if (num >= 1_000) {
-    return (num / 1_000).toFixed(3) + " K"; // thousands
+    return (num / 1_000).toFixed(2) + " K"; // thousands
   }
   return num.toString();
 };
