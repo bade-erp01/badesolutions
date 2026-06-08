@@ -1963,13 +1963,13 @@ export function DashboardStats({ todaysSale,cust }) {
             </CardTitle>
         </CardHeader>
         <CardContent>
+          <p className="text-2xl font-bold">{cust.lastPayDate}</p>
+          <Separator className="my-2" />
           <Badge variant="secondary">
             {daysAwayFromToday(cust.lastPayDate) > 0
               ? `${Math.abs(daysAwayFromToday(cust.lastPayDate))} day(s) ago`
               : "Today"}
           </Badge>
-          <Separator className="my-2" />
-          <p className="text-2xl font-bold">{cust.lastPayDate}</p>
         </CardContent>
       </Card>
 
