@@ -1955,23 +1955,26 @@ export function DashboardStats({ todaysSale,cust }) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <Badge variant="outline" className="">
-             Last transaction Date
+
+      {cust.lastPayDate !== "" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Badge variant="outline" className="">
+              Last transaction Date
+              </Badge>
+              </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Separator className="my-2" />
+            <Badge variant="secondary" className="text-lg font-bold">
+              {daysAwayFromToday(cust.lastPayDate) == 0
+                ? `Today`
+                : `${Math.abs(daysAwayFromToday(cust.lastPayDate))} day(s) ago`}
             </Badge>
-            </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Separator className="my-2" />
-          <Badge variant="secondary" className="text-lg font-bold">
-            {daysAwayFromToday(cust.lastPayDate) == 0
-              ? `Today`
-              : `${Math.abs(daysAwayFromToday(cust.lastPayDate))} day(s) ago`}
-          </Badge>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Another metric (optional) */}
       <Card>
