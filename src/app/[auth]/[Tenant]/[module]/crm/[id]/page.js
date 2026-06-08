@@ -1951,7 +1951,7 @@ export function DashboardStats({ todaysSale,cust }) {
         </CardHeader>
         <CardContent>
         <Separator className="my-2" />
-          <p className="text-2xl font-bold">₦{formatNumberShort(todaysSale || 0)}</p>
+          <p className="text-lg font-bold">₦{formatNumberShort(todaysSale || 0)}</p>
         </CardContent>
       </Card>
 
@@ -1984,7 +1984,7 @@ export function DashboardStats({ todaysSale,cust }) {
         </CardHeader>
         <CardContent>
         <Separator className="my-2" />
-          <p className="text-2xl font-bold">₦{formatNumberShort(cust.Debt)}</p>
+          <p className="text-lg font-bold">₦{formatNumberShort(cust.Debt)}</p>
         </CardContent>
       </Card>
 
