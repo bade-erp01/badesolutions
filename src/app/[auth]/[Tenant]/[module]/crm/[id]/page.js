@@ -44,7 +44,7 @@ import {
   CardTitle,
   CardDescription
 } from "@/components/ui/card";
-
+import {Separator} from "@/components/ui/separator"
 import {
   Table,
   TableBody,
@@ -1926,6 +1926,19 @@ function Checkbox({ label, name, checked, onChange }) {
 
 
 export function DashboardStats({ todaysSale,cust }) {
+
+  // utility function to calculate days away from today for last transaction date and change badge color accordingly
+  const daysAwayFromToday = (targetDate) => {
+  // targetDate can be a string like "2026-06-15" or a Date object
+  const today = moment().startOf("day"); // normalize to midnight
+  const target = moment(targetDate).startOf("day");
+
+  // Difference in days (positive = future, negative = past)
+  const diff = target.diff(today, "days");
+
+  return diff;
+};
+
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
       <Card>
@@ -1950,6 +1963,10 @@ export function DashboardStats({ todaysSale,cust }) {
             </CardTitle>
         </CardHeader>
         <CardContent>
+          <Badge variant="outline">
+            {daysAwayFromToday(cust.lastPayDate)}
+          </Badge>
+          <Separator className="my-2" />
           <p className="text-2xl font-bold">{cust.lastPayDate}</p>
         </CardContent>
       </Card>
