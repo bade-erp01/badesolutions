@@ -1949,8 +1949,8 @@ export function DashboardStats({ todaysSale,cust }) {
             </Badge>
             </CardTitle>
         </CardHeader>
-        <Separator className="my-2" />
         <CardContent>
+        <Separator className="my-2" />
           <p className="text-2xl font-bold">₦{formatNumberShort(todaysSale || 0)}</p>
         </CardContent>
       </Card>
@@ -1965,7 +1965,7 @@ export function DashboardStats({ todaysSale,cust }) {
         </CardHeader>
         <CardContent>
           <Separator className="my-2" />
-          <Badge variant="secondary" className="text-bold">
+          <Badge variant="secondary" className="text-2xl font-bold">
             {daysAwayFromToday(cust.lastPayDate) > 0
               ? `${Math.abs(daysAwayFromToday(cust.lastPayDate))} day(s) ago`
               : "Today"}
@@ -1982,8 +1982,8 @@ export function DashboardStats({ todaysSale,cust }) {
             </Badge>
             </CardTitle>
         </CardHeader>
-        <Separator className="my-2" />
         <CardContent>
+        <Separator className="my-2" />
           <p className="text-2xl font-bold">₦{formatNumberShort(cust.Debt)}</p>
         </CardContent>
       </Card>
