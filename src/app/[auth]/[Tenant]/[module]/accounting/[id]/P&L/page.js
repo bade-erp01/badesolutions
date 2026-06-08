@@ -294,6 +294,9 @@ export default function Page({ baseUrl, userData, data }) {
                               <p>
                                 + Net Purchase: {currency}
                                 {selectedMonth?.totals?.netPurchase || 0}
+
+                                + Goods in Transit: {currency}
+                                {selectedMonth?.totals?.}
                               </p>
                               <p className="font-bold">
                                 C.O.G.A.S: {currency}
