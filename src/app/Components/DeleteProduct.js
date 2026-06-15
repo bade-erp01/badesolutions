@@ -1,59 +1,88 @@
-'use client'; // for Next.js 13+ with App Router
+'use client';
 
-import Swal from 'sweetalert2';
+import { useState } from 'react';
 import axios from 'axios';
-import { Encrypt, plsWait } from '../../../Functions/Mics';
-import {EXPRESS_PRIVATE_URL} from "../../../Functions/Functions"
-import {useState} from "react"
-import {useRouter} from 'next/navigation'
+import { Encrypt, plsWait, ErrorMessage, SuccessToast } from '../../../Functions/Mics';
+import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
-const DeleteButton =  ({ productId, business,user }) => {
-  const navigation = useRouter()
+const DeleteButton = ({ productId, business, user }) => {
+  const navigation = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const CreateFoc = async () => {
+  const deleteProduct = async () => {
     try {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action can not be reversed!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel',
-      });
+      setLoading(true);
+      plsWait('Deleting Product...');
 
-      if (result.isConfirmed) {
-        plsWait('Deleting Product...')
-       const { data } = await axios.delete(
+      const { data } = await axios.delete(
         `${EXPRESS_PRIVATE_URL}/api/Product/Delete/${Encrypt(productId)}`,
         {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+            "idempotency-key": `DELETE-PRODUCT-${productId}`,
           }
         }
       );
 
-        if(data.message){
-            Swal.fire('Deleted!', 'Product has been successfully Deleted.', 'success');
-            navigation.back()
-        }else{
-            throw new Error(data.error)
-        }
-
+      if (data.message) {
+        SuccessToast(data.message);
+        navigation.back();
       } else {
-        Swal.fire('Cancelled', 'Delete Operation cancelled.', 'info');
+        throw new Error(data.error);
       }
     } catch (err) {
-      Swal.fire('Error', 'Something went wrong.', 'error');
+      ErrorMessage(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <span title='Delete this product' onClick={CreateFoc} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-orange-700">
-      Delete Product
-    </span>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="destructive"
+          type="button"
+          title="Delete this product"
+          aria-label="Delete Product"
+        >
+          Delete Product
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+          <AlertDialogDescription>
+            You are about to delete this product. This action cannot be undone.
+            Do you want to proceed?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={deleteProduct} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading ? 'Deleting...' : 'Proceed'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
