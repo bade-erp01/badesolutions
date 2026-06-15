@@ -14,7 +14,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function SingleStoreProductpage({ storeProduct, userInfo }) {
   const router = useRouter();
@@ -30,10 +32,8 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       plsWait("Updating Fields...");
-
       const response = await axios.patch(
         `${EXPRESS_PRIVATE_URL}/api/Adjust/Product/${Encrypt(formData._id)}`,
         {
@@ -89,6 +89,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
               name="currentQty"
               value={formData.currentQty}
               onChange={handleChange}
+              className="text-black"
             />
           </div>
 
@@ -101,14 +102,14 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
               name="pcs"
               value={formData.pcs}
               onChange={handleChange}
+              className="text-black"
             />
           </div>
 
-          {/* isActivated */}
-          <div className="col-span-2 flex items-center space-x-2">
-            <Checkbox
+          {/* isActivated toggle */}
+          <div className="col-span-2 flex items-center space-x-2 pt-2">
+            <Switch
               id="isActivated"
-              name="isActivated"
               checked={formData.isActivated}
               onCheckedChange={(checked) =>
                 setFormData((prev) => ({ ...prev, isActivated: checked }))
@@ -125,12 +126,38 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
             <p className="text-xs text-yellow-700 bg-yellow-100 border border-yellow-300 rounded-md px-4 py-2">
               ⚠️ Ensure this product is <strong>not being billed</strong> when the update is performed.
             </p>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="secondary" className="cursor-pointer">
               Update Product
             </Button>
           </div>
         )}
       </form>
+
+      {/* Audit Log */}
+      <Card className="mt-10">
+        <CardHeader>
+          <CardTitle>Audit Log</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-64">
+            <div className="space-y-6 pl-6 border-l border-gray-300">
+              {storeProduct.ActivitiyLog?.map((log, index) => (
+                <div key={index} className="relative">
+                  <div className="absolute -left-3 top-1 w-3 h-3 bg-gray-500 rounded-full"></div>
+                  <div className="text-xs text-gray-700">
+                    <p className="font-medium">{log.message}</p>
+                    {log.timestamp && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(log.timestamp).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 }
