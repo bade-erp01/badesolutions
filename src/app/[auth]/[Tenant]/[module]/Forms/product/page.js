@@ -9,8 +9,8 @@ import {
 import { Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
 // shadcn/ui components
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -131,6 +131,7 @@ export default function ProductForm({
               Ensure to provide correct information for your product
             </p>
           </CardHeader>
+          <Separator/>
 
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-10">
