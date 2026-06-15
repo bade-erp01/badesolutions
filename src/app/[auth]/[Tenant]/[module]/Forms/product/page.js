@@ -123,9 +123,9 @@ export default function ProductForm({
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-6xl mx-auto px-4">
         <Card className="shadow-xl">
-          <CardHeader className="bg-gray-900 text-white rounded-t-lg">
+          <CardHeader className="text-gray-900 rounded-t-lg">
             <CardTitle className="text-3xl">Create Product</CardTitle>
             <p className="text-gray-300 mt-2">
               Ensure to provide correct information for your product
