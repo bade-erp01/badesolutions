@@ -82,7 +82,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* CASE */}
           <div>
-            <Label htmlFor="currentQty">CASE</Label>
+            <Label htmlFor="currentQty" className={'text-black'}>CASE</Label>
             <Input
               type="number"
               id="currentQty"
@@ -95,7 +95,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
 
           {/* PCS */}
           <div>
-            <Label htmlFor="pcs">PCS</Label>
+            <Label htmlFor="pcs" className={'text-black'}>PCS</Label>
             <Input
               type="number"
               id="pcs"
