@@ -29,7 +29,8 @@ const DeleteButton =  ({ productId, business,user }) => {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(user._id)}`
+            access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           }
         }
       );

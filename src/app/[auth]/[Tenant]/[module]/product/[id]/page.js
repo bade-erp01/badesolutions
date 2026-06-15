@@ -162,6 +162,7 @@ export default function SingleProductpage({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
     access: `${Encrypt(userInfo._id)}`,
+    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
   });
 
   const [formData, setFormData] = useState({ ...data });
@@ -916,7 +917,7 @@ export default function SingleProductpage({
                                   product._id,
                                 )}?Modules=inventory`}
                                 >
-                                View Product Inventory Record in {log.warehouseName.toLowerCase()}
+                                View Stock Position in {log.warehouseName.toLowerCase()}
                                 </Link>
                               </TableCell>
 
@@ -1080,6 +1081,7 @@ function ProductChart({ productId, productName, umo, business, user }) {
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             dbConnect: `Bearer ${business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           next: {
             revalidate: 120,
@@ -1323,7 +1325,8 @@ export function ProductPriceList({ initialData, Biz, user }) {
         headers: {
            "Content-Type": "application/json",
             Authorization:`Bearer ${Encrypt(user.tenantId)}`,
-            access: Encrypt(user._id)
+            access: Encrypt(user._id),
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
         body: JSON.stringify(update),
       });
