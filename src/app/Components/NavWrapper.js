@@ -303,11 +303,12 @@ export function DialogDemo({ userData }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
           access: `${Encrypt(userData.user._id)}`,
+          "sessionkey": `Bearer ${userData.SessionId}`
         },
       };
 
       const response = await axios.post(
-        `${process.env.EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
+        `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
         formData,
         config,
       );
@@ -347,19 +348,19 @@ export function DialogDemo({ userData }) {
 
           <DialogHeader className="relative z-10 space-y-3 text-left">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10">
+              {/* <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10">
                 <UserPlusIcon className="h-7 w-7 text-white" />
-              </div>
+              </div> */}
 
               <div>
                 <DialogTitle className="text-2xl font-semibold tracking-tight">
                   Register Lead
                 </DialogTitle>
 
-                <DialogDescription className="mt-1 text-sm text-zinc-300 leading-relaxed">
+                {/* <DialogDescription className="mt-1 text-sm text-zinc-300 leading-relaxed">
                   Create a prospect profile to manage customer engagement,
-                  follow-ups, and conversion opportunities in one place.
-                </DialogDescription>
+                  follow-ups.
+                </DialogDescription> */}
               </div>
             </div>
           </DialogHeader>
