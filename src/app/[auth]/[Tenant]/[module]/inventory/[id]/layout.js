@@ -20,6 +20,7 @@ export default async function StoreLayout({ params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
         access: `${Encrypt(userInfo.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
       },
     });
 
