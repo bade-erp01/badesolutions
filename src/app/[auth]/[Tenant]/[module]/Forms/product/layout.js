@@ -62,6 +62,7 @@ export default async function Productlayout({ children, params }) {
          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
          dbConnect: `Bearer ${userData.business.rustyRoof}`,
          access: `${Encrypt(userData.user._id)}`,
+         sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
        },
      // cache: 'no-store', // Ensures fresh data on every request
     next: {

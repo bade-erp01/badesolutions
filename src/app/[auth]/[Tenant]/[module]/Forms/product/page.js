@@ -10,6 +10,22 @@ import { Encrypt } from "../../../../../../../Functions/Functions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
+// shadcn/ui components
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";   // ← Add this import
+
 export default function ProductForm({
   userData,
   businessData,
@@ -19,24 +35,38 @@ export default function ProductForm({
   const [user] = useState(userData);
   const [business] = useState(businessData);
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     Name: "",
     UOM: "",
     category: "",
     Vendor: "",
-    color: "",
+    color: "#000000",
     Description: "",
     Sellable: true,
     Ecom_sale: false,
     Manufacturer: "",
     VAT: 0,
     Pieces: 1,
-    category: "",
     BuyingPrice: 0,
   });
 
+  const [isLoading, setIsLoading] = useState(false);   // ← New state
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
+  };
+
+  const handleCheckboxChange = (name, checked) => {
+    setFormData((prev) => ({ ...prev, [name]: checked }));
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const config = {
@@ -44,11 +74,13 @@ export default function ProductForm({
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
       access: `${Encrypt(userData._id)}`,
+      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
     },
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);     // ← Start loading
 
     try {
       plsWait("Creating Product...⌛");
@@ -59,271 +91,250 @@ export default function ProductForm({
 
       if (data.Message) {
         SuccessToast(data.Message);
+        
+        // Reset form
         setFormData({
           Name: "",
           UOM: "",
           category: "",
           Vendor: "",
-          color: "",
+          color: "#000000",
           Description: "",
           Sellable: true,
           Ecom_sale: false,
           Manufacturer: "",
           VAT: 0,
           Pieces: 1,
-          category: "",
           BuyingPrice: 0,
         });
+
         router.push(
-          `/${businessData.companyName}/${Encrypt(userData._id)}/product/product/${data.data}?Modules=product`,
+          `/${businessData.companyName}/${Encrypt(userData._id)}/product/product/${data.data}?Modules=product`
         );
       } else {
         throw new Error(data.error || "Unexpected error occurred.");
       }
     } catch (error) {
       ErrorMessage("Failed to create product.");
+    } finally {
+      setIsLoading(false);    // ← Stop loading
     }
   };
 
-  const inputClass =
-    "block w-full rounded-md bg-white px-2.5 py-1 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 transition-colors";
-  const labelClass = "block text-xs font-semibold text-gray-700 mb-1.5";
-
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        <form className="space-y-0" onSubmit={handleSubmit}>
-          {/* Header Section */}
-          <div className="bg-gray-700 px-8 py-6">
-            <h2 className="text-2xl font-bold text-white">Create Product</h2>
-            <p className="text-indigo-100 text-sm mt-1">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        <Card className="shadow-xl">
+          <CardHeader className="bg-gray-900 text-white rounded-t-lg">
+            <CardTitle className="text-3xl">Create Product</CardTitle>
+            <p className="text-gray-300 mt-2">
               Ensure to provide correct information for your product
             </p>
-          </div>
+          </CardHeader>
 
-          {/* Form Content */}
-          <div className="px-8 py-8">
-            {/* Basic Information Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                Product Information
-              </h3>
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-10">
+              {/* Product Information */}
+              <div>
+                <h3 className="text-lg font-semibold mb-6 pb-2 border-b">
+                  Product Information
+                </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Name */}
-                <div>
-                  <label htmlFor="Name" className={labelClass}>
-                    Product Name
-                  </label>
-                  <input
-                    id="Name"
-                    name="Name"
-                    type="text"
-                    required
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="e.g., Product Name"
-                  />
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label htmlFor="category" className={labelClass}>
-                    Category
-                  </label>
-                  <input
-                    id="category"
-                    name="category"
-                    type="text"
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="e.g., Electronics"
-                  />
-                </div>
-
-                {/* Buying Price */}
-                <div>
-                  <label htmlFor="BuyingPrice" className={labelClass}>
-                    Vendor Price
-                  </label>
-                  <input
-                    required
-                    id="BuyingPrice"
-                    name="BuyingPrice"
-                    defaultValue={formData.BuyingPrice || 0}
-                    type="number"
-                    step="any"
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="0.00"
-                  />
-                </div>
-
-                {/* Manufacturer */}
-                <div>
-                  <label htmlFor="Manufacturer" className={labelClass}>
-                    Manufacturer
-                  </label>
-                  <input
-                    id="Manufacturer"
-                    name="Manufacturer"
-                    type="text"
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="Manufacturer name"
-                  />
-                </div>
-
-                {/* Pieces */}
-                <div>
-                  <label htmlFor="Pieces" className={labelClass}>
-                    Pieces in Carton
-                  </label>
-                  <input
-                    id="Pieces"
-                    required
-                    name="Pieces"
-                    defaultValue={formData.Pieces || 0}
-                    onChange={handleChange}
-                    type="number"
-                    className={inputClass}
-                    placeholder="0"
-                  />
-                </div>
-
-                {/* Vendor */}
-                <div>
-                  <label htmlFor="Vendor" className={labelClass}>
-                    Vendor
-                  </label>
-                  <select
-                    id="Vendor"
-                    name="Vendor"
-                    required
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="">Select Vendor...</option>
-                    {VendorList.map((vendor) => (
-                      <option value={vendor._id} key={vendor._id}>
-                        {vendor.Name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Unit of Measure */}
-                <div>
-                  <label htmlFor="UMO" className={labelClass}>
-                    Unit of Measure
-                  </label>
-                  <input
-                    id="UMO"
-                    name="UMO"
-                    type="text"
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="e.g., pcs, kg"
-                  />
-                </div>
-
-                {/* Color */}
-                <div>
-                  <label htmlFor="color" className={labelClass}>
-                    Color
-                  </label>
-                  <input
-                    id="color"
-                    name="color"
-                    onChange={handleChange}
-                    type="color"
-                    className={inputClass}
-                  />
-                </div>
-
-                {/* VAT */}
-                <div>
-                  <label htmlFor="VAT" className={labelClass}>
-                    VAT (%)
-                  </label>
-                  <input
-                    id="VAT"
-                    name="VAT"
-                    onChange={handleChange}
-                    defaultValue={formData.VAT || 0}
-                    type="number"
-                    step="any"
-                    className={inputClass}
-                    placeholder="0"
-                  />
-                </div>
-
-                {/* Sellable Checkbox */}
-                <div className="flex items-end pb-1">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="Name">Product Name</Label>
+                    <Input
+                      id="Name"
+                      name="Name"
+                      required
+                      placeholder="e.g., Wireless Headphones"
+                      value={formData.Name}
                       onChange={handleChange}
-                      id="Sellable"
-                      name="Sellable"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      disabled={isLoading}
                     />
-                    <span className="text-xs font-medium text-gray-700">
-                      Sell on ERP
-                    </span>
-                  </label>
-                </div>
+                  </div>
 
-                {/* E-commerce Checkbox */}
-                <div className="flex items-end pb-1">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Input
+                      id="category"
+                      name="category"
+                      placeholder="e.g., Electronics"
+                      value={formData.category}
                       onChange={handleChange}
-                      id="Ecom_sale"
-                      name="Ecom_sale"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      disabled={isLoading}
                     />
-                    <span className="text-xs font-medium text-gray-700">
-                      Sell on E-commerce
-                    </span>
-                  </label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="BuyingPrice">Vendor Price</Label>
+                    <Input
+                      id="BuyingPrice"
+                      name="BuyingPrice"
+                      type="number"
+                      step="any"
+                      required
+                      placeholder="0.00"
+                      value={formData.BuyingPrice}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Manufacturer">Manufacturer</Label>
+                    <Input
+                      id="Manufacturer"
+                      name="Manufacturer"
+                      placeholder="Manufacturer name"
+                      value={formData.Manufacturer}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Pieces">Pieces in Carton</Label>
+                    <Input
+                      id="Pieces"
+                      name="Pieces"
+                      type="number"
+                      required
+                      placeholder="0"
+                      value={formData.Pieces}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Vendor">Vendor</Label>
+                    <Select
+                      value={formData.Vendor}
+                      onValueChange={(value) => handleSelectChange("Vendor", value)}
+                      disabled={isLoading}
+                      required
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Vendor..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {VendorList.map((vendor) => (
+                          <SelectItem key={vendor._id} value={vendor._id}>
+                            {vendor.Name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="UOM">Unit of Measure</Label>
+                    <Input
+                      id="UOM"
+                      name="UOM"
+                      placeholder="e.g., pcs, kg, box"
+                      value={formData.UOM}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="color">Color</Label>
+                    <Input
+                      id="color"
+                      name="color"
+                      type="color"
+                      className="h-10 p-1 cursor-pointer"
+                      value={formData.color}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="VAT">VAT (%)</Label>
+                    <Input
+                      id="VAT"
+                      name="VAT"
+                      type="number"
+                      step="any"
+                      placeholder="0"
+                      value={formData.VAT}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-8 pt-6 lg:col-span-3">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="Sellable"
+                        checked={formData.Sellable}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange("Sellable", !!checked)
+                        }
+                        disabled={isLoading}
+                      />
+                      <Label htmlFor="Sellable" className="cursor-pointer font-medium">
+                        Sell on ERP
+                      </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="Ecom_sale"
+                        checked={formData.Ecom_sale}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange("Ecom_sale", !!checked)
+                        }
+                        disabled={isLoading}
+                      />
+                      <Label htmlFor="Ecom_sale" className="cursor-pointer font-medium">
+                        Sell on E-commerce
+                      </Label>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Description Section */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                Description
-              </h3>
+              {/* Description */}
               <div>
-                <label htmlFor="Description" className={labelClass}>
-                  Product Description
-                </label>
-                <textarea
+                <h3 className="text-lg font-semibold mb-4">Description</h3>
+                <Textarea
                   id="Description"
-                  onChange={handleChange}
                   name="Description"
-                  className="w-full text-black h-24 p-2.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:outline-none transition-colors resize-none"
                   placeholder="Write a simple and concise description about this product..."
+                  value={formData.Description}
+                  onChange={handleChange}
+                  className="min-h-[120px] resize-y"
+                  disabled={isLoading}
                 />
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-              {user.createProduct && (
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors shadow-md"
-                >
-                  Create Product
-                </button>
-              )}
-            </div>
-          </div>
-        </form>
+              {/* Submit Button with Loading */}
+              <div className="flex justify-end pt-6 border-t">
+                {user.createProduct && (
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Creating Product...
+                      </>
+                    ) : (
+                      "Create Product"
+                    )}
+                  </Button>
+                )}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
