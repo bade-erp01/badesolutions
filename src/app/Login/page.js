@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState } from "react";
 import Nav1 from "../Components/Nav1";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,26 +7,29 @@ import Footer1 from "../Components/Footer1";
 import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 import { loginSuccess, loginFailure } from "../../../lib/User";
 import { useDispatch, useSelector } from "react-redux";
-import {Encrypt,Dencrypt} from "../../../Functions/Functions"
+import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import Footer2 from "../Components/Footer2";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-// import ReCAPTCHA from "react-google-recaptcha";
+// shadcn/ui imports
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
-export default function Login({userInfo,businessInfo,url,SessionId}) {
+export default function Login({ userInfo, businessInfo, url, SessionId }) {
   const dispatch = useDispatch();
-  // const recaptchaRef = useRef();
-  // const userInfo = useSelector((state) => state.user.userInfo);
-  // const businessInfo = useSelector((state) => state.user.businessInfo);
   const router = useRouter();
+
   const [date, setDate] = useState("");
   const [weekday, setWeekday] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("Loading location...");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showSplash, setShowSplash] = useState(false);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -35,6 +38,7 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     setTime(
       now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })
     );
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
@@ -76,346 +80,239 @@ export default function Login({userInfo,businessInfo,url,SessionId}) {
     }
   }
 
-  // login form
-
-  const handleChange = async (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value,location });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  //   e.preventDefault();
-  //   // const token = await recaptchaRef.current.executeAsync();
-  //   // recaptchaRef.current.reset();
-  //   plsWait("Verifying Credentials. Please wait...");
-
-  //   try {
-  //     const response = await fetch(`${url}/api/v1/Login`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({formData:Encrypt(formData)}),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok && data.Newcustomer) {
-  //       dispatch(loginSuccess({ user: Dencrypt(data.Newcustomer), business: data.Tenant, SessionId:data.SessionId}));
-  //       // reset the form
-  //       SuccessToast('Login successful')
-
-  //       // settime out display bade on dark background 
-
-  //       plsWait("Login successful, Redirecting...");
-
-  //       // Reset the form
-  //       setFormData({ email: "", password: "" }); // or setFormData(initialState)
-
-  //       const sanitizedCompanyName = data.Tenant.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-
-  //       const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(data.Newcustomer._id)}`;
-  //       // Redirect using Next.js router
-  //       router.push(dashboardUrl);
-  //     } else if (data.error) {
-  //       throw new Error(data.error);
-  //     }
-  //   } catch (error) {
-  //     setFormData({ email: "", password: "" });
-  //     ErrorMessage(error.message);
-  //     dispatch(loginFailure(error.message));
-  //   }
-  // };
-
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.email || !formData.password) {
-    return ErrorMessage("Email and password are required");
-  }
-
-  try {
-    // const token = await recaptchaRef.current.executeAsync();
-    // recaptchaRef.current.reset();
-    setLoading(true);
-    const response = await fetch(`${url}/api/v1/Login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        formData: Encrypt(formData),
-      }),
-    });
-
-    let data;
+    if (!formData.email || !formData.password) {
+      return ErrorMessage("Email and password are required");
+    }
 
     try {
-      data = await response.json();
-    } catch {
-      throw new Error("Invalid server response");
-    }
+      setLoading(true);
+      const response = await fetch(`${url}/api/v1/Login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          formData: Encrypt(formData),
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(data?.error || "Login failed");
-    }
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("Invalid server response");
+      }
 
-    if (!data?.Newcustomer || !data?.Tenant) {
-      throw new Error("Invalid login response");
-    }
+      if (!response.ok) {
+        throw new Error(data?.error || "Login failed");
+      }
 
-    // decrypt once
-    const decryptedUser = Dencrypt(data.Newcustomer);
+      if (!data?.Newcustomer || !data?.Tenant) {
+        throw new Error("Invalid login response");
+      }
 
-    dispatch(
-      loginSuccess({
-        user: decryptedUser,
-        business: data.Tenant,
-        SessionId: data.SessionId,
-      })
-    );
-    
-     // show splash ONLY after successful login
-     setShowSplash(true);
+      const decryptedUser = Dencrypt(data.Newcustomer);
 
-    // reset form
-    setFormData({
-      email: "",
-      password: "",
-    });
-    
-    const sanitizedCompanyName = data.Tenant
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-    
-    const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(
-      decryptedUser._id
-    )}`;
-    
-    
-    setTimeout(() => {
-      // wait for splash animation before redirect
+      dispatch(
+        loginSuccess({
+          user: decryptedUser,
+          business: data.Tenant,
+          SessionId: data.SessionId,
+        })
+      );
+
+      setShowSplash(true);
+      setFormData({ email: "", password: "" });
+
+      const sanitizedCompanyName = data.Tenant
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(
+        decryptedUser._id
+      )}`;
+
+      setTimeout(() => {
+        setLoading(false);
+        router.push(dashboardUrl);
+      }, 5000);
+    } catch (error) {
+      setShowSplash(false);
       setLoading(false);
-      router.push(dashboardUrl)
-    }, 5000);
+      setFormData({ email: "", password: "" });
 
-  } catch (error) {
-    setShowSplash(false);
-    setLoading(false);
-    setFormData({
-      email: "",
-      password: "",
-    });
+      ErrorMessage(error.message || "Something went wrong");
+      dispatch(loginFailure(error.message || "Login failed"));
+    }
+  };
 
-    ErrorMessage(error.message || "Something went wrong");
-
-    dispatch(
-      loginFailure(error.message || "Login failed")
-    );
-  }
-};
+  const isLoggedIn = userInfo && businessInfo && SessionId === userInfo?.SessionId;
 
   return (
     <div
+      className="min-h-screen bg-cover bg-fixed bg-no-repeat"
       style={{
         backgroundImage: "url('/bg.jpg')",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
       }}
     >
-        {showSplash && (
-          <BadeSplashScreen/>
-        )}
+      <AnimatePresence>
+        {showSplash && <BadeSplashScreen />}
+      </AnimatePresence>
 
       <Nav1
         user={userInfo}
         business={businessInfo}
-        page={userInfo ? `dashboard` : "Bade"}
+        page={userInfo ? "dashboard" : "Bade"}
       />
-      <div className="min-h-screen flex items-center justify-center  p-4">
+
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
-          {/* Login Card */}
-          {
-          !SessionId  ||
-          SessionId !== userInfo?.SessionId ||
-          !userInfo ||
-          !businessInfo? (
-            <div className="bg-white/80 backdrop-blur-md rounded-md shadow-xl p-8 w-[340px] max-w-full flex flex-col gap-6">
-              <div className="flex justify-between items-center mb-2">
-                <Link href="/" className="font-bold text-xl text-gray-900">
+          {!isLoggedIn ? (
+            <Card className="w-[380px] max-w-full bg-white/90 backdrop-blur-md border-0 shadow-2xl">
+              <CardHeader className="flex flex-row items-center justify-between pb-6">
+                <Link href="/" className="flex items-center gap-3">
                   <Image
                     src="/bade.jpg"
                     alt="Bade Logo"
-                    width={40}
-                    height={40}
-                    className="rounded shadow-sm"
+                    width={48}
+                    height={48}
+                    className="rounded-xl shadow-sm"
                   />
                 </Link>
-                <h2 className="text-2xl font-semibold hover:underline text-gray-700 mb-2">
-                  Log in
-                </h2>
-              </div>
+                <h2 className="text-3xl font-semibold text-gray-900">Log in</h2>
+              </CardHeader>
 
-              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
-                  <span className="mr-2 text-gray-400">
-                    <svg
-                      width="18"
-                      height="18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M16 16c0-2.21-3.58-4-8-4s-8 1.79-8 4" />
-                    </svg>
-                  </span>
-                  <input
-                    type="email"
-                    onChange={handleChange}
-                    placeholder="e-mail address"
-                    className="bg-transparent outline-none flex-1 text-gray-700 placeholder-gray-400"
-                    value={formData.email}
-                    name="email"
-                    required
-                  />
-                </div>
-                <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
-                  <span className="mr-2 text-gray-400">
-                    <svg
-                      width="18"
-                      height="18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <rect x="3" y="11" width="18" height="7" rx="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                  </span>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    className="bg-transparent outline-none flex-1 text-gray-700 placeholder-gray-400"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                  />
-                  <Link
-                    href="/auth/Forgot_password"
-                    className="ml-2 text-xs text-gray-500 hover:underline"
-                  >
-                    I forgot
-                  </Link>
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                 <button
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      name="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="h-12 bg-gray-50 border-gray-200 focus:border-gray-400"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <Link
+                        href="/auth/Forgot_password"
+                        className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      name="password"
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      className="h-12 bg-gray-50 border-gray-200 focus:border-gray-400"
+                    />
+                  </div>
+
+                  <Button
                     type="submit"
                     disabled={loading}
-                    className={`rounded p-2 ml-2 shadow-md transition-all duration-200 min-w-[110px]
-                      ${
-                        loading
-                          ? "bg-gray-700 text-gray-300 cursor-not-allowed"
-                          : "bg-black text-white hover:bg-gray-900"
-                      }`}
+                    className="w-full h-12 text-base font-medium bg-black hover:bg-gray-900 transition-all"
                   >
-                      {loading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg
-                            className="animate-spin h-4 w-4"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                            />
-                          </svg>
-                          Logging in...
-                        </span>
-                      ) : (
-                        "Login"
-                      )}
-                    </button>
-                </div>
-              </form>
-              {/* Event Card */}
-              <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 w-[340px] max-w-full flex flex-col gap-6 relative overflow-auto">
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full opacity-60 blur-2xl z-0" />
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Logging in...
+                      </>
+                    ) : (
+                      "Sign in"
+                    )}
+                  </Button>
+                  <Link
+                    href="/SalesPortal"
+                    className="mt-2 inline-block w-full text-center bg-gray-500 text-white border border-white/20 rounded py-3 px-6 font-medium hover:bg-gray-700 transition"
+                  >
+                    Access Sale portal →
+                  </Link>
+                </form>
 
-                <div className="flex justify-between gap-4 items-start relative z-10">
-                  <div>
-                    <div className="text-2xl font-bold text-gray-700 leading-none">
-                      {weekday}
+                {/* Event Card */}
+                <div className="mt-8 bg-white rounded-3xl p-8 relative overflow-hidden border border-gray-100">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full opacity-60 blur-2xl" />
+
+                  <div className="flex justify-between gap-4 items-start relative z-10">
+                    <div>
+                      <div className="text-4xl font-bold text-gray-800 leading-none">
+                        {weekday}
+                      </div>
+                      <div className="text-3xl font-light text-gray-400 -mt-1">
+                        {date}
+                      </div>
                     </div>
-                    <div className="text-2xl font-light text-gray-400 -mt-2 mb-4">
-                      {date}
+                    <div className="text-right text-sm text-gray-600 mt-2">
+                      <div>
+                        {time}
+                        <br />
+                        <span className="text-xs text-gray-500">How&apos;s {location} today?</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="relative z-10 text-sm text-gray-600 mt-2">
-                    <div className="flex items-center gap-4">
-                      <span className="text-xs text-gray-500 font-medium">
-                        {time} <br />
-                        How&apos;s {location} today?
-                      </span>
-                    </div>
-                  </div>
+
+                  <Link
+                    href="/Marketers"
+                    className="mt-8 inline-block w-full text-center bg-black text-white border border-white/20 rounded-full py-3 px-6 font-medium hover:bg-gray-900 transition"
+                  >
+                    Refer and Earn →
+                  </Link>
                 </div>
-                <Link
-                  href="/Marketers"
-                  className="text-white/80 bg-black border z-20 border-white/20 rounded-full px-6 py-2 font-medium hover:bg-dark/20 hover:border hover:border-gray-300 transition"
-                >
-                  Refer and Earn →
-                </Link>
-                {/* </div> */}
-              </div>
-              {/* New In Card */}
-              <p className="text-xs text-gray-400 text-center mt-2">
-                Business Automated Dynamic Enterprise!
-              </p>
-            </div>
+
+                <p className="text-center text-xs text-gray-400 mt-6">
+                  Business Automated Dynamic Enterprise!
+                </p>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="max-w-sm w-full bg-white rounded-xl shadow-lg p-4 flex items-center gap-4">
+            <Card className="max-w-sm w-full bg-white shadow-xl p-6 flex items-center gap-5">
               <Image
                 src={userInfo?.image || businessInfo?.companyLogo || "/bade.jpg"}
-                alt="Logo"
-                width={60}
-                height={60}
-                className="rounded-full shadow-md"
-                quality={100}
-                loading="eager"
+                alt="User"
+                width={72}
+                height={72}
+                className="rounded-2xl shadow-md object-cover"
               />
               <div>
-                <h3 className="text-amber-950 font-semibold text-md leading-tight">
-                  Welcome Back {userInfo?.firstName || "Guest"}..!!
+                <h3 className="font-semibold text-xl text-amber-950">
+                  Welcome back, {userInfo?.firstName || "User"}!
                 </h3>
-                <p className="text-sm text-gray-600">Glad to see you again</p>
+                <p className="text-gray-600 mt-1">Glad to see you again.</p>
               </div>
-            </div>
+            </Card>
           )}
         </div>
-        {/* Decorative spheres and background */}
-        <div className="absolute inset-0 -z-10 flex items-end justify-center">
-          <div className="w-[420px] h-[420px] bg-gradient-to-br from-[#f5ede7] to-[#e7e3df] rounded-full absolute left-1/2 -translate-x-1/2 bottom-0 blur-2xl opacity-80" />
-          <div className="w-40 h-40 bg-gradient-to-br from-orange-200 to-orange-400 rounded-full absolute left-12 bottom-12 blur-xl opacity-70" />
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-300 rounded-full absolute right-20 bottom-24 blur-lg opacity-60" />
-          <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full absolute left-32 bottom-32 blur-md opacity-50" />
+
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 -z-10 flex items-end justify-center pointer-events-none">
+          <div className="w-[420px] h-[420px] bg-gradient-to-br from-[#f5ede7] to-[#e7e3df] rounded-full absolute left-1/2 -translate-x-1/2 bottom-0 blur-3xl opacity-70" />
+          <div className="w-40 h-40 bg-gradient-to-br from-orange-200 to-orange-400 rounded-full absolute left-12 bottom-12 blur-2xl opacity-60" />
+          <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-300 rounded-full absolute right-20 bottom-24 blur-xl opacity-50" />
         </div>
       </div>
+
       {userInfo && businessInfo ? <Footer2 /> : <Footer1 />}
     </div>
   );
