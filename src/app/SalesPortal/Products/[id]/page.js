@@ -336,6 +336,7 @@ function ProductChart({ productId, productName, umo, business, user }) {
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             dbConnect: `Bearer ${business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           next: {
             revalidate: 120,
@@ -546,6 +547,7 @@ export function CommentForm({ userData, product }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
             access: `${Encrypt(userData._id)}`,
+            sessionKey: `Bearer ${userData.SessionId}`
           },
         },
       );

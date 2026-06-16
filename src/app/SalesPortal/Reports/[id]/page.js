@@ -74,6 +74,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
                   'content-type': 'application/json',
                   Authorization: `Bearer ${Encrypt(userInfo?.user?.tenantId)}`,
                   access: `${Encrypt(userInfo?.user?._id)}`,
+                  sessionKey: `Bearer ${userInfo.SessionId}`
                  },
             });
 
@@ -108,6 +109,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userInfo?.user?.tenantId)}`,
           access: `${Encrypt(userInfo?.user?._id)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
         },
         body: JSON.stringify({ status })
       });

@@ -82,6 +82,7 @@ export default async function layout({ params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
         access: `${Encrypt(userData?.user?._id)}`,
+        sessionKey: `Bearer ${userData.SessionId}`
       },
       next: { revalidate: 60 },
     });

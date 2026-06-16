@@ -231,6 +231,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           cache: "no-store", // Optional: disables caching for fresh data
         },
@@ -381,6 +382,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
       access: `${Encrypt(userInfo.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
     },
   };
 
@@ -1261,6 +1263,7 @@ export function TextareaButton({ user, cust }) {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${Encrypt(user.tenantId)}`,
                   access: `${Encrypt(user._id)}`,
+                  sessionKey: `Bearer ${Encrypt(user.SessionId)}`
                 },
               },
             );
@@ -1331,6 +1334,7 @@ export function TextareaButton({ user, cust }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(user.tenantId)}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           body: JSON.stringify({
             message,
@@ -1439,6 +1443,7 @@ export function MyComponent({ cust, userInfo }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userInfo.user.tenantId)}`,
           access: `${Encrypt(userInfo.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
         },
         body: JSON.stringify({ leadId:Encrypt(cust._id)}),
       });
@@ -1531,6 +1536,7 @@ export function GeoButton({ userData, cust }) {
                 access: Encrypt(
                   userData.user._id
                 ),
+                sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
               },
             }
           );
