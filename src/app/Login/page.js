@@ -245,7 +245,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                   </Button>
                   <Link
                     href="/SalesPortal"
-                    className="mt-2 inline-block w-full text-center bg-gray-500 text-white border border-white/20 rounded py-3 px-6 font-medium hover:bg-gray-700 transition"
+                    className="mt-2 inline-block w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white border border-white/20 rounded py-3 px-6 font-medium  transition"
                   >
                     Access Sale portal →
                   </Link>

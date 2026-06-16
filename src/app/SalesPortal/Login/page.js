@@ -312,7 +312,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         </div>
       </div>
 
-      {userInfo && businessInfo ? <Footer2 /> : <Footer1 />}
+      {userInfo && businessInfo ? <Footer1 /> : <Footer2 />}
     </div>
   );
 }
