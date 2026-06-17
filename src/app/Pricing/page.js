@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Nav1 from "../Components/Nav1";
 import Footer1 from "../Components/Footer1";
+import Link from "next/link"
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -127,16 +128,26 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <div>
+              {/* <div>
                 <p className="text-3xl font-semibold">₦332,820</p>
                 <p className="text-sm text-zinc-500">Yearly</p>
-              </div>
+              </div> */}
 
-              <Button
+              {/* <Button
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
                 onClick={() => router.push("/auth/SignUp?plan=Standard")}
               >
                 Start scaling
+              </Button> */}
+
+              <Button
+                className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+              >
+                <Link
+                  href="mailto:Operations@badesolutions.com.ng"
+                >
+                  Contact Sales
+                </Link>
               </Button>
 
               <ul className="text-sm text-zinc-600 space-y-2">
@@ -162,8 +173,14 @@ export default function Pricing() {
                 Custom pricing based on your business needs.
               </p>
 
-              <Button className="w-full rounded-xl">
-                Contact sales
+              <Button
+                className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+              >
+                <Link
+                  href="mailto:Operations@badesolutions.com.ng"
+                >
+                  Contact Sales
+                </Link>
               </Button>
 
               <ul className="text-sm text-zinc-600 space-y-2">
