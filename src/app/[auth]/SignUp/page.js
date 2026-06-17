@@ -42,9 +42,9 @@ export default function SignUpPage() {
     email: "",
     Tel: "",
     plan: plan,
-    NumberOfUsers: plan === "Basic" ? 4 : 6 ,
-    renewalFee: plan === "Basic" ? 139750 : 332820,
-    totalAmount: plan === "Basic" ? 139750 : 332820,
+    NumberOfUsers: plan === "Basic" ? 4 : 4 ,//6
+    renewalFee: plan === "Basic" ? 332820 : 332820,
+    totalAmount: plan === "Basic" ? 332820 : 332820,
     referalCode: "",
   });
 

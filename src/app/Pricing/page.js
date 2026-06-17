@@ -70,16 +70,16 @@ export default function Pricing() {
                     <div className="space-y-1">
                       {/* Old price */}
                       <p className="text-sm text-zinc-400 line-through">
-                        ₦153,725
+                        ₦366,102
                       </p>
 
                       {/* Promo price */}
                       <h2 className="text-4xl font-bold tracking-tight text-zinc-900">
-                        ₦139,750
+                        ₦332,820
                       </h2>
 
                       <p className="text-sm text-zinc-600">
-                        Save <span className="font-semibold text-emerald-700">10%[₦13,975]</span> on Basic plan.
+                        Save <span className="font-semibold text-emerald-700">10%[₦33,282]</span> on Basic plan.
                       </p>
                     </div>
                   </div>
