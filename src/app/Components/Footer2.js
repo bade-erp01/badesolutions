@@ -15,10 +15,10 @@ export default function Footer2() {
         </span>
         {" "} | {" "}
         <span className="text-xs md:text-base text-gray-200">
-           Gain visibility in the BADE ecosystem and attract new opportunities.
+          Share BADE with your network and unlock exclusive benefits.
         </span>
         {" "} |  {" "}
-       <span>Whatsapp Support on +234 704 4889 034</span>
+       <span>Chat us on Whatsapp Support on +234 704 4889 034</span>
         {" "} |  {" "}
       </Marquee>
     </footer>
