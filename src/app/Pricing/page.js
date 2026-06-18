@@ -169,9 +169,6 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <p className="text-sm text-zinc-500">
-                Custom pricing based on your business needs.
-              </p>
 
               <Button
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
@@ -183,6 +180,9 @@ export default function Pricing() {
                 </Link>
               </Button>
 
+              <p className="text-sm text-zinc-500">
+                Custom pricing based on your business needs.
+              </p>
               <ul className="text-sm text-zinc-600 space-y-2">
                 <li>Unlimited users</li>
                 <li>Dedicated VPS</li>
