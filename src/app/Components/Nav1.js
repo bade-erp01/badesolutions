@@ -87,6 +87,7 @@ export default function Nav1({ page, Module, user, business, IconArray }) {
               "Content-Type": "application/json",
               Authorization: `Bearer ${Encrypt(business.tenantId)}`,
               access: `${Encrypt(user._id)}`,
+              sessionKey: `Bearer ${Encrypt(user.SessionId)}`
             },
             body: JSON.stringify({ tenantId }),
           },
