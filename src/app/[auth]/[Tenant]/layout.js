@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import moment from "moment";
 import PrivacyIdleOverlay from "@/app/Components/PrivacyOverlay";
 import RenewSubscription from "@/app/Components/RenewSubcription";
+import ParticleBackground from "@/app/Components/Particles"
 // hypothetical component
 
 export const metadata = {
@@ -78,22 +79,8 @@ export default async function Layout({ children }) {
       requirePin={false}
     >
       <CookiesPolicyAlert />
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute left-10 top-10 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute right-10 bottom-10 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
-
-        {/* Grid */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right,#000 1px,transparent 1px),linear-gradient(to bottom,#000 1px,transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
+      <ParticleBackground/>
         {children}
-      </div>
     </PrivacyIdleOverlay>
   );
 }
