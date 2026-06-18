@@ -18,7 +18,7 @@ export default function Footer2() {
           Share BADE with your network and unlock exclusive benefits.
         </span>
         {" "} |  {" "}
-       <span>Chat us on Whatsapp Support on +234 704 4889 034</span>
+       <span>Chat our Whatsapp Support line on +234 704 4889 034</span>
         {" "} |  {" "}
       </Marquee>
     </footer>
