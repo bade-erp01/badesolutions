@@ -202,7 +202,7 @@ export default async function AccountingPage({ children, params }) {
 }
 
 
-export default function VendorBadges({ VendorList }) {
+export function VendorBadges({ VendorList }) {
   return (
     <div className="flex flex-wrap gap-2">
       {VendorList.map((vendor, index) => (
