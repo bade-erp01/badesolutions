@@ -170,7 +170,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
                 </Table>
               ) : (
                 <div className="p-12 text-center text-muted-foreground">
-                  No bills found.
+                  No Transaction found.
                 </div>
               )}
             </CardContent>
