@@ -5,19 +5,27 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import moment from "moment";
-import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Dencrypt, Encrypt } from "../../../../../../../../Functions/Functions";
 
-export default function Page({ baseUrl, userData, VendorList, BanksList }) {
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export default function AccountPayablesPage({ baseUrl, userData, VendorList, BanksList }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [billList, setBillList] = useState([]);
   const [totalInvoices, setTotalInvoices] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const params = useParams();
 
-  // Fetch bills from API
+  // Fetch bills
   useEffect(() => {
     const fetchBills = async () => {
       setIsLoading(true);
@@ -37,9 +45,8 @@ export default function Page({ baseUrl, userData, VendorList, BanksList }) {
         setBillList(Dencrypt(data.data) || []);
         setTotalPages(data.pagination.totalPages);
         setTotalInvoices(data.pagination.total);
-        // ❌ don’t reset currentPage here, it’s already tracked
       } catch (error) {
-        console.error("Error fetching bills:", error.message);
+        console.error("Error fetching bills:", error);
       } finally {
         setIsLoading(false);
       }
@@ -48,145 +55,186 @@ export default function Page({ baseUrl, userData, VendorList, BanksList }) {
     fetchBills();
   }, [currentPage, baseUrl, userData]);
 
-  // filter vendor list for vendor names only
   const filteredVendors = (id) => {
     try {
-      const vendor = VendorList.find((vendor) => vendor._id === id);
-      return vendor ? vendor.Name : "";
+      const vendor = VendorList.find((v) => v._id === id);
+      return vendor ? vendor.Name : "Unknown";
     } catch {
-      return "";
+      return "Unknown";
     }
   };
 
-  // filter Banks BanksList
   const filteredBanksList = (id) => {
     try {
-      const acc = BanksList.find((acc) => acc._id === id);
-      return acc ? acc.bankName : "";
+      const bank = BanksList.find((b) => b._id === id);
+      return bank ? bank.bankName : "Unknown";
     } catch {
-      return "";
+      return "Unknown";
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status?.toLowerCase()) {
+      case "posted":
+        return <Badge variant="default">Posted</Badge>;
+      case "pending":
+        return <Badge variant="secondary">Pending</Badge>;
+      case "reversed":
+        return <Badge variant="destructive">Reversed</Badge>;
+      default:
+        return <Badge variant="outline">N/A</Badge>;
     }
   };
 
   return (
-    <div className="text-sm bg-gray-50 min-h-screen">
-      <div className="mx-auto">
-        {/* Header */}
-        <div className="border border-gray-200 p-4 shadow-xl bg-white">
-          <div className="border-b pb-4 mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Account Payables</h1>
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-64 border-r bg-card flex flex-col">
+        <div className="p-6 border-b">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 bg-primary rounded-md flex items-center justify-center text-white font-bold">AP</div>
+            <div>
+              <div className="font-semibold">ACCOUNT PAYABLES</div>
+              <div className="text-xs text-muted-foreground">Vendor Payments</div>
+            </div>
           </div>
-          <p className="text-gray-600">
-            Showing page {currentPage} of {totalPages} ({totalInvoices})
-          </p>
         </div>
 
-        {/* Table Container */}
-        <div className="shadow-lg border border-gray-200 bg-white">
-          {isLoading ? (
-            <SuspenenseFallBack pagedata={"Account Payables"} />
-          ) : billList.length > 0 ? (
-            <>
-              <div className="p-6">
-                <table className="min-w-full text-sm rounded-lg shadow-md overflow-hidden">
-                  <thead className="bg-gray-100 sticky top-0 z-10">
-                    <tr>
-                      {[
-                        "Ref No",
-                        "Vendor",
-                        "Accountant",
-                        "Date",
-                        "Status",
-                        "Bank",
-                        "Amount",
-                      ].map((header) => (
-                        <th
-                          key={header}
-                          className="px-4 py-3 text-left font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
+        <nav className="flex-1 p-4 space-y-1">
+          {["Dashboard", "Invoices", "Payments", "Vendors", "Reports"].map((item) => (
+            <Button
+              key={item}
+              variant={item === "Invoices" ? "secondary" : "ghost"}
+              className="w-full justify-start"
+            >
+              {item}
+            </Button>
+          ))}
+        </nav>
+      </div>
 
-                  <tbody className="divide-y divide-gray-200">
-                    {billList.map((bill) => (
-                      <tr
-                        key={bill._id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-4 py-2 truncate">
-                          <Link
-                            href={`/${params.auth}/${params.Tenant}/${params.module}/${params.module}/vendorsPayment/vendorsPayment/${Encrypt(
-                              bill._id
-                            )}`}
-                            className="text-indigo-600 hover:text-indigo-400 underline font-bold"
-                          >
-                            {bill?.billReferenceNo}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-2 truncate">
-                          {filteredVendors(bill.vendor)}
-                        </td>
-                        <td className="px-4 py-2 truncate">{bill.AccountatntId}</td>
-                        <td className="px-4 py-2 truncate">
-                          {moment(bill.PaymentDate).format("YYYY-MM-DD")}
-                        </td>
-                        <td className="px-4 py-2 truncate">
-                          <span
-                            className={`inline-block px-2 py-0.5 text-xs rounded-full ${
-                              bill.ledgerStatus === "posted"
-                                ? "bg-green-100 text-green-700"
-                                : bill.ledgerStatus === "pending"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : bill.ledgerStatus === "reversed"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-gray-100 text-gray-700"
-                            }`}
-                          >
-                            {bill.ledgerStatus || "N/A"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 truncate">
-                          {filteredBanksList(bill.bankAccount)}
-                        </td>
-                        <td className="px-4 py-2 truncate font-medium">
-                          ₦{bill.Amount?.toLocaleString() ?? "0"}
-                        </td>
-                      </tr>
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        {/* Header */}
+        <div className="border-b bg-card p-4 flex items-center justify-between sticky top-0 z-10">
+          <div>
+            <h1 className="text-3xl font-bold">Account Payables</h1>
+            <p className="text-muted-foreground">Manage and track vendor payments</p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Input
+              placeholder="Search bills..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-80"
+            />
+            <Button>Export</Button>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-muted-foreground">TOTAL INVOICES</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{totalInvoices}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-muted-foreground">CURRENT PAGE</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{currentPage} <span className="text-xl text-muted-foreground">/ {totalPages}</span></div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Bills List</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {isLoading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-pulse space-y-4">
+                    {[...Array(6)].map((_, i) => (
+                      <Skeleton key={i} className="h-12 w-full" />
                     ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination Controls */}
-              <div className="flex justify-between items-center px-4 py-3 border-t border-gray-200 bg-gray-50">
-                <span className="text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className="px-3 py-1 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-30"
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    className="px-3 py-1 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-30"
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </button>
+                  </div>
                 </div>
+              ) : billList.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ref No</TableHead>
+                      <TableHead>Vendor</TableHead>
+                      <TableHead>Accountant</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Bank</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {billList.map((bill) => (
+                      <TableRow key={bill._id} className="hover:bg-muted/50">
+                        <TableCell>
+                          <Link
+                            href={`/${params.auth}/${params.Tenant}/${params.module}/${params.module}/vendorsPayment/vendorsPayment/${Encrypt(bill._id)}`}
+                            className="font-medium text-primary hover:underline"
+                          >
+                            {bill.billReferenceNo}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{filteredVendors(bill.vendor)}</TableCell>
+                        <TableCell>{bill.AccountatntId || "—"}</TableCell>
+                        <TableCell>{moment(bill.PaymentDate).format("DD MMM YYYY")}</TableCell>
+                        <TableCell>{getStatusBadge(bill.ledgerStatus)}</TableCell>
+                        <TableCell>{filteredBanksList(bill.bankAccount)}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          ₦{bill.Amount?.toLocaleString() ?? "0"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="p-12 text-center text-muted-foreground">
+                  No bills found.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Showing page {currentPage} of {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
               </div>
-            </>
-          ) : (
-            <p className="p-6 text-gray-600">Nothing to show</p>
+            </div>
           )}
         </div>
       </div>
