@@ -110,10 +110,10 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">CURRENT PAGE</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">Total Vendor</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{currentPage} <span className="text-xl text-muted-foreground">/ {totalPages}</span></div>
+                <div className="text-4xl font-bold">{VendorList.length} <span className="text-xl text-muted-foreground">/ {totalPages}</span></div>
               </CardContent>
             </Card>
           </div>
