@@ -102,7 +102,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
                 <CardTitle className="text-sm text-muted-foreground">TOTAL PAYABLE</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{ VendorList.reduce((acc, vendor) => {
+                <div className="text-lg font-bold">₦{VendorList.reduce((acc, vendor) => {
                   return acc + (vendor.Balance || 0);
                   }, 0)}
                 </div>
@@ -113,7 +113,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
                 <CardTitle className="text-sm text-muted-foreground">Total Vendor</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{VendorList.length} <span className="text-xl text-muted-foreground">/ {totalPages}</span></div>
+                <div className="text-lg font-bold">{VendorList.length} <span className="text-xl text-muted-foreground">/ {totalPages}</span></div>
               </CardContent>
             </Card>
           </div>
