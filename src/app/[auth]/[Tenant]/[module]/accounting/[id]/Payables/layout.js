@@ -11,6 +11,9 @@ import PayableRegister from "@/app/Components/Reports/PayableRegister";
 import { notFound } from "next/navigation";
 import SharePdfMinimal from "@/app/Components/ShareViaBluthoot";
 import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+
+
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -171,6 +174,7 @@ export default async function AccountingPage({ children, params }) {
                 userData={userData}
                 baseUrl={baseUrl}
               />
+              <Separator/>
 
               <VendorBadges VendorList={VendorList}/>
             </nav>
@@ -204,15 +208,18 @@ export default async function AccountingPage({ children, params }) {
 
 export function VendorBadges({ VendorList }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 h-64 overflow-y-auto p-2 border rounded-md">
       {VendorList.map((vendor, index) => (
         <Badge key={index} variant="secondary" className="flex items-center gap-2">
-          <span className="font-medium">{vendor.Name}</span>
+          <span className="font-medium">
+            {vendor.Name.length > 10 ? vendor.Name.slice(0, 10) + "..." : vendor.Name}
+          </span>
           <span className="text-xs text-gray-500">
-            ₦{Number(vendor.Balance || 0).toLocaleString()}
+            ₦{Number(vendor.Balance || 0).toLocaleString("en-NG")}
           </span>
         </Badge>
       ))}
     </div>
   )
 }
+
