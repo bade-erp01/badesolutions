@@ -209,7 +209,7 @@ export function VendorBadges({ VendorList }) {
       className="flex flex-wrap gap-2 h-64 overflow-y-auto p-2 border rounded-md"
       style={{
         scrollbarWidth: "thin",
-        scrollbarColor: "#453d46ff transparent",
+        scrollbarColor: "rgb(227, 219, 228) transparent",
       }}
     >
       {VendorList.map((vendor, index) => (
