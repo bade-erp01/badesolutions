@@ -37,6 +37,8 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
               "Content-Type": "application/json",
               dbConnect: `Bearer ${userData.business.rustyRoof}`,
               Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+              access: `Bearer ${Encrypt(userData.user._id)}`,
             },
           }
         );
