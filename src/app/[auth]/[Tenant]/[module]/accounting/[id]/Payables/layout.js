@@ -2,13 +2,13 @@ import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
-import {Encrypt} from "../../../../../../../../Functions/Mics"
-import Page from "./page"
-import Link from "next/link"
-import Image from "next/image"
-import { CreditCardIcon,BanknotesIcon } from "@heroicons/react/24/outline";
+import { Encrypt } from "../../../../../../../../Functions/Mics";
+import Page from "./page";
+import Link from "next/link";
+import Image from "next/image";
+import { CreditCardIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import PayableRegister from "@/app/Components/Reports/PayableRegister";
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 import SharePdfMinimal from "@/app/Components/ShareViaBluthoot";
 
 export const metadata = {
@@ -55,40 +55,37 @@ export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
 
+  // check if user has access to crm and cash register
+  const AccountingFinder = userData.user.Apps.find((app) => {
+    return app.Name === "Accounting";
+  });
 
-   // check if user has access to crm and cash register
-  const AccountingFinder = userData.user.Apps.find(app=>{
-    return app.Name === "Accounting"
-  })
-
-  if(!AccountingFinder){
-    return notFound()
+  if (!AccountingFinder) {
+    return notFound();
   }
 
   // check if user has access to crm and cash register
-  const StoreFinder = userData.user.Apps.find(app=>{
-    return app.Name === "Stores Operations"
-  })
+  const StoreFinder = userData.user.Apps.find((app) => {
+    return app.Name === "Stores Operations";
+  });
 
-  
-
-  // fetch all credit payment from all bank account 
+  // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const [vendors,Banks] = await Promise.all([
-        fetch(`${baseUrl}/api/Vendors`, {
+  const [vendors, Banks] = await Promise.all([
+    fetch(`${baseUrl}/api/Vendors`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
       },
       next: { revalidate: 120 }, // Revalidate every 2 minutes
     }),
 
-    //  get all banks 
-     fetch(`${baseUrl}/api/Bank/Accounts`, {
+    //  get all banks
+    fetch(`${baseUrl}/api/Bank/Accounts`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -98,15 +95,13 @@ export default async function AccountingPage({ children, params }) {
         // sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
       next: { revalidate: 120 }, // Revalidate every 2 minutes
-    })
+    }),
+  ]);
 
-    ])
-    
-    const VendorList = await vendors.json()
-    const BanksList = await Banks.json()
+  const VendorList = await vendors.json();
+  const BanksList = await Banks.json();
 
   try {
-   
     return (
       <div className="flex flex-col min-h-screen overflow-hidden">
         <Nav1
@@ -116,36 +111,35 @@ export default async function AccountingPage({ children, params }) {
         />
 
         <div className="flex flex-1 overflow-hidden">
-        {/* BLACK SIDEBAR */}
-        <aside
-          className="hidden md:flex w-72 bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white text-white p-5 flex-col gap-4"
-        >
+          {/* BLACK SIDEBAR */}
+          <aside
+            className="hidden md:flex w-72 flex-shrink-0 bg-[#1e1e20]/80 backdrop-blur-lg
+  text-white p-5 flex-col gap-4"
+          >
             <BackButton />
             <hr className="border-gray-100 mb-4" />
             <nav className="space-y-2">
-              
-                {(userData.user.creditOfficer || userData.user.isAccountant)  && (
-                 <>
+              {(userData.user.creditOfficer || userData.user.isAccountant) && (
+                <>
                   <Link
-                  href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-CreditNote/Vendor-CreditNote`}
-                  title={"Credit Notes"}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                    href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-CreditNote/Vendor-CreditNote`}
+                    title={"Credit Notes"}
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
                   >
-                   <CreditCardIcon className="h-5 w-5 text-gray-100" />
-                   <span className="text-xs">Vendor Credit Notes</span>
-                 </Link>
-                 
+                    <CreditCardIcon className="h-5 w-5 text-gray-100" />
+                    <span className="text-xs">Vendor Credit Notes</span>
+                  </Link>
+
                   <Link
-                   href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-DebitNote/Vendor-DebitNote`}
-                   title={"Debit Notes"}
-                   className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                 >
-                   <BanknotesIcon className="h-5 w-5 text-gray-100" />
-                   <span className="text-xs">Vendor Debit Notes</span>
-                 </Link>
-                 </>
-                )}
+                    href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-DebitNote/Vendor-DebitNote`}
+                    title={"Debit Notes"}
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+                  >
+                    <BanknotesIcon className="h-5 w-5 text-gray-100" />
+                    <span className="text-xs">Vendor Debit Notes</span>
+                  </Link>
+                </>
+              )}
 
               {StoreFinder && (
                 <Link
@@ -159,7 +153,8 @@ export default async function AccountingPage({ children, params }) {
                 >
                   <Image
                     src={
-                      StoreFinder.icon || "https://img.icons8.com/deco/48/open-box.png"
+                      StoreFinder.icon ||
+                      "https://img.icons8.com/deco/48/open-box.png"
                     }
                     width={24}
                     height={24}
@@ -168,7 +163,7 @@ export default async function AccountingPage({ children, params }) {
                   <span className="text-xs">{StoreFinder.Name}</span>
                 </Link>
               )}
-               
+
               <PayableRegister
                 banks={BanksList}
                 customers={VendorList}
@@ -181,9 +176,14 @@ export default async function AccountingPage({ children, params }) {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1">
-            <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-3 relative z-10 max-h-[83dvh] overflow-y-auto">
-              <Page VendorList={VendorList} userData={userData} baseUrl={baseUrl} BanksList={BanksList}/>
+          <main className="flex-1 overflow-hidden">
+            <section className=" flex-2 max-w-7xl h-[83vh] overflow-y-scroll">
+              <Page
+                VendorList={VendorList}
+                userData={userData}
+                baseUrl={baseUrl}
+                BanksList={BanksList}
+              />
             </section>
           </main>
         </div>
