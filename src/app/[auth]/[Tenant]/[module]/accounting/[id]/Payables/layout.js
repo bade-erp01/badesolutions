@@ -82,6 +82,7 @@ export default async function AccountingPage({ children, params }) {
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         access: `${Encrypt(userData.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
       next: { revalidate: 120 }, // Revalidate every 2 minutes
     }),
@@ -94,6 +95,7 @@ export default async function AccountingPage({ children, params }) {
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         dbConnect: `Bearer ${userData.business.rustyRoof}`,
         access: `${Encrypt(userData.user._id)}`,
+        // sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
       next: { revalidate: 120 }, // Revalidate every 2 minutes
     })
