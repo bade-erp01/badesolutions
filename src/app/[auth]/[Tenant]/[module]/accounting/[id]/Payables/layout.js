@@ -10,6 +10,7 @@ import { CreditCardIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import PayableRegister from "@/app/Components/Reports/PayableRegister";
 import { notFound } from "next/navigation";
 import SharePdfMinimal from "@/app/Components/ShareViaBluthoot";
+import { Badge } from "@/components/ui/badge"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -171,7 +172,7 @@ export default async function AccountingPage({ children, params }) {
                 baseUrl={baseUrl}
               />
 
-              {/* <SharePdfMinimal/> */}
+              <VendorBadges VendorList={VendorList}/>
             </nav>
           </aside>
 
@@ -198,4 +199,20 @@ export default async function AccountingPage({ children, params }) {
       </div>
     );
   }
+}
+
+
+export default function VendorBadges({ VendorList }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {VendorList.map((vendor, index) => (
+        <Badge key={index} variant="secondary" className="flex items-center gap-2">
+          <span className="font-medium">{vendor.Name}</span>
+          <span className="text-xs text-gray-500">
+            ₦{Number(vendor.Balance || 0).toLocaleString()}
+          </span>
+        </Badge>
+      ))}
+    </div>
+  )
 }
