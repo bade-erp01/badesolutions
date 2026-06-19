@@ -177,7 +177,7 @@ export default async function AccountingPage({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1 overflow-hidden">
-            <section className=" flex-2 max-w-7xl h-[83vh] overflow-y-scroll">
+            <section className="flex-2 w-full h-[83vh] overflow-y-none">
               <Page
                 VendorList={VendorList}
                 userData={userData}
