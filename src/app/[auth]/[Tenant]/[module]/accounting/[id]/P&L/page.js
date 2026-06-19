@@ -103,6 +103,7 @@ export default function Page({ baseUrl, userData, data }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             access: `${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
           },
           // cache: "force-cache", // Try cache first
           // next: { revalidate: 60 }, // cache for 1 minutes
