@@ -104,7 +104,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
               <CardContent>
                 <div className="text-lg font-bold">₦{VendorList.reduce((acc, vendor) => {
                   return acc + (vendor.Balance || 0);
-                  }, 0)}
+                  }, 0).toLocaleString()}
                 </div>
               </CardContent>
             </Card>
