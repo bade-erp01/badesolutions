@@ -10,10 +10,8 @@ import { CreditCardIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import PayableRegister from "@/app/Components/Reports/PayableRegister";
 import { notFound } from "next/navigation";
 import SharePdfMinimal from "@/app/Components/ShareViaBluthoot";
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-
-
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -174,9 +172,9 @@ export default async function AccountingPage({ children, params }) {
                 userData={userData}
                 baseUrl={baseUrl}
               />
-              <Separator/>
+              <Separator />
 
-              <VendorBadges VendorList={VendorList}/>
+              <VendorBadges VendorList={VendorList} />
             </nav>
           </aside>
 
@@ -205,14 +203,26 @@ export default async function AccountingPage({ children, params }) {
   }
 }
 
-
 export function VendorBadges({ VendorList }) {
   return (
-    <div className="flex flex-wrap gap-2 h-64 overflow-y-auto p-2 border rounded-md">
+    <div
+      className="flex flex-wrap gap-2 h-64 overflow-y-auto p-2 border rounded-md"
+      style={{
+        scrollbarWidth: "thin",
+        scrollbarColor: "#453d46ff transparent",
+      }}
+    >
       {VendorList.map((vendor, index) => (
-        <Badge key={index} variant="secondary" className="flex items-center gap-2">
+        <Badge
+          key={index}
+          variant="secondary"
+          className="flex items-center gap-2"
+          title={`${vendor.Name}`}
+        >
           <span className="font-medium">
-            {vendor.Name.length > 10 ? vendor.Name.slice(0, 10) + "..." : vendor.Name}
+            {vendor.Name.length > 10
+              ? vendor.Name.slice(0, 10) + "..."
+              : vendor.Name}
           </span>
           <span className="text-xs text-gray-500">
             ₦{Number(vendor.Balance || 0).toLocaleString("en-NG")}
@@ -220,6 +230,5 @@ export function VendorBadges({ VendorList }) {
         </Badge>
       ))}
     </div>
-  )
+  );
 }
-
