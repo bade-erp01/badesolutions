@@ -90,60 +90,19 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-64 border-r bg-card flex flex-col">
-        <div className="p-6 border-b">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 bg-primary rounded-md flex items-center justify-center text-white font-bold">AP</div>
-            <div>
-              <div className="font-semibold">ACCOUNT PAYABLES</div>
-              <div className="text-xs text-muted-foreground">Vendor Payments</div>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-1">
-          {["Dashboard", "Invoices", "Payments", "Vendors", "Reports"].map((item) => (
-            <Button
-              key={item}
-              variant={item === "Invoices" ? "secondary" : "ghost"}
-              className="w-full justify-start"
-            >
-              {item}
-            </Button>
-          ))}
-        </nav>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {/* Header */}
-        <div className="border-b bg-card p-4 flex items-center justify-between sticky top-0 z-10">
-          <div>
-            <h1 className="text-3xl font-bold">Account Payables</h1>
-            <p className="text-muted-foreground">Manage and track vendor payments</p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Input
-              placeholder="Search bills..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-80"
-            />
-            <Button>Export</Button>
-          </div>
-        </div>
 
         <div className="p-6 space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">TOTAL INVOICES</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">TOTAL PAYABLE</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{totalInvoices}</div>
+                <div className="text-4xl font-bold">0.00</div>
               </CardContent>
             </Card>
             <Card>
@@ -159,7 +118,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
           {/* Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Bills List</CardTitle>
+              <CardTitle>Transactions</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {isLoading ? (

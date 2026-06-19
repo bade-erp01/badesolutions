@@ -115,12 +115,12 @@ export default async function AccountingPage({ children, params }) {
           page={` ${moduleList.id}`}
         />
 
-        <div className="flex flex-1 text-white bt-2">
-          {/* Sidebar */}
-          <aside
-            className="w-72 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
-            style={{ overflowY: "auto" }}
-          >
+        <div className="flex flex-1 overflow-hidden">
+        {/* BLACK SIDEBAR */}
+        <aside
+          className="hidden md:flex w-72 bg-[#1e1e20]/80 backdrop-blur-lg
+          text-white text-white p-5 flex-col gap-4"
+        >
             <BackButton />
             <hr className="border-gray-100 mb-4" />
             <nav className="space-y-2">
