@@ -94,12 +94,12 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
       <div className="flex-1 overflow-auto">
         {/* Header */}
 
-        <div className="p-6 space-y-6">
+        <div className="p-2 space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">TOTAL PAYABLE</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">CURRENT PAYABLE</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-lg font-bold">₦{VendorList.reduce((acc, vendor) => {
@@ -110,10 +110,10 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Total Vendor</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">VENDOR COUNT</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-lg font-bold">{VendorList.length} <span className="text-xl text-muted-foreground">/ {totalPages}</span></div>
+                <div className="text-lg font-bold">{VendorList.length}</div>
               </CardContent>
             </Card>
           </div>
