@@ -48,7 +48,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
         setTotalPages(data.pagination.totalPages);
         setTotalInvoices(data.pagination.total);
       } catch (error) {
-        console.error("Error fetching bills:", error);
+        // console.error("Error fetching bills:", error);
       } finally {
         setIsLoading(false);
       }
@@ -102,7 +102,10 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
                 <CardTitle className="text-sm text-muted-foreground">TOTAL PAYABLE</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">0.00</div>
+                <div className="text-4xl font-bold">{ VendorList.reduce((acc, vendor) => {
+                  return acc + (vendor.Balance || 0);
+                  }, 0)}
+                </div>
               </CardContent>
             </Card>
             <Card>
