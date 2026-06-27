@@ -126,7 +126,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
             <p className="text-xs text-yellow-700 bg-yellow-100 border border-yellow-300 rounded-md px-4 py-2">
               ⚠️ Ensure this product is <strong>not being billed</strong> when the update is performed.
             </p>
-            <Button type="submit" variant="secondary" className="cursor-pointer">
+            <Button type="submit" variant="default" className="cursor-pointer">
               Update Product
             </Button>
           </div>
