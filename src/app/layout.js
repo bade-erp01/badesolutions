@@ -131,6 +131,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <link rel="manifest" href="/site.webmanifest" />
       <body
         className={`
           ${geistSans.variable} 
