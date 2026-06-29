@@ -993,7 +993,7 @@ export default function InvoicePage({
                     />
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                   <Badge variant={bill.returnId === "WH/IN" ? "secondary" : "default"}>
+                    <Badge variant={bill.returnId === "WH/IN" ? "destructive" : "secondary"}>
                       {bill.returnId === "WH/IN" ? "Returned" : "Sold"}
                     </Badge>
                   </td>
