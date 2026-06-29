@@ -1,35 +1,38 @@
 "use client";
+
 import BackButton from "@/app/Components/BackBotton";
 const NaijaStates = require("naija-state-local-government");
-import {
-  PhotoIcon,
-  UserCircleIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
-import {React,useState,useEffect} from "react";
-import { Encrypt, ErrorMessage,SuccessToast,plsWait,} from "../../../../../../../Functions/Mics";
-import {EXPRESS_PRIVATE_URL} from "../../../../../../../Functions/Functions"
-import Swal from "sweetalert2";
+import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react";
+import { Encrypt, ErrorMessage, SuccessToast, plsWait } from "../../../../../../../Functions/Mics";
+import { EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 
-
-export default function NewEmployeeForm({userData,baseUrl}) {
+export default function NewEmployeeForm({ userData, baseUrl }) {
   const states = NaijaStates.states();
-  const [Formtext,setFormText] = useState('')
   const [formData, setFormData] = useState({});
   const router = useRouter();
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,367 +41,250 @@ export default function NewEmployeeForm({userData,baseUrl}) {
     }));
   };
 
+  const handleSelectChange = (name, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    plsWait('Please wait... Do not refresh this page')
+    plsWait("Please wait... Do not refresh this page");
+
     try {
-      const response = await fetch(`${baseUrl}/api/createUser/${Encrypt(userData.user._id)}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`
-      },
-      body: JSON.stringify(formData),
-      });
-      
+      const response = await fetch(
+        `${baseUrl}/api/createUser/${Encrypt(userData.user._id)}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
       const result = await response.json();
-      if (!response.ok) {
-      throw new Error(result.error);
-      }else{
-        SuccessToast(result.message)
-        setFormData({});
-        router.refresh();
-        setTimeout(() => {
-          router.push(`/${userData.business.companyName}/${Encrypt(userData.business.tenantId)}/employee/employee/${result.user}?Modules=employee`);
-        }, 2000);
-      }
+
+      if (!response.ok) throw new Error(result.error);
+
+      SuccessToast(result.message);
       setFormData({});
-      e.target.reset();
+      router.refresh();
+
+      setTimeout(() => {
+        router.push(
+          `/${userData.business.companyName}/${Encrypt(
+            userData.business.tenantId
+          )}/employee/employee/${result.user}?Modules=employee`
+        );
+      }, 2000);
     } catch (error) {
       ErrorMessage(error);
     }
   };
 
-  // const handlePurchaseLicenses = (formData) => {
-  //   Swal.fire({
-  //     title: "Purchase User Licenses",
-  //     html: `
-  //       <div class="text-left">
-  //         <p class="text-gray-700 mb-4">How many licenses would you like to purchase?</p>
-  //         <input 
-  //           id="licenseInput" 
-  //           type="number" 
-  //           min="1" 
-  //           step="1" 
-  //           class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-  //           placeholder="Enter number of licenses"
-  //         />
-  //       </div>
-  //     `,
-  //     showCancelButton: true,
-  //     confirmButtonText: "Calculate Price",
-  //     confirmButtonColor: "#4f46e5",
-  //     cancelButtonColor: "#6b7280",
-  //     preConfirm: () => {
-  //       const inputValue = document.getElementById("licenseInput").value;
-  //       const numberOfUsers = parseInt(inputValue);
-  //       if (isNaN(numberOfUsers) || numberOfUsers < 1) {
-  //         Swal.showValidationMessage("Please enter a valid number (minimum 1)");
-  //         return false;
-  //       }
-  //       const baseAmount = formData.plan === "Basic" ? 1500 : 4000;
-  //       const vat = baseAmount * numberOfUsers * 0.075;
-  //       const total = (baseAmount * numberOfUsers + vat) * 12;
-  //       return { numberOfUsers, baseAmount, vat, total };
-  //     },
-  //   }).then((result) => {
-  //     if (result.isConfirmed && result.value) {
-  //       const { numberOfUsers, baseAmount, vat, total } = result.value;
-  //       Swal.fire({
-  //         icon: "info",
-  //         title: "Payment Summary",
-  //         html: `
-  //           <div class="text-left bg-gray-50 p-6 rounded-lg">
-  //             <div class="space-y-4">
-  //               <div class="flex justify-between border-b pb-2">
-  //                 <span class="text-gray-600">Number of Licenses:</span>
-  //                 <span class="font-semibold text-gray-900">${numberOfUsers}</span>
-  //               </div>
-  //               <div class="flex justify-between border-b pb-2">
-  //                 <span class="text-gray-600">Base Amount (per license):</span>
-  //                 <span class="font-semibold text-gray-900">₦${baseAmount.toLocaleString()}</span>
-  //               </div>
-  //               <div class="flex justify-between border-b pb-2">
-  //                 <span class="text-gray-600">Subtotal:</span>
-  //                 <span class="font-semibold text-gray-900">₦${(baseAmount * numberOfUsers).toLocaleString()}</span>
-  //               </div>
-  //               <div class="flex justify-between pb-4">
-  //                 <span class="text-gray-600">VAT (7.5%):</span>
-  //                 <span class="font-semibold text-orange-600">₦${vat.toLocaleString()}</span>
-  //               </div>
-  //               <div class="flex justify-between bg-indigo-50 p-3 rounded border border-indigo-200">
-  //                 <span class="font-bold text-indigo-900">Total (12 months):</span>
-  //                 <span class="font-bold text-indigo-600 text-lg">₦${total.toLocaleString()}</span>
-  //               </div>
-  //             </div>
-  //           </div>
-  //         `,
-  //         showCancelButton: true,
-  //         confirmButtonText: "Proceed to Payment",
-  //         confirmButtonColor: "#059669",
-  //         cancelButtonColor: "#6b7280",
-  //       }).then((paymentResult) => {
-  //         if (paymentResult.isConfirmed) {
-  //           plsWait("Processing payment...");
-  //           fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
-  //             method: "POST",
-  //             headers: {
-  //               "Content-Type": "application/json",
-  //               Authorization: `Bearer ${Encrypt(userData.business._id)}`,
-  //             },
-  //             body: JSON.stringify({
-  //               numberOfUsers,
-  //               plan: formData.plan,
-  //               totalAmount: total,
-  //             }),
-  //           })
-  //             .then((response) => {
-  //               if (!response.ok) throw new Error("Payment request failed");
-  //               return response.json();
-  //             })
-  //             .then((data) => {
-  //               router.push(data.data);
-  //               SuccessToast("Redirecting to payment...");
-  //             })
-  //             .catch((error) => ErrorMessage(error.message));
-  //         }
-  //       });
-  //     }
-  //   });
-  // };
-
-  useEffect(() => {
-    const numberOfUsers = parseInt(1);
-    const baseAmount = formData.plan === "Basic" ? 900 : 1200;
-    const vat = baseAmount * numberOfUsers * 0.075;
-    const total = (baseAmount * numberOfUsers + vat) * 12;
-    setFormText(total);
-  }, [formData.plan]);
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="mx-auto">
-        <div className="bg-white shadow-lg overflow-hidden">
+    <div className="min-h-screen py-3 w-full">
+      <Card className="mt-6 shadow-xl">
           {/* Header */}
-          <div className="bg-gray-700 px-6 py-6">
-            <h1 className="text-2xl font-bold text-white mb-1">New User Profile</h1>
-            <p className="text-indigo-100 text-sm">Add a new employee to your organization</p>
-          </div>
-
-          <form className="space-y-6 p-6" onSubmit={handleSubmit}>
-            {/* Personal Information Section */}
-            <div>
-              <h2 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
-                <UserCircleIcon className="w-4 h-4 mr-2 text-indigo-600" />
-                Personal Information
-              </h2>
-              
-              <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-6">
-                <div className="sm:col-span-3">
-                  <label htmlFor="firstName" className="block text-xs font-medium text-gray-700 mb-1">
-                    First Name *
-                  </label>
-                  <input
-                    id="firstName"
-                    required
-                    name="firstName"
-                    type="text"
-                    onChange={handleChange}
-                    placeholder="John"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label htmlFor="lastName" className="block text-xs font-medium text-gray-700 mb-1">
-                    Last Name *
-                  </label>
-                  <input
-                    id="lastName"
-                    required
-                    name="lastName"
-                    type="text"
-                    onChange={handleChange}
-                    placeholder="Doe"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label htmlFor="Email" className="block text-xs font-medium text-gray-700 mb-1">
-                    Email Address *
-                  </label>
-                  <input
-                    id="Email"
-                    required
-                    name="Email"
-                    type="email"
-                    onChange={handleChange}
-                    placeholder="john@example.com"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label htmlFor="DOB" className="block text-xs font-medium text-gray-700 mb-1">
-                    Date of Birth *
-                  </label>
-                  <input
-                    id="DOB"
-                    required
-                    name="DOB"
-                    type="date"
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label htmlFor="telephone" className="block text-xs font-medium text-gray-700 mb-1">
-                    Telephone *
-                  </label>
-                  <input
-                    id="telephone"
-                    name="telephone"
-                    type="tel"
-                    required
-                    onChange={handleChange}
-                    placeholder="+234 XXX XXX XXXX"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label htmlFor="workTelephone" className="block text-xs font-medium text-gray-700 mb-1">
-                    Work Line
-                  </label>
-                  <input
-                    id="workTelephone"
-                    name="workTelephone"
-                    type="tel"
-                    onChange={handleChange}
-                    placeholder="+234 XXX XXX XXXX"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
-                </div>
+          <CardHeader className="bg-gradient-to-r from-zinc-900 to-zinc-800 text-white rounded-t-xl">
+            <div className="flex items-center gap-3">
+              <UserCircleIcon className="w-8 h-8" />
+              <div>
+                <CardTitle className="text-3xl">New User Profile</CardTitle>
+                <p className="text-zinc-400 mt-1">
+                  Add a new employee to your organization
+                </p>
               </div>
             </div>
+          </CardHeader>
 
-            {/* Location Information Section */}
-            <div className="border-t pt-6">
-              <h2 className="text-base font-semibold text-gray-900 mb-4">Location Information</h2>
-              
-              <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-6">
-                <div className="sm:col-span-2">
-                  <label htmlFor="Country" className="block text-xs font-medium text-gray-700 mb-1">
-                    Country
-                  </label>
-                  <input
-                    id="Country"
-                    name="Country"
-                    type="text"
-                    placeholder="Nigeria"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-10">
+              {/* Personal Information */}
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <UserCircleIcon className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold">Personal Information</h2>
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label htmlFor="stateOfOrigin" className="block text-xs font-medium text-gray-700 mb-1">
-                    State / Province
-                  </label>
-                  <input
-                    id="stateOfOrigin"
-                    name="stateOfOrigin"
-                    type="text"
-                    onChange={handleChange}
-                    placeholder="Lagos"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition outline-none"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      required
+                      onChange={handleChange}
+                      placeholder="John"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      required
+                      onChange={handleChange}
+                      placeholder="Doe"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Email">Email Address *</Label>
+                    <Input
+                      id="Email"
+                      name="Email"
+                      type="email"
+                      required
+                      onChange={handleChange}
+                      placeholder="john@example.com"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="DOB">Date of Birth *</Label>
+                    <Input
+                      id="DOB"
+                      name="DOB"
+                      type="date"
+                      required
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="telephone">Telephone *</Label>
+                    <Input
+                      id="telephone"
+                      name="telephone"
+                      type="tel"
+                      required
+                      onChange={handleChange}
+                      placeholder="+234 XXX XXX XXXX"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="workTelephone">Work Line</Label>
+                    <Input
+                      id="workTelephone"
+                      name="workTelephone"
+                      type="tel"
+                      onChange={handleChange}
+                      placeholder="+234 XXX XXX XXXX"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="border-t border-dotted mb-6 mt-6 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
-              <button
-                type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-200 shadow-md hover:shadow-lg"
-              >
-                Register New User
-              </button>
+              <Separator />
 
-              <PurchaseLicenseButton formData={formData} userData={userData} />
-            </div>
-          </form>
-        </div>
-      </div>
+              {/* Location Information */}
+              <div>
+                <h2 className="text-xl font-semibold mb-6">Location Information</h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="Country">Country</Label>
+                    <Input
+                      id="Country"
+                      name="Country"
+                      defaultValue="Nigeria"
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="stateOfOrigin">State / Province</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        handleSelectChange("stateOfOrigin", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {states.map((state) => (
+                          <SelectItem key={state} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="flex-1 sm:flex-none text-base font-medium"
+                >
+                  Register New User
+                </Button>
+
+                <PurchaseLicenseButton formData={formData} userData={userData} />
+              </div>
+            </form>
+          </CardContent>
+        </Card>
     </div>
   );
 }
 
-
-
-
-export function PurchaseLicenseButton({
-  formData,
-  userData,
-}) {
+export function PurchaseLicenseButton({ formData, userData }) {
   const router = useRouter();
-
   const [open, setOpen] = useState(false);
   const [licenses, setLicenses] = useState("");
   const [summary, setSummary] = useState(null);
 
   const calculatePrice = () => {
     const numberOfUsers = parseInt(licenses);
-
     if (!numberOfUsers || numberOfUsers < 1) {
-      return ErrorMessage("Please enter a valid number");
+      ErrorMessage("Please enter a valid number (minimum 1)");
+      return;
     }
 
     const baseAmount = formData.plan === "Basic" ? 900 : 1200;
-
     const vat = baseAmount * numberOfUsers * 0.075;
-
     const total = (baseAmount * numberOfUsers + vat) * 12;
 
-    setSummary({
-      numberOfUsers,
-      baseAmount,
-      vat,
-      total,
-    });
+    setSummary({ numberOfUsers, baseAmount, vat, total });
   };
 
   const proceedPayment = async () => {
+    if (!summary) return;
+
     try {
       plsWait("Processing payment...");
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/purchase/License`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business._id)}`,
-          },
-          body: JSON.stringify({
-            numberOfUsers: summary.numberOfUsers,
-            plan: formData.plan,
-            totalAmount: summary.total,
-          }),
+      const response = await fetch(`${EXPRESS_PRIVATE_URL}/purchase/License`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.business._id)}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
         },
-      );
+        body: JSON.stringify({
+          numberOfUsers: summary.numberOfUsers,
+          plan: formData.plan,
+          totalAmount: summary.total,
+        }),
+      });
 
-      if (!response.ok) {
-        throw new Error("Payment request failed");
-      }
+      if (!response.ok) throw new Error("Payment request failed");
 
       const data = await response.json();
-
       SuccessToast("Redirecting to payment...");
-
       router.push(data.data);
     } catch (error) {
       ErrorMessage(error.message);
@@ -408,120 +294,86 @@ export function PurchaseLicenseButton({
   return (
     <>
       <Button
-      type="button"
+        type="button"
+        variant="outline"
+        size="lg"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white shadow-sm"
+        className="flex-1 sm:flex-none border-zinc-800 hover:bg-zinc-900 hover:text-white"
       >
         Purchase Licenses
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-lg border-zinc-200 rounded-2xl">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-zinc-900">
-              Purchase User Licenses
-            </DialogTitle>
+            <DialogTitle>Purchase User Licenses</DialogTitle>
+            <DialogDescription>
+              Enter the number of licenses you want to purchase.
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-5 py-2">
+          <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <p className="text-sm text-zinc-500">
-                Enter the number of licenses you want to purchase.
-              </p>
-
+              <Label htmlFor="licenses">Number of Licenses</Label>
               <Input
+                id="licenses"
                 type="number"
                 min={1}
                 value={licenses}
                 onChange={(e) => setLicenses(e.target.value)}
                 placeholder="Enter number of licenses"
-                className="h-11 rounded-xl"
               />
             </div>
 
-            <Button
-              onClick={calculatePrice}
-              className="w-full rounded-xl bg-zinc-900 hover:bg-zinc-800"
-            >
+            <Button onClick={calculatePrice} className="w-full">
               Calculate Price
             </Button>
 
             {summary && (
-              <Card className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 shadow-none">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-zinc-500">
-                      Number of Licenses
-                    </span>
+              <Card className="bg-muted/50">
+                <CardContent className="pt-6">
+                  <div className="space-y-4 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Number of Licenses</span>
+                      <span className="font-medium">{summary.numberOfUsers}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Base Amount (per license)</span>
+                      <span>₦{summary.baseAmount.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span>
+                        ₦{(summary.baseAmount * summary.numberOfUsers).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">VAT (7.5%)</span>
+                      <span className="text-amber-600">
+                        ₦{summary.vat.toLocaleString()}
+                      </span>
+                    </div>
 
-                    <span className="font-medium text-zinc-900">
-                      {summary.numberOfUsers}
-                    </span>
+                    <Separator />
+
+                    <div className="flex justify-between text-base font-semibold">
+                      <span>Total (12 months)</span>
+                      <span>₦{summary.total.toLocaleString()}</span>
+                    </div>
                   </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-zinc-500">
-                      Base Amount
-                    </span>
-
-                    <span className="font-medium text-zinc-900">
-                      ₦{summary.baseAmount.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-zinc-500">
-                      Subtotal
-                    </span>
-
-                    <span className="font-medium text-zinc-900">
-                      ₦
-                      {(
-                        summary.baseAmount *
-                        summary.numberOfUsers
-                      ).toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-zinc-500">
-                      VAT (7.5%)
-                    </span>
-
-                    <span className="font-medium text-amber-600">
-                      ₦{summary.vat.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <Separator />
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-semibold text-zinc-900">
-                      Total (12 months)
-                    </span>
-
-                    <span className="text-lg font-bold text-zinc-900">
-                      ₦{summary.total.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
+                </CardContent>
               </Card>
             )}
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              className="rounded-xl"
-            >
+          <DialogFooter className="gap-3">
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-
             <Button
-              disabled={!summary}
               onClick={proceedPayment}
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+              disabled={!summary}
+              className="bg-emerald-600 hover:bg-emerald-700"
             >
               Proceed to Payment
             </Button>
