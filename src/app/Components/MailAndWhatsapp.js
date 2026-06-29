@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
-import React from 'react';
-import { AtSymbolIcon,ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AtSymbolIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { Encrypt } from "../../../Functions/Functions";
-import {plsWait, SuccessToast, ErrorMessage} from '../../../Functions/Mics';
-import {useRouter} from 'next/navigation';
+import { plsWait, SuccessToast, ErrorMessage } from '../../../Functions/Mics';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 const MailAndWhatsapp = ({ 
     billStatus = '',
@@ -13,57 +15,97 @@ const MailAndWhatsapp = ({
     firstName,
     userId,
     businessToken,
-    baseUrl
+    baseUrl,
+    sessionId
 }) => {
     const router = useRouter();
+    const [isMailLoading, setIsMailLoading] = useState(false);
 
     const onMailClick = async () => {
-        plsWait("Sending Mail");
-        const api = `${baseUrl}/api/sendmail/${Encrypt(billId)}/${firstName}`;
+        setIsMailLoading(true);
+        plsWait("Sending email...");
 
-        const request = await fetch(api, {
-            method: "GET",
-            headers: {
-                "content-type": "application/json",
-                dbConnect: `Bearer ${businessToken}`,
-                access: `${Encrypt(userId)}`,
-            },
-        });
-        const response = await request.json();
+        try {
+            const api = `${baseUrl}/api/sendmail/${Encrypt(billId)}/${firstName}`;
 
-        if (response.message) {
-            SuccessToast(response.message);
-            router.refresh();
+            const request = await fetch(api, {
+                method: "GET",
+                headers: {
+                    "content-type": "application/json",
+                    Authorization: `Bearer ${Encrypt(businessToken)}`,
+                    access: Encrypt(userId),
+                    sessionKey: `Bearer ${Encrypt(sessionId)}`,
+                    "idempotency-key": `quote-${billId}`,
+                },
+            });
+
+            const response = await request.json();
+
+            if (response.message) {
+                SuccessToast(response.message);
+                router.refresh();
+            }
+            if (response.error) {
+                ErrorMessage(response.error);
+            }
+        } catch (error) {
+            ErrorMessage("Failed to send email. Please try again.");
+        } finally {
+            setIsMailLoading(false);
         }
-        if (response.error) ErrorMessage(response.error);
     };
 
-    const onWhatsappClick = async () => {
-        ErrorMessage("Whatsapp feature coming soon!");
-        router.refresh();
+    const onWhatsappClick = () => {
+        ErrorMessage("Whatsapp feature is coming soon!");
+        // router.refresh();
     };
 
     return (
-        <div className="flex gap-2 mt-2">
-            
-            {/* Mail Button */}
-            <button
-                title={`Send via Mail ${billStatus}`}
-                onClick={onMailClick}
-                className="mr-1 group inline-flex items-center gap-3 px-3 bg-gray-100/50 py-2 rounded-full text-gray-200 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out"
-            >
-                <AtSymbolIcon className="w-4 h-4 text-blue-300" />
-            </button>
+        <TooltipProvider delayDuration={300}>
+            <div className="flex items-center gap-2 mt-3">
+                
+                {/* Email Button */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            onClick={onMailClick}
+                            disabled={isMailLoading}
+                            variant="defalut"
+                            size="sm"
+                            className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-all"
+                        >
+                            {isMailLoading ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <AtSymbolIcon className="w-4 h-4" />
+                            )}
+                            Email
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Send {billStatus} via Email
+                    </TooltipContent>
+                </Tooltip>
 
-            {/* WhatsApp Button */}
-            <button
-                title="Send via Whatsapp"
-                onClick={onWhatsappClick}
-                className="mr-1 group inline-flex items-center gap-3 px-3 py-2 rounded-full text-gray-200 font-semibold hover:border border-gray-200 hover:shadow-lg hover:bg-gray-100/50 transition duration-200 ease-in-out"
-            >
-                <ChatBubbleLeftRightIcon className="w-4 h-4 text-gray-200"/>
-            </button>
-        </div>
+                {/* WhatsApp Button */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            onClick={onWhatsappClick}
+                            variant="default"
+                            size="sm"
+                            className="flex items-center gap-2 hover:bg-green-50 hover:border-green-200 hover:text-green-600 transition-all"
+                        >
+                            <ChatBubbleLeftRightIcon className="w-4 h-4" />
+                            WhatsApp
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Send via WhatsApp (Coming Soon)
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </TooltipProvider>
     );
 };
 
