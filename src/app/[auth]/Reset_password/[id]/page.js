@@ -38,8 +38,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
-const PasswordReset = ({ params }) => {
-  const UserId = params.id;
+const PasswordReset = async ({ params }) => {
+  const UserId = await params.id;
   const router = useRouter();
 
   const [newPassword, setNewPassword] = useState("");
