@@ -15,8 +15,28 @@ import {
   plsWait,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import { Encrypt, Dencrypt,pricelistSetter } from "../../../../../Functions/Functions";
+import { Encrypt, Dencrypt, pricelistSetter } from "../../../../../Functions/Functions";
 import { Badge } from "@/components/ui/badge";
+
+// shadcn/ui imports
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function BusinessDatas({ data, userInfo, baseUrl }) {
   const navigation = useRouter();
@@ -47,8 +67,8 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
           img.onload = async () => {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            const maxWidth = 800; // Set your desired max width
-            const maxHeight = 600; // Set your desired max height
+            const maxWidth = 800;
+            const maxHeight = 600;
             let width = img.width;
             let height = img.height;
 
@@ -68,7 +88,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
 
-            const resizedImage = canvas.toDataURL("image/jpeg", 0.7); // Adjust quality as needed
+            const resizedImage = canvas.toDataURL("image/jpeg", 0.7);
 
             const request = await fetch(
               `${baseUrl}/api/images/upload?id=${id}&module=${moduleList}`,
@@ -102,12 +122,12 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
     }
   };
 
-  // Use a single config object for axios
   const config = {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
       access: `${Encrypt(userInfo.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
     },
   };
 
@@ -117,12 +137,11 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
       plsWait("Submitting Business update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const url = `${baseUrl}/api/account/${Encrypt(formData._id)}`;
-      // Await axios call directly
-      const { data } = await axios.patch(url, formData, config);
+      const { data: responseData } = await axios.patch(url, formData, config);
 
-      if (data && data.message) {
-        SuccessToast(data.message);
-        setFormData(Dencrypt(data.data));
+      if (responseData && responseData.message) {
+        SuccessToast(responseData.message);
+        setFormData(Dencrypt(responseData.data));
         navigation.refresh();
       } else {
         throw new Error("Something went wrong");
@@ -132,501 +151,489 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
     }
   };
 
-  const handlecurrencyChange = (currency) => {
+  const handlecurrencyChange = (currencyObj) => {
     setFormData((prev) => ({
       ...prev,
-      currency,
+      currency: currencyObj,
     }));
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
+  const handleSelectChange = (name, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border-1 space-y-8 text-xs m-2"
+      className="max-w-full p-6 bg-background shadow-2xl border rounded-xl space-y-8 text-sm m-2"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h4 className="text-xl font-bold text-gray-800">
-          {/* {formData.companyName.charAt(0).toUpperCase() +
-            formData.companyName.slice(1)}
-          &apos;s  */}
-          Business profile
-        </h4>
-        <span
-          className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
-            !formData.isVerified
-              ? "bg-red-50 text-red-600 border-red-200"
-              : "bg-indigo-50 text-green-700 border-green-200"
-          }`}
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Business Profile
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your business information and settings
+          </p>
+        </div>
+
+        <Badge
+          variant={formData.isVerified ? "default" : "destructive"}
+          className="text-base px-6 py-1.5 font-semibold"
         >
           {formData.isVerified ? "Verified Account" : "Not Verified"}
-        </span>
+        </Badge>
       </div>
 
-      {/* Avatar & Attachment */}
-      <div className="flex flex-wrap gap-8 items-center py-4">
-        {/* Avatar */}
-        <div className="flex items-center space-x-6">
-          <div className="w-28 h-28 rounded-full overflow-hidden bg-linear-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center">
-            {formData.companyLogo ? (
-              <Image
-                width={200}
-                height={200}
-                quality={90}
-                src={formData.companyLogo}
-                priority
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-gray-400 text-lg font-semibold">
-                No Image
-              </span>
-            )}
-          </div>
-          <div>
-            <span
-              onClick={() => {
-                uploadFiles(Encrypt(formData._id), "Business");
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-300/50 text-black rounded-md shadow hover:bg-blue-600/50 transition"
+      {/* Avatar & Quick Links */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-wrap gap-8 items-center">
+            {/* Avatar */}
+            <div className="flex items-center gap-6">
+              <div className="w-28 h-28 rounded-full overflow-hidden bg-muted border-4 border-border shadow-sm flex items-center justify-center">
+                {formData.companyLogo ? (
+                  <Image
+                    width={200}
+                    height={200}
+                    quality={90}
+                    src={formData.companyLogo}
+                    priority
+                    alt="Business Logo"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-4xl text-muted-foreground font-semibold">
+                    {formData.companyName?.charAt(0) || "B"}
+                  </div>
+                )}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => uploadFiles(Encrypt(formData._id), "Business")}
+                className="flex items-center gap-2"
+              >
+                <PhotoIcon className="h-5 w-5" />
+                Upload Logo
+              </Button>
+            </div>
+
+            <div className="hidden md:block h-24 border-l border-border mx-6" />
+
+            {/* Add User Button */}
+            <Link
+              href={`/${data?.companyName
+                .toLowerCase()
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                userInfo?.user._id,
+              )}/Module/Forms/employee`}
             >
-              <PhotoIcon className="h-5 w-5" />
-              <span className="text-sm font-medium ">Upload</span>
-            </span>
+              <Button
+                className="flex items-center gap-2 text-base h-12 px-6"
+                size="lg"
+              >
+                <UserPlusIcon className="h-5 w-5" />
+                Add User
+              </Button>
+            </Link>
           </div>
-        </div>
-
-        {/* Divider */}
-        <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
-
-        {/* Attachment */}
-
-        <Link
-          href={`/${data?.companyName
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-            userInfo?.user._id,
-          )}/Module/Forms/employee`}
-          className="inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-md shadow-md hover:bg-[#18181b] transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-          role="button"
-          tabIndex={0}
-        >
-          <UserPlusIcon class="h-6 w-6 text-gray-200" />
-          Add user
-        </Link>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
-      <Section title="⚙️ Quick Actions">
-        <div className="flex flex-wrap gap-4">
-          {userInfo.user.isAdmin && formData.isActive && (
-            <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            ⚙️ Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-4">
+            {userInfo.user.isAdmin && formData.isActive && (
               <TermsAndConditionsLink BusinessPlan={data.subscriptionplan} />
-            </>
-          )}
+            )}
 
-          {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
-            <span
-              className="inline-flex items-center gap-2 bg-amber-300 text-black px-5 py-2.5 rounded-md shadow-md hover:bg-amber-500 transition font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-              role="button"
-              tabIndex={0}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 17l4 4 4-4m0-5V3m-8 4h8"
-                />
-              </svg>
-              Upgrade Plan
-            </span>
-          )}
-        </div>
-      </Section>
+            {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
+              <Button variant="outline" className="flex items-center gap-2">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 17l4 4 4-4m0-5V3m-8 4h8"
+                  />
+                </svg>
+                Upgrade Plan
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Identity */}
-      <Section title="Identity">
-        <Grid>
-          <Input
-            label="Business Name"
-            readOnly
-            disabled
-            value={formData.companyName}
-          />
-          <Input
-            label="Tenant Id"
-            value={formData.tenantId}
-            disabled
-            readonly
-            type="password"
-          />
-          <Input
-            label="Email"
-            name="Email"
-            type="email"
-            value={formData.email}
-            eadonly
-            disabled
-          />
-          <Input label="Phone" readonly disabled value={formData.Tel} />
-          <Input
-            label="Industry"
-            name="industryType"
-            value={formData.industryType}
-            onChange={handleChange}
-          />
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Business Type
-            </label>
-            <select
-              name="BusinessType"
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-            >
-              <option value={formData.BusinessType}>
-                {formData.BusinessType || "Choose..."}
-              </option>
-              <option value="Business">Business</option>
-              <option value="Individual">Individual</option>
-            </select>
+      <Card>
+        <CardHeader>
+          <CardTitle>Identity</CardTitle>
+          <CardDescription>Core business identification details</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label>Business Name</Label>
+            <Input value={formData.companyName} disabled />
           </div>
-        </Grid>
-      </Section>
+          <div className="space-y-2">
+            <Label>Tenant ID</Label>
+            <Input value={formData.tenantId} type="password" disabled />
+          </div>
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input value={formData.email} type="email" disabled />
+          </div>
+          <div className="space-y-2">
+            <Label>Phone</Label>
+            <Input value={formData.Tel} disabled />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="industryType">Industry</Label>
+            <Input
+              id="industryType"
+              name="industryType"
+              value={formData.industryType}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="BusinessType">Business Type</Label>
+            <Select
+              value={formData.BusinessType}
+              onValueChange={(value) => handleSelectChange("BusinessType", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select business type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Business">Business</SelectItem>
+                <SelectItem value="Individual">Individual</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Contact Info */}
-      <Section title="Subscription Info">
-        <Grid>
-          <Input
-            label="Subscription Validity"
-            value={formData.subscriptionEndDate}
-            type="date"
-            disabled
-            readOnly
-          />
-          <Input
-            label="Current plan"
-            readonly
-            disabled
-            value={formData.subscriptionplan}
-          />
-          <Input
-            label="Pending user Licenses"
-            readonly
-            disabled
-            value={formData.Pendinglicense}
-          />
-          <h4 className="text-black font-bold">
-            {moment(formData.subscriptionEndDate).isValid() &&
-            moment(formData.subscriptionEndDate).isAfter(moment())
-              ? `Subscription ends in ${moment(
-                  formData.subscriptionEndDate,
-                ).diff(moment(), "days")} day(s)`
-              : "Subscription has expired."}
-          </h4>
-        </Grid>
-      </Section>
+      {/* Subscription Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscription Info</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label>Subscription Validity</Label>
+            <Input
+              value={formData.subscriptionEndDate}
+              type="date"
+              disabled
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Current Plan</Label>
+            <Input value={formData.subscriptionplan} disabled />
+          </div>
+          <div className="space-y-2">
+            <Label>Pending User Licenses</Label>
+            <Input value={formData.Pendinglicense} disabled />
+          </div>
+          <div className="pt-2">
+            <p className="text-sm font-medium text-foreground">
+              {moment(formData.subscriptionEndDate).isValid() &&
+              moment(formData.subscriptionEndDate).isAfter(moment())
+                ? `Subscription ends in ${moment(
+                    formData.subscriptionEndDate,
+                  ).diff(moment(), "days")} day(s)`
+                : "Subscription has expired."}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Location */}
-      <Section title="Location">
-        <Grid columns={3}>
-          <Input
-            label="City"
-            name="companyCity"
-            value={formData.companyCity}
-            onChange={handleChange}
-          />
-          <Input
-            label="State"
-            name="companyState"
-            value={formData.companyState}
-            onChange={handleChange}
-          />
-          <Input
-            label="Address"
-            name="shopAddress"
-            value={formData.shopAddress}
-            onChange={handleChange}
-          />
-        </Grid>
-      </Section>
+      <Card>
+        <CardHeader>
+          <CardTitle>Location</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="companyCity">City</Label>
+            <Input
+              id="companyCity"
+              name="companyCity"
+              value={formData.companyCity}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="companyState">State</Label>
+            <Input
+              id="companyState"
+              name="companyState"
+              value={formData.companyState}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="shopAddress">Address</Label>
+            <Input
+              id="shopAddress"
+              name="shopAddress"
+              value={formData.shopAddress}
+              onChange={handleChange}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Financials */}
-      <Section title="Financials">
-        <Grid columns={3}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Country & Currency
-            </label>
-            <select
-              required
-              name="currency"
-              value={formData.currency?.currency.CountryName}
-              onChange={(e) =>
-                handlecurrencyChange({
-                  currency: currencies.find(
-                    (c) => c.CountryName === e.target.value,
-                  ),
-                })
+      <Card>
+        <CardHeader>
+          <CardTitle>Financials</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="currency">Country & Currency</Label>
+            <Select
+              value={formData.currency?.currency?.CountryName || ""}
+              onValueChange={(value) => {
+                const selected = currencies.find(
+                  (c) => c.CountryName === value
+                );
+                if (selected) handlecurrencyChange(selected);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies.map((num) => (
+                  <SelectItem key={num.CountryName} value={num.CountryName}>
+                    {num.CountryName} • {num.Symbol}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="allowCreditLimit">Credit Limit Application</Label>
+            <Select
+              value={formData.allowCreditLimit || ""}
+              onValueChange={(value) =>
+                handleSelectChange("allowCreditLimit", value)
               }
-              className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
             >
-              {currencies.map((num) => (
-                <option key={num.CountryName} value={num.CountryName}>
-                  {num.CountryName} {"   "} {num.Symbol}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select credit option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">This doesn&apos;t apply to my business</SelectItem>
+                <SelectItem value="Customer">Customers</SelectItem>
+                <SelectItem value="Warehouse">Warehouse</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Credit Limit Application
-            </label>
-            <select
-              name="allowCreditLimit"
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-            >
-              <option value={formData.allowCreditLimit}>
-                {formData.allowCreditLimit === ""
-                  ? "This dosen't apply to my business"
-                  : formData.allowCreditLimit}
-              </option>
-              <option value=""> This dosen't apply to my business</option>
-              <option value="Customer"> Customers</option>
-              <option value="Warehouse"> Warehouse</option>
-            </select>
-          </div>
-        </Grid>
-      </Section>
-
-      {/* pricelist */}
-      {/* <Section title="Pricelists Management">
-        <Grid>
-          {userInfo.business.priceList.map((pl) => (
-            <Badge
-              key={pl._id}
-              variant="secondary"
-              title={pricelistSetter(pl.Name ?? "Unknown PriceList", userInfo.business)}
-              className="max-w-[140px] truncate lowercase text-sm font-semibold px-2 py-0.5"
-            >
-              {pricelistSetter(pl.Name ?? "Unknown PriceList", userInfo.business)}
-            </Badge>
-          ))}
-        </Grid>
-      </Section> */}
+        </CardContent>
+      </Card>
 
       {/* Status Flags */}
       {userInfo.business.subscriptionplan === "Standard" && (
-        <Section title="Status Flags">
-          <Grid columns={3}>
-            <Checkbox
-              label={`Send Daily Business Report to ${formData.email.substring(
-                0,
-                6,
-              )}***.`}
-              name="dailyReport"
-              checked={formData.dailyReport}
-              onChange={handleChange}
-            />
-            <Checkbox
-              label="Generate and send monthly Statements to my Customers."
-              name="monthlyCutStatement"
-              checked={formData.monthlyCutStatement}
-              onChange={handleChange}
-            />
-            <Checkbox
-              label={
-                formData.allowPriceChangeOnInvoice
+        <Card>
+          <CardHeader>
+            <CardTitle>Status Flags</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="dailyReport"
+                checked={formData.dailyReport}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, dailyReport: checked }))
+                }
+              />
+              <Label htmlFor="dailyReport" className="cursor-pointer">
+                Send Daily Business Report to {formData.email?.substring(0, 6)}
+                ***
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="monthlyCutStatement"
+                checked={formData.monthlyCutStatement}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, monthlyCutStatement: checked }))
+                }
+              />
+              <Label htmlFor="monthlyCutStatement" className="cursor-pointer">
+                Generate and send monthly Statements to my Customers
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="allowPriceChangeOnInvoice"
+                checked={formData.allowPriceChangeOnInvoice}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, allowPriceChangeOnInvoice: checked }))
+                }
+              />
+              <Label htmlFor="allowPriceChangeOnInvoice" className="cursor-pointer">
+                {formData.allowPriceChangeOnInvoice
                   ? "Price Change on Invoice Allowed"
-                  : "Block Price Change on Invoice"
-              }
-              name="allowPriceChangeOnInvoice"
-              checked={formData.allowPriceChangeOnInvoice}
-              onChange={handleChange}
-            />
-            <Checkbox
-              label={
-                formData.allowPriceChangeOnInvoice
+                  : "Block Price Change on Invoice"}
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="allowSkuSplitting"
+                checked={formData.allowSkuSplitting}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, allowSkuSplitting: checked }))
+                }
+              />
+              <Label htmlFor="allowSkuSplitting" className="cursor-pointer">
+                {formData.allowSkuSplitting
                   ? "Product Splitting Allowed"
-                  : "Product Splitting Blocked"
-              }
-              name="allowSkuSplitting"
-              checked={formData.allowSkuSplitting}
-              onChange={handleChange}
-            />
-            <Checkbox
-              label={
-                formData.InvoiceRestriction
+                  : "Product Splitting Blocked"}
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="InvoiceRestriction"
+                checked={formData.InvoiceRestriction}
+                onCheckedChange={(checked) =>
+                  setFormData((prev) => ({ ...prev, InvoiceRestriction: checked }))
+                }
+              />
+              <Label htmlFor="InvoiceRestriction" className="cursor-pointer">
+                {formData.InvoiceRestriction
                   ? "Do not apply Restriction on Draft sales"
-                  : "Apply Restriction on Draft sales After 24Hrs"
-              }
-              name="InvoiceRestriction"
-              checked={formData.InvoiceRestriction}
-              onChange={handleChange}
-            />
-          </Grid>
-        </Section>
+                  : "Apply Restriction on Draft sales After 24Hrs"}
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Services */}
-      <Section title="🛎 Services">
-        <Grid columns={2}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              clear in-App Notifications
-            </label>
-            <select
-              name="clearNotification"
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+      <Card>
+        <CardHeader>
+          <CardTitle>🛎 Services</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="clearNotification">Clear In-App Notifications</Label>
+            <Select
+              value={formData.clearNotification || ""}
+              onValueChange={(value) =>
+                handleSelectChange("clearNotification", value)
+              }
             >
-              <option value={formData.clearNotification}>
-                {formData.clearNotification === ""
-                  ? "Leave Forever"
-                  : formData.clearNotification}
-              </option>
-              <option value="">Leave Forever</option>
-              <option value="Daily"> Daily</option>
-              <option value="Monthly">Monthly </option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select notification policy" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Leave Forever</SelectItem>
+                <SelectItem value="Daily">Daily</SelectItem>
+                <SelectItem value="Monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div>
+
+          <div className="space-y-2">
+            <Label htmlFor="invoicePolicy">Invoice Policy</Label>
             <Input
-              label="Invoice Policy"
+              id="invoicePolicy"
               name="invoicePolicy"
               value={formData.invoicePolicy}
               onChange={handleChange}
             />
           </div>
-        </Grid>
-      </Section>
+        </CardContent>
+      </Card>
 
-      {/* Recent Transactions */}
-      <Section title="Installed Business Apps">
-        <div className="overflow-x-auto p-2">
-          {data && data.modules.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {data.modules.map((data) => (
+      {/* Installed Business Apps */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Installed Business Apps</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data && data.modules?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {data.modules.map((mod) => (
                 <Link
-                  key={data._id}
-                  href={`#`}
-                  title={data.Description}
-                  className="block w-full h-full text-xs"
-                  style={{ textDecoration: "none" }}
+                  key={mod._id}
+                  href="#"
+                  className="block group"
                 >
-                  <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-md shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-[80px] w-full h-full">
-                    <Image
-                      src={data.icon || "/preview.png"}
-                      width={60}
-                      height={60}
-                      alt={truncate(data.Name || "photo")}
-                      className="rounded-md object-cover w-16 h-16"
-                      priority
-                    />
-
-                    <div className="flex flex-col justify-center w-full">
-                      <p className="text-base font-semibold text-gray-800 truncate">
-                        {truncate(data.Name)}
+                  <div className="flex items-center gap-4 bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all duration-200 h-full">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                      <Image
+                        src={mod.icon || "/preview.png"}
+                        width={64}
+                        height={64}
+                        alt={mod.Name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                        {truncate(mod.Name)}
                       </p>
-                      <small className="text-sm w-fit p-1 rounded text-gray-500 mt-1">
-                        {truncate("Installed")}
-                      </small>
+                      <p className="text-xs text-muted-foreground mt-1">Installed</p>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 italic">No Module installed.</p>
+            <p className="text-muted-foreground italic py-8 text-center">
+              No modules installed yet.
+            </p>
           )}
-        </div>
-      </Section>
+        </CardContent>
+      </Card>
 
-      {userInfo.user && (
-        <div className="pt-4">
-          <button
+      {/* Submit */}
+      {userInfo.user.isAdmin && (
+        <div className="flex justify-end pt-4">
+          <Button
             type="submit"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 transition"
+            size="lg"
+            className="px-10 text-base font-medium"
           >
             Save Changes
-          </button>
+          </Button>
         </div>
       )}
     </form>
-  );
-}
-
-function Section({ title, children }) {
-  return (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
-      {children}
-    </div>
-  );
-}
-
-function Grid({ children, columns = 2 }) {
-  return (
-    <div className={`grid grid-cols-1 md:grid-cols-${columns} gap-4`}>
-      {children}
-    </div>
-  );
-}
-
-function Input({
-  label,
-  name,
-  type = "text",
-  value,
-  onChange,
-  disabled = false,
-  readonly = false,
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-        readOnly={readonly}
-        className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
-      />
-    </div>
-  );
-}
-
-function Checkbox({ label, name, checked, onChange }) {
-  return (
-    <div className="flex items-center space-x-2">
-      <input
-        type="checkbox"
-        name={name}
-        checked={checked}
-        onChange={onChange}
-        className="h-4 w-4 border-gray-300 rounded text-orange-600"
-      />
-      <label className="text-sm text-gray-700">{label}</label>
-    </div>
   );
 }

@@ -296,6 +296,7 @@ export default function InvoicePage({
         Authorization: `Bearer ${userInfo.business.tenantId}`,
         dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
         access: `${Encrypt(userInfo.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
       },
     };
 
@@ -320,7 +321,8 @@ export default function InvoicePage({
             headers: {
               "Content-Type": "application/json",
               Authorization:`Bearer ${Encrypt(userInfo.business.tenantId)}`,
-              access:`${Encrypt(userInfo.user._id)}`
+              access:`${Encrypt(userInfo.user._id)}`,
+              sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
             },
             body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
           });
@@ -628,7 +630,8 @@ export default function InvoicePage({
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
-            "idempotency-key" : `recalled-${option}-${Singlebill._id}`
+            "idempotency-key" : `recalled-${option}-${Singlebill._id}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           body: JSON.stringify({ id: Encrypt(orderId) }),
         }
@@ -990,7 +993,7 @@ export default function InvoicePage({
                     />
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {bill.returnId}
+                    {bill.returnId === "WH/IN" ? "Returned" : "Sold"}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.item.ADCcode || bill.item.ACDcode}
