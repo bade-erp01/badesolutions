@@ -88,6 +88,7 @@ export default function DraftInvoicePage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });
 
@@ -373,6 +374,7 @@ export default function DraftInvoicePage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
         body: JSON.stringify({ product: cleanedProducts.storeId }), // Ensure it's sent as an object
       });
@@ -417,6 +419,7 @@ export default function DraftInvoicePage({
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
           "idempotency-key": `delete-${bill._id}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });
       const data = await response.json();
@@ -458,6 +461,7 @@ export default function DraftInvoicePage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
         body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
       });
@@ -521,6 +525,7 @@ export default function DraftInvoicePage({
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
             access: `${Encrypt(user._id)}`,
             "idempotency-key": `invoice-${bill._id}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           body: JSON.stringify({
             billId: bill._id,
@@ -559,6 +564,7 @@ export default function DraftInvoicePage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
         body: JSON.stringify({ lineId, billId: bill._id }),
       });
