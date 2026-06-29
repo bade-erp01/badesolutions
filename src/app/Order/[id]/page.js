@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Dencrypt,totalInWords } from "../../../../Functions/Functions";
-import { showDeliveryModal } from "@/app/Components/Delivery";
+import DeliveryModal from "@/app/Components/Delivery";
 import { PrinterIcon, TruckIcon } from "@heroicons/react/24/solid";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
@@ -495,7 +495,7 @@ export default function InvoicePage({ invoice }) {
     {inv.billStatus === "Order" ? (
       <button
         title={`Convert ${inv.billStatus} to Invoice and Generate WayBill`}
-        onClick={() => showDeliveryModal(inv, user, biz)}
+        onClick={() => DeliveryModal(inv, user, biz)}
         className="mt-6 inline-flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-700 text-gray-100 font-semibold border border-gray-300 hover:shadow-lg hover:border-gray-400 hover:text-white transition duration-200 ease-in-out"
       >
         <TruckIcon className="w-5 h-5 text-gray-100" />
