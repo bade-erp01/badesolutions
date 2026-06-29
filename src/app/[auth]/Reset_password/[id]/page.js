@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useMemo, useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import {
   Eye,
   EyeOff,
   LockKeyhole,
-  ShieldCheck,
-  CheckCircle2,
-  XCircle,
 } from "lucide-react";
 
 import {
@@ -37,17 +34,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, XCircle } from "lucide-react";
 
-const PasswordReset = async ({ params }) => {
-  const UserId = await params.id;
+const PasswordReset = () => {
   const router = useRouter();
+  const params = useParams();
+  const UserId = params?.id;
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -66,36 +64,23 @@ const PasswordReset = async ({ params }) => {
   const strength = useMemo(() => {
     const passed = Object.values(validations).filter(Boolean).length;
 
-    if (passed <= 1)
-      return { score: 20, label: "Very Weak" };
-
-    if (passed === 2)
-      return { score: 40, label: "Weak" };
-
-    if (passed === 3)
-      return { score: 60, label: "Fair" };
-
-    if (passed === 4)
-      return { score: 80, label: "Strong" };
-
+    if (passed <= 1) return { score: 20, label: "Very Weak" };
+    if (passed === 2) return { score: 40, label: "Weak" };
+    if (passed === 3) return { score: 60, label: "Fair" };
+    if (passed === 4) return { score: 80, label: "Strong" };
     return { score: 100, label: "Very Strong" };
   }, [validations]);
 
-  const isStrongPassword = Object.values(
-    validations
-  ).every(Boolean);
+  const isStrongPassword = Object.values(validations).every(Boolean);
 
   const passwordsMatch =
-    confirmPassword.length > 0 &&
-    confirmPassword === newPassword;
+    confirmPassword.length > 0 && confirmPassword === newPassword;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isStrongPassword) {
-      return setError(
-        "Password does not meet security requirements."
-      );
+      return setError("Password does not meet security requirements.");
     }
 
     if (!passwordsMatch) {
@@ -124,16 +109,13 @@ const PasswordReset = async ({ params }) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          result.error || "Unable to reset password"
-        );
+        throw new Error(result.error || "Unable to reset password");
       }
 
       SuccessToast(result.message);
 
       setNewPassword("");
       setConfirmPassword("");
-
       router.push("/Login");
     } catch (err) {
       ErrorMessage(err.message);
@@ -143,15 +125,20 @@ const PasswordReset = async ({ params }) => {
     }
   };
 
+  // Optional: Redirect if no UserId
+  useEffect(() => {
+    if (!UserId) {
+      router.push("/Login");
+    }
+  }, [UserId, router]);
+
   return (
     <>
       <Nav1 />
 
       <div
         className="min-h-screen flex items-center justify-center px-4 py-10 bg-cover bg-center bg-fixed"
-        style={{
-          backgroundImage: "url('/bg.jpg')",
-        }}
+        style={{ backgroundImage: "url('/bg.jpg')" }}
       >
         <Card className="w-full max-w-lg bg-background/95 backdrop-blur-md shadow-2xl">
           <CardHeader className="text-center">
@@ -159,102 +146,58 @@ const PasswordReset = async ({ params }) => {
               <LockKeyhole className="h-8 w-8 text-primary" />
             </div>
 
-            <CardTitle className="text-3xl">
-              Reset Password
-            </CardTitle>
-
+            <CardTitle className="text-3xl">Reset Password</CardTitle>
             <CardDescription>
               Create a secure password for your account
             </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-6"
-            >
-              {/* Password */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* New Password */}
               <div className="space-y-2">
                 <Label>New Password</Label>
-
                 <div className="relative">
                   <Input
-                    type={
-                      showPassword ? "text" : "password"
-                    }
+                    type={showPassword ? "text" : "password"}
                     value={newPassword}
-                    onChange={(e) =>
-                      setNewPassword(e.target.value)
-                    }
+                    onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password"
                     className="pr-12"
                   />
-
                   <Button
                     type="button"
                     size="icon"
                     variant="ghost"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() =>
-                      setShowPassword(!showPassword)
-                    }
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
 
-                <Progress value={strength.score} />
-
+                <Progress value={strength.score} className="h-2" />
                 <p className="text-sm text-muted-foreground">
-                  Strength: {strength.label}
+                  Strength: <span className="font-medium">{strength.label}</span>
                 </p>
               </div>
 
-              {/* Requirements */}
-              <div className="rounded-xl border p-4 space-y-3">
+              {/* Password Requirements */}
+              <div className="rounded-xl border p-4 space-y-3 bg-card">
                 {[
-                  {
-                    label: "Minimum 8 characters",
-                    valid: validations.length,
-                  },
-                  {
-                    label: "At least one uppercase letter",
-                    valid: validations.uppercase,
-                  },
-                  {
-                    label: "At least one lowercase letter",
-                    valid: validations.lowercase,
-                  },
-                  {
-                    label: "At least one number",
-                    valid: validations.number,
-                  },
-                  {
-                    label: "At least one special character",
-                    valid: validations.special,
-                  },
+                  { label: "Minimum 8 characters", valid: validations.length },
+                  { label: "At least one uppercase letter", valid: validations.uppercase },
+                  { label: "At least one lowercase letter", valid: validations.lowercase },
+                  { label: "At least one number", valid: validations.number },
+                  { label: "At least one special character", valid: validations.special },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-2 text-sm"
-                  >
+                  <div key={item.label} className="flex items-center gap-2 text-sm">
                     {item.valid ? (
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                     ) : (
                       <XCircle className="h-4 w-4 text-muted-foreground" />
                     )}
-
-                    <span
-                      className={
-                        item.valid
-                          ? "text-green-600"
-                          : "text-muted-foreground"
-                      }
-                    >
+                    <span className={item.valid ? "text-green-600" : "text-muted-foreground"}>
                       {item.label}
                     </span>
                   </div>
@@ -264,52 +207,32 @@ const PasswordReset = async ({ params }) => {
               {/* Confirm Password */}
               <div className="space-y-2">
                 <Label>Confirm Password</Label>
-
                 <div className="relative">
                   <Input
-                    type={
-                      showConfirmPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) =>
-                      setConfirmPassword(e.target.value)
-                    }
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm password"
                     className="pr-12"
                   />
-
                   <Button
                     type="button"
                     size="icon"
                     variant="ghost"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() =>
-                      setShowConfirmPassword(
-                        !showConfirmPassword
-                      )
-                    }
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
 
                 {confirmPassword && (
                   <p
-                    className={`text-sm ${
-                      passwordsMatch
-                        ? "text-green-600"
-                        : "text-destructive"
+                    className={`text-sm font-medium ${
+                      passwordsMatch ? "text-green-600" : "text-destructive"
                     }`}
                   >
-                    {passwordsMatch
-                      ? "✓ Passwords match"
-                      : "✗ Passwords do not match"}
+                    {passwordsMatch ? "✓ Passwords match" : "✗ Passwords do not match"}
                   </p>
                 )}
               </div>
@@ -323,15 +246,9 @@ const PasswordReset = async ({ params }) => {
               <Button
                 className="w-full"
                 size="lg"
-                disabled={
-                  loading ||
-                  !isStrongPassword ||
-                  !passwordsMatch
-                }
+                disabled={loading || !isStrongPassword || !passwordsMatch}
               >
-                {loading
-                  ? "Resetting Password..."
-                  : "Reset Password"}
+                {loading ? "Resetting Password..." : "Reset Password"}
               </Button>
             </form>
           </CardContent>
