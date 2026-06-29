@@ -33,15 +33,6 @@ export default async function SetUpLayout({children, params }) {
             >
             <BackButton />
               <hr />
-              <nav className="space-y-4  overflow-y-auto ">
-                <br/>
-                <Link
-                 href={`/`}
-                  className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
-                >
-                  <h3>Next Renual Fee: ₦{userData.business.SubcriptionAmount.toLocaleString()}</h3>
-                </Link>
-              </nav>
     
             </aside>{" "}
             {/* Main Content Area */}

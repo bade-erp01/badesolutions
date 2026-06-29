@@ -8,6 +8,7 @@ import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
 import Business from "../../../../../models/Business";
 import { notFound } from "next/navigation";
+import CreateBusinessTenant from "@/app/Components/AddTenant"
 
 export async function generateMetadata() {
   const userData = await fetchUser();
@@ -173,7 +174,9 @@ export default async function SetUpLayout({ children, params }) {
               <span className="text-lg font-semibold text-gray-800">
                 {business.currency?.currency.CountryName}
               </span>
+
             </div>
+            <CreateBusinessTenant/>
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
