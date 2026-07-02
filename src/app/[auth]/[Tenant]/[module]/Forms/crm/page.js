@@ -28,7 +28,7 @@ const sanitizeObject = (obj) => {
   return obj;
 };
 
-export default function NewCustomerForm({ userData, businessData, salesperson }) {
+export default function NewCustomerForm({ userData, businessData, salesperson,sessionId }) {
   const sanitizedUserData = sanitizeObject(userData);
   const sanitizedSalespersons = salesperson.map(sanitizeObject);
   
@@ -103,7 +103,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(sessionId)}`
         },
       };
 
@@ -141,7 +141,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-8">
+          <CardContent className="p-8 w-full">
             <form onSubmit={handleSubmit} autoComplete="off" className="space-y-8">
               {/* Server Messages */}
               {serverMsg && (
