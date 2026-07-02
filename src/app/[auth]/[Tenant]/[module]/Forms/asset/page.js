@@ -26,8 +26,8 @@ export default function Page({
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
     access: `${Encrypt(userInfo.user._id)}`,
+    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
   });
 
 

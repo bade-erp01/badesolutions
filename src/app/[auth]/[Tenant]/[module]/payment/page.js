@@ -60,9 +60,9 @@ export default async function paymentlayout({ children, params }) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
+      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
       access: `${Encrypt(userData.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
     },
      next: { revalidate: 60 } // cache for 1 minutes
   });

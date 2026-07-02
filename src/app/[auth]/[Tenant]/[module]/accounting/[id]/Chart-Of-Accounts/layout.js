@@ -68,6 +68,7 @@ export default async function AccountingPage({ children, params }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
       access: `${Encrypt(userData.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
     },
   });
 

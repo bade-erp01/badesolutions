@@ -19,8 +19,8 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
     access: `${Encrypt(userInfo.user._id)}`,
+    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
   });
 
   const activityLogs = DecryptedAsset.AcivityLog || [];

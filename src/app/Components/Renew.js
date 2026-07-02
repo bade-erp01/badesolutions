@@ -43,6 +43,7 @@ const RenewButton = ({id ,baseUrl,User}) => {
           headers:{
             Authorization:`Bearer ${id}`,
             access:Encrypt(user._id),
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           }
         });
 

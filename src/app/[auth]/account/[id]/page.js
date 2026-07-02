@@ -97,8 +97,9 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
                 body: JSON.stringify({ image: resizedImage }),
                 headers: {
                   "Content-Type": "application/json",
-                  dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+                  Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
                   access: `${Encrypt(userInfo.user._id)}`,
+                  sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
                 },
               },
             );

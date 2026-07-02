@@ -60,6 +60,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             access: `${Encrypt(Currentuser._id)}`,
+            sessionKey: `Bearer ${Encrypt(Currentuser.SessionId)}`
           },
         }
       );
@@ -120,6 +121,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
             access: `${Encrypt(Currentuser._id)}`,
+            sessionKey: `Bearer ${Encrypt(Currentuser.SessionId)}`
           },
         }
       );

@@ -63,6 +63,7 @@ export default function Page({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
           access: `${Encrypt(userData._id)}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
       };
 

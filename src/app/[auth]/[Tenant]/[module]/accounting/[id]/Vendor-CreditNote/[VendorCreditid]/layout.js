@@ -75,8 +75,8 @@ export default async function page({children, params }) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
         access: `${Encrypt(userData.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
     }),
 

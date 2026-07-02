@@ -2,7 +2,7 @@
 import Swal from "sweetalert2";
 import moment from "moment";
 import { useState } from "react";
-import {downloadExcel} from "../../../../Functions/Functions"
+import {downloadExcel,Encrypt} from "../../../../Functions/Functions"
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 import { TruckIcon } from "@heroicons/react/24/outline";
 
@@ -24,6 +24,7 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
               "Content-Type": "application/json",
               Authorization: `Bearer ${business.tenantId}`,
               dbConnect: `Bearer ${business.rustyRoof}`,
+              sessionKey: `Bearer ${Encrypt(user.SessionId)}`
             },
           });
     

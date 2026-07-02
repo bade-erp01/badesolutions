@@ -89,7 +89,8 @@ const BulkUploader = ({ tenantId, collectionName }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${tenantId.business.tenantId}`,
           dbConnect: `Bearer ${tenantId.business.rustyRoof}`,
-          access: `${Encrypt(tenantId.user._id)}`
+          access: `${Encrypt(tenantId.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(tenantId.SessionId)}`
         },
         body: JSON.stringify({ collectionName, data }),
       });

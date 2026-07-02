@@ -108,7 +108,8 @@ const BulkUpdate = ({ tenantId, collectionName,WHID }) => {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Encrypt(tenantId.business.tenantId)}`,
-          access: `${Encrypt(tenantId.user._id)}`
+          access: `${Encrypt(tenantId.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(tenantId.SessionId)}`
         },
         body: JSON.stringify({data:Encrypt(data), collectionName:Encrypt(collectionName)}),
       });

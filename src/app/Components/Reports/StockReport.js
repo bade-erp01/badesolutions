@@ -22,6 +22,7 @@ export default function StockReportModal({ baseUrl, userData }) {
           Authorization: `Bearer ${userData.business.tenantId}`,
           dbConnect: `Bearer ${userData.business.rustyRoof}`,
           access: `${Encrypt(userData.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
       });
 

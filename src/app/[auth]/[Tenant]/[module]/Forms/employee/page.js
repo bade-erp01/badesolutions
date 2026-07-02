@@ -273,6 +273,7 @@ export function PurchaseLicenseButton({ formData, userData }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userData.business._id)}`,
           sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+          access: `${Encrypt(userData.user._id)}`,
         },
         body: JSON.stringify({
           numberOfUsers: summary.numberOfUsers,

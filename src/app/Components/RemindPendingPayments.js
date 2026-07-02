@@ -11,14 +11,14 @@ const PendingPaymentReminder = ( {data, business }) => {
   useEffect(() => {
       MySwal.fire({
         toast: true,
-        position: "top-end", // ✅ top right
+        position: "top-end", // top right
         showConfirmButton: false,
         timer: 10000,
         timerProgressBar: true,
         customClass: {
           popup: "swal2-pending-toast animate__animated animate__slideInRight",
         },
-        background: "#f9f9f9", // ✅ softer background color
+        background: "#f9f9f9", // softer background color
         html: `
             <div style="display: flex; align-items: center;">
                 <img src="${business?.companyLogo || ""}" 

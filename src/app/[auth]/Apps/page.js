@@ -131,6 +131,8 @@ const ModuleCard = ({ item, userInfo }) => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${await Encrypt(TenantId)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+            access: `${Encrypt(userInfo.user._id)}`,
           },
           body: JSON.stringify(module),
         }

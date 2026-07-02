@@ -2,7 +2,7 @@
 import Swal from "sweetalert2";
 import moment from "moment";
 import { useState } from "react";
-import { downloadExcel, pricelistSetter } from "../../../../Functions/Functions";
+import { downloadExcel, pricelistSetter,Encrypt } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 
@@ -24,6 +24,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${business.tenantId}`,
           dbConnect: `Bearer ${business.rustyRoof}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });
 

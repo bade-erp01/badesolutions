@@ -90,6 +90,7 @@ export default function TaskAssigner({users, userInfo , EXPRESS_PRIVATE_URL}) {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
                             access: `${Encrypt(userInfo.user._id)}`,
+                            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
                         },
                     }
                 );

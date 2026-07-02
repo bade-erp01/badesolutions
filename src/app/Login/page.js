@@ -125,6 +125,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
           user: decryptedUser,
           business: data.Tenant,
           SessionId: data.SessionId,
+          rustyRoof:data.rustyRoof
         })
       );
 

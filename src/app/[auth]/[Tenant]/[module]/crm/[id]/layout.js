@@ -34,7 +34,8 @@ export default async function StoreLayout2({ params }) {
     const headers = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-    access: `${Encrypt(userData.user._id)}`
+    access: `${Encrypt(userData.user._id)}`,
+    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
   };
 
   // Run both requests in parallel

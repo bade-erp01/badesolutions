@@ -79,6 +79,7 @@ export default function ExpenseCategoriesModal({
                         userData.business.tenantId
                       )}`,
                       access: `${Encrypt(userData.user._id)}`,
+                      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
                     },
                   }
                 );

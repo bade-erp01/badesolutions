@@ -38,6 +38,7 @@ export default async function layout({ params }) {
       Authorization: `Bearer ${userData.business.tenantId}`,
       dbConnect: `Bearer ${userData.business.rustyRoof}`,
       access: `${Encrypt(userData.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
     },
   });
 

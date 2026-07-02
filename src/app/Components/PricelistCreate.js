@@ -54,6 +54,7 @@ export default function AddPriceListModal({baseUrl,userData}) {
           "Content-Type": "application/json",
            Authorization: `Bearer ${Encrypt(userData.user.tenantId)}`,
            access: `${Encrypt(userData.user._id)}`,
+           sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
         body: JSON.stringify({
           Name: priceListName.trim(),

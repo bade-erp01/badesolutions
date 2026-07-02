@@ -68,6 +68,7 @@ export default async function Productlayout({ children, params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         access: `${Encrypt(userData.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
       next: { revalidate: 120 }, // cache for 1 minutes
     });

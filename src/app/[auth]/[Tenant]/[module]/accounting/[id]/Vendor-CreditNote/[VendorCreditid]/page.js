@@ -21,8 +21,8 @@ export default function Page({ data,userData,baseurl }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
-            access: `Bearer ${Encrypt(userData.user._id)}`,
+            access: `${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
           },
         }
       );

@@ -50,6 +50,7 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
             "Content-Type": "application/json",
              Authorization: `Bearer ${Encrypt(UserData.business.tenantId)}`,
              access: `${Encrypt(UserData.user._id)}`,
+             sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
            },
           body: JSON.stringify({ ids: Encrypt(selectedIds) }),
         });

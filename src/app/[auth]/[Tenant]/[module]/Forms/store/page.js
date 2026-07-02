@@ -33,8 +33,8 @@ export default function StoreForm({business, user}) {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${encryptedTenantId}`,
-            dbConnect:`Bearer ${business.rustyRoof}`,
-            access:`${Encrypt(user._id)}`
+            access:`${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           body: JSON.stringify(formData),
         });

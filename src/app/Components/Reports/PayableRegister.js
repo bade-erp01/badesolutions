@@ -24,6 +24,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             dbConnect: `Bearer ${userData.business.rustyRoof}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
           },
         });
   

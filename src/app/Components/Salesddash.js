@@ -6,7 +6,7 @@ import moment from 'moment';
 import Swal from 'sweetalert2';
 import { CursorArrowRaysIcon } from "@heroicons/react/24/outline";
 import withReactContent from 'sweetalert2-react-content';
-import { plsWait, ErrorMessage } from '../../../Functions/Mics';
+import { plsWait, ErrorMessage, Encrypt } from '../../../Functions/Mics';
 import { motion } from 'framer-motion';
 import {
   Chart as ChartJS,
@@ -58,6 +58,7 @@ const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${business.tenantId}`,
           dbConnect: `Bearer ${business.rustyRoof}`,
+          sessionKey: `Bearer ${Encrypt()}`
         },
       });
 

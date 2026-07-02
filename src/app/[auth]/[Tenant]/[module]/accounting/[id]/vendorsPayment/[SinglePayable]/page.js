@@ -35,9 +35,9 @@ const Delete = async () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
         access: `${Encrypt(userInfo.user._id)}`,
         Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
     });
 
@@ -76,9 +76,9 @@ const Delete = async () => {
           method: "PATCH",
           headers: { 
               "Content-Type": "application/json",
-               dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
                access:`${Encrypt(userInfo.user._id)}`,
                Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+               sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           body: JSON.stringify({action,user:`${userInfo.user.firstName} ${userInfo.user.lastName}` }),
         }

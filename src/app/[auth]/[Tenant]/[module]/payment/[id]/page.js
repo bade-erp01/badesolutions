@@ -38,6 +38,7 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
             "idempotency-key": `payment-${action}-${id}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           body: JSON.stringify({ date: moment().format("L") }),
         }

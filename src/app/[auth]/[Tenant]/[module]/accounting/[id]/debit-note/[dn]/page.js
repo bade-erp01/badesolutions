@@ -2,6 +2,9 @@
 import React from 'react'
 import {useRouter, useParams} from "next/navigation"
 import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../../../Functions/Mics';
+import {Dencrypt} from "../../../../../../../../../Functions/Functions"
+
+
 
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
@@ -20,9 +23,10 @@ export default function Page({ data,userData,baseurl }) {
           }),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userData.business.tenantId}`,
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             access: `Bearer ${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+            "idempotency-key" : `DN-${action}-${Dencrypt(Params.cn)}`,
           },
         }
       );

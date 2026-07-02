@@ -74,7 +74,8 @@ export default async function layout({params}) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+            access:`${Encrypt(userData.user_id)}`
           },
         }),
 
@@ -82,8 +83,9 @@ export default async function layout({params}) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userData.business.tenantId}`,
-          dbConnect: `Bearer ${userData.business.rustyRoof}`,
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+          access: `${Encrypt(userData.user_id)}`
         },
         next: {
           revalidate: 120,

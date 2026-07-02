@@ -48,8 +48,8 @@ export default function TransferPage({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            dbConnect: `Bearer ${Business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
         }
       );
@@ -81,8 +81,8 @@ export default function TransferPage({
          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            dbConnect: `Bearer ${Business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
       });
 
@@ -126,8 +126,8 @@ export default function TransferPage({
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            dbConnect: `Bearer ${Business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
       });
 
@@ -161,8 +161,8 @@ export default function TransferPage({
          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            dbConnect: `Bearer ${Business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
       });
 
@@ -210,8 +210,8 @@ export default function TransferPage({
          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            dbConnect: `Bearer ${Business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
       });
 

@@ -23,6 +23,7 @@ export default async function layout({ children, params }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
           access: `${Encrypt(userInfo.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
         },
         next: {
           revalidate: 120, // 2 minutes
@@ -34,6 +35,7 @@ export default async function layout({ children, params }) {
 
   const data = Dencrypt(response.employee);
   const custList = Dencrypt(response.cust);
+  const StoreList = Dencrypt(response.stores);
 
   // get all business data
   const RawBusiness = await Businesses.find({
@@ -43,22 +45,6 @@ export default async function layout({ children, params }) {
   
   const StringedBusiness = JSON.stringify(RawBusiness);
   const businessData = JSON.parse(StringedBusiness);
-
-  // fetch store 
-  const res = await fetch(`${baseUrl}/api/Stores`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${userInfo.business.tenantId}`,
-      dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
-    },
-    next: {
-      revalidate: 120, // 2 minutes
-    },
-  });
-
-
-  const StoreList = await res.json();
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -88,6 +74,7 @@ export default async function layout({ children, params }) {
               <SingleEmployeeView
                 userInfo={userInfo.user}
                 businessInfo={userInfo.business}
+                SessionId={userInfo.SessionId}
                 Backdata={data}
                 module={Params?.module}
                 businessData={businessData}

@@ -53,6 +53,7 @@ export default async function crmLayout({ params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         access: `${Encrypt(userData.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
       next: { revalidate: 120 }, // cache for 2 minutes
     });

@@ -99,6 +99,7 @@ export default function EquityForm({
               user.tenantId
             )}`,
             access: Encrypt(user._id),
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           body: JSON.stringify({
             accountType,

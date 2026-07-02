@@ -47,6 +47,7 @@ export default function DialogDemo({ PayId, pendingInvoices, userData }) {
            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
            access: `${Encrypt(userData.user._id)}`,
           "idempotency-key": `assign-payment-${PayId._id}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
         body: JSON.stringify(formData),
       })

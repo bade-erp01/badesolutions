@@ -57,6 +57,7 @@ const formatNumberShort = (num) => {
 export default function SingleEmployeeView({
   userInfo,
   businessInfo,
+  SessionId,
   Backdata,
   module,
   businessData,
@@ -102,6 +103,7 @@ export default function SingleEmployeeView({
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
             access: `${Encrypt(userInfo._id)}`,
+            sessionKey: `Bearer ${Encrypt(SessionId)}`
           },
         },
       );
@@ -509,6 +511,7 @@ export default function SingleEmployeeView({
             customerName={Backdata.firstName}
             business={businessInfo}
             custList={custList || []}
+            SessionId={SessionId}
           />
           <br />
           {/* dashboard for sales person */}
@@ -1424,6 +1427,7 @@ export default function SingleEmployeeView({
                 url={EXPRESS_PRIVATE_URL}
                 user={Encrypt(String(userInfo._id))}
                 biz={Encrypt(String(businessInfo.tenantId))}
+                SessionId={userInfo.SessionId}
               />
               </>
             )}
@@ -1450,7 +1454,7 @@ export default function SingleEmployeeView({
   );
 }
 
-function SalePersonChart({ customerId, customerName, business, custList }) {
+function SalePersonChart({ customerId, customerName, business, custList,SessionId }) {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -1468,7 +1472,7 @@ function SalePersonChart({ customerId, customerName, business, custList }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${business.token}`,
-            dbConnect: `Bearer ${business.rustyRoof}`,
+            sessionKey: `Bearer ${Encrypt(SessionId)}`,
             // access: `${Encrypt(userInfo._id)}`,
           },
         });
@@ -1659,6 +1663,7 @@ export function SendInviteButton({ id, url, user, biz }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${biz}`,
           access: `${user}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });
 
@@ -1753,7 +1758,7 @@ export function SendInviteButton({ id, url, user, biz }) {
 }
 
 
-export function AssignLicenceButton({ id, url, userToken, bizToken }) {
+export function AssignLicenceButton({ id, url, userToken, bizToken,SessionId }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -1769,6 +1774,7 @@ export function AssignLicenceButton({ id, url, userToken, bizToken }) {
           Authorization: `Bearer ${bizToken}`,
           access: userToken,
           "idempotencey-key": `Assign-Licence-${id}`,
+          sessionKey: `Bearer ${Encrypt(SessionId)}`
         },
       });
 
@@ -1867,6 +1873,7 @@ export  function LiveLocationMap({userData}) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
           access: `${Encrypt(userData._id)}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
       }
     );

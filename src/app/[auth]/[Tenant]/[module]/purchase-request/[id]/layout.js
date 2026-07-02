@@ -62,8 +62,10 @@ export default async function storelayout({ params }) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${userData.business.tenantId}`,
-      dbConnect: `Bearer ${userData.business.rustyRoof}`,
+      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+      access: `${Encrypt(userData.user._id)}`,
     },
+    next: { revalidate: 60 }, // cache for 1 minutes
   });
 
   if (!res.ok) {

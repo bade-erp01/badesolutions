@@ -78,16 +78,16 @@ export default async function AccountingPage({ children, params }) {
   const cashRegister = userData.user.Apps.find(app=>{
     return app.Name === "Cash Register"
   })
-
+  
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
     const res = await fetch(`${baseUrl}/api/cashRegister`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userData.business.tenantId}`,
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         access: `${Encrypt(userData.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
     });
   

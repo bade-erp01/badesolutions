@@ -293,8 +293,7 @@ export default function InvoicePage({
   const config = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userInfo.business.tenantId}`,
-        dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
         access: `${Encrypt(userInfo.user._id)}`,
         sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
       },
@@ -697,8 +696,9 @@ export default function InvoicePage({
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           body: JSON.stringify({ id: Encrypt(orderId) }),
         }

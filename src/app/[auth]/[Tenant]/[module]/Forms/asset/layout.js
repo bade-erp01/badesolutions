@@ -63,8 +63,9 @@ export default async function ExpenseLayout({ children, params }) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userData.business.tenantId}`,
-          dbConnect: `Bearer ${userData.business.rustyRoof}`,
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+          access: `${Encrypt(userData.user._id)}`,
         },
         next: {
           revalidate: 120,

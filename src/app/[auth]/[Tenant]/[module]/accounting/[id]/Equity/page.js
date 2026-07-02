@@ -99,6 +99,7 @@ export default function Page({
             )}`,
             access: `${Encrypt(userData.user._id)}`,
             "idempotency-key": `Equity-${selectedAction.action}-${selectedAction.id}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
           },
           body: JSON.stringify({
             status: selectedAction.action,

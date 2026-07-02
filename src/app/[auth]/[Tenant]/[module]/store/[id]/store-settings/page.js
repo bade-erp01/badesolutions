@@ -5,7 +5,7 @@ import { useSearchParams,useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { plsWait, ErrorMessage, SuccessToast, } from "../../../../../../../../Functions/Mics";
 
-export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE_URL,userId}) {
+export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE_URL,userId, SessionId}) {
   // const searchParams = useSearchParams();
   const Router = useRouter();
   // const storeParam = searchParams.get("store");
@@ -44,8 +44,8 @@ export default function Page({ staffs, store ,currentStoreKeeper,EXPRESS_PRIVATE
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(store.tenantId)}`,
-        dbConnect: `Bearer ${store.rustyRoof}`,
         access: userId,
+        sessionKey: `Bearer ${Encrypt(SessionId)}`
       },
       body: JSON.stringify(formData),
     })

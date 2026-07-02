@@ -133,6 +133,7 @@ export default function MainDash({ userData }) {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
             access: `${Encrypt(userData?.user._id)}`,
+            "sessionKey": `Bearer ${Encrypt(userData.SessionId)}`
             // cache: "force-cache" // or "default", "reload", "no-store"
           },
         });

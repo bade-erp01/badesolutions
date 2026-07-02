@@ -76,10 +76,10 @@ export default function ReplenishFeature({
 
           headers: {
             "Content-Type": "application/json",
-
+            Authorization: `Bearer ${Encrypt(user.tenantId)}`,
             dbConnect: `Bearer ${business.rustyRoof}`,
-
             access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
 
           body: JSON.stringify({

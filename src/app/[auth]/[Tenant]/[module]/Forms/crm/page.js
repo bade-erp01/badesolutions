@@ -62,6 +62,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
           access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       };
 

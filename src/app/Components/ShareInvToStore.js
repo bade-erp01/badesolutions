@@ -28,6 +28,7 @@ const ShareInvToStore = ({
                 Authorization: `Bearer ${Encrypt(businessToken)}`,
                 access: `${Encrypt(userId)}`,
                 "idempotency-key": `Mail-${billId}`,
+                sessionKey: `Bearer ${Encrypt()}`
             },
         });
         const response = await request.json();

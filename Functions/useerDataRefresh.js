@@ -13,12 +13,13 @@ const fetchUser = async () => {
     const userToken = cookieStore.get("userInfo")?.value;
     const businessToken = cookieStore.get("businessInfo")?.value;
     const StoredSession = cookieStore.get("SessionId")?.value;
+    const RustyRoof = cookieStore.get("rustyRoof")?.value;
 
-    if (!userToken || !businessToken) {
+    if (!userToken || !businessToken || Dencrypt(RustyRoof) === null ) {
       //redirect to login page
       return { error: "Session expired, please log in again." };
     }
-
+ 
     // Decode JWT Tokens
     let decodedUser, decodedBusiness, decodedSessionId;
     try {
@@ -28,8 +29,8 @@ const fetchUser = async () => {
     } catch (error) {
       return { error: "Invalid session tokens, please log in again." };
     }
-
-    await dbConnect("BadeAdmin"); // Ensure database connection
+    
+    await dbConnect(Dencrypt(RustyRoof));
     // Fetch user & business details
     const rawUserInfo = await User.findById(decodedUser)
     .select("-password -__v -createdAt -updatedAt -opsCode")

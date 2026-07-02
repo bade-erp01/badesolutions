@@ -25,8 +25,7 @@ export default function SingleVendorpage({
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    // "X-Requested-With": "XMLHttpRequest",
-    dbConnect: `Bearer ${userInfo.business.rustyRoof}`,
+    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
     access: `${Encrypt(userInfo.user._id)}`,
   });
 

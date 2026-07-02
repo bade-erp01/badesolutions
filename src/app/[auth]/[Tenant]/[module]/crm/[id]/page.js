@@ -246,6 +246,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           body: JSON.stringify({
             id: Encrypt(cust._id),
@@ -491,6 +492,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
       access: `${Encrypt(userInfo.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
     },
   };
 

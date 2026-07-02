@@ -118,6 +118,7 @@ const VendorCreditNoteModal = ({
                         Authorization: `Bearer ${userData.business.tenantId}`,
                         dbConnect: `Bearer ${userData.business.rustyRoof}`,
                         access: `Bearer ${Encrypt(userData.user._id)}`,
+                        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
                     },
                 });
 

@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { NewspaperIcon } from "@heroicons/react/24/outline";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL, Dencrypt } from "../../../Functions/Functions";
+import { EXPRESS_PRIVATE_URL, Dencrypt,Encrypt } from "../../../Functions/Functions";
 
 export default function DeliveryModal({ id, user, business }) {
   const [open, setOpen] = useState(false);
@@ -55,6 +55,8 @@ export default function DeliveryModal({ id, user, business }) {
           "Content-Type": "application/json",
           dbConnect: `Bearer ${business.rustyRoof}`,
           Authorization: `Bearer ${business.tenantId}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
         body: JSON.stringify(deliveryData),
       });

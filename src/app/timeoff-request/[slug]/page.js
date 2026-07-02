@@ -64,6 +64,7 @@ export default function Page({user,baseUrl}) {
           Authorization: `Bearer ${Encrypt(user.tenantId)}`,
           access: `${Encrypt(user._id)}`,
           "idempotency-key": `Timeout-${form.RefNo}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
         body: JSON.stringify(form),
       });

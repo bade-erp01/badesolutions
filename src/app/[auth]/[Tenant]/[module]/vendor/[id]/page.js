@@ -24,9 +24,8 @@ export default function SingleVendorpage({AccountingFinder,userInfo,Backdata,wh,
   const [headers] = useState({
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    // "X-Requested-With": "XMLHttpRequest",
-     dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
-     access:`${Encrypt(userInfo.user._id)}`
+     access:`${Encrypt(userInfo.user._id)}`,
+     sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
   });
 
 
@@ -646,8 +645,8 @@ function ProductChart({ productId, productName, umo, business }) {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${Encrypt(business.tenantId)}`,
-            dbConnect:`Bearer ${userInfo.business.rustyRoof}`,
-            access:`${Encrypt(userInfo.user._id)}`
+            access:`${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
         });
 

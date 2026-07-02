@@ -1,12 +1,13 @@
 "use client"
 import React from 'react'
 import {useRouter, useParams} from "next/navigation"
-import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../../../Functions/Mics';
+import { plsWait,ErrorMessage,SuccessToast,Encrypt } from '../../../../../../../../../Functions/Mics';
+import {Dencrypt} from "../../../../../../../../../Functions/Functions"
 
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
   const Params = useParams()
-
+  
   const handleApprove = async (action) => {
     if (!confirm(`Are you sure you want to ${action} this credit note?`)) return;
     plsWait('')
@@ -20,9 +21,10 @@ export default function Page({ data,userData,baseurl }) {
           }),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userData.business.tenantId}`,
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
-            access: `Bearer ${Encrypt(userData.user._id)}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+            "idempotency-key" : `CN-${action}-${Dencrypt(Params.cn)}`,
           },
         }
       );
