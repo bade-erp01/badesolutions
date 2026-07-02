@@ -28,15 +28,22 @@ const sanitizeObject = (obj) => {
   return obj;
 };
 
-export default function NewCustomerForm({ userData, businessData, salesperson,sessionId }) {
+export default function NewCustomerForm({ 
+  userData, 
+  businessData, 
+  salesperson,
+  priceList 
+}) {
   const sanitizedUserData = sanitizeObject(userData);
   const sanitizedSalespersons = salesperson.map(sanitizeObject);
+  const sanitizedPriceLists = priceList.map(sanitizeObject);
   
   const router = useRouter();
   const params = useParams();
 
   const [user] = useState(sanitizedUserData.user);
   const [salespersons] = useState(sanitizedSalespersons);
+  const [priceListOptions] = useState(sanitizedPriceLists);
   
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -103,7 +110,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson,se
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(sessionId)}` 
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       };
 
@@ -116,7 +123,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson,se
       SuccessToast(response.data?.message || "Customer created successfully!");
       setFormData({});
       
-      router.push(`/${params.auth}/${params.Tenant}/${`crm`}/${`crm`}/${response.data.newCustomer }?Modules=${`crm`}`);
+      router.push(`/${params.auth}/${params.Tenant}/crm/crm/${response.data.newCustomer }?Modules=crm`);
      
     } catch (error) {
       ErrorMessage(
@@ -141,7 +148,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson,se
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-8 w-full">
+          <CardContent className="p-8">
             <form onSubmit={handleSubmit} autoComplete="off" className="space-y-8">
               {/* Server Messages */}
               {serverMsg && (
@@ -269,6 +276,29 @@ export default function NewCustomerForm({ userData, businessData, salesperson,se
                   {errors.salesPerson && (
                     <p className="text-red-500 text-xs mt-1">{errors.salesPerson}</p>
                   )}
+                </div>
+
+                {/* Price List - NEW */}
+                <div className="space-y-2">
+                  <Label htmlFor="priceList" className="text-sm font-semibold">
+                    Price List
+                  </Label>
+                  <Select
+                    value={formData.priceList || ""}
+                    onValueChange={(value) => handleSelectChange("priceList", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Price List" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Default / No Price List</SelectItem>
+                      {priceListOptions.map((list) => (
+                        <SelectItem key={list._id} value={list.Name}>
+                          {list.Name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Account Manager */}
