@@ -342,6 +342,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
           cache: "no-store", // Optional: disables caching for fresh data
         },
