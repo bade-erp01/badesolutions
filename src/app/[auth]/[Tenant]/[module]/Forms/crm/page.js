@@ -32,18 +32,18 @@ export default function NewCustomerForm({
   userData, 
   businessData, 
   salesperson,
-  // priceList 
+  priceLists = []   // ← Add this when calling the component
 }) {
   const sanitizedUserData = sanitizeObject(userData);
   const sanitizedSalespersons = salesperson.map(sanitizeObject);
-  // const sanitizedPriceLists = priceList.map(sanitizeObject);
+  const sanitizedPriceLists = priceLists.map(sanitizeObject);
   
   const router = useRouter();
   const params = useParams();
 
   const [user] = useState(sanitizedUserData.user);
   const [salespersons] = useState(sanitizedSalespersons);
-  // const [priceListOptions] = useState(sanitizedPriceLists);
+  const [priceListOptions] = useState(sanitizedPriceLists);
   
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -85,14 +85,6 @@ export default function NewCustomerForm({
       newErrors.salesPerson = "Sales Person is required.";
     }
 
-    // Optional validation for lat/long
-    if (formData.latitude && isNaN(parseFloat(formData.latitude))) {
-      newErrors.latitude = "Latitude must be a valid number.";
-    }
-    if (formData.longitude && isNaN(parseFloat(formData.longitude))) {
-      newErrors.longitude = "Longitude must be a valid number.";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -123,15 +115,13 @@ export default function NewCustomerForm({
       SuccessToast(response.data?.message || "Customer created successfully!");
       setFormData({});
       
-      router.push(`/${params.auth}/${params.Tenant}/crm/crm/${response.data.newCustomer }?Modules=crm`);
+      // Fixed router.push
+      router.push(`/${params.auth}/${params.Tenant}/crm/crm/${response.data.newCustomer}?Modules=crm`);
      
     } catch (error) {
-      ErrorMessage(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to create customer. Please try again."
-      );
-      setServerError(error.response?.data?.message || error.message);
+      const errorMsg = error.response?.data?.message || error.message || "Failed to create customer.";
+      ErrorMessage(errorMsg);
+      setServerError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -139,7 +129,7 @@ export default function NewCustomerForm({
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto w-full max-w-7xl">   {/* ← Wider form */}
         <Card className="shadow-xl border border-gray-200">
           <CardHeader className="bg-gray-900 text-white rounded-t-lg">
             <CardTitle className="text-3xl font-bold">New Customer</CardTitle>
@@ -185,9 +175,7 @@ export default function NewCustomerForm({
                     placeholder="Customer Name"
                     className={errors.Username ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
-                  {errors.Username && (
-                    <p className="text-red-500 text-xs mt-1">{errors.Username}</p>
-                  )}
+                  {errors.Username && <p className="text-red-500 text-xs mt-1">{errors.Username}</p>}
                 </div>
 
                 {/* Telephone */}
@@ -205,9 +193,7 @@ export default function NewCustomerForm({
                     placeholder="+234 080********"
                     className={errors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
-                  {errors.phone && (
-                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-                  )}
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                 </div>
 
                 {/* Email */}
@@ -225,9 +211,7 @@ export default function NewCustomerForm({
                     placeholder="customer@email.com"
                     className={errors.Email ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
-                  {errors.Email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.Email}</p>
-                  )}
+                  {errors.Email && <p className="text-red-500 text-xs mt-1">{errors.Email}</p>}
                 </div>
 
                 {/* Start Balance */}
@@ -248,9 +232,7 @@ export default function NewCustomerForm({
                     placeholder="0.00"
                     className={errors.Debt ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
-                  {errors.Debt && (
-                    <p className="text-red-500 text-xs mt-1">{errors.Debt}</p>
-                  )}
+                  {errors.Debt && <p className="text-red-500 text-xs mt-1">{errors.Debt}</p>}
                 </div>
 
                 {/* Sales Person */}
@@ -273,12 +255,10 @@ export default function NewCustomerForm({
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.salesPerson && (
-                    <p className="text-red-500 text-xs mt-1">{errors.salesPerson}</p>
-                  )}
+                  {errors.salesPerson && <p className="text-red-500 text-xs mt-1">{errors.salesPerson}</p>}
                 </div>
 
-                {/* Price List - NEW */}
+                {/* Price List */}
                 <div className="space-y-2">
                   <Label htmlFor="priceList" className="text-sm font-semibold">
                     Price List
@@ -291,12 +271,12 @@ export default function NewCustomerForm({
                       <SelectValue placeholder="Select Price List" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="select one">Default / No Price List</SelectItem>
-                      {/* {priceListOptions.map((list) => (
-                        <SelectItem key={list._id} value={list.Name}>
-                          {list.Name}
+                      <SelectItem value="">Default / No Price List</SelectItem>
+                      {priceListOptions.map((list) => (
+                        <SelectItem key={list._id || list.id} value={list._id || list.id}>
+                          {list.Name || list.name || list.title || list.listName}
                         </SelectItem>
-                      ))} */}
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -304,7 +284,7 @@ export default function NewCustomerForm({
                 {/* Account Manager */}
                 <div className="space-y-2">
                   <Label htmlFor="Manager" className="text-sm font-semibold">
-                    Account Manager 
+                    Account Manager
                   </Label>
                   <Select
                     value={formData.Manager || ""}
@@ -323,11 +303,9 @@ export default function NewCustomerForm({
                   </Select>
                 </div>
 
-                {/* Latitude */}
+                {/* Latitude & Longitude */}
                 <div className="space-y-2">
-                  <Label htmlFor="latitude" className="text-sm font-semibold">
-                    Latitude
-                  </Label>
+                  <Label htmlFor="latitude" className="text-sm font-semibold">Latitude</Label>
                   <Input
                     id="latitude"
                     name="latitude"
@@ -336,18 +314,11 @@ export default function NewCustomerForm({
                     value={formData.latitude || ""}
                     onChange={handleChange}
                     placeholder="6.524379"
-                    className={errors.latitude ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
-                  {errors.latitude && (
-                    <p className="text-red-500 text-xs mt-1">{errors.latitude}</p>
-                  )}
                 </div>
 
-                {/* Longitude */}
                 <div className="space-y-2">
-                  <Label htmlFor="longitude" className="text-sm font-semibold">
-                    Longitude
-                  </Label>
+                  <Label htmlFor="longitude" className="text-sm font-semibold">Longitude</Label>
                   <Input
                     id="longitude"
                     name="longitude"
@@ -356,14 +327,10 @@ export default function NewCustomerForm({
                     value={formData.longitude || ""}
                     onChange={handleChange}
                     placeholder="3.379206"
-                    className={errors.longitude ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
-                  {errors.longitude && (
-                    <p className="text-red-500 text-xs mt-1">{errors.longitude}</p>
-                  )}
                 </div>
 
-                {/* Address - Full Width */}
+                {/* Address */}
                 <div className="md:col-span-2 space-y-2">
                   <Label htmlFor="billingAddress" className="text-sm font-semibold">
                     Address
@@ -387,18 +354,13 @@ export default function NewCustomerForm({
                     type="submit"
                     disabled={loading}
                     size="lg"
-                    className="min-w-[200px]"
+                    className="min-w-[220px]"
                   >
                     {loading ? (
                       <>
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                         </svg>
                         Creating Customer...
                       </>
