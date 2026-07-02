@@ -103,7 +103,7 @@ export default function NewCustomerForm({ userData, businessData, salesperson,se
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(sessionId)}`
+          sessionKey: `Bearer ${Encrypt(sessionId)}` 
         },
       };
 
