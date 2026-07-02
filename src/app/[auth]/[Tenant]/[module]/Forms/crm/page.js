@@ -304,7 +304,7 @@ export default function NewCustomerForm({
                 {/* Account Manager */}
                 <div className="space-y-2">
                   <Label htmlFor="Manager" className="text-sm font-semibold">
-                    Account Manager
+                    Account Manager 
                   </Label>
                   <Select
                     value={formData.Manager || ""}
