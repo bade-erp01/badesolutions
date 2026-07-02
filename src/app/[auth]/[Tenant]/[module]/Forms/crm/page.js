@@ -32,18 +32,18 @@ export default function NewCustomerForm({
   userData, 
   businessData, 
   salesperson,
-  priceList 
+  // priceList 
 }) {
   const sanitizedUserData = sanitizeObject(userData);
   const sanitizedSalespersons = salesperson.map(sanitizeObject);
-  const sanitizedPriceLists = priceList.map(sanitizeObject);
+  // const sanitizedPriceLists = priceList.map(sanitizeObject);
   
   const router = useRouter();
   const params = useParams();
 
   const [user] = useState(sanitizedUserData.user);
   const [salespersons] = useState(sanitizedSalespersons);
-  const [priceListOptions] = useState(sanitizedPriceLists);
+  // const [priceListOptions] = useState(sanitizedPriceLists);
   
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -291,12 +291,12 @@ export default function NewCustomerForm({
                       <SelectValue placeholder="Select Price List" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Default / No Price List</SelectItem>
-                      {priceListOptions.map((list) => (
+                      <SelectItem value="select one">Default / No Price List</SelectItem>
+                      {/* {priceListOptions.map((list) => (
                         <SelectItem key={list._id} value={list.Name}>
                           {list.Name}
                         </SelectItem>
-                      ))}
+                      ))} */}
                     </SelectContent>
                   </Select>
                 </div>

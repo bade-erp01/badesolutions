@@ -60,7 +60,9 @@ export default async function crmLayout({ params }) {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
           <section className="w-full max-w-screen-xl flex flex-col gap-6 rounded-lg p-1">
-            <NewCustomerForm userData={userData} businessData={userData.business} salesperson={paresedSalesperson} sessionId={userData.SessionId} priceList={userData.businessData.priceList}/>
+            <NewCustomerForm userData={userData} businessData={userData.business} salesperson={paresedSalesperson} sessionId={userData.SessionId} 
+            // priceList={userData.businessData.priceList}
+            />
           </section>
         </main>
       </div>
