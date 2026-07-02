@@ -284,7 +284,7 @@ export default function Page({ baseUrl, userData, data }) {
                         <AccordionItem value="cogs">
                           <AccordionTrigger className="justify-end">
                             {currency}
-                            {selectedMonth?.totals?.COGS || 0}
+                            {selectedMonth?.totals?.COGS.toFixed(2) || 0}
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="space-y-2 text-left">
