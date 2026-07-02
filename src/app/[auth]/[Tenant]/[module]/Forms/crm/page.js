@@ -3,8 +3,23 @@ import axios from "axios";
 import { useState } from "react";
 import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { plsWait, ErrorMessage, SuccessToast, Encrypt } from "../../../../../../../Functions/Mics";
-import { Dencrypt,EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
-import { useRouter,useParams } from 'next/navigation';
+import { Dencrypt, EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
+import { useRouter, useParams } from 'next/navigation';
+
+// Shadcn UI Components
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const sanitizeObject = (obj) => {
   if (obj && typeof obj === "object" && obj.toJSON) {
@@ -16,10 +31,13 @@ const sanitizeObject = (obj) => {
 export default function NewCustomerForm({ userData, businessData, salesperson }) {
   const sanitizedUserData = sanitizeObject(userData);
   const sanitizedSalespersons = salesperson.map(sanitizeObject);
-  const router =  useRouter();
-  const params = useParams()
+  
+  const router = useRouter();
+  const params = useParams();
+
   const [user] = useState(sanitizedUserData.user);
   const [salespersons] = useState(sanitizedSalespersons);
+  
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -27,14 +45,23 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
   const [serverError, setServerError] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: undefined });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: undefined });
+    setServerMsg(null);
+    setServerError(null);
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: undefined });
     setServerMsg(null);
     setServerError(null);
   };
 
   const validateForm = () => {
     const newErrors = {};
+    
     if (!formData.Username || formData.Username.length < 2) {
       newErrors.Username = "Name is required and must be at least 2 characters.";
     }
@@ -44,9 +71,21 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
     if (!formData.Email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.Email)) {
       newErrors.Email = "Email is required and must be valid.";
     }
-    if (formData.Debt && isNaN(formData.Debt)) {
+    if (formData.Debt && isNaN(parseFloat(formData.Debt))) {
       newErrors.Debt = "Opening Balance must be a number.";
     }
+    if (!formData.salesPerson) {
+      newErrors.salesPerson = "Sales Person is required.";
+    }
+
+    // Optional validation for lat/long
+    if (formData.latitude && isNaN(parseFloat(formData.latitude))) {
+      newErrors.latitude = "Latitude must be a valid number.";
+    }
+    if (formData.longitude && isNaN(parseFloat(formData.longitude))) {
+      newErrors.longitude = "Longitude must be a valid number.";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -55,8 +94,10 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
     e.preventDefault();
     if (!validateForm()) return;
 
+    setLoading(true);
     try {
-      plsWait('Submiting customer data...');
+      plsWait('Submitting customer data...');
+      
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -74,208 +115,273 @@ export default function NewCustomerForm({ userData, businessData, salesperson })
 
       SuccessToast(response.data?.message || "Customer created successfully!");
       setFormData({});
-      router.push(`/${params.auth}/${params.Tenant}/${`crm`}/${`crm`}/${response.data.newCustomer }?Modules=${`crm`}`)
       
+      router.push(`/${params.auth}/${params.Tenant}/${`crm`}/${`crm`}/${response.data.newCustomer }?Modules=${`crm`}`);
+     
     } catch (error) {
       ErrorMessage(
         error.response?.data?.message ||
           error.message ||
           "Failed to create customer. Please try again."
       );
+      setServerError(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-  <div className="w-full min-h-screen">
-    <div className=" mx-auto">
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-        <div className="bg-gray-700 px-8 py-6 border-b border-gray-700 ">
-          <h2 className="text-2xl font-bold text-white">New Customer</h2>
-          <p className="text-white mt-1 text-sm">Please provide accurate customer information to ensure smooth onboarding.</p>
-        </div>
+    <div className="w-full min-h-screen bg-gray-50 p-4">
+      <div className="mx-auto max-w-4xl">
+        <Card className="shadow-xl border border-gray-200">
+          <CardHeader className="bg-gray-900 text-white rounded-t-lg">
+            <CardTitle className="text-3xl font-bold">New Customer</CardTitle>
+            <CardDescription className="text-gray-300 text-base">
+              Please provide accurate customer information to ensure smooth onboarding.
+            </CardDescription>
+          </CardHeader>
 
-        <form className="p-8 space-y-6 text-black" onSubmit={handleSubmit} autoComplete="off">
-          {serverMsg && (
-            <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-green-800">
-              <CheckCircleIcon className="h-5 w-5 text-green-600 flex-shrink-0" />
-              <span className="text-sm font-medium">{serverMsg}</span>
-            </div>
-          )}
-          {serverError && (
-            <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-800">
-              <ExclamationCircleIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <span className="text-sm font-medium">{serverError}</span>
-            </div>
-          )}
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-8">
+              {/* Server Messages */}
+              {serverMsg && (
+                <Alert className="border-green-200 bg-green-50">
+                  <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                  <AlertDescription className="text-green-800 font-medium">
+                    {serverMsg}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              {serverError && (
+                <Alert variant="destructive">
+                  <ExclamationCircleIcon className="h-5 w-5" />
+                  <AlertDescription className="font-medium">
+                    {serverError}
+                  </AlertDescription>
+                </Alert>
+              )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name */}
-            <div>
-              <label htmlFor="Name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="Name"
-                name="Username"
-                type="text"
-                required
-                onChange={handleChange}
-                value={formData.Username || ""}
-                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.Username ? "border-red-400 bg-red-50" : "border-gray-300 bg-white"
-                }`}
-                placeholder="Customer Name"
-              />
-              {errors.Username && <p className="text-red-500 text-xs mt-1">{errors.Username}</p>}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="Name" className="text-sm font-semibold">
+                    Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="Name"
+                    name="Username"
+                    type="text"
+                    required
+                    value={formData.Username || ""}
+                    onChange={handleChange}
+                    placeholder="Customer Name"
+                    className={errors.Username ? "border-red-500 focus-visible:ring-red-500" : ""}
+                  />
+                  {errors.Username && (
+                    <p className="text-red-500 text-xs mt-1">{errors.Username}</p>
+                  )}
+                </div>
 
-            {/* Telephone */}
-            <div>
-              <label htmlFor="Telephone" className="block text-sm font-semibold text-gray-700 mb-2">
-                Telephone <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="Telephone"
-                name="phone"
-                type="tel"
-                required
-                onChange={handleChange}
-                value={formData.phone || ""}
-                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.phone ? "border-red-400 bg-red-50" : "border-gray-300 bg-white"
-                }`}
-                placeholder="+234 080*****"
-              />
-              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-            </div>
+                {/* Telephone */}
+                <div className="space-y-2">
+                  <Label htmlFor="Telephone" className="text-sm font-semibold">
+                    Telephone <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="Telephone"
+                    name="phone"
+                    type="tel"
+                    required
+                    value={formData.phone || ""}
+                    onChange={handleChange}
+                    placeholder="+234 080********"
+                    className={errors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}
+                  />
+                  {errors.phone && (
+                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                  )}
+                </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="Email" className="block text-sm font-semibold text-gray-700 mb-2">
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="Email"
-                name="Email"
-                type="email"
-                onChange={handleChange}
-                value={formData.Email || ""}
-                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.Email ? "border-red-400 bg-red-50" : "border-gray-300 bg-white"
-                }`}
-                placeholder="customer@email.com"
-              />
-              {errors.Email && <p className="text-red-500 text-xs mt-1">{errors.Email}</p>}
-            </div>
+                {/* Email */}
+                <div className="space-y-2">
+                  <Label htmlFor="Email" className="text-sm font-semibold">
+                    Email <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="Email"
+                    name="Email"
+                    type="email"
+                    required
+                    value={formData.Email || ""}
+                    onChange={handleChange}
+                    placeholder="customer@email.com"
+                    className={errors.Email ? "border-red-500 focus-visible:ring-red-500" : ""}
+                  />
+                  {errors.Email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.Email}</p>
+                  )}
+                </div>
 
-            {/* Start Balance */}
-            <div>
-              <label htmlFor="Debt" className="block text-sm font-semibold text-gray-700 mb-2">Start Balance <i><small className="text-red-600">[Nagative values signifies that your business owes the customer.]</small></i></label>
-              <input
-                id="Debt"
-                name="Debt"
-                type="number"
-                onChange={handleChange}
-                value={formData.Debt || 0}
-                required
-                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.Debt ? "border-red-400 bg-red-50" : "border-gray-300 bg-white"
-                }`}
-                placeholder="0"
-              />
-              {errors.Debt && <p className="text-red-500 text-xs mt-1">{errors.Debt}</p>}
-            </div>
+                {/* Start Balance */}
+                <div className="space-y-2">
+                  <Label htmlFor="Debt" className="text-sm font-semibold">
+                    Start Balance{" "}
+                    <span className="text-xs text-gray-500 italic">
+                      (Negative = business owes customer)
+                    </span>
+                  </Label>
+                  <Input
+                    id="Debt"
+                    name="Debt"
+                    type="number"
+                    step="0.01"
+                    value={formData.Debt || 0}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                    className={errors.Debt ? "border-red-500 focus-visible:ring-red-500" : ""}
+                  />
+                  {errors.Debt && (
+                    <p className="text-red-500 text-xs mt-1">{errors.Debt}</p>
+                  )}
+                </div>
 
-            {/* Sales Person */}
-            <div>
-              <label htmlFor="salesPerson" className="block text-sm font-semibold text-gray-700 mb-2">
-                Sales Person <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="salesPerson"
-                name="salesPerson"
-                required
-                onChange={handleChange}
-                value={formData.salesPerson || ""}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              >
-                <option value="">Choose...</option>
-                {salespersons.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.firstName} {person.lastName}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Sales Person */}
+                <div className="space-y-2">
+                  <Label htmlFor="salesPerson" className="text-sm font-semibold">
+                    Sales Person <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={formData.salesPerson || ""}
+                    onValueChange={(value) => handleSelectChange("salesPerson", value)}
+                  >
+                    <SelectTrigger className={errors.salesPerson ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Choose Sales Person" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {salespersons.map((person) => (
+                        <SelectItem key={person._id} value={person._id}>
+                          {person.firstName} {person.lastName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.salesPerson && (
+                    <p className="text-red-500 text-xs mt-1">{errors.salesPerson}</p>
+                  )}
+                </div>
 
-            {/* Account Manager */}
-            <div>
-              <label htmlFor="Manager" className="block text-sm font-semibold text-gray-700 mb-2">Account Manager</label>
-              <select
-                id="Manager"
-                name="Manager"
-                onChange={handleChange}
-                value={formData.Manager || ""}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              >
-                <option value="">Select...</option>
-                {salespersons.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.firstName} {person.lastName}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Account Manager */}
+                <div className="space-y-2">
+                  <Label htmlFor="Manager" className="text-sm font-semibold">
+                    Account Manager
+                  </Label>
+                  <Select
+                    value={formData.Manager || ""}
+                    onValueChange={(value) => handleSelectChange("Manager", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Account Manager" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {salespersons.map((person) => (
+                        <SelectItem key={person._id} value={person._id}>
+                          {person.firstName} {person.lastName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Address */}
-            <div className="md:col-span-2">
-              <label htmlFor="billingAddress" className="block text-sm font-semibold text-gray-700 mb-2">Address</label>
-              <textarea
-                id="billingAddress"
-                name="billingAddress"
-                rows="3"
-                onChange={handleChange}
-                value={formData.billingAddress || ""}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition resize-none"
-                placeholder="Customer delivery address"
-              ></textarea>
-            </div>
-          </div>
+                {/* Latitude */}
+                <div className="space-y-2">
+                  <Label htmlFor="latitude" className="text-sm font-semibold">
+                    Latitude
+                  </Label>
+                  <Input
+                    id="latitude"
+                    name="latitude"
+                    type="number"
+                    step="0.000001"
+                    value={formData.latitude || ""}
+                    onChange={handleChange}
+                    placeholder="6.524379"
+                    className={errors.latitude ? "border-red-500 focus-visible:ring-red-500" : ""}
+                  />
+                  {errors.latitude && (
+                    <p className="text-red-500 text-xs mt-1">{errors.latitude}</p>
+                  )}
+                </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end pt-6">
-            {user.createCustomer && (
-              <button
-                type="submit"
-                disabled={loading}
-                className={`inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg transition ${
-                  loading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg"
-                } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
-              >
-                {loading ? (
-                  <>
-                    <svg
-                      className="animate-spin h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                    </svg>
-                    Submitting...
-                  </>
-                ) : (
-                  "Create New Customer"
+                {/* Longitude */}
+                <div className="space-y-2">
+                  <Label htmlFor="longitude" className="text-sm font-semibold">
+                    Longitude
+                  </Label>
+                  <Input
+                    id="longitude"
+                    name="longitude"
+                    type="number"
+                    step="0.000001"
+                    value={formData.longitude || ""}
+                    onChange={handleChange}
+                    placeholder="3.379206"
+                    className={errors.longitude ? "border-red-500 focus-visible:ring-red-500" : ""}
+                  />
+                  {errors.longitude && (
+                    <p className="text-red-500 text-xs mt-1">{errors.longitude}</p>
+                  )}
+                </div>
+
+                {/* Address - Full Width */}
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="billingAddress" className="text-sm font-semibold">
+                    Address
+                  </Label>
+                  <Textarea
+                    id="billingAddress"
+                    name="billingAddress"
+                    rows={4}
+                    value={formData.billingAddress || ""}
+                    onChange={handleChange}
+                    placeholder="Customer delivery address..."
+                    className="resize-y min-h-[100px]"
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end pt-6">
+                {user.createCustomer && (
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    size="lg"
+                    className="min-w-[200px]"
+                  >
+                    {loading ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                        Creating Customer...
+                      </>
+                    ) : (
+                      "Create New Customer"
+                    )}
+                  </Button>
                 )}
-              </button>
-            )}
-          </div>
-        </form>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
-  </div>
   );
 }
