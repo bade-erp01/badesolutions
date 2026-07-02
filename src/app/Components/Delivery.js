@@ -53,7 +53,6 @@ export default function DeliveryModal({ id, user, business }) {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          dbConnect: `Bearer ${business.rustyRoof}`,
           Authorization: `Bearer ${business.tenantId}`,
           access: `${Encrypt(user._id)}`,
           sessionKey: `Bearer ${Encrypt(user.SessionId)}`
