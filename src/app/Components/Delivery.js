@@ -53,7 +53,7 @@ export default function DeliveryModal({ id, user, business }) {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${business.tenantId}`,
+          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
           sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
