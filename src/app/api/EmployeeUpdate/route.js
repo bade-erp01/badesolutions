@@ -26,9 +26,7 @@ export async function PATCH(request) {
       );
     }
     
-    await dbConnect("BadeAdmin");
     const result = await Users.findByIdAndUpdate(id, updateFields, { new: true });
-
 
     if (!result) {
       return new Response(

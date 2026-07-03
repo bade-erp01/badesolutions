@@ -510,6 +510,7 @@ export default function SingleEmployeeView({
             customerId={Backdata._id}
             customerName={Backdata.firstName}
             business={businessInfo}
+            userInfo={userInfo}
             custList={custList || []}
             SessionId={SessionId}
           />
@@ -1454,7 +1455,7 @@ export default function SingleEmployeeView({
   );
 }
 
-function SalePersonChart({ customerId, customerName, business, custList,SessionId,userInfo }) {
+function SalePersonChart({ customerId, customerName,userInfo, business, custList,SessionId }) {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartData, setChartData] = useState(null);
