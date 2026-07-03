@@ -262,9 +262,30 @@ export default function SingleEmployeeView({
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    await UpdateEmployeeData(data._id, "form", formData);
-    router.refresh();
+    try{
+      plsWait("Updating user data...");
+      e.preventDefault();
+      const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(data._id)}`,{
+        method:"PATCH",
+        body:JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+          access: `${Encrypt(userInfo._id)}`,
+        },
+      })
+
+    const response = await request.json();
+
+    if (response.message) {
+      SuccessToast(response.message);
+      router.refresh();
+    }
+
+    }catch(err){
+      ErrorMessage(err.message)
+    }
   };
 
   // upload docs
@@ -516,7 +537,7 @@ export default function SingleEmployeeView({
           />
           <br />
           {/* dashboard for sales person */}
-          <LiveLocationMap userData={data}/>
+          {/* <LiveLocationMap userData={data}/> */}
           <div className="border rounded-lg overflow-hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
