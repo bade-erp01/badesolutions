@@ -25,7 +25,7 @@ export default function SingleVendorpage({AccountingFinder,userInfo,Backdata,wh,
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
      access:`${Encrypt(userInfo.user._id)}`,
-     sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
+     sessionKey: `Bearer ${Encrypt(userInfo.user.SessionId)}`
   });
 
 

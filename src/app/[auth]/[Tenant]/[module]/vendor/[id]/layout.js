@@ -56,7 +56,7 @@ export default async function SingleVendorPagelayout({ params }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
       access:`${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+      sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`
     },
     // Optional: Add caching headers if needed
     next: { revalidate: 120 }, // Revalidate every 2 minutes
@@ -69,7 +69,7 @@ export default async function SingleVendorPagelayout({ params }) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
       access:`${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+      sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`
     },
     // Optional: Add caching headers if needed
     next: { revalidate: 120 }, // Revalidate every 2 minutes

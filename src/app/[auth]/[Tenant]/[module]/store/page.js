@@ -65,7 +65,7 @@ export default async function storelayout({ children, params }) {
       access: `${Encrypt(userData.user._id)}`,
     },
     next: {
-      revalidate: 120, // 2 minutes
+      // revalidate: 120, // 2 minutes
     },
   });
 
