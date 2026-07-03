@@ -510,7 +510,7 @@ export default function SingleEmployeeView({
             customerId={Backdata._id}
             customerName={Backdata.firstName}
             business={businessInfo}
-            userInfo={userInfo}
+            userInfo={user}
             custList={custList || []}
             SessionId={SessionId}
           />
@@ -1461,7 +1461,6 @@ function SalePersonChart({ customerId, customerName,userInfo, business, custList
   const [chartData, setChartData] = useState(null);
   const [tottalSales, setTotalSales] = useState();
   const [todaysSale, setTodaysSale] = useState(0);
-
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
@@ -1473,7 +1472,7 @@ function SalePersonChart({ customerId, customerName,userInfo, business, custList
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(business.token)}`,
-            sessionKey: `Bearer ${Encrypt(SessionId)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
             access: `${Encrypt(userInfo._id)}`,
           },
         });
