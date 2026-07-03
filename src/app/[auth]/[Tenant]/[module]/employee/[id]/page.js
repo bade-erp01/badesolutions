@@ -537,7 +537,7 @@ export default function SingleEmployeeView({
           />
           <br />
           {/* dashboard for sales person */}
-          {/* <LiveLocationMap userData={data}/> */}
+          <LiveLocationMap userData={data}/>
           <div className="border rounded-lg overflow-hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}

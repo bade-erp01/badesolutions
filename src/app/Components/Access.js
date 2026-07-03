@@ -29,8 +29,9 @@ export default function AccessControl({
         method: "PUT",
         body,
         headers: {
-          dbConnect: `Bearer ${businessInfo.rustyRoof}`,
+          Authorization: `Bearer ${businessInfo.tenantId}`,
           access: `${Encrypt(formData._id)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
         },
         timeout: 10000, // ✅ 10s timeout for better error handling
       });
@@ -47,14 +48,36 @@ export default function AccessControl({
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    UpdateEmployeeData(formData._id, e.target.name, e.target.checked,userInfo._id);
+    plsWait("Updating user access...")
+    const request = await fetch(
+      `${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(formData._id)}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+          access: `${Encrypt(userInfo._id)}`,
+        },
+      },
+    );
+
+    const response = await request.json();
+
+    if (response.message) {
+      SuccessToast(response.message);
+      router.refresh();
+    } else {
+      ErrorMessage(response.error || "Failed to update user access");
+    }
   };
 
   const handleChange2 = async (e) => {
