@@ -1454,7 +1454,7 @@ export default function SingleEmployeeView({
   );
 }
 
-function SalePersonChart({ customerId, customerName, business, custList,SessionId }) {
+function SalePersonChart({ customerId, customerName, business, custList,SessionId,userInfo }) {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -1471,9 +1471,9 @@ function SalePersonChart({ customerId, customerName, business, custList,SessionI
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${business.token}`,
+            Authorization: `Bearer ${Encrypt(business.token)}`,
             sessionKey: `Bearer ${Encrypt(SessionId)}`,
-            // access: `${Encrypt(userInfo._id)}`,
+            access: `${Encrypt(userInfo._id)}`,
           },
         });
 
