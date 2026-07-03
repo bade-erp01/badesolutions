@@ -32,18 +32,15 @@ export default function NewCustomerForm({
   userData, 
   businessData, 
   salesperson,
-  priceLists = []   // ← Add this when calling the component
 }) {
   const sanitizedUserData = sanitizeObject(userData);
   const sanitizedSalespersons = salesperson.map(sanitizeObject);
-  const sanitizedPriceLists = priceLists.map(sanitizeObject);
   
   const router = useRouter();
   const params = useParams();
 
   const [user] = useState(sanitizedUserData.user);
   const [salespersons] = useState(sanitizedSalespersons);
-  const [priceListOptions] = useState(sanitizedPriceLists);
   
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -258,29 +255,6 @@ export default function NewCustomerForm({
                   {errors.salesPerson && <p className="text-red-500 text-xs mt-1">{errors.salesPerson}</p>}
                 </div>
 
-                {/* Price List */}
-                <div className="space-y-2">
-                  <Label htmlFor="priceList" className="text-sm font-semibold">
-                    Price List
-                  </Label>
-                  <Select
-                    value={formData.priceList || ""}
-                    onValueChange={(value) => handleSelectChange("priceList", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Price List" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Default / No Price List</SelectItem>
-                      {priceListOptions.map((list) => (
-                        <SelectItem key={list._id || list.id} value={list._id || list.id}>
-                          {list.Name || list.name || list.title || list.listName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 {/* Account Manager */}
                 <div className="space-y-2">
                   <Label htmlFor="Manager" className="text-sm font-semibold">
@@ -301,33 +275,6 @@ export default function NewCustomerForm({
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-
-                {/* Latitude & Longitude */}
-                <div className="space-y-2">
-                  <Label htmlFor="latitude" className="text-sm font-semibold">Latitude</Label>
-                  <Input
-                    id="latitude"
-                    name="latitude"
-                    type="number"
-                    step="0.000001"
-                    value={formData.latitude || ""}
-                    onChange={handleChange}
-                    placeholder="6.524379"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="longitude" className="text-sm font-semibold">Longitude</Label>
-                  <Input
-                    id="longitude"
-                    name="longitude"
-                    type="number"
-                    step="0.000001"
-                    value={formData.longitude || ""}
-                    onChange={handleChange}
-                    placeholder="3.379206"
-                  />
                 </div>
 
                 {/* Address */}

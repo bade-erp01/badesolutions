@@ -1079,7 +1079,6 @@ function ProductChart({ productId, productName, umo, business, user }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            dbConnect: `Bearer ${business.rustyRoof}`,
             access: `${Encrypt(user._id)}`,
             sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
