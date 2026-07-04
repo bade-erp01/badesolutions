@@ -10,7 +10,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 
-const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng" 
+const EXPRESS_PRIVATE_URL = "https://1492-102-91-102-30.ngrok-free.app" 
 // const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
 // const EXPRESS_PRIVATE_URL = "https://bade-backend.vercel.app" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
@@ -140,12 +140,12 @@ function DecryptBAckend(payload) {
 
 
 //update employee data
-const UpdateEmployeeData = async (id, fieldName, value,userId) => {
+const UpdateEmployeeData = async (id, fieldName, value,userInfo, businessInfo, SessionId) => {
   try {
     plsWait(`Updating User...⌛`);
 
     const { data } = await axios.patch(
-      "/api/EmployeeUpdate",
+      `${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(id)}`,
       {
         [fieldName]: value,
         id,
@@ -153,13 +153,16 @@ const UpdateEmployeeData = async (id, fieldName, value,userId) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userId)}`,
+          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+          access: `${Encrypt(userInfo._id)}`,
         },
       }
     );
 
     SuccessToast(data.message);
   } catch (error) {
+    console.log(err.message)
     ErrorMessage(error.response?.data?.error || "Something went wrong");
   }
 };

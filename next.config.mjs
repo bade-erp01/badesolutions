@@ -44,6 +44,11 @@ const nextConfig = {
         hostname: "api.badesolutions.com.ng",
         pathname: "/**",
       },
+       {
+        protocol: "https",
+        hostname: "1492-102-91-102-30.ngrok-free.app",
+        pathname: "/**",
+      },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
