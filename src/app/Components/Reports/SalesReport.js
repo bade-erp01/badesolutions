@@ -22,8 +22,8 @@ export default function SalesRportModal({ user, business, baseUrl }) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${business.tenantId}`,
-          dbConnect: `Bearer ${business.rustyRoof}`,
+          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
           sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });

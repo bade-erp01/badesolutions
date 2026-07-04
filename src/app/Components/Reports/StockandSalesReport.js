@@ -31,8 +31,7 @@ export default function StockandSalesReport({
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userData.business.tenantId}`,
-          dbConnect: `Bearer ${userData.business.rustyRoof}`,
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
           access: `${Encrypt(userData.user._id)}`,
           sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
