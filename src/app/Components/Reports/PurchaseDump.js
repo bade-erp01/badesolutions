@@ -7,7 +7,7 @@ import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { plsWait, Encrypt, ErrorMessage } from "../../../../Functions/Mics";
 import moment from "moment";
 
-const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,vendorsData}) => {
+const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,vendorsData,userData}) => {
     const [ProductList] = useState(Products);//from server
     const [StoreList] = useState(storesData);
     const [Vendors] = useState(vendorsData);
@@ -175,7 +175,7 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
             confirmButton: "bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500",
             cancelButton: "bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600",
             },
-            // 👇 this line disables the spinner
+            // this line disables the spinner
             showLoaderOnConfirm: false,
             preConfirm: () => {
             return {
