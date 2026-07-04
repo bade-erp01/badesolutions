@@ -46,15 +46,15 @@ export default async function Layout({ children }) {
   const SessionId = userData?.SessionId;
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   // Redirect if either user OR business is missing
-  // if (
-  //   !userInfo ||
-  //   !businessInfo ||
-  //   !SessionId ||
-  //   userInfo.status !== "active" ||
-  //   SessionId !== userInfo.SessionId
-  // ) {
-  //   redirect("/Login");
-  // }
+  if (
+    !userInfo ||
+    !businessInfo ||
+    !SessionId ||
+    userInfo.status !== "active" ||
+    SessionId !== userInfo.SessionId
+  ) {
+    redirect("/Login");
+  }
 
   const isSubscriptionExpired = moment().isAfter(
     moment(businessInfo.subscriptionEndDate),
