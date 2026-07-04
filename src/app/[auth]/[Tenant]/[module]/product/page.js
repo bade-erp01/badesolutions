@@ -120,6 +120,7 @@ export default async function Productlayout({ children, params }) {
                     Products={productList}
                     storesData={storeList}
                     vendorsData={vendorList}
+                    userData={userData}
                   />
 
                  <ProductXLSXDownload productList={productList} />

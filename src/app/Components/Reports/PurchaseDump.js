@@ -199,7 +199,8 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-                    dbConnect: `Bearer ${business.rustyRoof}`,
+                    access: Encrypt(userData.user._id),
+                    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
                 },
                 }
             );
@@ -273,8 +274,7 @@ const PurchaseDumpModal = ({ business,Products,EXPRESS_PRIVATE_URL,storesData,ve
                 }
             });
             } catch (err) {
-            Swal.close();
-            Swal.fire("Error", "Failed to generate preview. Try again.", "error");
+              ErrorMessage("Faile to load dataset. Please try again later.");
             }
         });
     };
