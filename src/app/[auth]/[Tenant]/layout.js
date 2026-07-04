@@ -50,8 +50,8 @@ export default async function Layout({ children }) {
     !userInfo ||
     !businessInfo ||
     !SessionId ||
-    userInfo.status !== "active" ||
-    SessionId !== userInfo.SessionId
+    userInfo.status !== "active" 
+    // SessionId !== userInfo.SessionId
   ) {
     redirect("/Login");
   }
