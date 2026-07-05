@@ -166,12 +166,29 @@ export default function SingleProductpage({
   });
 
   const [formData, setFormData] = useState({ ...data });
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const { name, value, type, checked } = e.target;
+
+  setFormData((prev) => {
+    // Special handling for nested fields like VAT.$numberDecimal
+      if (name.includes('.')) {
+        const [parent, child] = name.split('.');
+        return {
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: type === "checkbox" ? checked : value,
+          },
+        };
+      }
+
+      // Normal fields
+      return {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+    });
   };
 
   // update vendor prce
@@ -691,9 +708,9 @@ export default function SingleProductpage({
                     </label>
                     <div className="mt-2">
                       <input
-                        value={Number(formData.VAT.$numberDecimal)}
+                        value={formData.VAT?.$numberDecimal ?? ''}
                         id="VAT"
-                        name="VAT"
+                        name="VAT.$numberDecimal"           // ← Important: Use dot notation
                         onChange={handleChange}
                         type="number"
                         step="any"
