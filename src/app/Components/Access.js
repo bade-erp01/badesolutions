@@ -1532,6 +1532,7 @@ export default function AccessControl({
       </fieldset>
       {/* moduar acces */}
       <hr />
+      {userData?.business?.subscriptionplan.trim() !== "Basic" && (
       <div className="mt-10 space-y-10 " title={`Assign view only access to ${formData.firstName} on Apps installed on business enviroment`}>
         <fieldset className="grid grid-cols-4">
           <legend className="text-sm/6 font-semibold text-gray-900 col-span-4">
@@ -1597,8 +1598,9 @@ export default function AccessControl({
           </div>
         </fieldset>
       </div>
-      <hr />
+      )}
 
+      <hr />
       {/* display all TenantData in a drop down */}
       {userInfo?.isDev && (
         <>

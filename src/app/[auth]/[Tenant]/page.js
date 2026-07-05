@@ -159,7 +159,7 @@ export default async function TenantPage({ params }) {
               })}
 
               {/* SPECIAL APPS */}
-              {userData?.user?.Email.trim() === "tobenna970@gmail.com" && (
+              {userData?.business?.subscriptionplan.trim() === "Basic" && (
                 <>
                   {[
                     {
