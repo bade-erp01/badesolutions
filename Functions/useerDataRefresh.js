@@ -30,7 +30,8 @@ const fetchUser = async () => {
       return { error: "Invalid session tokens, please log in again." };
     }
     
-    await dbConnect(Dencrypt(RustyRoof));
+    await dbConnect("BadeAdmin");
+    // await dbConnect(Dencrypt(RustyRoof));
     
     // Fetch user & business details
     const rawUserInfo = await User.findById(decodedUser)

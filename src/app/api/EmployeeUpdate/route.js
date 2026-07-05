@@ -6,46 +6,48 @@ import { formatMongooseError,Encrypt } from "../../../../Functions/Functions";
 
 
 // update a user data
-export async function PATCH(request) {
-  try {
-    const body = await request.json();
-    const { id, form, ...updateData } = body;
+// export async function PATCH(request) {
+//   try {
+//     const body = await request.json();
+//     const { id, form, ...updateData } = body;
     
-    if (!id) {
-      return new Response(
-        JSON.stringify({ error: "Missing parameter." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
+//     if (!id) {
+//       return new Response(
+//         JSON.stringify({ error: "Missing parameter." }),
+//         { status: 400, headers: { "Content-Type": "application/json" } }
+//       );
+//     }
     
-    const updateFields = form || updateData;
-    if (!Object.keys(updateFields).length) {
-      return new Response(
-        JSON.stringify({ error: "No fields provided for update." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
+//     const updateFields = form || updateData;
+//     if (!Object.keys(updateFields).length) {
+//       return new Response(
+//         JSON.stringify({ error: "No fields provided for update." }),
+//         { status: 400, headers: { "Content-Type": "application/json" } }
+//       );
+//     }
     
-    const result = await Users.findByIdAndUpdate(id, updateFields, { new: true });
+   
+//     const result = await Users.findByIdAndUpdate(id, updateFields, { new: true });
 
-    if (!result) {
-      return new Response(
-        JSON.stringify({ error: "User not found." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
 
-    return new Response(
-      JSON.stringify({ message: "Update Complete."}),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: formatMongooseError(error)}),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-}
+//     if (!result) {
+//       return new Response(
+//         JSON.stringify({ error: "User not found." }),
+//         { status: 404, headers: { "Content-Type": "application/json" } }
+//       );
+//     }
+
+//     return new Response(
+//       JSON.stringify({ message: "Update Complete."}),
+//       { status: 200, headers: { "Content-Type": "application/json" } }
+//     );
+//   } catch (error) {
+//     return new Response(
+//       JSON.stringify({ error: formatMongooseError(error)}),
+//       { status: 500, headers: { "Content-Type": "application/json" } }
+//     );
+//   }
+// }
 
 
 

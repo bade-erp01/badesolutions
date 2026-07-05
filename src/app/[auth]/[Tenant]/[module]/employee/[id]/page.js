@@ -1477,6 +1477,7 @@ export default function SingleEmployeeView({
 }
 
 function SalePersonChart({ customerId, customerName,userInfo, business, custList,SessionId }) {
+  console.log(customerId, customerName,userInfo, business, custList,SessionId )
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -1492,8 +1493,8 @@ function SalePersonChart({ customerId, customerName,userInfo, business, custList
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.token)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
+            sessionKey: `Bearer ${Encrypt(SessionId)}`,
             access: `${Encrypt(userInfo._id)}`,
           },
         });
@@ -1924,11 +1925,11 @@ export  function LiveLocationMap({userData}) {
   useEffect(() => {
     fetchLocation();
 
-    const interval = setInterval(() => {
-      fetchLocation();
-    }, 60000); // 1 minute
+    // const interval = setInterval(() => {
+    //   fetchLocation();
+    // }, 60000); // 1 minute
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, []);
 
   if (!coords) {
