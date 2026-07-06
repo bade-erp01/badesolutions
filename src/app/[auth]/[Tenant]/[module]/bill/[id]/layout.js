@@ -74,13 +74,12 @@ async function StoreLayoutContent({ params }) {
   let Inv = [],
     cust = [];
 
-  const AppFinder = userInfo.user.Apps.find((app) => {
-    return app.Name === "CRM";
- }); 
+ const crmApp = userInfo.user.Apps.find((app) => app.Name === "CRM");
 
- if (!AppFinder && userInfo.user.Email !== "tobenna970@gmail.com") {
-    return notFound();
-  }
+ // Option 1: Strict check (only allow if they have CRM or are on Basic plan)
+ if (userInfo.business?.subscriptionplan !== "Basic" && !crmApp) {
+   return notFound(); // or redirect, or show upgrade message
+ }
 
   try {
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
