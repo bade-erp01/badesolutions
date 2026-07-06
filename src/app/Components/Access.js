@@ -51,8 +51,6 @@ export default function AccessControl({
 
   const handleChange = async (e) => {
     const { name,  checked } = e.target;
-
-    console.log(name, checked)
     setFormData((prev) => ({
       ...prev,
       [name]: checked,
