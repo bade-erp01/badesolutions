@@ -40,11 +40,11 @@ export default async function crmLayout({ params }) {
   };
 
   try {
-    const AppFinder = userData.user.Apps.find((app) => app.Name === "CRM");
+    // const AppFinder = userData.user.Apps.find((app) => app.Name === "CRM");
 
-    if (!AppFinder && userData.user.Email !== "tobenna970@gmail.com") {
-      return notFound();
-    }
+    // if (!AppFinder && userData.business.subscriptionplan !== "Basic") {
+    //   return notFound();
+    // }
 
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
@@ -55,7 +55,7 @@ export default async function crmLayout({ params }) {
         access: `${Encrypt(userData.user._id)}`,
         sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
       },
-      next: { revalidate: 120 }, // cache for 2 minutes
+      // next: { revalidate: 120 }, // cache for 2 minutes
     });
 
     customerList = res.data; 
