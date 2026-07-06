@@ -50,18 +50,20 @@ export default function AccessControl({
   };
 
   const handleChange = async (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name,  checked } = e.target;
+
+    console.log(name, checked)
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: checked,
     }));
-
+   
     plsWait("Updating user access...")
     const request = await fetch(
       `${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(formData._id)}`,
       {
         method: "PATCH",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({[name]:checked}),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
