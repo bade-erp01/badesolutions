@@ -5,7 +5,6 @@ import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../
 import {Dencrypt} from "../../../../../../../../../Functions/Functions"
 
 
-
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
   const Params = useParams()
