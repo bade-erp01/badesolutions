@@ -1,10 +1,41 @@
 "use client";
+
 import { useState } from "react";
 import Image from "next/image";
-import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
-import {plsWait,ErrorMessage,SuccessToast} from "../../../../../../../Functions/Mics";
+import { Encrypt } from "../../../../../../../Functions/Functions";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../../../../../Functions/Mics";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,19 +46,19 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
   const [usersList] = useState(users || []);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
-  
-  const [headers] = useState({
+
+  const headers = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
     access: `${Encrypt(userInfo.user._id)}`,
-    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-  });
+    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+  };
 
-  const activityLogs = DecryptedAsset.AcivityLog || [];
+  const activityLogs = DecryptedAsset?.AcivityLog || [];
   const totalPages = Math.ceil(activityLogs.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedLogs = activityLogs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -35,10 +66,14 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-  
+
+  const handleSelectChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      e.preventDefault();
       plsWait("Please wait...");
       const { data } = await axios.patch(
         `${baseUrl}/api/update/asset/${Encrypt(DecryptedAsset._id)}`,
@@ -46,395 +81,326 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
         { headers }
       );
 
-      if (data && data.message) {
-        SuccessToast("Asset updated...");
+      if (data?.message) {
+        SuccessToast("Asset updated successfully");
         router.refresh();
       } else {
-        throw new Error(data.error);
+        throw new Error(data?.error || "Update failed");
       }
     } catch (error) {
-      ErrorMessage(error.message);
+      ErrorMessage(error.message || "Something went wrong");
       router.refresh();
     }
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto p-6 rounded-lg shadow-lg border border-gray-200 bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
-        <form className="space-y-8" onSubmit={handleSubmit}>
-          {/* Header Section */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-gray-200">
-            <h4 className="text-xs font-bold text-gray-900">{formData.Name}</h4>
-            <span className={`px-4 py-2 rounded-full font-semibold tracking-wide shadow-sm border text-xs ${
-              formData.status === "Running" ? "bg-green-50 text-green-700 border-green-200" :
-              formData.status === "Sold" ? "bg-blue-50 text-blue-700 border-blue-200" :
-              "bg-red-50 text-red-700 border-red-200"
-            }`}>
-              {formData.status}
-            </span>
-          </div>
-
-          {/* Image Section */}
-          <div className="flex items-center space-x-6 pb-6">
-            <div className="w-32 h-32 rounded-lg overflow-hidden bg-linear-to-br from-gray-200 to-gray-300 shadow-md border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-              <Image
-                height={128}
-                width={128}
-                src={formData.image || "https://img.icons8.com/stickers/100/decentralized-network.png"}
-                alt="Asset"
-                quality={90}
-                priority
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h3 className="text-xs font-semibold text-gray-900">{formData.AssetCode}</h3>
-              <p className="text-gray-600 mt-1 text-xs">Location: {formData.Location?.WHName}</p>
-            </div>
-          </div>
-
-          {/* Form Grid */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Name */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Name</label>
-              <input
-                id="Name"
-                name="Name"
-                type="text"
-                value={formData.Name}
-                placeholder="Enter Asset Name"
-                required
-                onChange={handleChange}
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              />
-            </div>
-
-            {/* Location */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Location</label>
-              <select
-                id="Location"
-                name="Location"
-                onChange={handleChange}
-                required
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+    <div className="min-h-screen py-8">
+      <div className="max-w-6xl mx-auto px-6">
+        <Card className="shadow-xl border-0">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Header */}
+            <CardHeader className="flex flex-row items-center justify-between border-b pb-6">
+              <div>
+                <CardTitle className="text-2xl">{formData.Name}</CardTitle>
+                <CardDescription className="text-sm mt-1">
+                  Asset Code: <span className="font-mono">{formData.AssetCode}</span>
+                </CardDescription>
+              </div>
+              <Badge
+                variant={
+                  formData.status === "Running"
+                    ? "default"
+                    : formData.status === "Sold"
+                    ? "secondary"
+                    : "destructive"
+                }
+                className="text-sm px-4 py-1"
               >
-                <option value={formData.Location?._id}>{formData.Location?.WHName}</option>
-                {Stores.map((store) => (
-                  <option key={store._id} value={store._id}>{store.WHName}</option>
-                ))}
-              </select>
-            </div>
+                {formData.status}
+              </Badge>
+            </CardHeader>
 
-            {/* Assigned To */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Assigned To</label>
-              <select
-                id="AssignedTo"
-                name="AssignedTo"
-                onChange={handleChange}
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              >
-                <option value={formData.AssignedTo?._id}>{formData.AssignedTo?.firstName} {formData.AssignedTo?.lastName}</option>
-                {usersList.map((u) => (
-                  <option key={u._id} value={u._id}>{u.firstName} {u.lastName}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Status */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Status</label>
-              {!DecryptedAsset.runDepreciation ? (
-                <select
-                  id="status"
-                  name="status"
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-                >
-                  <option value={formData.status}>{formData.status}</option>
-                  <option value="Running">Running</option>
-                  <option value="Sold">Sold</option>
-                  <option value="Disposed">Disposed</option>
-                </select>
-              ) : (
-                <div className="w-full rounded-lg bg-gray-100 px-4 py-2.5 text-xs text-gray-900 border border-gray-300">
-                  {DecryptedAsset?.status}
+            <CardContent className="space-y-8">
+              {/* Image & Basic Info */}
+              <div className="flex items-center gap-6">
+                <div className="w-32 h-32 rounded-xl overflow-hidden border bg-muted flex items-center justify-center flex-shrink-0">
+                  <Image
+                    height={128}
+                    width={128}
+                    src={formData.image || "https://img.icons8.com/stickers/100/decentralized-network.png"}
+                    alt="Asset"
+                    className="object-cover w-full h-full"
+                    priority
+                  />
                 </div>
-              )}
-            </div>
 
-            {/* Serial Number */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Serial Number</label>
-              <input
-                value={formData.SerialNumber}
-                id="SerialNumber"
-                name="SerialNumber"
-                required
-                type="text"
-                placeholder="Enter serial number"
-                onChange={handleChange}
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              />
-            </div>
-
-            {/* Purchase Value */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Purchase Value</label>
-              <input
-                value={formData.PurchasedValue || 0}
-                id="PurchasedValue"
-                name="PurchasedValue"
-                required
-                placeholder="0.00"
-                type="number"
-                step="any"
-                min="0"
-                onChange={handleChange}
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              />
-            </div>
-
-            {/* Depreciation Rate */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2" htmlFor="ResidualValue">Depreciation Rate</label>
-              {!DecryptedAsset.runDepreciation ? (
-                <input
-                  value={Number(formData.ResidualValue) || 0}
-                  id="ResidualValue"
-                  name="ResidualValue"
-                  required
-                  placeholder="0.00"
-                  type="number"
-                  step="any"
-                  min="0"
-                  onChange={handleChange}
-                  className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-                />
-              ) : (
-                <div className="w-full rounded-lg bg-gray-100 px-4 py-2.5 text-xs text-gray-900 border border-gray-300">
-                  {formData.ResidualValue.$numberDecimal}
+                <div>
+                  <p className="text-sm text-muted-foreground">Location</p>
+                  <p className="font-medium">{formData.Location?.WHName}</p>
                 </div>
-              )}
-            </div>
-
-            {/* Purchase Date */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Purchase Date</label>
-              <input
-                value={formData.PurchsedDate}
-                id="PurchsedDate"
-                name="PurchsedDate"
-                onChange={handleChange}
-                type="date"
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              />
-            </div>
-
-            {/* Current Value */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Current Value</label>
-              {!DecryptedAsset.runDepreciation ? (
-                <input
-                  value={formData.CurrentValue || 0}
-                  id="CurrentValue"
-                  name="CurrentValue"
-                  type="number"
-                  placeholder="0.00"
-                  step="any"
-                  min="0"
-                  onChange={handleChange}
-                  className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-                />
-              ) : (
-                <div className="w-full rounded-lg bg-gray-100 px-4 py-2.5 text-xs text-gray-900 border border-gray-300">
-                  {DecryptedAsset?.CurrentValue || 0}
-                </div>
-              )}
-            </div>
-
-            {/* Category */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Category</label>
-              <input
-                value={formData.Category}
-                id="Category"
-                name="Category"
-                onChange={handleChange}
-                placeholder="e.g., Equipment, Furniture"
-                type="text"
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              />
-            </div>
-
-            {/* Useful Life */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Useful Life (Months)</label>
-              {!DecryptedAsset.runDepreciation ? (
-                <input
-                  value={formData.usefulYear || 0}
-                  id="usefulYear"
-                  name="usefulYear"
-                  onChange={handleChange}
-                  placeholder="e.g., 24 months = 2 years"
-                  type="number"
-                  min="0"
-                  className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-                />
-              ) : (
-                <div className="w-full rounded-lg bg-gray-100 px-4 py-2.5 text-xs text-gray-900 border border-gray-300">
-                  {DecryptedAsset?.usefulYear} months
-                </div>
-              )}
-            </div>
-
-            {/* Vendor */}
-            <div className="sm:col-span-1">
-              <label className="block text-xs font-semibold text-gray-900 mb-2">Supplier / Vendor</label>
-              <input
-                value={formData.vendor}
-                id="vendor"
-                name="vendor"
-                placeholder="Vendor name"
-                onChange={handleChange}
-                type="text"
-                className="w-full rounded-lg bg-white px-4 py-2.5 text-xs text-gray-900 border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
-              />
-            </div>
-          </div>
-
-          {/* Depreciation Checkbox */}
-          <div className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition">
-            <input
-              type="checkbox"
-              id="runDepreciation"
-              name="runDepreciation"
-              checked={formData.runDepreciation || false}
-              onChange={handleChange}
-              className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
-            />
-            <label htmlFor="runDepreciation" className="text-xs font-semibold text-gray-800 cursor-pointer">
-              Activate Depreciation
-            </label>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="description" className="block text-xs font-semibold text-gray-900 mb-2">
-              Description
-            </label>
-            <textarea
-              id="description"
-              onChange={handleChange}
-              name="description"
-              value={formData.description || ""}
-              className="w-full h-28 p-3 text-xs text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none transition resize-none"
-              placeholder="Write something about this asset..."
-            />
-          </div>
-
-          {/* Depreciation Schedule Table */}
-          {activityLogs.length > 0 && (
-            <div className="border-t pt-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xs font-bold text-gray-900">Depreciation Schedule</h2>
-                <span className="text-xs text-gray-600">Page {currentPage} of {totalPages}</span>
               </div>
 
-              <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="bg-gray-700 text-white">
-                      <th className="px-6 py-3 text-left font-semibold text-xs">Date</th>
-                      <th className="px-6 py-3 text-left font-semibold text-xs">Depreciation Amount</th>
-                      <th className="px-6 py-3 text-left font-semibold text-xs">Asset Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedLogs.map((schedule, index) => (
-                      <tr key={index} className="border-t border-gray-200 hover:bg-gray-50 transition">
-                        <td className="px-6 py-3 text-xs text-gray-900">{schedule.Date}</td>
-                        <td className="px-6 py-3 text-xs text-gray-900 font-medium">
-                          {parseFloat(schedule.DepreciatedValue?.$numberDecimal).toFixed(2)}
-                        </td>
-                        <td className="px-6 py-3 text-xs text-gray-900 font-medium">
-                          {parseFloat(schedule.Assetvalue || 0).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <Separator />
+
+              {/* Form Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="Name">Asset Name</Label>
+                  <Input
+                    id="Name"
+                    name="Name"
+                    value={formData.Name || ""}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Select
+                    value={formData.Location?._id}
+                    onValueChange={(value) => handleSelectChange("Location", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Stores.map((store) => (
+                        <SelectItem key={store._id} value={store._id}>
+                          {store.WHName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Assigned To</Label>
+                  <Select
+                    value={formData.AssignedTo?._id}
+                    onValueChange={(value) => handleSelectChange("AssignedTo", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {usersList.map((u) => (
+                        <SelectItem key={u._id} value={u._id}>
+                          {u.firstName} {u.lastName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="SerialNumber">Serial Number</Label>
+                  <Input
+                    id="SerialNumber"
+                    name="SerialNumber"
+                    value={formData.SerialNumber || ""}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="PurchasedValue">Purchase Value</Label>
+                  <Input
+                    id="PurchasedValue"
+                    name="PurchasedValue"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={formData.PurchasedValue || 0}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ResidualValue">Residual Value / Depreciation Rate</Label>
+                  {!DecryptedAsset.runDepreciation ? (
+                    <Input
+                      id="ResidualValue"
+                      name="ResidualValue"
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={Number(formData.ResidualValue) || 0}
+                      onChange={handleChange}
+                      required
+                    />
+                  ) : (
+                    <div className="px-4 py-2.5 bg-muted rounded-md text-sm">
+                      {formData.ResidualValue?.$numberDecimal || "0.00"}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="PurchsedDate">Purchase Date</Label>
+                  <Input
+                    id="PurchsedDate"
+                    name="PurchsedDate"
+                    type="date"
+                    value={formData.PurchsedDate || ""}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Current Value</Label>
+                  {!DecryptedAsset.runDepreciation ? (
+                    <Input
+                      name="CurrentValue"
+                      type="number"
+                      step="any"
+                      value={formData.CurrentValue || 0}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <div className="px-4 py-2.5 bg-muted rounded-md text-sm">
+                      {DecryptedAsset?.CurrentValue || 0}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="Category">Category</Label>
+                  <Input
+                    id="Category"
+                    name="Category"
+                    value={formData.Category || ""}
+                    onChange={handleChange}
+                    placeholder="Equipment, Furniture, etc."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="usefulYear">Useful Life (Months)</Label>
+                  {!DecryptedAsset.runDepreciation ? (
+                    <Input
+                      id="usefulYear"
+                      name="usefulYear"
+                      type="number"
+                      min="0"
+                      value={formData.usefulYear || 0}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <div className="px-4 py-2.5 bg-muted rounded-md text-sm">
+                      {DecryptedAsset?.usefulYear} months
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="vendor">Supplier / Vendor</Label>
+                  <Input
+                    id="vendor"
+                    name="vendor"
+                    value={formData.vendor || ""}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
 
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-lg border border-gray-300 text-xs text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    Previous
-                  </button>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      type="button"
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-2 rounded-lg font-medium text-xs transition ${
-                        currentPage === page
-                          ? "bg-indigo-600 text-white"
-                          : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+              {/* Depreciation Checkbox */}
+              <div className="flex items-center space-x-3 bg-muted/50 p-4 rounded-xl">
+                <Checkbox
+                  id="runDepreciation"
+                  name="runDepreciation"
+                  checked={formData.runDepreciation || false}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, runDepreciation: checked }))
+                  }
+                />
+                <Label htmlFor="runDepreciation" className="cursor-pointer font-medium">
+                  Activate Depreciation Schedule
+                </Label>
+              </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded-lg border border-gray-300 text-xs text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    Next
-                  </button>
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description || ""}
+                  onChange={handleChange}
+                  placeholder="Additional information about this asset..."
+                  rows={4}
+                />
+              </div>
+
+              {/* Depreciation Schedule */}
+              {activityLogs.length > 0 && (
+                <>
+                  <Separator />
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-semibold">Depreciation Schedule</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </p>
+                    </div>
+
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Depreciation Amount</TableHead>
+                            <TableHead>Asset Value After</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {paginatedLogs.map((log, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{log.Date}</TableCell>
+                              <TableCell className="font-medium">
+                                {parseFloat(log.DepreciatedValue?.$numberDecimal || 0).toFixed(2)}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {parseFloat(log.Assetvalue || 0).toFixed(2)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Card>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="flex justify-center gap-2 mt-6">
+                        {/* Pagination buttons using Shadcn Button */}
+                        {/* You can enhance this further with a Pagination component if needed */}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Submit Buttons */}
+              {user.user.AssetManager && (
+                <div className="pt-6 border-t flex flex-col gap-3">
+                  {DecryptedAsset.status === "Running" && (
+                    <Button type="submit" size="lg" className="w-full sm:w-auto">
+                      Save Changes
+                    </Button>
+                  )}
+
+                  {DecryptedAsset.status !== "Running" && DecryptedAsset.AcivityLog?.length === 0 && (
+                    <Button type="submit" variant="destructive" size="lg">
+                      Delete Asset
+                    </Button>
+                  )}
                 </div>
               )}
-            </div>
-          )}
-
-          {/* Submit Section */}
-          <div>
-          {user.user.AssetManager && DecryptedAsset.status === "Running" && (
-            <div className="border-t pt-6 flex flex-col gap-3">
-              <p className="text-xs text-gray-600 italic">📅 Depreciation runs on the 1st of every month</p>
-              <button
-                type="submit"
-                className="px-6 py-2.5 rounded-lg bg-indigo-600 text-xs text-white font-semibold shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition"
-              >
-                Save Changes
-              </button>
-            </div>
-          )}
-
-          {user.user.AssetManager && DecryptedAsset.status !== "Running" && DecryptedAsset.AcivityLog.length === 0 && (
-            <div className="border-t pt-6 flex flex-row gap-3">
-              <button
-                type="submit"
-                className="px-6 py-2.5 rounded-lg bg-red-600 text-xs text-white font-semibold shadow-md hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition"
-              >
-                Delete Asset
-              </button>
-            </div>
-           )} 
-          </div>
-        </form>
+            </CardContent>
+          </form>
+        </Card>
       </div>
     </div>
   );

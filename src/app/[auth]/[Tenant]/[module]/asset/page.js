@@ -69,7 +69,7 @@ export default async function AssetLayout({ children, params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        access: `${Encrypt(userData.user_id)}`
+        access: `${Encrypt(userData.user._id)}`
       },
       next: {
         revalidate: 60,
@@ -150,6 +150,7 @@ export default async function AssetLayout({ children, params }) {
       </div>
     );
   } catch (err) {
+    console.log(err.message)
     return (
       <div className="text-black p-6">
         Failed to load. Please try again later.

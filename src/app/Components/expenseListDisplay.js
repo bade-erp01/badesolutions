@@ -1,21 +1,40 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import Card from "@/app/Components/Card"
+import { useState, useEffect } from "react";
 import { Encrypt } from "../../../Functions/Mics";
-import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import axios from "axios";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import  Link  from "next/link";
+
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 
 export default function InvoiceLandingPage({ baseUrl, userData }) {
-  const [searchRef, setSearchRef] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [billList, setBillList] = useState([]);
@@ -32,7 +51,6 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
         const query = new URLSearchParams({
           page: currentPage,
           itemsPerPage,
-          searchRef,
         }).toString();
 
         const response = await axios.get(`${baseUrl}/api/ExpenseList?${query}`, {
@@ -40,81 +58,154 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
           },
         });
 
-        const data = await response.data;
+        const data = response.data;
 
         setBillList(data.expenses || []);
-        setTotalPages(data.pagination.totalPages);
-        setTotalInvoices(data.pagination.total);
-        setCurrentPage(data.pagination.page);
+        setTotalPages(data.pagination?.totalPages || 1);
+        setTotalInvoices(data.pagination?.total || 0);
+        setCurrentPage(data.pagination?.page || 1);
       } catch (error) {
+        console.error("Failed to fetch expenses:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchBills();
-  }, [currentPage, searchRef]);
+  }, [currentPage, baseUrl, userData]);
 
   return (
-    <Suspense fallback={<SuspenenseFallBack pagedata={"Expense"} />}>
-      <div className="text-white text-xs">
-        <div className="mx-auto">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Expenses</CardTitle>
+              <CardDescription>
+                Total Records: <span className="font-medium">{totalInvoices}</span>
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent>
           {isLoading ? (
             <SuspenenseFallBack pagedata={"Expenses"} />
           ) : billList.length > 0 ? (
-            <div className="animate__animated animate__fadeInUp animate__faster">
-                {/* Expense Grid */}
-                <div className="flex flex-col h-[81vh] p-1">
-                  {/* Scrollable cards grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-1 flex-1 overflow-y-auto"  style={{ scrollbarWidth: 'thin', scrollbarColor: '#4B5563 transparent' }}>
-                    {billList.map((element) => (
-                      <Card key={element._id} data={element} module="expense" />
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Reference</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Initiated</TableHead>
+                      <TableHead>Payee</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {billList.map((expense) => (
+                      <TableRow key={expense._id}>
+                        <TableCell>
+                          <Link
+                            href={`/${userData.business.companyName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/expense/expense/${Encrypt(expense._id)}?Modules=Expense`}
+                            className="text-blue-500 hover:underline" >
+                            {expense.refNo}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {new Date(expense.date || expense.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="max-w-md truncate">
+                          {expense.initiatorId}
+                        </TableCell>
+                        <TableCell className="max-w-md truncate">
+                          {expense.payee}
+                        </TableCell>
+                        <TableCell className="max-w-md truncate">
+                          {expense.category.NAME}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {expense.category.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={expense.status !== "pending" ? "default" : "secondary"}
+                          >
+                            {expense.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          ₦{parseFloat(expense.Amount || 0).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </div>
-
-                  {/* Fixed pagination bar */}
-                  <div className="flex justify-between items-center px-4 py-3 border-t border-white/10 bg-[#121216] rounded-b-md">
-                    <span className="text-xs text-white/70">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        className="px-3 py-1 text-sm rounded-md bg-white/10 text-white hover:bg-white/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </button>
-                      <button
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        className="px-3 py-1 text-sm rounded-md bg-white/10 text-white hover:bg-white/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  </TableBody>
+                </Table>
               </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-between mt-6">
+                <p className="text-sm text-muted-foreground">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                  {Math.min(currentPage * itemsPerPage, totalInvoices)} of {totalInvoices} entries
+                </p>
+
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNum = i + 1;
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationLink
+                            isActive={currentPage === pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            </>
           ) : (
             <Empty>
               <EmptyHeader>
-                <EmptyMedia variant="default">
-                </EmptyMedia>
-                <EmptyTitle className="text-black font-bold">No expense registerd Yet</EmptyTitle>
+                <EmptyTitle>No expenses registered yet</EmptyTitle>
                 <EmptyDescription>
-                  You haven&apos;t created any expense yet. Get started by
-                  recording your first expense.
+                  You haven&apos;t created any expense yet. Get started by recording your first expense.
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>
           )}
-        </div>
-      </div>
-    </Suspense>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -58,6 +58,9 @@ export default async function ExpenseLayout({ children, params }) {
               access: `${Encrypt(userData.user._id)}`,
               sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
             },
+            next: {
+              revalidate: 60,
+            },
         });
         
         const data = await res.json();

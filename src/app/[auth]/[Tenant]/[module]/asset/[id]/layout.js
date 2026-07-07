@@ -64,7 +64,7 @@ export default async function layout({params}) {
         return notFound();
       }
 
-      const users = await Users.findByTenant(userData.business.tenantId)
+      const users = await Users.findByTenant(userData.business.tenantId).lean()
       const StringedUsers = JSON.stringify(users)
       const ParsedUser = JSON.parse(StringedUsers)
     
@@ -75,7 +75,7 @@ export default async function layout({params}) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-            access:`${Encrypt(userData.user_id)}`
+            access:`${Encrypt(userData.user._id)}`
           },
         }),
 
@@ -85,7 +85,7 @@ export default async function layout({params}) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
           sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-          access: `${Encrypt(userData.user_id)}`
+          access: `${Encrypt(userData.user._id)}`
         },
         next: {
           revalidate: 120,

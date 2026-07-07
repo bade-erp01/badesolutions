@@ -319,7 +319,8 @@ export default function DraftPurchasePage({
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
             access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+            "idempotency-key": `${status}-${Singlebill._id}`,
           },
       });
 
