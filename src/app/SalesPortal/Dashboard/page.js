@@ -331,7 +331,7 @@ export function MainDash({ userData, baseUrl }) {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
             access: `${Encrypt(userData?.user._id)}`,
-            sessionKey: `Bearer ${userData.SessionId}`,
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
             // cache: "force-cache" // or "default", "reload", "no-store"
             next: { revalidate: 60 },
           },
