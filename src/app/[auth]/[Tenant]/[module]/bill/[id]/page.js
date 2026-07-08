@@ -1070,8 +1070,15 @@ export default function InvoicePage({
                     />
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    <Badge variant={bill.returnId === "WH/IN" ? "secondary" : "default"}>
-                      {bill.returnId === "WH/IN" ? "Returned" : "Sold"}
+                    <Badge 
+                      variant={
+                        bill.returnId === "WH/IN" ? "secondary" :
+                        bill.returnId === "WH/OUT" ? "destructive" :
+                        "outline"
+                      }
+                    >
+                      {bill.returnId === "WH/IN" ? "Returned" :
+                      bill.returnId === "WH/OUT" ? "Issued Out" :"N/A"}
                     </Badge>
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
