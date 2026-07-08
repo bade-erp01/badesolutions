@@ -23,7 +23,7 @@ export default function Page({ data,userData,baseurl }) {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `Bearer ${Encrypt(userData.user._id)}`,
+            access: `${Encrypt(userData.user._id)}`,
             sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
             "idempotency-key" : `DN-${action}-${Dencrypt(Params.cn)}`,
           },
