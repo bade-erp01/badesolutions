@@ -25,7 +25,7 @@ export default function Page({ data,userData,baseurl }) {
             Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
             access: `${Encrypt(userData.user._id)}`,
             sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-            "idempotency-key" : `DN-${action}-${Dencrypt(Params.cn)}`,
+            "idempotency-key" : `DN-${action}-${data._id}`,
           },
         }
       );

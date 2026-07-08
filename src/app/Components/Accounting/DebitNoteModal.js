@@ -113,11 +113,14 @@ export default function DebitNoteModal({ customersList, baseUrl, userData, Accou
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
-                  {customersList.map((c) => (
-                    <SelectItem key={c._id} value={c._id}>
-                      {c.Username}
-                    </SelectItem>
-                  ))}
+                  {customersList
+                    .slice() // Create a copy to avoid mutating original array
+                    .sort((a, b) => a.Username?.localeCompare(b.Username || ""))
+                    .map((c) => (
+                      <SelectItem key={c._id} value={c._id}>
+                        {c.Username}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
