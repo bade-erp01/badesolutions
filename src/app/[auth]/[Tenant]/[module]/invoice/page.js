@@ -208,7 +208,11 @@ useEffect(() => {
                           )}
                         </TableCell>
                         <TableCell>{bill.orders.length} SKU</TableCell>
-                        <TableCell>{bill.means ?? "—"}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                           {bill.means ?? "—"}
+                          </Badge>
+                          </TableCell>
                         <TableCell>{bill.RaiseBy}</TableCell>
                         <TableCell>
                           <span

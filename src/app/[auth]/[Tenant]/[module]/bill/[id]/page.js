@@ -1073,7 +1073,7 @@ export default function InvoicePage({
                     <Badge 
                       variant={
                         bill.returnId === "WH/IN" ? "secondary" :
-                        bill.returnId === "WH/OUT" ? "destructive" :
+                        bill.returnId === "WH/OUT" ? "default" :
                         "outline"
                       }
                     >
