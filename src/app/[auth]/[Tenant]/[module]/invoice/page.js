@@ -7,7 +7,7 @@ import axios from "axios";
 import { Encrypt } from "../../../../../../Functions/Mics";
 import { pricelistSetter } from "../../../../../../Functions/Functions";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import { Paperclip, ShoppingCart } from "lucide-react";
+import { Paperclip, ShoppingCart,Database } from "lucide-react";
 
 import {
   Card,
@@ -171,6 +171,9 @@ useEffect(() => {
                     <TableHead>
                       <ShoppingCart className="h-4 w-4" />
                     </TableHead>
+                    <TableHead>
+                      <Database className="w-4 h-4" />
+                    </TableHead>
                     <TableHead>Raised By</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Value</TableHead>
@@ -205,6 +208,7 @@ useEffect(() => {
                           )}
                         </TableCell>
                         <TableCell>{bill.orders.length} SKU</TableCell>
+                        <TableCell>{bill.means ?? "—"}</TableCell>
                         <TableCell>{bill.RaiseBy}</TableCell>
                         <TableCell>
                           <span

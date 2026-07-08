@@ -485,7 +485,7 @@ export default function DraftInvoicePage({
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
             access: `${Encrypt(user._id)}`,
-            "idempotency-key": `invoice-${bill._id}`,
+            "idempotency-key": `Draft-${bill._id}`,
             sessionKey: `Bearer ${Encrypt(user.SessionId)}`
           },
           body: JSON.stringify({
@@ -557,7 +557,7 @@ export default function DraftInvoicePage({
   const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
 
   return (
-    <Suspense fallback={<SuspenenseFallBack pagedata={"Requisition"} />}>
+    <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
       <div className="max-w-6xl mx-auto px-4 py-8 sm:px-6 bg-white shadow-2xl text-xs m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
         <div className="grid gap-3 sm:flex sm:items-center sm:justify-between mb-8">
           <span
@@ -618,15 +618,15 @@ export default function DraftInvoicePage({
             {((!userInfo.business.InvoiceRestriction &&
               user._id === Singlebill.invoicerId &&
               user.raiseInvoice &&
-              Singlebill.billStatus.toLowerCase() === "requisition") ||
+              Singlebill.billStatus.toLowerCase() === "draft") ||
               (userInfo.business.InvoiceRestriction &&
                 user._id === Singlebill.invoicerId &&
                 user.raiseInvoice &&
-                Singlebill.billStatus.toLowerCase() === "requisition" &&
+                Singlebill.billStatus.toLowerCase() === "draft" &&
                 isOlderThan24Hours)) &&
               Singlebill.orders.length > 0 && (
                 <button
-                  title="Process this Requisition to Draft"
+                  title="Process this Draft to Requisition"
                   onClick={processInvoice}
                   className="w-full md:w-auto px-5 py-2 rounded-md font-semibold text-base shadow border border-green-500 bg-green-600 text-white inline-flex items-center justify-center hover:bg-green-700 transition duration-200 ease-in-out"
                 >
@@ -637,9 +637,9 @@ export default function DraftInvoicePage({
 
             {user._id === Singlebill.invoicerId &&
               user.raiseInvoice &&
-              Singlebill.billStatus.toLowerCase() === "requisition" && (
+              Singlebill.billStatus.toLowerCase() === "draft" && (
                 <button
-                  title="Delete this Requisition"
+                  title="Delete this Draft"
                   onClick={deleteDraftInvoice}
                   className="w-full md:w-auto px-5 py-2 rounded-md font-semibold text-base inline-flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition duration-200 ease-in-out"
                 >
@@ -650,7 +650,7 @@ export default function DraftInvoicePage({
           </div>
 
           {/* Print Button */}
-          {bill.billStatus.toLowerCase() === "requisition" && (
+          {bill.billStatus.toLowerCase() === "draft" && (
             <button
               title={`Download and Print ${Singlebill.billStatus}`}
               onClick={() => generatePdf(Business, Singlebill.customer, bill)}
@@ -679,7 +679,7 @@ export default function DraftInvoicePage({
                   <th
                     key={i}
                     className={`px-4 py-3 font-semibold whitespace-nowrap text-center ${
-                      (Singlebill.billStatus.toLowerCase() !== "requisition" || i === 7)
+                      (Singlebill.billStatus.toLowerCase() !== "draft" || i === 7)
                         ? "hidden sm:table-cell"
                         : ""
                     }`}
@@ -696,7 +696,7 @@ export default function DraftInvoicePage({
                   className="border-t hover:bg-gray-50 transition"
                 >
                   <td className="px-4 py-2 text-indigo-700 text-center text-xs">
-                    {Singlebill.billStatus.toLowerCase() !== "requisition" ? (
+                    {Singlebill.billStatus.toLowerCase() !== "draft" ? (
                       <a
                       href={`/SalesPortal/Products/${Encrypt(
                         bill.item._id,
@@ -711,7 +711,7 @@ export default function DraftInvoicePage({
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {user._id === Singlebill.invoicerId &&
-                    Singlebill.billStatus.toLowerCase() === "requisition" ? (
+                    Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
                         defaultValue={bill.Qty || 0}
@@ -737,7 +737,7 @@ export default function DraftInvoicePage({
                   <td className="px-4 py-2 text-center text-xs">
                     {Business.allowSkuSplitting &&
                     user._id === Singlebill.invoicerId &&
-                    Singlebill.billStatus.toLowerCase() === "requisition" ? (
+                    Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
                         defaultValue={bill.pcsReq || 0}
@@ -774,7 +774,7 @@ export default function DraftInvoicePage({
                   <td className="px-4 py-2 text-center">
                     {user._id === Singlebill.invoicerId &&
                       user.raiseInvoice &&
-                      Singlebill.billStatus.toLowerCase() === "requisition" && (
+                      Singlebill.billStatus.toLowerCase() === "draft" && (
                         <button onClick={() => removeLineItem(bill._id)}>
                           <TrashIcon className="w-5 h-5 text-red-500" />
                         </button>
@@ -787,7 +787,7 @@ export default function DraftInvoicePage({
           </table>
         </div>
 
-        {user._id === Singlebill.invoicerId && Singlebill.billStatus === "Requisition" && (
+        {user._id === Singlebill.invoicerId && Singlebill.billStatus === "Draft" && (
           <div className="mb-8">
             <div className="block md:hidden">
               <label

@@ -225,6 +225,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
                 <UserNotification user={userData} />
               </>
             )}
+            <br />
             <Logout />
           </div>
         </aside>
@@ -242,8 +243,8 @@ export default function DashboardLayout({ userData, baseUrl }) {
           <div className="flex items-center space-x-2">
             <Image
               src={
-                userData.user.image ||
                 userData.business.companyLogo ||
+                userData.user.image ||
                 "/person.png"
               }
               className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
@@ -325,15 +326,15 @@ export function MainDash({ userData, baseUrl }) {
         //   });
         return;
       }
-
+      
       try {
         const res = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
             access: `${Encrypt(userData?.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+            sessionKey: `Bearer ${userData.SessionId}`,
             // cache: "force-cache" // or "default", "reload", "no-store"
-            next: { revalidate: 60 },
+            next: { revalidate: 60, cache: "force-cache", },
           },
         });
 

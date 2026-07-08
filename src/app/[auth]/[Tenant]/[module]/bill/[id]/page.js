@@ -727,6 +727,71 @@ export default function InvoicePage({
     }
   };
 
+
+  // set req back to draft
+   const REQToDRAFT = async (orderId,option) => {
+    const confirmed = await Swal.fire({
+      title: "Confirm Action?",
+      text: "Are you sure you want to proceed with this action?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Proceed",
+      cancelButtonText: "No",
+      reverseButtons: true,
+    });
+
+    if (!confirmed.isConfirmed) return;
+
+    const { value: opCode } = await Swal.fire({
+      title: "Security Check point",
+      input: "password",
+      inputLabel: "Enter Ops Code to proceed",
+      inputPlaceholder: "Input your security code 🔐",
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+    });
+
+    if (!opCode) {
+      Swal.fire("Cancelled", "Operation was cancelled.", "info");
+      return;
+    }
+
+    try {
+      plsWait("Processing Request...");
+      const res = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/REQToDRAFT/${Encrypt(
+          orderId
+        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}&option=${option}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+            access: `${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+            "idempotency-key": `Requisitions-${orderId}`,
+          },
+          body: JSON.stringify({ id: Encrypt(orderId) }),
+        }
+      );
+
+      const result = await res.json();
+
+      if (res.ok) {
+        SuccessToast(result.message);
+        Router.push( `/${Path.auth}/${Path.Tenant}/${path.module}/Forms/invoice/${Encrypt(orderId)}`)
+        
+      } else {
+        throw new Error(result.error || "Request failed");
+      }
+    } catch (err) {
+      ErrorMessage(
+        err.message || "An error occurred while processing request."
+      );
+      Router.refresh();
+    }
+  };
+
   return (
     <>
       <div className="max-w-6xl text-xs mx-auto px-6 py-10 bg-white shadow-2xl  m-6 animate__animated animate__fadeIn invoicecontainer border border-gray-200">
@@ -876,6 +941,18 @@ export default function InvoicePage({
             </button>
           )}
 
+          {(userInfo.user.cancelInvoice && Singlebill.billStatus === "Requisition") && (
+            <button
+              title="Revert this requisition back to draft for editing"
+              onClick={() => REQToDRAFT(Singlebill._id, "Draft")}
+              className="group inline-flex items-center gap-3 px-5 py-3 rounded-lg 
+                        bg-amber-600 hover:bg-amber-700 text-white font-semibold 
+                        shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <ArrowUturnLeftIcon className="w-5 h-5" />
+              <span>Revert to Draft</span>
+            </button>
+          )}
 
           {/* approve inventory adjustment */}
           {userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "LOCKED" && (
