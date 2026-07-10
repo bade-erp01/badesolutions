@@ -70,7 +70,7 @@ export default async function Productlayout({ children, params }) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userData.business.tenantId}`,
+        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
         access: `${Encrypt(userData.user._id)}`
       },
