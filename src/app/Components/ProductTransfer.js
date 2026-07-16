@@ -149,7 +149,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
           </div>
 
           <DialogFooter>
-            <Button onClick={handleSubmit}>Schedule Transfer</Button>
+            <Button variant="default" onClick={handleSubmit}>Schedule Transfer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
