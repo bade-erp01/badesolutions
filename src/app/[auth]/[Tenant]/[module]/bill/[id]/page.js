@@ -746,7 +746,7 @@ export default function InvoicePage({
       title: "Security Check point",
       input: "password",
       inputLabel: "Enter Ops Code to proceed",
-      inputPlaceholder: "Input your security code 🔐",
+      inputPlaceholder: "Input your security code...",
       showCancelButton: true,
       confirmButtonText: "Submit",
     });
@@ -779,7 +779,7 @@ export default function InvoicePage({
 
       if (res.ok) {
         SuccessToast(result.message);
-        Router.push( `/${Path.auth}/${Path.Tenant}/${path.module}/Forms/invoice/${Encrypt(orderId)}`)
+        Router.push( `/${path.auth}/${path.Tenant}/${path.module}/Forms/invoice/${Encrypt(orderId)}`)
         
       } else {
         throw new Error(result.error || "Request failed");
@@ -941,7 +941,7 @@ export default function InvoicePage({
             </button>
           )}
 
-          {(userInfo.user.cancelInvoice && Singlebill.billStatus === "Requisition") && (
+          {(userInfo.user.raiseInvoice && Singlebill.billStatus === "Requisition") && (
             <button
               title="Revert this requisition back to draft for editing"
               onClick={() => REQToDRAFT(Singlebill._id, "Draft")}
