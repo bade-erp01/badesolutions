@@ -83,7 +83,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[640px]">
+        <DialogContent className="sm:max-w-[640px] text-black">
           <DialogHeader>
             <DialogTitle>Schedule Product Transfer</DialogTitle>
           </DialogHeader>
