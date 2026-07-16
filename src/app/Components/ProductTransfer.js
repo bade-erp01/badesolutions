@@ -76,16 +76,15 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
-            variant="outline"
-            className="w-full flex items-center gap-3 font-semibold"
+            className="w-full flex items-center gap-3 font-semibold bg-black text-white hover:bg-zinc-800"
           >
             Start New Product Transfer
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[640px] text-black">
+        <DialogContent className="sm:max-w-[640px]">
           <DialogHeader>
-            <DialogTitle className="text-black">Schedule Product Transfer</DialogTitle>
+            <DialogTitle>Schedule Product Transfer</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
