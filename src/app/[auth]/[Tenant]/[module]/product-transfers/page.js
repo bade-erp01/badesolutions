@@ -80,7 +80,7 @@ export default function TransferPage({ purchaseList, userData, VendorList,Store,
        <SideNavWrapper>
           <BackButton />
           <hr className=" border-white/10" />
-          {userData?.user?.allowInternalTransfers && (
+          {userData?.user?.raiseInvoice && (
             <div className="pt-2">
               <ProductTransfer Store={Stores} userData={userData} baseUrl={baseUrl}/>
             </div>
