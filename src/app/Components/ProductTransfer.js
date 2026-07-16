@@ -85,7 +85,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
 
         <DialogContent className="sm:max-w-[640px] text-black">
           <DialogHeader>
-            <DialogTitle>Schedule Product Transfer</DialogTitle>
+            <DialogTitle className="text-black">Schedule Product Transfer</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
