@@ -80,6 +80,7 @@ export default async function Employeelayout({ children, params }) {
               baseUrl={baseUrl}
               business={userData.business}
               user={parsedUser}
+              activeUser={userData.user}
               Employees={parsedUser}
               />
 

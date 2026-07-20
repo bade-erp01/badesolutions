@@ -8,7 +8,7 @@ import { plsWait, Encrypt } from "../../../../Functions/Mics";
 import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
 import moment from "moment";
 
-const SalesDumpModal = ({ business, Employees }) => {
+const SalesDumpModal = ({ business, Employees,activeUser }) => {
   const [salesDatas, setSalesDatas] = useState([]);
   const [ProductList, setProductList] = useState([]);
   const [StoreList, setStoreList] = useState([]);
@@ -215,7 +215,8 @@ const SalesDumpModal = ({ business, Employees }) => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-              dbConnect: `Bearer ${business.rustyRoof}`,
+              access: `${Encrypt(activeUser._id)}`,
+              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
             },
           }
         );
