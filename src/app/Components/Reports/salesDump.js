@@ -216,7 +216,7 @@ const SalesDumpModal = ({ business, Employees,activeUser }) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${Encrypt(business.tenantId)}`,
               access: `${Encrypt(activeUser._id)}`,
-              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+              sessionKey: `Bearer ${Encrypt(activeUser.SessionId)}`
             },
           }
         );
