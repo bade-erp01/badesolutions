@@ -130,7 +130,7 @@ export default async function crmLayout({ params }) {
                       Email: customer.Email,
                       Phone: customer.phone,
                       Code: customer.CustomerCode,
-                      state: customer.State,
+                      state: customer.State || customer.state,
                       Rep: FilterSaLePerson(customer.salesPerson),
                       Manager: FilterSaLePerson( customer.Manager || customer.accountManager),
                       creditLimit: customer.creditLimit,
