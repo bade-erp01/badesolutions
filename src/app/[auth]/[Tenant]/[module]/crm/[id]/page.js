@@ -962,7 +962,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                 <Select
                   label="State"
                   name="state"
-                  value={formData.state}
+                  value={formData.state || formData.State}
                   onChange={handleChange}
                   options={States}
                 />
