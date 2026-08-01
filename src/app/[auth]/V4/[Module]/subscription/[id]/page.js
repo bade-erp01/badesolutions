@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/table";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 
-export default function page({ data, baseUrl, subscribers }) {
+export default function Page({ data, baseUrl, subscribers }) {
   const [formData, setFormData] = useState({
     title: "",
     plan: "",

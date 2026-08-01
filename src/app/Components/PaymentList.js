@@ -23,7 +23,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import {Encrypt} from "../../../Functions/Mics"
+import { Encrypt } from "../../../Functions/Mics";
 import {
   Card as UiCard,
   CardContent,
@@ -34,21 +34,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function PaymentListpage({
+export default function PaymentListPage({
   bank,
   Customers,
   Payments,
 }) {
-  
   const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [paymentDate, setPaymentDate] = useState("");
   const [accountId, setAccountId] = useState("");
+
   const CustomersList = useMemo(() => Customers || [], [Customers]);
   const PaymentList = useMemo(() => Payments || [], [Payments]);
   const Accountslist = useMemo(() => bank || [], [bank]);
-  const module  = useParams();
+
+  const params = useParams(); // ← fixed (was "module")
 
   const itemsPerPage = 12;
 
@@ -73,12 +74,12 @@ export default function PaymentListpage({
   // Helper functions to get display names
   const getCustomerName = (id) => {
     const customer = CustomersList.find((c) => c._id === id);
-    return customer ? (customer.Username || customer.customer_code || id) : id;
+    return customer ? customer.Username || customer.customer_code || id : id;
   };
 
   const getAccountName = (id) => {
     const account = Accountslist.find((a) => a._id === id);
-    return account ? (account.NAME || account.bankCode || id) : id;
+    return account ? account.NAME || account.bankCode || id : id;
   };
 
   const getStatusBadge = (status) => {
@@ -196,13 +197,16 @@ export default function PaymentListpage({
                 paginatedPayments.map((payment) => (
                   <TableRow key={payment._id}>
                     <TableCell>
-                      <Link href={`/${module.auth}/V4/${module.Module}/${module.Module}/${Encrypt(payment._id)}`} className="text-blue-500">
-                        {payment.paymentReferenceNo.trim().toUpperCase()}
+                      <Link
+                        href={`/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(payment._id)}`}
+                        className="text-blue-500"
+                      >
+                        {payment.paymentReferenceNo?.trim().toUpperCase()}
                       </Link>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {payment.PaymentDate 
-                        ? new Date(payment.PaymentDate).toLocaleDateString() 
+                      {payment.PaymentDate
+                        ? new Date(payment.PaymentDate).toLocaleDateString()
                         : "—"}
                     </TableCell>
                     <TableCell>{getCustomerName(payment.customer)}</TableCell>
@@ -213,7 +217,10 @@ export default function PaymentListpage({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="h-24 text-center text-muted-foreground"
+                  >
                     No payments found
                   </TableCell>
                 </TableRow>
