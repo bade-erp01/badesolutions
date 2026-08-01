@@ -167,7 +167,9 @@ export default function Wrapper({ children }) {
       ErrorMessage("Please enter a search word");
       return;
     }
-    router.push(`/${Params.auth}/V4/Search/${encodeURIComponent(page)}?search=${trimmedTerm}`);
+    router.push(
+      `/${Params.auth}/V4/Search/${encodeURIComponent(page)}?search=${trimmedTerm}`,
+    );
     setSearchTerm("");
   };
 
@@ -278,13 +280,46 @@ export default function Wrapper({ children }) {
             <BackButton />
           )}
 
-          {user.user?.Apps?.sort((a, b) => a.Name.localeCompare(b.Name)).map(
-            (item) => {
+          {/* for basic plan */}
+          {user.business?.subscriptionplan?.trim() === "Basic" &&
+            [
+              {
+                name: "CRM",
+                url: "crm",
+                icon: "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
+                description: "Customer relationship management.",
+              },
+              // {
+              //   name: "Employee Management",
+              //   url: "employee",
+              //   icon: "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
+              //   description: "Manage employee operations efficiently.",
+              // },
+              {
+                name: "Product Management",
+                url: "product",
+                icon: "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
+                description: "Centralized product operations.",
+              },
+              {
+                name: "Cash Register",
+                url: "payment",
+                icon: "https://img.icons8.com/dusk/64/cash-register.png",
+                description: "Process transactions and payments.",
+              },
+              {
+                name: "Stores Operations",
+                url: "store",
+                icon: "https://img.icons8.com/arcade/64/garage-closed.png",
+                description: "Warehouse and inventory management.",
+              },
+            ].map((item) => {
               const isActive =
                 pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
+
               return (
                 <Button
-                  key={item._id}
+                  key={item.url}
                   disabled={isActive}
                   variant={isActive ? "destructive" : "ghost"}
                   className="w-full justify-start cursor-pointer"
@@ -292,11 +327,32 @@ export default function Wrapper({ children }) {
                     router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
                   }
                 >
-                  {item.Name}
+                  {item.name}
                 </Button>
               );
-            },
-          )}
+            })}
+
+          {user.businessInfo?.subscriptionplan?.trim() !== "Basic" &&
+            user.user?.Apps?.sort((a, b) => a.Name.localeCompare(b.Name)).map(
+              (item) => {
+                const isActive =
+                  pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
+
+                return (
+                  <Button
+                    key={item._id}
+                    disabled={isActive}
+                    variant={isActive ? "destructive" : "ghost"}
+                    className="w-full justify-start cursor-pointer"
+                    onClick={() =>
+                      router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
+                    }
+                  >
+                    {item.Name}
+                  </Button>
+                );
+              },
+            )}
 
           {pathname !== `/${Params.auth}/V4` && (
             <Button
@@ -568,7 +624,6 @@ export function UserProfile({ user, biz }) {
 
   const logout = async () => {
     try {
-
       await dispatch(logoutAction());
 
       SuccessToast("You have been logged out successfully.");
@@ -576,9 +631,8 @@ export function UserProfile({ user, biz }) {
       router.push("/Login");
     } catch (e) {
       ErrorMessage("Logout failed. Please try again.");
-    } 
+    }
   };
-
 
   return (
     <DropdownMenu>
