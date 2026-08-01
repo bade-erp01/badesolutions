@@ -56,6 +56,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { logout as logoutAction } from "../../../lib/User";
 
 export default function Wrapper({ children }) {
   const router = useRouter();
@@ -562,6 +564,21 @@ export const LastUpdated = () => {
 export function UserProfile({ user, biz }) {
   const router = useRouter();
   const Path = useParams();
+  const dispatch = useDispatch();
+
+  const logout = async () => {
+    try {
+
+      await dispatch(logoutAction());
+
+      SuccessToast("You have been logged out successfully.");
+
+      router.push("/Login");
+    } catch (e) {
+      ErrorMessage("Logout failed. Please try again.");
+    } 
+  };
+
 
   return (
     <DropdownMenu>
@@ -624,7 +641,7 @@ export function UserProfile({ user, biz }) {
 
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
-          onClick={() => router.push("/")}
+          onClick={() => logout()}
           variant="destructive"
         >
           <LogOut className="mr-2 h-4 w-4" /> Logout

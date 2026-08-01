@@ -4,6 +4,7 @@ import Notch from "@/app/Components/Notch";
 import Page from "./page";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import {notFound} from "next/navigation";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",

@@ -9,7 +9,7 @@ import { loginSuccess, loginFailure } from "../../../lib/User";
 import { useDispatch, useSelector } from "react-redux";
 import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import Footer2 from "../Components/Footer2";
-import { useRouter } from "next/navigation";
+import { useRouter,useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 // shadcn/ui imports
@@ -22,7 +22,7 @@ import { Loader2 } from "lucide-react";
 export default function Login({ userInfo, businessInfo, url, SessionId }) {
   const dispatch = useDispatch();
   const router = useRouter();
-
+  const path = useParams()
   const [date, setDate] = useState("");
   const [weekday, setWeekday] = useState("");
   const [time, setTime] = useState("");
@@ -138,9 +138,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "");
 
-      const dashboardUrl = `/${sanitizedCompanyName}/${Encrypt(
-        decryptedUser._id
-      )}`;
+      const dashboardUrl = `/${sanitizedCompanyName}/V4`;
 
       setTimeout(() => {
         setLoading(false);
