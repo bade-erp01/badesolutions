@@ -948,16 +948,18 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
             Print Statement
           </Button>
 
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2 p-2"
-            onClick={handlePrint}
-            type="button"
-          >
-            <Printer className="w-5 h-5" />
-            Print Allocation Letter
-          </Button>
+          {userInfo.user.isDev && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2 p-2"
+              onClick={handlePrint}
+              type="button"
+            >
+              <Printer className="w-5 h-5" />
+              Print Allocation Letter
+            </Button>
+          )}
 
           {/* Register Down Payment */}
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
