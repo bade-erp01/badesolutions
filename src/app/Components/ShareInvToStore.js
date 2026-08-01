@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Encrypt } from "../../../Functions/Functions";
 import {plsWait, SuccessToast, ErrorMessage} from '../../../Functions/Mics';
 import {useRouter} from 'next/navigation';
+import { useUser } from "@/components/UserProvider";
 
 const ShareInvToStore = ({ 
     billStatus = '',
@@ -16,7 +17,7 @@ const ShareInvToStore = ({
     baseUrl
 }) => {
     const router = useRouter();
-
+    const user = useUser()
     const onMailClick = async () => {
         plsWait("Sending Mail");
         const api = `${baseUrl}/api/sendMail_To_Store/${Encrypt(billId)}`;
@@ -25,10 +26,10 @@ const ShareInvToStore = ({
             method: "GET",
             headers: {
                 "content-type": "application/json",
-                Authorization: `Bearer ${Encrypt(businessToken)}`,
-                access: `${Encrypt(userId)}`,
+                Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
+                access: `${Encrypt(user.user_id)}`,
                 "idempotency-key": `Mail-${billId}`,
-                sessionKey: `Bearer ${Encrypt()}`
+                sessionKey: `Bearer ${Encrypt(user.SessionId)}`
             },
         });
         const response = await request.json();

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import { Line } from "react-chartjs-2";
-import { StarIcon, ChartBarIcon } from "@heroicons/react/24/solid";
+import { StarIcon, ChartBarIcon} from "@heroicons/react/24/solid";
 import {
   Chart as ChartJS,
   LineElement,
@@ -15,113 +15,117 @@ import {
   Filler,
 } from "chart.js";
 
-ChartJS.register(
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-  Filler
-);
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, Filler);
 
 const StoreChart = ({ productsList }) => {
   const [products] = useState(productsList);
-  const filtered = products.sort((a, b) => b.currentQty - a.currentQty).filter((p) => p.currentQty > 0);
-  const sorted = [...filtered];
-  const bestSort = products.sort((a, b) => b.currentQty - a.currentQty);
-  const bestSeller = bestSort[0];
 
+  // Memoized computations
+  const sortedProducts = useMemo(() => {
+    return [...products]
+      .sort((a, b) => b.currentQty - a.currentQty)
+      .filter((p) => p.currentQty > 0);
+  }, [products]);
+
+  const bestSeller = sortedProducts[0];
+
+  // Gradient helpers
   const gradientFill = (ctx) => {
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, "rgba(250, 72, 40, 0.62)");
-    gradient.addColorStop(1, "rgba(205, 203, 211, 0.69)");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 420);
+    gradient.addColorStop(0, "rgba(59, 130, 246, 0.65)"); // blue-500
+    gradient.addColorStop(1, "rgba(147, 51, 234, 0.15)"); // purple-600
     return gradient;
   };
 
   const gradientBorder = (ctx) => {
-    const gradient = ctx.createLinearGradient(0, 0, 600, 0);
-    gradient.addColorStop(0, "#cf1e11b2");
-    gradient.addColorStop(1, "#94d4eefb");
+    const gradient = ctx.createLinearGradient(0, 0, 700, 0);
+    gradient.addColorStop(0, "#3b82f6");
+    gradient.addColorStop(1, "#a855f7");
     return gradient;
   };
 
   const data = {
-    labels: sorted.map((p) => p.productName.substring(0, 7).trim()),
+    labels: sortedProducts.map((p) => p.productName.length > 12 
+      ? p.productName.substring(0, 12) + "..." 
+      : p.productName),
     datasets: [
       {
-        label: "Heat Map",
-        data: sorted.map((p) => p.currentQty),
+        label: "Current Stock",
+        data: sortedProducts.map((p) => p.currentQty),
         fill: true,
         backgroundColor: (context) => gradientFill(context.chart.ctx),
         borderColor: (context) => gradientBorder(context.chart.ctx),
-        pointBackgroundColor: "#a9c1e6ff",
-        pointBorderColor: "#a9c1e6ff",
+        borderWidth: 3,
+        tension: 0.65,
+        pointBackgroundColor: "#fff",
+        pointBorderColor: "#3b82f6",
         pointBorderWidth: 2,
-        tension: 0.7,
-        pointRadius: 2,
-        pointHoverRadius: 4,
+        pointHoverRadius: 6,
+        pointRadius: 3,
       },
     ],
   };
 
   const options = {
     responsive: true,
-    animation: {
-      duration: 1200,
-      easing: "easeOutQuart",
-    },
+    maintainAspectRatio: false,
+    animation: { duration: 1000, easing: "easeOutQuart" },
     plugins: {
       legend: {
+        display: true,
+        position: "top",
+        align: "end",
         labels: {
-          color: "#a9c1e6ff",
+          color: "hsl(var(--foreground))",
           font: { size: 13, weight: "600" },
+          usePointStyle: true,
+          padding: 20,
         },
       },
       tooltip: {
         enabled: false,
-        external: function (context) {
-          const tooltipModel = context.tooltip;
-          const chartCanvas = context.chart.canvas;
+        external: (context) => {
           let tooltipEl = document.getElementById("chartjs-tooltip");
-
           if (!tooltipEl) {
             tooltipEl = document.createElement("div");
             tooltipEl.id = "chartjs-tooltip";
             tooltipEl.style.position = "absolute";
-            tooltipEl.style.background = "rgba(30,41,59,0.9)";
-            tooltipEl.style.border = "1px solid #475569";
-            tooltipEl.style.borderRadius = "10px";
-            tooltipEl.style.padding = "12px";
-            tooltipEl.style.color = "#f8fafc";
-            tooltipEl.style.pointerEvents = "none";
-            tooltipEl.style.transition = "opacity 0.3s ease";
             tooltipEl.style.zIndex = "100";
             document.body.appendChild(tooltipEl);
           }
 
+          const tooltipModel = context.tooltip;
           if (tooltipModel.opacity === 0) {
             tooltipEl.style.opacity = "0";
             return;
           }
 
           const index = tooltipModel.dataPoints[0].dataIndex;
-          const product = sorted[index];
+          const product = sortedProducts[index];
           const imageUrl = product.image || "/preview.png";
 
           tooltipEl.innerHTML = `
-            <div style="text-align:center;">
-              <strong>${product.productName}</strong><br/>
-              <img src="${imageUrl}" alt="${product.productName}" style="width:60px;height:auto;border-radius:6px;margin-top:6px;" />
-              <div style="margin-top:8px;">Case:${product.currentQty} Pcs:${product.pcs}</div>
+            <div class="bg-card border border-border rounded-xl shadow-xl p-4 w-56 text-sm">
+              <div class="flex items-center gap-3">
+                <img src="${imageUrl}" alt="${product.productName}" 
+                     class="w-14 h-14 object-cover rounded-lg border border-border" />
+                <div>
+                  <strong class="block text-foreground">${product.productName}</strong>
+                  <div class="text-muted-foreground text-xs mt-1">
+                    ${product.currentQty} cases • ${product.pcs} pcs
+                  </div>
+                </div>
+              </div>
+              ${product.LastBatchDate ? 
+                `<div class="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+                  Last purchased: <span class="font-medium">${product.LastBatchDate}</span>
+                </div>` : ''}
             </div>
           `;
 
-          const position = chartCanvas.getBoundingClientRect();
-          tooltipEl.style.left =
-            position.left + window.pageXOffset + tooltipModel.caretX + "px";
-          tooltipEl.style.top =
-            position.top + window.pageYOffset + tooltipModel.caretY - 90 + "px";
+          const position = context.chart.canvas.getBoundingClientRect();
+          tooltipEl.style.left = `${position.left + window.pageXOffset + tooltipModel.caretX - 110}px`;
+          tooltipEl.style.top = `${position.top + window.pageYOffset + tooltipModel.caretY - 110}px`;
           tooltipEl.style.opacity = "1";
         },
       },
@@ -130,32 +134,31 @@ const StoreChart = ({ productsList }) => {
       x: {
         title: {
           display: true,
-          text: "Product Name",
-          color: "#e3e3e6ff",
-          font: { size: 15, weight: "bold" },
+          text: "Products",
+          color: "hsl(var(--muted-foreground))",
+          font: { size: 14, weight: "600" },
         },
         ticks: {
-          color: "#e3e3e6ff",
+          color: "hsl(var(--muted-foreground))",
           maxRotation: 45,
           minRotation: 45,
+          font: { size: 12 },
         },
         grid: {
-          display: true,
-          color: "rgba(255, 252, 252, 0.4)",
-          borderDash: [4, 4],
+          color: "hsl(var(--border))",
+          lineWidth: 0.5,
         },
       },
       y: {
         title: {
           display: true,
-          text: "Available Stock Quantity",
-          color: "#e3e3e6ff",
-          font: { size: 15, weight: "bold" },
+          text: "Stock Quantity (Cases)",
+          color: "hsl(var(--muted-foreground))",
+          font: { size: 14, weight: "600" },
         },
-        ticks: { color: "#e3e3e6ff" },
+        ticks: { color: "hsl(var(--muted-foreground))" },
         grid: {
-          color: "rgba(255, 252, 252, 0.4)",
-          borderDash: [4, 4],
+          color: "hsl(var(--border))",
         },
         beginAtZero: true,
       },
@@ -163,55 +166,84 @@ const StoreChart = ({ productsList }) => {
   };
 
   return (
-    <div className="rounded-lg p-6 shadow-lg bg-[#1e1e20]/70 backdrop-blur-md border border-gray-700 mb-6">
-      <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <ChartBarIcon className="h-6 w-6 text-sky-400" />
-        <span>Store Inventory Overview</span>
-      </h4>
+    <div className="space-y-6">
+      {/* Main Card */}
+      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm dark:shadow-xl transition-all">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-500/10 rounded-xl">
+              <ChartBarIcon className="h-7 w-7 text-blue-500" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-semibold text-foreground">Store Inventory Overview</h3>
+              <p className="text-sm text-muted-foreground">Real-time stock levels • Top performers</p>
+            </div>
+          </div>
+          
+          {bestSeller && (
+            <div className="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full">
+            
+              {sortedProducts.length} active products
+            </div>
+          )}
+        </div>
 
-      <div className="mb-6">
-        <div
-          className="border border-gray-600 rounded-lg p-2 bg-black/30"
-          style={{
-            minWidth: `600px`,
-            height: "450px",
-          }}
-        >
+        {/* Chart Container */}
+        <div className="relative bg-muted/30 rounded-xl border border-border p-4 min-h-[420px] mb-8">
           <Line data={data} options={options} />
         </div>
-      </div>
 
-      {bestSeller && (
-        <div className="bg-black/40 border border-gray-600 rounded-lg shadow-md p-5 flex items-center gap-6">
-          <Image
-            src={bestSeller.image || "/preview.png"}
-            alt={bestSeller.productName}
-            width={50}
-            height={50}
-            quality={100}
-            className="w-24 h-24 object-cover rounded-lg border border-gray-500"
-          />
-          <div>
-            <div className="flex items-center gap-2 mb-1 text-xs">
-              <span className="text-sm bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-semibold">
-                Most Stocked Product
-              </span>
-              <div className="flex gap-1">
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-                <StarIcon className="h-5 w-5 text-yellow-400" />
+        {/* Best Seller Highlight */}
+        {bestSeller && (
+          <div className="bg-gradient-to-br from-card to-muted/50 border border-border rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
+            <div className="relative">
+              <Image
+                src={bestSeller.image || "/preview.png"}
+                alt={bestSeller.productName}
+                width={140}
+                height={140}
+                className="w-32 h-32 md:w-36 md:h-36 object-cover rounded-2xl border-2 border-white dark:border-gray-800 shadow-lg"
+              />
+              <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                <StarIcon className="h-3.5 w-3.5" /> TOP
               </div>
             </div>
-            <h5 className="text-sm font-bold text-white">{bestSeller.productName}</h5>
-            <p className="text-xs text-gray-300">Case:{bestSeller.currentQty} Pcs:{bestSeller.pcs}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              <strong>Last Purchased date:</strong>{" "}
-              {bestSeller.LastBatchDate || "No data available."}
-            </p>
+
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 px-4 py-1 rounded-full text-sm font-semibold mb-3">
+                MOST STOCKED PRODUCT
+              </div>
+              
+              <h4 className="text-2xl font-bold text-foreground mb-2 leading-tight">
+                {bestSeller.productName}
+              </h4>
+              
+              <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Cases:</span>{" "}
+                  <span className="font-mono font-semibold text-foreground">{bestSeller.currentQty}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Pieces:</span>{" "}
+                  <span className="font-mono font-semibold text-foreground">{bestSeller.pcs}</span>
+                </div>
+                {bestSeller.LastBatchDate && (
+                  <div>
+                    <span className="text-muted-foreground">Last purchase:</span>{" "}
+                    <span className="font-medium">{bestSeller.LastBatchDate}</span>
+                  </div>
+                )}
+                {bestSeller.ExpDate && (
+                  <div>
+                    <span className="text-muted-foreground">Expiry Date:</span>{" "}
+                    <span className="font-medium">{bestSeller.ExpDate}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

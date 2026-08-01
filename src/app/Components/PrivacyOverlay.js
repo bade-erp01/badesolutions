@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { ErrorMessage } from "../../../Functions/Mics";
 
 export default function PrivacyIdleOverlay({
@@ -65,16 +71,14 @@ export default function PrivacyIdleOverlay({
       "click",
     ];
 
-    events.forEach((event) =>
-      window.addEventListener(event, resetTimer)
-    );
+    const reset = () => resetTimer();
+
+    events.forEach((event) => window.addEventListener(event, reset));
 
     resetTimer();
 
     return () => {
-      events.forEach((event) =>
-        window.removeEventListener(event, resetTimer)
-      );
+      events.forEach((event) => window.removeEventListener(event, reset));
 
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -96,6 +100,7 @@ export default function PrivacyIdleOverlay({
 
       if (pin !== String(storedPin)) {
         ErrorMessage("Invalid PIN.");
+        setPin("");
         return;
       }
     }
@@ -105,6 +110,16 @@ export default function PrivacyIdleOverlay({
     resetTimer();
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      unlock();
+    }
+  };
+
+  // Get logo or fallback initials
+  const logoUrl = userData?.business?.companyLogo;
+  const businessName = userData?.business?.name || "Company";
+
   return (
     <>
       {children}
@@ -112,111 +127,68 @@ export default function PrivacyIdleOverlay({
       <AnimatePresence>
         {locked && (
           <motion.div
-            initial={{
-              y: "-100%",
-              opacity: 0,
-            }}
-            animate={{
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              y: "-100%",
-              opacity: 0,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 120,
-              damping: 18,
-            }}
-            className="
-              fixed inset-0
-              z-[99999]
-              flex items-center justify-center
-              backdrop-blur-2xl
-              bg-black/20
-            "
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-2xl"
           >
-            <div
-              className="
-                bg-gray-700
-                backdrop-blur-3xl
-                border border-white/20
-                rounded-3xl
-                p-8
-                w-[95%]
-                max-w-md
-                shadow-2xl
-              "
-            >
-              <div className="flex flex-col items-center">
-                <div
-                  className="
-                    w-20 h-20
-                    rounded-full
-                    bg-white/20
-                    flex items-center justify-center
-                    text-4xl
-                    mb-4
-                  "
-                >
-                  🔒
-                </div>
+            <Card className="w-[95%] max-w-md shadow-2xl border border-white/10 bg-gray-900/95 backdrop-blur-3xl">
+              <CardContent className="p-8 flex flex-col items-center text-center">
+                {/* Avatar */}
+                <Avatar className="mb-6 h-20 w-20 border-2 border-white/20">
+                  <AvatarImage
+                    src={logoUrl}
+                    alt={businessName}
+                    className="object-contain"
+                  />
+                  <AvatarFallback className="bg-white/10 text-3xl font-semibold text-white">
+                    {businessName.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
 
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="text-3xl font-semibold tracking-tight text-white">
                   Privacy Mode
                 </h1>
 
-                <p className="text-white/80 text-center mt-2">
+                <p className="mt-3 text-lg text-white/80">
                   Your session has been locked due to inactivity.
                 </p>
 
-                <p className="text-white/60 text-xs text-center mt-1">
+                <p className="mt-1 text-sm text-white/60">
                   Unlock to continue working.
                 </p>
 
                 {requirePin && (
-                  <input
-                    type="password"
-                    inputMode="numeric"
-                    maxLength={6}
-                    placeholder="Enter PIN"
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)}
-                    className="
-                      mt-5
-                      w-full
-                      px-4 py-3
-                      rounded-lg
-                      bg-white/20
-                      text-white
-                      placeholder:text-white/50
-                      border border-white/20
-                      outline-none
-                    "
-                  />
+                  <div className="mt-8 w-full">
+                    <Input
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={6}
+                      placeholder="Enter your PIN"
+                      value={pin}
+                      onChange={(e) => setPin(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="h-12 bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center text-lg tracking-widest"
+                    />
+                  </div>
                 )}
 
-                <button
+                <Button
                   onClick={unlock}
-                  className="
-                    mt-5
-                    w-full
-                    py-3
-                    rounded-lg
-                    bg-white
-                    text-black
-                    font-medium
-                    hover:bg-gray-100
-                    transition-all
-                  "
+                  size="lg"
+                  className="mt-6 w-full h-12 text-base font-medium"
                 >
-                  {requirePin
-                    ? "Unlock Session"
-                    : "Continue Working"}
-                </button>
-              </div>
-            </div>
+                  {requirePin ? "Unlock Session" : "Continue Working"}
+                </Button>
+
+                {requirePin && (
+                  <p className="mt-4 text-xs text-white/50">
+                    Press Enter after entering PIN
+                  </p>
+                )}
+              </CardContent>
+            </Card>
           </motion.div>
         )}
       </AnimatePresence>

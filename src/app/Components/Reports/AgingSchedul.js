@@ -4,13 +4,14 @@ import moment from "moment";
 import { useState } from "react";
 import { downloadExcel } from "../../../../Functions/Functions";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
 
 export default function ReceivablesAgingModal({ data }) {
   const [debtorsList] = useState(
     (data || []).filter((customer) => customer.Debt > 0)
   );
 
-  // 🔍 Normalize date whether it's serial or standard
+  // Normalize date whether it's serial or standard
   function normalizeDate(value) {
     if (!value) return null;
     const isSerial = typeof value === "number" || /^\d+(\.\d+)?$/.test(value);
@@ -28,7 +29,7 @@ export default function ReceivablesAgingModal({ data }) {
       : null;
   }
 
-  // 📆 Calculate debt days from normalized date
+  // Calculate debt days from normalized date
   const calculateDebtDays = (lastPayDate) => {
     const normalized = normalizeDate(lastPayDate);
     if (!normalized) return null;
@@ -37,7 +38,7 @@ export default function ReceivablesAgingModal({ data }) {
     return today.diff(lastPayment, "days");
   };
 
-  // 📊 Group debts into aging buckets
+  // Group debts into aging buckets
   const getAgingBuckets = () => {
     const buckets = {
       "Current (0–30 days)": 0,
@@ -59,7 +60,7 @@ export default function ReceivablesAgingModal({ data }) {
     return buckets;
   };
 
-  // 🧾 Show modal with aging summary
+  // Show modal with aging summary
   const showModal = () => {
     const agingData = getAgingBuckets();
 
@@ -121,12 +122,14 @@ export default function ReceivablesAgingModal({ data }) {
   };
 
   return (
-    <button
+    <Button
       onClick={showModal}
+      variant="outline"
+      type="button"
       className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
     >
       <CalendarDaysIcon className="w-4 h-4 inline-block" />
       Receivable Aging Summary
-    </button>
+    </Button>
   );
 }

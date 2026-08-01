@@ -105,7 +105,7 @@ const ScheduledActivity = ({ Sales,customer,business,Rep }) => {
   };
 
   return (
-    <section className="max-w-6xl mx-auto p-4 text-xs">
+    <section className=" text-xs">
      
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -141,20 +141,20 @@ const ScheduledActivity = ({ Sales,customer,business,Rep }) => {
       </div>
 
       {/* Table */}
-          <table className="min-w-full text-sm text-gray-700">
+          <table className="min-w-full text-sm">
             <tbody className="divide-y divide-gray-200 text-xs">
           {paginatedSales.map((inv, idx) => (
            <React.Fragment key={idx}>
-              <details className="bg-white rounded-lg shadow overflow-x-auto text-xs">
-                <summary className="px-2 py-2 cursor-pointer hover:bg-gray-50 ">
+              <details className="rounded-lg shadow overflow-x-auto text-xs">
+                <summary className="px-2 py-2 cursor-pointer  ">
                    {inv.billStatus.toUpperCase().slice(0, 3)}/{inv.billReferenceNo} - [{moment(inv.startDate).format('MMM D, YYYY')}] - {inv.grandTotal.toLocaleString()}
                 </summary>
                 <tr>
-                  <td colSpan="4" className="px-4 py-2 bg-gray-50">
+                  <td colSpan="4" className="px-4 py-2 ">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       {inv.orders?.map((order, orderIdx) => (
-                        <div key={orderIdx} className="border p-2 rounded hover:border-purple-300 hover:bg-white text-xs">
-                          <p className='text-purple-800'><strong>Product:</strong> {order.item.Name}</p>
+                        <div key={orderIdx} className="border p-2 rounded hover:border-purple-300 text-xs">
+                          <p className=''><strong>Product:</strong> {order.item.Name}</p>
                           <h4 className="font-semibold mb-2">Case: {order.Qty}, Pcs: {order.pcsReq}</h4>
                           <h4 className="font-semibold mb-2">Sold @: {order.priceListPrice?.toLocaleString()}</h4>
                           <h4 className="font-semibold mb-2">Total: {order.total?.toLocaleString()}</h4>
@@ -170,11 +170,11 @@ const ScheduledActivity = ({ Sales,customer,business,Rep }) => {
           </table>
 
         {/* Pagination + Export */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+      <div className="flex justify-between items-center mt-4 text-sm ">
         <span
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className="px-3 py-1 bg-white border rounded hover:bg-gray-100 disabled:opacity-50"
+          className="px-3 py-1 border rounded disabled:opacity-50"
         >
           ← Prev
         </span>
@@ -184,13 +184,13 @@ const ScheduledActivity = ({ Sales,customer,business,Rep }) => {
         <span
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 bg-white border rounded hover:bg-gray-100 disabled:opacity-50"
+          className="px-3 py-1 border rounded disabled:opacity-50"
         >
           Next →
         </span>
         <span
           onClick={exportToCSV}
-          className="ml-4 px-4 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+          className="ml-4 px-4 py-1 text-white rounded"
         >
           Export dump CSV
         </span>

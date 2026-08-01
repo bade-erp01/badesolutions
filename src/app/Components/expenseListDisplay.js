@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Encrypt } from "../../../Functions/Mics";
 import axios from "axios";
-
 import {
   Table,
   TableBody,
@@ -19,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
@@ -40,7 +39,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
   const [billList, setBillList] = useState([]);
   const [totalInvoices, setTotalInvoices] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
+  const params = useParams()
   const itemsPerPage = 15;
 
   // Fetch bills from API
@@ -116,7 +115,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                       <TableRow key={expense._id}>
                         <TableCell>
                           <Link
-                            href={`/${userData.business.companyName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}/${Encrypt(userData.user._id)}/expense/expense/${Encrypt(expense._id)}?Modules=Expense`}
+                            href={`/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(expense._id)}`}
                             className="text-blue-500 hover:underline" >
                             {expense.refNo}
                           </Link>
@@ -131,11 +130,11 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                           {expense.payee}
                         </TableCell>
                         <TableCell className="max-w-md truncate">
-                          {expense.category.NAME}
+                          {expense?.category?.NAME}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">
-                            {expense.category.type}
+                            {expense?.category?.type}
                           </Badge>
                         </TableCell>
                         <TableCell>

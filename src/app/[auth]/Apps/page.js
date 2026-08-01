@@ -42,11 +42,11 @@ const ModulesPage = ({ userInfo }) => {
 
   return (
     <>
-      <Nav1
+      {/* <Nav1
         user={userInfo.user}
         business={userInfo.business}
         page={`App Store`}
-      />
+      /> */}
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 pt-20">
         {/* Hero Section */}
         <div className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-24">

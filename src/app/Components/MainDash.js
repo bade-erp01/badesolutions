@@ -31,7 +31,16 @@ import PendingPaymentReminder from "@/app/Components/RemindPendingPayments";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import { Badge } from "@/components/ui/badge";
-
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {useParams} from "next/navigation";
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -46,7 +55,7 @@ export default function MainDash({ userData }) {
   const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
   const MySwal = withReactContent(Swal);
-
+  const Params = useParams()
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
   const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
@@ -203,7 +212,7 @@ export default function MainDash({ userData }) {
         html: `
             <div style="display: flex; align-items: center;">
               <div style="text-align: left;">
-                <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
+                <strong style="font-size: 14px;"> No internet connection</strong><br/>
               </div>
             </div>
         `,
@@ -292,7 +301,7 @@ export default function MainDash({ userData }) {
           {/* KPI */}
           <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-6">
             {/* SALES */}
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-2xl">
+            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white ">
               <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
 
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -357,12 +366,12 @@ export default function MainDash({ userData }) {
             </Card>
 
             {/* REVENUE */}
-            <Card className="border-0 shadow-xl">
+            <Card className="border">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardDescription>Revenue</CardDescription>
 
-                  <CardTitle className="mt-3 text-4xl font-black">
+                  <CardTitle className="mt-3 text-4xl font-white">
                     <TodaySRevenueTotal
                       tenantData={tenantData}
                       userData={userData}
@@ -371,24 +380,24 @@ export default function MainDash({ userData }) {
                 </div>
 
                 <div className="rounded-2xl bg-violet-100 p-3">
-                  <BanknotesIcon className="h-7 w-7 text-violet-700" />
+                  <BanknotesIcon className="h-7 w-7 text-black" />
                 </div>
               </CardHeader>
 
               <CardContent>
-                <Badge variant="secondary" className="text-sm text-muted-foreground">
+                <Badge variant="secondary" className="text-sm ">
                   Total posted revenue
                 </Badge>
               </CardContent>
             </Card>
 
             {/* PURCHASE */}
-            <Card className="border-0 shadow-xl">
+            <Card className="border-0  border">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardDescription>Purchases</CardDescription>
 
-                  <CardTitle className="mt-3 text-4xl font-black">
+                  <CardTitle className="mt-3 text-4xl ">
                     <PurchaseOrderTotal
                       tenantData={tenantData}
                       userData={userData}
@@ -397,35 +406,35 @@ export default function MainDash({ userData }) {
                 </div>
 
                 <div className="rounded-2xl bg-amber-100 p-3">
-                  <ShoppingBagIcon className="h-7 w-7 text-amber-700" />
+                  <ShoppingBagIcon className="h-7 w-7 text-black" />
                 </div>
               </CardHeader>
 
               <CardContent>
-                <Badge variant="secondary" className="text-sm text-muted-foreground">
+                <Badge variant="secondary" className="text-sm">
                   Total purchase orders
                 </Badge>
               </CardContent>
             </Card>
 
             {/* EXPENSE */}
-            <Card className="border-0 shadow-xl">
+            <Card className="border ">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardDescription>Expenses</CardDescription>
 
-                  <CardTitle className="mt-3 text-4xl font-black text-rose-600">
+                  <CardTitle className="mt-3 text-4xl  ">
                     <ExpenseTotal tenantData={tenantData} userData={userData} />
                   </CardTitle>
                 </div>
 
                 <div className="rounded-2xl bg-rose-100 p-3">
-                  <ArrowTrendingDownIcon className="h-7 w-7 text-rose-700" />
+                  <ArrowTrendingDownIcon className="h-7 w-7 text-black" />
                 </div>
               </CardHeader>
 
               <CardContent>
-                <Badge variant="secondary" className="text-sm text-muted-foreground">
+                <Badge variant="secondary" className="text-sm ">
                   Operational expenses
                 </Badge>
               </CardContent>
@@ -435,7 +444,7 @@ export default function MainDash({ userData }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}
             <section className="lg:col-span-2">
-              <div className="bg-white rounded p-3 shadow-xl mb-3">
+              <div className=" rounded p-3  mb-3 ">
                 {/* Chart */}
                 <GenerealSalesMargin
                   yearlysales={tenantData.yearlysales}
@@ -443,7 +452,7 @@ export default function MainDash({ userData }) {
                 />
               </div>
 
-              <div className="bg-white rounded p-3 shadow-xl">
+              <div className="rounded p-3  border-0">
                 {/* payment */}
                 <GenerealPaymentMargin
                   yearlyPayment={tenantData.revenuePayments.filter(
@@ -452,88 +461,77 @@ export default function MainDash({ userData }) {
                   warehouses={tenantData.warehouses}
                 />
               </div>
-
-              {/* Properties table */}
-              <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg text-gray-500 font-semibold">
-                    Today's Sales.
+              {/* === TODAY'S SALES TABLE (shadcn) === */}
+              <div className="rounded-xl p-6 mt-6  border-0">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold">
+                    Today's Sales
                   </h3>
                 </div>
 
-                <div className="overflow-y-hidden max-h-96">
-                  <table className="w-full text-left text-sm">
-                    <thead className="text-xs text-gray-500 border-b">
-                      <tr>
-                        <th className="py-3 border-r">S/N</th>
-                        <th className="p-3">Ref</th>
-                        <th className="py-3">Customer</th>
-                        <th className="py-3">Grand Total</th>
-                        <th>Raised By</th>
-                        <th className="py-3">Status</th>
-                      </tr>
-                    </thead>
-
-                    <tbody className="text-gray-700">
+                <div className="overflow-hidden border-0">
+                  <Table className="">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12">S/N</TableHead>
+                        <TableHead>Ref</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead className="text-right">Grand Total</TableHead>
+                        <TableHead>Raised By</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {paginatedInvoices.length > 0 ? (
                         paginatedInvoices.map((invoice, index) => (
-                          <tr
-                            key={index}
-                            className="border-b animate__animated animate__fadeInRight text-xs"
-                          >
-                            <td className="py-3 border-r">
+                          <TableRow key={index} className="">
+                            <TableCell className="font-medium">
                               {(currentPage - 1) * itemsPerPage + index + 1}
-                            </td>
-                            <td className="p-3 font-semibold text-blue-700">
+                            </TableCell>
+                            <TableCell className="font-semibold">
                               <Link
-                                href={`/${
-                                  userData.business.companyName
-                                }/${Encrypt(
-                                  userData.user._id,
-                                )}/bill/bill/${Encrypt(invoice._id)}`}
-                                className="text-indigo-600"
+                                href={`/${Params.auth}/V4/Sales/Sales/${Encrypt(invoice._id)}`}
+                                className="text-indigo-600 hover:underline"
                               >
-                                {invoice.billReferenceNo}/
-                                {invoice.invoicelocation}
+                                {invoice.billReferenceNo}/{invoice.invoicelocation}
                               </Link>
-                            </td>
-                            <td className="py-3">{invoice.customerName}</td>
-                            <td className="py-3">
+                            </TableCell>
+                            <TableCell>{invoice.customerName}</TableCell>
+                            <TableCell className="text-right font-medium font-mono">
                               {userData.business.currency?.currency.Symbol}
                               {invoice.grandTotal?.toLocaleString()}
-                            </td>
-                            <td className="py-3">{invoice.RaiseBy}</td>
-                            <td
-                              className={`py-3 ${
-                                invoice.billStatus !== "Cancelled"
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              }`}
-                            >
-                              {invoice.billStatus}
-                            </td>
-                          </tr>
+                            </TableCell>
+                            <TableCell>{invoice.RaiseBy}</TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  invoice.billStatus !== "Cancelled"
+                                    ? "default"
+                                    : "destructive"
+                                }
+                              >
+                                {invoice.billStatus}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
                         ))
                       ) : (
-                        <tr>
-                          <td
-                            colSpan={6}
-                            className="py-6 text-center text-gray-500 text-sm"
-                          >
+                        <TableRow>
+                          <TableCell colSpan={6} className="h-24 text-center ">
                             No invoices found for this page.
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       )}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
 
-                {/* Pagination Controls */}
-                <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+                {/* Pagination */}
+                <div className="flex justify-center items-center gap-2 mt-6">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                    className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors"
                   >
                     Prev
                   </button>
@@ -541,10 +539,10 @@ export default function MainDash({ userData }) {
                     <button
                       key={i}
                       onClick={() => handlePageChange(i + 1)}
-                      className={`px-3 py-1 rounded border ${
+                      className={`px-4 py-2 rounded-md border transition-colors ${
                         currentPage === i + 1
-                          ? "bg-indigo-600 text-white"
-                          : "border-gray-300 hover:bg-gray-100"
+                          ? "bg-indigo-600 border-indigo-600"
+                          : "border-gray-300 "
                       }`}
                     >
                       {i + 1}
@@ -553,140 +551,106 @@ export default function MainDash({ userData }) {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                    className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors"
                   >
                     Next
                   </button>
                 </div>
               </div>
 
-              {/* Monitored Products */}
-              {paginatedMonitoredProduct.length > 0 ? (
-                <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg text-gray-500 font-semibold">
+              {/* === MONITORED PRODUCTS TABLE (shadcn) === */}
+              {sortedMonitoredProducts.length > 0 && (
+                <div className="bg-white rounded-xl p-6 mt-6  border-0">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold">
                       Monitored Products
                     </h3>
                   </div>
 
-                  <div className="overflow-y-hidden max-h-96">
-                    <table className="w-full text-left text-sm">
-                      <thead className="text-xs text-gray-500 border-b">
-                        <tr>
-                          <th className="py-3 border-r">S/N</th>
-                          <th className="p-3">Product Name</th>
-                          <th className="py-3">InStock</th>
-                          <th className="py-3">Monitor</th>
-                          <th className="py-3">Re-Order</th>
-                          <th className="py-3"></th>
-                        </tr>
-                      </thead>
-
-                      <tbody className="text-gray-700">
-                        {paginatedMonitoredProduct.length > 0 ? (
-                          paginatedMonitoredProduct.map((product, index) => (
-                            <tr
-                              key={index}
-                              className="border-b animate__animated animate__fadeInRight text-xs"
-                            >
-                              <td className="py-3 border-r">
-                                {(monitoredCurrentPage - 1) *
-                                  monitoredItemsPerPage +
-                                  index +
-                                  1}
-                              </td>
-                              <td className="p-3 font-semibold text-blue-700">
-                                <Link
-                                  href={`/${
-                                    userData.business.companyName
-                                  }/${Encrypt(
-                                    userData.user._id,
-                                  )}/product/product/${Encrypt(product.productId)}?Modules=product`}
-                                >
-                                  {product.productName}
-                                </Link>
-                              </td>
-                              <td className="py-3">{product.currentQty}</td>
-                              <td className="py-3">{product.replenishMin}</td>
-                              <td className="py-3">{product.replenishQty}</td>
-                              <td className="py-3" title="Raise purchase order">
-                                <button className="text-black hover:underline">
-                                  <ShoppingCartIcon className="h-5 w-5 inline-block mr-1" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td
-                              colSpan={6}
-                              className="py-6 text-center text-gray-500 text-sm"
-                            >
-                              No monitored products found.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                  <div className="overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">S/N</TableHead>
+                          <TableHead>Product Name</TableHead>
+                          <TableHead>In Stock</TableHead>
+                          <TableHead>Monitor</TableHead>
+                          <TableHead>Re-Order Qty</TableHead>
+                          <TableHead className="w-16"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedMonitoredProduct.map((product, index) => (
+                          <TableRow key={index} className="">
+                            <TableCell className="font-medium">
+                              {(monitoredCurrentPage - 1) * monitoredItemsPerPage + index + 1}
+                            </TableCell>
+                            <TableCell className="font-semibold">
+                              <Link
+                                href={`/${Params.auth}/V4/product/product/${Encrypt(product.productId)}`}
+                                className="text-indigo-600 hover:underline"
+                              >
+                                {product.productName}
+                              </Link>
+                            </TableCell>
+                            <TableCell>{product.currentQty}</TableCell>
+                            <TableCell>{product.replenishMin}</TableCell>
+                            <TableCell>{product.replenishQty}</TableCell>
+                            <TableCell>
+                              <button
+                                className="hover:text-indigo-600 transition-colors"
+                                title="Raise purchase order"
+                              >
+                                <ShoppingCartIcon className="h-5 w-5" />
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
 
-                  {/* Pagination Controls */}
-                  <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+                  {/* Monitored Products Pagination */}
+                  <div className="flex justify-center items-center gap-2 mt-6">
                     <button
-                      onClick={() =>
-                        handleMonitoredProductPageChange(
-                          monitoredCurrentPage - 1,
-                        )
-                      }
+                      onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage - 1)}
                       disabled={monitoredCurrentPage === 1}
-                      className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors text-gray-300"
                     >
                       Prev
                     </button>
-                    {Array.from(
-                      { length: totalMonitoredProductPages },
-                      (_, i) => (
-                        <button
-                          key={i}
-                          onClick={() =>
-                            handleMonitoredProductPageChange(i + 1)
-                          }
-                          className={`px-3 py-1 rounded border ${
-                            monitoredCurrentPage === i + 1
-                              ? "bg-indigo-600 text-white"
-                              : "border-gray-300 hover:bg-gray-100"
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ),
-                    )}
+                    {Array.from({ length: totalMonitoredProductPages }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleMonitoredProductPageChange(i + 1)}
+                        className={`px-4 py-2 rounded-md border transition-colors ${
+                          monitoredCurrentPage === i + 1
+                            ? "bg-indigo-600 text-white border-indigo-600"
+                            : "border-gray-300 "
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
                     <button
-                      onClick={() =>
-                        handleMonitoredProductPageChange(
-                          monitoredCurrentPage + 1,
-                        )
-                      }
-                      disabled={
-                        monitoredCurrentPage === totalMonitoredProductPages
-                      }
-                      className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                      onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage + 1)}
+                      disabled={monitoredCurrentPage === totalMonitoredProductPages}
+                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors text-gray-300"
                     >
                       Next
                     </button>
                   </div>
                 </div>
-              ) : (
-                ""
               )}
+             
             </section>
-            <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
-              <h3 className="text-lg text-gray-500 font-semibold mb-4">
-                🗿 Quick Stats Widget
+            <aside className="rounded p-6 border-0 text-xs  animate__animated animate__fadeInRight animate__faster">
+              <h3 className="text-lg font-semibold mb-4">
+                Quick Stats Widget
               </h3>
               <div className="flex flex-col">
-                <h4 className="text-lg text-gray-500 font-semibold mb-4">
-                  ⏰ Tasks Reminder
+                <h4 className="text-lg font-semibold mb-4">
+                  Tasks Reminder
                 </h4>
 
                 {userData?.user?.TaskLogs &&
@@ -694,15 +658,15 @@ export default function MainDash({ userData }) {
                   userData.user.TaskLogs.map((task, idx) => (
                     <div
                       key={idx}
-                      className="text-xs bg-gray-100/50 flex gap-3 rounded-sm p-1 mb-1 hover:border-gray-200 hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
+                      className="text-xs  flex gap-3 rounded-sm p-1 mb-1 hover:border-gray-200 hover: transition duration-200 animate__animated animate__fadeInRight"
                       title={task.notes}
                     >
                       <div>
-                        <p className="font-medium text-gray-900">{task.Text}</p>
-                        <p className="text-xs font-semibold text-gray-500">
+                        <p className="font-medium ">{task.Text}</p>
+                        <p className="text-xs font-semibold">
                           * {task.notes}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs ">
                           Created:{" "}
                           {new Date(task.createdAt).toLocaleString("en-US", {
                             year: "numeric",
@@ -718,7 +682,7 @@ export default function MainDash({ userData }) {
                       <button
                         className={`ml-auto px-2 py-1 rounded-sm text-xs font-medium transition-all duration-200 ${
                           task.Status === "Done"
-                            ? "bg-green-500 text-white"
+                            ? "bg-green-500"
                             : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                         }`}
                       >
@@ -730,7 +694,7 @@ export default function MainDash({ userData }) {
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-gray-500 italic">
+                  <p className="text-xs italic">
                     No task assigned
                   </p>
                 )}
@@ -742,7 +706,7 @@ export default function MainDash({ userData }) {
                 {/* {tenantData.result.map((person, index) => (
                   <div
                     key={index}
-                    className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
+                    className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover: transition duration-200 animate__animated animate__fadeInRight"
                     title={`${person.firstName}`}
                   >
                     <div className="flex justify-between items-center mb-2">
@@ -785,11 +749,11 @@ export default function MainDash({ userData }) {
                 </div> */}
 
                 <div className="mt-6 border-t-2">
-                  <h4 className="text-lg text-gray-500 font-semibold mb-4">
+                  <h4 className="text-lg font-semibold mb-4">
                     💵 Todays Payments
                   </h4>
                   <ul
-                    className="list-disc list-inside space-y-2 text-sm text-gray-700  overflow-y-auto max-h-80"
+                    className="list-disc list-inside space-y-2 text-sm  overflow-y-auto max-h-80"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "#453d46ff transparent",
@@ -814,14 +778,14 @@ export default function MainDash({ userData }) {
                         .map((payment) => (
                           <li
                             key={payment._id}
-                            className="flex items-center justify-between px-4 py-2 bg-white shadow-sm rounded-md border border-gray-200 hover:shadow-md hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
+                            className="flex items-center justify-between px-4 py-2 shadow-sm rounded-md border border-gray-200 hover: hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
                           >
                             <div className="flex flex-col">
-                              <span className="text-sm text-gray-800 font-semibold">
+                              <span className="text-sm font-semibold font-mono">
                                 {userData.business.currency?.currency.Symbol}
                                 {payment.crAmount.toLocaleString()}
                               </span>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs">
                                 {payment.collectionRef}/{payment.type}
                               </span>
                             </div>
@@ -878,15 +842,15 @@ export default function MainDash({ userData }) {
                   <Marquee
                     gradient={false}
                     speed={30}
-                    className="w-full bg-gray-100/50 py-2"
+                    className="w-full py-2"
                   >
-                    <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
+                    <span className="px-2 py-1 rounded mr-2">
                       ⚠️ Debtors:
                     </span>
                     {tenantData.debtorsArray.map((debtor) => (
                       <span
                         key={debtor._id}
-                        className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                        className="mx-1 px-2 py-1 rounded"
                       >
                         {debtor.Username} owes{" "}
                         {userData.business.currency?.currency.Symbol}
@@ -905,15 +869,15 @@ export default function MainDash({ userData }) {
               <Marquee
                 gradient={false}
                 speed={40}
-                className="w-full bg-gray-100/50 py-2"
+                className="w-full py-2"
               >
-                <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
+                <span className="px-2 py-1 rounded mr-2">
                   🗂️ Products On Promo:
                 </span>
                 {tenantData.promotions.map((product) => (
                   <span
                     key={product._id}
-                    className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                    className="mx-1 px-2 py-1 rounded"
                   >
                     {product.Name}
                   </span>
@@ -923,7 +887,7 @@ export default function MainDash({ userData }) {
           )}
 
           {/* Footer */}
-          <footer className="mt-8 text-sm text-gray-500">
+          <footer className="mt-8 text-sm">
             © <span id="year">{moment().format("YYYY")}</span> Business
             Automated Dynamic Enterprise — All rights reserved.
           </footer>
@@ -966,7 +930,7 @@ export default function MainDash({ userData }) {
                   alt="Company Logo"
                   width={150}
                   height={150}
-                  className="rounded-full shadow-lg hover:shadow-2xl transition-shadow"
+                  className="rounded-full shadow-lg hover: transition-shadow"
                 />
               </div>
               <p className="text-gray-500 text-sm pt-6">
@@ -1003,7 +967,7 @@ const PurchaseOrderTotal = ({ tenantData, userData }) => {
   }, 0);
 
   return (
-    <p className="text-2xl text-gray-500 font-bold mt-1">
+    <p className="text-2xl font-bold mt-1">
       {userData.business.currency?.currency.Symbol}
       {formatNumberShort(total)}
     </p>
@@ -1014,7 +978,7 @@ const TodaySaleTotal = ({ tenantData, userData }) => {
   const total = tenantData?.TodaySale;
 
   return (
-    <p className="text-2xl text-gray-100 font-bold mt-1">
+    <p className="text-2xl font-bold mt-1">
       {userData.business.currency?.currency.Symbol}
       {formatNumberShort(total)}
     </p>
@@ -1025,7 +989,7 @@ const TodaySRevenueTotal = ({ tenantData, userData }) => {
   const total = tenantData?.Revenue;
 
   return (
-    <p className="text-2xl text-gray-500 font-bold mt-1">
+    <p className="text-2xl font-bold mt-1">
       {userData.business.currency?.currency.Symbol}
       {formatNumberShort(total)}
     </p>
@@ -1039,7 +1003,7 @@ const ExpenseTotal = ({ tenantData, userData }) => {
   }, 0);
 
   return (
-    <p className="text-2xl text-gray-500 font-bold mt-1">
+    <p className="text-2xl font-bold mt-1">
       {userData.business.currency?.currency.Symbol}
       {formatNumberShort(total)}
     </p>

@@ -3,98 +3,151 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import moment from "moment";
 import "animate.css";
 
-export default function GenerealPaymentMargin({
+export default function GeneralPaymentMargin({
   businessColor = "#27272a",
-  yearlyPayment,
+  yearlyPayment = [],
 }) {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [invoices] = useState(Array.isArray(yearlyPayment) ? yearlyPayment : []);
+  const [isReady, setIsReady] = useState(false);
+  const [isChartLoaded, setIsChartLoaded] = useState(false);
 
   const chartRef = useRef(null);
   const plotlyRef = useRef(null);
 
   const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
 
-  // Memoized monthly totals
-  const monthTotals = useMemo(() => {
+  const { monthTotals, totalPayment } = useMemo(() => {
     const year = moment().year();
     const totals = new Array(12).fill(0);
+    let total = 0;
 
-    invoices.forEach((inv) => {
-      if (!inv) return;
-      if (String(inv.billStatus || "").toLowerCase() === "cancelled") return;
-
+    yearlyPayment.forEach((inv) => {
+      if (!inv || String(inv.billStatus || "").toLowerCase() === "cancelled") return;
       const s = moment(inv.PaymentDate);
       if (s.isValid() && s.year() === year) {
-        totals[s.month()] += toNum(inv.crAmount);
+        const amount = toNum(inv.crAmount);
+        totals[s.month()] += amount;
+        total += amount;
       }
     });
 
-    return totals;
-  }, [invoices]);
+    return { monthTotals: totals, totalPayment: total };
+  }, [yearlyPayment]);
 
-  // Memoized chart data
-  const chartData = useMemo(() => {
-    const chartType = Math.random() < 0.5 ? "bar" : "scatter";
-    const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
-    const colors = ["#27272a", "#16A085"];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  const chartData = useMemo(() => [{
+    x: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+    y: monthTotals.map((v) => Number(v.toFixed(2))),
+    type: "bar",
+    name: "Monthly Payments",
+    marker: {
+      color: Array(12).fill(0).map((_, i) =>
+        i === moment().month() ? "#16A085" : businessColor
+      ),
+      opacity: 0.9,
+    },
+    hovertemplate: "<b>%{x}</b><br>Payment: ₦%{y:,.2f}<extra></extra>",
+  }], [monthTotals, businessColor]);
 
-    return [
-      {
-        x: ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],
-        y: monthTotals.map((v) => Number(v.toFixed(2))),
-        type: chartType,
-        mode: chartMode,
-        marker: { color: randomColor || businessColor },
-      },
-    ];
-  }, [monthTotals, businessColor]);
-
-  const chartLayout = useMemo(() => ({
-    title: "M/M PAYMENT RECORD",
-  }), []);
-
+  // Staggered Load - Start after 800ms
   useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Chart Rendering
+  useEffect(() => {
+    if (!isReady) return;
+
     let mounted = true;
+
     (async () => {
       try {
         const Plotly = (await import("plotly.js-dist-min")).default;
         plotlyRef.current = Plotly;
 
         if (mounted && chartRef.current) {
-          Plotly.newPlot(chartRef.current, chartData, chartLayout);
+          await Plotly.newPlot(chartRef.current, chartData, {
+            title: { text: `Monthly Payment Collection • ${moment().year()}`, font: { size: 18 } },
+            paper_bgcolor: "transparent",
+            plot_bgcolor: "transparent",
+            font: { family: "Inter, sans-serif" },
+            margin: { t: 60, r: 30, b: 60, l: 70 },
+            xaxis: { gridcolor: "#eee" },
+            yaxis: { gridcolor: "#eee", tickprefix: "₦" },
+          }, { responsive: true });
+
+          setIsChartLoaded(true);
         }
       } catch (err) {
-        setError(err?.message || String(err));
+        setError(err?.message || "Failed to load chart");
       }
     })();
 
     return () => {
       mounted = false;
-      const Plotly = plotlyRef.current;
-      if (Plotly && chartRef.current) {
-        Plotly.purge(chartRef.current);
+      if (plotlyRef.current && chartRef.current) {
+        plotlyRef.current.purge(chartRef.current);
       }
     };
-  }, [chartData, chartLayout]);
+  }, [chartData, isReady]);
+
+  const exportChart = async () => {
+    if (!plotlyRef.current || !chartRef.current) return;
+    plotlyRef.current.downloadImage(chartRef.current, {
+      format: "png",
+      filename: "monthly-payments",
+      width: 1200,
+      height: 700,
+    });
+  };
+
+  if (!isReady) {
+    return (
+      <div className="space-y-8 animate__animated animate__fadeInUp">
+        <div className="flex justify-between items-end">
+          <div>
+            <h2 className="text-3xl font-bold">General Payment Margin</h2>
+            <p>Overall Collection Performance • {moment().format("YYYY")}</p>
+          </div>
+        </div>
+        <div className="h-[420px] flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl">
+          <div className="text-center">
+            <div className="animate-spin h-8 w-8 border-b-2 border-zinc-400 mx-auto rounded-full"></div>
+            <p className="mt-3 text-sm text-zinc-500">Loading payment chart...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4 animate__animated animate__fadeInUp animate__faster">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg text-gray-500 font-semibold">
-          Overall Payment collection for {moment().format("YYYY")}
-        </h3>
-        <div className="text-sm text-gray-500">
-          {loading ? "Loading..." : error ? "Error" : "12 months performance"}
+    <div className="space-y-8 animate__animated animate__fadeInUp">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">General Payment Margin</h2>
+          <p>Overall Collection Performance • {moment().format("YYYY")}</p>
+        </div>
+
+        <div className="border p-6 rounded-2xl text-center lg:text-left">
+          <p className="text-sm ">Total Collection</p>
+          <p className="text-lg font-semibold mt-1 font-mono">₦{totalPayment.toLocaleString()}</p>
         </div>
       </div>
 
-      {error && <div className="text-sm text-red-600">{error}</div>}
+      {error && <div className="text-red-600 bg-red-50 p-4 rounded-xl">{error}</div>}
 
-      <div>
-         <div ref={chartRef} id="chart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
+      <div className="bg-white dark:bg-zinc-900 rounded-3xl border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-semibold text-lg">Monthly Payment Trend</h3>
+          <button
+            onClick={exportChart}
+            className="text-sm px-5 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center gap-2 transition"
+          >
+            ↓ Export PNG
+          </button>
+        </div>
+
+        <div ref={chartRef} className="w-full h-[350px]" />
       </div>
     </div>
   );

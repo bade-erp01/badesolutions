@@ -103,7 +103,7 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
 
   if (loading) {
     return (
-      <div className="w-full max-w-5xl flex flex-col items-center justify-between mb-3">
+      <div className="w-full flex flex-col items-center justify-between">
         <p className="text-sm text-gray-800">
           Searching for{" "}
           <span className="text-purple-600 font-bold">
@@ -118,9 +118,9 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
 
   return (
     <div>
-      <div className="flex flex-col items-center py-6 min-h-auto">
+      <div className="flex flex-col items-center">
         {filteredModules.length > 0 ? (
-          <p className="text-sm text-gray-800 mb-4">
+          <p className="text-sm">
             Showing Search result for{" "}
             <span className="text-purple-600 font-bold">
               &lsquo;{searchTerm}&lsquo;

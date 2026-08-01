@@ -151,8 +151,6 @@ export default function EquityForm({
           className="
             flex items-center gap-3
             p-3 rounded-md
-            bg-gray-500
-            hover:bg-gray-600
             transition
             text-xs
             w-full

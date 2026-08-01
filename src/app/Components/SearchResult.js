@@ -10,12 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Encrypt } from "../../../Functions/Functions";
 import { Badge } from "@/components/ui/badge";
+import {useParams} from "next/navigation"
 
 const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }) => {
   const [auth] = useState(UserData.business.companyName);
   const [Tenant] = useState(Encrypt(UserData.user._id));
   const [Module, setModule] = useState(module);
   const [link, setLink] = useState("");
+  const Path = useParams()
 
   useEffect(() => {
     let normalizedModule = module.toLowerCase();
@@ -23,36 +25,36 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
       case "stores":
         normalizedModule = "store";
         break;
-      case "purchase":
-        normalizedModule = "purchase-request";
+      case "purchases":
+        normalizedModule = "purchases";
         break;
       case "debit-note":
         normalizedModule = "debit-note";
-        setLink(`/${auth}/${Tenant}/${Module}/accounting/debit-note/debit-note/${Encrypt(data._id)}`);
+        setLink(`/${Path.auth}/V4/${Path.searchProduct}/accounting/debit-note/debit-note/${Encrypt(data._id)}`);
         break;
       case "credit-note":
         normalizedModule = "credit-note";
-        setLink(`/${auth}/${Tenant}/${Module}/accounting/credit-note/credit-note/${Encrypt(data._id)}`);
+        setLink(`/${Path.auth}/V4/${Path.searchProduct}/accounting/credit-note/credit-note/${Encrypt(data._id)}`);
         break;
-      case "transfers":
-        normalizedModule = "transfers";
-        setLink(`/${auth}/${Tenant}/transfer/Forms/transfer/${Encrypt(data._id)}`);
+      case "product-transfer":
+        normalizedModule = "product-transfer";
+        setLink(`/${Path.auth}/V4/transfer/transfer/${Encrypt(data._id)}`);
         break;
-      case "invoice":
+      case "sales":
         if (data.billStatus === "Draft") {
-          setLink(`/${auth}/${Tenant}/invoice/Forms/invoice/${Encrypt(data._id)}`);
+          setLink(`/${Path.auth}/V4/${Path.searchProduct}/${Path.searchProduct}/Draft/${Encrypt(data._id)}`);
           return;
         } else {
-          setLink(`/${auth}/${Tenant}/bill/bill/${Encrypt(data._id)}?Modules=bill`);
+          setLink(`/${Path.auth}/V4/${Path.searchProduct}/${Path.searchProduct}/${Encrypt(data._id)}`);
         }
-        normalizedModule = "bill";
+        normalizedModule = "Sales";
         break;
       default:
         break;
     }
     setModule(normalizedModule);
     if (!link) {
-      setLink(`/${auth}/${Tenant}/${normalizedModule}/${normalizedModule}/${Encrypt(data._id)}?Modules=${normalizedModule}`);
+      setLink(`/${Path.auth}/V4/${Path.searchProduct}/${Path.searchProduct}/${Encrypt(data._id)}`);
     }
   }, [auth, Tenant, module, data, link]);
 
@@ -66,7 +68,7 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
     data.WHName,
     data.productName,
     data.Username,
-    module === "purchase" ? data.billReferenceNo : "",
+    module === "purchases" ? data.billReferenceNo : "",
     data.billReferenceNo === "" ? data.customerName : data.billReferenceNo,
     data.productName,
     data.Username,
@@ -112,13 +114,13 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
       )}
 
       {/* Main content row */}
-      <div className="flex items-center gap-4 pl-8">
-        <MagnifyingGlassIcon className="h-6 w-6 text-purple-500" />
+      <div className="flex items-center gap-4 ">
+        <MagnifyingGlassIcon className="h-7 w-7 text-purple-400" />
         <CardContent className="flex flex-col justify-center w-full p-0">
           <HoverCard>
             <HoverCardTrigger asChild>
-              <Link href={link} title={title} className="block w-full">
-                <CardTitle className="text-sm font-semibold text-gray-800 truncate">
+              <Link href={link} className="block w-full">
+                <CardTitle className="text-sm font-semibold  truncate">
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />

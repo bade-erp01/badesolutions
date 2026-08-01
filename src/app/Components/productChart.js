@@ -1,217 +1,248 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
-import { Line } from "react-chartjs-2";
-import { StarIcon, ChartBarIcon } from "@heroicons/react/24/solid";
+import { Bar } from "react-chartjs-2";
+import { StarIcon, ChartBarIcon, TrophyIcon } from "@heroicons/react/24/solid";
 import {
   Chart as ChartJS,
-  LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
-  PointElement,
   Tooltip,
   Legend,
   Filler,
 } from "chart.js";
 
-ChartJS.register(
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-  Filler
-);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Filler);
 
 const ProductSalesChart = ({ productsList }) => {
   const [products] = useState(productsList);
-  const filtered = products.sort((a, b) => b.TotalSale - a.TotalSale).filter((p) => p.TotalSale > 0);
-  const sorted = [...filtered];
-  const bestSort = products.sort((a, b) => b.TotalSale - a.TotalSale);
-  const bestSeller = bestSort[0];
 
-  const gradientFill = (ctx) => {
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, "rgba(250, 72, 40, 0.62)");
-    gradient.addColorStop(1, "rgba(205, 203, 211, 0.69)");
-    return gradient;
-  };
+  const processedData = useMemo(() => {
+    const filtered = [...products]
+      .filter((p) => p.TotalSale > 0)
+      .sort((a, b) => b.TotalSale - a.TotalSale);
 
-  const gradientBorder = (ctx) => {
-    const gradient = ctx.createLinearGradient(0, 0, 600, 0);
-    gradient.addColorStop(0, "#cf1e11b2");
-    gradient.addColorStop(1, "#94d4eefb");
-    return gradient;
-  };
+    return {
+      filtered,
+      bestSeller: filtered[0],
+      top10: filtered.slice(0, 10),
+    };
+  }, [products]);
+
+  const { bestSeller, top10 } = processedData;
+  const totalSales = top10.reduce((sum, p) => sum + p.TotalSale, 0);
 
   const data = {
-    labels: sorted.map((p) => p.Name.substring(0, 7).trim()),
+    labels: top10.map((p) =>
+      p.Name.length > 22 ? p.Name.substring(0, 22) + "..." : p.Name
+    ),
     datasets: [
       {
-        label: "Heat Map",
-        data: sorted.map((p) => p.TotalSale),
-        fill: true,
-        backgroundColor: (context) => gradientFill(context.chart.ctx),
-        borderColor: (context) => gradientBorder(context.chart.ctx),
-        pointBackgroundColor: "#a9c1e6ff",
-        pointBorderColor: "#a9c1e6ff",
-        pointBorderWidth: 2,
-        tension: 0.7,
-        pointRadius: 2,
-        pointHoverRadius: 4,
+        label: "Units Sold",
+        data: top10.map((p) => p.TotalSale),
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+          gradient.addColorStop(0, "#f97316");
+          gradient.addColorStop(1, "#c2410c");
+          return gradient;
+        },
+        borderColor: "#fb923c",
+        borderWidth: 2,
+        borderRadius: 12,
+        borderSkipped: false,
+        hoverBackgroundColor: "#fb923c",
       },
     ],
   };
 
   const options = {
+    indexAxis: "y",
     responsive: true,
-    animation: {
-      duration: 1200,
-      easing: "easeOutQuart",
-    },
+    maintainAspectRatio: false,
+    animation: { duration: 1400, easing: "easeOutQuart" },
     plugins: {
-      legend: {
-        labels: {
-          color: "#a9c1e6ff",
-          font: { size: 13, weight: "600" },
-        },
-      },
+      legend: { display: false },
       tooltip: {
         enabled: false,
         external: function (context) {
-          const tooltipModel = context.tooltip;
-          const chartCanvas = context.chart.canvas;
           let tooltipEl = document.getElementById("chartjs-tooltip");
-
           if (!tooltipEl) {
             tooltipEl = document.createElement("div");
             tooltipEl.id = "chartjs-tooltip";
             tooltipEl.style.position = "absolute";
-            tooltipEl.style.background = "rgba(30,41,59,0.9)";
-            tooltipEl.style.border = "1px solid #475569";
-            tooltipEl.style.borderRadius = "10px";
-            tooltipEl.style.padding = "12px";
-            tooltipEl.style.color = "#f8fafc";
+            tooltipEl.style.padding = "14px";
+            tooltipEl.style.borderRadius = "12px";
             tooltipEl.style.pointerEvents = "none";
-            tooltipEl.style.transition = "opacity 0.3s ease";
             tooltipEl.style.zIndex = "100";
+            tooltipEl.style.boxShadow = "0 10px 15px -3px rgb(0 0 0 / 0.3)";
             document.body.appendChild(tooltipEl);
           }
 
-          if (tooltipModel.opacity === 0) {
+          if (context.tooltip.opacity === 0) {
             tooltipEl.style.opacity = "0";
             return;
           }
 
-          const index = tooltipModel.dataPoints[0].dataIndex;
-          const product = sorted[index];
+          const index = context.tooltip.dataPoints[0].dataIndex;
+          const product = top10[index];
           const imageUrl = product.image || "/preview.png";
 
           tooltipEl.innerHTML = `
-            <div style="text-align:center;">
-              <strong>${product.Name}</strong><br/>
-              <img src="${imageUrl}" alt="${product.Name}" style="width:60px;height:auto;border-radius:6px;margin-top:6px;" />
-              <div style="margin-top:8px;">Sold: ${product.TotalSale}</div>
+            <div class="flex gap-4 items-center min-w-[240px]">
+              <img src="${imageUrl}" alt="${product.Name}" class="w-16 h-16 object-cover rounded-2xl" />
+              <div>
+                <div class="font-bold text-base">${product.Name}</div>
+                <div class="text-xl font-mono font-semibold text-orange-500">${product.TotalSale} units</div>
+              </div>
             </div>
           `;
 
-          const position = chartCanvas.getBoundingClientRect();
-          tooltipEl.style.left =
-            position.left + window.pageXOffset + tooltipModel.caretX + "px";
-          tooltipEl.style.top =
-            position.top + window.pageYOffset + tooltipModel.caretY - 90 + "px";
+          const position = context.chart.canvas.getBoundingClientRect();
           tooltipEl.style.opacity = "1";
+          tooltipEl.style.left = `${position.left + window.pageXOffset + context.tooltip.caretX + 20}px`;
+          tooltipEl.style.top = `${position.top + window.pageYOffset + context.tooltip.caretY - 50}px`;
         },
       },
     },
     scales: {
       x: {
-        title: {
-          display: true,
-          text: "Product Name",
-          color: "#e3e3e6ff",
-          font: { size: 15, weight: "bold" },
-        },
-        ticks: {
-          color: "#e3e3e6ff",
-          maxRotation: 45,
-          minRotation: 45,
-        },
-        grid: {
-          display: true,
-          color: "rgba(255, 252, 252, 0.4)",
-          borderDash: [4, 4],
-        },
+        title: { display: true, text: "Units Sold", font: { size: 13, weight: "600" } },
+        ticks: { font: { size: 12 } },
+        grid: { color: "rgba(148, 163, 184, 0.15)" },
       },
       y: {
-        title: {
-          display: true,
-          text: "Units Sold",
-          color: "#e3e3e6ff",
-          font: { size: 15, weight: "bold" },
-        },
-        ticks: { color: "#e3e3e6ff" },
-        grid: {
-          color: "rgba(255, 252, 252, 0.4)",
-          borderDash: [4, 4],
-        },
-        beginAtZero: true,
+        ticks: { font: { size: 13 }, padding: 12 },
+        grid: { display: false },
       },
     },
   };
 
   return (
-    <div className="rounded-lg p-6 shadow-lg bg-[#1e1e20]/70 backdrop-blur-md border border-gray-700 mb-6">
-      <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <ChartBarIcon className="h-6 w-6 text-sky-400" />
-        <span>Product Sales Overview</span>
-      </h4>
+    <div className="bg-white dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-zinc-950 
+                    rounded-md p-6 md:p-8 shadow-xl border border-slate-200 dark:border-slate-700/50 mb-3">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-orange-100 dark:bg-orange-500/10 rounded-2xl">
+            <ChartBarIcon className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+              Sales Performance
+            </h3>
+            <p className="text-slate-500 dark:text-slate-400">Top products by volume</p>
+          </div>
+        </div>
 
-      <div className="mb-6">
-        <div
-          className="border border-gray-600 rounded-lg p-2 bg-black/30"
-          style={{
-            minWidth: `600px`,
-            height: "450px",
-          }}
-        >
-          <Line data={data} options={options} />
+        <div className="text-left md:text-right">
+          <div className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            TOTAL UNITS SOLD
+          </div>
+          <div className="text-4xl font-mono font-bold text-slate-900 dark:text-white tracking-tighter">
+            {totalSales.toLocaleString()}
+          </div>
         </div>
       </div>
 
-      {bestSeller && (
-        <div className="bg-black/40 border border-gray-600 rounded-lg shadow-md p-5 flex items-center gap-6">
-          <Image
-            src={bestSeller.image || "/preview.png"}
-            alt={bestSeller.Name}
-            width={50}
-            height={50}
-            quality={100}
-            className="w-24 h-24 object-cover rounded-lg border border-gray-500"
-          />
-          <div>
-            <div className="flex items-center gap-2 mb-1 text-xs">
-              <span className="text-sm bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-semibold">
-                Best Seller
-              </span>
-              <div className="flex gap-1">
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-                <StarIcon className="h-5 w-5 text-yellow-400" />
-              </div>
-            </div>
-            <h5 className="text-sm font-bold text-white">{bestSeller.Name}</h5>
-            <p className="text-xs text-gray-300">{bestSeller?.ADCcode || bestSeller?.ACDcode || ""}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              <strong>Description:</strong>{" "}
-              {bestSeller?.description || bestSeller?.Description || "No description available."}
-            </p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Chart Area */}
+        <div className="lg:col-span-7 bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 md:p-6">
+          <div className="h-[460px] md:h-[520px]">
+            <Bar data={data} options={options} />
           </div>
         </div>
-      )}
+
+        {/* Sidebar */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Best Seller */}
+          {bestSeller && (
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-amber-900/30 dark:to-orange-900/20 
+                            border border-orange-200 dark:border-orange-500/30 rounded-3xl p-7 relative">
+              <div className="absolute top-5 right-5">
+                <TrophyIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+              </div>
+
+              <div className="flex items-center gap-2 mb-4">
+                <div className="px-4 py-1 bg-amber-400 text-amber-950 text-xs font-bold rounded-full flex items-center gap-1">
+                  <StarIcon className="h-4 w-4" /> BEST SELLER
+                </div>
+              </div>
+
+              <div className="flex gap-5">
+                <Image
+                  src={bestSeller.image || "/preview.png"}
+                  alt={bestSeller.Name}
+                  width={140}
+                  height={140}
+                  className="w-32 h-32 md:w-36 md:h-36 object-cover rounded-2xl border border-orange-300 dark:border-orange-400 shadow-md"
+                />
+
+                <div className="pt-1">
+                  <h4 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                    {bestSeller.Name}
+                  </h4>
+                  <p className="text-2xl font-mono font-semibold text-orange-600 dark:text-orange-400 mt-1">
+                    {bestSeller.TotalSale} <span className="text-base">units</span>
+                  </p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    {bestSeller.ADCcode || bestSeller.ACDcode}
+                  </p>
+
+                  <div className="mt-5">
+                    <p className="text-xs uppercase text-slate-500 dark:text-slate-400 mb-1">Description</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-3">
+                      {bestSeller.description || bestSeller.Description || "No description available."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Top 5 */}
+          <div className="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-3xl p-6">
+            <h5 className="font-semibold text-slate-700 dark:text-slate-300 mb-5 flex items-center gap-2">
+              TOP 5 PRODUCTS
+              <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            </h5>
+
+            <div className="space-y-4">
+              {top10.slice(0, 5).map((product, idx) => (
+                <div key={idx} className="flex items-center gap-4 group">
+                  <div className="w-8 h-8 flex items-center justify-center bg-slate-200 dark:bg-slate-800 text-orange-600 dark:text-orange-400 font-bold rounded-2xl text-sm">
+                    #{idx + 1}
+                  </div>
+
+                  <Image
+                    src={product.image || "/preview.png"}
+                    alt={product.Name}
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-cover rounded-xl"
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-slate-900 dark:text-white truncate group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      {product.Name}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {product.ADCcode || product.ACDcode}
+                    </p>
+                  </div>
+
+                  <div className="font-mono font-bold text-xl text-slate-900 dark:text-white">
+                    {product.TotalSale}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

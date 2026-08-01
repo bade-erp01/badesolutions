@@ -1,9 +1,7 @@
 
 import { fetchUser } from '../../../../Functions/useerDataRefresh'
 import {Encrypt} from "../../../../Functions/Functions"
-import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
-import Footer2 from '@/app/Components/Footer2';
 import SearchResultPage from './page'
 import axios from "axios"
 import { redirect } from "next/navigation";
@@ -52,36 +50,11 @@ export default async function searchLayout({children, params }) {
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
-      <Nav1
-        user={userData.user}
-        business={userData.business}
-        page={`Search Result`}
-      />
-
-      <div className="flex flex-1 text-white bt-2">
-        {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
-          style={{ overflowY: "hidden" }}
-        >
-          <BackButton />
-          <hr />
-          <nav className="space-y-4  h-[520px] max-h-[600px] overflow-y-auto ">
-           
-          </nav>
-
-          {/* Bottom Section with Settings Link */}
-        </aside>{" "}
         {/* Main Content Area */}
         <main className="flex-1 ">
-          <section className="w-full max-w-screen-xl mx-auto flex flex-col gap-6 rounded-lg p-6 relative z-10 max-h-[83dvh] overflow-y-auto">
-            {/* {children} */}
-            <SearchResultPage result={data} linkData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL}/>
-          </section>
+          <SearchResultPage result={data} linkData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL}/>
         </main>
       </div>
-      <Footer2 />
-    </div>
   );
 }
 

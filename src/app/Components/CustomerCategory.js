@@ -39,7 +39,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList, userData }) {
   const debtors = customers.filter((cust) => cust.Debt > 0);
 
   return (
-    <section className="sm:p-10 mx-auto max-w-6xl transition-all duration-700">
+    <section className="sm:p-10 w-full transition-all duration-700">
       {/* Summary Cards */}
       <div className="text-right">
         <span className="text-xs text-gray-900 tracking-tight mb-1">
@@ -79,7 +79,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList, userData }) {
         ].map((card, idx) => (
           <div
             key={idx}
-            className="p-5 rounded-lg shadow-md mt-4 bg-white dark:bg-gray-800 transition-all duration-500"
+            className="p-5 rounded-lg border  mt-4 bg-white dark:bg-gray-800 transition-all duration-500"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -95,7 +95,7 @@ function CustomerCategoryPieChart({ customersList, invoiceList, userData }) {
                 </p>
               </div>
               <div
-                className={`flex items-center gap-2 ${card.bg} px-4 py-2 rounded-full shadow-sm`}
+                className={`flex items-center gap-2 ${card.bg} px-4 py-2 rounded-full`}
               >
                 {card.icon}
               </div>

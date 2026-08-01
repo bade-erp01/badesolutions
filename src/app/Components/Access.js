@@ -102,13 +102,13 @@ export default function AccessControl({
   return (
     <form>
       <fieldset className="grid grid-cols-1">
-        <legend className="text-sm/6 font-semibold text-gray-900">
+        <legend className="text-sm/6 font-semibold">
           Assign Operational Access
         </legend>
         <div className="flex flex-wrap gap-4 p-4">
           {/* Individual permission toggles using shadcn Switch */}
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to onboard new customers`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to onboard new customers`}>
               Create Customer
             </label>
             <Switch
@@ -121,7 +121,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to register new products`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to register new products`}>
               Create Product
             </label>
             <Switch
@@ -134,7 +134,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to update create new supplier`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to update create new supplier`}>
               Create Vendor
             </label>
             <Switch
@@ -147,7 +147,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to update customer information `}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to update customer information `}>
               Update Customer
             </label>
             <Switch
@@ -160,7 +160,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to update general products information `}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to update general products information `}>
               Update Products
             </label>
             <Switch
@@ -173,7 +173,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData?.firstName} will be able to update purchase price of products`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData?.firstName} will be able to update purchase price of products`}>
               Update Buying Price
             </label>
             <Switch
@@ -186,7 +186,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer">
+            <label className="text-sm font-medium cursor-pointer">
               Chief Financial Officer
             </label>
             <Switch
@@ -199,7 +199,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to update Suppliers infomation`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to update Suppliers infomation`}>
               Update Vendor
             </label>
             <Switch
@@ -212,7 +212,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to generate Sales receipt from BADE`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to generate Sales receipt from BADE`}>
               Raise Invoice
             </label>
             <Switch
@@ -225,7 +225,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to generate L.P.O`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to generate L.P.O`}>
               Raise Purchase Order
             </label>
             <Switch
@@ -238,7 +238,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to POST and APPROVE credit and debit note respectively`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to POST and APPROVE credit and debit note respectively`}>
               Credit Officer
             </label>
             <Switch
@@ -251,7 +251,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to manage asset`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to manage asset`}>
               Asset Manager
             </label>
             <Switch
@@ -264,7 +264,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to Raise/Request expense`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to Raise/Request expense`}>
               Create Expense
             </label>
             <Switch
@@ -277,7 +277,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to Approve expense`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to Approve expense`}>
               Expense Approver
             </label>
             <Switch
@@ -290,7 +290,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to create and manage expense tags`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to create and manage expense tags`}>
               Expense Manager
             </label>
             <Switch
@@ -303,7 +303,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be notified when a new Sales order is generated`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be notified when a new Sales order is generated`}>
               Notify Sales Order
             </label>
             <Switch
@@ -316,7 +316,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to register payment to vendors ledger.`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to register payment to vendors ledger.`}>
               Register Vendor Payment
             </label>
             <Switch
@@ -329,7 +329,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to post payent to customers ledger.`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to post payent to customers ledger.`}>
               Register Customer Payment
             </label>
             <Switch
@@ -342,7 +342,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to Assign credit limit to a customer's account`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to Assign credit limit to a customer's account`}>
               Edit Credit Limit
             </label>
             <Switch
@@ -355,7 +355,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be notified when selling price of products are updated`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be notified when selling price of products are updated`}>
               Notify pricelist update
             </label>
             <Switch
@@ -368,7 +368,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be notified when purchase price of products are updated`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be notified when purchase price of products are updated`}>
               Notify Buying Price Change
             </label>
             <Switch
@@ -381,7 +381,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer">
+            <label className="text-sm font-medium cursor-pointer">
               Human Resource Manager
             </label>
             <Switch
@@ -394,7 +394,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will verify inter-stores transfers and purchase from suppliers`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will verify inter-stores transfers and purchase from suppliers`}>
               Approve Transfers / Purchase
             </label>
             <Switch
@@ -407,7 +407,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be responsible for support related issue.`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be responsible for support related issue.`}>
               Help-Desk Officer
             </label>
             <Switch
@@ -420,7 +420,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will be able to perform full sales return`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will be able to perform full sales return`}>
               Cancel Invoice
             </label>
             <Switch
@@ -433,7 +433,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer">
+            <label className="text-sm font-medium cursor-pointer">
               Request Leave
             </label>
             <Switch
@@ -446,7 +446,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer">
+            <label className="text-sm font-medium cursor-pointer">
               Appraisal User
             </label>
             <Switch
@@ -459,7 +459,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer">
+            <label className="text-sm font-medium cursor-pointer">
               Approve Leave
             </label>
             <Switch
@@ -472,7 +472,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`${formData.firstName} will act as a middleman to verify payments befor they impact customer ledger`}>
+            <label className="text-sm font-medium cursor-pointer" title={`${formData.firstName} will act as a middleman to verify payments befor they impact customer ledger`}>
               Accountant
             </label>
             <Switch
@@ -485,7 +485,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer">
+            <label className="text-sm font-medium cursor-pointer">
               Appraisal Manager
             </label>
             <Switch
@@ -498,7 +498,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`Grant ${formData.firstName} access to view sensitive business dashboards.`}>
+            <label className="text-sm font-medium cursor-pointer" title={`Grant ${formData.firstName} access to view sensitive business dashboards.`}>
               C-level Dashboard
             </label>
             <Switch
@@ -511,7 +511,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`Grant ${formData.firstName} access to view sensitive business Reports.`}>
+            <label className="text-sm font-medium cursor-pointer" title={`Grant ${formData.firstName} access to view sensitive business Reports.`}>
               Report User
             </label>
             <Switch
@@ -524,7 +524,7 @@ export default function AccessControl({
           </div>
 
           <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium text-gray-900 cursor-pointer" title={`Grant ${formData.firstName} access to sales portal.`}>
+            <label className="text-sm font-medium cursor-pointer" title={`Grant ${formData.firstName} access to sales portal.`}>
               Access sales portal
             </label>
             <Switch
@@ -543,7 +543,7 @@ export default function AccessControl({
       {businessInfo?.subscriptionplan?.trim() !== "Basic" && (
         <div className="mt-10 space-y-10" title={`Assign view only access to ${formData.firstName} on Apps installed on business enviroment`}>
           <fieldset className="grid grid-cols-4">
-            <legend className="text-sm/6 font-semibold text-gray-900 col-span-4">
+            <legend className="text-sm/6 font-semibold col-span-4">
               Push Modular Application Access
             </legend>
             <div className="mt-6 col-span-4 space-y-1">
@@ -552,8 +552,8 @@ export default function AccessControl({
                   const isChecked = formData.Apps?.some((a) => a.Name === app.Name) || false;
 
                   return (
-                    <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0 px-2 hover:bg-gray-50 rounded-lg">
-                      <label className="text-sm font-medium text-gray-900 cursor-pointer">
+                    <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0 px-2 rounded-lg">
+                      <label className="text-sm font-medium cursor-pointer">
                         {app?.Name || ""}
                       </label>
                       <Switch
@@ -581,7 +581,7 @@ export default function AccessControl({
           <AssignTenantDropdown businessData={TenantData} businessInfo={businessInfo} userInfo={userInfo} data={data}/>
 
           <div className="mt-10">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">
+            <h3 className="text-sm font-semibold mb-3">
               Assigned Tenants
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -666,7 +666,7 @@ export function AssignTenantDropdown({businessInfo, businessData, userInfo, data
   return (
     <div className="mt-10 space-y-10">
       <fieldset className="grid grid-cols-4 gap-4">
-        <legend className="text-sm font-semibold text-gray-900 col-span-4">
+        <legend className="text-sm font-semibold col-span-4">
           Assign Tenant
         </legend>
 
@@ -694,7 +694,7 @@ export function AssignTenantDropdown({businessInfo, businessData, userInfo, data
                   value={tenant}
                   className={({ active }) =>
                     `cursor-pointer px-4 py-2 text-xs ${
-                      active ? "bg-blue-600 text-white" : "text-gray-900"
+                      active ? "bg-blue-600 text-white" : ""
                     }`
                   }
                 >

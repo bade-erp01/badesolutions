@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import "animate.css";
@@ -9,13 +10,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-const Card = ({ data, module }) => {
+const Card = ({ data, module, url }) => {
   const { auth, Tenant } = useParams();
 
-  const truncate = (str, length = 20) =>
+  const truncate = (str, length = 22) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
 
   const title =
@@ -29,7 +29,7 @@ const Card = ({ data, module }) => {
     data.paymentReferenceNo ||
     data.accountName ||
     data.refNo ||
-    `${data.billStatus}/${data.billReferenceNo}`;
+    `${data.billStatus || ""}/${data.billReferenceNo || ""}`;
 
   const subtitle =
     data.CustomerCode ||
@@ -43,93 +43,122 @@ const Card = ({ data, module }) => {
     }`;
 
   const imageSrc = data.image || data.Image || data.icon || "/preview.png";
-  const linkHref = `/${auth}/${Tenant}/${module}/${module}/${Encrypt(
-    data._id
-  )}?Modules=${module}`;
+  const linkHref = url
+    ? url
+    : `/${auth}/${Tenant}/${module}/${module}/${Encrypt(data._id)}?Modules=${module}`;
 
   return (
-    <HoverCard openDelay={100} closeDelay={100}>
+    <HoverCard openDelay={80} closeDelay={120}>
       <HoverCardTrigger asChild>
         <Link
           href={linkHref}
           className="block w-full h-full"
           style={{ textDecoration: "none" }}
         >
-          <div className="flex flex-row items-center gap-4 bg-white border border-gray-200 rounded-sm shadow-sm px-4 py-3 hover:shadow-md transition duration-200 animate__animated animate__fadeInUp min-h-20 w-full h-full">
-            <Image
-              src={imageSrc}
-              width={60}
-              height={60}
-              alt={truncate(title) || "photo"}
-              className="rounded-md object-cover w-16 h-16 drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]"
-              quality={100}
-              priority={true}
-            />
-            <div className="flex flex-col justify-center w-full">
-              <p className="font-semibold text-gray-800 truncate text-sm">
+          <div
+            className="flex flex-row items-center gap-4 bg-white dark:bg-slate-900 
+                          border border-gray-200 dark:border-slate-700 
+                          hover:border-gray-300 dark:hover:border-slate-600
+                          rounded-xl shadow-sm hover:shadow-md 
+                          transition-all duration-200 
+                          animate__animated animate__fadeInUp 
+                          min-h-[88px] p-4 group"
+          >
+            <div className="relative flex-shrink-0">
+              <Image
+                src={imageSrc}
+                width={64}
+                height={64}
+                alt={title || "item"}
+                className="rounded-xl object-cover w-16 h-16 shadow-sm 
+                           ring-1 ring-gray-200 dark:ring-slate-700 group-hover:ring-orange-200 dark:group-hover:ring-orange-800 transition-all"
+                quality={100}
+              />
+            </div>
+
+            <div className="flex flex-col justify-center flex-1 min-w-0">
+              <p className="font-semibold text-gray-800 dark:text-slate-100 truncate text-[15px] leading-tight">
                 {truncate(title)}
               </p>
-              <Separator />
-              <small className="text-gray-500 mt-1 truncate text-xs">
-                {truncate(subtitle)}
+              <Separator className="my-2 dark:bg-slate-700" />
+              <small className="text-gray-500 dark:text-slate-400 truncate text-sm">
+                {truncate(subtitle, 28)}
               </small>
             </div>
           </div>
         </Link>
       </HoverCardTrigger>
 
-      {/* Overlay dropdown */}
+      {/* Enhanced Hover Card - Fully Theme Responsive */}
       <HoverCardContent
-        className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 z-50"
+        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 
+                   rounded-2xl shadow-xl p-5 w-72 z-50"
         side="top"
         align="start"
+        sideOffset={8}
       >
-        <div className="space-y-2">
-          <p className="font-semibold text-sm text-gray-900">{title}</p>
-          <Separator />
-          <p className="text-xs text-gray-600">{subtitle}</p>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {data.image && (
-              < >
-                <Image
-                  src={imageSrc}
-                  width={60}
-                  height={60}
-                  alt={truncate(title) || "photo"}
-                  className="object-cover w-16 h-16"
-                  quality={100}
-                  priority={true}
-                />
-                <Separator />
-              </>
-            )}
+        <div className="space-y-4">
+          <div className="flex items-start gap-4">
+            <Image
+              src={imageSrc}
+              width={72}
+              height={72}
+              alt={title}
+              className="rounded-xl object-cover shadow-md ring-1 ring-gray-200 dark:ring-slate-700"
+              quality={100}
+            />
+            <div className="flex-1">
+              <p className="font-semibold text-lg text-gray-900 dark:text-white leading-tight">
+                {title}
+              </p>
+              {data.ADCcode || data.ACDcode ? (
+                <p className="text-orange-600 dark:text-orange-400 text-sm font-mono mt-1">
+                  {data.ADCcode || data.ACDcode}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <Separator className="dark:bg-slate-700" />
+
+          <div className="text-sm text-gray-600 dark:text-slate-300">
+            {subtitle || "No additional information"}
+          </div>
+
+          {/* Extra Info Badges */}
+          <div className="flex flex-wrap gap-2 pt-2">
             {data.Email && (
-              <p variant="outline" className="text-xs">
+              <div className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-3 py-1.5 rounded-lg">
                 {data.Email}
-                <Separator />
-              </p>
+              </div>
             )}
-            {data.ADCcode || data.ACDcode && (
-              <span variant="secondary" className="text-xs p-1 bg-blue-300 rounded-md">
-                {data.ADCcode || data.ACDcode}
-                <Separator />
-              </span>
+
+            {data.Debt > 0 && (
+              <div className="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1.5 rounded-lg font-medium">
+                Owes:{" "}
+                {data.Debt.toLocaleString("en-NG", {
+                  style: "currency",
+                  currency: "NGN",
+                })}
+              </div>
             )}
-            {data.Debt > 0  && (
-              <p variant="outline" className="text-xs">
-                {`Owes: ${data.Debt.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}`}
-                <Separator />
-              </p>
+
+            {data.firstName && data.status && (
+              <div
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium ${
+                  data.status === "suspended"
+                    ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400"
+                    : "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400"
+                }`}
+              >
+                {data.status === "suspended" ? "Inactive" : data.status}
+              </div>
             )}
-            {data.firstName && (
-              <span variant="outline" className={`${data.status ==='suspended' ? 'bg-amber-300':"bg-green-300"} p-1 text-xs rounded-md`}>
-                {data.status ==='suspended' ? "Inactive" : data.status}
-              </span>
-            )}
-            {data.refNo && (
-              <span variant="outline" className={`p-1 text-xs rounded-md`}>
+
+            {data.refNo && data.status && (
+              <div className="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
                 {data.status}
-              </span>
+              </div>
             )}
           </div>
         </div>

@@ -73,10 +73,8 @@ export default function DebitNoteModal({ customersList, baseUrl, userData, Accou
   return (
     <>
       <Button
-        onClick={() => setOpen(true)}
-        className="hover:bg-gray-700 text-white p-4 rounded-md flex items-center gap-2 transition-colors duration-200 shadow-sm w-full text-xs"
-      >
-        <BanknotesIcon className="h-5 w-5 text-white" />
+        onClick={() => setOpen(true)} variant="default">
+        <BanknotesIcon className="h-5 w-5" />
         Create Debit Note
       </Button>
 

@@ -74,9 +74,9 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
     <>
       <Button
         onClick={() => setOpen(true)}
-        className="hover:bg-gray-700 text-white p-4 rounded-md flex items-center gap-2 transition-colors duration-200 shadow-sm w-full text-xs"
+        variant="default"
       >
-        <CreditCardIcon className="h-5 w-5 text-white" />
+        <CreditCardIcon className="h-5 w-5" />
         Create Credit Note
       </Button>
 

@@ -55,7 +55,8 @@ export default function DeliveryModal({ id, user, business }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+          "idempotency-key": `delivery-${id}`,
         },
         body: JSON.stringify(deliveryData),
       });
@@ -80,7 +81,7 @@ export default function DeliveryModal({ id, user, business }) {
         onClick={() => setOpen(true)}
         className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gray-200 hover:shadow-lg hover:border-gray-400 hover:text-white transition duration-200 ease-in-out mr-1"
       >
-        <NewspaperIcon className="w-5 h-5 text-gray-100" />
+        <NewspaperIcon className="w-5 h-5" />
         <span>Generate Invoice</span>
       </button>
 
@@ -88,12 +89,12 @@ export default function DeliveryModal({ id, user, business }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900">
+            <DialogTitle className="text-2xl font-bold ">
               Invoice Details
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 text-left text-gray-700">
+          <div className="space-y-4 text-left ">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="mb-2">Invoice Date *</Label>
@@ -126,7 +127,7 @@ export default function DeliveryModal({ id, user, business }) {
               <Textarea placeholder="Add any special instructions..." value={deliveryRemarks} onChange={(e) => setDeliveryRemarks(e.target.value)} />
             </div>
 
-            <p className="text-xs text-gray-500 mt-3">* Required fields</p>
+            <p className="text-xs  mt-3">* Required fields</p>
           </div>
 
           <DialogFooter>

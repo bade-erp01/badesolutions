@@ -229,7 +229,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MegaphoneIcon  } from '@heroicons/react/24/outline';
+import { Button } from "@/components/ui/button";
+import {FileText } from "lucide-react";
 
 export default function TextToSpeechTrigger({ text }) {
   const [voice, setVoice] = useState(null);
@@ -279,12 +280,15 @@ export default function TextToSpeechTrigger({ text }) {
   };
 
   return (
-    <span
-      onClick={speakText}
-      className="inline-flex items-center gap-1 cursor-pointer  hover:text-black transition"
-      title="Read aloud to me"
-    >
-      <MegaphoneIcon  className="h-5 w-5 text-black hover:text-black hover:scale-110 hover:drop-shadow-md transition-all duration-300" />
-    </span>
+    <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            onClick={speakText}
+          >
+            <FileText className="w-4 h-4" />
+            <span className="text-xs">Read Summary</span>
+    </Button>
   );
 }

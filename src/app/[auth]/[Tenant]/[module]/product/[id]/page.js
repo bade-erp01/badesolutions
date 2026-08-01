@@ -1363,8 +1363,8 @@ export function ProductPriceList({ initialData, Biz, user }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
-      {formData.PriceLists.length > 0 ? (
-        formData.PriceLists.map((price, idx) => (
+      {formData?.PriceLists?.length > 0 ? (
+        formData?.PriceLists?.map((price, idx) => (
           <Card
             key={idx}
             className="group w-full max-w-xs rounded-sm hover:shadow-md hover:border-border transition-all duration-300 bg-white"

@@ -1,115 +1,213 @@
 "use client";
-import React, { useEffect, useRef, useState, useMemo } from "react";
-import moment from "moment";
+import React, { useEffect, useState, useMemo } from "react";
+import { format } from "date-fns";
 import "animate.css";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
 
-export default function GenerealSalesMargin({
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
+
+function GeneralSalesMargin({
   businessColor = "#27272a",
-  yearlysales,
-  warehouses,
+  yearlysales = [],
+  warehouses = [],
 }) {
-  const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState(null);
-  const [invoices] = useState(Array.isArray(yearlysales) ? yearlysales : []);
-  const [whs] = useState(Array.isArray(warehouses) ? warehouses : []);
 
-  const pieRef = useRef(null);
-  const chartRef = useRef(null);
-  const plotlyRef = useRef(null);
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+  const prevYear = useMemo(() => currentYear - 1, [currentYear]);
+  const currentMonth = useMemo(() => new Date().getMonth(), []);
+  let prevTotal = 0;
 
-  const toNum = (v) => (typeof v === "number" ? v : parseFloat(v) || 0);
 
-  // Memoized aggregates
-  const { monthTotals, whTotals } = useMemo(() => {
-    const year = moment().year();
+  const { totalRevenue, yoyGrowth, momGrowth, chartData } = useMemo(() => {
     const monthTotals = new Array(12).fill(0);
-    const whTotals = new Map(whs.map((wh) => [String(wh._id), 0]));
+    const whTotals = new Map(warehouses.map((wh) => [String(wh._id), 0]));
 
-    invoices.forEach((inv) => {
-      if (!inv) return;
-      if (String(inv.billStatus || "").toLowerCase() === "cancelled") return;
+    let currentTotal = 0;
+    
 
-      const s = moment(inv.startDate);
-      if (s.isValid() && s.year() === year) {
-        monthTotals[s.month()] += toNum(inv.grandTotal);
+    for (const inv of yearlysales) {
+      if (!inv || String(inv.billStatus || "").toLowerCase() === "cancelled")
+        continue;
+
+      const s = new Date(inv.startDate);
+      if (isNaN(s)) continue;
+
+      const amount = toNum(inv.grandTotal);
+      const year = s.getFullYear();
+
+      if (year === currentYear) {
+        monthTotals[s.getMonth()] += amount;
+        currentTotal += amount;
+      } else if (year === prevYear) {
+        prevTotal += amount;
       }
+    }
 
-      const whId = inv.whId ? String(inv.whId) : null;
-      if (whId && whTotals.has(whId)) {
-        whTotals.set(whId, whTotals.get(whId) + toNum(inv.grandTotal));
-      }
-    });
+    // YoY Growth
+    let growth = 0;
+    if (prevTotal > 0) {
+      growth = ((currentTotal - prevTotal) / prevTotal) * 100;
+    } else if (currentTotal > 0) {
+      growth = 100;
+    }
 
-    return { monthTotals, whTotals };
-  }, [invoices, whs]);
+    // MoM Growth
+    const currentMonthSales = monthTotals[currentMonth] || 0;
+    const prevMonthSales = currentMonth > 0 ? monthTotals[currentMonth - 1] : 0;
+    let momGrowth = 0;
+    if (prevMonthSales > 0) {
+      momGrowth = ((currentMonthSales - prevMonthSales) / prevMonthSales) * 100;
+    } else if (currentMonthSales > 0) {
+      momGrowth = 100;
+    }
 
-  // Memoized chart data
-  const pieData = useMemo(() => [{
-    labels: whs.map((w) => w.WHName || "Unknown"),
-    values: whs.map((w) => whTotals.get(String(w._id)) || 0),
-    type: "pie",
-  }], [whs, whTotals]);
+    const chartData = [
+      "JAN","FEB","MAR","APR","MAY","JUN",
+      "JUL","AUG","SEP","OCT","NOV","DEC",
+    ].map((month, index) => ({
+      month,
+      sales: Number(monthTotals[index].toFixed(2)),
+      fill: index === currentMonth ? "#16A085" : businessColor,
+    }));
 
-  const chartData = useMemo(() => {
-    const chartType = Math.random() < 0.5 ? "bar" : "scatter";
-    const chartMode = chartType === "scatter" ? "lines+markers" : undefined;
-    const colors = ["#27272a", "#16A085"];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    return {
+      totalRevenue: currentTotal,
+      yoyGrowth: growth.toFixed(1),
+      momGrowth: momGrowth.toFixed(1),
+      chartData,
+    };
+  }, [yearlysales, warehouses, businessColor, currentYear, prevYear, currentMonth]);
 
-    return [{
-      x: ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],
-      y: monthTotals.map((v) => Number(v.toFixed(2))),
-      type: chartType,
-      mode: chartMode,
-      marker: { color: randomColor || businessColor },
-    }];
-  }, [monthTotals, businessColor]);
+  const chartOptions = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context) => `₦${context.raw.toLocaleString()}`,
+        },
+      },
+    },
+    scales: {
+      y: {
+        ticks: {
+          callback: (value) => `₦${value.toLocaleString()}`,
+        },
+        grid: { color: "#e5e7eb" },
+      },
+      x: { grid: { display: false } },
+    },
+  }), []);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const Plotly = (await import("plotly.js-dist-min")).default;
-        plotlyRef.current = Plotly;
+    const timer = setTimeout(() => setIsReady(true), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
-        if (mounted && pieRef.current) {
-          Plotly.newPlot(pieRef.current, pieData, { title: "REVENUE GENERATION MARGIN" });
-        }
-        if (mounted && chartRef.current) {
-          Plotly.newPlot(chartRef.current, chartData, { title: "M/M SALES TURN OVER" });
-        }
-      } catch (err) {
-        setError(err?.message || String(err));
-      }
-    })();
-
-    return () => {
-      mounted = false;
-      const Plotly = plotlyRef.current;
-      if (Plotly) {
-        if (pieRef.current) Plotly.purge(pieRef.current);
-        if (chartRef.current) Plotly.purge(chartRef.current);
-      }
-    };
-  }, [pieData, chartData]);
+  if (!isReady) {
+    return (
+      <div className="space-y-8 animate__animated animate__fadeInUp">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">General Sales Margin</h2>
+            <p>Overall performance • {format(new Date(), "yyyy")}</p>
+          </div>
+        </div>
+        <div className="h-[420px] flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl border">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-zinc-400 mx-auto"></div>
+            <p className="mt-4 text-sm text-zinc-500">Loading sales analytics...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4 animate__animated animate__fadeInUp animate__faster">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg text-gray-500 font-semibold">
-          Overall Converted Sales for {moment().format("YYYY")}
-        </h3>
-        <div className="text-sm text-gray-500">
-          {loading ? "Loading..." : error ? "Error" : "12 months performance"}
+    <div className="space-y-8 animate__animated animate__fadeInUp">
+      {/* Header + KPIs */}
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">General Sales Margin</h2>
+          <p>Overall performance • {format(new Date(), "yyyy")}</p>
+        </div>
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+
+        <div className="flex flex-wrap gap-4">
+          {/* last year sales */}
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+            <p className="text-sm">Total Revenue • {prevYear}</p>
+            <p className="text-xl font-semibold mt-1">₦{prevTotal.toLocaleString()}</p>
+          </div>
+          
+          {/* Total Revenue */}
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+            <p className="text-sm">Total Revenue • {format(new Date(), "yyyy")}</p>
+            <p className="text-xl font-semibold mt-1 text-green-600">₦{totalRevenue.toLocaleString()}</p>
+          </div>
+
+          {/* YoY Growth */}
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+            <p className="text-sm">YoY Growth</p>
+            <p className={`text-xl font-semibold mt-1 ${parseFloat(yoyGrowth) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              {parseFloat(yoyGrowth) >= 0 ? "+" : ""}
+              {yoyGrowth}%
+            </p>
+            <p className="text-xs">vs last year</p>
+          </div>
+
+          {/* MoM Growth */}
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+            <p className="text-sm">MoM Growth</p>
+            <p className={`text-xl font-semibold mt-1 ${parseFloat(momGrowth) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              {parseFloat(momGrowth) >= 0 ? "+" : ""}
+              {momGrowth}%
+            </p>
+            <p className="text-xs">vs last month</p>
+          </div>
         </div>
       </div>
 
-      {error && <div className="text-sm text-red-600">{error}</div>}
+      {error && <div className="text-red-600 bg-red-50 p-4 rounded-xl">{error}</div>}
 
-      <div>
-        <div ref={chartRef} id="chart" className="max-h-75" style={{ width: "100%", height: "25%" }} />
-        {/* <div ref={pieRef} id="PIE" style={{ width: "100%", height: "50%" }} /> */}
+      {/* Chart */}
+      <div className="dark:bg-zinc-900 rounded-3xl border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-semibold text-lg">Monthly Sales Trend for {format(new Date(), "yyyy")}</h3>
+        </div>
+
+        <div className="w-full h-[380px]">
+          <Bar
+            data={{
+              labels: chartData.map((d) => d.month),
+              datasets: [
+                {
+                  label: "Sales",
+                  data: chartData.map((d) => d.sales),
+                  backgroundColor: chartData.map((d) => d.fill),
+                  borderRadius: 6,
+                },
+              ],
+            }}
+            options={chartOptions}
+          />
+        </div>
       </div>
     </div>
   );
 }
+
+export default React.memo(GeneralSalesMargin);

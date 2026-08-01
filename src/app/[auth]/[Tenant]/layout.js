@@ -1,7 +1,7 @@
-import CookiesPolicyAlert from "@/app/Components/Cookies";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
 import { redirect } from "next/navigation";
 import moment from "moment";
+import CookiesPolicyAlert from "@/app/Components/Cookies";
 import PrivacyIdleOverlay from "@/app/Components/PrivacyOverlay";
 import RenewSubscription from "@/app/Components/RenewSubcription";
 import ParticleBackground from "@/app/Components/Particles"

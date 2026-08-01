@@ -1,9 +1,7 @@
 "use client";
 
 import { downloadExcel } from "../../../Functions/Functions";
-
-import Image from "next/image";
-
+import {Download} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ExcelDownloadBtn({
@@ -34,28 +32,7 @@ export default function ExcelDownloadBtn({
         bg-gray-300
       "
     >
-      <Image
-        src="https://img.icons8.com/color/48/microsoft-excel-2025.png"
-        alt="Download icon"
-        width={24}
-        height={24}
-        priority
-        quality={100}
-        className="shrink-0"
-      />
-
-      <span
-        className="
-          text-xs
-          font-semibold
-          text-black
-          leading-tight
-          break-words
-          whitespace-normal
-        "
-      >
-        Export {page}
-      </span>
+      <Download className="h-4 w-4 ml-2" /> Export {page}
     </Button>
   );
 }
