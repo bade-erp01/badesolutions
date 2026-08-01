@@ -1,6 +1,6 @@
-import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
+import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import TransitPage from "./page";
-import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
+import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
 import { notFound } from "next/navigation";

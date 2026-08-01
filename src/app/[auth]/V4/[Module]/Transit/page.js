@@ -11,8 +11,8 @@ import {
   ErrorMessage,
   SuccessToast,
   plsWait,
-} from "../../../../../../../../Functions/Mics";
-import { totalInWords } from "../../../../../../../../Functions/Functions";
+} from "../../../../../../../Functions/Mics";
+import { totalInWords } from "../../../../../../../Functions/Functions";
 import Link from "next/link";
 import {
   TrashIcon,
