@@ -654,7 +654,7 @@ export function UserProfile({ user, biz }) {
               <span className="text-xs text-muted-foreground">
                 {biz.subscriptionplan} Plan
               </span>
-              <span className="font-medium text-sm">
+              <span className="font-medium text-sm truncate max-w-[140px] block">
                 {user.firstName} {user.lastName}
               </span>
             </div>
