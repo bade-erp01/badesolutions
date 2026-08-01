@@ -4,8 +4,8 @@ import BackButton from "@/app/Components/BackBotton";
 const NaijaStates = require("naija-state-local-government");
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
-import { Encrypt, ErrorMessage, SuccessToast, plsWait } from "../../../../../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
+import { Encrypt, ErrorMessage, SuccessToast, plsWait } from "../../../../../../Functions/Mics";
+import { EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

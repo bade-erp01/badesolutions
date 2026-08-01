@@ -1,5 +1,5 @@
 import NewEmployeeForm from "./page"
-import { fetchUser } from '../../../../../../../Functions/useerDataRefresh';
+import { fetchUser } from '../../../../../../Functions/useerDataRefresh';
 import Nav1 from '@/app/Components/Nav1';
 import BackButton from '@/app/Components/BackBotton';
 import Link from "next/link"
