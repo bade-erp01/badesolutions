@@ -50,7 +50,7 @@ const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
   const {user} = useUser();
-
+  
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -60,7 +60,7 @@ const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-          access: `Bearer ${Encrypt(user.user._id)}`,
+          access: `${Encrypt(user.user._id)}`,
           sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });
