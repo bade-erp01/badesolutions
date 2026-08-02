@@ -119,6 +119,20 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
               {formData.isActivated ? "Activated" : "Deactivated"}
             </Label>
           </div>
+
+           {/* Display as featured product */}
+          <div className="col-span-2 flex items-center space-x-2 pt-2">
+            <Switch
+              id="featured"
+              checked={formData.featured}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, featured: checked }))
+              }
+            />
+            <Label htmlFor="featured">
+              {formData.featured ? "Displayed as featured product on E-commerce" : "Not displayed as featured product on E-commerce"}
+            </Label>
+          </div>
         </div>
 
         {userInfo?.user?.isAdmin && !formData?.FOCProId && (

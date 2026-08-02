@@ -20,6 +20,8 @@ import {
   Legend,
   Filler
 } from 'chart.js';
+import { useUser } from "@/components/UserProvider";
+
 
 ChartJS.register(
   CategoryScale,
@@ -47,6 +49,7 @@ const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
   const [invoices, setInvoices] = useState([]);
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
+  const user = useUser();
 
   const fetchData = async () => {
     try {
@@ -56,9 +59,9 @@ const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${business.tenantId}`,
-          dbConnect: `Bearer ${business.rustyRoof}`,
-          sessionKey: `Bearer ${Encrypt()}`
+          Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
+          access: `Bearer ${Encrypt(user.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
       });
 

@@ -674,6 +674,26 @@ export default function SingleProductpage({
                     </div>
                   </div>
 
+                  <div className="sm:col-span-2 sm:col-start-1">
+                    <label
+                      htmlFor="LeadTime"
+                      className="block text-sm/6 font-medium "
+                    >
+                      Lead Time
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        value={formData.LeadTime}
+                        id="LeadTime"
+                        name="LeadTime"
+                        onChange={handleChange}
+                        type="number"
+                        autoComplete="LeadTime"
+                        className="block w-full rounded-md  px-3 py-1.5 text-base  outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                      />
+                    </div>
+                  </div>
+
                   {/* <div className="sm:col-span-2">
                 <label
                   htmlFor="Sellable"
