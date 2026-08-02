@@ -49,7 +49,7 @@ const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
   const [invoices, setInvoices] = useState([]);
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
-  const user = useUser();
+  const {user} = useUser();
 
   const fetchData = async () => {
     try {
