@@ -5,6 +5,7 @@ import { useState } from "react";
 import { downloadExcel, pricelistSetter,Encrypt } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
+import { useUser } from "@/components/UserProvider";
 
 export default function SalesRportModal({ user, business, baseUrl }) {
   const [StoresList, setStoresList] = useState([]);
@@ -13,6 +14,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
   const [searchPeriod, setSearchPeriod] = useState("");
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const currentUser = useUser();
 
   const fetchData = async () => {
     try {
@@ -22,9 +24,9 @@ export default function SalesRportModal({ user, business, baseUrl }) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
+          access: `${Encrypt(currentUser.user.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`
         },
       });
 

@@ -44,13 +44,13 @@ const statusColors = {
 
 const MySwal = withReactContent(Swal);
 
-const DashboardCharts = ({ business, baseUrl, triggerButton = true }) => {
+const DashboardCharts = ({ baseUrl, triggerButton = true }) => {
   const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState([]);
   const [selectedYear, setSelectedYear] = useState('All');
   const [showModal, setShowModal] = useState(false);
   const {user} = useUser();
-  
+
   const fetchData = async () => {
     try {
       setLoading(true);

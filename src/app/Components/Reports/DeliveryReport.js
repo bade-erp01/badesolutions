@@ -5,6 +5,7 @@ import { useState } from "react";
 import {downloadExcel,Encrypt} from "../../../../Functions/Functions"
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 import { TruckIcon } from "@heroicons/react/24/outline";
+import { useUser } from "@/components/UserProvider";
 
 export default function DeliveryRportModal({user,business, baseUrl }) {
  const [filteredData, setFilteredData] = useState([]);
@@ -13,6 +14,7 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
   const [usersList] = useState(user);
   const [searchPeriod, setSearchPeriod] = useState('')
   const [loading, setLoading] = useState(false);
+  const currentUser = useUser();
 
   const fetchData = async () => {
       try {
@@ -22,9 +24,9 @@ export default function DeliveryRportModal({user,business, baseUrl }) {
           method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${business.tenantId}`,
-              dbConnect: `Bearer ${business.rustyRoof}`,
-              sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+              Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
+              access: `${Encrypt(currentUser.user.user._id)}`,
+              sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`
             },
           });
     

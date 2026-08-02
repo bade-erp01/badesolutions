@@ -20,12 +20,12 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
         plsWait("Loading Report Data...");
         const res = await fetch(`${baseUrl}/api/PayableReports`, {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            dbConnect: `Bearer ${userData.business.rustyRoof}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-          },
+           headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              access: `${Encrypt(userData.user._id)}`,
+              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+            },
         });
   
         if (!res.ok) throw new Error("Failed to fetch product data");
