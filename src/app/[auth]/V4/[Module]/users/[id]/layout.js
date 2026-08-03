@@ -3,11 +3,7 @@ import SingleEmployeeView from "./page";
 import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import Businesses from "../../../../../../../models/Business";
-import Nav1 from "@/app/Components/Nav1";
-import Footer2 from "@/app/Components/Footer2";
-import BackButton from "@/app/Components/BackBotton";
 import CalendarDemo from "@/app/Components/calendar"
-import SideNavWrapper from "@/app/Components/sideNavWrapper"
 
 
 export default async function layout({ children, params }) {
