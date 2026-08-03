@@ -11,13 +11,13 @@ import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import Footer2 from "../Components/Footer2";
 import { useRouter,useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-
 // shadcn/ui imports
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { logout as logoutAction } from "../../../lib/User";
 
 export default function Login({ userInfo, businessInfo, url, SessionId }) {
   const dispatch = useDispatch();
@@ -155,6 +155,21 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
   };
 
   const isLoggedIn = userInfo && businessInfo && SessionId === userInfo?.SessionId;
+
+   const logout = async () => {
+      try {
+
+        SuccessToast("Signing out...");
+  
+        await dispatch(logoutAction());
+  
+        SuccessToast("You have been logged out successfully.");
+  
+        router.push("/");
+      } catch (e) {
+        ErrorMessage("Logout failed. Please try again.");
+      }
+    };
 
   return (
     <div
@@ -300,6 +315,13 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                 </h3>
                 <p className="text-gray-600 mt-1">Glad to see you again.</p>
               </div>
+               <Button
+                    type="button"
+                    onClick={() => logout()}
+                    className="w-full h-12 text-base font-medium bg-red-500 hover:bg-red-600 transition-all"
+               >
+                logout
+               </Button>
             </Card>
           )}
         </div>
