@@ -77,7 +77,7 @@ export default function CustomerForm({
     Debt: Number(cust.Debt),
   });
   const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
-
+console.log(router)
   const [formData, setFormData] = useState({
     bankJournal: "",
     ...cust,
@@ -779,7 +779,7 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
         // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
         navigation.push(
-          `/${router.auth}/V4/${router.Module}/${router.Module}/${Encrypt(data.result)}`,
+          `/${router.auth}/V4/Draft/Draft/${Encrypt(data.result)}`,
         );
       } else {
         Swal.fire({

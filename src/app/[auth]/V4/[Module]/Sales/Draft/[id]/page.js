@@ -849,7 +849,7 @@ export default function DraftInvoicePage({
                       <input
                         type="number"
                         defaultValue={bill.priceListPrice || 0}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                        className="w-20 px-2 py-1 border rounded text-center "
                         onBlur={(e) => {
                           let val = e.target.value;
                           if (val < 0) return;
@@ -899,7 +899,7 @@ export default function DraftInvoicePage({
                 </tr>
               ))}
             </tbody>
-           <caption class="text-sm font-medium text-gray-700 bg-gray-100 p-2 rounded">
+           <caption class="text-sm font-medium p-2 rounded">
               Ensure to verify pricelist on {} account before closing Draft
           </caption>
           </table>
