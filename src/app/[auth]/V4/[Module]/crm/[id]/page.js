@@ -77,7 +77,7 @@ export default function CustomerForm({
     Debt: Number(cust.Debt),
   });
   const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
-console.log(router)
+
   const [formData, setFormData] = useState({
     bankJournal: "",
     ...cust,
@@ -798,7 +798,7 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
   const updateServiceLocation = async () => {
     try {
       plsWait(
-        "Updating service location... Please wait ⏳ This may take a moment.",
+        "Updating service location... Please wait This may take a moment.",
       );
       const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(cust._id)}`;
       const { data } = await axios.patch(
