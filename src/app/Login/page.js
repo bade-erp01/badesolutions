@@ -9,7 +9,7 @@ import { loginSuccess, loginFailure } from "../../../lib/User";
 import { useDispatch, useSelector } from "react-redux";
 import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import Footer2 from "../Components/Footer2";
-import { useRouter,useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 // shadcn/ui imports
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import { logout as logoutAction } from "../../../lib/User";
 export default function Login({ userInfo, businessInfo, url, SessionId }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const path = useParams()
+  const path = useParams();
   const [date, setDate] = useState("");
   const [weekday, setWeekday] = useState("");
   const [time, setTime] = useState("");
@@ -36,7 +36,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     setDate(now.getDate() + getOrdinal(now.getDate()));
     setWeekday(now.toLocaleDateString(undefined, { weekday: "short" }));
     setTime(
-      now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })
+      now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
     );
 
     if (navigator.geolocation) {
@@ -45,7 +45,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
           const { latitude, longitude } = pos.coords;
           try {
             const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
             );
             const data = await res.json();
             setLocation(
@@ -53,13 +53,13 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                 data.address.town ||
                 data.address.village ||
                 data.address.state ||
-                "Your area"
+                "Your area",
             );
           } catch {
             setLocation("Your area");
           }
         },
-        () => setLocation("Your area")
+        () => setLocation("Your area"),
       );
     } else {
       setLocation("Your area");
@@ -125,15 +125,14 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
           user: decryptedUser,
           business: data.Tenant,
           SessionId: data.SessionId,
-          rustyRoof:data.rustyRoof
-        })
+          rustyRoof: data.rustyRoof,
+        }),
       );
 
       setShowSplash(true);
       setFormData({ email: "", password: "" });
 
-      const sanitizedCompanyName = data.Tenant
-        .toLowerCase()
+      const sanitizedCompanyName = data.Tenant.toLowerCase()
         .trim()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "");
@@ -154,22 +153,22 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     }
   };
 
-  const isLoggedIn = userInfo && businessInfo && SessionId === userInfo?.SessionId;
+  const isLoggedIn =
+    userInfo && businessInfo && SessionId === userInfo?.SessionId;
 
-   const logout = async () => {
-      try {
+  const logout = async () => {
+    try {
+      SuccessToast("Signing out...");
 
-        SuccessToast("Signing out...");
-  
-        await dispatch(logoutAction());
-  
-        SuccessToast("You have been logged out successfully.");
-  
-        router.push("/");
-      } catch (e) {
-        ErrorMessage("Logout failed. Please try again.");
-      }
-    };
+      await dispatch(logoutAction());
+
+      SuccessToast("You have been logged out successfully.");
+
+      router.push("/");
+    } catch (e) {
+      ErrorMessage("Logout failed. Please try again.");
+    }
+  };
 
   return (
     <div
@@ -178,9 +177,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         backgroundImage: "url('/bg.jpg')",
       }}
     >
-      <AnimatePresence>
-        {showSplash && <BadeSplashScreen />}
-      </AnimatePresence>
+      <AnimatePresence>{showSplash && <BadeSplashScreen />}</AnimatePresence>
 
       <Nav1
         user={userInfo}
@@ -282,7 +279,9 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       <div>
                         {time}
                         <br />
-                        <span className="text-xs text-gray-500">How&apos;s {location} today?</span>
+                        <span className="text-xs text-gray-500">
+                          How&apos;s {location} today?
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -303,7 +302,9 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
           ) : (
             <Card className="max-w-sm w-full bg-white shadow-xl p-6 flex items-center gap-5">
               <Image
-                src={userInfo?.image || businessInfo?.companyLogo || "/bade.jpg"}
+                src={
+                  userInfo?.image || businessInfo?.companyLogo || "/bade.jpg"
+                }
                 alt="User"
                 width={72}
                 height={72}
@@ -315,13 +316,13 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                 </h3>
                 <p className="text-gray-600 mt-1">Glad to see you again.</p>
               </div>
-               <Button
-                    type="button"
-                    onClick={() => logout()}
-                    className="w-full h-12 text-base font-medium bg-red-500 hover:bg-red-600 transition-all"
-               >
+              <Button
+                type="button"
+                onClick={() => logout()}
+                className="w-full h-12 text-base font-medium bg-red-500 hover:bg-red-600 transition-all"
+              >
                 logout
-               </Button>
+              </Button>
             </Card>
           )}
         </div>
@@ -339,13 +340,11 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
   );
 }
 
-
-
 // demo screen brfore login
 export function BadeSplashScreen() {
   const [visible, setVisible] = useState(true);
   const [glow, setGlow] = useState(false);
-  const timeout = 10000
+  const timeout = 10000;
 
   useEffect(() => {
     const glowTimer = setTimeout(() => {
@@ -429,5 +428,3 @@ export function BadeSplashScreen() {
     </AnimatePresence>
   );
 }
-
-
