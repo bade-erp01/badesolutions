@@ -243,9 +243,9 @@ export default function Wrapper({ children }) {
         }
 
         // delete user cookies
-        await dispatch(logoutAction());
         SuccessToast("Tenant switched successfully.");
-        router.push(`Login`);
+        await dispatch(logoutAction());
+        router.push(`/Login`);
       } catch (error) {
         ErrorMessage("An error occurred while switching tenant.");
       }

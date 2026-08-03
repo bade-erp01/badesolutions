@@ -560,7 +560,7 @@ export default function MainDash({ userData }) {
 
               {/* === MONITORED PRODUCTS TABLE (shadcn) === */}
               {sortedMonitoredProducts.length > 0 && (
-                <div className="bg-white rounded-xl p-6 mt-6  border-0">
+                <div className="rounded-xl p-6 mt-6  border-0">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold">
                       Monitored Products
@@ -615,7 +615,7 @@ export default function MainDash({ userData }) {
                     <button
                       onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage - 1)}
                       disabled={monitoredCurrentPage === 1}
-                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors text-gray-300"
+                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors "
                     >
                       Prev
                     </button>
@@ -625,7 +625,7 @@ export default function MainDash({ userData }) {
                         onClick={() => handleMonitoredProductPageChange(i + 1)}
                         className={`px-4 py-2 rounded-md border transition-colors ${
                           monitoredCurrentPage === i + 1
-                            ? "bg-indigo-600 text-white border-indigo-600"
+                            ? "bg-indigo-600 border-indigo-600"
                             : "border-gray-300 "
                         }`}
                       >
@@ -635,7 +635,7 @@ export default function MainDash({ userData }) {
                     <button
                       onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage + 1)}
                       disabled={monitoredCurrentPage === totalMonitoredProductPages}
-                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors text-gray-300"
+                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors"
                     >
                       Next
                     </button>

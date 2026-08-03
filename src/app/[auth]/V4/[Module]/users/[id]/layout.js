@@ -48,13 +48,6 @@ export default async function layout({ children, params }) {
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
-        {/* Sidebar (collapsible on mobile) */}
-        {/* <SideNavWrapper>
-          <BackButton />
-          <hr />
-           {userInfo.business.subscriptionplan !== "Basic" && <CalendarDemo employee={data}/>}
-        </SideNavWrapper>{" "} */}
-        {/* Main Content Area */}
         <main className="flex-1 ">
               <SingleEmployeeView
                 userInfo={userInfo.user}
@@ -64,7 +57,6 @@ export default async function layout({ children, params }) {
                 module={Params?.module}
                 businessData={businessData}
                 storeList={StoreList}
-                // storeList={[]}
                 custList={custList || []}
               />
         </main>
