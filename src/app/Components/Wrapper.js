@@ -415,7 +415,7 @@ export default function Wrapper({ children }) {
               user.user &&
               pathname !== `/${Params.auth}/V4` && <BackButton />}
 
-            {user.user?.Apps?.sort((a, b) => a.Name.localeCompare(b.Name)).map(
+            {user.user?.Apps?.filter((app) => app.Name !== "Employee Management").sort((a, b) => a.Name.localeCompare(b.Name)).map(
               (item) => {
                 const isActive =
                   pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
