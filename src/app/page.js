@@ -268,6 +268,7 @@ const logos = [
   "/logo3.jpg",
   "/WhatsApp Image 2025-03-12 at 09.55.20_dfbb45cd.jpg",
   "/logo.webp",
+  "https://res.cloudinary.com/dgiajxtvn/image/upload/v1785151551/qc6dc_hyndll.jpg"
 ];
 
 export function TrustedBusinessesSection() {

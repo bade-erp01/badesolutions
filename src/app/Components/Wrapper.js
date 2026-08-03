@@ -67,6 +67,8 @@ export default function Wrapper({ children }) {
   const Params = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const page = Params.Module;
+  const dispatch = useDispatch();
+
 
   // Driver.js Tour
   const startTour = () => {
@@ -240,8 +242,10 @@ export default function Wrapper({ children }) {
           throw new Error("Failed to switch tenant.");
         }
 
+        // delete user cookies
+        await dispatch(logoutAction());
         SuccessToast("Tenant switched successfully.");
-        router.refresh();
+        router.push(`Login`);
       } catch (error) {
         ErrorMessage("An error occurred while switching tenant.");
       }
