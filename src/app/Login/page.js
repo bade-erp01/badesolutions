@@ -420,7 +420,7 @@ export function BadeSplashScreen() {
               initial={{ width: 0 }}
               animate={{ width: "220px" }}
               transition={{ duration: timeout / 1000, ease: "linear" }}
-              className="mt-8 h-[2px] rounded-full bg-white/70"
+              className="mt-8 h-0.5 rounded-full bg-white/70"
             />
           </motion.div>
         </motion.div>

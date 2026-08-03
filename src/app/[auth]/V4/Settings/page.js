@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Settings as SettingsIcon,
   UserPlus,
   Search,
   Edit3,
-  Trash2,
+  Loader2,
   X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -33,10 +33,17 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import moment from "moment";
 import { ExternalLink } from "lucide-react";
-import {useRouter,useParams} from "next/navigation"
-import { Encrypt, Dencrypt } from "../../../../../Functions/Functions";
+import { useRouter, useParams } from "next/navigation";
+import { ErrorMessage, SuccessToast, plsWait } from "../../../../../Functions/Mics"
+import { Encrypt, Dencrypt ,EXPRESS_PRIVATE_URL} from "../../../../../Functions/Functions";
+import { useUser } from "@/components/UserProvider";
 
-export default function SettingsPage({ userList, userData, businessInfo ,baseUrl}) {
+export default function SettingsPage({
+  userList,
+  userData,
+  businessInfo,
+  baseUrl,
+}) {
   const [activeTab, setActiveTab] = useState("general");
   const [users] = useState(userList.data);
   const [dashboardPrefs, setDashboardPrefs] = useState({
@@ -88,9 +95,9 @@ export default function SettingsPage({ userList, userData, businessInfo ,baseUrl
 
             {/* General Tab */}
             {activeTab === "general" && (
-             <div>
-               <CompanyProfileForm data={businessInfo} userData={userData} />
-             </div>
+              <div>
+                <CompanyProfileForm data={businessInfo} userData={userData} />
+              </div>
             )}
 
             {/* Users & Permissions Tab */}
@@ -98,9 +105,7 @@ export default function SettingsPage({ userList, userData, businessInfo ,baseUrl
 
             {/* Notifications Tab */}
             {activeTab === "notifications" && (
-              <NotificationSettings
-                data={businessInfo}
-              />
+              <NotificationSettings data={businessInfo} />
             )}
 
             {/* Audit Logs Tab */}
@@ -121,10 +126,15 @@ export default function SettingsPage({ userList, userData, businessInfo ,baseUrl
             )}
 
             {activeTab === "App" && (
-              <Card className="mt-3"> 
+              <Card className="mt-3">
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Button asChild>
-                    <Link href="/auth/Apps" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <Link
+                      href="/auth/Apps"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
                       Go to App Store
                       <ExternalLink className="w-4 h-4" />
                     </Link>
@@ -140,300 +150,347 @@ export default function SettingsPage({ userList, userData, businessInfo ,baseUrl
 }
 
 // ====================== USERS & PERMISSIONS PAGE ======================
-function UsersPermissionsPage({ users }) {
-  const [userslist, setUserslist] = useState(users);
+
+export function UsersPermissionsPage({ users }) {
+  const [usersList, setUsersList] = useState(users || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const router = useRouter()
-  const Path = useParams()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
+  const Path = useParams();
+  const currentUser = useUser();
   const pageSize = 10;
 
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
-    email: "",
-    phone: "",
-    dateOfBirth: "",
-    role: "Operator",
-    department: "Operations",
-    permissions: ["View Dashboard", "View Safety Reports", "Create Incidents"],
+    Email: "",
+    telephone: "",
+    DOB: "",
   });
 
-  const availablePermissions = [
-    "View Dashboard",
-    "View Safety Reports",
-    "Create Incidents",
-    "Edit Safety Data",
-    "Manage Users",
-    "Approve Actions",
-    "Export Reports",
-    "View Audit Logs",
-    "Manage Integrations",
-    "Access Critical Path",
-  ];
+  // Optimized filtering + sorting (non-mutating)
+  const filteredUsers = useMemo(() => {
+    return [...usersList]
+      .sort((a, b) => {
+        const nameA = (a.firstName || "").toLowerCase();
+        const nameB = (b.firstName || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      })
+      .filter((user) => {
+        const search = searchTerm.toLowerCase().trim();
 
-  const roleDefaultPermissions = {
-    Admin: availablePermissions,
-    Supervisor: [
-      "View Dashboard",
-      "View Safety Reports",
-      "Create Incidents",
-      "Edit Safety Data",
-      "Approve Actions",
-      "Export Reports",
-    ],
-    Operator: ["View Dashboard", "View Safety Reports", "Create Incidents"],
-    Viewer: ["View Dashboard", "View Safety Reports"],
-  };
-
-  // Update permissions when role changes
-  useEffect(() => {
-    setNewUser((prev) => ({
-      ...prev,
-      permissions: roleDefaultPermissions[prev.role] || [],
-    }));
-  }, [newUser.role]);
-
-  // Fixed Status Filter + Search
-  const filteredUsers = userslist.sort((a, b) => {
-      const nameA = (a.firstName || "").toLowerCase();
-      const nameB = (b.firstName || "").toLowerCase();
-      return nameA.localeCompare(nameB);
-      }).filter((user) => {
         const matchesSearch =
-          (user.firstName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-          (user.lastName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-          (user.Email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+          !search ||
+          (user.firstName || "").toLowerCase().includes(search) ||
+          (user.lastName || "").toLowerCase().includes(search) ||
+          (user.Email || "").toLowerCase().includes(search);
 
         const matchesStatus =
           selectedStatus === "All" ||
-          user.status?.toLowerCase() === selectedStatus.toLowerCase();
+          (user.status || "").toLowerCase() === selectedStatus.toLowerCase();
 
         return matchesSearch && matchesStatus;
-  });
+      });
+  }, [usersList, searchTerm, selectedStatus]);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / pageSize);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
 
-  // Reset to page 1 when filter changes
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredUsers.slice(start, start + pageSize);
+  }, [filteredUsers, currentPage]);
+
+  // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedStatus]);
 
-  const handleAddUser = (e) => {
-    e.preventDefault();
-    if (!newUser.firstName || !newUser.email) return;
-
-    const user = {
-      id: Date.now(),
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      Email: newUser.email,
-      phone: newUser.phone,
-      dateOfBirth: newUser.dateOfBirth,
-      role: newUser.role,
-      department: newUser.department,
-      status: "Active",
-      lastActive: "Just now",
-      permissions: [...newUser.permissions],
-    };
-
-    setUserslist([user, ...userslist]);
+  const resetForm = () => {
     setNewUser({
       firstName: "",
       lastName: "",
-      email: "",
-      phone: "",
-      dateOfBirth: "",
-      role: "Operator",
-      department: "Operations",
-      permissions: roleDefaultPermissions.Operator,
+      Email: "",
+      telephone: "",
+      DOB: "",
     });
-    setIsModalOpen(false);
   };
 
-  const togglePermission = (permission) => {
-    setNewUser((prev) => ({
-      ...prev,
-      permissions: prev.permissions.includes(permission)
-        ? prev.permissions.filter((p) => p !== permission)
-        : [...prev.permissions, permission],
-    }));
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+
+    if (!newUser.firstName.trim() || !newUser.Email.trim()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        firstName: newUser.firstName.trim(),
+        lastName: newUser.lastName.trim(),
+        Email: newUser.Email.trim(),
+        telephone: newUser.telephone.trim(),
+        DOB: newUser.DOB,
+      };
+
+      const req = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/createUser/${Encrypt(currentUser.user.user._id)}`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
+            access: `${Encrypt(currentUser.user.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`,
+          },
+        }
+      );
+
+      const res = await req.json();
+
+      if (!req.ok) {
+        throw new Error(res?.message || "Failed to create user");
+      }
+
+      // Optimistically add the new user
+      const createdUser = res?.data || res?.user || {
+        ...payload,
+        _id: res?._id || Date.now().toString(),
+        status: "Active",
+      };
+
+      resetForm();
+      SuccessToast("User created successfully");
+      setIsModalOpen(false);
+      router.refresh();
+      // router.push(`/${Path.auth}/V4/users/users/${createdUser.user}`);
+    } catch (error) {
+      ErrorMessage(error.message || "Something went wrong while creating the user");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const getUserId = (user) => user._id || user.id;
 
   return (
     <div className="flex overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-auto p-2">
-          <div className="">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h1 className="text-2xl font-semibold">User Management</h1>
-                <p className="text-muted-foreground mt-1">
-                  Manage user accounts, roles, and access permissions
-                </p>
-              </div>
-              <Button onClick={() => setIsModalOpen(true)}>
-                <UserPlus className="w-4 h-4 mr-2" />
-                Add New User
-              </Button>
+        <div className="flex-1 overflow-auto p-2 sm:p-4">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-semibold">User Management</h1>
+              <p className="text-muted-foreground mt-1">
+                Manage user accounts, roles, and access permissions
+              </p>
+            </div>
+            <Button onClick={() => setIsModalOpen(true)}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add New User
+            </Button>
+          </div>
+
+          {/* Search + Filter */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users by name or email..."
+                type="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 text-muted-foreground" />
-                <Input
-                  placeholder="Search users by name or email..."
-                  type="search"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Filter by Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Status</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Suspended">Suspended</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All Status</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  All Users • {filteredUsers.length} results
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-4 px-6">User</th>
-                        <th className="text-left py-4 px-6">Status</th>
-                        <th className="text-right py-4 px-6">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedUsers.length > 0 ? (
-                        paginatedUsers.map((user) => (
-                          <tr key={user.id} className="border-b hover:bg-muted/50">
-                            <td className="py-4 px-6">
-                              <div className="font-medium">
-                                {user.firstName} {user.lastName}
-                              </div>
-                              <a
-                                href={`mailto:${user.Email}`}
-                                className="text-sm text-blue-600 hover:underline"
-                              >
-                                {user.Email}
-                              </a>
-                            </td>
-                            <td className="py-4 px-6">
-                              <Badge
-                                variant={
-                                  user.status?.toLowerCase() === "active"
-                                    ? "default"
-                                    : "secondary"
-                                }
-                              >
-                                {user.status}
-                              </Badge>
-                            </td>
-                            <td className="py-4 px-6 text-right">
-                              <Button variant="ghost" size="icon" className="cursor-pointer" onClick={()=>router.push(`/${Path.auth}/V4/users/users/${Encrypt(user._id)}`)}>
-                                <Edit3 className="h-4 w-4" />
-                              </Button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={3} className="text-center py-12 text-muted-foreground">
-                            No users found.
+          {/* Users Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                All Users • {filteredUsers.length} result
+                {filteredUsers.length !== 1 ? "s" : ""}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-4 px-4 sm:px-6 font-medium">
+                        User
+                      </th>
+                      <th className="text-left py-4 px-4 sm:px-6 font-medium">
+                        Status
+                      </th>
+                      <th className="text-right py-4 px-4 sm:px-6 font-medium">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedUsers.length > 0 ? (
+                      paginatedUsers.map((user) => (
+                        <tr
+                          key={getUserId(user)}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="py-4 px-4 sm:px-6">
+                            <div className="font-medium">
+                              {user.firstName} {user.lastName}
+                            </div>
+                            <a
+                              href={`mailto:${user.Email}`}
+                              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                              {user.Email}
+                            </a>
+                          </td>
+                          <td className="py-4 px-4 sm:px-6">
+                            <Badge
+                              variant={
+                                user.status?.toLowerCase() === "active"
+                                  ? "default"
+                                  : "secondary"
+                              }
+                            >
+                              {user.status || "—"}
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-4 sm:px-6 text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="cursor-pointer"
+                              onClick={() =>
+                                router.push(
+                                  `/${Path.auth}/V4/users/users/${Encrypt(
+                                    getUserId(user)
+                                  )}`
+                                )
+                              }
+                            >
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
                           </td>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={3}
+                          className="text-center py-12 text-muted-foreground"
+                        >
+                          No users found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="text-sm text-muted-foreground">
-                      Showing {(currentPage - 1) * pageSize + 1} to{" "}
-                      {Math.min(currentPage * pageSize, filteredUsers.length)} of{" "}
-                      {filteredUsers.length} users
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </Button>
-
-                      <div className="flex gap-1">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <Button
-                            key={page}
-                            variant={currentPage === page ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </Button>
-                        ))}
-                      </div>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                        }
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </Button>
-                    </div>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {(currentPage - 1) * pageSize + 1} to{" "}
+                    {Math.min(currentPage * pageSize, filteredUsers.length)} of{" "}
+                    {filteredUsers.length} users
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+
+                    <div className="flex gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter((page) => {
+                          if (totalPages <= 5) return true;
+                          return (
+                            page === 1 ||
+                            page === totalPages ||
+                            Math.abs(page - currentPage) <= 1
+                          );
+                        })
+                        .map((page, index, arr) => (
+                          <div key={page} className="flex items-center">
+                            {index > 0 && arr[index - 1] !== page - 1 && (
+                              <span className="px-1 text-muted-foreground">
+                                …
+                              </span>
+                            )}
+                            <Button
+                              variant={
+                                currentPage === page ? "default" : "outline"
+                              }
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                            >
+                              {page}
+                            </Button>
+                          </div>
+                        ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, totalPages)
+                        )
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Add User Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white text-black rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+          <div className="bg-background text-foreground rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden border shadow-xl">
             <div className="flex items-center justify-between p-6 border-b">
               <div className="flex items-center gap-3">
-                <UserPlus className="h-6 w-6 text-emerald-600" />
+                <UserPlus className="h-6 w-6 text-primary" />
                 <h2 className="text-xl font-semibold">Add New User</h2>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  resetForm();
+                }}
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -441,12 +498,13 @@ function UsersPermissionsPage({ users }) {
 
             <form
               onSubmit={handleAddUser}
-              className="p-6 space-y-6 overflow-auto max-h-[calc(90vh-80px)]"
+              className="p-6 space-y-5 overflow-auto max-h-[calc(90vh-80px)]"
             >
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>First Name</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
                   <Input
+                    id="firstName"
                     required
                     value={newUser.firstName}
                     onChange={(e) =>
@@ -455,9 +513,10 @@ function UsersPermissionsPage({ users }) {
                     placeholder="John"
                   />
                 </div>
-                <div>
-                  <Label>Last Name</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
                   <Input
+                    id="lastName"
                     required
                     value={newUser.lastName}
                     onChange={(e) =>
@@ -468,38 +527,43 @@ function UsersPermissionsPage({ users }) {
                 </div>
               </div>
 
-              <div>
-                <Label>Email Address</Label>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
                 <Input
+                  id="email"
                   type="email"
                   required
-                  value={newUser.email}
+                  value={newUser.Email}
                   onChange={(e) =>
-                    setNewUser({ ...newUser, email: e.target.value })
+                    setNewUser({ ...newUser, Email: e.target.value })
                   }
-                  placeholder="user@nlng.com"
+                  placeholder={
+                    currentUser?.user?.business?.email || "user@example.com"
+                  }
                 />
               </div>
 
-              <div>
-                <Label>Telephone</Label>
+              <div className="space-y-2">
+                <Label htmlFor="telephone">Telephone</Label>
                 <Input
+                  id="telephone"
                   type="tel"
-                  value={newUser.phone}
+                  value={newUser.telephone}
                   onChange={(e) =>
-                    setNewUser({ ...newUser, phone: e.target.value })
+                    setNewUser({ ...newUser, telephone: e.target.value })
                   }
                   placeholder="+234 901 234 5678"
                 />
               </div>
 
-              <div>
-                <Label>Date of Birth</Label>
+              <div className="space-y-2">
+                <Label htmlFor="dob">Date of Birth</Label>
                 <Input
+                  id="dob"
                   type="date"
-                  value={newUser.dateOfBirth}
+                  value={newUser.DOB}
                   onChange={(e) =>
-                    setNewUser({ ...newUser, dateOfBirth: e.target.value })
+                    setNewUser({ ...newUser, DOB: e.target.value })
                   }
                 />
               </div>
@@ -509,12 +573,23 @@ function UsersPermissionsPage({ users }) {
                   type="button"
                   variant="destructive"
                   className="flex-1"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    resetForm();
+                  }}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1">
-                  Create User
+                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create User"
+                  )}
                 </Button>
               </div>
             </form>
@@ -524,7 +599,6 @@ function UsersPermissionsPage({ users }) {
     </div>
   );
 }
-
 
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -683,7 +757,6 @@ const CompanyProfileForm = ({ data, userData }) => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 gap-6">
-
                   {/* Allow Price Change */}
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
@@ -824,7 +897,7 @@ const CompanyProfileForm = ({ data, userData }) => {
                 <div>Amount: {formData.SubcriptionAmount}</div>
                 <div>Pending License: {formData.Pendinglicense}</div>
               </div>
-               <Separator />
+              <Separator />
               <div className="flex justify-between">
                 <div>Notifications Token</div>
                 <div className="text-md font-bold">0</div>
@@ -924,8 +997,6 @@ const CompanyProfileForm = ({ data, userData }) => {
   );
 };
 
-
-
 const NotificationSettings = ({ data, onSubmit }) => {
   const [settings, setSettings] = React.useState({
     dailyReport: data?.dailyReport || false,
@@ -933,9 +1004,9 @@ const NotificationSettings = ({ data, onSubmit }) => {
   });
 
   const handleToggle = (key) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
@@ -982,7 +1053,10 @@ const NotificationSettings = ({ data, onSubmit }) => {
           {/* Monthly Customer Statements */}
           <div className="flex items-center justify-between py-1">
             <div className="space-y-1">
-              <Label htmlFor="monthlyCutStatement" className="text-base cursor-pointer">
+              <Label
+                htmlFor="monthlyCutStatement"
+                className="text-base cursor-pointer"
+              >
                 Monthly Customer Statements
               </Label>
               <p className="text-sm text-muted-foreground">
@@ -1005,9 +1079,9 @@ const NotificationSettings = ({ data, onSubmit }) => {
                   Additional Cost Notice
                 </p>
                 <p className="text-amber-600/80 dark:text-amber-500">
-                  Each service you turn on may attract extra charges depending on 
-                  your current subscription plan. You will be notified before any 
-                  billing occurs.
+                  Each service you turn on may attract extra charges depending
+                  on your current subscription plan. You will be notified before
+                  any billing occurs.
                 </p>
               </div>
             </div>
