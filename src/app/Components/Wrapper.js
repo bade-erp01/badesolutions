@@ -460,10 +460,10 @@ export default function Wrapper({ children }) {
                 <SelectContent>
                   {user?.user?.toogledTenants?.map((tenant) => (
                     <SelectItem
-                      key={tenant.tenantIds._id}
-                      value={tenant.tenantIds._id}
+                      key={tenant?.tenantIds?._id}
+                      value={tenant?.tenantIds?._id}
                     >
-                      {tenant.tenantIds.companyName}
+                      {tenant?.tenantIds?.companyName}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -496,10 +496,10 @@ export default function Wrapper({ children }) {
                 <SelectContent>
                   {user?.user?.toogledTenants?.map((tenant) => (
                     <SelectItem
-                      key={tenant.tenantIds._id}
-                      value={tenant.tenantIds._id}
+                      key={tenant?.tenantIds?._id}
+                      value={tenant?.tenantIds?._id}
                     >
-                      {tenant.tenantIds.companyName}
+                      {tenant?.tenantIds?.companyName}
                     </SelectItem>
                   ))}
                 </SelectContent>
