@@ -77,7 +77,7 @@ export default async function paymentlayout({ children, params }) {
                 {data.map((account) => (
                   <Link
                     key={account._id}
-                    href={`/${moduleList.auth}/${moduleList.Tenant}/${moduleList.module}/accounting/${moduleList.id}/Bank-Accounts/${Encrypt(account._id)}`}
+                    href={`/${moduleList.auth}/V4/accounting/accounting/Bank-Accounts/Bank-Accounts/${Encrypt(account._id)}`}
                     title={account.NAME}
                     className="block w-full h-full text-xs"
                     style={{ textDecoration: "none" }}

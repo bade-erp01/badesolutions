@@ -1,11 +1,11 @@
-import Nav1 from "@/app/Components/Nav1";
+import Notch from "@/app/Components/Notch";
 import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt,Dencrypt } from "../../../../../../../../../Functions/Functions";
+import { Encrypt } from "../../../../../../../../../Functions/Functions";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
-import BankStatement from "@/app/Components/Reports/BankStatement"
+import BankStatement from "@/app/Components/Reports/BankStatement";
 import { notFound } from "next/navigation";
-import Page from "./page"
+import Page from "./page";
 import moment from "moment";
 
 export const metadata = {
@@ -35,78 +35,70 @@ export const metadata = {
     "Affordable ERP",
     "Scalable ERP Solutions",
   ],
-  author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow", // Allows search engines to index and follow links
-  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff", // Moved themeColor here
-  ogTitle:
-    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
-  ogDescription:
-    "Streamline your business with AI-driven automation, real-time insights, and scalability",
-  ogImage: "/assets/bade.png", // Preview image when shared on social media
-  ogUrl: "https://badesolutions.com.ng",
-  twitterCard: "/assets/bade.png",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription:
-    "Automate and optimize your enterprise with cutting-edge business solutions",
-  twitterImage: "/assets/bade.png",
-  facicon: "/favicon",
+  authors: [{ name: "Business Automated Dynamic Enterprise" }],
+  robots: "index, follow",
+  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
+  openGraph: {
+    title:
+      "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
+    description:
+      "Streamline your business with AI-driven automation, real-time insights, and scalability",
+    url: "https://badesolutions.com.ng",
+    images: ["/assets/bade.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Business Automated Dynamic Enterprise [B.A.D.E]",
+    description:
+      "Automate and optimize your enterprise with cutting-edge business solutions",
+    images: ["/assets/bade.png"],
+  },
+  icons: {
+    icon: "/favicon",
+  },
 };
 
-export default async function paymentlayout({ children, params }) {
-  const moduleList = await params;
+export default async function PaymentLayout({ children, params }) {
+  const { account } = await params;
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Bank/Account/${moduleList.account}`, {
+
+  const res = await fetch(`${baseUrl}/api/Bank/Account/${account}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+      Access: Encrypt(userData.user._id),
+      SessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
     },
-    next: { revalidate: 60 } // cache for 1 minutes
+    next: { revalidate: 60 }, // cache for 1 minute
   });
 
+  if (!res.ok) return notFound();
+
   const data = await res.json();
-  if(!data.account) return notFound()
+  if (!data.account) return notFound();
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
-      <Nav1
-        user={userData.user}
-        business={userData.business}
-        page={`${data.account.NAME}`}
-      />
+    <div className="flex flex-col overflow-hidden">
+      <Notch>
+        <BackButton />
+        <hr />
+        <span className="group flex items-center gap-4 p-3 rounded-md transition text-sm w-full">
+          Current Bal: {data.account.Balance.toLocaleString()}
+        </span>
+        <span className="group flex items-center gap-4 p-3 rounded-md transition text-xs w-full">
+          Updated: {moment(data.account.updatedAt).fromNow()}
+        </span>
 
-      <div className="flex flex-1 text-white bt-2 ">
-        {/* Sidebar (collapsible on mobile) */}
-        <aside
-          className={`bg-[#1e1e20]/80 backdrop-blur-lg
-          text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] overflow-y-auto md:block`}
-          style={{ overflowY: "auto" }}
-        >
-          <BackButton />
-          <hr />
-          <nav className="space-y-4">
-            {/* Sidebar content can go here */}
-            <span  className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-sm w-full">
-             Current Bal: {data.account.Balance.toLocaleString()}
-            </span>
-             <span  className="group flex items-center gap-4 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full">
-             Updated: {moment(data.account.updatedAt).fromNow()}
-            </span>
+        <BankStatement dataArray={data.Entries} bank={data.account} />
+      </Notch>
 
-            <BankStatement  dataArray={data.Entries} bank={data.account}/>
-          </nav>
-        </aside>{" "}
-        {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 rounded-lg p-2 relative max-h-[81dvh] overflow-y-auto">
-           <Page data={data}/>
-          </section>
-        </main>
-      </div>
-      <Footer2 />
+      {/* Main Content Area */}
+      <main className="flex-1">
+        <Page data={data} />
+        {children}
+      </main>
     </div>
   );
 }
