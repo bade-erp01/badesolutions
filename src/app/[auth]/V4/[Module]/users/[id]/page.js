@@ -12,11 +12,7 @@ import {
   EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../../../Functions/Functions";
-import {
-  PhotoIcon,
-  PaperClipIcon,
-  CameraIcon,
-} from "@heroicons/react/24/outline";
+import { useUser } from "@/components/UserProvider";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 const NaijaStates = require("naija-state-local-government");
 import moment from "moment";
@@ -525,7 +521,7 @@ export default function SingleEmployeeView({
             </div>
           </div>
 
-          {/* <NearbyBusinessesMap/> */}
+          <NearbyBusinessesMap/>
           {/* chart  */}
           <SalePersonChart
             customerId={Backdata._id}
@@ -1671,7 +1667,7 @@ export function SendInviteButton({ id, url, user, biz }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
-
+  const currentUser = useUser()
   const handleInvite = async () => {
     try {
       setLoading(true);
@@ -1682,9 +1678,9 @@ export function SendInviteButton({ id, url, user, biz }) {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${biz}`,
-          access: `${user}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
+          access: `${Encrypt(currentUser.user.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`
         },
       });
 
@@ -1782,20 +1778,20 @@ export function SendInviteButton({ id, url, user, biz }) {
 export function AssignLicenceButton({ id, url, userToken, bizToken,SessionId }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const currentUser = useUser()
   const handleAssign = async () => {
     try {
       setLoading(true);
 
       const response = await fetch(`${url}/api/licence/assign/${id}`, {
         method: "PATCH",
-        headers: {
+         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${bizToken}`,
-          access: userToken,
-          "idempotencey-key": `Assign-Licence-${id}`,
-          sessionKey: `Bearer ${Encrypt(SessionId)}`
+          Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
+          access: `${Encrypt(currentUser.user.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`,
+          "Idempotency-Key": `Assign-Licence-${Dencrypt(id)}`,
         },
       });
 
@@ -1975,17 +1971,39 @@ import {
   RefreshCcw,
 } from "lucide-react";
 
+// Haversine formula to calculate distance in km
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export function NearbyBusinessesMap() {
   const [location, setLocation] = useState(null);
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchNearbyBusinesses();
   }, []);
 
   const fetchNearbyBusinesses = () => {
+    setLoading(true);
+    setError(null);
+
     if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
       setLoading(false);
       return;
     }
@@ -1996,34 +2014,84 @@ export function NearbyBusinessesMap() {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
 
-          setLocation({
-            latitude,
-            longitude,
-          });
+          setLocation({ latitude, longitude });
 
-          const { data } = await axios.get(
-            "/api/business/nearby",
+          // Overpass API query (10km radius)
+          const radius = 10000; // meters
+          const query = `
+            [out:json][timeout:25];
+            (
+              node["shop"](around:${radius},${latitude},${longitude});
+              node["amenity"~"restaurant|cafe|fast_food|bank|pharmacy|hospital|fuel|marketplace"](around:${radius},${latitude},${longitude});
+              node["office"](around:${radius},${latitude},${longitude});
+            );
+            out body 30;
+          `;
+
+          const response = await fetch(
+            "https://overpass-api.de/api/interpreter",
             {
-              params: {
-                latitude,
-                longitude,
-                radius: 10,
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
               },
+              body: `data=${encodeURIComponent(query)}`,
             }
           );
 
-          setBusinesses(data || []);
+          if (!response.ok) {
+            throw new Error("Failed to fetch nearby businesses");
+          }
+
+          const data = await response.json();
+
+          const formatted = (data.elements || [])
+            .filter((item) => item.tags?.name) // only keep places with a name
+            .map((item) => {
+              const distance = getDistance(
+                latitude,
+                longitude,
+                item.lat,
+                item.lon
+              );
+
+              return {
+                _id: item.id,
+                name: item.tags.name,
+                address:
+                  item.tags["addr:street"] ||
+                  item.tags["addr:full"] ||
+                  item.tags["addr:place"] ||
+                  "Address not available",
+                latitude: item.lat,
+                longitude: item.lon,
+                distance,
+                type:
+                  item.tags.shop ||
+                  item.tags.amenity ||
+                  item.tags.office ||
+                  "Business",
+              };
+            })
+            .sort((a, b) => a.distance - b.distance) // nearest first
+            .slice(0, 25); // limit results
+
+          setBusinesses(formatted);
         } catch (err) {
-          console.log(err);
+          console.error(err);
+          setError(err.message || "Something went wrong");
         } finally {
           setLoading(false);
         }
       },
-      () => {
+      (err) => {
+        console.error(err);
+        setError("Location permission denied");
         setLoading(false);
       },
       {
         enableHighAccuracy: true,
+        timeout: 10000,
       }
     );
   };
@@ -2031,24 +2099,20 @@ export function NearbyBusinessesMap() {
   if (loading) {
     return (
       <div className="h-[500px] flex flex-col items-center justify-center gap-3">
-        <Loader2 className="h-10 w-10 animate-spin" />
-        <p>Finding nearby businesses...</p>
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground">Finding nearby businesses...</p>
       </div>
     );
   }
 
-  if (!location) {
+  if (!location || error) {
     return (
-      <div className="h-[400px] flex flex-col items-center justify-center gap-3">
-        <MapPin className="h-12 w-12" />
-        <p>Location permission denied</p>
-
-        <button
-          onClick={fetchNearbyBusinesses}
-          className="px-4 py-2 rounded-lg bg-black text-white"
-        >
-          Try Again
-        </button>
+      <div className="h-[400px] flex flex-col items-center justify-center gap-4">
+        <MapPin className="h-12 w-12 text-muted-foreground" />
+        <p className="text-muted-foreground">
+          {error || "Location permission denied"}
+        </p>
+        <Button onClick={fetchNearbyBusinesses}>Try Again</Button>
       </div>
     );
   }
@@ -2063,60 +2127,64 @@ export function NearbyBusinessesMap() {
             height="650"
             loading="lazy"
             allowFullScreen
+            className="border-0"
             src={`https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=14&output=embed`}
           />
         </div>
       </div>
 
       {/* BUSINESS LIST */}
-      <div className="rounded-2xl border  overflow-hidden shadow">
+      <div className="rounded-2xl border overflow-hidden shadow bg-card">
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="font-semibold">
-            Nearby Businesses
+            Nearby Businesses ({businesses.length})
           </h2>
 
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={fetchNearbyBusinesses}
-            className="p-2 rounded-lg "
+            disabled={loading}
           >
-            <RefreshCcw className="h-4 w-4" />
-          </button>
+            <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
         </div>
 
         <div className="max-h-[650px] overflow-y-auto">
           {businesses.length === 0 ? (
-            <div className="p-8 text-center">
+            <div className="p-8 text-center text-muted-foreground">
               No nearby businesses found
             </div>
           ) : (
             businesses.map((biz) => (
               <div
                 key={biz._id}
-                className="border-b p-4 transition"
+                className="border-b p-4 hover:bg-muted/50 transition"
               >
                 <div className="flex items-start gap-3">
-                  <Building2 className="h-5 w-5 mt-1 text-blue-600" />
+                  <Building2 className="h-5 w-5 mt-1 text-blue-600 shrink-0" />
 
-                  <div className="flex-1">
-                    <h3 className="font-semibold">
-                      {biz.name}
-                    </h3>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold truncate">{biz.name}</h3>
 
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                       {biz.address}
                     </p>
 
-                    {biz.distance && (
-                      <p className="text-xs text-blue-600 mt-2">
-                        {Number(biz.distance).toFixed(2)} km away
-                      </p>
-                    )}
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-xs text-blue-600 font-medium">
+                        {biz.distance.toFixed(2)} km away
+                      </span>
+                      <span className="text-xs text-muted-foreground capitalize">
+                        {biz.type}
+                      </span>
+                    </div>
 
                     <a
                       target="_blank"
                       rel="noreferrer"
                       href={`https://www.google.com/maps/dir/?api=1&destination=${biz.latitude},${biz.longitude}`}
-                      className="inline-flex items-center gap-2 mt-3 text-sm font-medium text-green-600"
+                      className="inline-flex items-center gap-2 mt-3 text-sm font-medium text-green-600 hover:underline"
                     >
                       <Navigation className="h-4 w-4" />
                       Navigate
