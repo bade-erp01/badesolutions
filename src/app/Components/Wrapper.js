@@ -69,7 +69,6 @@ export default function Wrapper({ children }) {
   const page = Params.Module;
   const dispatch = useDispatch();
 
-
   // Driver.js Tour
   const startTour = () => {
     const driverObj = driver({
@@ -293,12 +292,6 @@ export default function Wrapper({ children }) {
                 icon: "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
                 description: "Customer relationship management.",
               },
-              // {
-              //   name: "Employee Management",
-              //   url: "employee",
-              //   icon: "https://img.icons8.com/?size=80&id=SiarGqFdE5SR&format=png",
-              //   description: "Manage employee operations efficiently.",
-              // },
               {
                 name: "Product Management",
                 url: "product",
@@ -337,7 +330,7 @@ export default function Wrapper({ children }) {
             })}
 
           {user.businessInfo?.subscriptionplan?.trim() !== "Basic" &&
-            user.user?.Apps?.sort((a, b) => a.Name.localeCompare(b.Name)).map(
+            user.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) => a.Name.localeCompare(b.Name)).map(
               (item) => {
                 const isActive =
                   pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
@@ -415,7 +408,7 @@ export default function Wrapper({ children }) {
               user.user &&
               pathname !== `/${Params.auth}/V4` && <BackButton />}
 
-            {user.user?.Apps?.filter((app) => app.Name !== "Employee Management").sort((a, b) => a.Name.localeCompare(b.Name)).map(
+            {user.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) => a.Name.localeCompare(b.Name)).map(
               (item) => {
                 const isActive =
                   pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
@@ -449,7 +442,8 @@ export default function Wrapper({ children }) {
           </nav>
 
           {/* Tenant Switch - Visible ONLY on mobile */}
-          <div className="flex lg:hidden items-center gap-4 m-3">
+          {user?.user?.toogledTenants?.length > 0 && (
+            <div className="flex lg:hidden items-center gap-4 m-3">
             <div className="tenant-switch">
               <div className="text-sm text-muted-foreground">
                 Switch Tenants
@@ -473,7 +467,8 @@ export default function Wrapper({ children }) {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+            </div>
+          )}
 
           <div className="p-1 border-t w-full user-profile">
             <UserProfile user={user.user} biz={user.business} />
@@ -484,6 +479,7 @@ export default function Wrapper({ children }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
+        {user?.user?.toogledTenants?.length > 0 && (
         <div className="border-b bg-card p-4 flex items-center justify-between">
           <div className="hidden lg:flex items-center gap-4">
             <div className="tenant-switch lg:ml-0 ml-12">
@@ -521,6 +517,7 @@ export default function Wrapper({ children }) {
             !pathname.includes("product-transfer") &&
             !pathname.includes("Forms") &&
             !pathname.includes("inventory") &&
+            !pathname.includes("users") &&
             pathname !== `/${Params.auth}/V4/Settings` &&
             Params.Module !== `accounting` && (
               <form
@@ -563,6 +560,7 @@ export default function Wrapper({ children }) {
             </div>
           </div>
         </div>
+        )}
 
         {/* Main View */}
         <div className="flex-1 overflow-auto p-4 space-y-8 view">
