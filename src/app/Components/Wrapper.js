@@ -479,8 +479,9 @@ export default function Wrapper({ children }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
-        {user?.user?.toogledTenants?.length > 0 && (
+        
         <div className="border-b bg-card p-4 flex items-center justify-between">
+          {user?.user?.toogledTenants?.length > 0 && (
           <div className="hidden lg:flex items-center gap-4">
             <div className="tenant-switch lg:ml-0 ml-12">
               <div className="text-sm text-muted-foreground">
@@ -506,6 +507,7 @@ export default function Wrapper({ children }) {
               </Select>
             </div>
           </div>
+          )}
 
           {/* Search */}
           {user.business &&
@@ -517,7 +519,6 @@ export default function Wrapper({ children }) {
             !pathname.includes("product-transfer") &&
             !pathname.includes("Forms") &&
             !pathname.includes("inventory") &&
-            !pathname.includes("users") &&
             pathname !== `/${Params.auth}/V4/Settings` &&
             Params.Module !== `accounting` && (
               <form
@@ -560,7 +561,7 @@ export default function Wrapper({ children }) {
             </div>
           </div>
         </div>
-        )}
+        
 
         {/* Main View */}
         <div className="flex-1 overflow-auto p-4 space-y-8 view">
