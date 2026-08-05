@@ -780,7 +780,7 @@ export default function InvoicePage({
 
       if (res.ok) {
         SuccessToast(result.message);
-        Router.push( `/${Path.auth}/${Path.Tenant}/${path.module}/Forms/invoice/${Encrypt(orderId)}`)
+        Router.push( `/${path.auth}/V4/${path.Module}/${path.Module}/Draft/Draft/${Encrypt(orderId)}`)
         
       } else {
         throw new Error(result.error || "Request failed");
