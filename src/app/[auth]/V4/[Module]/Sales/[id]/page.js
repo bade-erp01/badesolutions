@@ -958,7 +958,7 @@ export default function InvoicePage({
             </button>
           )}
 
-          {(userInfo.user.cancelInvoice && Singlebill.billStatus === "Requisition") && (
+          {(userInfo.user.raiseInvoice && Singlebill.billStatus === "Requisition") && (
             <button
               title="Revert this requisition back to draft for editing"
               onClick={() => REQToDRAFT(Singlebill._id, "Draft")}

@@ -654,11 +654,9 @@ export default function DraftInvoicePage({
               {Singlebill.customerName?.toUpperCase()}
             </h3>
             <p>
-              <span className="mr-1">📌</span>
               {Singlebill.customer.billingAddress?.slice(0, 30) || "N/A"}
             </p>
             <p>
-              <span className="mr-1">✉️</span>
               <a
                 href={`mailto:${Singlebill.customer.Email}`}
                 className="hover:underline text-indigo-700"
@@ -667,7 +665,6 @@ export default function DraftInvoicePage({
               </a>
             </p>
             <p>
-              <span className="mr-1">🗓️</span>
               {moment(Singlebill.startDate).format("YYYY-MM-DD")}
             </p>
              <p className="p-2 rounded-full text-sm tracking-wide shadow-sm border bg-green-50 text-green-700 border-green-200">
