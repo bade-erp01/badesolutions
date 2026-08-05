@@ -19,7 +19,7 @@ export default function AccessControl({
   const router = useRouter();
 
   const buisnessFinder = (id) => {
-    const biz = TenantData.find((item) => item.tenantId === id);
+    const biz = TenantData.find((item) => item._id === id);
     return biz?.companyName || "N/A";
   };
 
@@ -552,7 +552,7 @@ export default function AccessControl({
             </legend>
             <div className="mt-6 col-span-4 space-y-1">
               {businessInfo?.modules && Array.isArray(businessInfo.modules) && businessInfo.modules.length > 0 ? (
-                businessInfo.modules.map((app, index) => {
+                businessInfo.modules.filter((app) => app.url !== "employee").map((app, index) => {
                   const isChecked = formData.Apps?.some((a) => a.Name === app.Name) || false;
 
                   return (
@@ -660,7 +660,7 @@ export function AssignTenantDropdown({
       }
 
       setIsAssigning(true);
-      // plsWait("Assigning tenant...");
+      plsWait("Assigning tenant...");
 
       const response = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/assign-tenant/${Encrypt(data._id)}`,
@@ -682,14 +682,13 @@ export function AssignTenantDropdown({
         throw new Error(resData?.message || "Failed to assign tenant.");
       }
 
-      // SuccessToast(resData.message || "Tenant assigned successfully.");
+      SuccessToast(resData.message || "Tenant assigned successfully.");
       setSelectedTenant(null);
       setOpen(false);
       window.location.reload();
     } catch (error) {
       setSelectedTenant(null);
-      // ErrorMessage(error.message || "Something went wrong");
-      console.error(error);
+      ErrorMessage(error.message || "Something went wrong");
     } finally {
       setIsAssigning(false);
     }
