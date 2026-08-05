@@ -118,6 +118,9 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         throw new Error("Invalid login response");
       }
 
+      // ensure to logout old session cookies
+      await dispatch(logoutAction());
+      
       const decryptedUser = Dencrypt(data.Newcustomer);
 
       dispatch(

@@ -30,6 +30,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import Link from "next/link"
+
 
 export default function Page({ data, baseUrl, subscribers }) {
   const [formData, setFormData] = useState({
@@ -225,7 +227,7 @@ export default function Page({ data, baseUrl, subscribers }) {
                           subscribers.map((subscriber) => (
                             <TableRow key={subscriber._id}>
                               <TableCell className="font-medium">
-                                {subscriber.Username ?? ""}
+                                <Link className="text-indigo-300" href={``}>{subscriber.Username ?? ""}</Link>
                               </TableCell>
 
                               <TableCell>{subscriber.Email || "-"}</TableCell>
@@ -237,13 +239,13 @@ export default function Page({ data, baseUrl, subscribers }) {
                               <TableCell className="text-right">
                                 <Badge
                                   variant={
-                                    Number(subscriber.debt || 0) > 0
+                                    Number(subscriber.Debt || 0) > 0
                                       ? "destructive"
                                       : "secondary"
                                   }
                                 >
                                   ₦
-                                  {Number(subscriber.debt || 0).toLocaleString()}
+                                  {Number(subscriber.Debt || 0).toLocaleString()}
                                 </Badge>
                               </TableCell>
                             </TableRow>
