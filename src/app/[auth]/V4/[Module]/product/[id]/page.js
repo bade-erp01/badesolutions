@@ -281,17 +281,19 @@ export default function SingleProductpage({
                 onClick={() => {
                   uploadFiles(Encrypt(data._id), "product");
                 }}
-                className="w-28 h-28 rounded overflow-hidden flex items-center justify-center"
+                className="rounded overflow-hidden flex items-center justify-center"
               >
                 <Image
-                  height={70}
-                  width={70}
+                  height={400}
+                  width={400}
+                  layout="intrinsic"
                   src={data.image || "/preview.png"}
                   alt="Avatar"
-                  className="w-full h-full object-cover shadow-lg drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="eager"
-                  priority={true}
-                  quality={100}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={100}   
+                  priority   
                 />
               </div>
             </div>

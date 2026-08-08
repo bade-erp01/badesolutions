@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -31,10 +31,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import Link from "next/link"
-import {useParams} from "next/navigation"
-import {Encrypt, Dencrypt} from "../../../../../../../Functions/Functions";
-
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Encrypt } from "../../../../../../../Functions/Functions";
 
 export default function Page({ data, baseUrl, subscribers }) {
   const [formData, setFormData] = useState({
@@ -44,18 +43,25 @@ export default function Page({ data, baseUrl, subscribers }) {
     status: "",
     completionDate: "",
     description: "",
+    generatDebit: false,
+    Whatsapp: false,
+    assignedContract: "",
   });
-  const path = useParams()
+
+  const path = useParams();
 
   useEffect(() => {
     if (data) {
       setFormData({
         title: data.title || "",
         plan: data.plan || "",
-        fee: data.fee || "",
+        fee: data.fee ?? "",
         status: data.status || "",
-        completionDate: data.completionDate || "",
+        completionDate: data.completionDate ?? "",
         description: data.description || "",
+        generatDebit: data.generatDebit ?? false,
+        Whatsapp: data.Whatsapp ?? false,
+        assignedContract: data.assignedContract || "",
       });
     }
   }, [data]);
@@ -72,6 +78,20 @@ export default function Page({ data, baseUrl, subscribers }) {
     setFormData((prev) => ({
       ...prev,
       status: value,
+    }));
+  };
+
+  const handleContractChange = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      assignedContract: value,
+    }));
+  };
+
+  const handleSwitchChange = (name, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
     }));
   };
 
@@ -92,6 +112,7 @@ export default function Page({ data, baseUrl, subscribers }) {
       if (!res.ok) throw new Error("Update failed");
       alert("Updated successfully!");
     } catch (error) {
+      console.error(error);
       alert("Failed to update");
     }
   };
@@ -100,13 +121,16 @@ export default function Page({ data, baseUrl, subscribers }) {
     return <div className="p-6 text-muted-foreground">No data available</div>;
   }
 
+  const totalDebt =
+    subscribers?.reduce((acc, sub) => acc + Number(sub.Debt || 0), 0) || 0;
+
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={`${formData.title}`} />}>
       <div className="">
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl"> {formData.title} </CardTitle>
+              <CardTitle className="text-xl">{formData.title}</CardTitle>
               <Badge
                 variant={
                   formData.status === "pending" ? "secondary" : "default"
@@ -119,7 +143,7 @@ export default function Page({ data, baseUrl, subscribers }) {
 
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-8">
-              {/* Main Fields - Grid */}
+              {/* Main Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Title */}
                 <div className="space-y-2">
@@ -133,10 +157,12 @@ export default function Page({ data, baseUrl, subscribers }) {
                   />
                 </div>
 
-                {/* Plan */}
+                {/* Plan (read-only) */}
                 <div className="space-y-2">
-                  <Label htmlFor="plan">Payment Schedul</Label>
-                  <h5>{formData.plan}</h5>
+                  <Label>Payment Schedule</Label>
+                  <div className="flex h-10 items-center rounded-md border border-input bg-muted px-3 text-sm">
+                    {formData.plan || "—"}
+                  </div>
                 </div>
 
                 {/* Fee */}
@@ -152,7 +178,7 @@ export default function Page({ data, baseUrl, subscribers }) {
                   />
                 </div>
 
-                {/* Status - Dropdown */}
+                {/* Status */}
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
                   <Select
@@ -185,9 +211,27 @@ export default function Page({ data, baseUrl, subscribers }) {
                     required
                   />
                 </div>
+
+                {/* Assign Contract */}
+                <div className="space-y-2">
+                  <Label htmlFor="assignedContract">Assign Contract</Label>
+                  <Select
+                    value={formData.assignedContract}
+                    onValueChange={handleContractChange}
+                  >
+                    <SelectTrigger id="assignedContract">
+                      <SelectValue placeholder="Select a contract" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="contract-1">Contract 1</SelectItem>
+                      <SelectItem value="contract-2">Contract 2</SelectItem>
+                      <SelectItem value="contract-3">Contract 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              {/* Description - Full width */}
+              {/* Description */}
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -201,66 +245,56 @@ export default function Page({ data, baseUrl, subscribers }) {
 
               <Separator />
 
-              <div className="flex items-center justify-between">
-                  <Label className="text-base font-semibold">Settings</Label>
-              </div>
+              {/* Settings */}
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">Settings</Label>
 
-              <div className="flex items-center space-x-2">
-              <Switch
-                id="create-invoice-after-subscription"
-                // checked={enabled}
-                // onCheckedChange={setEnabled}
-              />
-                <Label htmlFor="create-invoice-after-subscription">
-                  Generate debit reciept after subscription job triggered.
-                </Label>
-              </div>
+                {/* Generate Debit */}
+                <div className="flex items-center space-x-3">
+                  <Switch
+                    id="generatDebit"
+                    checked={formData.generatDebit}
+                    onCheckedChange={(checked) =>
+                      handleSwitchChange("generatDebit", checked)
+                    }
+                  />
+                  <Label htmlFor="generatDebit">
+                    Generate debit receipt after subscription job is triggered
+                  </Label>
+                </div>
 
-              {/* Additional Cost Notice */}
-              <div className="mt-6 pt-4 border-t border-border bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">
-                <div className="flex gap-3">
+                {/* WhatsApp */}
+                <div className="mt-4 pt-4 border-t border-border bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
                     <Switch
                       id="Whatsapp"
-                      // checked={enabled}
-                      // onCheckedChange={setEnabled}
+                      checked={formData.Whatsapp}
+                      onCheckedChange={(checked) =>
+                        handleSwitchChange("Whatsapp", checked)
+                      }
+                      className="mt-0.5"
                     />
-                  <div className="text-sm">
-                    <Label htmlFor="" className="font-medium text-amber-700 dark:text-amber-400">
-                      Send credit reciept via Whatsapp
-                    </Label>
-                    <p className="text-amber-600/80 dark:text-amber-500">
-                      This service may attract extra charges.
-                    </p>
+                    <div className="text-sm">
+                      <Label
+                        htmlFor="Whatsapp"
+                        className="font-medium text-amber-700 dark:text-amber-400"
+                      >
+                        Send credit receipt via WhatsApp
+                      </Label>
+                      <p className="text-amber-600/80 dark:text-amber-500 mt-1">
+                        This service may attract extra charges.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-               <div className="space-y-2">
-                <Label htmlFor="completionDate">Assign Contract</Label>
-                <select
-                  id="completionDate"
-                  name="completionDate"
-                  value={formData.completionDate}
-                  onChange={handleChange}
-                  required
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="">Select a contract</option>
-                  <option value="1">Contract 1</option>
-                  <option value="2">Contract 2</option>
-                  <option value="3">Contract 3</option>
-                  {/* Add more options as needed */}
-                </select>
-              </div>
-
-              {/* settings */}
-
               <Separator />
+
               {/* Subscribers */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Label className="text-base font-semibold">Subscribers</Label>
-
                   <Badge variant="secondary">
                     {subscribers?.length || 0} Subscriber
                     {subscribers?.length === 1 ? "" : "s"}
@@ -283,42 +317,44 @@ export default function Page({ data, baseUrl, subscribers }) {
 
                       <TableBody>
                         {subscribers?.length > 0 ? (
-                          subscribers.map((subscriber) => (
-                            <>
-                            <TableRow key={subscriber._id}>
-                              <TableCell className="font-medium">
-                                <Link className="text-indigo-300" href={`/${path.auth}/V4/contract/contract/${Encrypt(subscriber._id)}`}>{subscriber.Username ?? ""}</Link>
-                              </TableCell>
+                          <>
+                            {subscribers.map((subscriber) => (
+                              <TableRow key={subscriber._id}>
+                                <TableCell className="font-medium">
+                                  <Link
+                                    className="text-indigo-600 hover:underline"
+                                    href={`/${path.auth}/V4/contract/contract/${Encrypt(
+                                      subscriber._id
+                                    )}`}
+                                  >
+                                    {subscriber.Username ?? "—"}
+                                  </Link>
+                                </TableCell>
+                                <TableCell>{subscriber.Email || "—"}</TableCell>
+                                <TableCell>{subscriber.phone || "—"}</TableCell>
+                                <TableCell className="text-right">
+                                  ₦
+                                  {Number(subscriber.Debt || 0).toLocaleString()}
+                                </TableCell>
+                              </TableRow>
+                            ))}
 
-                              <TableCell>{subscriber.Email || "-"}</TableCell>
-
-                              <TableCell>
-                                {subscriber.phone || "-"}
-                              </TableCell>
-
-                              <TableCell className="text-right">
-                                ₦{Number(subscriber.Debt || 0).toLocaleString()}
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
+                            {/* Total row */}
+                            <TableRow className="bg-muted/50 font-medium">
                               <TableCell>Total</TableCell>
                               <TableCell></TableCell>
                               <TableCell></TableCell>
                               <TableCell className="text-right">
                                 <Badge
                                   variant={
-                                    Number(subscriber.Debt || 0) > 0
-                                      ? "destructive"
-                                      : "secondary"
+                                    totalDebt > 0 ? "destructive" : "secondary"
                                   }
                                 >
-                                  ₦
-                                   {subscribers ? subscribers.reduce((acc, subscriber) => acc + Number(subscriber.Debt || 0), 0).toLocaleString() : "0"}
+                                  ₦{totalDebt.toLocaleString()}
                                 </Badge>
                               </TableCell>
                             </TableRow>
-                            </>
-                          ))
+                          </>
                         ) : (
                           <TableRow>
                             <TableCell
@@ -369,7 +405,11 @@ export default function Page({ data, baseUrl, subscribers }) {
                 </div>
                 <div className="sm:col-span-2">
                   <span className="font-medium text-foreground">ID:</span>{" "}
-                  <span className="font-mono text-xs">{data._id}</span>
+                  <span className="font-mono text-xs">
+                    {typeof data._id === "object"
+                      ? data._id.$oid || data._id
+                      : data._id}
+                  </span>
                 </div>
               </div>
             </CardContent>
