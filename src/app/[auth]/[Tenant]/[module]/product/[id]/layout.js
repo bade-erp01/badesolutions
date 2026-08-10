@@ -75,7 +75,7 @@ export default async function layout({ params, children }) {
   if (!res.ok) {
     return (
       <div className="text-black p-6">
-        Failed to load. Please try again later.{data.error}
+        Failed to load. Please try again later.
       </div>
     );
   }
