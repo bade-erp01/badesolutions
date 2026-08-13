@@ -267,7 +267,7 @@ export default function DraftInvoicePage({
         margin: { left: pageWidth - 90 },
         head: [],
         body: [
-          ["Tax Rate", `${bill.taxRate?.toFixed(2) || 0} (inc in sub.)`],
+          ["Tax Rate", `${bill.taxRate ? bill.taxRate?.toFixed(2) : 0} (inc in sub.)`],
           ["Subtotal", bill.subTotal?.toFixed(2) || "0.00"],
           ["Discount", bill.discount?.toFixed(2) || "0.00"],
           ["Total Due", bill.grandTotal?.toFixed(2) || "0.00"],
@@ -988,8 +988,7 @@ export default function DraftInvoicePage({
                 <span>Subtotal:</span>
                 <strong>
                   {userInfo.business.currency?.currency.Symbol}
-                  {Singlebill.subTotal.toFixed(2) -
-                    Singlebill.taxRate.toFixed(2)}
+                  {((Singlebill?.subTotal ?? 0) - (Singlebill?.taxRate ?? 0)).toFixed(2)}
                 </strong>
               </div>
               <div className="flex justify-between">
@@ -1020,7 +1019,7 @@ export default function DraftInvoicePage({
                 <span>Tax Rate:</span>
                 <strong>
                   {userInfo.business.currency?.currency.Symbol}
-                  {Singlebill.taxRate.toFixed(2)}
+                  {Singlebill.taxRate ? Singlebill.taxRate.toFixed(2) : 0.00}
                 </strong>
               </div>
               <div className="flex justify-between">

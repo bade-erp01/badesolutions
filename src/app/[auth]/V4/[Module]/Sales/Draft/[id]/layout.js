@@ -69,7 +69,7 @@ export default async function StoreLayout2({ params }) {
       </div>
     );
   } catch (error) {
-    return notFound();
+    return <div>Something went wrong</div>;
   }
 }
 
