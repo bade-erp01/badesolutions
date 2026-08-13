@@ -118,7 +118,7 @@ export default function DebitnoteTable({ data }) {
                     <TableRow key={index} className="hover:bg-muted/50">
                       <TableCell className="font-medium">
                         <Link 
-                          href={`/${Path.auth}/V4/${Path.Module}/${Path.Module}/debit-note}/debit-note/${Encrypt(note._id)}`}
+                          href={`/${Path.auth}/V4/${Path.Module}/${Path.Module}/debit-note/debit-note/${Encrypt(note._id)}`}
                           className="hover:text-primary hover:underline"
                         >
                           {note.DebitId}

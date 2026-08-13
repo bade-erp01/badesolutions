@@ -62,7 +62,7 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
     if (request.ok) {
       SuccessToast("Credit note has been created successfully. Awaiting Approval");
       Router.push(
-        `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/credit-note/credit-note/${Encrypt(response.data)}`
+        `/${Path.auth}/V4/${Path.Module}/${Path.Module}/${Path.module}/credit-note/credit-note/${Encrypt(response.data)}`
       );
       setOpen(false);
     } else {
