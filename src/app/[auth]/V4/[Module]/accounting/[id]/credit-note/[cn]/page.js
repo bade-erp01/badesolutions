@@ -46,7 +46,7 @@ export default function Page({ data, userData, baseurl }) {
       SuccessToast(request.message);
 
       if (action === "Delete") {
-        Router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/${Params.module}/credit-note/credit-note`);
+        Router.push(`/${Params.auth}/V4/${Params.module}/${Params.module}/credit-note/credit-note`);
       } else {
         Router.refresh();
       }
