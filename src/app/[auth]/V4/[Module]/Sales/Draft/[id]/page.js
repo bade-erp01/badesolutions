@@ -269,7 +269,7 @@ export default function DraftInvoicePage({
         body: [
           ["Tax Rate", `${bill.taxRate ? bill.taxRate?.toFixed(2) : 0} (inc in sub.)`],
           ["Subtotal", bill.subTotal?.toFixed(2) || "0.00"],
-          ["Discount", bill.discount?.toFixed(2) || "0.00"],
+          ["Discount", bill.discount ? bill.discount?.toFixed(2) : "0.00"],
           ["Total Due", bill.grandTotal?.toFixed(2) || "0.00"],
         ],
         theme: "grid",
@@ -997,7 +997,7 @@ export default function DraftInvoicePage({
                 Singlebill.billStatus === "Draft" ? (
                   <input
                     type="number"
-                    defaultValue={Singlebill.discount || 0}
+                    defaultValue={Singlebill.discount ? Singlebill.discount : 0}
                     className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
                     onBlur={(e) => {
                       const val = parseFloat(e.target.value);
@@ -1011,7 +1011,7 @@ export default function DraftInvoicePage({
                 ) : (
                   <strong>
                     {userInfo.business.currency?.currency.Symbol}
-                    {Singlebill.discount.toFixed(2)}
+                    {Singlebill.discount ? Singlebill.discount.toFixed(2) : 0}
                   </strong>
                 )}
               </div>
@@ -1030,10 +1030,10 @@ export default function DraftInvoicePage({
                 </strong>
               </div>
               <div className="flex justify-between text-lg font-bold mt-4 border-t pt-2">
-                <span>Grand Total:</span>
+                <span>GRAND TOTAL:</span>
                 <span>
                   {userInfo.business.currency?.currency.Symbol}
-                  {Singlebill.grandTotal?.toFixed(2)}
+                  {Singlebill.grandTotal ? Singlebill.grandTotal?.toFixed(2) : 0}
                 </span>
               </div>
             </div>
@@ -1044,7 +1044,7 @@ export default function DraftInvoicePage({
             <h3 className="text-lg font-bold mb-4">Total In Words</h3>
             <p className="italic text-base text-orange-700">
               {totalInWords(
-                Singlebill.grandTotal,
+                Singlebill.grandTotal ? Singlebill.grandTotal : 0,
                 userInfo.business.currency?.currency,
               )}
             </p>
