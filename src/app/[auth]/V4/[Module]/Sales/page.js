@@ -238,7 +238,7 @@ useEffect(() => {
                           </span>
                         </TableCell>
                         <TableCell className="text-right font-bold">
-                          ₦{bill.grandTotal.toLocaleString()}
+                          ₦{bill.grandTotal ? bill.grandTotal.toLocaleString() : 0.00}
                         </TableCell>
                       </TableRow>
                     );
