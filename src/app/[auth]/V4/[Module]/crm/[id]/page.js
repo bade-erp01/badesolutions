@@ -96,7 +96,7 @@ export default function CustomerForm({
   const currentRows = data.transcations.slice(indexOfFirstRow, indexOfLastRow);
 
   const salespers = salesPerson.find(
-    (person) => person._id.toString() === cust.salesPerson.toString(),
+    (person) => person._id.toString() === cust.salesPerson?.toString(),
   );
   const repName = salespers
     ? `${salespers.firstName} ${salespers.lastName || ""}`
