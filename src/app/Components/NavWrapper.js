@@ -232,7 +232,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
 }
 
 export function DialogDemo({ userData }) {
-  const [formData, setFormData] = useState({ salesPerson: userData.user._id });
+  const [formData, setFormData] = useState({ salesPerson: userData.user._id,signUpVia:'sales-app' });
   const router = useRouter();
 
   // Auto-populate billingAddress + capture lat/lon

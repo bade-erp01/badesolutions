@@ -42,7 +42,7 @@ export default function NewCustomerForm({
   const [user] = useState(sanitizedUserData.user);
   const [salespersons] = useState(sanitizedSalespersons);
   
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({signUpVia:'sales-app'});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [serverMsg, setServerMsg] = useState(null);
