@@ -34,6 +34,7 @@ import {
 } from "@heroicons/react/24/solid";
 import {pricelistSetter} from "../../../../../../../Functions/Functions"
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link"
 
 
 export default function InvoicePage({
@@ -77,6 +78,13 @@ export default function InvoicePage({
       img.src = src;
     });
   };
+
+  const formatPrice = (amount) =>
+    new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 2,
+    }).format(amount || 0)
 
   //  Full PDF generator
   const generatePdf = async (business, customer, bill) => {
@@ -1223,13 +1231,83 @@ export default function InvoicePage({
 
           {/* Words representation */}
           <div className="bg-white rounded-xl border border-gray-100 shadow p-6 text-gray-700 flex flex-col justify-between">
-            <h3 className="text-lg font-bold mb-4">Total In Words</h3>
-            <p className="italic text-base text-orange-700">
-              {totalInWords(
-                Singlebill.grandTotal,
-                userInfo.business.currency.currency
+            <div>
+              <h3 className="text-lg font-bold mb-4">Total In Words</h3>
+              <p className="italic text-base text-orange-700 mb-6">
+                {totalInWords(
+                  Singlebill.grandTotal,
+                  userInfo.business.currency.currency
+                )}
+              </p>
+
+              {/* Delivery Details */}
+              {Singlebill.deliveryOption && (
+                <div className="border-t border-gray-100 pt-5 space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                    Delivery Information
+                  </h4>
+
+                  {/* Shipping Method */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Method</span>
+                    <span className="font-medium capitalize">
+                      {Singlebill.deliveryOption?.shippingMethod === "pickup"
+                        ? "Store Pickup"
+                        : Singlebill.deliveryOption?.shippingMethod || "—"}
+                    </span>
+                  </div>
+
+                  {/* Shipping Fee */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Shipping Fee</span>
+                    <span className="font-medium">
+                      {Singlebill.deliveryOption?.shippingFee > 0
+                        ? formatPrice(Singlebill.deliveryOption?.shippingFee) // or your currency formatter
+                        : "Free"}
+                    </span>
+                  </div>
+
+                  {/* Payment Method (if available) */}
+                  {Singlebill.deliveryOption.paymentMethod && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Payment</span>
+                      <span className="font-medium">
+                        {Singlebill.deliveryOption.paymentMethod === "cod"
+                          ? "Cash on Delivery"
+                          : Singlebill.deliveryOption?.paymentMethod === "transfer"
+                          ? "Bank Transfer"
+                          : Singlebill.deliveryOption.paymentMethod}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Address (only show if exists) */}
+                  {Singlebill.deliveryOption?.address && (
+                    <div className="pt-2">
+                      <p className="text-gray-500 text-sm mb-1">Delivery Address</p>
+                      <p className="text-sm font-medium text-gray-800 leading-relaxed">
+                        {Singlebill.deliveryOption?.address}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Receipt (if uploaded) */}
+                  {Singlebill.deliveryOption?.receipt && (
+                    <div className="pt-2">
+                      <p className="text-gray-500 text-sm mb-1">Payment Receipt</p>
+                      <Link
+                        href={Singlebill.deliveryOption?.receipt}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-orange-600 hover:underline font-medium"
+                      >
+                        View Payment Receipt
+                      </Link>
+                    </div>
+                  )}
+                </div>
               )}
-            </p>
+            </div>
           </div>
         </div>
 
