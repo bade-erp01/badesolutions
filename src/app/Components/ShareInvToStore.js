@@ -17,7 +17,7 @@ const ShareInvToStore = ({
     baseUrl
 }) => {
     const router = useRouter();
-    const user = useUser()
+    const {user} = useUser()
     const onMailClick = async () => {
         plsWait("Sending Mail");
         const api = `${baseUrl}/api/sendMail_To_Store/${Encrypt(billId)}`;
