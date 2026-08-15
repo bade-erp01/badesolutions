@@ -1292,7 +1292,7 @@ export default function InvoicePage({
                   )}
 
                   {/* Receipt (if uploaded) */}
-                  {Singlebill.deliveryOption?.receipt && (
+                  {/* {Singlebill.deliveryOption?.receipt && ( */}
                     <div className="pt-2">
                       <p className="text-gray-500 text-sm mb-1">Payment Receipt</p>
                       <Link
@@ -1304,7 +1304,7 @@ export default function InvoicePage({
                         View Payment Receipt
                       </Link>
                     </div>
-                  )}
+                  {/* )} */}
                 </div>
               )}
             </div>
