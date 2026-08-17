@@ -226,7 +226,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       <Label htmlFor="password">Password</Label>
                       <Link
                         href="/auth/Forgot_password"
-                        className="text-sm hover:text-gray-700 hover:underline"
+                        className="text-sm hover:text-indigo-400 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -246,7 +246,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 text-base font-medium bg-black hover:bg-gray-900 transition-all"
+                    className="w-full h-12 text-base font-medium text-gray-50 bg-black hover:bg-gray-900 transition-all"
                   >
                     {loading ? (
                       <>
