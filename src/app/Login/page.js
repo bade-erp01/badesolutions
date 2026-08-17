@@ -191,7 +191,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
           {!isLoggedIn ? (
-            <Card className="w-[380px] max-w-full bg-white/90 backdrop-blur-md border-0 shadow-2xl">
+            <Card className="w-[380px] max-w-full backdrop-blur-md border-0 shadow-2xl">
               <CardHeader className="flex flex-row items-center justify-between pb-6">
                 <Link href="/" className="flex items-center gap-3">
                   <Image
@@ -217,7 +217,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="h-12 bg-gray-50 border-gray-200 focus:border-gray-400"
+                      className="h-12  border-gray-200 focus:border-gray-400"
                     />
                   </div>
 
@@ -226,7 +226,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       <Label htmlFor="password">Password</Label>
                       <Link
                         href="/auth/Forgot_password"
-                        className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
+                        className="text-sm hover:text-gray-700 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -239,7 +239,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       value={formData.password}
                       onChange={handleChange}
                       required
-                      className="h-12 bg-gray-50 border-gray-200 focus:border-gray-400"
+                      className="h-12  border-gray-200 focus:border-gray-400"
                     />
                   </div>
 
