@@ -785,7 +785,7 @@ export default function DraftInvoicePage({
                     {bill.item.ACDcode || bill.item.ADCcode}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {user._id === Singlebill.invoicerId &&
+                    {(Singlebill.means ?? "") !== "Ecomm" && user._id === Singlebill.invoicerId &&
                     Singlebill.billStatus.toLowerCase() === "draft" ? (
                       <input
                         type="number"
