@@ -136,7 +136,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>HR & Payroll</CardTitle>
               <CardDescription className={"text-white"}>
-                Staff, attendance, Payroll, Help desk,staff Appraisal, Time-off.
+                Staff, attendance, Payroll, Help desk,staff Appraisal, Time-off, Contracts and Subscription.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -156,7 +156,7 @@ export default function LandingPage() {
             <CardHeader className="relative z-10">
               <CardTitle>Sales</CardTitle>
               <CardDescription className={"text-white"}>
-                CRM, invoice lifecycle, transaction ledgers
+                CRM, E-commerce store, invoice lifecycle, transaction ledgers
               </CardDescription>
             </CardHeader>
           </Card>
