@@ -59,15 +59,15 @@ function SubscriptionTableSkeleton() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Contract NO:</TableHead>
-          <TableHead>Customer</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Balance</TableHead>
-          <TableHead>Stage</TableHead>
-          <TableHead>Contract Amount</TableHead>
-          <TableHead>Installment Fee</TableHead>
-          <TableHead>Duration</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
+          <TableHead>####</TableHead>
         </TableRow>
       </TableHeader>
 
