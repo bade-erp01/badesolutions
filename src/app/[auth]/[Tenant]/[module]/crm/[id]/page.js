@@ -824,11 +824,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
 
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
 
-          {cust.phone && (
+          {/* {cust.phone && ( */}
             <Link
               href={`https://wa.me/${cust.phone.replace(/\D/g, "")}`}
               target="_blank"
-              title={`chat ${cust.Username} on whatsApp on ${cust.phone}`}
+              title={`chat with ${cust.Username} on whatsApp.`}
               rel="noopener noreferrer"
               className="font-mono text-xs text-right truncate max-w-[160px] text-emerald-600 dark:text-emerald-400 hover:underline"
             >
@@ -842,7 +842,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                 quality={75}
               />
             </Link>
-          )}
+          {/* )} */}
         </div>
       </Section>
 
