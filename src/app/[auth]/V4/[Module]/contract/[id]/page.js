@@ -331,11 +331,11 @@ export default function ContractDetailsPage({
                   <TableBody>
                     {payments.length > 0 ? (
                       payments.map((payment) => (
-                        <TableRow key={payment.id || payment.contractNo}>
-                          <TableCell>{payment.contractNo}</TableCell>
-                          <TableCell>{payment.customer}</TableCell>
-                          <TableCell>{payment.email}</TableCell>
-                          <TableCell>{payment.stage}</TableCell>
+                        <TableRow key={payment._id}>
+                          <TableCell>{payment.PaymentDate}</TableCell>
+                          <TableCell>{payment.Accountant}</TableCell>
+                          <TableCell>{payment.status}</TableCell>
+                          <TableCell>{formatCurrency(payment.crAmount)}</TableCell>
                         </TableRow>
                       ))
                     ) : (
