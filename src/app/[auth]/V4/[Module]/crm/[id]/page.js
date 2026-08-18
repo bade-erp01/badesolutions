@@ -1018,7 +1018,7 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
               target="_blank"
               title={`chat with ${cust.Username} on whatsApp.`}
               rel="noopener noreferrer"
-              className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
+              className="flex items-center gap-2 transition-all"
             >
               <img
                 src="https://img.icons8.com/color/48/whatsapp.png"
