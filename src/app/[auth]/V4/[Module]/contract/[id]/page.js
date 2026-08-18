@@ -332,6 +332,7 @@ export default function ContractDetailsPage({
                     {payments.length > 0 ? (
                       payments.map((payment) => (
                         <TableRow key={payment._id}>
+                          <TableCell>{payment.paymentReferenceNo}</TableCell>
                           <TableCell>{payment.PaymentDate}</TableCell>
                           <TableCell>{payment.Accountant}</TableCell>
                           <TableCell>{payment.status}</TableCell>
