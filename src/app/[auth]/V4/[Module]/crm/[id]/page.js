@@ -1023,9 +1023,9 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
               <img
                 src="https://img.icons8.com/color/48/whatsapp.png"
                 alt="WhatsApp"
-                width={16}
-                height={16}
-                className="w-4 h-4"
+                width={30}
+                height={30}
+                className="w-7 h-7"
                 priority
                 quality={75}
               />
