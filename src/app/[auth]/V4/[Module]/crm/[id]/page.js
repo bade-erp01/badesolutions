@@ -7,6 +7,7 @@ import Image from "next/image";
 import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
 import InvoicePaymentForm from "@/app/Components/PaymentWithInv";
+import Link from "next/link";
 import {
   postPayment,
   pricelistSetter,
@@ -1010,6 +1011,26 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
 
           {/* Text to Speech */}
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
+
+          {cust.phone && (
+            <Link
+              href={`https://wa.me/${cust.phone.replace(/\D/g, "")}`}
+              target="_blank"
+              title={`chat with ${cust.Username} on whatsApp.`}
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-right truncate max-w-[160px] text-emerald-600 dark:text-emerald-400 hover:underline"
+            >
+              <img
+                src="https://img.icons8.com/color/48/whatsapp.png"
+                alt="WhatsApp"
+                width={16}
+                height={16}
+                className="w-4 h-4"
+                priority
+                quality={75}
+              />
+            </Link>
+          )} 
         </div>
       </Section>
 
