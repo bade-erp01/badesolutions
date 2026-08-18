@@ -72,7 +72,7 @@ export default function ContractDetailsPage({
   const params = useParams();
 
   const progress = Math.min(
-    (contract.PeriodCount / contract.installmentPeriod) * 100,
+    (payments.length / contract.installmentPeriod) * 100,
     100,
   );
 
