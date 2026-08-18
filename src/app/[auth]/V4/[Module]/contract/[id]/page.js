@@ -250,7 +250,7 @@ export default function ContractDetailsPage({
                   Installment Progress
                 </span>
                 <span className="text-zinc-500 dark:text-zinc-400">
-                  {contract.PeriodCount} of {contract.installmentPeriod} periods
+                  {payments.length} of {contract.installmentPeriod} periods
                 </span>
               </div>
               <div className="h-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
@@ -447,7 +447,7 @@ export default function ContractDetailsPage({
                     Discount
                   </span>
                   <span className="capitalize font-medium">
-                    {contract.invoiceId.discount}
+                    {formatCurrency(contract.invoiceId.discount)}
                   </span>
                 </div>
                 <div className="flex justify-between">
