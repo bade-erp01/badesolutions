@@ -949,7 +949,7 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
             Print Statement
           </Button>
 
-          {userInfo.user.isDev && (
+          {/* {userInfo.user.isDev && (
             <Button
               size="sm"
               variant="outline"
@@ -960,7 +960,7 @@ Email: info@abcestates.com | Tel: +234 800 000 0000
               <Printer className="w-5 h-5" />
               Print Allocation Letter
             </Button>
-          )}
+          )} */}
 
           {/* Register Down Payment */}
           {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
