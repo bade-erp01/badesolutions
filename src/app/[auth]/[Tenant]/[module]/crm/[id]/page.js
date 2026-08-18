@@ -8,7 +8,7 @@ import Image from "next/image";
 import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
 import InvoicePaymentForm from "@/app/Components/PaymentWithInv";
-import Link from "next.link";
+import Link from "next/link";
 import {
   postPayment,
   pricelistSetter,
