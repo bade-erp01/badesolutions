@@ -8,6 +8,7 @@ import Image from "next/image";
 import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
 import InvoicePaymentForm from "@/app/Components/PaymentWithInv";
+import Link from "next.link";
 import {
   postPayment,
   pricelistSetter,
@@ -644,7 +645,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
             &apos;s profile
           </h4>
           <span className="block lg:hidden bg-gray-300 w-50 rounded-sm">
-            < BackButton />
+            <BackButton />
           </span>
           <br />
           <span className="text-sm text-gray-600 italic">
@@ -822,17 +823,42 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
           )}
 
           <TextToSpeechPlayer text={`${getCustomerSummary(cust)}`} />
+
+          {cust.phone && (
+            <Link
+              href={`https://wa.me/${cust.phone.replace(/\D/g, "")}`}
+              target="_blank"
+              title={`chat ${cust.Username} on whatsApp on ${cust.phone}`}
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-right truncate max-w-[160px] text-emerald-600 dark:text-emerald-400 hover:underline"
+            >
+              <img
+                src="https://img.icons8.com/color/48/whatsapp.png"
+                alt="WhatsApp"
+                width={16}
+                height={16}
+                className="w-4 h-4"
+                priority
+                quality={75}
+              />
+            </Link>
+          )}
         </div>
       </Section>
 
       {/* dashboard*/}
-      <Section  title={`🗿 Quick view for ${cust.Username}.`}
-        className="lg:col-span-2">
+      <Section
+        title={`🗿 Quick view for ${cust.Username}.`}
+        className="lg:col-span-2"
+      >
         <div className="">
-          <DashboardStats cust={cust} todaysSale={data.SandS.reduce(
-            (acc, item) => acc + Number(item.grandTotal || 0),
-            0
-          )}/>
+          <DashboardStats
+            cust={cust}
+            todaysSale={data.SandS.reduce(
+              (acc, item) => acc + Number(item.grandTotal || 0),
+              0,
+            )}
+          />
         </div>
       </Section>
 
@@ -1151,7 +1177,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
                     </option>
 
                     {/* Dynamic options based on subscription plan */}
-                    {PriceList?.data?.map((pl) =>(
+                    {PriceList?.data?.map((pl) => (
                       <option key={pl._id} value={pl.Name}>
                         {pricelistSetter(pl.Name, userInfo.business)}
                       </option>
@@ -1429,198 +1455,183 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson, PriceL
         >
           {/* Recent Transactions */}
           <Section title="">
-          <Card className="border-0 shadow-xl">
-            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle className="text-lg font-bold">
-                  Transaction History
-                </CardTitle>
+            <Card className="border-0 shadow-xl">
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-lg font-bold">
+                    Transaction History
+                  </CardTitle>
 
-                <CardDescription>
-                  {cust.Username} account transactions and balances
-                </CardDescription>
-              </div>
-
-            </CardHeader>
-            
-            <CardContent>
-              {data && data.transcations.length > 0 ? (
-                <>
-                  {/* TABLE */}
-                  <div className="overflow-hidden rounded-2xl border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/50">
-                          <TableHead>Ref No</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Credit</TableHead>
-                          <TableHead>Debit</TableHead>
-                          <TableHead className="text-right">
-                            Balance
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-
-                      <TableBody>
-                        {currentRows.map((tx, idx) => (
-                          <TableRow
-                            key={idx}
-                            className="hover:bg-muted/40 transition-colors"
-                          >
-                            {/* REF */}
-                            <TableCell
-                              className="max-w-[250px] truncate font-medium"
-                              title={tx.ReferenceNo}
-                            >
-                              {tx.ReferenceNo.length > 50
-                                ? `${tx.ReferenceNo.substring(0, 50)}...`
-                                : tx.ReferenceNo}
-                            </TableCell>
-
-                            {/* DATE */}
-                            <TableCell>
-                              {moment(tx.Date).format("MMM D, YYYY")}
-                            </TableCell>
-
-                            {/* CREDIT */}
-                            <TableCell>
-                              {tx.CreditAmount > 0 ? (
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20"
-                                >
-                                  CR:{" "}
-                                  {tx.CreditAmount?.toLocaleString()}
-                                </Badge>
-                              ) : (
-                                "-"
-                              )}
-                            </TableCell>
-
-                            {/* DEBIT */}
-                            <TableCell>
-                              {tx.DebitAmount > 0 ? (
-                                <Badge
-                                  variant="destructive"
-                                  className="bg-rose-500/10 text-rose-700 hover:bg-rose-500/20"
-                                >
-                                  DR:{" "}
-                                  {tx.DebitAmount?.toLocaleString()}
-                                </Badge>
-                              ) : (
-                                "-"
-                              )}
-                            </TableCell>
-
-                            {/* BALANCE */}
-                            <TableCell
-                              className={`text-right text-sm font-bold ${
-                                tx.Balance < 0
-                                  ? "text-emerald-600"
-                                  : "text-foreground"
-                              }`}
-                            >
-                              {tx.Balance?.toLocaleString()}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  <ExcelDownloadBtn
-                data={data?.transcations || []}
-                page={`${cust.Username.substring(0, 8)} transaction`}
-              />
-                  {/* ALERT */}
-                  <div className="mt-6">
-                    {cust.Debt < 0 ? (
-                      <Alert className="border-purple-300 bg-purple-50">
-                        <AlertCircle className="h-4 w-4 text-purple-700" />
-
-                        <AlertTitle className="text-purple-800">
-                          Business Debt Notice
-                        </AlertTitle>
-
-                        <AlertDescription className="text-purple-700">
-                          Kindly note that{" "}
-                          <strong>
-                            {userInfo.business.companyName}
-                          </strong>{" "}
-                          owes{" "}
-                          <strong>{cust.Username}</strong>{" "}
-                          <strong>
-                            {cust.Debt?.toLocaleString()}
-                          </strong>
-                          .
-                        </AlertDescription>
-                      </Alert>
-                    ) : (
-                      <Alert className="border-yellow-300 bg-yellow-50">
-                        <AlertCircle className="h-4 w-4 text-yellow-700" />
-
-                        <AlertTitle className="text-yellow-800">
-                          Outstanding Debt
-                        </AlertTitle>
-
-                        <AlertDescription className="text-yellow-700">
-                          Kindly note that{" "}
-                          <strong>{cust.Username}</strong>{" "}
-                          owes your business{" "}
-                          <strong>
-                            {cust.Debt?.toLocaleString()}
-                          </strong>
-                          .
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
-
-                  {/* PAGINATION */}
-                  <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Page {currentPage} of {totalPages}
-                    </p>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        type="button"
-                        size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.max(prev - 1, 1),
-                          )
-                        }
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        type="button"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages),
-                          )
-                        }
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed">
-                  <p className="text-sm italic text-muted-foreground">
-                    No recent transactions found.
-                  </p>
+                  <CardDescription>
+                    {cust.Username} account transactions and balances
+                  </CardDescription>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </Section>
+              </CardHeader>
+
+              <CardContent>
+                {data && data.transcations.length > 0 ? (
+                  <>
+                    {/* TABLE */}
+                    <div className="overflow-hidden rounded-2xl border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-muted/50">
+                            <TableHead>Ref No</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Credit</TableHead>
+                            <TableHead>Debit</TableHead>
+                            <TableHead className="text-right">
+                              Balance
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                          {currentRows.map((tx, idx) => (
+                            <TableRow
+                              key={idx}
+                              className="hover:bg-muted/40 transition-colors"
+                            >
+                              {/* REF */}
+                              <TableCell
+                                className="max-w-[250px] truncate font-medium"
+                                title={tx.ReferenceNo}
+                              >
+                                {tx.ReferenceNo.length > 50
+                                  ? `${tx.ReferenceNo.substring(0, 50)}...`
+                                  : tx.ReferenceNo}
+                              </TableCell>
+
+                              {/* DATE */}
+                              <TableCell>
+                                {moment(tx.Date).format("MMM D, YYYY")}
+                              </TableCell>
+
+                              {/* CREDIT */}
+                              <TableCell>
+                                {tx.CreditAmount > 0 ? (
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20"
+                                  >
+                                    CR: {tx.CreditAmount?.toLocaleString()}
+                                  </Badge>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+
+                              {/* DEBIT */}
+                              <TableCell>
+                                {tx.DebitAmount > 0 ? (
+                                  <Badge
+                                    variant="destructive"
+                                    className="bg-rose-500/10 text-rose-700 hover:bg-rose-500/20"
+                                  >
+                                    DR: {tx.DebitAmount?.toLocaleString()}
+                                  </Badge>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+
+                              {/* BALANCE */}
+                              <TableCell
+                                className={`text-right text-sm font-bold ${
+                                  tx.Balance < 0
+                                    ? "text-emerald-600"
+                                    : "text-foreground"
+                                }`}
+                              >
+                                {tx.Balance?.toLocaleString()}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <ExcelDownloadBtn
+                      data={data?.transcations || []}
+                      page={`${cust.Username.substring(0, 8)} transaction`}
+                    />
+                    {/* ALERT */}
+                    <div className="mt-6">
+                      {cust.Debt < 0 ? (
+                        <Alert className="border-purple-300 bg-purple-50">
+                          <AlertCircle className="h-4 w-4 text-purple-700" />
+
+                          <AlertTitle className="text-purple-800">
+                            Business Debt Notice
+                          </AlertTitle>
+
+                          <AlertDescription className="text-purple-700">
+                            Kindly note that{" "}
+                            <strong>{userInfo.business.companyName}</strong>{" "}
+                            owes <strong>{cust.Username}</strong>{" "}
+                            <strong>{cust.Debt?.toLocaleString()}</strong>.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <Alert className="border-yellow-300 bg-yellow-50">
+                          <AlertCircle className="h-4 w-4 text-yellow-700" />
+
+                          <AlertTitle className="text-yellow-800">
+                            Outstanding Debt
+                          </AlertTitle>
+
+                          <AlertDescription className="text-yellow-700">
+                            Kindly note that <strong>{cust.Username}</strong>{" "}
+                            owes your business{" "}
+                            <strong>{cust.Debt?.toLocaleString()}</strong>.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </div>
+
+                    {/* PAGINATION */}
+                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </p>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          type="button"
+                          size="sm"
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                        >
+                          Previous
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages),
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed">
+                    <p className="text-sm italic text-muted-foreground">
+                      No recent transactions found.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </Section>
         </div>
       </div>
 
