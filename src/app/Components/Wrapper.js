@@ -90,7 +90,7 @@ export default function Wrapper({ children }) {
         popover: {
           title: `How'dy ${user.user.firstName}, Welcome to Bade`,
           description:
-            "I’m Jane, your personal tour assistant. You’re exploring Bade ERP, version 4.1 — let’s make this journey effortless and exciting.",
+            "I’m Kamsi, your personal tour assistant. You’re exploring Bade ERP, version 4.1 — let’s make this journey effortless and exciting.",
           side: "right",
         },
       },
