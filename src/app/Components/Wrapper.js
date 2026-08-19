@@ -542,7 +542,7 @@ export default function Wrapper({ children }) {
             )}
 
           <div className="flex items-center gap-6 text-sm justify-between">
-            <div className="fixed top-4 right-4 z-50">
+            <div className="theme-toggle ml-auto">
               <ThemeToggle />
             </div>
 
