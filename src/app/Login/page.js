@@ -144,7 +144,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
       setTimeout(() => {
         setLoading(false);
-        router.push(dashboardUrl);
+        window.location.assign(dashboardUrl);
       }, 5000);
     } catch (error) {
       setShowSplash(false);
