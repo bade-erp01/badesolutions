@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { Encrypt } from "../../../../../../Functions/Mics";
-import { pricelistSetter,EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
+import { pricelistSetter, EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Paperclip, ShoppingCart } from "lucide-react";
 import Notch from "@/app/Components/Notch";
@@ -33,8 +33,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/components/UserProvider";
 
-
-
 export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
   const [searchRef, setSearchRef] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -47,11 +45,9 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
   const { user } = useUser();
   const userData = user;
 
-
   const params = useParams();
   const itemsPerPage = 20;
 
-  // 🔹 Fetch function lifted out of useEffect
   const fetchBills = async (append = false, page = currentPage) => {
     setIsLoading(true);
     try {
@@ -68,14 +64,14 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
           access: `${Encrypt(userData.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
         },
       });
 
       const data = response.data;
 
-      setBillList(prev =>
-        append ? [...prev, ...(data.invoices || [])] : (data.invoices || [])
+      setBillList((prev) =>
+        append ? [...prev, ...(data.invoices || [])] : data.invoices || [],
       );
       setTotalPages(data.totalPages);
       setTotalInvoices(data.totalInvoices);
@@ -87,173 +83,261 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
     }
   };
 
-  //  Auto-refresh effect
-// Auto refresh ONLY when exactly 20 invoices are loaded
-useEffect(() => {
-  let intervalId;
+  useEffect(() => {
+    let intervalId;
 
-  // stop completely if invoices are more than 20
-  if (billList.length > 20) {
-    return;
-  }
+    if (billList.length > 20) {
+      return;
+    }
 
-  const startAutoRefresh = () => {
-    // refresh immediately
-    fetchBills(false);
-
-    // clear previous interval before creating new one
-    clearInterval(intervalId);
-
-    intervalId = setInterval(() => {
+    const startAutoRefresh = () => {
       fetchBills(false);
-    }, 120000); // 2 mins
-  };
+      clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        fetchBills(false);
+      }, 120000);
+    };
 
-  const stopAutoRefresh = () => {
-    clearInterval(intervalId);
-  };
+    const stopAutoRefresh = () => {
+      clearInterval(intervalId);
+    };
 
-  const handleVisibilityChange = () => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        startAutoRefresh();
+      } else {
+        stopAutoRefresh();
+      }
+    };
+
     if (document.visibilityState === "visible") {
       startAutoRefresh();
-    } else {
-      stopAutoRefresh();
     }
-  };
 
-  // start only if page is visible
-  if (document.visibilityState === "visible") {
-    startAutoRefresh();
-  }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  document.addEventListener(
-    "visibilitychange",
-    handleVisibilityChange
-  );
+    return () => {
+      stopAutoRefresh();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [billList.length, searchRef, startDate, endDate]);
 
-  return () => {
-    stopAutoRefresh();
-
-    document.removeEventListener(
-      "visibilitychange",
-      handleVisibilityChange
-    );
-  };
-}, [billList.length, searchRef, startDate, endDate]);
-
-  // 🔹 Load More handler
   const handleLoadMore = () => {
     if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
-      fetchBills(true, nextPage); // append new invoices
+      fetchBills(true, nextPage);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const base = "px-2 py-0.5 text-xs rounded-full font-semibold";
+    switch (status) {
+      case "Invoice":
+        return `${base} bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300`;
+      case "Order":
+        return `${base} bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300`;
+      case "Cancelled":
+        return `${base} bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300`;
+      case "Processing":
+        return `${base} bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200`;
+      default:
+        return `${base} bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300`;
     }
   };
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Sales List"} />}>
-      <Card>
-        <CardHeader className="flex justify-between gap-2">
-          <CardTitle>Sales Management</CardTitle>
-          <Badge variant="secondary" className="text-xs">
+      <Card className="w-full border bg-card text-card-foreground shadow-sm">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <CardTitle className="text-lg sm:text-xl">Sales Management</CardTitle>
+          <Badge variant="secondary" className="text-xs w-fit">
             Auto refresh is enabled
           </Badge>
         </CardHeader>
+
         <Separator />
-        <CardContent>
+
+        <CardContent className="p-3 sm:p-6">
           {isLoading && billList.length === 0 ? (
             <SuspenenseFallBack pagedata={"Sales List"} />
           ) : billList.length > 0 ? (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ref No</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Order Date</TableHead>
-                    <TableHead>Store</TableHead>
-                    <TableHead>Pricelist</TableHead>
-                    <TableHead>Alt</TableHead>
-                    <TableHead>
-                      <ShoppingCart className="h-4 w-4" />
-                    </TableHead>
-                    <TableHead>
-                      Source
-                    </TableHead>
-                    <TableHead>Raised By</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Value</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {billList.map((bill) => {
-                    const url =
-                      bill.billStatus?.toLowerCase() === "draft"
-                        ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${Encrypt(bill._id)}`
-                        : `/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(bill._id)}`;
+              {/* ========== DESKTOP / TABLET TABLE ========== */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ref No</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Order Date</TableHead>
+                      <TableHead>Store</TableHead>
+                      <TableHead>Pricelist</TableHead>
+                      <TableHead>Alt</TableHead>
+                      <TableHead>
+                        <ShoppingCart className="h-4 w-4" />
+                      </TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Raised By</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Value</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {billList.map((bill) => {
+                      const url =
+                        bill.billStatus?.toLowerCase() === "draft"
+                          ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${Encrypt(bill._id)}`
+                          : `/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(bill._id)}`;
 
-                    return (
-                      <TableRow key={bill._id}>
-                        <TableCell>
+                      return (
+                        <TableRow key={bill._id}>
+                          <TableCell>
+                            <Link
+                              href={url}
+                              className="text-indigo-600 hover:underline font-medium dark:text-indigo-400"
+                            >
+                              {bill?.billReferenceNo && bill?.invoicelocation
+                                ? `${bill.billReferenceNo}/${bill.invoicelocation}`
+                                : "View Draft"}
+                            </Link>
+                          </TableCell>
+                          <TableCell>{bill.customerName}</TableCell>
+                          <TableCell>{bill.startDate}</TableCell>
+                          <TableCell>{bill.whId?.WHName}</TableCell>
+                          <TableCell>
+                            {pricelistSetter(bill.priceList, userData.business)}
+                          </TableCell>
+                          <TableCell>
+                            {bill.memoId && (
+                              <Paperclip className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </TableCell>
+                          <TableCell>{bill.orders?.length || 0} SKU</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{bill.means ?? "—"}</Badge>
+                          </TableCell>
+                          <TableCell>{bill.RaiseBy}</TableCell>
+                          <TableCell>
+                            <span className={getStatusBadge(bill.billStatus)}>
+                              {bill.billStatus}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right font-bold">
+                            ₦
+                            {bill.grandTotal
+                              ? bill.grandTotal.toLocaleString()
+                              : "0.00"}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* ========== MOBILE CARD LAYOUT ========== */}
+              <div className="md:hidden space-y-4">
+                {billList.map((bill) => {
+                  const url =
+                    bill.billStatus?.toLowerCase() === "draft"
+                      ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${Encrypt(bill._id)}`
+                      : `/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(bill._id)}`;
+
+                  return (
+                    <Card
+                      key={bill._id}
+                      className="overflow-hidden border bg-card text-card-foreground shadow-sm dark:border-border"
+                    >
+                      <CardContent className="p-4 space-y-3">
+                        {/* Header: Ref + Status */}
+                        <div className="flex items-start justify-between gap-2">
                           <Link
                             href={url}
-                            className="text-indigo-600 hover:underline font-medium"
+                            className="text-indigo-600 hover:underline font-semibold text-sm dark:text-indigo-400"
                           >
                             {bill?.billReferenceNo && bill?.invoicelocation
                               ? `${bill.billReferenceNo}/${bill.invoicelocation}`
                               : "View Draft"}
                           </Link>
-                        </TableCell>
-                        <TableCell>{bill.customerName}</TableCell>
-                        <TableCell>{bill.startDate}</TableCell>
-                        <TableCell>{bill.whId.WHName}</TableCell>
-                        <TableCell>{pricelistSetter(bill.priceList,userData.business)}</TableCell>
-                        <TableCell>
-                          {bill.memoId && (
-                            <Paperclip className="h-4 w-4 text-gray-400" />
-                          )}
-                        </TableCell>
-                        <TableCell>{bill.orders.length} SKU</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                           {bill.means ?? "—"}
-                          </Badge>
-                          </TableCell>
-                        <TableCell>{bill.RaiseBy}</TableCell>
-                        <TableCell>
-                          <span
-                            className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
-                              bill.billStatus === "Invoice"
-                                ? "bg-green-100 text-green-700"
-                                : bill.billStatus === "Order"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : bill.billStatus === "Cancelled"
-                                ? "bg-red-100 text-red-700"
-                                : bill.billStatus === "Processing"
-                                ? "bg-gray-200 text-gray-800"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
+                          <span className={getStatusBadge(bill.billStatus)}>
                             {bill.billStatus}
                           </span>
-                        </TableCell>
-                        <TableCell className="text-right font-bold">
-                          ₦{bill.grandTotal ? bill.grandTotal.toLocaleString() : 0.00}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                        </div>
+
+                        {/* Customer & Date */}
+                        <div className="space-y-1">
+                          <p className="font-medium text-sm">{bill.customerName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {bill.startDate}
+                          </p>
+                        </div>
+
+                        <Separator />
+
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                          <div>
+                            <p className="text-xs text-muted-foreground">Store</p>
+                            <p className="font-medium truncate">
+                              {bill.whId?.WHName || "—"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Pricelist</p>
+                            <p className="font-medium truncate">
+                              {pricelistSetter(bill.priceList, userData.business)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Items</p>
+                            <p className="font-medium">
+                              {bill.orders?.length || 0} SKU
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Source</p>
+                            <Badge variant="outline" className="mt-0.5">
+                              {bill.means ?? "—"}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Raised By</p>
+                            <p className="font-medium truncate">{bill.RaiseBy}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Value</p>
+                            <p className="font-bold text-base">
+                              ₦
+                              {bill.grandTotal
+                                ? bill.grandTotal.toLocaleString()
+                                : "0.00"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Memo indicator */}
+                        {bill.memoId && (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground pt-1">
+                            <Paperclip className="h-3.5 w-3.5" />
+                            <span>Has attachment</span>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
 
               {/* Load More Button */}
               {currentPage < totalPages && (
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center mt-6">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleLoadMore}
                     disabled={isLoading}
+                    className="w-full sm:w-auto"
                   >
                     {isLoading ? "Loading..." : "Load More"}
                   </Button>
@@ -264,7 +348,8 @@ useEffect(() => {
             <Empty>
               <EmptyTitle>No sales registered yet</EmptyTitle>
               <EmptyDescription>
-                You haven&apos;t created any order yet. Get started by recording your first sales.
+                You haven&apos;t created any order yet. Get started by recording
+                your first sales.
               </EmptyDescription>
             </Empty>
           )}

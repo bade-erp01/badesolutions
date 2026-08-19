@@ -1,8 +1,8 @@
 "use client";
 
-import { mutate } from "swr"; // make sure this is imported
+import { mutate } from "swr";
 import QRCode from "qrcode";
-import  DeliveryModal  from "@/app/Components/Delivery";
+import DeliveryModal from "@/app/Components/Delivery";
 import { React, useState } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
@@ -19,7 +19,7 @@ import {
 } from "../../../../../../../Functions/Mics";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import axios from "axios"
+import axios from "axios";
 import moment from "moment";
 import { useRouter, useParams } from "next/navigation";
 import {
@@ -30,12 +30,11 @@ import {
   TruckIcon,
   LockClosedIcon,
   ShieldCheckIcon,
-  XMarkIcon
+  XMarkIcon,
 } from "@heroicons/react/24/solid";
-import {pricelistSetter} from "../../../../../../../Functions/Functions"
+import { pricelistSetter } from "../../../../../../../Functions/Functions";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link"
-
+import Link from "next/link";
 
 export default function InvoicePage({
   userInfo,
@@ -45,7 +44,7 @@ export default function InvoicePage({
   const Router = useRouter();
   const path = useParams();
   const [cust] = useState(customerList);
-  const [Singlebill,setSinglebill] = useState(SinglebillItem);
+  const [Singlebill, setSinglebill] = useState(SinglebillItem);
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
 
   //  Safe image loader as Data URL
@@ -59,19 +58,15 @@ export default function InvoicePage({
         canvas.height = img.height;
         const ctx = canvas.getContext("2d");
 
-        // Draw image
         ctx.drawImage(img, 0, 0);
 
-        // Add watermark (bottom right)
-
         ctx.font = "italic bold 16px 'Courier New'";
-        ctx.textAlign = "center"; // Or "left" depending on your layout
+        ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
-        ctx.fillStyle = "rgba(109, 107, 107, 0.59)"; // Semi-transparent white
-        ctx.globalAlpha = 0.5; // Semi-transparent watermark
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10); // Centered horizontally, 10px from bottom
+        ctx.fillStyle = "rgba(109, 107, 107, 0.59)";
+        ctx.globalAlpha = 0.5;
+        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10);
 
-        // Convert to PNG
         resolve(canvas.toDataURL("image/png"));
       };
       img.onerror = () => reject(new Error("Image loading failed"));
@@ -84,9 +79,9 @@ export default function InvoicePage({
       style: "currency",
       currency: "NGN",
       minimumFractionDigits: 2,
-    }).format(amount || 0)
+    }).format(amount || 0);
 
-  //  Full PDF generator
+  //  Full PDF generator (unchanged)
   const generatePdf = async (business, customer, bill) => {
     try {
       plsWait("Setting things up, Ensure your printer is connected ⌛...");
@@ -98,7 +93,6 @@ export default function InvoicePage({
       const margin = 10;
       let currentY = margin;
 
-      //  Logo
       if (business.companyLogo) {
         try {
           const logo = await loadImageAsDataURL(business.companyLogo);
@@ -120,7 +114,7 @@ export default function InvoicePage({
         }`,
         pageWidth - 10,
         20,
-        { align: "right" }
+        { align: "right" },
       );
       doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
       doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
@@ -129,37 +123,32 @@ export default function InvoicePage({
 
       currentY = 50;
 
-      // Customer Info + 🔳 QR Code in same row
       doc.setFontSize(17).setTextColor(0, 0, 0).setFont("helvetica", "bold");
       doc.text(
-        `${bill.billStatus?.slice(0, 3).toUpperCase()}/${
-          bill.billReferenceNo
-        }`,
+        `${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}`,
         10,
-        currentY
+        currentY,
       );
       currentY += 10;
 
-      // Left Column: Customer Info
       doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
       doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
       doc.setFontSize(7).setTextColor(0, 0, 0);
       doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
       doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
-      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
-
-      // Right Column: QR Code
-      // try {
-      //   const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-      //   doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
-      // } catch (err) {
-      //   console.warn("QR code failed to generate");
-      // }
+      doc.text(
+        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
+        10,
+        currentY + 18,
+      );
+      doc.text(
+        `Download Date: ${moment().format("YYYY-MM-DD")}`,
+        10,
+        currentY + 24,
+      );
 
       currentY += 2;
 
-      //  Bill Metadata
       autoTable(doc, {
         startY: currentY,
         tableWidth: 80,
@@ -182,7 +171,6 @@ export default function InvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      //  Invoice Table
       autoTable(doc, {
         startY: currentY,
         head: [
@@ -198,23 +186,24 @@ export default function InvoicePage({
             "Total",
           ],
         ],
-        body: bill.orders.filter(entry => entry.Qty > 0 || entry.pcsReq > 0).map((ord, i) => [
-          i + 1,
-          `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
-          ord.item?.ACDcode || "N/A",
-          ord.priceListPrice?.toFixed(2) || 0,
-          ord.promotionData || 0,
-          ord.Qty,
-          ord.pcsReq || 0,
-          ord.vat > 0 ? ord.item?.VAT?.$numberDecimal : 0,
-          ord.total?.toFixed(2) || 0,
-        ]),
+        body: bill.orders
+          .filter((entry) => entry.Qty > 0 || entry.pcsReq > 0)
+          .map((ord, i) => [
+            i + 1,
+            `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
+            ord.item?.ACDcode || "N/A",
+            ord.priceListPrice?.toFixed(2) || 0,
+            ord.promotionData || 0,
+            ord.Qty,
+            ord.pcsReq || 0,
+            ord.vat > 0 ? ord.item?.VAT?.$numberDecimal : 0,
+            ord.total?.toFixed(2) || 0,
+          ]),
         theme: "grid",
         styles: { fontSize: 7 },
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      //  Summary Table
       autoTable(doc, {
         startY: currentY,
         tableWidth: 80,
@@ -235,12 +224,11 @@ export default function InvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      //  Signatures
       doc.setFontSize(7);
       doc.text(
         `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
         margin,
-        currentY
+        currentY,
       );
       currentY += 10;
       doc.text("Authorized Signatures", margin, currentY);
@@ -248,13 +236,13 @@ export default function InvoicePage({
       doc.text(
         `${business.companyName.toLowerCase()} _______________________________`,
         margin,
-        currentY
+        currentY,
       );
       currentY += 10;
       doc.text(
         "Customer Sign & Date _______________________________",
         margin,
-        currentY
+        currentY,
       );
       currentY += 10;
       if (business.invoicePolicy) {
@@ -262,11 +250,6 @@ export default function InvoicePage({
         currentY += 10;
       }
 
-      //  Footer
-      // doc.setFontSize(9);
-      // doc.text(`This ${bill.billStatus} is generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
-
-      //  Page Numbers
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -274,11 +257,10 @@ export default function InvoicePage({
           `Page ${i} of ${totalPages}`,
           pageWidth - 20,
           pageHeight - 10,
-          { align: "right" }
+          { align: "right" },
         );
       }
 
-      //  Preview or Save
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       const win = window.open(url, "_blank");
@@ -298,88 +280,76 @@ export default function InvoicePage({
     }
   };
 
-
   const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-        access: `${Encrypt(userInfo.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
-      },
-    };
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+      access: `${Encrypt(userInfo.user._id)}`,
+      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+    },
+  };
 
-    // recall and adjust values on inv line item
-      const handleQtyChange = async (
-         lineId,
-        value,
-        toUpdate,
-        billId,
-        storeId,
-        companyName
-      ) => {
-        try {
-          plsWait('Updating cart...');
-    
-          const url = `${EXPRESS_PRIVATE_URL}/api/Recalled/Cart/Update?user=${Encrypt(
-            userInfo.user._id
-          )}`;
-    
-          const response = await fetch(url, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:`Bearer ${Encrypt(userInfo.business.tenantId)}`,
-              access:`${Encrypt(userInfo.user._id)}`,
-              sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
-            },
-            body: JSON.stringify({ lineId, value , toUpdate, billId, storeId }),
-          });
-    
-          const data = await response.json();
-    
-          if (data.message) {
-            SuccessToast(data.message);
-    
-            //  Revalidate the invoice data (instead of reload)
-            setSinglebill(Dencrypt(data.Updatedinvoice))
-            mutate(`/api/storeApi/invoice/${billId}`);
-            Router.refresh();
-          } else {
-            throw new Error(data.error || "An unknown error occurred.");
-          }
-        } catch (err) {
-          ErrorMessage(err.message);
-          Router.refresh();
-        }
-      };
+  const handleQtyChange = async (
+    lineId,
+    value,
+    toUpdate,
+    billId,
+    storeId,
+    companyName,
+  ) => {
+    try {
+      plsWait("Updating cart...");
 
-  // rebill a canceled invoice to return items
+      const url = `${EXPRESS_PRIVATE_URL}/api/Recalled/Cart/Update?user=${Encrypt(
+        userInfo.user._id,
+      )}`;
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+          access: `${Encrypt(userInfo.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+        },
+        body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
+      });
+
+      const data = await response.json();
+
+      if (data.message) {
+        SuccessToast(data.message);
+        setSinglebill(Dencrypt(data.Updatedinvoice));
+        mutate(`/api/storeApi/invoice/${billId}`);
+        Router.refresh();
+      } else {
+        throw new Error(data.error || "An unknown error occurred.");
+      }
+    } catch (err) {
+      ErrorMessage(err.message);
+      Router.refresh();
+    }
+  };
+
   const Rebill = async () => {
     plsWait(
-      "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page. Also note that this Bill will carry a new Reference."
+      "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page. Also note that this Bill will carry a new Reference.",
     );
 
     try {
-      // Use destructuring for required IDs
       const Biller = Encrypt(userInfo.user._id);
-
-      // Avoid unnecessary template literals
       const url = `${EXPRESS_PRIVATE_URL}/api/Redo/invoice/${Encrypt(
-        Singlebill._id
+        Singlebill._id,
       )}?Biller=${Biller}`;
 
-      // Await axios call directly
       const { data } = await axios.post(url, {}, config);
 
-      // Handle response (redirect or update UI as needed)
-      // Redirect to the new invoice page
       if (data && data.result) {
-        // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
         Router.push(
           `/${path.auth}/V4/${path.Module}/${path.Module}/Sales/Draft/${Encrypt(
-            data.result
-          )}`
+            data.result,
+          )}`,
         );
       } else {
         Swal.fire({
@@ -390,12 +360,10 @@ export default function InvoicePage({
         });
       }
     } catch (error) {
-      // Prefer error.message fallback
       ErrorMessage(error?.response?.data?.error || error.message);
     }
   };
 
-  // print waybill
   const printWayBill = async (business, customer, bill, userInfo) => {
     try {
       plsWait("Setting things up, Ensure your printer is connected⌛...");
@@ -406,7 +374,6 @@ export default function InvoicePage({
       const margin = 10;
       let currentY = margin;
 
-      //  Logo
       if (business.companyLogo) {
         try {
           const logoDataURL = await loadImageAsDataURL(business.companyLogo);
@@ -418,14 +385,13 @@ export default function InvoicePage({
             margin,
             currentY,
             logoWidth,
-            logoHeight
+            logoHeight,
           );
         } catch (imgErr) {
           console.warn("Logo failed to load:", imgErr.message);
         }
       }
 
-      //  Business Info
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
       doc.text(business.companyName, pageWidth - margin, currentY + 5, {
@@ -435,7 +401,7 @@ export default function InvoicePage({
       const address = `${business.shopAddress} ${business.companyCity} ${business.companyState}`;
       const wrappedAddress = doc.splitTextToSize(
         address.toLowerCase(),
-        pageWidth * 0.5
+        pageWidth * 0.5,
       );
       doc.text(wrappedAddress, pageWidth - margin, currentY + 12, {
         align: "right",
@@ -450,16 +416,14 @@ export default function InvoicePage({
         `Invoiced By: ${bill.RaiseBy}`,
         pageWidth - margin,
         currentY + 32,
-        { align: "right" }
+        { align: "right" },
       );
 
       currentY += 50;
 
-      //  QR Code
       const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
       doc.addImage(qrDataURL, "PNG", pageWidth - margin - 30, currentY, 30, 30);
 
-      // Customer Info
       doc.setFontSize(17);
       doc.setFont("helvetica", "bold");
       doc.text(`${bill.WayBillNo}`, margin, currentY);
@@ -468,15 +432,22 @@ export default function InvoicePage({
       doc.text(
         `${bill.customerName?.toUpperCase() || ""}`,
         margin,
-        currentY + 8
+        currentY + 8,
       );
       doc.setFontSize(8).setTextColor(0, 0, 0);
       doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
       doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(`Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`, 10, currentY + 18);
-      doc.text(`Download Date: ${moment().format("YYYY-MM-DD")}`, 10, currentY + 24);
+      doc.text(
+        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
+        10,
+        currentY + 18,
+      );
+      doc.text(
+        `Download Date: ${moment().format("YYYY-MM-DD")}`,
+        10,
+        currentY + 24,
+      );
 
-      // 📋 Metadata Table
       autoTable(doc, {
         startY: currentY + 30,
         tableWidth: 80,
@@ -489,7 +460,10 @@ export default function InvoicePage({
             }`,
           ],
           ["Order Date:", bill.startDate || ""],
-          ["Invoice Date:", moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || ""],
+          [
+            "Invoice Date:",
+            moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || "",
+          ],
         ],
         theme: "plain",
         styles: { fontSize: 7, cellPadding: 1 },
@@ -499,17 +473,18 @@ export default function InvoicePage({
         },
       });
 
-      //  Invoice Table with Pagination
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 5,
         head: [["#", "Product", "Code", "Case", "Pcs"]],
-        body: bill.orders.filter(entry => entry.Qty > 0 || entry.pcsReq > 0).map((ord, i) => [
-          i + 1,
-          ord.item?.Name,
-          ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
-          ord.Qty,
-          ord.pcsReq || 0,
-        ]),
+        body: bill.orders
+          .filter((entry) => entry.Qty > 0 || entry.pcsReq > 0)
+          .map((ord, i) => [
+            i + 1,
+            ord.item?.Name,
+            ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
+            ord.Qty,
+            ord.pcsReq || 0,
+          ]),
         theme: "grid",
         styles: {
           fontSize: 7,
@@ -539,7 +514,6 @@ export default function InvoicePage({
         },
       });
 
-      //Summary Table
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 5,
         margin: { left: margin },
@@ -577,7 +551,6 @@ export default function InvoicePage({
         },
       });
 
-      // Preview or Save
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       const win = window.open(url, "_blank");
@@ -597,12 +570,13 @@ export default function InvoicePage({
     }
   };
 
-
-  // Action button for canceling sales and returns
-  const ActionBtn = async (orderId,option) => {
+  const ActionBtn = async (orderId, option) => {
     const confirmed = await Swal.fire({
       title: "Confirm Action?",
-      text: option === "Approved" ? "Proceed with approval will lead to inventory update and this action cannot be undone." : "Are you sure you want to decline this invoice?",
+      text:
+        option === "Approved"
+          ? "Proceed with approval will lead to inventory update and this action cannot be undone."
+          : "Are you sure you want to decline this invoice?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, Proceed",
@@ -630,45 +604,46 @@ export default function InvoicePage({
       plsWait("Processing Request...");
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/Recalled/invoice/${Encrypt(
-          orderId
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}&option=${option}`,
+          orderId,
+        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(
+          opCode,
+        )}&option=${option}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
-            "idempotency-key" : `recalled-${option}-${Singlebill._id}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
+            "idempotency-key": `recalled-${option}-${Singlebill._id}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
           },
           body: JSON.stringify({ id: Encrypt(orderId) }),
-        }
+        },
       );
 
       const result = await res.json();
 
       if (res.ok) {
         SuccessToast(result.message);
-        
-        if(result.Updatedinvoice){
-          setSinglebill(Dencrypt(result.Updatedinvoice))
-          Router.refresh()
+
+        if (result.Updatedinvoice) {
+          setSinglebill(Dencrypt(result.Updatedinvoice));
+          Router.refresh();
         }
 
-        Router.refresh()
-        
+        Router.refresh();
       } else {
         throw new Error(result.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(
-        err.message || "An error occurred while processing request."
+        err.message || "An error occurred while processing request.",
       );
       Router.refresh();
     }
-  }
+  };
 
-  const cancelSales = async (orderId,option) => {
+  const cancelSales = async (orderId, option) => {
     const confirmed = await Swal.fire({
       title: "Confirm Action?",
       text: "Are you sure you want to proceed with this action?",
@@ -699,46 +674,45 @@ export default function InvoicePage({
       plsWait("Processing Request...");
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/SingleReturn/${Encrypt(
-          orderId
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}&option=${option}`,
+          orderId,
+        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(
+          opCode,
+        )}&option=${option}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
             access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
           },
           body: JSON.stringify({ id: Encrypt(orderId) }),
-        }
+        },
       );
 
       const result = await res.json();
 
       if (res.ok) {
         SuccessToast(result.message);
-        
-        if(result.Updatedinvoice){
-          setSinglebill(Dencrypt(result.Updatedinvoice))
-           Router.refresh()
+
+        if (result.Updatedinvoice) {
+          setSinglebill(Dencrypt(result.Updatedinvoice));
+          Router.refresh();
         }
 
-        Router.refresh()
-        
+        Router.refresh();
       } else {
         throw new Error(result.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(
-        err.message || "An error occurred while processing request."
+        err.message || "An error occurred while processing request.",
       );
       Router.refresh();
     }
   };
 
-
-  // set req back to draft
-   const REQToDRAFT = async (orderId,option) => {
+  const REQToDRAFT = async (orderId, option) => {
     const confirmed = await Swal.fire({
       title: "Confirm Action?",
       text: "Are you sure you want to proceed with this action?",
@@ -769,8 +743,10 @@ export default function InvoicePage({
       plsWait("Processing Request...");
       const res = await fetch(
         `${EXPRESS_PRIVATE_URL}/api/REQToDRAFT/${Encrypt(
-          orderId
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(opCode)}&option=${option}`,
+          orderId,
+        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(
+          opCode,
+        )}&option=${option}`,
         {
           method: "PATCH",
           headers: {
@@ -781,21 +757,24 @@ export default function InvoicePage({
             "idempotency-key": `Requisitions-${orderId}`,
           },
           body: JSON.stringify({ id: Encrypt(orderId) }),
-        }
+        },
       );
 
       const result = await res.json();
 
       if (res.ok) {
         SuccessToast(result.message);
-        Router.push( `/${path.auth}/V4/${path.Module}/${path.Module}/Draft/${Encrypt(orderId)}`)
-        
+        Router.push(
+          `/${path.auth}/V4/${path.Module}/${path.Module}/Draft/${Encrypt(
+            orderId,
+          )}`,
+        );
       } else {
         throw new Error(result.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(
-        err.message || "An error occurred while processing request."
+        err.message || "An error occurred while processing request.",
       );
       Router.refresh();
     }
@@ -803,251 +782,270 @@ export default function InvoicePage({
 
   return (
     <>
-      <div className=" text-xs px-6 py-10 bg-white animate__animated animate__fadeIn invoicecontainer border border-gray-200">
-        {/* Top Controls */}
-        <div className="flex items-center justify-between mb-8">
-            <h1
-              className={`font-bold text-base ${
-                isCancelled ? "text-red-600" : "text-gray-800"
-              }`}
-            >
-              {Singlebill.billStatus.toUpperCase()} /{" "}
-              {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
-            </h1>
-           <div className="text-right">
-              <span className="text-xs text-gray-900 tracking-tight mb-1">
-                  Created on: {moment(Singlebill.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
-              </span>
-            </div>
+      <div className="text-xs px-3 sm:px-6 py-6 sm:py-10 bg-card text-card-foreground animate__animated animate__fadeIn invoicecontainer border border-border rounded-lg">
+        {/* ========== TOP HEADER ========== */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
+          <h1
+            className={`font-bold text-base sm:text-lg ${
+              isCancelled
+                ? "text-red-600 dark:text-red-400"
+                : "text-foreground"
+            }`}
+          >
+            {Singlebill.billStatus.toUpperCase()} / {Singlebill.billReferenceNo}{" "}
+            / {Singlebill.invoicelocation}
+          </h1>
+          <div className="text-left sm:text-right">
+            <span className="text-xs text-muted-foreground tracking-tight">
+              Created on:{" "}
+              {moment(Singlebill.createdAt).format(
+                "dddd DD MMMM YYYY [at] hh:mm A",
+              )}
+            </span>
+          </div>
         </div>
 
-        {/* Company + Customer Info */}
-        <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
-    {/* Left Side - Business Info */}
-    <div className="flex items-start gap-6">
-      <Image
-        src={userInfo.business.companyLogo}
-        width={90}
-        height={90}
-        alt="logo"
-        loading="eager"
-        priority
-        quality="100"
-      />
-      <div className="text-sm text-gray-700 space-y-1">
-        <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
-          {userInfo.business.companyName}
-        </h3>
-        <p className="text-gray-500">{userInfo.business.email}</p>
-        <p className="text-gray-500">{userInfo.business.Tel}</p>
-        <p className="text-gray-500">{userInfo.business.shopAddress?.slice(0, 30)}...</p>
-        <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
-        
-        <h2
-          className={`mt-3 font-bold text-base ${
-            isCancelled ? "text-red-600" : "text-gray-800"
-          }`}
-        >
-          {Singlebill.billStatus.toUpperCase()} /{" "}
-          {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
-        </h2>
-        
-        <Badge 
-          variant="secondary"
-          className="max-w-40 text-lg font-semibold px-2 py-0.5"
-        >
-          {Singlebill.WayBillNo}
-        </Badge>
-        
-        <Badge 
-          variant="secondary"
-          className="max-w-40 lowercase text-sm font-semibold px-2 py-0.5"
-        >
-          Store: {Singlebill.whId?.WHName}
-        </Badge>
-      </div>
-  </div>
+        {/* ========== COMPANY + CUSTOMER INFO ========== */}
+        <div className="flex flex-col lg:flex-row justify-between gap-8 border-t border-b border-border py-6 sm:py-8 mb-6">
+          {/* Left - Business Info */}
+          <div className="flex items-start gap-4 sm:gap-6">
+            <Image
+              src={userInfo.business.companyLogo}
+              width={90}
+              height={90}
+              alt="logo"
+              loading="eager"
+              priority
+              quality={100}
+              className="rounded-md shrink-0"
+            />
+            <div className="text-sm space-y-1">
+              <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">
+                {userInfo.business.companyName}
+              </h3>
+              <p className="text-muted-foreground">{userInfo.business.email}</p>
+              <p className="text-muted-foreground">{userInfo.business.Tel}</p>
+              <p className="text-muted-foreground">
+                {userInfo.business.shopAddress?.slice(0, 40)}...
+              </p>
+              <p className="text-muted-foreground">
+                {userInfo.business.CompanyCity}
+              </p>
 
-  {/* Right Side - Customer Info */}
-  <div className="text-right text-sm text-gray-700 space-y-1 min-w-[220px]">
-    <h3 className="text-lg font-bold text-gray-900 tracking-tight">
-      {Singlebill.customer?.Username?.toUpperCase()}
-    </h3>
-    
-    <p>
-      {Singlebill.customer?.billingAddress?.slice(0, 30)}
-    </p>
+              <h2
+                className={`mt-3 font-bold text-sm sm:text-base ${
+                  isCancelled
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-foreground"
+                }`}
+              >
+                {Singlebill.billStatus.toUpperCase()} /{" "}
+                {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
+              </h2>
 
-    {/* Phone */}
-    <p className="flex items-center justify-end gap-2">
-      <a
-        href={`tel:${Singlebill.customer.phone}`}
-        className="hover:underline text-indigo-700"
-      >
-        {Singlebill.customer.phone}
-      </a>
-    </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <Badge
+                  variant="secondary"
+                  className="text-sm font-semibold px-2 py-0.5"
+                >
+                  {Singlebill.WayBillNo}
+                </Badge>
+                <Badge
+                  variant="secondary"
+                  className="lowercase text-sm font-semibold px-2 py-0.5"
+                >
+                  Store: {Singlebill.whId?.WHName}
+                </Badge>
+              </div>
+            </div>
+          </div>
 
-    {/* Email */}
-    <p className="flex items-center justify-end gap-2">
-      <a
-        href={`mailto:${Singlebill.customer.Email}`}
-        className="hover:underline text-indigo-700">
-            {Singlebill.customer.Email}
-          </a>
-        </p>
+          {/* Right - Customer Info */}
+          <div className="text-left lg:text-right text-sm space-y-1 min-w-0 lg:min-w-[220px]">
+            <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
+              {Singlebill.customer?.Username?.toUpperCase()}
+            </h3>
 
-        {/* Date */}
-        <p className="flex items-center justify-end gap-2">
-          {new Date(Singlebill.startDate).toLocaleDateString()}
-        </p>
+            <p className="text-muted-foreground">
+              {Singlebill.customer?.billingAddress?.slice(0, 40)}
+            </p>
 
-        <Badge 
-          variant="secondary"
-          className="max-w-[160px] lowercase text-sm font-semibold px-2 py-0.5"
-        >
-          Billed at: {pricelistSetter(Singlebill.priceList, userInfo.business)}
-        </Badge>
-      </div>
-    </div>
+            <p>
+              <a
+                href={`tel:${Singlebill.customer.phone}`}
+                className="hover:underline text-indigo-600 dark:text-indigo-400"
+              >
+                {Singlebill.customer.phone}
+              </a>
+            </p>
 
-        {/* cancel invoice button */}
+            <p>
+              <a
+                href={`mailto:${Singlebill.customer.Email}`}
+                className="hover:underline text-indigo-600 dark:text-indigo-400"
+              >
+                {Singlebill.customer.Email}
+              </a>
+            </p>
 
-        {/* Print Button */}
-        <div className="flex justify-end mb-6">
-         
-         {(Singlebill.billStatus?.toUpperCase() === "INVOICE" || Singlebill.billStatus?.toUpperCase() === "ORDER" && Singlebill.billStatus?.toUpperCase() !== "RECALLED" ) &&
+            <p className="text-muted-foreground">
+              {new Date(Singlebill.startDate).toLocaleDateString()}
+            </p>
+
+            <Badge
+              variant="secondary"
+              className="lowercase text-sm font-semibold px-2 py-0.5 mt-1"
+            >
+              Billed at:{" "}
+              {pricelistSetter(Singlebill.priceList, userInfo.business)}
+            </Badge>
+          </div>
+        </div>
+
+        {/* ========== ACTION BUTTONS ========== */}
+        <div className="flex flex-wrap gap-2 mb-6 justify-start sm:justify-end">
+          {(Singlebill.billStatus?.toUpperCase() === "INVOICE" ||
+            (Singlebill.billStatus?.toUpperCase() === "ORDER" &&
+              Singlebill.billStatus?.toUpperCase() !== "RECALLED")) &&
             userInfo.user.cancelInvoice && (
               <>
                 <button
-                title={`Cancel and return SKU in ${Singlebill.billStatus}`}
-                onClick={() => cancelSales(Singlebill._id)}
-                className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-red-500 transition duration-200 ease-in-out mr-2 hover:bg-red-600 text-white font-semibold border border-red-400 hover:shadow-lg"
-              >
-                < ArrowUturnLeftIcon className="w-5 h-5 text-white" />
-                <span>
-                  Cancel {Singlebill.billStatus}/{Singlebill.billReferenceNo}
-                </span>
-              </button>
+                  title={`Cancel and return SKU in ${Singlebill.billStatus}`}
+                  onClick={() => cancelSales(Singlebill._id)}
+                  className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold text-xs sm:text-sm transition"
+                >
+                  <ArrowUturnLeftIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden xs:inline">
+                    Cancel {Singlebill.billStatus}/{Singlebill.billReferenceNo}
+                  </span>
+                  <span className="xs:hidden">Cancel</span>
+                </button>
 
-              {userInfo.user.cancelInvoice && userInfo.business.subscriptionplan === "Standard" && !Singlebill.memoId && (
-                <button
-                title={`Return line item(s) in ${Singlebill.billStatus}`}
-                onClick={() => cancelSales(Singlebill._id,"Recalled")}
-                 className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
-              >
-                < AdjustmentsVerticalIcon className="w-5 h-5 text-white" />
-                <span>
-                  Generate CN /Return
-                </span>
-              </button>
-              )}
+                {userInfo.user.cancelInvoice &&
+                  userInfo.business.subscriptionplan === "Standard" &&
+                  !Singlebill.memoId && (
+                    <button
+                      title={`Return line item(s) in ${Singlebill.billStatus}`}
+                      onClick={() => cancelSales(Singlebill._id, "Recalled")}
+                      className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs sm:text-sm border border-border transition"
+                    >
+                      <AdjustmentsVerticalIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span>Generate CN / Return</span>
+                    </button>
+                  )}
               </>
             )}
 
           {Singlebill.billStatus?.toUpperCase() === "ORDER" && (
-            < DeliveryModal 
-                id={Singlebill._id}
-                user={userInfo.user}
-                business={userInfo.business}
+            <DeliveryModal
+              id={Singlebill._id}
+              user={userInfo.user}
+              business={userInfo.business}
             />
           )}
 
-          {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus?.toUpperCase() === "RECALLED" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") && (
+          {((userInfo.user._id === Singlebill.invoicerId &&
+            Singlebill.billStatus?.toUpperCase() === "RECALLED") ||
+            (userInfo.user.cancelInvoice &&
+              Singlebill.billStatus?.toUpperCase() === "RECALLED")) && (
             <button
               title={`Lock ${Singlebill.billStatus}`}
-              onClick={() =>
-               cancelSales(Singlebill._id,"Locked")
-              }
-               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
+              onClick={() => cancelSales(Singlebill._id, "Locked")}
+              className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs sm:text-sm border border-border transition"
             >
-               <LockClosedIcon className="w-5 h-5 text-gray-100" />
+              <LockClosedIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Lock Updates</span>
             </button>
           )}
 
-          {(userInfo.user.raiseInvoice && Singlebill.billStatus === "Requisition") && (
-            <button
-              title="Revert this requisition back to draft for editing"
-              onClick={() => REQToDRAFT(Singlebill._id, "Draft")}
-              className="group inline-flex items-center gap-3 px-5 py-3 rounded-lg 
-                        bg-amber-600 hover:bg-amber-700 text-white font-semibold 
-                        shadow-sm hover:shadow-md transition-all duration-200"
-            >
-              <ArrowUturnLeftIcon className="w-5 h-5" />
-              <span>Revert to Draft</span>
-            </button>
-          )}
+          {userInfo.user.raiseInvoice &&
+            Singlebill.billStatus === "Requisition" && (
+              <button
+                title="Revert this requisition back to draft for editing"
+                onClick={() => REQToDRAFT(Singlebill._id, "Draft")}
+                className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs sm:text-sm transition"
+              >
+                <ArrowUturnLeftIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Revert to Draft</span>
+              </button>
+            )}
 
-          {/* approve inventory adjustment */}
-          {userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "LOCKED" && (
-           <>
-             <button
-              title={`Approve ${Singlebill.billStatus} Ajustment`}
-             onClick={() =>
-               ActionBtn(Singlebill._id,"Approved")
-              }
-               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
-            >
-               <ShieldCheckIcon className="w-5 h-5 text-gray-100" />
-              <span>Approve Ajustment</span>
-            </button>
+          {userInfo.user.cancelInvoice &&
+            Singlebill.billStatus?.toUpperCase() === "LOCKED" && (
+              <>
+                <button
+                  title={`Approve ${Singlebill.billStatus} Adjustment`}
+                  onClick={() => ActionBtn(Singlebill._id, "Approved")}
+                  className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs sm:text-sm border border-border transition"
+                >
+                  <ShieldCheckIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Approve Adjustment</span>
+                </button>
 
-             <button
-              title={`Decline ${Singlebill.billStatus} Adjustment`}
-              onClick={() =>
-               ActionBtn(Singlebill._id,"Declined")
-              }
-               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-red-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
-            >
-               <XMarkIcon className="w-5 h-5 text-gray-100" />
-              <span>Decline Updates</span>
-            </button>
-           </>
-          )}
+                <button
+                  title={`Decline ${Singlebill.billStatus} Adjustment`}
+                  onClick={() => ActionBtn(Singlebill._id, "Declined")}
+                  className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs sm:text-sm transition"
+                >
+                  <XMarkIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Decline Updates</span>
+                </button>
+              </>
+            )}
 
           {Singlebill.billStatus?.toUpperCase() === "INVOICE" && (
             <button
               title={`Print WayBill ${Singlebill.billStatus}`}
               onClick={() => {
-                printWayBill(userInfo.business, Singlebill.customer, Singlebill);
+                printWayBill(
+                  userInfo.business,
+                  Singlebill.customer,
+                  Singlebill,
+                );
               }}
-               className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
+              className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs sm:text-sm border border-border transition"
             >
-              <PrinterIcon className="w-5 h-5 text-gray-100" />
+              <PrinterIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Print WB/{Singlebill.WayBillNo}</span>
             </button>
           )}
 
-          {/* duplicate */}
-            {userInfo.business.subscriptionplan === "Standard" && userInfo.user.raiseInvoice && !Singlebill.reBilled && Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
+          {userInfo.business.subscriptionplan === "Standard" &&
+            userInfo.user.raiseInvoice &&
+            !Singlebill.reBilled &&
+            Singlebill.billStatus?.toUpperCase() === "CANCELLED" && (
               <button
-              title={`Re-Bill ${Singlebill.billReferenceNo}`}
-              onClick={Rebill}
-              className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-green-200 transition duration-200 ease-in-out mr-2 hover:bg-green-600 font-semibold"
-            >
-              <ArrowPathRoundedSquareIcon className="w-5 h-5 text-gray-700" />
-              <span>Recycle</span>
-            </button> 
-           )}
+                title={`Re-Bill ${Singlebill.billReferenceNo}`}
+                onClick={Rebill}
+                className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green-200 dark:bg-green-900/40 text-green-800 dark:text-green-300 hover:bg-green-600 hover:text-white font-semibold text-xs sm:text-sm transition"
+              >
+                <ArrowPathRoundedSquareIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Recycle</span>
+              </button>
+            )}
 
-           {Singlebill.billStatus?.toUpperCase() !== "PROCESSING" &&(
+          {Singlebill.billStatus?.toUpperCase() !== "PROCESSING" && (
             <button
-            title={`Download and Print ${Singlebill.billStatus}`}
-            onClick={() => generatePdf(userInfo.business, Singlebill.customer, Singlebill)}
-            className="group inline-flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-gray-100 font-semibold border border-gary-200 hover:shadow-lg hover:border-gary-400 hover:text-white transition duration-200 ease-in-out mr-1"
-          >
-            <PrinterIcon className="w-5 h-5 text-gray-100" />
-            <span>Print {Singlebill.billStatus}</span>
-          </button>
-           )}
-          
+              title={`Download and Print ${Singlebill.billStatus}`}
+              onClick={() =>
+                generatePdf(
+                  userInfo.business,
+                  Singlebill.customer,
+                  Singlebill,
+                )
+              }
+              className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 font-semibold text-xs sm:text-sm border border-border transition"
+            >
+              <PrinterIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Print {Singlebill.billStatus}</span>
+            </button>
+          )}
         </div>
 
-        {/* Product Table */}
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white mb-8 text-xs">
+        {/* ========== PRODUCT TABLE (Desktop) ========== */}
+        <div className="hidden md:block overflow-x-auto rounded-lg border border-border bg-card mb-8 text-xs">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
+            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
               <tr>
                 {[
                   "#",
@@ -1073,11 +1071,11 @@ export default function InvoicePage({
                 ))}
               </tr>
             </thead>
-            <tbody className="text-gray-800">
+            <tbody className="text-foreground">
               {Singlebill.orders?.map((bill, index) => (
                 <tr
                   key={bill._id}
-                  className="border-t hover:bg-orange-50 transition"
+                  className="border-t border-border hover:bg-muted/40 transition"
                 >
                   <td className="px-4 py-2 text-center text-xs">{index + 1}</td>
                   <td className="px-4 py-2 font-medium text-center text-xs">
@@ -1091,19 +1089,24 @@ export default function InvoicePage({
                       width={38}
                       height={38}
                       alt="preview"
-                      className="rounded-md"
+                      className="rounded-md mx-auto"
                     />
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    <Badge 
+                    <Badge
                       variant={
-                        bill.returnId === "WH/IN" ? "secondary" :
-                        bill.returnId === "WH/OUT" ? "default" :
-                        "outline"
+                        bill.returnId === "WH/IN"
+                          ? "secondary"
+                          : bill.returnId === "WH/OUT"
+                            ? "default"
+                            : "outline"
                       }
                     >
-                      {bill.returnId === "WH/IN" ? "Returned" :
-                      bill.returnId === "WH/OUT" ? "Issued Out" :"N/A"}
+                      {bill.returnId === "WH/IN"
+                        ? "Returned"
+                        : bill.returnId === "WH/OUT"
+                          ? "Issued Out"
+                          : "N/A"}
                     </Badge>
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
@@ -1113,49 +1116,59 @@ export default function InvoicePage({
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.pcsReq || 0}
                   </td>
-                  <td className="px-4 py-2 text-center text-xs" title="Returned Case">
-                    {(userInfo.user._id === Singlebill.invoicerId && Singlebill.billStatus.toLowerCase() === "recalled" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
-                     <input
-                      type="number"
-                      defaultValue={bill.RCRT || 0}
-                      min={0}
-                      onBlur={(e) => {
-                        let val = e.target.value;
-                        if (val < 0) return
-                        if (val < 0) val = 0;
-                        handleQtyChange(
-                          bill._id,
-                          val,
-                          "Qty",
-                          Singlebill._id,
-                          bill.storeProductId,
-                          userInfo.business.companyName
-                        );
-                      }}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
-                    />
+                  <td
+                    className="px-4 py-2 text-center text-xs"
+                    title="Returned Case"
+                  >
+                    {(userInfo.user._id === Singlebill.invoicerId &&
+                      Singlebill.billStatus.toLowerCase() === "recalled") ||
+                    (userInfo.user.cancelInvoice &&
+                      Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
+                      <input
+                        type="number"
+                        defaultValue={bill.RCRT || 0}
+                        min={0}
+                        onBlur={(e) => {
+                          let val = e.target.value;
+                          if (val < 0) return;
+                          handleQtyChange(
+                            bill._id,
+                            val,
+                            "Qty",
+                            Singlebill._id,
+                            bill.storeProductId,
+                            userInfo.business.companyName,
+                          );
+                        }}
+                        className="w-16 px-2 py-1 border border-border rounded text-center bg-background"
+                      />
                     ) : (
                       bill.RCRT
                     )}
                   </td>
-                  <td className="px-4 py-2 text-center text-xs" title="Returned Pcs">
-                    {(userInfo.business.allowSkuSplitting && userInfo.user._id === Singlebill.invoicerId &&
-                    Singlebill.billStatus.toLowerCase() === "recalled" || userInfo.user.cancelInvoice && Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
+                  <td
+                    className="px-4 py-2 text-center text-xs"
+                    title="Returned Pcs"
+                  >
+                    {(userInfo.business.allowSkuSplitting &&
+                      userInfo.user._id === Singlebill.invoicerId &&
+                      Singlebill.billStatus.toLowerCase() === "recalled") ||
+                    (userInfo.user.cancelInvoice &&
+                      Singlebill.billStatus?.toUpperCase() === "RECALLED") ? (
                       <input
                         type="number"
                         defaultValue={bill.RPCS || 0}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                        className="w-16 px-2 py-1 border border-border rounded text-center bg-background"
                         onBlur={(e) => {
                           let val = e.target.value;
-                          if (val < 0) return
-                          if (val < 0) val = 0;
+                          if (val < 0) return;
                           handleQtyChange(
-                            bill._id, // lineId
-                            val, // new value
-                            "pcs", // toUpdate
-                            Singlebill._id, // billId
-                            bill.storeProductId, // storeId
-                            userInfo.business.companyName // companyName
+                            bill._id,
+                            val,
+                            "pcs",
+                            Singlebill._id,
+                            bill.storeProductId,
+                            userInfo.business.companyName,
                           );
                         }}
                       />
@@ -1172,7 +1185,9 @@ export default function InvoicePage({
                     {bill.promotionData?.toFixed(2) || 0}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {bill.vat > 0 && bill.item.VAT ? bill.item.VAT.$numberDecimal : 0}
+                    {bill.vat > 0 && bill.item.VAT
+                      ? bill.item.VAT.$numberDecimal
+                      : 0}
                   </td>
                   <td className="px-4 py-2 font-bold text-right text-xs">
                     {userInfo.business.currency.currency.Symbol}
@@ -1184,42 +1199,169 @@ export default function InvoicePage({
           </table>
         </div>
 
-        {/* Summary Section */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-          <div className="bg-gradient-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
-            <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
+        {/* ========== PRODUCT CARDS (Mobile) ========== */}
+        <div className="md:hidden space-y-4 mb-8">
+          {Singlebill.orders?.map((bill, index) => (
+            <div
+              key={bill._id}
+              className="border border-border rounded-lg bg-card p-4 space-y-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={bill.item.image || bill.item.QrCode || "/preview.png"}
+                    width={48}
+                    height={48}
+                    alt="preview"
+                    className="rounded-md shrink-0"
+                  />
+                  <div>
+                    <p className="font-medium text-sm leading-tight">
+                      {bill.item.Name}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {bill.item.ADCcode || bill.item.ACDcode}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs text-muted-foreground">#{index + 1}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Case</p>
+                  <p className="font-medium">{bill.Qty}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Pcs</p>
+                  <p className="font-medium">{bill.pcsReq || 0}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Price</p>
+                  <p className="font-medium">
+                    {userInfo.business.currency.currency.Symbol}
+                    {bill.priceListPrice?.toFixed(2) || 0}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Promo</p>
+                  <p className="font-medium">
+                    {userInfo.business.currency.currency.Symbol}
+                    {bill.promotionData?.toFixed(2) || 0}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">VAT</p>
+                  <p className="font-medium">
+                    {bill.vat > 0 && bill.item.VAT
+                      ? bill.item.VAT.$numberDecimal
+                      : 0}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="font-bold">
+                    {userInfo.business.currency.currency.Symbol}
+                    {bill.total?.toFixed(2) || 0}
+                  </p>
+                </div>
+              </div>
+
+              {/* Editable returned quantities on mobile */}
+              {((userInfo.user._id === Singlebill.invoicerId &&
+                Singlebill.billStatus.toLowerCase() === "recalled") ||
+                (userInfo.user.cancelInvoice &&
+                  Singlebill.billStatus?.toUpperCase() === "RECALLED")) && (
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Returned Case
+                    </p>
+                    <input
+                      type="number"
+                      defaultValue={bill.RCRT || 0}
+                      min={0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) return;
+                        handleQtyChange(
+                          bill._id,
+                          val,
+                          "Qty",
+                          Singlebill._id,
+                          bill.storeProductId,
+                          userInfo.business.companyName,
+                        );
+                      }}
+                      className="w-full px-2 py-1.5 border border-border rounded text-center bg-background text-sm"
+                    />
+                  </div>
+                  {userInfo.business.allowSkuSplitting && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">
+                        Returned Pcs
+                      </p>
+                      <input
+                        type="number"
+                        defaultValue={bill.RPCS || 0}
+                        onBlur={(e) => {
+                          let val = e.target.value;
+                          if (val < 0) return;
+                          handleQtyChange(
+                            bill._id,
+                            val,
+                            "pcs",
+                            Singlebill._id,
+                            bill.storeProductId,
+                            userInfo.business.companyName,
+                          );
+                        }}
+                        className="w-full px-2 py-1.5 border border-border rounded text-center bg-background text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* ========== SUMMARY SECTION ========== */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 text-sm">
+          <div className="bg-card rounded-xl border border-border shadow-sm p-5 sm:p-6">
+            <h3 className="text-base sm:text-lg font-bold mb-4 text-foreground border-b border-border pb-2">
               Summary
             </h3>
-            <div className="space-y-2 text-gray-700">
+            <div className="space-y-2 text-foreground">
               <div className="flex justify-between">
-                <span>Subtotal:</span>
+                <span className="text-muted-foreground">Subtotal:</span>
                 <strong>
                   {userInfo.business.currency.currency.Symbol}
                   {Singlebill.subTotal?.toFixed(2)}
                 </strong>
               </div>
               <div className="flex justify-between">
-                <span>Discount:</span>
+                <span className="text-muted-foreground">Discount:</span>
                 <strong>
                   {userInfo.business.currency.currency.Symbol}
                   {Singlebill.discount?.toFixed(2) || 0}
                 </strong>
               </div>
               <div className="flex justify-between">
-                <span>Tax Rate:</span>
+                <span className="text-muted-foreground">Tax Rate:</span>
                 <strong>
                   {userInfo.business.currency.currency.Symbol}
                   {Singlebill.taxRate.toFixed(2)}
                 </strong>
               </div>
               <div className="flex justify-between">
-                <span>Shipping Fee:</span>
+                <span className="text-muted-foreground">Shipping Fee:</span>
                 <strong>
                   {userInfo.business.currency.currency.Symbol}
                   {Singlebill.shippingFee.toFixed(2)}
                 </strong>
               </div>
-              <div className="flex justify-between text-lg font-bold mt-4 border-t pt-2">
+              <div className="flex justify-between text-base sm:text-lg font-bold mt-4 border-t border-border pt-3">
                 <span>Grand Total:</span>
                 <span>
                   {userInfo.business.currency.currency.Symbol}
@@ -1229,27 +1371,27 @@ export default function InvoicePage({
             </div>
           </div>
 
-          {/* Words representation */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow p-6 text-gray-700 flex flex-col justify-between">
+          {/* Words + Delivery */}
+          <div className="bg-card rounded-xl border border-border shadow-sm p-5 sm:p-6 text-foreground flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold mb-4">Total In Words</h3>
-              <p className="italic text-base text-orange-700 mb-6">
+              <h3 className="text-base sm:text-lg font-bold mb-4">
+                Total In Words
+              </h3>
+              <p className="italic text-sm sm:text-base text-orange-600 dark:text-orange-400 mb-6">
                 {totalInWords(
                   Singlebill.grandTotal,
-                  userInfo.business.currency.currency
+                  userInfo.business.currency.currency,
                 )}
               </p>
 
-              {/* Delivery Details */}
               {Singlebill.deliveryOption && (
-                <div className="border-t border-gray-100 pt-5 space-y-3">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                <div className="border-t border-border pt-5 space-y-3">
+                  <h4 className="text-sm font-semibold text-foreground mb-3">
                     Delivery Information
                   </h4>
 
-                  {/* Shipping Method */}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Method</span>
+                    <span className="text-muted-foreground">Method</span>
                     <span className="font-medium capitalize">
                       {Singlebill.deliveryOption?.shippingMethod === "pickup"
                         ? "Store Pickup"
@@ -1257,49 +1399,50 @@ export default function InvoicePage({
                     </span>
                   </div>
 
-                  {/* Shipping Fee */}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Shipping Fee</span>
+                    <span className="text-muted-foreground">Shipping Fee</span>
                     <span className="font-medium">
                       {Singlebill.deliveryOption?.shippingFee > 0
-                        ? formatPrice(Singlebill.deliveryOption?.shippingFee) // or your currency formatter
+                        ? formatPrice(Singlebill.deliveryOption?.shippingFee)
                         : "Free"}
                     </span>
                   </div>
 
-                  {/* Payment Method (if available) */}
                   {Singlebill.deliveryOption.paymentMethod && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Payment</span>
+                      <span className="text-muted-foreground">Payment</span>
                       <span className="font-medium">
                         {Singlebill.deliveryOption.paymentMethod === "cod"
                           ? "Cash on Delivery"
-                          : Singlebill.deliveryOption?.paymentMethod === "transfer"
-                          ? "Bank Transfer"
-                          : Singlebill.deliveryOption.paymentMethod}
+                          : Singlebill.deliveryOption?.paymentMethod ===
+                              "transfer"
+                            ? "Bank Transfer"
+                            : Singlebill.deliveryOption.paymentMethod}
                       </span>
                     </div>
                   )}
 
-                  {/* Address (only show if exists) */}
                   {Singlebill.deliveryOption?.address && (
                     <div className="pt-2">
-                      <p className="text-gray-500 text-sm mb-1">Delivery Address</p>
-                      <p className="text-sm font-medium text-gray-800 leading-relaxed">
+                      <p className="text-muted-foreground text-sm mb-1">
+                        Delivery Address
+                      </p>
+                      <p className="text-sm font-medium leading-relaxed">
                         {Singlebill.deliveryOption?.address}
                       </p>
                     </div>
                   )}
 
-                  {/* Receipt (if uploaded) */}
                   {Singlebill.deliveryOption?.receipt && (
                     <div className="pt-2">
-                      <p className="text-gray-500 text-sm mb-1">Payment Receipt</p>
+                      <p className="text-muted-foreground text-sm mb-1">
+                        Payment Receipt
+                      </p>
                       <Link
                         href={Singlebill.deliveryOption?.receipt}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-orange-600 hover:underline font-medium"
+                        className="text-sm text-orange-600 dark:text-orange-400 hover:underline font-medium"
                       >
                         View Payment Receipt
                       </Link>
@@ -1311,26 +1454,24 @@ export default function InvoicePage({
           </div>
         </div>
 
-        {/* Signature & T&C */}
-        <div className="mt-12 flex flex-col md:flex-row justify-between items-start gap-10">
+        {/* ========== SIGNATURE & T&C ========== */}
+        <div className="mt-10 sm:mt-12 flex flex-col md:flex-row justify-between items-start gap-8">
           <div className="max-w-md">
-            <h4 className="font-semibold text-gray-700 mb-2">
+            <h4 className="font-semibold text-foreground mb-2">
               Terms & Conditions
             </h4>
-            <p className="text-sm text-gray-500 whitespace-pre-line">
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
               {userInfo.business.invoicePolicy}
             </p>
           </div>
-          <div className="text-right">
-            <h4 className="font-semibold text-gray-700 mb-2">Issued by</h4>
-            <p className="text-sm font-medium text-gray-800">
-              {Singlebill.RaiseBy}
-            </p>
+          <div className="text-left md:text-right">
+            <h4 className="font-semibold text-foreground mb-2">Issued by</h4>
+            <p className="text-sm font-medium">{Singlebill.RaiseBy}</p>
           </div>
         </div>
 
-        {/* Footer Reference */}
-        <div className="mt-12 pt-8 border-t text-center text-sm text-gray-400 tracking-wide">
+        {/* ========== FOOTER ========== */}
+        <div className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-border text-center text-sm text-muted-foreground tracking-wide">
           {Singlebill.billStatus.toUpperCase()} / {Singlebill.billReferenceNo} /{" "}
           {Singlebill.invoicelocation}
         </div>
