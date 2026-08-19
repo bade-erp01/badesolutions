@@ -12,7 +12,7 @@ import QRCode from "qrcode";
 
 const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng"
 // const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
-// const EXPRESS_PRIVATE_URL = "https://bade-backend.vercel.app" 
+// const EXPRESS_PRIVATE_URL = "https://1492-102-91-102-30.ngrok-free.app" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
 const IV = '1234567890123456'; // 16 chars
 
@@ -468,7 +468,7 @@ async function postPayment(customerId, user, config) {
       confirmButtonText: 'OK'
     });
 
-    window.location.href = `/auth/${Encrypt(user._id)}/payment/payment/${Encrypt(data.data)}?Module=payment`;
+    window.location.href = `/auth/V4/payment/payment/${Encrypt(data.data)}?Module=payment`;
   } catch (err) {
     Swal.fire({
       icon: 'error',
