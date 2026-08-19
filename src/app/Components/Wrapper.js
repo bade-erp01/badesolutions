@@ -15,7 +15,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
-  Plus,
   LogOut,
   Settings,
   User,
@@ -36,14 +35,12 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import ThemeToggle from "@/components/theme-toggle.jsx";
 import { useUser } from "@/components/UserProvider";
 import CookiesPolicyAlert from "@/app/Components/Cookies";
 import PrivacyIdleOverlay from "@/app/Components/PrivacyOverlay";
 import ParticleBackground from "@/app/Components/Particles";
 import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
-import SideNavWrapper from "@/app/Components/sideNavWrapper";
 import BackButton from "@/app/Components/BackBotton";
 import Swal from "sweetalert2";
 import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
@@ -191,7 +188,7 @@ export default function Wrapper({ children }) {
         </p>
       </div>
     `,
-      imageUrl: user?.business?.companyLogo || "", // Your company logo
+      imageUrl: user?.business?.companyLogo || "",
       imageWidth: 80,
       imageHeight: 80,
       imageAlt: "Company Logo",
@@ -211,7 +208,7 @@ export default function Wrapper({ children }) {
         htmlContainer: "text-center",
         confirmButton: "rounded-xl font-medium px-8 py-2.5 text-base",
         cancelButton: "rounded-xl font-medium px-8 py-2.5 text-base",
-        image: "mx-auto rounded-2xl object-contain", // Clean logo styling
+        image: "mx-auto rounded-2xl object-contain",
       },
 
       reverseButtons: true,
@@ -241,7 +238,6 @@ export default function Wrapper({ children }) {
           throw new Error("Failed to switch tenant.");
         }
 
-        // delete user cookies
         SuccessToast("Tenant switched successfully.");
         await dispatch(logoutAction());
         router.refresh();
@@ -330,8 +326,9 @@ export default function Wrapper({ children }) {
             })}
 
           {user.businessInfo?.subscriptionplan?.trim() !== "Basic" &&
-            user.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) => a.Name.localeCompare(b.Name)).map(
-              (item) => {
+            user.user?.Apps?.filter((app) => app.url !== "employee")
+              .sort((a, b) => a.Name.localeCompare(b.Name))
+              .map((item) => {
                 const isActive =
                   pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
 
@@ -348,8 +345,7 @@ export default function Wrapper({ children }) {
                     {item.Name}
                   </Button>
                 );
-              },
-            )}
+              })}
 
           {pathname !== `/${Params.auth}/V4` && (
             <Button
@@ -369,144 +365,149 @@ export default function Wrapper({ children }) {
         </div>
       </div>
 
-      {/* Mobile Sidebar (Sheet) */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden fixed top-4 left-4 z-50"
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-        </SheetTrigger>
-
-        <SheetContent side="left" className="w-72 p-0">
-          <SheetHeader className="p-5 border-b">
-            <SheetTitle className="flex items-center gap-3">
-              <Avatar className="h-8 w-8 shadow-sm">
-                <AvatarImage
-                  src="/bade.jpg"
-                  alt="Company Logo"
-                  className="object-contain p-0.5"
-                />
-              </Avatar>
-              <div>
-                <div className="font-semibold">Bade</div>
-                <Badge
-                  variant="secondary"
-                  className="text-xs text-muted-foreground"
-                >
-                  Business Manager .v4.1
-                </Badge>
-              </div>
-            </SheetTitle>
-          </SheetHeader>
-
-          <nav className="flex-1 p-4 space-y-1 overflow-auto">
-            {user.business &&
-              user.user &&
-              pathname !== `/${Params.auth}/V4` && <BackButton />}
-
-            {user.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) => a.Name.localeCompare(b.Name)).map(
-              (item) => {
-                const isActive =
-                  pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
-                return (
-                  <Button
-                    key={item._id}
-                    disabled={isActive}
-                    variant={isActive ? "destructive" : "ghost"}
-                    className="w-full justify-start cursor-pointer"
-                    onClick={() =>
-                      router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
-                    }
-                  >
-                    {item.Name}
-                  </Button>
-                );
-              },
-            )}
-
-            {pathname !== `/${Params.auth}/V4` && (
-              <Button
-                variant={
-                  pathname === `/${Params.auth}/V4` ? "destructive" : "ghost"
-                }
-                className="w-full justify-start cursor-pointer"
-                onClick={() => router.push(`/${Params.auth}/V4/`)}
-              >
-                Business Overview
-              </Button>
-            )}
-          </nav>
-
-          {/* Tenant Switch - Visible ONLY on mobile */}
-          {user?.user?.toogledTenants?.length > 0 && (
-            <div className="flex lg:hidden items-center gap-4 m-3">
-            <div className="tenant-switch">
-              <div className="text-sm text-muted-foreground">
-                Switch Tenants
-              </div>
-              <Select
-                value={user?.business?.tenantId}
-                onValueChange={handleTenantSwitch}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Select tenant..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {user?.user?.toogledTenants?.map((tenant) => (
-                    <SelectItem
-                      key={tenant?.tenantIds?._id}
-                      value={tenant?.tenantIds?._id}
-                    >
-                      {tenant?.tenantIds?.companyName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            </div>
-          )}
-
-          <div className="p-1 border-t w-full user-profile">
-            <UserProfile user={user.user} biz={user.business} />
-          </div>
-        </SheetContent>
-      </Sheet>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
-        
-        <div className="border-b bg-card p-4 flex items-center justify-between">
-          {user?.user?.toogledTenants?.length > 0 && (
-          <div className="hidden lg:flex items-center gap-4">
-            <div className="tenant-switch lg:ml-0 ml-12">
-              <div className="text-sm text-muted-foreground">
-                Switch Tenants
-              </div>
-              <Select
-                value={user?.business?.tenantId}
-                onValueChange={handleTenantSwitch}
+        <div className="border-b bg-card p-4 flex items-center gap-4">
+          {/* Mobile Menu Button (now part of the flow) */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden shrink-0"
               >
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Select tenant..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {user?.user?.toogledTenants?.map((tenant) => (
-                    <SelectItem
-                      key={tenant?.tenantIds?._id}
-                      value={tenant?.tenantIds?._id}
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent side="left" className="w-72 p-0">
+              <SheetHeader className="p-5 border-b">
+                <SheetTitle className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8 shadow-sm">
+                    <AvatarImage
+                      src="/bade.jpg"
+                      alt="Company Logo"
+                      className="object-contain p-0.5"
+                    />
+                  </Avatar>
+                  <div>
+                    <div className="font-semibold">Bade</div>
+                    <Badge
+                      variant="secondary"
+                      className="text-xs text-muted-foreground"
                     >
-                      {tenant?.tenantIds?.companyName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                      Business Manager .v4.1
+                    </Badge>
+                  </div>
+                </SheetTitle>
+              </SheetHeader>
+
+              <nav className="flex-1 p-4 space-y-1 overflow-auto">
+                {user.business &&
+                  user.user &&
+                  pathname !== `/${Params.auth}/V4` && <BackButton />}
+
+                {user.user?.Apps?.filter((app) => app.url !== "employee")
+                  .sort((a, b) => a.Name.localeCompare(b.Name))
+                  .map((item) => {
+                    const isActive =
+                      pathname ===
+                      `/${Params.auth}/V4/${item.url}/${item.url}`;
+                    return (
+                      <Button
+                        key={item._id}
+                        disabled={isActive}
+                        variant={isActive ? "destructive" : "ghost"}
+                        className="w-full justify-start cursor-pointer"
+                        onClick={() =>
+                          router.push(
+                            `/${Params.auth}/V4/${item.url}/${item.url}`,
+                          )
+                        }
+                      >
+                        {item.Name}
+                      </Button>
+                    );
+                  })}
+
+                {pathname !== `/${Params.auth}/V4` && (
+                  <Button
+                    variant={
+                      pathname === `/${Params.auth}/V4`
+                        ? "destructive"
+                        : "ghost"
+                    }
+                    className="w-full justify-start cursor-pointer"
+                    onClick={() => router.push(`/${Params.auth}/V4/`)}
+                  >
+                    Business Overview
+                  </Button>
+                )}
+              </nav>
+
+              {/* Tenant Switch - Visible ONLY on mobile */}
+              {user?.user?.toogledTenants?.length > 0 && (
+                <div className="flex lg:hidden items-center gap-4 m-3">
+                  <div className="tenant-switch">
+                    <div className="text-sm text-muted-foreground">
+                      Switch Tenants
+                    </div>
+                    <Select
+                      value={user?.business?.tenantId}
+                      onValueChange={handleTenantSwitch}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Select tenant..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {user?.user?.toogledTenants?.map((tenant) => (
+                          <SelectItem
+                            key={tenant?.tenantIds?._id}
+                            value={tenant?.tenantIds?._id}
+                          >
+                            {tenant?.tenantIds?.companyName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-1 border-t w-full user-profile">
+                <UserProfile user={user.user} biz={user.business} />
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Tenant Switch (Desktop) */}
+          {user?.user?.toogledTenants?.length > 0 && (
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="tenant-switch">
+                <div className="text-sm text-muted-foreground">
+                  Switch Tenants
+                </div>
+                <Select
+                  value={user?.business?.tenantId}
+                  onValueChange={handleTenantSwitch}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Select tenant..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {user?.user?.toogledTenants?.map((tenant) => (
+                      <SelectItem
+                        key={tenant?.tenantIds?._id}
+                        value={tenant?.tenantIds?._id}
+                      >
+                        {tenant?.tenantIds?.companyName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
           )}
 
           {/* Search */}
@@ -523,7 +524,7 @@ export default function Wrapper({ children }) {
             Params.Module !== `accounting` && (
               <form
                 onSubmit={handleSearch}
-                className="flex flex-1 items-center mx-8 max-w-md search-form"
+                className="flex flex-1 items-center max-w-md search-form"
               >
                 <div className="relative w-full mr-1">
                   <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -541,12 +542,12 @@ export default function Wrapper({ children }) {
               </form>
             )}
 
-          <div className="flex items-center gap-6 text-sm justify-between">
-            <div className="theme-toggle ml-auto">
+          {/* Right side items */}
+          <div className="flex items-center gap-6 text-sm ml-auto">
+            <div className="theme-toggle">
               <ThemeToggle />
             </div>
 
-            {/* Hidden on mobile */}
             <div className="hidden lg:flex gap-4">
               <LastUpdated />
 
@@ -561,7 +562,6 @@ export default function Wrapper({ children }) {
             </div>
           </div>
         </div>
-        
 
         {/* Main View */}
         <div className="flex-1 overflow-auto p-4 space-y-8 view">
