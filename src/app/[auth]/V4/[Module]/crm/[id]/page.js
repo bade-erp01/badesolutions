@@ -53,7 +53,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { PrinterIcon, WalletIcon, FileText, Plus } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
