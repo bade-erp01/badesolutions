@@ -10,17 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
   LogOut,
   Settings,
-  User,
   Bell,
-  PlusIcon,
-  X,
 } from "lucide-react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useRouter, usePathname, useParams } from "next/navigation";
@@ -59,7 +55,6 @@ import { logout as logoutAction } from "../../../lib/User";
 export default function Wrapper({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [selectedForm, setSelectedForm] = useState("");
   const { user } = useUser();
   const Params = useParams();
   const [searchTerm, setSearchTerm] = useState("");
@@ -201,7 +196,6 @@ export default function Wrapper({ children }) {
       padding: "2rem",
       background: isDark ? "#0f172a" : "#ffffff",
       color: isDark ? "#e2e8f0" : "#0f172a",
-
       customClass: {
         popup: `rounded-3xl shadow-2xl border ${isDark ? "border-slate-700" : "border-slate-200"}`,
         title: `text-2xl font-semibold ${isDark ? "text-white" : "text-slate-900"}`,
@@ -210,7 +204,6 @@ export default function Wrapper({ children }) {
         cancelButton: "rounded-xl font-medium px-8 py-2.5 text-base",
         image: "mx-auto rounded-2xl object-contain",
       },
-
       reverseButtons: true,
       allowOutsideClick: true,
       allowEscapeKey: true,
@@ -279,32 +272,24 @@ export default function Wrapper({ children }) {
             <BackButton />
           )}
 
-          {/* for basic plan */}
+          {/* Basic Plan */}
           {user.business?.subscriptionplan?.trim() === "Basic" &&
             [
               {
                 name: "CRM",
                 url: "crm",
-                icon: "https://img.icons8.com/?size=80&id=6Dhx5KybHIh2&format=png",
-                description: "Customer relationship management.",
               },
               {
                 name: "Product Management",
                 url: "product",
-                icon: "https://img.icons8.com/?size=64&id=aR2Ar4o65ts7&format=png",
-                description: "Centralized product operations.",
               },
               {
                 name: "Cash Register",
                 url: "payment",
-                icon: "https://img.icons8.com/dusk/64/cash-register.png",
-                description: "Process transactions and payments.",
               },
               {
                 name: "Stores Operations",
                 url: "store",
-                icon: "https://img.icons8.com/arcade/64/garage-closed.png",
-                description: "Warehouse and inventory management.",
               },
             ].map((item) => {
               const isActive =
@@ -367,97 +352,135 @@ export default function Wrapper({ children }) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Header */}
-        <div className="border-b bg-card p-4 flex items-center gap-4">
-          {/* Mobile Menu Button (now part of the flow) */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden shrink-0"
-              >
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-
-            <SheetContent side="left" className="w-72 p-0">
-              <SheetHeader className="p-5 border-b">
-                <SheetTitle className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8 shadow-sm">
-                    <AvatarImage
-                      src="/bade.jpg"
-                      alt="Company Logo"
-                      className="object-contain p-0.5"
-                    />
-                  </Avatar>
-                  <div>
-                    <div className="font-semibold">Bade</div>
-                    <Badge
-                      variant="secondary"
-                      className="text-xs text-muted-foreground"
-                    >
-                      Business Manager .v4.1
-                    </Badge>
-                  </div>
-                </SheetTitle>
-              </SheetHeader>
-
-              <nav className="flex-1 p-4 space-y-1 overflow-auto">
-                {user.business &&
-                  user.user &&
-                  pathname !== `/${Params.auth}/V4` && <BackButton />}
-
-                {user.user?.Apps?.filter((app) => app.url !== "employee")
-                  .sort((a, b) => a.Name.localeCompare(b.Name))
-                  .map((item) => {
-                    const isActive =
-                      pathname ===
-                      `/${Params.auth}/V4/${item.url}/${item.url}`;
-                    return (
-                      <Button
-                        key={item._id}
-                        disabled={isActive}
-                        variant={isActive ? "destructive" : "ghost"}
-                        className="w-full justify-start cursor-pointer"
-                        onClick={() =>
-                          router.push(
-                            `/${Params.auth}/V4/${item.url}/${item.url}`,
-                          )
-                        }
-                      >
-                        {item.Name}
-                      </Button>
-                    );
-                  })}
-
-                {pathname !== `/${Params.auth}/V4` && (
+        {/* ========== TOP HEADER ========== */}
+        <div className="border-b bg-card px-3 sm:px-4 py-3">
+          <div className="flex items-center gap-3">
+            {/* ===== LEFT ZONE ===== */}
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Mobile Menu */}
+              <Sheet>
+                <SheetTrigger asChild>
                   <Button
-                    variant={
-                      pathname === `/${Params.auth}/V4`
-                        ? "destructive"
-                        : "ghost"
-                    }
-                    className="w-full justify-start cursor-pointer"
-                    onClick={() => router.push(`/${Params.auth}/V4/`)}
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden shrink-0"
                   >
-                    Business Overview
+                    <Menu className="h-5 w-5" />
                   </Button>
-                )}
-              </nav>
+                </SheetTrigger>
 
-              {/* Tenant Switch - Visible ONLY on mobile */}
+                <SheetContent side="left" className="w-72 p-0">
+                  <SheetHeader className="p-5 border-b">
+                    <SheetTitle className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8 shadow-sm">
+                        <AvatarImage
+                          src="/bade.jpg"
+                          alt="Company Logo"
+                          className="object-contain p-0.5"
+                        />
+                      </Avatar>
+                      <div>
+                        <div className="font-semibold">Bade</div>
+                        <Badge
+                          variant="secondary"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Business Manager .v4.1
+                        </Badge>
+                      </div>
+                    </SheetTitle>
+                  </SheetHeader>
+
+                  <nav className="flex-1 p-4 space-y-1 overflow-auto">
+                    {user.business &&
+                      user.user &&
+                      pathname !== `/${Params.auth}/V4` && <BackButton />}
+
+                    {user.user?.Apps?.filter((app) => app.url !== "employee")
+                      .sort((a, b) => a.Name.localeCompare(b.Name))
+                      .map((item) => {
+                        const isActive =
+                          pathname ===
+                          `/${Params.auth}/V4/${item.url}/${item.url}`;
+                        return (
+                          <Button
+                            key={item._id}
+                            disabled={isActive}
+                            variant={isActive ? "destructive" : "ghost"}
+                            className="w-full justify-start cursor-pointer"
+                            onClick={() =>
+                              router.push(
+                                `/${Params.auth}/V4/${item.url}/${item.url}`,
+                              )
+                            }
+                          >
+                            {item.Name}
+                          </Button>
+                        );
+                      })}
+
+                    {pathname !== `/${Params.auth}/V4` && (
+                      <Button
+                        variant={
+                          pathname === `/${Params.auth}/V4`
+                            ? "destructive"
+                            : "ghost"
+                        }
+                        className="w-full justify-start cursor-pointer"
+                        onClick={() => router.push(`/${Params.auth}/V4/`)}
+                      >
+                        Business Overview
+                      </Button>
+                    )}
+                  </nav>
+
+                  {/* Tenant Switch - Mobile only */}
+                  {user?.user?.toogledTenants?.length > 0 && (
+                    <div className="p-4 border-t">
+                      <div className="tenant-switch space-y-1.5">
+                        <div className="text-sm text-muted-foreground">
+                          Switch Tenants
+                        </div>
+                        <Select
+                          value={user?.business?.tenantId}
+                          onValueChange={handleTenantSwitch}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select tenant..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {user?.user?.toogledTenants?.map((tenant) => (
+                              <SelectItem
+                                key={tenant?.tenantIds?._id}
+                                value={tenant?.tenantIds?._id}
+                              >
+                                {tenant?.tenantIds?.companyName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-1 border-t w-full user-profile">
+                    <UserProfile user={user.user} biz={user.business} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Tenant Switch - Desktop only */}
               {user?.user?.toogledTenants?.length > 0 && (
-                <div className="flex lg:hidden items-center gap-4 m-3">
-                  <div className="tenant-switch">
-                    <div className="text-sm text-muted-foreground">
+                <div className="hidden lg:flex items-center">
+                  <div className="tenant-switch space-y-0.5">
+                    <div className="text-xs text-muted-foreground">
                       Switch Tenants
                     </div>
                     <Select
                       value={user?.business?.tenantId}
                       onValueChange={handleTenantSwitch}
                     >
-                      <SelectTrigger className="w-40">
+                      <SelectTrigger className="w-44 h-9">
                         <SelectValue placeholder="Select tenant..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -474,91 +497,60 @@ export default function Wrapper({ children }) {
                   </div>
                 </div>
               )}
+            </div>
 
-              <div className="p-1 border-t w-full user-profile">
-                <UserProfile user={user.user} biz={user.business} />
+            {/* ===== CENTER ZONE (Search) ===== */}
+            <div className="flex-1 flex justify-center min-w-0">
+              {user.business &&
+                user.user &&
+                pathname !== `/${Params.auth}/V4` &&
+                !pathname.includes("Search") &&
+                !pathname.includes("store") &&
+                !pathname.includes("purchases") &&
+                !pathname.includes("product-transfer") &&
+                !pathname.includes("Forms") &&
+                !pathname.includes("inventory") &&
+                pathname !== `/${Params.auth}/V4/Settings` &&
+                Params.Module !== `accounting` && (
+                  <form
+                    onSubmit={handleSearch}
+                    className="flex items-center gap-2 w-full max-w-md search-form"
+                  >
+                    <div className="relative flex-1">
+                      <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder={`Search ${page || "module"}...`}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9 h-9"
+                      />
+                    </div>
+                    <Button type="submit" size="sm" className="h-9 shrink-0">
+                      Search
+                    </Button>
+                  </form>
+                )}
+            </div>
+
+            {/* ===== RIGHT ZONE ===== */}
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+              <div className="theme-toggle">
+                <ThemeToggle />
               </div>
-            </SheetContent>
-          </Sheet>
 
-          {/* Tenant Switch (Desktop) */}
-          {user?.user?.toogledTenants?.length > 0 && (
-            <div className="hidden lg:flex items-center gap-4">
-              <div className="tenant-switch">
-                <div className="text-sm text-muted-foreground">
-                  Switch Tenants
-                </div>
-                <Select
-                  value={user?.business?.tenantId}
-                  onValueChange={handleTenantSwitch}
+              <div className="hidden lg:flex items-center gap-3">
+                <LastUpdated />
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={startTour}
+                  className="text-xs h-8"
                 >
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Select tenant..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {user?.user?.toogledTenants?.map((tenant) => (
-                      <SelectItem
-                        key={tenant?.tenantIds?._id}
-                        value={tenant?.tenantIds?._id}
-                      >
-                        {tenant?.tenantIds?.companyName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-
-          {/* Search */}
-          {user.business &&
-            user.user &&
-            pathname !== `/${Params.auth}/V4` &&
-            !pathname.includes("Search") &&
-            !pathname.includes("store") &&
-            !pathname.includes("purchases") &&
-            !pathname.includes("product-transfer") &&
-            !pathname.includes("Forms") &&
-            !pathname.includes("inventory") &&
-            pathname !== `/${Params.auth}/V4/Settings` &&
-            Params.Module !== `accounting` && (
-              <form
-                onSubmit={handleSearch}
-                className="flex flex-1 items-center max-w-md search-form"
-              >
-                <div className="relative w-full mr-1">
-                  <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-                  <Input
-                    type="search"
-                    placeholder={`Search ${page}...`}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button type="submit" size="sm" variant="default">
-                  Search
+                  Take a Tour
                 </Button>
-              </form>
-            )}
-
-          {/* Right side items */}
-          <div className="flex items-center gap-6 text-sm ml-auto">
-            <div className="theme-toggle">
-              <ThemeToggle />
-            </div>
-
-            <div className="hidden lg:flex gap-4">
-              <LastUpdated />
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={startTour}
-                className="text-xs"
-              >
-                Take a Tour
-              </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -609,12 +601,13 @@ export const LastUpdated = () => {
   }, []);
 
   return (
-    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+    <div className="flex items-center gap-3 text-sm text-muted-foreground">
       <Separator orientation="vertical" className="h-4" />
-
       <div className="flex items-center gap-2">
         <Calendar className="h-4 w-4" />
-        <span className="font-medium text-foreground">{currentTime}</span>
+        <span className="font-medium text-foreground whitespace-nowrap">
+          {currentTime}
+        </span>
       </div>
     </div>
   );
@@ -628,9 +621,7 @@ export function UserProfile({ user, biz }) {
   const logout = async () => {
     try {
       await dispatch(logoutAction());
-
       SuccessToast("You have been logged out successfully.");
-
       router.push("/Login");
     } catch (e) {
       ErrorMessage("Logout failed. Please try again.");
@@ -681,6 +672,7 @@ export function UserProfile({ user, biz }) {
           <Bell className="mr-2 h-4 w-4" />
           {user.Notification.length} Notification
         </DropdownMenuItem>
+
         {user.isAdmin && (
           <DropdownMenuItem
             onClick={() => router.push(`/${Path.auth}/V4/Settings`)}
@@ -688,6 +680,7 @@ export function UserProfile({ user, biz }) {
             <Settings className="mr-2 h-4 w-4" /> Settings
           </DropdownMenuItem>
         )}
+
         <DropdownMenuItem>
           <TermsAndConditionsLink
             BusinessPlan={user?.business?.subscriptionplan}
@@ -699,7 +692,6 @@ export function UserProfile({ user, biz }) {
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
           onClick={() => logout()}
-          variant="destructive"
         >
           <LogOut className="mr-2 h-4 w-4" /> Logout
         </DropdownMenuItem>

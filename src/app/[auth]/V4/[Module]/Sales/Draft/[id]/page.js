@@ -1,110 +1,85 @@
 "use client";
 
-import { mutate } from "swr"; // make sure this is imported
 import { useState, useEffect, Suspense } from "react";
-import QRCode from "qrcode";
-import Swal from "sweetalert2";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import {
-  totalInWords,
-  Encrypt,
-  EXPRESS_PRIVATE_URL,
-} from "../../../../../../../../Functions/Functions";
+import Link from "next/link";
+import Swal from "sweetalert2";
+import moment from "moment";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import moment from "moment";
+import QRCode from "qrcode";
+import { mutate } from "swr";
+
 import {
-  plsWait,
+  Encrypt,
+  Dencrypt,
+  totalInWords,
+  EXPRESS_PRIVATE_URL,
+  pricelistSetter,
+} from "../../../../../../../../Functions/Functions";
+import {
   ErrorMessage,
   SuccessToast,
+  plsWait,
 } from "../../../../../../../../Functions/Mics";
-import { useRouter,useParams } from "next/navigation";
+import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
+import { Badge } from "@/components/ui/badge";
 import {
   TrashIcon,
   PrinterIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/solid";
-import {pricelistSetter} from "../../../../../../../../Functions/Functions"
 
-export default function DraftInvoicePage({
-  Business,
-  bill,
-  products,
-  user,
-}) {
-  // Use useState to store products
-  const [inputValue, setInputValue] = useState("");
-  const [productList, setProductList] = useState(products || []);
-  // const [qty,setQty] = useState('')
+export default function DraftInvoicePage({ Business, bill, products, user }) {
   const router = useRouter();
-  const params = useParams()
+  const params = useParams();
 
-  // check epirt date function
-  const checkExpiryDate = (createdAt) => {
-    try {
-      // Expiry is 24 hours later
-      const expiryTime = moment(createdAt).add(24, "hours");
+  const [inputValue, setInputValue] = useState("");
+  const [productList] = useState(products || []);
+  const [Singlebill, setSinglebill] = useState(bill);
 
-      // Current time
-      const now = moment();
-
-      // Calculate time left
-      const duration = moment.duration(expiryTime.diff(now));
-      if (duration.asMilliseconds() <= 0) {
-        return "Expired";
-      } else {
-        const hours = Math.floor(duration.asHours());
-        const minutes = duration.minutes();
-        const seconds = duration.seconds();
-        return `Expire in: ${hours}h ${minutes}m ${seconds}s`;
-      }
-    } catch (err) {
-      return "";
-    }
+  const userInfo = {
+    user,
+    business: Business,
   };
+
+  const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
+  const isDraft = Singlebill?.billStatus?.toLowerCase() === "draft";
+
+  // Check if draft is still within 24 hours
+  const createdAt = moment(Singlebill?.createdAt);
+  const isOlderThan24Hours = moment().diff(createdAt, "hours") < 24;
 
   useEffect(() => {
     Swal.close();
   }, []);
 
-  const createdAt = moment(bill.createdAt);
-  const now = moment();
-  const isOlderThan24Hours = now.diff(createdAt, "hours") < 24;
-
-  // update discount of draft
-  const updateDiscount = async (billId, value) => {
+  const checkExpiryDate = (createdAt) => {
     try {
-      plsWait("Updating Discount"); // starts spinner or loading indicator
+      const expiryTime = moment(createdAt).add(24, "hours");
+      const now = moment();
+      const duration = moment.duration(expiryTime.diff(now));
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/discount/update?user=${Encrypt(user._id)}`;
+      if (duration.asMilliseconds() <= 0) return "Expired";
 
-      const response = await fetch(url, {
-        body: JSON.stringify({ billId, value }),
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-        },
-      });
-
-      const result = await response.json();
-
-      if (result.message) {
-        SuccessToast(result.message); // toast or alert
-        router.refresh(); // refresh the page to see changes
-      } else {
-        throw new Error(result.error || "Something went wrong.");
-      }
-    } catch (error) {
-      ErrorMessage(
-        error.message || "Network or server error. Please try again.",
-      );
+      const hours = Math.floor(duration.asHours());
+      const minutes = duration.minutes();
+      const seconds = duration.seconds();
+      return `Expire in: ${hours}h ${minutes}m ${seconds}s`;
+    } catch {
+      return "";
     }
   };
 
+  const formatPrice = (amount) =>
+    new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 2,
+    }).format(amount || 0);
+
+  // ==================== IMAGE LOADER ====================
   const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
     return new Promise((resolve, reject) => {
       const img = new window.Image();
@@ -115,19 +90,14 @@ export default function DraftInvoicePage({
         canvas.height = img.height;
         const ctx = canvas.getContext("2d");
 
-        // Draw image
         ctx.drawImage(img, 0, 0);
-
-        // 💧 Add watermark (bottom right)
-
         ctx.font = "italic bold 16px 'Courier New'";
-        ctx.textAlign = "center"; // Or "left" depending on your layout
+        ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // Semi-transparent white
-        ctx.globalAlpha = 0.5; // Semi-transparent watermark
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10); // Centered horizontally, 10px from bottom
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.globalAlpha = 0.5;
+        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10);
 
-        // Convert to PNG
         resolve(canvas.toDataURL("image/png"));
       };
       img.onerror = () => reject(new Error("Image loading failed"));
@@ -135,26 +105,21 @@ export default function DraftInvoicePage({
     });
   };
 
-  // Dummy implementations for missing functions (replace with your actual implementations)
-  const generatePdf = async (business, customer, bill) => {
+  // ==================== PDF GENERATOR ====================
+  const generatePdf = async (business, customer, billData) => {
     try {
-      Swal.fire({
-        title: "Setting things up ⌛...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
+      plsWait("Setting things up ⌛...");
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
 
-      // Logo on the Left, Business Info on the Right
       if (business.companyLogo) {
         try {
           const logo = await loadImageAsDataURL(business.companyLogo);
           doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-        } catch (err) {
+        } catch {
           console.warn("Logo failed to load");
         }
       }
@@ -178,19 +143,17 @@ export default function DraftInvoicePage({
 
       let currentY = 50;
 
-      // Customer Info + 🔳 QR Code in same row
-      doc.setFontSize(15).setTextColor(0, 0, 0).setFont("helvetica", "bold");
+      doc.setFontSize(15).setFont("helvetica", "bold");
       doc.text("QUOTATION", 10, currentY);
       currentY += 10;
 
-      // Left Column: Customer Info
-      doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(8).setTextColor(0, 0, 0);
+      doc.setFont("helvetica", "bold").setFontSize(13);
+      doc.text(`${billData.customerName?.toUpperCase() || ""}`, 10, currentY);
+      doc.setFontSize(8);
       doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
       doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
       doc.text(
-        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
+        `Contact Person: ${customer?.contactPerson || billData.customerName || "N/A"}`,
         10,
         currentY + 18,
       );
@@ -200,51 +163,23 @@ export default function DraftInvoicePage({
         currentY + 24,
       );
 
-      // Right Column: QR Code
       try {
         const qrDataURL = await QRCode.toDataURL(
           "https://badesolutions.com.ng",
         );
         doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
-      } catch (err) {
-        console.warn("QR code failed to generate");
+      } catch {
+        console.warn("QR code failed");
       }
 
       currentY += 30;
 
-      // Bill Metadata (Placeholder for future use)
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [],
-        theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      // Invoice Table
       autoTable(doc, {
         startY: currentY,
         head: [
-          [
-            "#",
-            "Product",
-            "Code",
-            "Price",
-            "Promo",
-            "CASE",
-            "PCS",
-            "VAT",
-            "Total",
-          ],
+          ["#", "Product", "Code", "Price", "Promo", "CASE", "PCS", "VAT", "Total"],
         ],
-        body: bill.orders.map((ord, i) => [
+        body: billData.orders.map((ord, i) => [
           i + 1,
           ord.item?.Name || "N/A",
           ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
@@ -260,17 +195,21 @@ export default function DraftInvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      // Summary Table
       autoTable(doc, {
         startY: currentY,
         tableWidth: 76,
         margin: { left: pageWidth - 90 },
-        head: [],
         body: [
-          ["Tax Rate", `${bill.taxRate ? bill.taxRate?.toFixed(2) : 0} (inc in sub.)`],
-          ["Subtotal", bill.subTotal?.toFixed(2) || "0.00"],
-          ["Discount", bill.discount ? bill.discount?.toFixed(2) : "0.00"],
-          ["Total Due", bill.grandTotal?.toFixed(2) || "0.00"],
+          [
+            "Tax Rate",
+            `${billData.taxRate ? billData.taxRate?.toFixed(2) : 0} (inc in sub.)`,
+          ],
+          ["Subtotal", billData.subTotal?.toFixed(2) || "0.00"],
+          [
+            "Discount",
+            billData.discount ? billData.discount?.toFixed(2) : "0.00",
+          ],
+          ["Total Due", billData.grandTotal?.toFixed(2) || "0.00"],
         ],
         theme: "grid",
         styles: { fontSize: 9, cellPadding: 1 },
@@ -281,10 +220,9 @@ export default function DraftInvoicePage({
       });
       currentY = doc.lastAutoTable.finalY + 10;
 
-      // Signatures
       doc.setFontSize(10);
       doc.text(
-        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
+        `${totalInWords(billData.grandTotal, business.currency?.currency)}`,
         10,
         currentY,
       );
@@ -305,18 +243,15 @@ export default function DraftInvoicePage({
       currentY += 10;
       if (business.invoicePolicy) {
         doc.text(business.invoicePolicy, 10, currentY);
-        currentY += 10;
       }
 
-      // 📎 Footer
       doc.setFontSize(9);
       doc.text(
-        `Kindly note that this ${bill.billStatus} is invalid after ${moment().format("l")}`,
+        `Kindly note that this ${billData.billStatus} is invalid after ${moment().format("l")}`,
         10,
         pageHeight - 20,
       );
 
-      //Page Numbers
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -328,7 +263,6 @@ export default function DraftInvoicePage({
         );
       }
 
-      // Output
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       const win = window.open(url, "_blank");
@@ -339,48 +273,46 @@ export default function DraftInvoicePage({
           win.print();
         };
       } else {
-        doc.save(`${bill.customerName || "invoice"}.pdf`);
+        doc.save(`${billData.customerName || "invoice"}.pdf`);
         Swal.close();
       }
     } catch (error) {
       Swal.close();
-      console.error("Error generating PDF:");
+      console.error("Error generating PDF:", error);
     }
   };
 
-  // Optimized product selection handler
+  // ==================== HANDLERS ====================
   const handleProductSelection = async (productId) => {
     try {
-      // return
       plsWait("Adding product...");
-      // find the product and return the id
-      const cleanedProducts = await products.find((product) => {
-        return (
+      const cleanedProducts = products.find(
+        (product) =>
           product.item?.ACDcode === productId ||
-          product.item?.ADCcode === productId
-        );
-      });
+          product.item?.ADCcode === productId,
+      );
 
-      if (!cleanedProducts) {
-        throw new Error("Product not found");
-      }
+      if (!cleanedProducts) throw new Error("Product not found");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(bill._id)}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(
+        bill._id,
+      )}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
+
       const res = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
         },
-        body: JSON.stringify({ product: cleanedProducts.storeId }), // Ensure it's sent as an object
+        body: JSON.stringify({ product: cleanedProducts.storeId }),
       });
+
       const data = await res.json();
       if (data.message) {
         SuccessToast(data.message);
         setInputValue("");
-        // Use Next.js router.reload() instead of window.location.reload()
         router.refresh();
       } else {
         throw new Error(data.error || "Unknown error occurred.");
@@ -392,7 +324,6 @@ export default function DraftInvoicePage({
     }
   };
 
-  // Delete draft invoice (optimized & Next.js compatible)
   const deleteDraftInvoice = async () => {
     try {
       const result = await Swal.fire({
@@ -405,11 +336,12 @@ export default function DraftInvoicePage({
         confirmButtonText: "Yes, delete it!",
       });
 
-      if (!result.isConfirmed) {
-        return;
-      }
+      if (!result.isConfirmed) return;
+
       plsWait("Deleting draft. Please wait.");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/order/Delete/${Encrypt(bill._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/order/Delete/${Encrypt(
+        bill._id,
+      )}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -417,7 +349,7 @@ export default function DraftInvoicePage({
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
           "idempotency-key": `delete-${bill._id}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
         },
       });
       const data = await response.json();
@@ -459,7 +391,7 @@ export default function DraftInvoicePage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
         },
         body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
       });
@@ -468,8 +400,6 @@ export default function DraftInvoicePage({
 
       if (data.message) {
         SuccessToast(data.message);
-
-        // ✅ Revalidate the invoice data (instead of reload)
         mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${Encrypt(billId)}`);
         router.refresh();
       } else {
@@ -481,12 +411,10 @@ export default function DraftInvoicePage({
     }
   };
 
-  // processInvoice
-
   let isProcessing = false;
 
   const processInvoice = async () => {
-    if (isProcessing) return; // Prevent multiple triggers
+    if (isProcessing) return;
     isProcessing = true;
 
     try {
@@ -498,9 +426,7 @@ export default function DraftInvoicePage({
         inputAutoFocus: true,
         showCancelButton: true,
         inputValidator: (value) => {
-          if (!value) {
-            return "You need to Enter your code!";
-          }
+          if (!value) return "You need to Enter your code!";
         },
       });
 
@@ -509,13 +435,14 @@ export default function DraftInvoicePage({
         return;
       }
 
-      // loading indicator
       plsWait(
-        "Please wait while i process your request. This should only take a bit. Do not reload this page...",
+        "Please wait while I process your request. Do not reload this page...",
       );
 
       const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/wareHouse/Bill?user=${Encrypt(user._id)}&ops=${Encrypt(userInput)}`,
+        `${EXPRESS_PRIVATE_URL}/api/wareHouse/Bill?user=${Encrypt(
+          user._id,
+        )}&ops=${Encrypt(userInput)}`,
         {
           method: "PATCH",
           headers: {
@@ -523,7 +450,7 @@ export default function DraftInvoicePage({
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
             access: `${Encrypt(user._id)}`,
             "idempotency-key": `invoice-${bill._id}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
           },
           body: JSON.stringify({
             billId: bill._id,
@@ -545,16 +472,17 @@ export default function DraftInvoicePage({
       ErrorMessage(error.message);
       router.refresh();
     } finally {
-      isProcessing = false; // Reset flag after completion
+      isProcessing = false;
     }
   };
 
-  // delete line items from ivoice
   const removeLineItem = async (lineId) => {
     try {
       plsWait("Removing item from order...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/delete/order?user=${Encrypt(user._id)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/delete/order?user=${Encrypt(
+        user._id,
+      )}`;
 
       const response = await fetch(url, {
         method: "DELETE",
@@ -562,7 +490,7 @@ export default function DraftInvoicePage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
           access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
         },
         body: JSON.stringify({ lineId, billId: bill._id }),
       });
@@ -571,45 +499,68 @@ export default function DraftInvoicePage({
 
       if (data.message) {
         SuccessToast(data.message);
-
-        // Refresh invoice data instead of reloading the page
-        // mutate(`/api/invoice/${billId}`);
         router.refresh();
       } else {
         ErrorMessage(data.error || "Something went wrong.");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       ErrorMessage("Unexpected error occurred.");
       router.refresh();
     }
   };
 
-  // Use props instead of undefined variables
-  const userInfo = {
-    user: user,
-    business: Business,
+  const updateDiscount = async (billId, value) => {
+    try {
+      plsWait("Updating Discount");
+
+      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/discount/update?user=${Encrypt(
+        user._id,
+      )}`;
+
+      const response = await fetch(url, {
+        body: JSON.stringify({ billId, value }),
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.message) {
+        SuccessToast(result.message);
+        router.refresh();
+      } else {
+        throw new Error(result.error || "Something went wrong.");
+      }
+    } catch (error) {
+      ErrorMessage(
+        error.message || "Network or server error. Please try again.",
+      );
+    }
   };
-  const Singlebill = bill;
-  const cust = Singlebill.customer;
-  const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
-      <div className="px-6 py-10 bg-white shadow-2xl text-xs animate__animated animate__fadeIn invoicecontainer border border-gray-200">
-        {/* Top Controls */}
-        <div className="flex items-center justify-between mb-8">
+      <div className="px-3 sm:px-6 py-6 sm:py-10 bg-card text-card-foreground shadow-sm text-xs border border-border rounded-lg">
+        
+        {/* ========== TOP HEADER ========== */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
           <span
-            className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
+            className={`px-4 py-1.5 rounded-full font-semibold text-sm tracking-wide border w-fit ${
               isCancelled
-                ? "bg-red-50 text-red-600 border-red-200"
-                : "bg-indigo-50 text-indigo-700 border-indigo-200"
+                ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+                : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800"
             }`}
           >
             {Singlebill.billStatus}
           </span>
-          <div className="text-right">
-            <span className="text-xs text-gray-900 tracking-tight mb-1">
+          <div className="text-left sm:text-right">
+            <span className="text-xs text-muted-foreground">
               Created on:{" "}
               {moment(Singlebill.createdAt).format(
                 "dddd DD MMMM YYYY [at] hh:mm A",
@@ -618,122 +569,129 @@ export default function DraftInvoicePage({
           </div>
         </div>
 
-        {/* Company + Customer Info */}
-        <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
-          <div className="flex items-start gap-6 w-full md:w-auto">
+        {/* ========== COMPANY + CUSTOMER ========== */}
+        <div className="flex flex-col lg:flex-row justify-between gap-8 border-t border-b border-border py-6 sm:py-8 mb-6">
+          {/* Business */}
+          <div className="flex items-start gap-4 sm:gap-6">
             <Image
               src={userInfo.business.companyLogo}
-              width={90}
-              height={90}
+              width={80}
+              height={80}
               alt="logo"
+              className="rounded-md shrink-0"
             />
-            <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
+            <div className="text-sm space-y-1">
+              <h3 className="text-base sm:text-lg font-extrabold text-foreground">
                 {userInfo.business.companyName}
               </h3>
-              <p className="text-gray-500">{userInfo.business.email}</p>
-              <p className="text-gray-500">{userInfo.business.Tel}</p>
-              <p className="text-gray-500">{userInfo.business.Address}</p>
-              <p className="text-gray-500">{userInfo.business.CompanyCity}</p>
+              <p className="text-muted-foreground">{userInfo.business.email}</p>
+              <p className="text-muted-foreground">{userInfo.business.Tel}</p>
+              <p className="text-muted-foreground">
+                {userInfo.business.Address}
+              </p>
+              <p className="text-muted-foreground">
+                {userInfo.business.CompanyCity}
+              </p>
+
               <h2
-                className={`mt-3 font-bold text-base ${
-                  isCancelled ? "text-red-600" : "text-gray-800"
+                className={`mt-3 font-bold text-sm sm:text-base ${
+                  isCancelled
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-foreground"
                 }`}
               >
                 {Singlebill.billStatus.toUpperCase()} /{" "}
                 {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
               </h2>
-              <h2 className=" mb-2 text-lg font-bold text-indigo-700 tracking-wide">
+              <p className="text-indigo-600 dark:text-indigo-400 font-bold text-sm mt-1">
                 {Singlebill.WayBillNo}
-              </h2>
+              </p>
             </div>
           </div>
 
-          <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
-            <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+          {/* Customer */}
+          <div className="text-left lg:text-right text-sm space-y-1">
+            <h3 className="text-lg font-bold text-foreground">
               {Singlebill.customerName?.toUpperCase()}
             </h3>
-            <p>
-              {Singlebill.customer.billingAddress?.slice(0, 30) || "N/A"}
+            <p className="text-muted-foreground">
+              {Singlebill.customer?.billingAddress?.slice(0, 40) || "N/A"}
             </p>
             <p>
               <a
-                href={`mailto:${Singlebill.customer.Email}`}
-                className="hover:underline text-indigo-700"
+                href={`mailto:${Singlebill.customer?.Email}`}
+                className="text-indigo-600 dark:text-indigo-400 hover:underline"
               >
-                {Singlebill.customer.Email || "N/A"}
+                {Singlebill.customer?.Email || "N/A"}
               </a>
             </p>
-            <p>
+            <p className="text-muted-foreground">
               {moment(Singlebill.startDate).format("YYYY-MM-DD")}
             </p>
-             <p className="p-2 rounded-full text-sm tracking-wide shadow-sm border bg-green-50 text-green-700 border-green-200">
-              Current Pricelist: {pricelistSetter(Singlebill.priceList,Business)}
+            <p className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800">
+              Current Pricelist:{" "}
+              {pricelistSetter(Singlebill.priceList, Business)}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-          {/* CheckOut Button */}
-          <div className="flex justify-evenly items-center gap-4">
-            {((!userInfo.business.InvoiceRestriction &&
+        {/* ========== ACTION BUTTONS ========== */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          {((!userInfo.business.InvoiceRestriction &&
+            user._id === Singlebill.invoicerId &&
+            user.raiseInvoice &&
+            isDraft) ||
+            (userInfo.business.InvoiceRestriction &&
               user._id === Singlebill.invoicerId &&
               user.raiseInvoice &&
-              Singlebill.billStatus.toLowerCase() === "draft") ||
-              (userInfo.business.InvoiceRestriction &&
-                user._id === Singlebill.invoicerId &&
-                user.raiseInvoice &&
-                Singlebill.billStatus.toLowerCase() === "draft" &&
-                isOlderThan24Hours)) &&
-              Singlebill.orders.length > 0 && (
-                <button
-                  title="Process this draft to order"
-                  onClick={processInvoice}
-                  className="px-5 py-2 rounded-sm font-semibold text-base tracking-wide shadow-lg border bg-black border-green-300 inline-flex items-center justify-center hover:bg-gray-900/50 hover:shadow-xl hover:border-green-400 transition duration-200 ease-in-out"
-                >
-                  <ShoppingCartIcon className="h-5 w-5 text-gray-100" />{" "}
-                  <span className="text-gray-100">Checkout Cart </span>
-                </button>
-              )}
+              isDraft &&
+              isOlderThan24Hours)) &&
+            Singlebill.orders?.length > 0 && (
+              <button
+                title="Process this draft to order"
+                onClick={processInvoice}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 transition"
+              >
+                <ShoppingCartIcon className="h-5 w-5" />
+                <span>Checkout Cart</span>
+              </button>
+            )}
 
-            {user._id === Singlebill.invoicerId &&
-              user.raiseInvoice &&
-              Singlebill.billStatus.toLowerCase() === "draft" && (
-                <button
-                  title="Delete this draft"
-                  onClick={deleteDraftInvoice}
-                  className="inline-flex items-center justify-center px-3 py-3 rounded-lg  text-white font-semibold hover:shadow-xl hover:bg-red-100 transition duration-200 ease-in-out"
-                >
-                  <TrashIcon className="h-6 w-6 text-red-500" />
-                  {/* <span className="text-gray-500">Delete</span> */}
-                </button>
-              )}
-          </div>
+          {user._id === Singlebill.invoicerId &&
+            user.raiseInvoice &&
+            isDraft && (
+              <button
+                title="Delete this draft"
+                onClick={deleteDraftInvoice}
+                className="inline-flex items-center justify-center p-2.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+              >
+                <TrashIcon className="h-6 w-6 text-red-500" />
+              </button>
+            )}
 
-          {/* Print Button */}
-          {bill.billStatus.toLowerCase() === "draft" && (
+          {isDraft && (
             <button
               title={`Download and Print ${Singlebill.billStatus}`}
-              onClick={() => generatePdf(Business, Singlebill.customer, bill)}
-              className="inline-flex items-center justify-center px-3 py-3 rounded-lg  text-white font-semibold bg-black transition duration-200 ease-in-out"
+              onClick={() =>
+                generatePdf(Business, Singlebill.customer, bill)
+              }
+              className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 transition ml-auto"
             >
-              <PrinterIcon className="h-6 w-6 text-gray-100" />
-              {/* <span>Print Quotation</span> */}
+              <PrinterIcon className="h-5 w-5" />
+              <span className="hidden sm:inline">Print Quotation</span>
             </button>
           )}
         </div>
 
-        {/* Print Button */}
-        {/* Product Table */}
-        <div className=" rounded-sm border border-gray-200 bg-white mb-8">
+        {/* ========== DESKTOP TABLE ========== */}
+        <div className="hidden md:block overflow-x-auto rounded-lg border border-border bg-card mb-8">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
+            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
               <tr>
                 {[
                   "S/N",
                   "Product",
                   "Photo",
-                  // "Trace",
                   "Code",
                   "Case",
                   "PCS",
@@ -752,253 +710,381 @@ export default function DraftInvoicePage({
                 ))}
               </tr>
             </thead>
-            <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill, index) => (
+            <tbody className="text-foreground">
+              {Singlebill.orders?.map((billItem, index) => (
                 <tr
-                  key={bill._id}
-                  className="border-t hover:bg-gray-50 transition"
+                  key={billItem._id}
+                  className="border-t border-border hover:bg-muted/30 transition"
                 >
-                  <td className="flex-2 px-4 py-2 font-small text-center text-xs">
-                    {index + 1}
-                  </td>
-                  <td className="flex-2 px-4 py-2 text-indigo-700 font-small text-center">
-                    <a
-                      href={`/${params.auth}/V4/product/product/${Encrypt(bill.item._id)}`}
-                      className="hover:underline text-xs"
+                  <td className="px-4 py-2 text-center text-xs">{index + 1}</td>
+                  <td className="px-4 py-2 text-center">
+                    <Link
+                      href={`/${params.auth}/V4/product/product/${Encrypt(
+                        billItem.item._id,
+                      )}`}
+                      className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-medium"
                     >
-                      {bill.item.Name}
-                    </a>
+                      {billItem.item.Name}
+                    </Link>
                   </td>
                   <td className="px-4 py-2 text-center">
                     <Image
                       src={
-                        bill.item.image || bill.item.QrCode || "/preview.png"
+                        billItem.item.image ||
+                        billItem.item.QrCode ||
+                        "/preview.png"
                       }
                       width={38}
                       height={38}
                       alt="preview"
-                      className="rounded-md "
+                      className="rounded-md mx-auto"
                     />
                   </td>
-                  {/* <td className="px-4 py-2 text-center">{bill.returnId}</td> */}
                   <td className="px-4 py-2 text-center text-xs">
-                    {bill.item.ACDcode || bill.item.ADCcode}
+                    {billItem.item.ACDcode || billItem.item.ADCcode}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {(Singlebill.means ?? "") !== "Ecomm" && user._id === Singlebill.invoicerId &&
-                    Singlebill.billStatus.toLowerCase() === "draft" ? (
+                    {(Singlebill.means ?? "") !== "Ecomm" &&
+                    user._id === Singlebill.invoicerId &&
+                    isDraft ? (
                       <input
                         type="number"
-                        defaultValue={bill.Qty || 0}
+                        defaultValue={billItem.Qty || 0}
                         min={0}
                         onBlur={(e) => {
                           let val = e.target.value;
                           if (val < 0) return;
-                          if (val < 0) val = 0;
                           handleQtyChange(
-                            bill._id,
+                            billItem._id,
                             val,
                             "Qty",
                             Singlebill._id,
-                            bill.storeProductId,
+                            billItem.storeProductId,
                             userInfo.user._id,
                             userInfo.business.companyName,
                           );
                         }}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 "
+                        className="w-16 px-2 py-1 border border-border rounded text-center bg-background"
                       />
                     ) : (
-                      bill.Qty
+                      billItem.Qty
                     )}
                   </td>
-
                   <td className="px-4 py-2 text-center text-xs">
                     {Business.allowSkuSplitting &&
                     user._id === Singlebill.invoicerId &&
-                    Singlebill.billStatus.toLowerCase() === "draft" ? (
+                    isDraft ? (
                       <input
                         type="number"
-                        defaultValue={bill.pcsReq || 0}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                        defaultValue={billItem.pcsReq || 0}
+                        className="w-16 px-2 py-1 border border-border rounded text-center bg-background"
                         onBlur={(e) => {
                           let val = e.target.value;
                           if (val < 0) return;
-                          if (val < 0) val = 0;
                           handleQtyChange(
-                            bill._id, // lineId
-                            val, // new value
-                            "pcs", // toUpdate
-                            Singlebill._id, // billId
-                            bill.storeProductId, // storeId
-                            userInfo.user._id, // userId
-                            userInfo.business.companyName, // companyName
+                            billItem._id,
+                            val,
+                            "pcs",
+                            Singlebill._id,
+                            billItem.storeProductId,
+                            userInfo.user._id,
+                            userInfo.business.companyName,
                           );
                         }}
                       />
                     ) : (
-                      bill.pcsReq || 0
+                      billItem.pcsReq || 0
                     )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {user._id === Singlebill.invoicerId &&
                     Business.allowPriceChangeOnInvoice &&
-                    Singlebill.billStatus.toLowerCase() === "draft" ? (
+                    isDraft ? (
                       <input
                         type="number"
-                        defaultValue={bill.priceListPrice || 0}
-                        className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                        defaultValue={billItem.priceListPrice || 0}
+                        className="w-20 px-2 py-1 border border-border rounded text-center bg-background"
                         onBlur={(e) => {
                           let val = e.target.value;
                           if (val < 0) return;
-                          if (val < 0) val = 0;
                           handleQtyChange(
-                            bill._id, // lineId
-                            val, // new value
-                            "priceListPrice", // toUpdate
-                            Singlebill._id, // billId
-                            bill.storeProductId, // storeId
-                            userInfo.user._id, // userId
-                            userInfo.business.companyName, // companyName
+                            billItem._id,
+                            val,
+                            "priceListPrice",
+                            Singlebill._id,
+                            billItem.storeProductId,
+                            userInfo.user._id,
+                            userInfo.business.companyName,
                           );
                         }}
                       />
                     ) : (
-                      bill.priceListPrice
+                      billItem.priceListPrice
                     )}
                   </td>
-
                   <td className="px-4 py-2 text-center text-xs">
                     {userInfo.business.currency?.currency.Symbol}
-                    {bill.promotionData || 0}
+                    {billItem.promotionData || 0}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
-                    {bill.vat > 0 && bill.item.VAT
-                      ? bill.item.VAT.$numberDecimal
+                    {billItem.vat > 0 && billItem.item.VAT
+                      ? billItem.item.VAT.$numberDecimal
                       : 0}
                   </td>
                   <td className="px-4 py-2 font-bold text-right text-xs">
                     {userInfo.business.currency?.currency.Symbol}
-                    {bill.total?.toFixed(2)}
+                    {billItem.total?.toFixed(2)}
                   </td>
-                  <td>
+                  <td className="px-4 py-2 text-center">
                     {user._id === Singlebill.invoicerId &&
                       user.raiseInvoice &&
-                      Singlebill.billStatus.toLowerCase() === "draft" && (
-                        <span
-                          title={`Click to remove ${bill.item?.ADCcode?.toLowerCase()} from cart`}
+                      isDraft && (
+                        <button
+                          title={`Remove ${billItem.item?.ADCcode?.toLowerCase()} from cart`}
+                          onClick={() => removeLineItem(billItem._id)}
                         >
-                          <button onClick={() => removeLineItem(bill._id)}>
-                            <TrashIcon className="w-5 h-5 text-red-500" />
-                          </button>
-                        </span>
+                          <TrashIcon className="w-5 h-5 text-red-500 hover:text-red-600" />
+                        </button>
                       )}
                   </td>
                 </tr>
               ))}
             </tbody>
-           <caption class="text-sm font-medium text-gray-700 bg-gray-100 p-2 rounded">
-              Ensure to verify pricelist on {} account before closing Draft
-          </caption>
           </table>
+          <div className="text-sm font-medium text-muted-foreground bg-muted/50 p-2 text-center">
+            Ensure to verify pricelist on account before closing Draft
+          </div>
         </div>
 
-        {user._id === Singlebill.invoicerId &&
-          Singlebill.billStatus.toLowerCase() === "draft" && (
-            <div className="mb-8">
-              {/* Dropdown for small screens */}
-              <div className="block md:hidden">
-                <label
-                  htmlFor="productDropdown"
-                  className="block mb-2 text-sm font-medium text-gray-700"
-                >
-                  Select {productList.length} Products
-                </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value !== "") {
-                      handleProductSelection(e.target.value);
-                    }
-                  }}
-                  id="productDropdown"
-                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
-                >
-                  <option value={""}>Choose...</option>
-                  {products.map((product) => (
-                    <option
-                      key={product.item._id}
-                      value={product.item.ACDcode || product.item.ADCcode}
-                    >
-                      {product.item.Name} [ Case:{product.Case} Pcs:
-                      {product.pcs} ]
-                    </option>
-                  ))}
-                </select>
+        {/* ========== MOBILE PRODUCT CARDS ========== */}
+        <div className="md:hidden space-y-4 mb-8">
+          {Singlebill.orders?.map((billItem, index) => (
+            <div
+              key={billItem._id}
+              className="border border-border rounded-lg bg-card p-4 space-y-3"
+            >
+              <div className="flex items-start gap-3">
+                <Image
+                  src={
+                    billItem.item.image ||
+                    billItem.item.QrCode ||
+                    "/preview.png"
+                  }
+                  width={48}
+                  height={48}
+                  alt="preview"
+                  className="rounded-md shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/${params.auth}/V4/product/product/${Encrypt(
+                      billItem.item._id,
+                    )}`}
+                    className="font-medium text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    {billItem.item.Name}
+                  </Link>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {billItem.item.ACDcode || billItem.item.ADCcode}
+                  </p>
+                </div>
+                {user._id === Singlebill.invoicerId &&
+                  user.raiseInvoice &&
+                  isDraft && (
+                    <button onClick={() => removeLineItem(billItem._id)}>
+                      <TrashIcon className="w-5 h-5 text-red-500" />
+                    </button>
+                  )}
               </div>
 
-              {/* Datalist for medium and larger screens */}
-              <div className="hidden md:flex flex-col items-start justify-center space-y-4">
-                <label
-                  htmlFor="productDatalist"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Search {productList.length} Products
-                </label>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    defaultValue={inputValue}
-                    list="productsList"
-                    id="productDatalist"
-                    onBlur={(e) => {
-                      const trimmedValue = e.target.value.trim();
-                      setInputValue(trimmedValue);
-                      if (trimmedValue !== "") {
-                        handleProductSelection(trimmedValue);
-                        setInputValue("");
-                      }
-                      e.target.value = "";
-                    }}
-                    className="w-72 px-4 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                    placeholder="Type to search products..."
-                  />
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Case</p>
+                  {(Singlebill.means ?? "") !== "Ecomm" &&
+                  user._id === Singlebill.invoicerId &&
+                  isDraft ? (
+                    <input
+                      type="number"
+                      defaultValue={billItem.Qty || 0}
+                      min={0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) return;
+                        handleQtyChange(
+                          billItem._id,
+                          val,
+                          "Qty",
+                          Singlebill._id,
+                          billItem.storeProductId,
+                          userInfo.user._id,
+                          userInfo.business.companyName,
+                        );
+                      }}
+                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background"
+                    />
+                  ) : (
+                    <p className="font-medium">{billItem.Qty}</p>
+                  )}
                 </div>
 
-                <datalist id="productsList">
-                  {products.map((product) => (
-                    <option
-                      key={product.item._id}
-                      value={product.item.ACDcode || product.item.ADCcode}
-                    >
-                      {product.item.Name} [ Case:{product.Case} Pcs:
-                      {product.pcs} ]
-                    </option>
-                  ))}
-                </datalist>
+                <div>
+                  <p className="text-xs text-muted-foreground">Pcs</p>
+                  {Business.allowSkuSplitting &&
+                  user._id === Singlebill.invoicerId &&
+                  isDraft ? (
+                    <input
+                      type="number"
+                      defaultValue={billItem.pcsReq || 0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) return;
+                        handleQtyChange(
+                          billItem._id,
+                          val,
+                          "pcs",
+                          Singlebill._id,
+                          billItem.storeProductId,
+                          userInfo.user._id,
+                          userInfo.business.companyName,
+                        );
+                      }}
+                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background"
+                    />
+                  ) : (
+                    <p className="font-medium">{billItem.pcsReq || 0}</p>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground">Price</p>
+                  {user._id === Singlebill.invoicerId &&
+                  Business.allowPriceChangeOnInvoice &&
+                  isDraft ? (
+                    <input
+                      type="number"
+                      defaultValue={billItem.priceListPrice || 0}
+                      onBlur={(e) => {
+                        let val = e.target.value;
+                        if (val < 0) return;
+                        handleQtyChange(
+                          billItem._id,
+                          val,
+                          "priceListPrice",
+                          Singlebill._id,
+                          billItem.storeProductId,
+                          userInfo.user._id,
+                          userInfo.business.companyName,
+                        );
+                      }}
+                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background"
+                    />
+                  ) : (
+                    <p className="font-medium">
+                      {userInfo.business.currency?.currency.Symbol}
+                      {billItem.priceListPrice}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="font-bold">
+                    {userInfo.business.currency?.currency.Symbol}
+                    {billItem.total?.toFixed(2)}
+                  </p>
+                </div>
               </div>
             </div>
-          )}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-          <div className="bg-linear-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
-            <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
+          ))}
+        </div>
+
+        {/* ========== ADD PRODUCT ========== */}
+        {user._id === Singlebill.invoicerId && isDraft && (
+          <div className="mb-8">
+            {/* Mobile Select */}
+            <div className="block md:hidden">
+              <label className="block mb-2 text-sm font-medium text-foreground">
+                Select from {productList.length} Products
+              </label>
+              <select
+                onChange={(e) => {
+                  if (e.target.value !== "") {
+                    handleProductSelection(e.target.value);
+                  }
+                }}
+                className="w-full px-4 py-2.5 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="">Choose product...</option>
+                {products.map((product) => (
+                  <option
+                    key={product.item._id}
+                    value={product.item.ACDcode || product.item.ADCcode}
+                  >
+                    {product.item.Name} [Case: {product.Case} | Pcs:{" "}
+                    {product.pcs}]
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Desktop Search */}
+            <div className="hidden md:block">
+              <label className="block mb-2 text-sm font-medium text-foreground">
+                Search {productList.length} Products
+              </label>
+              <input
+                type="text"
+                defaultValue={inputValue}
+                list="productsList"
+                onBlur={(e) => {
+                  const trimmedValue = e.target.value.trim();
+                  if (trimmedValue !== "") {
+                    handleProductSelection(trimmedValue);
+                  }
+                  e.target.value = "";
+                }}
+                className="w-full max-w-md px-4 py-2.5 border border-border rounded-md bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Type product code to search..."
+              />
+              <datalist id="productsList">
+                {products.map((product) => (
+                  <option
+                    key={product.item._id}
+                    value={product.item.ACDcode || product.item.ADCcode}
+                  >
+                    {product.item.Name} [Case: {product.Case} | Pcs:{" "}
+                    {product.pcs}]
+                  </option>
+                ))}
+              </datalist>
+            </div>
+          </div>
+        )}
+
+        {/* ========== SUMMARY ========== */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          <div className="bg-card rounded-xl border border-border shadow-sm p-5 sm:p-6">
+            <h3 className="text-lg font-bold mb-4 text-foreground border-b border-border pb-2">
               Summary
             </h3>
-            <div className="space-y-2 text-gray-700">
+            <div className="space-y-2.5">
               <div className="flex justify-between">
-                <span>Subtotal:</span>
+                <span className="text-muted-foreground">Subtotal:</span>
                 <strong>
                   {userInfo.business.currency?.currency.Symbol}
-                  {((Singlebill?.subTotal ?? 0) - (Singlebill?.taxRate ?? 0)).toFixed(2)}
+                  {(
+                    (Singlebill?.subTotal ?? 0) - (Singlebill?.taxRate ?? 0)
+                  ).toFixed(2)}
                 </strong>
               </div>
-              <div className="flex justify-between">
-                <span>Discount Allowed:</span>
-                {user._id === Singlebill.invoicerId &&
-                Singlebill.billStatus === "Draft" ? (
+
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Discount Allowed:</span>
+                {user._id === Singlebill.invoicerId && isDraft ? (
                   <input
                     type="number"
-                    defaultValue={Singlebill.discount ? Singlebill.discount : 0}
-                    className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
+                    defaultValue={Singlebill.discount || 0}
+                    className="w-24 px-2 py-1 border border-border rounded text-center bg-background"
                     onBlur={(e) => {
                       const val = parseFloat(e.target.value);
                       if (val < 0) return;
@@ -1011,38 +1097,46 @@ export default function DraftInvoicePage({
                 ) : (
                   <strong>
                     {userInfo.business.currency?.currency.Symbol}
-                    {Singlebill.discount ? Singlebill.discount.toFixed(2) : 0}
+                    {Singlebill.discount
+                      ? Singlebill.discount.toFixed(2)
+                      : 0}
                   </strong>
                 )}
               </div>
+
               <div className="flex justify-between">
-                <span>Tax Rate:</span>
+                <span className="text-muted-foreground">Tax Rate:</span>
                 <strong>
                   {userInfo.business.currency?.currency.Symbol}
-                  {Singlebill.taxRate ? Singlebill.taxRate.toFixed(2) : 0.00}
+                  {Singlebill.taxRate ? Singlebill.taxRate.toFixed(2) : "0.00"}
                 </strong>
               </div>
+
               <div className="flex justify-between">
-                <span>Shipping Fee:</span>
+                <span className="text-muted-foreground">Shipping Fee:</span>
                 <strong>
                   {userInfo.business.currency?.currency.Symbol}
-                  {Singlebill.shippingFee.toFixed(2)}
+                  {Singlebill.shippingFee?.toFixed(2)}
                 </strong>
               </div>
-              <div className="flex justify-between text-lg font-bold mt-4 border-t pt-2">
+
+              <div className="flex justify-between text-base font-bold mt-4 border-t border-border pt-3">
                 <span>GRAND TOTAL:</span>
                 <span>
                   {userInfo.business.currency?.currency.Symbol}
-                  {Singlebill.grandTotal ? Singlebill.grandTotal?.toFixed(2) : 0}
+                  {Singlebill.grandTotal
+                    ? Singlebill.grandTotal?.toFixed(2)
+                    : 0}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Words representation */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow p-6 text-gray-700 flex flex-col justify-between">
-            <h3 className="text-lg font-bold mb-4">Total In Words</h3>
-            <p className="italic text-base text-orange-700">
+          <div className="bg-card rounded-xl border border-border shadow-sm p-5 sm:p-6">
+            <h3 className="text-lg font-bold mb-4 text-foreground">
+              Total In Words
+            </h3>
+            <p className="italic text-base text-orange-600 dark:text-orange-400">
               {totalInWords(
                 Singlebill.grandTotal ? Singlebill.grandTotal : 0,
                 userInfo.business.currency?.currency,
@@ -1051,34 +1145,32 @@ export default function DraftInvoicePage({
           </div>
         </div>
 
-        {/* Signature & T&C */}
-        <div className="mt-12 flex flex-col md:flex-row justify-between items-start gap-10">
+        {/* ========== TERMS & ISSUED BY ========== */}
+        <div className="mt-10 sm:mt-12 flex flex-col md:flex-row justify-between items-start gap-8">
           <div className="max-w-md">
-            <h4 className="font-semibold text-gray-700 mb-2">
+            <h4 className="font-semibold text-foreground mb-2">
               Terms & Conditions
             </h4>
-            <p className="text-sm text-gray-500 whitespace-pre-line">
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
               {userInfo.business.invoicePolicy}
             </p>
           </div>
-          <div className="text-right">
-            <h4 className="font-semibold text-gray-700 mb-2">Issued by</h4>
-            <p className="text-sm font-medium text-gray-800">
-              {Singlebill.RaiseBy}
-            </p>
-            {/* Optional signature */}
-            {/* <Image src="/QRBADE.png" width={150} height={150} alt="QR Code Signature" /> */}
+          <div className="text-left md:text-right">
+            <h4 className="font-semibold text-foreground mb-2">Issued by</h4>
+            <p className="text-sm font-medium">{Singlebill.RaiseBy}</p>
           </div>
         </div>
 
-        {/* Footer Reference */}
-        <div className="mt-12 pt-8 border-t text-center text-md text-gray-800 tracking-wide">
+        {/* ========== FOOTER ========== */}
+        <div className="mt-10 sm:mt-12 pt-6 border-t border-border text-center text-sm text-muted-foreground">
           {userInfo.business.InvoiceRestriction ? (
             <>{checkExpiryDate(Singlebill.createdAt)}</>
           ) : (
             <h2
-              className={`mt-3 font-bold text-base ${
-                isCancelled ? "text-red-600" : "text-gray-800"
+              className={`font-bold text-base ${
+                isCancelled
+                  ? "text-red-600 dark:text-red-400"
+                  : "text-foreground"
               }`}
             >
               {Singlebill.billStatus.toUpperCase()} /{" "}
