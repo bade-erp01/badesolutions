@@ -296,7 +296,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(
         bill._id,
-      )}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
+      )}?productId=${productId}&priceList=${Singlebill.priceList}`;
 
       const res = await fetch(url, {
         method: "PUT",
