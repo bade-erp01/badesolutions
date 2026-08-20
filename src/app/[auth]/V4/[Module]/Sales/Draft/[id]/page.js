@@ -313,7 +313,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       if (data.message) {
         SuccessToast(data.message);
         setInputValue("");
-        router.refresh();
+        setSinglebill(data.updatedBill);
       } else {
         throw new Error(data.error || "Unknown error occurred.");
       }
@@ -400,8 +400,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (data.message) {
         SuccessToast(data.message);
-        mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${Encrypt(billId)}`);
-        router.refresh();
+        setSinglebill(Dencrypt(data.Updatedinvoice))
       } else {
         throw new Error(data.error || "An unknown error occurred.");
       }
@@ -464,7 +463,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (response.ok) {
         SuccessToast(data.message || "Operation completed successfully!");
-        router.refresh();
+        setSinglebill(data.updatedBill)//redirect to sales [id]
       } else {
         throw new Error(data.error || "An error occurred.");
       }
@@ -499,7 +498,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (data.message) {
         SuccessToast(data.message);
-        router.refresh();
+        setSinglebill(data.updatedBill)
       } else {
         ErrorMessage(data.error || "Something went wrong.");
         router.refresh();
@@ -533,7 +532,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (result.message) {
         SuccessToast(result.message);
-        router.refresh();
+        setSinglebill(Dencrypt(result.Updatedinvoice));
       } else {
         throw new Error(result.error || "Something went wrong.");
       }

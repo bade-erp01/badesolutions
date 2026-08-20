@@ -320,8 +320,6 @@ export default function InvoicePage({
       if (data.message) {
         SuccessToast(data.message);
         setSinglebill(Dencrypt(data.Updatedinvoice));
-        mutate(`/api/storeApi/invoice/${billId}`);
-        Router.refresh();
       } else {
         throw new Error(data.error || "An unknown error occurred.");
       }
@@ -628,7 +626,6 @@ export default function InvoicePage({
 
         if (result.Updatedinvoice) {
           setSinglebill(Dencrypt(result.Updatedinvoice));
-          Router.refresh();
         }
 
         Router.refresh();
@@ -697,10 +694,7 @@ export default function InvoicePage({
 
         if (result.Updatedinvoice) {
           setSinglebill(Dencrypt(result.Updatedinvoice));
-          Router.refresh();
         }
-
-        Router.refresh();
       } else {
         throw new Error(result.error || "Request failed");
       }
