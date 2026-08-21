@@ -78,7 +78,7 @@ export default function CustomerForm({
   const [BalanceData, setBalanceData] = useState({
     Debt: Number(cust.Debt),
   });
-  const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
+  const [creditLimit, setcreditLimit] = useState({creditLimit : Number(cust.creditLimit)});
 
   const [formData, setFormData] = useState({
     bankJournal: "",
