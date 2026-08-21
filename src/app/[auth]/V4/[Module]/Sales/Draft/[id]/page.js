@@ -9,8 +9,10 @@ import moment from "moment";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import QRCode from "qrcode";
-import { mutate } from "swr";
-
+import Notch from "@/app/Components/Notch";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import BackButton from "@/app/Components/BackBotton";
 import {
   Encrypt,
   Dencrypt,
@@ -177,7 +179,17 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       autoTable(doc, {
         startY: currentY,
         head: [
-          ["#", "Product", "Code", "Price", "Promo", "CASE", "PCS", "VAT", "Total"],
+          [
+            "#",
+            "Product",
+            "Code",
+            "Price",
+            "Promo",
+            "CASE",
+            "PCS",
+            "VAT",
+            "Total",
+          ],
         ],
         body: billData.orders.map((ord, i) => [
           i + 1,
@@ -400,7 +412,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (data.message) {
         SuccessToast(data.message);
-        setSinglebill(Dencrypt(data.Updatedinvoice))
+        setSinglebill(Dencrypt(data.Updatedinvoice));
       } else {
         throw new Error(data.error || "An unknown error occurred.");
       }
@@ -463,7 +475,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (response.ok) {
         SuccessToast(data.message || "Operation completed successfully!");
-        setSinglebill(data.updatedBill)//redirect to sales [id]
+        setSinglebill(data.updatedBill); //redirect to sales [id]
       } else {
         throw new Error(data.error || "An error occurred.");
       }
@@ -498,7 +510,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (data.message) {
         SuccessToast(data.message);
-        setSinglebill(data.updatedBill)
+        setSinglebill(data.updatedBill);
       } else {
         ErrorMessage(data.error || "Something went wrong.");
         router.refresh();
@@ -546,7 +558,26 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
       <div className="px-3 sm:px-6 py-6 sm:py-10 bg-card text-card-foreground shadow-sm text-xs border border-border rounded-lg">
-        
+        <Notch>
+          <BackButton />
+          <hr className="my-4 border-gray-700" />
+          <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
+            <ul className="divide-y divide-gray-700">
+              {Singlebill?.ActivityLog?.map((log, index) => {
+                return (
+                  <li key={index} className="py-3 px-4 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span>{log.logMsg}</span>
+                    </div>
+                    <hr className="border-gray-500" />
+                  </li>
+                );
+              }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}
+            </ul>
+          </div>
+          <Separator className="my-4 border-gray-700" />
+          <ProgressDemo count={Singlebill?.orders?.length || 0} />
+        </Notch>
         {/* ========== TOP HEADER ========== */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
           <span
@@ -671,9 +702,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
           {isDraft && (
             <button
               title={`Download and Print ${Singlebill.billStatus}`}
-              onClick={() =>
-                generatePdf(Business, Singlebill.customer, bill)
-              }
+              onClick={() => generatePdf(Business, Singlebill.customer, bill)}
               className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 transition ml-auto"
             >
               <PrinterIcon className="h-5 w-5" />
@@ -1096,9 +1125,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                 ) : (
                   <strong>
                     {userInfo.business.currency?.currency.Symbol}
-                    {Singlebill.discount
-                      ? Singlebill.discount.toFixed(2)
-                      : 0}
+                    {Singlebill.discount ? Singlebill.discount.toFixed(2) : 0}
                   </strong>
                 )}
               </div>
@@ -1179,5 +1206,21 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
         </div>
       </div>
     </Suspense>
+  );
+}
+
+// progress on invoice qty
+export function ProgressDemo({ count }) {
+  return (
+    <div className="w-full max-w-md mx-auto space-y-4">
+      <h2 className="text-md font-semibold">{200 - count} Order available </h2>
+      <Progress
+        value={(count / 200) * 100}
+        className="h-4  [&>div]:bg-yellow-500"
+      />
+      <p className="text-sm text-gray-200">
+        {count} / 200 orders added to this invoice.
+      </p>
+    </div>
   );
 }
