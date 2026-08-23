@@ -19,7 +19,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
+import { Store, ShoppingBag, Warehouse } from "lucide-react";
 import {
   ChartPieIcon,
   ShoppingBagIcon,
@@ -170,6 +170,7 @@ export default async function storelayout({ children, params }) {
                   <TableHead>Code</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Contact</TableHead>
+                  <TableHead>used as E-commerce?</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -186,6 +187,11 @@ export default async function storelayout({ children, params }) {
                       <TableCell>{store.Address || "—"}</TableCell>
                       <TableCell>
                         {store.Tel || store.Email || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {store.E_commerce ? (
+                          <Store className="h-6 w-6 text-muted-foreground" />
+                        ) : null}
                       </TableCell>
                       <TableCell>
                         <Badge 

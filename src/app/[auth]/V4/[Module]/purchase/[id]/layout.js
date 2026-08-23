@@ -94,7 +94,6 @@ export default async function storelayout({ params, children }) {
                     <div className="flex justify-between items-center">
                       <span className="text-italic">{log.logMsg}</span>
                     </div>
-                    <hr className="border-gray-500" />
                   </li>
                 );
               }) || <li className="py-3 px-4 text-sm">No activity logs.</li>}

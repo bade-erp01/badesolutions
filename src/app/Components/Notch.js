@@ -69,7 +69,7 @@ export default function Notch({ children }) {
               bg-white dark:bg-zinc-950 
               backdrop-blur-xl bg-opacity-95 dark:bg-opacity-80
               before:absolute before:inset-0 before:rounded-full before:p-[1.5px]
-              before:bg-gradient-to-br before:from-orange-300 before:via-yellow-300 before:to-emerald-400
+              before:bg-gradient-to-br before:from-emerald-300 before:via-emerald-300 before:to-emerald-400
               before:content-[''] before:-z-10
             "
           >
