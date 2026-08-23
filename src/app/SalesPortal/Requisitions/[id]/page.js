@@ -771,15 +771,15 @@ export default function DraftInvoicePage({
                     {userInfo.business.currency?.currency.Symbol}
                     {bill.total?.toFixed(2)}
                   </td>
-                  <td className="px-4 py-2 text-center">
                     {user._id === Singlebill.invoicerId &&
                       user.raiseInvoice &&
                       Singlebill.billStatus.toLowerCase() === "draft" && (
-                        <button onClick={() => removeLineItem(bill._id)}>
-                          <TrashIcon className="w-5 h-5 text-red-500" />
-                        </button>
-                      )}
-                  </td>
+                      <td className="px-4 py-2 text-center">
+                          <button onClick={() => removeLineItem(bill._id)}>
+                            <TrashIcon className="w-5 h-5 text-red-500" />
+                          </button>
+                      </td>
+                    )}
                 </tr>
               ))}
             </tbody>
