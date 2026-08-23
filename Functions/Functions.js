@@ -10,8 +10,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 
-const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng"
-// const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
+// const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng"
+const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
 // const EXPRESS_PRIVATE_URL = "https://1492-102-91-102-30.ngrok-free.app" 
 const ENCRYPTION_KEY = '12345678901234567890123456789012'; // 32 chars
 const IV = '1234567890123456'; // 16 chars
