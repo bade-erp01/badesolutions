@@ -78,7 +78,7 @@ export default function CustomerForm({
   const [BalanceData, setBalanceData] = useState({
     Debt: Number(cust.Debt),
   });
-  const [creditLimit, setcreditLimit] = useState({creditLimit : Number(cust.creditLimit)});
+  const [creditLimit, setcreditLimit] = useState(Number(cust.creditLimit));
 
   const [formData, setFormData] = useState({
     bankJournal: "",
@@ -171,58 +171,57 @@ export default function CustomerForm({
 
   // ==================== HANDLERS ====================
   const UpdateCustomerBalance = async (value, field) => {
-    try {
-      const result = await Swal.fire({
-        title: "Confirm Sensitive Operation",
-        html: `
-          <div class="text-sm space-y-2 text-left">
-            <p>You are about to update a customer's financial balance.</p>
-            <p>This action is <strong>irreversible</strong> and may affect financial records.</p>
-          </div>
-        `,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#22c55e",
-        cancelButtonColor: "#f97316",
-        confirmButtonText: "Yes, Proceed!",
-        cancelButtonText: "Cancel",
-      });
+  try {
+    const result = await Swal.fire({
+      title: "Confirm Sensitive Operation",
+      html: `
+        <div class="text-sm space-y-2 text-left">
+          <p>You are about to update a customer's financial balance.</p>
+          <p>This action is <strong>irreversible</strong> and may affect financial records.</p>
+        </div>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#22c55e",
+      cancelButtonColor: "#f97316",
+      confirmButtonText: "Yes, Proceed!",
+      cancelButtonText: "Cancel",
+    });
 
-      if (!result.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-      plsWait("Please wait...This should only take a bit.");
+    plsWait("Please wait...This should only take a bit.");
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
-          userInfo.user._id,
-        )}/${Encrypt(cust._id)}/${field}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          },
-          body: JSON.stringify({
-            id: Encrypt(cust._id),
-            Debt: value,
-            creditLimit: value,
-          }),
+    const response = await fetch(
+      `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
+        userInfo.user._id,
+      )}/${Encrypt(cust._id)}/${field}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+          access: `${Encrypt(userInfo.user._id)}`,
+          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
         },
-      );
+        body: JSON.stringify({
+          id: Encrypt(cust._id),
+          [field]: value, // only sends Debt or creditLimit (whichever is in `field`)
+        }),
+      },
+    );
 
-      const data = await response.json();
-      if (response.ok) {
-        SuccessToast(data.message);
-        navigation.refresh();
-      } else {
-        throw new Error(data.error || "Update Failed");
-      }
-    } catch (error) {
-      ErrorMessage(error.message);
+    const data = await response.json();
+    if (response.ok) {
+      SuccessToast(data.message);
+      navigation.refresh();
+    } else {
+      throw new Error(data.error || "Update Failed");
     }
-  };
+  } catch (error) {
+    ErrorMessage(error.message);
+  }
+};
 
   let jsPDF;
   if (typeof window !== "undefined") {

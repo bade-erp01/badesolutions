@@ -8,7 +8,7 @@ import {
 } from "../../../../../../Functions/Mics";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import axios from "axios";
-import { useRouter,useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 // shadcn/ui components
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";   // ← Add this import
+import { Loader2 } from "lucide-react";
 
 export default function ProductForm({
   userData,
@@ -35,7 +35,7 @@ export default function ProductForm({
   const [user] = useState(userData);
   const [business] = useState(businessData);
   const router = useRouter();
-  const Path = useParams()
+  const Path = useParams();
 
   const [formData, setFormData] = useState({
     Name: "",
@@ -50,9 +50,11 @@ export default function ProductForm({
     VAT: 0,
     Pieces: 1,
     BuyingPrice: 0,
+    Manufacture_code: "",
+    Nafdac: "",
   });
 
-  const [isLoading, setIsLoading] = useState(false);   // ← New state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -81,7 +83,7 @@ export default function ProductForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);     // ← Start loading
+    setIsLoading(true);
 
     try {
       plsWait("Creating Product...");
@@ -92,7 +94,7 @@ export default function ProductForm({
 
       if (data.Message) {
         SuccessToast(data.Message);
-        
+
         // Reset form
         setFormData({
           Name: "",
@@ -107,18 +109,18 @@ export default function ProductForm({
           VAT: 0,
           Pieces: 1,
           BuyingPrice: 0,
+          Manufacture_code: "",
+          Nafdac: "",
         });
 
-        router.push(
-          `/${Path.auth}/V4/product/product/${data.data}`
-        );
+        router.push(`/${Path.auth}/V4/product/product/${data.data}`);
       } else {
         throw new Error(data.error || "Unexpected error occurred.");
       }
     } catch (error) {
       ErrorMessage("Failed to create product.");
     } finally {
-      setIsLoading(false);    // ← Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -126,13 +128,13 @@ export default function ProductForm({
     <div className="">
       <div className="">
         <Card className="shadow-xl">
-          <CardHeader className=" rounded-t-lg">
+          <CardHeader className="rounded-t-lg">
             <CardTitle className="text-3xl">Create Product</CardTitle>
-            <p className=" mt-2">
+            <p className="mt-2">
               Ensure to provide correct information for your product
             </p>
           </CardHeader>
-          <Separator/>
+          <Separator />
 
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-10">
@@ -213,7 +215,9 @@ export default function ProductForm({
                     <Label htmlFor="Vendor">Vendor</Label>
                     <Select
                       value={formData.Vendor}
-                      onValueChange={(value) => handleSelectChange("Vendor", value)}
+                      onValueChange={(value) =>
+                        handleSelectChange("Vendor", value)
+                      }
                       disabled={isLoading}
                       required
                     >
@@ -242,6 +246,32 @@ export default function ProductForm({
                     />
                   </div>
 
+                  {/* ========== NEW FIELDS ========== */}
+                  <div className="space-y-2">
+                    <Label htmlFor="Manufacture_code">Manufacture Code (Barcode)</Label>
+                    <Input
+                      id="Manufacture_code"
+                      name="Manufacture_code"
+                      placeholder="e.g., 6154000412715"
+                      value={formData.Manufacture_code}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Nafdac">NAFDAC Number</Label>
+                    <Input
+                      id="Nafdac"
+                      name="Nafdac"
+                      placeholder="NAFDAC registration number"
+                      value={formData.Nafdac}
+                      onChange={handleChange}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {/* ========== END NEW FIELDS ========== */}
+
                   <div className="space-y-2">
                     <Label htmlFor="color">Color</Label>
                     <Input
@@ -269,35 +299,6 @@ export default function ProductForm({
                     />
                   </div>
 
-                  <div className="flex items-center gap-8 pt-6 lg:col-span-3">
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        id="Sellable"
-                        checked={formData.Sellable}
-                        onCheckedChange={(checked) =>
-                          handleCheckboxChange("Sellable", !!checked)
-                        }
-                        disabled={isLoading}
-                      />
-                      <Label htmlFor="Sellable" className="cursor-pointer font-medium">
-                        Sell on ERP
-                      </Label>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        id="Ecom_sale"
-                        checked={formData.Ecom_sale}
-                        onCheckedChange={(checked) =>
-                          handleCheckboxChange("Ecom_sale", !!checked)
-                        }
-                        disabled={isLoading}
-                      />
-                      <Label htmlFor="Ecom_sale" className="cursor-pointer font-medium">
-                        Sell on E-commerce
-                      </Label>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -318,11 +319,7 @@ export default function ProductForm({
               {/* Submit Button with Loading */}
               <div className="flex justify-end pt-6 border-t">
                 {user.createProduct && (
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    disabled={isLoading}
-                  >
+                  <Button type="submit" size="lg" disabled={isLoading}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
