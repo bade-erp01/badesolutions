@@ -239,6 +239,9 @@ export default function SingleProductpage({
         Pieces: formData.Pieces,
         Manufacture_code: formData.Manufacturer,
         Vendor: formData.Vendor,
+        Subcategory: formData.Subcategory,
+        Nafdac:formData.Nafdac,
+        LeadTime:formData.LeadTime
       };
       const { data } = await axios.patch(
         `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
