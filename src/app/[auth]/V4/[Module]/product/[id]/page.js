@@ -237,7 +237,7 @@ export default function SingleProductpage({
         Manufacturer: formData.Manufacturer,
         VAT: formData.VAT.$numberDecimal,
         Pieces: formData.Pieces,
-        Manufacture_code: formData.Manufacturer,
+        Manufacture_code: formData.Manufacture_code,
         Vendor: formData.Vendor,
         Subcategory: formData.Subcategory,
         Nafdac:formData.Nafdac,
