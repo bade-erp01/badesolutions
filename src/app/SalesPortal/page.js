@@ -61,11 +61,11 @@ export default function SalesPortalLanding() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild className="text-lg h-14 px-10">
-              <Link href="/SalesPortal/Login">Get Started Free</Link>
+              <Link href="/Pricing">Get Started </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg h-14 px-10 border-white/30 text-white hover:bg-white/10">
+            {/* <Button size="lg" variant="outline" className="text-lg h-14 px-10 border-white/30 text-white hover:bg-white/10">
               Watch Demo
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>
