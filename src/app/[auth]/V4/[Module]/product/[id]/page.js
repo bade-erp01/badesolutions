@@ -40,10 +40,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { ChevronDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import {
   Table,
@@ -240,8 +244,8 @@ export default function SingleProductpage({
         Manufacture_code: formData.Manufacture_code,
         Vendor: formData.Vendor,
         Subcategory: formData.Subcategory,
-        Nafdac:formData.Nafdac,
-        LeadTime:formData.LeadTime
+        Nafdac: formData.Nafdac,
+        LeadTime: formData.LeadTime,
       };
       const { data } = await axios.patch(
         `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
@@ -295,8 +299,8 @@ export default function SingleProductpage({
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="eager"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  quality={100}   
-                  priority   
+                  quality={100}
+                  priority
                 />
               </div>
             </div>
@@ -832,51 +836,63 @@ export default function SingleProductpage({
               >
                 <div className="mt-10 max-h-96 overflow-y-auto space-y-4">
                   {formData.comments?.length > 0 ? (
-                    formData.comments.map((comment, index) => (
-                      <div
-                        key={index}
-                        className="border border-gray-200 rounded-lg p-3  shadow-sm hover:shadow-md transition-shadow duration-200"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-3">
-                            {/* Avatar/initials */}
-                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
-                              {comment.comment?.charAt(0) || "U"}
-                            </div>
-                            <div>
-                              {comment.createdAt && (
-                                <p className="text-xs text-gray-500">
-                                  {new Date(
-                                    comment.createdAt,
-                                  ).toLocaleDateString()}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <svg
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i < comment.rating
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {formData.comments.map((comment, index) => (
+                        <div
+                          key={index}
+                          className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-4 md:p-6 
+                   shadow-sm hover:shadow-md transition-shadow duration-200 
+                   bg-white dark:bg-gray-800"
+                        >
+                          <div className="flex items-center justify-between mb-2 flex-wrap">
+                            <div className="flex items-center space-x-3">
+                              {/* Avatar/initials */}
+                              <div
+                                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-100 dark:bg-gray-700 
+                            flex items-center justify-center font-semibold 
+                            text-sm sm:text-base text-gray-800 dark:text-gray-200"
                               >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.36 2.44a1 1 0 00-.364 1.118l1.286 3.95c.3.921-.755 1.688-1.54 1.118l-3.36-2.44a1 1 0 00-1.176 0l-3.36 2.44c-.785.57-1.84-.197-1.54-1.118l1.286-3.95a1 1 0 00-.364-1.118l-3.36-2.44c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.95z" />
-                              </svg>
-                            ))}
+                                {comment.comment?.charAt(0) || "U"}
+                              </div>
+                              <div>
+                                {comment.createdAt && (
+                                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                    {new Date(
+                                      comment.createdAt,
+                                    ).toLocaleDateString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center mt-2 sm:mt-0">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                                    i < comment.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300 dark:text-gray-600"
+                                  }`}
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.15c.969 0 1.371 1.24.588 1.81l-3.36 2.44a1 1 0 00-.364 1.118l1.286 3.95c.3.921-.755 1.688-1.54 1.118l-3.36-2.44a1 1 0 00-1.176 0l-3.36 2.44c-.785.57-1.84-.197-1.54-1.118l1.286-3.95a1 1 0 00-.364-1.118l-3.36-2.44c-.783-.57-.38-1.81.588-1.81h4.15a1 1 0 00.95-.69l1.286-3.95z" />
+                                </svg>
+                              ))}
+                            </div>
                           </div>
+                          <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+                            {comment.comment || `Comment ${index + 1}`}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                          {comment.comment || `Comment ${index + 1}`}
-                        </p>
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   ) : (
-                    <div className="text-sm text-gray-500 text-center py-6 border border-dashed border-gray-300 rounded-lg">
+                    <div
+                      className="text-sm sm:text-base text-gray-500 dark:text-gray-400 text-center py-6 
+                  border border-dashed border-gray-300 dark:border-gray-600 rounded-lg 
+                  bg-white dark:bg-gray-800"
+                    >
                       No reviews available for this product.
                     </div>
                   )}
@@ -940,7 +956,12 @@ export default function SingleProductpage({
                     </div>
                   ) : (
                     <div className="flex items-center justify-center py-10 border border-dashed rounded-lg text-sm text-muted-foreground">
-                     {user.editProduct &&  <ImageUploader  id={`${formData._id}`} module="AltImage"/>}
+                      {user.editProduct && (
+                        <ImageUploader
+                          id={`${formData._id}`}
+                          module="AltImage"
+                        />
+                      )}
                     </div>
                   )}
                 </div>
