@@ -1538,7 +1538,7 @@ export function GeoButton({ userData, cust }) {
                 access: Encrypt(
                   userData.user._id
                 ),
-                sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+                sessionKey: `Bearer ${userData.SessionId}`
               },
             }
           );
