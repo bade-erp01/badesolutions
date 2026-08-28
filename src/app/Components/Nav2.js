@@ -1,8 +1,11 @@
 "use client";
+
 import React, { useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Search, Menu, X } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,55 +18,80 @@ export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    onSearchChange(searchTerm);
+    onSearchChange?.(searchTerm);
   };
 
   return (
-    <nav className="sticky top-0 z-20 backdrop-blur w-full bg-[#fcfcfcda] p-2 shadow-xs shadow-gray-400 border-b border-slate-200">
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <h1 className="text-md font-black tracking-tight text-slate-900">
-          {navtitle}
-        </h1>
+    <header className="sticky top-0 z-30 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        {/* Left – Page Title */}
+        <div className="flex items-center gap-3 min-w-0">
+          <h1 className="truncate text-base font-semibold tracking-tight text-foreground">
+            {navtitle}
+          </h1>
+        </div>
 
-        {/* Search Bar */}
+        {/* Center – Search (only when not Dashboard) */}
         {navtitle && navtitle !== "Dashboard" && (
-          <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 mx-8 max-w-md">
+          <form
+            onSubmit={handleSearch}
+            className="hidden sm:flex flex-1 max-w-md items-center gap-2 mx-4"
+          >
             <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 type="search"
                 placeholder={`Search ${navtitle}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-9 h-9"
               />
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
-            <Button type="submit" size="sm" variant="default">
+            <Button type="submit" size="sm" className="shrink-0">
               Search
             </Button>
           </form>
         )}
 
-        {/* Toggle button */}
-        <button
-          onClick={handleToggle}
-          className="rounded-lg  px-5 py-2 text-sm font-semibold text-slate-900 transition hover:text-slate-800"
-          aria-label="Toggle Menu"
-        >
-          {isOpen ? (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          )}
-        </button>
+        {/* Right – Menu Toggle */}
+        <div className="flex items-center gap-2">
+          {/* Mobile search trigger could go here later */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggle}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            className="h-9 w-9"
+          >
+            {isOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
-    </nav>
+
+      {/* Optional: Mobile search row (visible only on small screens) */}
+      {navtitle && navtitle !== "Dashboard" && (
+        <div className="sm:hidden border-t px-4 py-2">
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Input
+                type="search"
+                placeholder={`Search ${navtitle}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
+            <Button type="submit" size="sm">
+              Search
+            </Button>
+          </form>
+        </div>
+      )}
+    </header>
   );
 }

@@ -54,6 +54,19 @@ import {
   Square3Stack3DIcon,
 } from "@heroicons/react/24/outline";
 import "animate.css";
+import {Badge} from "@/components/ui/badge";
+import {Skeleton} from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardLayout({ userData, baseUrl }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -277,12 +290,11 @@ export function MainDash({ userData, baseUrl }) {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const [status, setStatus] = useState("Active"); // UI status indicator
+  const [status, setStatus] = useState("Active");
   const MySwal = withReactContent(Swal);
 
-  const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
+  const INACTIVITY_LIMIT = 5 * 60 * 1000;
 
-  // Memoized sorted invoices
   const sortedInvoices = useMemo(() => {
     return (
       tenantData?.invoice?.sort(
@@ -291,7 +303,6 @@ export function MainDash({ userData, baseUrl }) {
     );
   }, [tenantData]);
 
-  // Memoized paginated invoices MonitoredProduct
   const paginatedInvoices = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return sortedInvoices.slice(start, start + itemsPerPage);
@@ -301,13 +312,10 @@ export function MainDash({ userData, baseUrl }) {
     return Math.ceil(sortedInvoices.length / itemsPerPage);
   }, [sortedInvoices]);
 
-  // ⏱ Debounced page change
   const handlePageChange = useCallback(
     (page) => {
       if (page >= 1 && page <= totalPages) {
-        setTimeout(() => {
-          setCurrentPage(page);
-        }, 300); // 300ms debounce
+        setTimeout(() => setCurrentPage(page), 300);
       }
     },
     [totalPages],
@@ -318,23 +326,15 @@ export function MainDash({ userData, baseUrl }) {
       const isVisible = document.visibilityState === "visible";
       const isOnline = navigator.onLine;
 
-      if (!isVisible || !isOnline || status === "Inactive") {
-        //  ErrorMessage("⏸ Fetch paused due to:", {
-        //     visibility: isVisible,
-        //     online: isOnline,
-        //     activity: status
-        //   });
-        return;
-      }
-      
+      if (!isVisible || !isOnline || status === "Inactive") return;
+
       try {
         const res = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
+          method: "GET",
           headers: {
-            Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
-            access: `${Encrypt(userData?.user._id)}`,
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
             sessionKey: `Bearer ${userData.SessionId}`,
-            // cache: "force-cache" // or "default", "reload", "no-store"
-            // next: { revalidate: 60, cache: "force-cache", },
           },
         });
 
@@ -352,9 +352,6 @@ export function MainDash({ userData, baseUrl }) {
     };
 
     const resetInactivityTimer = () => {
-      // if (status === "Inactive") {
-      //   console.log("🔄 User became active again");
-      // }
       setStatus("Active");
       clearTimeout(inactivityTimer.current);
       inactivityTimer.current = setTimeout(() => {
@@ -362,28 +359,20 @@ export function MainDash({ userData, baseUrl }) {
       }, INACTIVITY_LIMIT);
     };
 
-    // ensure on user with cleveldashboard acess can call the api
     if (userData.user.c_levelDash) {
-      // Initial fetch
       fetchTenantData();
       resetInactivityTimer();
-
-      // Set interval for periodic fetch
-      intervalRef.current = setInterval(fetchTenantData, 60000); // Every 1 min
+      intervalRef.current = setInterval(fetchTenantData, 60000);
     } else {
-      // show second dashboard
       setLoading(false);
     }
 
-    // Tab visibility
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible" && userData.user.c_levelDash) {
-        // console.log(" Tab became visible");
         fetchTenantData();
       }
     };
 
-    // Network status
     const handleOnline = () => {
       SuccessToast("Back online");
       if (userData.user.c_levelDash) fetchTenantData();
@@ -395,26 +384,18 @@ export function MainDash({ userData, baseUrl }) {
         position: "bottom-start",
         icon: "info",
         showConfirmButton: false,
-        // timer: 10000,
-        // timerProgressBar: true,
-        customClass: {
-          popup: "swal2-subscription-toast",
-        },
+        customClass: { popup: "swal2-subscription-toast" },
         html: `
-            <div style="display: flex; align-items: center;">
-              <div style="text-align: left;">
-                <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
-              </div>
+          <div style="display: flex; align-items: center;">
+            <div style="text-align: left;">
+              <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
             </div>
+          </div>
         `,
       });
-
-      setTimeout(() => {
-        plsWait("Currently Offline");
-      }, 3000);
+      setTimeout(() => plsWait("Currently Offline"), 3000);
     };
 
-    // User activity listeners
     const activityEvents = ["mousemove", "keydown", "scroll", "touchstart"];
     activityEvents.forEach((event) =>
       window.addEventListener(event, resetInactivityTimer),
@@ -424,7 +405,6 @@ export function MainDash({ userData, baseUrl }) {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Cleanup
     return () => {
       clearInterval(intervalRef.current);
       clearTimeout(inactivityTimer.current);
@@ -437,395 +417,413 @@ export function MainDash({ userData, baseUrl }) {
     };
   }, [userData, EXPRESS_PRIVATE_URL, Encrypt]);
 
+  // ─── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="w-full px-6 py-8 animate-pulse space-y-6">
-        <div className="h-6 bg-gray-300 rounded w-3/4"></div>
-        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-        <div className="h-48 bg-gray-300 rounded w-full"></div>
-        <div className="space-y-3">
-          <div className="h-4 bg-gray-300 rounded w-full"></div>
-          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+      <div className="w-full space-y-6 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="p-6">
+                <Skeleton className="h-4 w-24 mb-4" />
+                <Skeleton className="h-9 w-32 mb-3" />
+                <Skeleton className="h-3 w-40" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
-        <div className="h-10 bg-gray-300 rounded w-40 mt-4"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-5">
+            <Skeleton className="h-72 w-full rounded-xl" />
+            <Skeleton className="h-80 w-full rounded-xl" />
+          </div>
+          <Skeleton className="h-[480px] w-full rounded-xl" />
+        </div>
       </div>
     );
   }
 
+  // ─── Error ──────────────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="w-full px-6 py-10 flex flex-col items-center justify-center bg-grey-200 border border-red-200 rounded-md shadow-sm">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-10 w-10 text-red-500 mb-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01M4.93 4.93l14.14 14.14M12 2a10 10 0 100 20 10 10 0 000-20z"
-          />
-        </svg>
-        <h2 className="text-lg font-semibold text-red-700">
-          Dashboard Unavailable
-        </h2>
-        <p className="text-sm text-red-600 mt-2 max-w-md text-center">
-          {error}
-        </p>
-      </div>
+      <Alert variant="destructive" className="max-w-xl mx-auto mt-12">
+        <AlertTitle>Dashboard Unavailable</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
     );
   }
 
-  return (
-    <>
-      {userData.user.c_levelDash ? (
-        <div
-          className="text-xs"
-          style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: "#453d46ff transparent",
-          }}
-        >
-          {/* KPI cards */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white p-4 rounded card-shadow shadow-md animate__animated animate__flipInY max-h-full overflow-y-auto">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-500">Today‘s Sales</h3>
-                  <p className="text-2xl text-green-600 font-bold mt-1">
-                    {/* total sales */}
-                    <TodaySaleTotal
-                      tenantData={tenantData}
-                      userData={userData}
-                    />
+  // ─── C-Level Dashboard ──────────────────────────────────────────────────────
+  if (userData.user.c_levelDash) {
+    const currency = userData.business.currency?.currency.Symbol || "";
+
+    // Trend calculation for Sales card
+    const todaySales = Number(tenantData?.TodaySale) || 0;
+    const yesterdaySales = Number(tenantData?.yesterdaySale) || 0;
+    const salesDiff = todaySales - yesterdaySales;
+    const salesPercentage =
+      yesterdaySales > 0
+        ? ((salesDiff / yesterdaySales) * 100).toFixed(1)
+        : "100";
+    const salesIsUp = todaySales > yesterdaySales;
+    const salesIsDown = todaySales < yesterdaySales;
+
+    const overdueTotal =
+      tenantData.Routes?.filter((c) => c.Debt > 0).reduce(
+        (sum, c) => sum + (Number(c.Debt) || 0),
+        0,
+      ) || 0;
+
+    const pendingTasks =
+      tenantData.result?.Task?.filter((t) => t.status === "pending").length ||
+      0;
+
+    return (
+      <div className="space-y-6 text-sm">
+        {/* ───────────────────── KPI CARDS ───────────────────── */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          {/* 1. Today's Sales */}
+          <Card className="relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group">
+            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-emerald-400 to-emerald-600" />
+            <CardContent className="p-5 pl-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+                    Today’s Sales
                   </p>
-                  <p
-                    className={`flex items-center gap-1 text-xs mt-1 font-semibold ${
-                      Number(tenantData.TodaySale) >
-                      Number(tenantData.yesterdaySale)
-                        ? "text-green-600"
-                        : Number(tenantData.TodaySale) <
-                            Number(tenantData.yesterdaySale)
-                          ? "text-red-600"
-                          : "text-gray-500"
-                    }`}
+                  <p className="text-2xl font-bold tracking-tight text-foreground">
+                    {currency}
+                    {formatNumberShort(todaySales)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-emerald-50 p-2.5 group-hover:bg-emerald-100 transition-colors">
+                  <ArrowTrendingUpIcon className="h-5 w-5 text-emerald-600" />
+                </div>
+              </div>
+
+              <div className="mt-3">
+                {salesIsUp ? (
+                  <Badge
+                    variant="secondary"
+                    className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 gap-1"
                   >
-                    {(() => {
-                      const today = Number(tenantData.TodaySale) || 0;
-                      const yesterday = Number(tenantData.yesterdaySale) || 0;
-                      const diff = today - yesterday;
-                      let percentage;
-                      if (yesterday > 0) {
-                        percentage = ((diff / yesterday) * 100).toFixed(2);
-                      } else {
-                        percentage = "100";
-                      }
+                    <ArrowTrendingUpIcon className="h-3.5 w-3.5" />
+                    +{salesPercentage}% vs yesterday
+                  </Badge>
+                ) : salesIsDown ? (
+                  <Badge
+                    variant="secondary"
+                    className="bg-red-50 text-red-700 hover:bg-red-50 gap-1"
+                  >
+                    <ArrowTrendingDownIcon className="h-3.5 w-3.5" />
+                    {salesPercentage}% vs yesterday
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="text-muted-foreground">
+                    No change vs yesterday
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-                      if (today > yesterday) {
-                        return (
-                          <>
-                            <ArrowTrendingUpIcon className="w-4 h-4" />
-                            {`Up ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
-                          </>
-                        );
-                      } else if (today < yesterday) {
-                        return (
-                          <>
-                            <ArrowTrendingDownIcon className="w-4 h-4" />
-                            {`Down ${percentage}% from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`}
-                          </>
-                        );
-                      } else {
-                        return `No change from ${moment().subtract(1, "day").format("dddd")}'s (${userData.business.currency?.currency.Symbol}${formatNumberShort(yesterday)})`;
-                      }
-                    })()}
+          {/* 2. Overdue Payments */}
+          <Card className="relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group">
+            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-violet-400 to-violet-600" />
+            <CardContent className="p-5 pl-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+                    Overdue Payments
+                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-foreground">
+                    {currency}
+                    {overdueTotal.toLocaleString()}
                   </p>
                 </div>
-                <div className="p-3 rounded-full bg-green-100 text-white text-xl shadow-md">
-                  <ArrowTrendingUpIcon className="h-6 w-6 text-gray-900" />
+                <div className="rounded-xl bg-violet-50 p-2.5 group-hover:bg-violet-100 transition-colors">
+                  <BanknotesIcon className="h-5 w-5 text-violet-600" />
                 </div>
               </div>
-            </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                {tenantData.Routes?.filter((c) => c.Debt > 0).length || 0}{" "}
+                customers with outstanding debt
+              </p>
+            </CardContent>
+          </Card>
 
-            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-500">
-                    Todays Overdue Payments
-                  </h3>
-                  <p className="text-2xl text-gray-500 font-bold mt-1">
-                    {userData.business.currency?.currency.Symbol}
-                    {tenantData.Routes?.filter(
-                      (customer) => customer.Debt > 0,
-                    ).reduce(
-                      (sum, customer) =>
-                        sum + (formatNumberShort(customer.Debt) || 0),
-                      0,
-                    ) || 0}
+          {/* 3. Today's Route */}
+          <Card className="relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group">
+            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-sky-400 to-sky-600" />
+            <CardContent className="p-5 pl-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+                    Today’s Route
                   </p>
-                </div>
-                <div className="p-3 rounded-full bg-[#ddd6ff] text-white shadow-md">
-                  <BanknotesIcon className="h-6 w-6 text-gray-500" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-5 rounded shadow-md animate__animated animate__flipInY">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-500">Todays Route</h3>
-                  <p className="text-2xl text-gray-500 font-bold mt-1">
+                  <p className="text-2xl font-bold tracking-tight text-foreground">
                     {tenantData.Routes?.length || 0}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
-                  <MapIcon className="h-6 w-6 text-gray-900" />
+                <div className="rounded-xl bg-sky-50 p-2.5 group-hover:bg-sky-100 transition-colors">
+                  <MapIcon className="h-5 w-5 text-sky-600" />
                 </div>
               </div>
-            </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Customers scheduled for today
+              </p>
+            </CardContent>
+          </Card>
 
-            <div className="bg-white p-5 rounded card-shadow shadow-md animate__animated animate__flipInY">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-500">Pending Task</h3>
-                  <p className="text-2xl text-gray-500 font-bold mt-1">
-                    {tenantData.result.Task.filter(
-                      (entry) => entry.status === "pending",
-                    ).length || 0}
+          {/* 4. Pending Tasks */}
+          <Card className="relative overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group">
+            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-amber-400 to-amber-600" />
+            <CardContent className="p-5 pl-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+                    Pending Tasks
+                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-foreground">
+                    {pendingTasks}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-100 text-white px-4 py-2 rounded shadow-sm">
-                  <BellAlertIcon className="h-6 w-6 text-red-400" />
+                <div className="rounded-xl bg-amber-50 p-2.5 group-hover:bg-amber-100 transition-colors">
+                  <BellAlertIcon className="h-5 w-5 text-amber-600" />
                 </div>
               </div>
-            </div>
-          </section>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Tasks waiting for action
+              </p>
+            </CardContent>
+          </Card>
+        </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Recent Activity / feed */}
-            <section className="lg:col-span-2">
-              <div className="bg-white rounded p-3 shadow-xl mb-3">
-                {/* Chart */}
+        {/* ───────────────────── MAIN CONTENT ───────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <section className="lg:col-span-2 space-y-6">
+            <Card className="shadow-sm">
+              <CardContent className="p-4">
                 <GenerealSalesMargin
                   yearlysales={tenantData.yearlysales}
                   warehouses={tenantData.warehouses}
                 />
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Properties table */}
-              <div className="bg-white rounded p-6 mt-6 shadow-md animate__animated animate__fadeInUp animate__faster">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg text-gray-500 font-semibold">
-                    Today's Sales.
-                  </h3>
-                </div>
-
-                <div className="overflow-y-hidden max-h-96">
-                  <table className="w-full text-left text-sm">
-                    <thead className="text-xs text-gray-500 border-b">
-                      <tr>
-                        <th className="py-3 border-r">S/N</th>
-                        <th className="p-3">Ref</th>
-                        <th className="py-3">Customer</th>
-                        <th className="py-3">Grand Total</th>
-                        <th className="py-3">Status</th>
-                      </tr>
-                    </thead>
-
-                    <tbody className="text-gray-700">
+            {/* Today's Sales Table */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold">
+                  Today’s Sales
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/40">
+                        <TableHead className="w-12">#</TableHead>
+                        <TableHead>Reference</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {paginatedInvoices.length > 0 ? (
                         paginatedInvoices.map((invoice, index) => (
-                          <tr
-                            key={index}
-                            className="border-b animate__animated animate__fadeInRight text-xs"
-                          >
-                            <td className="py-3 border-r">
+                          <TableRow key={invoice._id || index}>
+                            <TableCell className="font-medium text-muted-foreground">
                               {(currentPage - 1) * itemsPerPage + index + 1}
-                            </td>
-                            <td className="p-3 font-semibold text-blue-700">
+                            </TableCell>
+                            <TableCell>
                               <Link
-                                href={`/${
-                                  userData.business.companyName
-                                }/${Encrypt(
+                                href={`/${userData.business.companyName}/${Encrypt(
                                   userData.user._id,
                                 )}/bill/bill/${Encrypt(invoice._id)}`}
-                                className="text-indigo-600"
+                                className="font-medium text-primary hover:underline"
                               >
                                 {invoice.billReferenceNo}/
                                 {invoice.invoicelocation}
                               </Link>
-                            </td>
-                            <td className="py-3">{invoice.customerName}</td>
-                            <td className="py-3">
-                              {userData.business.currency?.currency.Symbol}
+                            </TableCell>
+                            <TableCell>{invoice.customerName}</TableCell>
+                            <TableCell>
+                              {currency}
                               {invoice.grandTotal?.toLocaleString()}
-                            </td>
-                            <td
-                              className={`py-3 ${
-                                invoice.billStatus !== "Cancelled"
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              }`}
-                            >
-                              {invoice.billStatus}
-                            </td>
-                          </tr>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  invoice.billStatus !== "Cancelled"
+                                    ? "default"
+                                    : "destructive"
+                                }
+                                className="capitalize"
+                              >
+                                {invoice.billStatus}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
                         ))
                       ) : (
-                        <tr>
-                          <td
-                            colSpan={6}
-                            className="py-6 text-center text-gray-500 text-sm"
+                        <TableRow>
+                          <TableCell
+                            colSpan={5}
+                            className="h-28 text-center text-muted-foreground"
                           >
                             No invoices found for this page.
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       )}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
 
-                {/* Pagination Controls */}
-                <div className="flex justify-center items-center gap-2 mt-4 text-sm">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-                  >
-                    Prev
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handlePageChange(i + 1)}
-                      className={`px-3 py-1 rounded border ${
-                        currentPage === i + 1
-                          ? "bg-indigo-600 text-white"
-                          : "border-gray-300 hover:bg-gray-100"
-                      }`}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-1.5 mt-5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
                     >
-                      {i + 1}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </section>
-            <aside className="bg-white rounded p-6 card-shadow text-xs  animate__animated animate__fadeInRight animate__faster">
-              <h3 className="text-lg text-gray-500 font-semibold mb-4">
-                🗿 Quick Stats Widget
-              </h3>
-              <div className="flex flex-col">
-                <h4 className="text-lg text-gray-500 font-semibold mb-4">
-                  ⏰ Tasks Reminder
-                </h4>
+                      Prev
+                    </Button>
 
-                {tenantData.result.Task &&
-                  tenantData.result.Task.map((task, idx) => (
-                    <div
-                      key={idx}
-                      className="text-xs bg-gray-100/50 flex gap-3 rounded-sm p-1 mb-1 hover:border-gray-200 hover:shadow-md transition duration-200 animate__animated animate__fadeInRight"
-                      title={task.notes}
-                    >
-                      <div>
-                        <p className="font-medium text-gray-900">{task.Text}</p>
-                        <p className="text-xs font-semibold text-gray-500">
-                          * {task.notes}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Created:{" "}
-                          {new Date(task.createdAt).toLocaleString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </div>
-
-                      {/* Badge button */}
-                      <button
-                        className={`ml-auto px-2 py-1 rounded-sm text-xs font-medium transition-all duration-200 ${
-                          task.Status === "Done"
-                            ? "bg-green-500 text-white"
-                            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                        }`}
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <Button
+                        key={i}
+                        variant={currentPage === i + 1 ? "default" : "outline"}
+                        size="sm"
+                        className="w-9"
+                        onClick={() => handlePageChange(i + 1)}
                       >
-                        {task.Status === "Done"
-                          ? "✓ Completed"
-                          : "○ Mark as Done"}
-                      </button>
-                      <hr />
-                    </div>
-                  ))}
+                        {i + 1}
+                      </Button>
+                    ))}
 
-                <div className="mt-6 border-t-2">
-                  <div className="  transition-all duration-700 mt-5">
-                    <ChartRadialShape data={tenantData?.result} />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
                   </div>
-                </div>
-              </div>
-            </aside>
-          </div>
-          {tenantData.Routes.filter((cust) => cust.Debt > 0)?.length > 0 && (
-            <div className="w-full text-center mt-3">
-              {tenantData.Routes.filter((cust) => cust.Debt > 0)?.length >
-                0 && (
-                <div className="w-full text-center mt-3">
-                  <Marquee
-                    gradient={false}
-                    speed={30}
-                    className="w-full bg-gray-100/50 py-2"
-                  >
-                    <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
-                      ⚠️ Debtors:
-                    </span>
-                    {tenantData.Routes.filter((cust) => cust.Debt > 0).map(
-                      (debtor) => (
-                        <span
-                          key={debtor._id}
-                          className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
-                        >
-                          {debtor.Username} owes{" "}
-                          {userData.business.currency?.currency.Symbol}
-                          {debtor.Debt?.toLocaleString()},
-                        </span>
-                      ),
-                    )}
-                  </Marquee>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </CardContent>
+            </Card>
+          </section>
 
-          {/* produt promo */}
-          {tenantData.promotions?.length > 0 && (
-            <div className="w-full text-center mt-3">
-              <Marquee
-                gradient={false}
-                speed={40}
-                className="w-full bg-gray-100/50 py-2"
-              >
-                <span className="text-gray-700 bg-red-200 px-2 py-1 rounded mr-2">
-                  🗂️ Products On Promo:
-                </span>
+          {/* Right Sidebar */}
+          <aside className="space-y-6">
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold">
+                  Tasks & Target
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3">
+                    Task Reminder
+                  </h4>
+                  <ScrollArea className="h-56 pr-3">
+                    <div className="space-y-2.5">
+                      {tenantData.result?.Task?.length > 0 ? (
+                        tenantData.result.Task.map((task, idx) => (
+                          <div
+                            key={idx}
+                            className="flex gap-3 rounded-lg border bg-muted/30 p-3 hover:bg-muted/50 transition-colors"
+                            title={task.notes}
+                          >
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <p className="text-sm font-medium truncate">
+                                {task.Text}
+                              </p>
+                              <p className="text-xs text-muted-foreground line-clamp-1">
+                                {task.notes}
+                              </p>
+                              <p className="text-[11px] text-muted-foreground">
+                                {new Date(task.createdAt).toLocaleString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  },
+                                )}
+                              </p>
+                            </div>
+                            <Badge
+                              variant={
+                                task.Status === "Done" ? "default" : "secondary"
+                              }
+                              className="shrink-0 self-start"
+                            >
+                              {task.Status === "Done" ? "Done" : "Pending"}
+                            </Badge>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-8">
+                          No tasks available
+                        </p>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                <Separator />
+
+                <ChartRadialShape data={tenantData?.result} />
+              </CardContent>
+            </Card>
+          </aside>
+        </div>
+
+        {/* Debtors Marquee */}
+        {tenantData.Routes?.filter((c) => c.Debt > 0).length > 0 && (
+          <Card className="shadow-sm overflow-hidden">
+            <CardContent className="py-3 px-0">
+              <Marquee gradient={false} speed={32}>
+                <Badge variant="destructive" className="mr-4 ml-4">
+                  ⚠️ Debtors
+                </Badge>
+                {tenantData.Routes.filter((c) => c.Debt > 0).map((debtor) => (
+                  <span
+                    key={debtor._id}
+                    className="mx-2 inline-flex items-center rounded-md bg-muted px-2.5 py-1 text-xs font-medium"
+                  >
+                    {debtor.Username} owes {currency}
+                    {debtor.Debt?.toLocaleString()}
+                  </span>
+                ))}
+              </Marquee>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Promotions Marquee */}
+        {tenantData.promotions?.length > 0 && (
+          <Card className="shadow-sm overflow-hidden">
+            <CardContent className="py-3 px-0">
+              <Marquee gradient={false} speed={38}>
+                <Badge className="mr-4 ml-4 bg-amber-100 text-amber-800 hover:bg-amber-100">
+                  🗂️ Products On Promo
+                </Badge>
                 {tenantData.promotions.map((product) => (
                   <span
                     key={product._id}
-                    className="mx-1 text-black bg-gray-100 px-2 py-1 rounded"
+                    className="mx-2 inline-flex items-center rounded-md bg-muted px-2.5 py-1 text-xs font-medium"
                   >
-                    {product.Name} Promo:{" "}
-                    {userData.business.currency?.currency.Symbol}
+                    {product.Name}: {currency}
                     {(
                       product.Pricelist1Promo ??
                       product.Pricelist2Promo ??
@@ -838,48 +836,42 @@ export function MainDash({ userData, baseUrl }) {
                   </span>
                 ))}
               </Marquee>
-            </div>
-          )}
+            </CardContent>
+          </Card>
+        )}
 
-          {/* Footer */}
-          <footer className="mt-8 text-sm text-gray-500">
-            © <span id="year">{moment().format("YYYY")}</span> Business
-            Automated Dynamic Enterprise — All rights reserved.
-          </footer>
-        </div>
-      ) : (
-        <main className="flex-1">
-          <main className="flex-1">
-            <section className="w-full max-w-4xl mx-auto p-8">
-              <div className="text-center space-y-6">
-                <p className="text-gray-600 max-w-2xl mx-auto text-md">
-                  Track your sales performance, manage customer relationships,
-                  optimize your routes, and monitor your daily activities all in
-                  one place.
-                </p>
-                <div className="flex justify-center pt-4">
-                  <Image
-                    src={userData.business.companyLogo}
-                    alt="Company Logo"
-                    width={100}
-                    height={100}
-                    className="rounded-full shadow-lg hover:shadow-2xl transition-shadow"
-                  />
-                </div>
-                <p className="text-gray-500 text-sm pt-6">
-                  Navigate through the menu to explore your dashboard features
-                  and gain valuable insights into your business operations.
-                </p>
-              </div>
-              <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
-                © <span id="year">{moment().format("YYYY")}</span> Business
-                Automated Dynamic Enterprise — All rights reserved.
-              </footer>
-            </section>
-          </main>
-        </main>
-      )}
-    </>
+        <footer className="pt-4 text-center text-xs text-muted-foreground">
+          © {moment().format("YYYY")} Business Automated Dynamic Enterprise —
+          All rights reserved.
+        </footer>
+      </div>
+    );
+  }
+
+  // ─── Non C-Level Fallback ───────────────────────────────────────────────────
+  return (
+    <section className="w-full max-w-3xl mx-auto py-16 px-6 text-center space-y-8">
+      <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+        Track your sales performance, manage customer relationships, optimize
+        your routes, and monitor your daily activities all in one place.
+      </p>
+      <div className="flex justify-center">
+        <Avatar className="h-24 w-24 shadow-lg ring-4 ring-background">
+          <AvatarImage
+            src={userData.business.companyLogo}
+            alt="Company Logo"
+          />
+          <AvatarFallback className="text-xl">CO</AvatarFallback>
+        </Avatar>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        Navigate through the menu to explore your dashboard features.
+      </p>
+      <footer className="pt-10 border-t text-xs text-muted-foreground">
+        © {moment().format("YYYY")} Business Automated Dynamic Enterprise — All
+        rights reserved.
+      </footer>
+    </section>
   );
 }
 

@@ -17,8 +17,8 @@ const GeoUpdater = ({ userData, baseUrl }) => {
                 method: "POST",
                 headers: { 
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${Encrypt(userData?.business?.tenantId)}`,
-                  access: `${Encrypt(userData?.user?._id)}`,
+                  Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+                  access: `${Encrypt(userData.user._id)}`,
                   sessionKey: `Bearer ${userData.SessionId}`
                 },
                 body: JSON.stringify({ latitude, longitude }),
@@ -43,7 +43,7 @@ const GeoUpdater = ({ userData, baseUrl }) => {
     };
 
     // Run immediately on mount
-    updateLocation();
+    // updateLocation();
 
     // Run every 5 minutes after the initial call
     const interval = setInterval(updateLocation, 5 * 60 * 1000);

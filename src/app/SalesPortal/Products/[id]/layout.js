@@ -5,6 +5,10 @@ import { Encrypt, Dencrypt } from "../../../../../Functions/Functions";
 import SingleProductpage from "./page";
 import BackButton from "@/app/Components/BackBotton";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 export const metadata = {
   title: "B.A.D.E ERP Platform",
   description:
@@ -82,7 +86,7 @@ export default async function layout({ params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
         access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${userData.SessionId}`
+        sessionKey: `Bearer ${userData.SessionId}`,
       },
     });
 
@@ -90,39 +94,88 @@ export default async function layout({ params }) {
 
     if (!res.ok) {
       return (
-        <div className="text-black p-6">
-          Failed to load. Please try again later.
+        <div className="flex min-h-[70vh] items-center justify-center p-6">
+          <Alert variant="destructive" className="max-w-md">
+            <AlertTitle>Unable to load product</AlertTitle>
+            <AlertDescription>
+              Failed to load product data. Please try again later.
+            </AlertDescription>
+          </Alert>
         </div>
       );
     }
   } catch (err) {
     return (
-        <div className="text-black p-6">
-          Failed to load. Please try again later.
-        </div>
-      );
+      <div className="flex min-h-[70vh] items-center justify-center p-6">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Unable to load product</AlertTitle>
+          <AlertDescription>
+            Failed to load product data. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
-  return (
-    <div className="">
-      <nav className="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200 shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-          {/* Left: Username */}
-          <h6 className="text-md font-semibold tracking-tight text-slate-900">
-            {data.product.Name}
-          </h6>
 
-          {/* Right: Back button */}
-          <div className="flex items-center">
+  const product = data?.product;
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          {/* Left – Product info */}
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="h-9 w-9 border shadow-sm">
+              <AvatarImage
+                src={product?.image || product?.Image || "/preview.png"}
+                alt={product?.Name}
+              />
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                {product?.Name?.charAt(0)?.toUpperCase() || "P"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold tracking-tight text-foreground">
+                {product?.Name || "Product"}
+              </h1>
+              {product?.SKU || product?.barcode ? (
+                <p className="truncate text-xs text-muted-foreground">
+                  {product.SKU || product.barcode}
+                </p>
+              ) : null}
+            </div>
+
+            {product?.status && (
+              <Badge
+                variant={
+                  product.status === "active" || product.status === "Active"
+                    ? "default"
+                    : "secondary"
+                }
+                className="hidden sm:inline-flex capitalize"
+              >
+                {product.status}
+              </Badge>
+            )}
+          </div>
+
+          {/* Right – Back button */}
+          <div className="flex items-center gap-2 shrink-0">
             <BackButton />
           </div>
         </div>
-      </nav>
-      {/* display single product here */}
-      <SingleProductpage
-        userInfo={userData.user}
-        businessInfo={userData.business}
-        Backdata={data.product}
-      />
+      </header>
+
+      {/* Page Content */}
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <SingleProductpage
+          userInfo={userData.user}
+          businessInfo={userData.business}
+          Backdata={product}
+        />
+      </main>
     </div>
   );
 }

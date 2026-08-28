@@ -2,8 +2,14 @@ import React from "react";
 import { fetchUser } from "../../../../../Functions/whoIsSalesPerson";
 import { redirect } from "next/navigation";
 import { Encrypt, Dencrypt } from "../../../../../Functions/Functions";
-import SingleCustomerpage from"./page";
+import SingleCustomerpage from "./page";
 import BackButton from "@/app/Components/BackBotton";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card } from "@/components/ui/card";
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -82,41 +88,90 @@ export default async function layout({ params }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
         access: `${Encrypt(userData?.user?._id)}`,
-        sessionKey: `Bearer ${userData.SessionId}`
+        sessionKey: `Bearer ${userData.SessionId}`,
       },
       next: { revalidate: 60 },
     });
+
     if (res.ok) {
       data = await res.json();
+    } else {
+      throw new Error("Failed to fetch customer");
     }
   } catch (err) {
-    return(
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500 text-lg">Failed to load customer data. Please try again later.</p>
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center p-6">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Unable to load customer</AlertTitle>
+          <AlertDescription>
+            Failed to load customer data. Please try again later or contact
+            support if the issue persists.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
-  return (
-    <div className="">
-     <nav className="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200 shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-            {/* Left: Username */}
-            <h1 className="text-lg font-semibold tracking-tight text-slate-900">
-            {data.result.Username}
-            </h1>
 
-            {/* Right: Back button */}
-            <div className="flex items-center">
-            <BackButton />
+  const customer = data?.result;
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          {/* Left side – Customer info */}
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="h-9 w-9 border shadow-sm">
+              <AvatarImage
+                src={customer?.image || customer?.avatar}
+                alt={customer?.Username}
+              />
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                {customer?.Username?.charAt(0)?.toUpperCase() || "C"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold tracking-tight text-foreground">
+                {customer?.Username || "Customer"}
+              </h1>
+              {customer?.CompanyName && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {customer.CompanyName}
+                </p>
+              )}
             </div>
+
+            {customer?.status && (
+              <Badge
+                variant={
+                  customer.status === "active" || customer.status === "Active"
+                    ? "default"
+                    : "secondary"
+                }
+                className="hidden sm:inline-flex capitalize"
+              >
+                {customer.status}
+              </Badge>
+            )}
+          </div>
+
+          {/* Right side – Back button */}
+          <div className="flex items-center gap-2 shrink-0">
+            <BackButton />
+          </div>
         </div>
-        </nav>
-      <SingleCustomerpage
-        userInfo={userData}
-        data={data}
-        cust={data.result}
-        salesPerson={[]}
-      />
+      </header>
+
+      {/* Page Content */}
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <SingleCustomerpage
+          userInfo={userData}
+          data={data}
+          cust={customer}
+          salesPerson={[]}
+        />
+      </main>
     </div>
   );
 }
