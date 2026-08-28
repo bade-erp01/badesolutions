@@ -519,8 +519,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
-      <div className="max-w-6xl mx-auto px-3 py-4 sm:px-6 sm:py-8 bg-white shadow-2xl text-xs m-2 sm:m-6 border border-border">
-        
+      <div className="max-w-6xl mx-auto px-3 py-4 sm:px-6 sm:py-8 bg-white shadow-2xl text-xs m-2 sm:m-6 border border-border overflow-x-hidden">
         {/* Status + Date */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           <Badge
@@ -751,26 +750,29 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
         {/* Add Product */}
         {canEdit && (
-          <div className="mb-6 sm:mb-8 space-y-4">
+          <div className="mb-6 sm:mb-8 space-y-4 w-full min-w-0 overflow-hidden">
             {/* Mobile */}
-            <div className="block md:hidden space-y-2">
+            <div className="block md:hidden space-y-2 w-full min-w-0">
               <Label>Select {products.length} Products</Label>
               <Select
                 onValueChange={(value) => {
                   if (value) handleProductSelection(value);
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full max-w-full min-w-0">
                   <SelectValue placeholder="Choose..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-[var(--radix-select-trigger-width)] max-w-[calc(100vw-2rem)]">
                   {products.map((product) => (
                     <SelectItem
                       key={product.item._id}
                       value={product.item.ACDcode || product.item.ADCcode}
+                      className="max-w-full"
                     >
-                      {product.item.Name} [Case: {product.Case} Pcs:{" "}
-                      {product.pcs}]
+                      <span className="block truncate max-w-[min(100%,280px)]">
+                        {product.item.Name} [Case: {product.Case} Pcs:{" "}
+                        {product.pcs}]
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -785,7 +787,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                 list="productsList"
                 placeholder="Type to search products..."
                 defaultValue={inputValue}
-                className="max-w-xl"
+                className="max-w-xl w-full"
                 onBlur={(e) => {
                   const trimmedValue = e.target.value.trim();
                   setInputValue(trimmedValue);
