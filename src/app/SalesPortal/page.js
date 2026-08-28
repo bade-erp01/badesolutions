@@ -85,9 +85,7 @@ export default function SalesPortalLanding() {
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardContent className="p-10">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                  📋
-                </div>
+                
                 <h3 className="text-2xl font-semibold mb-3">Lead & Pipeline Management</h3>
                 <p className="text-slate-600">
                   Track every lead, manage your sales pipeline, and ensure no opportunity slips through.
@@ -97,9 +95,7 @@ export default function SalesPortalLanding() {
 
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardContent className="p-10">
-                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                  📊
-                </div>
+               
                 <h3 className="text-2xl font-semibold mb-3">Real-time Activity Tracking</h3>
                 <p className="text-slate-600">
                   Monitor calls, meetings, follow-ups, and field activities of your sales reps live.
@@ -109,9 +105,7 @@ export default function SalesPortalLanding() {
 
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardContent className="p-10">
-                <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6">
-                  🎯
-                </div>
+             
                 <h3 className="text-2xl font-semibold mb-3">Performance Analytics</h3>
                 <p className="text-slate-600">
                   Deep insights into individual and team performance with clear KPIs and leaderboards.

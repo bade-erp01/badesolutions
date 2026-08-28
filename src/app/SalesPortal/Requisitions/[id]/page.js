@@ -22,6 +22,22 @@ import {
 import { useRouter } from "next/navigation";
 import { Trash2, Printer, ShoppingCart } from "lucide-react";
 
+import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +64,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 export default function DraftInvoicePage({ Business, bill, products, user }) {
   const [inputValue, setInputValue] = useState("");
   const router = useRouter();
+  const [productOpen, setProductOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
 
   const checkExpiryDate = (createdAt) => {
     try {
@@ -301,6 +320,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
   const handleProductSelection = async (productId) => {
     try {
+      setIsAddingProduct(true);
       plsWait("Adding product...");
       const cleanedProducts = await products.find((product) => {
         return (
@@ -336,6 +356,8 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       ErrorMessage(error.message);
       setInputValue("");
       router.refresh();
+    } finally {
+    setIsAddingProduct(false);
     }
   };
 
@@ -606,9 +628,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
             {isDraft && (
               <Button
                 variant="secondary"
-                onClick={() =>
-                  generatePdf(Business, Singlebill.customer, bill)
-                }
+                onClick={() => generatePdf(Business, Singlebill.customer, bill)}
                 className="w-full sm:w-auto"
               >
                 <Printer className="mr-2 h-4 w-4" />
@@ -752,7 +772,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
         {canEdit && (
           <div className="mb-6 sm:mb-8 space-y-4 w-full min-w-0 overflow-hidden">
             {/* Mobile */}
-            <div className="block md:hidden space-y-2 w-full min-w-0">
+            {/* <div className="block md:hidden space-y-2 w-full min-w-0">
               <Label>Select {products.length} Products</Label>
               <Select
                 onValueChange={(value) => {
@@ -769,7 +789,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                       value={product.item.ACDcode || product.item.ADCcode}
                       className="max-w-full"
                     >
-                      <span className="block truncate max-w-[min(100%,280px)]">
+                      <span className="block max-w-[min(100%,280px)]">
                         {product.item.Name} [Case: {product.Case} Pcs:{" "}
                         {product.pcs}]
                       </span>
@@ -777,7 +797,77 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
+            {/* Add Product — Combobox */}
+            {canEdit && (
+              <div className="block md:hidden space-y-2 w-full min-w-0">
+                <Label>Search {products?.length || 0} Products</Label>
+
+                <Popover open={productOpen} onOpenChange={setProductOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={productOpen}
+                      className="w-full justify-between max-w-full min-w-0"
+                      disabled={isAddingProduct}
+                    >
+                      <span className="truncate">
+                        {selectedProduct
+                          ? `${selectedProduct.item?.Name} [Case: ${selectedProduct.Case} Pcs: ${selectedProduct.pcs}]`
+                          : "Search and select product..."}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    className="w-[var(--radix-popover-trigger-width)] max-w-[calc(100vw-2rem)] p-0"
+                    align="start"
+                  >
+                    <Command>
+                      <CommandInput placeholder="Search product..." />
+                      <CommandList>
+                        <CommandEmpty>No products found.</CommandEmpty>
+                        <CommandGroup>
+                          {products?.map((product) => {
+                            const code =
+                              product.item?.ACDcode ||
+                              product.item?.ADCcode ||
+                              "";
+                            return (
+                              <CommandItem
+                                key={product.item?._id || code}
+                                value={`${product.item?.Name || ""} ${code}`}
+                                onSelect={() => {
+                                  setSelectedProduct(product);
+                                  setProductOpen(false);
+                                  if (code) handleProductSelection(code);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4 shrink-0",
+                                    selectedProduct?.item?._id ===
+                                      product.item?._id
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                                <span className="truncate">
+                                  {product.item?.Name || "Unnamed"} [Case:{" "}
+                                  {product.Case} Pcs: {product.pcs}]
+                                </span>
+                              </CommandItem>
+                            );
+                          })}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
 
             {/* Desktop */}
             <div className="hidden md:block space-y-2">
@@ -804,8 +894,8 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                     key={product.item._id}
                     value={product.item.ACDcode || product.item.ADCcode}
                   >
-                    {product.item.Name} [Case: {product.Case} Pcs:{" "}
-                    {product.pcs}]
+                    {product.item.Name} [Case: {product.Case} Pcs: {product.pcs}
+                    ]
                   </option>
                 ))}
               </datalist>
