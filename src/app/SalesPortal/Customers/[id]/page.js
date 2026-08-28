@@ -550,6 +550,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               </span>
             )}
 
+            {/* use geo cordinate to only show this button when the user is in customer locatio */}
           <MyComponent cust={cust} userInfo={userInfo} />
 
           <span
@@ -1443,7 +1444,8 @@ export function MyComponent({ cust, userInfo }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(userInfo.user.tenantId)}`,
           access: `${Encrypt(userInfo.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
+          sessionKey: `Bearer ${userInfo.SessionId}`,
+          // "idempotency-key": `STOCK-CARD-${cust._id}`
         },
         body: JSON.stringify({ leadId:Encrypt(cust._id)}),
       });
@@ -1455,9 +1457,9 @@ export function MyComponent({ cust, userInfo }) {
       const data = await response.json();
 
       SuccessToast("Redirecting!");
-      router.push(`/SalesPortal/Reports/${Encrypt(data.invoiceId)}`);
+      router.push(`/SalesPortal/Reports/${Encrypt(data.data)}`);
     } catch (error) {
-      ErrorToast("Error creating new template for stock card");
+      ErrorMessage("Error creating new template for stock card");
       router.refresh()
     }
   };

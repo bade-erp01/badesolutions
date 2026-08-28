@@ -5,6 +5,10 @@ import { Encrypt, Dencrypt } from "../../../../../Functions/Functions";
 import DraftInvoicePage from "./page";
 import BackButton from "@/app/Components/BackBotton";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 export const metadata = {
   title: "B.A.D.E ERP Platform",
   description:
@@ -61,6 +65,7 @@ export default async function layout({ params }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const SessionId = Dencrypt(userData?.SessionId);
   const Params = await params;
+
   // Redirect if either user OR business is missing
   if (
     !userData?.user ||
@@ -72,46 +77,99 @@ export default async function layout({ params }) {
     redirect("/SalesPortal/Login");
   }
 
-  let data
+  let data;
 
   try {
-    const res = await fetch(`${baseUrl}/api/Sales_Portal/stock/position/${Params.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${userData.SessionId}`
+    const res = await fetch(
+      `${baseUrl}/api/Sales_Portal/stock/position/${Params.id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+          access: `${Encrypt(userData.user._id)}`,
+          sessionKey: `Bearer ${userData.SessionId}`,
+        },
+        next: { revalidate: 60 },
       },
-      next: { revalidate: 60 },
-    });
+    );
 
-     data = await res.json();
-    
+    data = await res.json();
+
     if (!res.ok) {
-        throw new Error( "Failed to fetch data");
+      throw new Error("Failed to fetch data");
     }
   } catch (err) {
-    return(
-        <p>{err.message}</p>
-    )
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center p-6">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Unable to load stock position</AlertTitle>
+          <AlertDescription>
+            {err.message ||
+              "Failed to load stock data. Please try again later."}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
-  return (
-    <div className="">
-      <nav className="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200 shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-          {/* Left: Username */}
-          <h1 className="text-lg font-semibold tracking-tight text-slate-900">
-            {`${data.newStock.Ref.toUpperCase()}`}
-          </h1>
 
-          {/* Right: Back button */}
-          <div className="flex items-center">
+  const stock = data?.newStock;
+  const isPending = stock?.status?.toLowerCase() === "pending";
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          {/* Left – Stock ref info */}
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="h-9 w-9 border shadow-sm">
+              <AvatarImage
+                src={userData.business?.companyLogo}
+                alt={userData.business?.companyName}
+              />
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                {stock?.Ref?.charAt(0)?.toUpperCase() || "S"}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold tracking-tight text-foreground">
+                {stock?.Ref?.toUpperCase()}
+              </h1>
+              {stock?.CustomerId?.Username && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {stock.CustomerId.Username}
+                </p>
+              )}
+            </div>
+
+            {stock?.status && (
+              <Badge
+                variant={isPending ? "destructive" : "default"}
+                className="hidden sm:inline-flex capitalize"
+              >
+                {stock.status}
+              </Badge>
+            )}
+          </div>
+
+          {/* Right – Back button */}
+          <div className="flex items-center gap-2 shrink-0">
             <BackButton />
           </div>
         </div>
-      </nav>
-       <DraftInvoicePage user={userData.user} customer={data.newStock.CustomerId} bill={data.newStock} Business={userData.business} />
+      </header>
+
+      {/* Page Content */}
+      <main className="mx-auto max-w-7xl">
+        <DraftInvoicePage
+          user={userData.user}
+          customer={data.newStock.CustomerId}
+          bill={data.newStock}
+          Business={userData.business}
+        />
+      </main>
     </div>
   );
 }

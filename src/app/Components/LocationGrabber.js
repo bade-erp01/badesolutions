@@ -43,7 +43,7 @@ const GeoUpdater = ({ userData, baseUrl }) => {
     };
 
     // Run immediately on mount
-    // updateLocation();
+    updateLocation();
 
     // Run every 5 minutes after the initial call
     const interval = setInterval(updateLocation, 5 * 60 * 1000);

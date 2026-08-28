@@ -44,15 +44,28 @@ import Image from "next/image";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
 import {
-  PresentationChartLineIcon,
-  UserGroupIcon,
-  MapIcon,
-  CubeIcon,
-  UserPlusIcon,
-  BuildingStorefrontIcon,
-  QueueListIcon,
-  Square3Stack3DIcon,
-} from "@heroicons/react/24/outline";
+  LayoutDashboard,
+  Package,
+  FileBarChart2,
+  Users,
+  Map,
+  ClipboardList,
+  Warehouse,
+  X,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import "animate.css";
 import {Badge} from "@/components/ui/badge";
 import {Skeleton} from "@/components/ui/skeleton";
@@ -65,15 +78,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function DashboardLayout({ userData, baseUrl }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [searchTerm] = useState("");
   const navtitle = "Dashboard";
-
-  const toggleSideNav = () => setIsOpen((prev) => !prev);
 
   const languages = useMemo(() => ["es", "en", "de", "fr"], []);
 
@@ -123,126 +132,158 @@ export default function DashboardLayout({ userData, baseUrl }) {
     };
   }, [languages]);
 
+  const navItems = [
+    {
+      href: "/SalesPortal/Dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      show: userData.user.c_levelDash,
+      active: true,
+    },
+    {
+      href: "/SalesPortal/Products",
+      label: "Products",
+      icon: Package,
+      show: true,
+      active: false,
+    },
+    {
+      href: "/SalesPortal/Reports",
+      label: "Product Report",
+      icon: FileBarChart2,
+      show: true,
+      active: false,
+    },
+    {
+      href: "/SalesPortal/Customers",
+      label: "My customers",
+      icon: Users,
+      show: true,
+      active: false,
+    },
+    {
+      href: "/SalesPortal/Route",
+      label: "My Route",
+      icon: Map,
+      show: true,
+      active: false,
+    },
+    {
+      href: "/SalesPortal/Requisitions",
+      label: "Requisitions",
+      icon: ClipboardList,
+      show: true,
+      active: false,
+    },
+    {
+      href: "/SalesPortal/Inventory",
+      label: "Inventory",
+      icon: Warehouse,
+      show: !!userData.user.workLocation,
+      active: false,
+    },
+  ];
+
+  const SidebarContent = () => (
+    <div className="flex h-full flex-col">
+      <div className="px-1 pb-4">
+        <h2 className="text-sm font-semibold text-white/90 tracking-tight">
+          Menu
+        </h2>
+      </div>
+
+      <Separator className="bg-white/10 mb-4" />
+
+      <ScrollArea className="flex-1 pr-2">
+        <nav className="space-y-1">
+          {navItems
+            .filter((item) => item.show)
+            .map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                  item.active
+                    ? "bg-white/15 text-white font-medium"
+                    : "text-white/80 hover:bg-white/10 hover:text-white",
+                )}
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span>{item.label}</span>
+              </Link>
+            ))}
+        </nav>
+      </ScrollArea>
+
+      {/* User footer */}
+      <div className="mt-auto pt-6 space-y-3">
+        <div className="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5">
+          <Avatar className="h-9 w-9 border border-white/20">
+            <AvatarImage
+              src={userData?.user?.image || "/person.png"}
+              alt="User"
+            />
+            <AvatarFallback className="bg-white/20 text-white text-xs">
+              {userData?.user?.firstName?.[0]}
+              {userData?.user?.lastName?.[0]}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-white">
+              {userData?.user?.firstName} {userData?.user?.lastName}
+            </p>
+            <p className="text-xs text-white/60">My Account</p>
+          </div>
+        </div>
+
+        {userData?.Notification?.length > 0 && (
+          <UserNotification user={userData} />
+        )}
+
+        <Logout />
+      </div>
+    </div>
+  );
+
   return (
     <div className="relative flex flex-col min-h-[90dvh]">
-      {/* Nav gets toggle + search setter */}
       <Nav2
         navtitle={"Dashboard"}
-        onToggleSideNav={toggleSideNav}
+        onToggleSideNav={() => setOpen(true)}
         onSearchChange={searchTerm}
         userData={userData}
       />
 
-      {/* Side nav */}
-      {isOpen && (
-        <aside className="fixed top-0 left-0 w-72 h-full bg-[#1e2939] text-white px-4 py-4 z-30 flex flex-col shadow-lg animate__animated animate__slideInLeft">
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-sm font-bold">Menu</h2>
-          </div>
-          <hr className="border-gray-600 mb-4" />
-
-          {/* Navigation links bg-gray-200/50*/}
-          <nav className="w-full space-y-2">
-            {userData.user.c_levelDash && (
-              <Link
-                href={`#`}
-                className={
-                  "flex items-center gap-3 p-3 rounded-md transition bg-gray-200/50"
-                }
+      {/* Mobile Sidebar (Sheet) */}
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="left"
+          className="w-72 border-r border-white/10 bg-zinc-950/95 p-0 text-white backdrop-blur-xl [&>button]:hidden"
+        >
+          <div className="flex items-center justify-between px-5 py-4">
+            <SheetHeader className="p-0">
+              <SheetTitle className="text-base font-semibold text-white">
+                Navigation
+              </SheetTitle>
+            </SheetHeader>
+            <SheetClose asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/10"
               >
-                <PresentationChartLineIcon class="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Dashboard</span>
-              </Link>
-            )}
-
-            <Link
-              href="/SalesPortal/Products"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
-                 ${navtitle === "Products" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <CubeIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Products</span>
-            </Link>
-
-            <Link
-              href="/SalesPortal/Reports"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
-                 ${navtitle === "Reports" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <Square3Stack3DIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Product Report</span>
-            </Link>
-
-            <Link
-              href="/SalesPortal/Customers"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
-                 ${navtitle === "Customers" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <UserGroupIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">My customers</span>
-            </Link>
-
-            <Link
-              href="/SalesPortal/Route"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
-                 ${navtitle === "Route" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <MapIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">My Route</span>
-            </Link>
-
-            <Link
-              href="/SalesPortal/Requisitions"
-              className={`flex items-center gap-3 p-3 rounded-md transition 
-                 ${navtitle === "Requisitions" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-            >
-              <QueueListIcon className="h-6 w-6 text-gray-100" />
-              <span className="text-xs">Requisitions</span>
-            </Link>
-
-            {userData.user.workLocation && (
-              <Link
-                href="/SalesPortal/Inventory"
-                className={`flex items-center gap-3 p-3 rounded-md transition 
-                            ${navtitle === "Inventory" ? "bg-gray-200/50" : "hover:bg-gray-700"}`}
-              >
-                <BuildingStorefrontIcon className="h-6 w-6 text-gray-100" />
-                <span className="text-xs">Inventory</span>
-              </Link>
-            )}
-          </nav>
-
-          {/* Logout pinned at bottom */}
-          <div className="mt-auto pt-6">
-            <button
-              className="flex items-center gap-3 px-4 py-2 w-full rounded-md transition-colors bg-gray-200 hover:bg-gray-300"
-              aria-label="User Profile"
-            >
-              <Image
-                src={userData?.user?.image || "/person.png"}
-                alt="User avatar"
-                width={28}
-                height={28}
-                className="rounded-full border border-black object-cover"
-              />
-              <div className="flex flex-col items-start">
-                <span className="text-sm text-black font-medium">
-                  {userData?.user?.firstName} {userData?.user?.lastName}
-                </span>
-                <span className="text-xs text-gray-500">My Account</span>
-              </div>
-            </button>
-            {userData?.Notification?.length > 0 && (
-              <>
-                <br />
-                <UserNotification user={userData} />
-              </>
-            )}
-            <br />
-            <Logout />
+                <X className="h-4 w-4" />
+              </Button>
+            </SheetClose>
           </div>
-        </aside>
-      )}
+          <Separator className="bg-white/10" />
+          <div className="h-[calc(100vh-73px)] px-4 py-4">
+            <SidebarContent />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Main content */}
       <main
@@ -252,29 +293,30 @@ export default function DashboardLayout({ userData, baseUrl }) {
           scrollbarColor: "#453d46ff transparent",
         }}
       >
-        <header className="mb-2">
-          <div className="flex items-center space-x-2">
-            <Image
-              src={
-                userData.business.companyLogo ||
-                userData.user.image ||
-                "/person.png"
-              }
-              className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] border-2 rounded-full object-cover "
-              // loading="lazy"
-              priority={true}
-              quality={100}
-              width={25}
-              height={25}
-              alt="user image"
-            />
-            <h2 className="text-xl font-bold text-gray-900">
-              {getLocalizedGreeting(userData.user.firstName)}
-            </h2>
+        <header className="mb-4">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8 border-2 drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">
+              <AvatarImage
+                src={
+                  userData.business.companyLogo ||
+                  userData.user.image ||
+                  "/person.png"
+                }
+                alt="user image"
+              />
+              <AvatarFallback>
+                {userData.user.firstName?.[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-xl font-bold text-foreground">
+                {getLocalizedGreeting(userData.user.firstName)}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
+              </p>
+            </div>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
-            {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
-          </p>
         </header>
         <MainDash userData={userData} baseUrl={baseUrl} />
       </main>
@@ -566,7 +608,7 @@ export function MainDash({ userData, baseUrl }) {
                   </p>
                 </div>
                 <div className="rounded-xl bg-sky-50 p-2.5 group-hover:bg-sky-100 transition-colors">
-                  <MapIcon className="h-5 w-5 text-sky-600" />
+                  <Map className="h-5 w-5 text-sky-600" />
                 </div>
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
