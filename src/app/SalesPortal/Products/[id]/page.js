@@ -546,7 +546,7 @@ export function CommentForm({ userData, product }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
             access: `${Encrypt(userData._id)}`,
-            sessionKey: `Bearer ${userData.SessionId}`
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
           },
         },
       );
