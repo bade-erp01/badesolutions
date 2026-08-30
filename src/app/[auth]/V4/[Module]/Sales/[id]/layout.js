@@ -96,7 +96,7 @@ async function StoreLayoutContent({ params }) {
   } catch (err) {
     return (
       <div className="">
-        Failed to load. Please try again later.
+        Failed to load. Please try again later {err.message}.
       </div>
     );
   }
