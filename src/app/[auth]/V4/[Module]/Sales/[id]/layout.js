@@ -66,7 +66,7 @@ async function StoreLayoutContent({ params }) {
   const userInfo = await fetchUser();
   const Params = await params;
   let Inv = [],
-    cust = [];
+    cust = [],
     Inventory = [];
 
   const crmApp = userInfo.user.Apps.find((app) => app.Name === "CRM");
@@ -96,7 +96,7 @@ async function StoreLayoutContent({ params }) {
   } catch (err) {
     return (
       <div className="">
-        Failed to load. Please try again later {err.message}.
+        Failed to load. Please try again later.
       </div>
     );
   }

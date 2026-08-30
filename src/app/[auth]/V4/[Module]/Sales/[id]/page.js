@@ -1103,7 +1103,7 @@ export default function InvoicePage({
                     />
                   </td>
                  <td className="px-4 py-2 text-center text-xs">
-                    {bill.status === "Order" ? (
+                    {Singlebill.billStatus === "Requisition" ? (
                       // Inventory column
                       <Badge variant="outline">
                         {getInventoryValue(bill.storeProductId)}
