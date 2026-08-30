@@ -67,6 +67,7 @@ async function StoreLayoutContent({ params }) {
   const Params = await params;
   let Inv = [],
     cust = [];
+    Inventory = [];
 
   const crmApp = userInfo.user.Apps.find((app) => app.Name === "CRM");
 
@@ -91,6 +92,7 @@ async function StoreLayoutContent({ params }) {
 
     Inv = data.Inv || [];
     cust = data.cust || [];
+    Inventory = data.products || []
   } catch (err) {
     return (
       <div className="">
@@ -171,6 +173,7 @@ async function StoreLayoutContent({ params }) {
           userInfo={userInfo}
           SinglebillItem={Inv}
           customerList={cust}
+          Inventory={Inventory}
         />
       </main>
     </div>

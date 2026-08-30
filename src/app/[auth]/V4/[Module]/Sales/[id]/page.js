@@ -40,10 +40,12 @@ export default function InvoicePage({
   userInfo,
   SinglebillItem,
   customerList,
+  Inventory
 }) {
   const Router = useRouter();
   const path = useParams();
   const [cust] = useState(customerList);
+  const [InventoryItem] = useState(Inventory)
   const [Singlebill, setSinglebill] = useState(SinglebillItem);
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
 
@@ -588,7 +590,7 @@ export default function InvoicePage({
       title: "Security Check point",
       input: "password",
       inputLabel: "Enter Ops Code to proceed",
-      inputPlaceholder: "Input your security code 🔐",
+      inputPlaceholder: "Input your security code",
       showCancelButton: true,
       confirmButtonText: "Submit",
     });
@@ -773,6 +775,20 @@ export default function InvoicePage({
       Router.refresh();
     }
   };
+
+
+  // get current inventroy value for requisition orders
+  const getInventoryValue = (id) => {
+    try {
+      const product = InventoryItem.find((p) => p.storeId === id || p.storeId?.toString() === id?.toString())
+
+      if (!product) return "N/A"
+
+      return `C:${product.Case ?? 0} P:${product.pcs ?? 0}`
+    } catch (err) {
+      return "N/A"
+    }
+  }
 
   return (
     <>
@@ -1045,7 +1061,7 @@ export default function InvoicePage({
                   "#",
                   "Product",
                   "Photo",
-                  "Trace",
+                   Singlebill.billStatus === "Requistion" ? "Inventory" : "Trace",
                   "Code",
                   "Case",
                   "Pcs",
@@ -1086,22 +1102,30 @@ export default function InvoicePage({
                       className="rounded-md mx-auto"
                     />
                   </td>
-                  <td className="px-4 py-2 text-center text-xs">
-                    <Badge
-                      variant={
-                        bill.returnId === "WH/IN"
-                          ? "secondary"
+                 <td className="px-4 py-2 text-center text-xs">
+                    {bill.status === "Order" ? (
+                      // Inventory column
+                      <Badge variant="outline">
+                        {getInventoryValue(bill.storeProductId)}
+                      </Badge>
+                    ) : (
+                      // Trace column
+                      <Badge
+                        variant={
+                          bill.returnId === "WH/IN"
+                            ? "secondary"
+                            : bill.returnId === "WH/OUT"
+                              ? "default"
+                              : "outline"
+                        }
+                      >
+                        {bill.returnId === "WH/IN"
+                          ? "Returned"
                           : bill.returnId === "WH/OUT"
-                            ? "default"
-                            : "outline"
-                      }
-                    >
-                      {bill.returnId === "WH/IN"
-                        ? "Returned"
-                        : bill.returnId === "WH/OUT"
-                          ? "Issued Out"
-                          : "N/A"}
-                    </Badge>
+                            ? "Issued Out"
+                            : "N/A"}
+                      </Badge>
+                    )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {bill.item.ADCcode || bill.item.ACDcode}
