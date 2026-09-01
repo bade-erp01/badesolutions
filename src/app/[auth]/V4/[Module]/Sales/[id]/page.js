@@ -1061,7 +1061,7 @@ export default function InvoicePage({
                   "#",
                   "Product",
                   "Photo",
-                   Singlebill.billStatus === "Requistion" ? "Inventory" : "Trace",
+                   Singlebill.billStatus === "Requisition" ? "Inventory" : "Trace",
                   "Code",
                   "Case",
                   "Pcs",
