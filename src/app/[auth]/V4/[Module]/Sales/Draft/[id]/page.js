@@ -555,6 +555,19 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
     }
   };
 
+  // display inventory 
+   const getInventoryValue = (id) => {
+    try {
+      const product = productList.find((p) => p.storeId === id || p.storeId?.toString() === id?.toString())
+
+      if (!product) return "N/A"
+
+      return `C:${product.Case ?? 0} P:${product.pcs ?? 0}`
+    } catch (err) {
+      return "N/A"
+    }
+  }
+
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
       <div className="px-3 sm:px-6 py-6 sm:py-10 bg-card text-card-foreground shadow-sm text-xs border border-border rounded-lg">
@@ -721,6 +734,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                   "Product",
                   "Photo",
                   "Code",
+                  "Inventory",
                   "Case",
                   "PCS",
                   "Price",
@@ -770,6 +784,11 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {billItem.item.ACDcode || billItem.item.ADCcode}
+                  </td>
+                  <td className="px-4 py-2 text-center text-xs">
+                    <Badge variant="outline">
+                        {getInventoryValue(billItem.storeProductId)}
+                    </Badge>
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
                     {(Singlebill.means ?? "") !== "Ecomm" &&

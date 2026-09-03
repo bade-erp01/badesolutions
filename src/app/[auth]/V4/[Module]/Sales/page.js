@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
@@ -8,7 +8,6 @@ import { Encrypt } from "../../../../../../Functions/Mics";
 import { pricelistSetter, EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Paperclip, ShoppingCart } from "lucide-react";
-import Notch from "@/app/Components/Notch";
 import {
   Card,
   CardHeader,
@@ -37,65 +36,90 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
   const [searchRef, setSearchRef] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
   const [billList, setBillList] = useState([]);
-  const [totalInvoices, setTotalInvoices] = useState(0);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // Track whether the user has already clicked "Load More"
+  const hasLoadedMore = useRef(false);
+
   const { user } = useUser();
   const userData = user;
-
   const params = useParams();
   const itemsPerPage = 20;
 
-  const fetchBills = async (append = false, page = currentPage) => {
-    setIsLoading(true);
-    try {
-      const query = new URLSearchParams({
-        page: page.toString(),
-        itemsPerPage: itemsPerPage.toString(),
-        searchRef,
-        startDate,
-        endDate,
-      }).toString();
+  const fetchBills = useCallback(
+    async ({ cursor = null, append = false } = {}) => {
+      if (append) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+        hasLoadedMore.current = false; // reset when doing a fresh fetch
+      }
 
-      const response = await axios.get(`${baseUrl}/api/Invoice?${query}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        },
-      });
+      try {
+        const queryParams = new URLSearchParams({
+          limit: itemsPerPage.toString(),
+        });
 
-      const data = response.data;
+        if (cursor) queryParams.set("cursor", cursor);
+        if (searchRef) queryParams.set("searchRef", searchRef);
+        if (startDate) queryParams.set("startDate", startDate);
+        if (endDate) queryParams.set("endDate", endDate);
 
-      setBillList((prev) =>
-        append ? [...prev, ...(data.invoices || [])] : data.invoices || [],
-      );
-      setTotalPages(data.totalPages);
-      setTotalInvoices(data.totalInvoices);
-      setCurrentPage(data.currentPage);
-    } catch (error) {
-      // console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const response = await axios.get(
+          `${baseUrl}/api/Invoice?${queryParams.toString()}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              access: `${Encrypt(userData.user._id)}`,
+              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
+            },
+          }
+        );
 
+        const data = response.data;
+        const newInvoices = data.invoices || [];
+
+        setBillList((prev) =>
+          append ? [...prev, ...newInvoices] : newInvoices
+        );
+
+        setNextCursor(data.nextCursor || null);
+        setHasMore(Boolean(data.hasMore));
+
+        if (append) {
+          hasLoadedMore.current = true;
+        }
+      } catch (error) {
+        // console.error(error);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [baseUrl, userData, searchRef, startDate, endDate]
+  );
+
+  // Initial load + auto-refresh (only while user has NOT loaded more pages)
   useEffect(() => {
     let intervalId;
 
-    if (billList.length > 20) {
-      return;
-    }
-
     const startAutoRefresh = () => {
-      fetchBills(false);
+      // Always fetch the first page
+      fetchBills({ append: false });
+
       clearInterval(intervalId);
       intervalId = setInterval(() => {
-        fetchBills(false);
-      }, 120000);
+        // Only auto-refresh if the user hasn't clicked "Load More"
+        if (!hasLoadedMore.current) {
+          fetchBills({ append: false });
+        }
+      }, 60000);
     };
 
     const stopAutoRefresh = () => {
@@ -120,14 +144,15 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
       stopAutoRefresh();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [billList.length, searchRef, startDate, endDate]);
+  }, [fetchBills]);
 
   const handleLoadMore = () => {
-    if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchBills(true, nextPage);
-    }
+    if (!hasMore || !nextCursor || isLoadingMore) return;
+
+    fetchBills({
+      cursor: nextCursor,
+      append: true,
+    });
   };
 
   const getStatusBadge = (status) => {
@@ -250,7 +275,6 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
                       className="overflow-hidden border bg-card text-card-foreground shadow-sm dark:border-border"
                     >
                       <CardContent className="p-4 space-y-3">
-                        {/* Header: Ref + Status */}
                         <div className="flex items-start justify-between gap-2">
                           <Link
                             href={url}
@@ -265,7 +289,6 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
                           </span>
                         </div>
 
-                        {/* Customer & Date */}
                         <div className="space-y-1">
                           <p className="font-medium text-sm">{bill.customerName}</p>
                           <p className="text-xs text-muted-foreground">
@@ -275,7 +298,6 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
 
                         <Separator />
 
-                        {/* Details Grid */}
                         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                           <div>
                             <p className="text-xs text-muted-foreground">Store</p>
@@ -316,7 +338,6 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
                           </div>
                         </div>
 
-                        {/* Memo indicator */}
                         {bill.memoId && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground pt-1">
                             <Paperclip className="h-3.5 w-3.5" />
@@ -330,16 +351,16 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
               </div>
 
               {/* Load More Button */}
-              {currentPage < totalPages && (
+              {hasMore && (
                 <div className="flex justify-center mt-6">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleLoadMore}
-                    disabled={isLoading}
+                    disabled={isLoadingMore}
                     className="w-full sm:w-auto"
                   >
-                    {isLoading ? "Loading..." : "Load More"}
+                    {isLoadingMore ? "Loading..." : "Load More"}
                   </Button>
                 </div>
               )}
