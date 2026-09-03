@@ -9,7 +9,6 @@ export default function CustomerGrid({ customerList, moduleParams }) {
   const [selectedLetter, setSelectedLetter] = useState(null);
   const params = useParams();
 
-  console.log(params)
   // Sort customers alphabetically
   const sortedCustomers = [...customerList].sort((a, b) =>
     a.Username.localeCompare(b.Username),

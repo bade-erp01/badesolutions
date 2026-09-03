@@ -45,7 +45,7 @@ export default function SettingsPage({
   baseUrl,
 }) {
   const [activeTab, setActiveTab] = useState("general");
-  const [users] = useState(userList.data);
+  const [users] = useState(userList.data.filter((user) => user.isDev !== true));
   const [dashboardPrefs, setDashboardPrefs] = useState({
     compactMode: false,
     showProgressOnCards: true,
