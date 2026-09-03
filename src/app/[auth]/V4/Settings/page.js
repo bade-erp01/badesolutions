@@ -51,6 +51,7 @@ export default function SettingsPage({
     showProgressOnCards: true,
     enableAutoRefresh: true,
   });
+  
 
   const [notifications, setNotifications] = useState({
     email: true,
