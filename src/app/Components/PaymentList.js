@@ -82,6 +82,25 @@ export default function PaymentListPage({
     return account ? account.NAME || account.bankCode || id : id;
   };
 
+  function formatPrice(amount, currency = 'NGN', locale = 'en-US') {
+  if (amount === null || amount === undefined || amount === '') {
+    return '';
+  }
+
+  const num = typeof amount === 'string' ? parseFloat(amount) : Number(amount);
+
+  if (isNaN(num)) {
+    return '';
+  }
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+}
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "posted":
@@ -190,6 +209,7 @@ export default function PaymentListPage({
                 <TableHead>Posted by</TableHead>
                 <TableHead>Account</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -213,6 +233,19 @@ export default function PaymentListPage({
                     <TableCell>{payment.Accountant}</TableCell>
                     <TableCell>{getAccountName(payment.bankAccount)}</TableCell>
                     <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                    <TableCell>
+                      {payment.crAmount > 0 ? (
+                        <span className="font-bold">
+                          {formatPrice(payment.crAmount)}
+                        </span>
+                      ) : payment.drAmount > 0 ? (
+                        <span className="text-red-600 font-bold">
+                          {formatPrice(payment.drAmount)} 
+                        </span>
+                      ) : (
+                        formatPrice(0)
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
