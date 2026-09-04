@@ -475,7 +475,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
       if (response.ok) {
         SuccessToast(data.message || "Operation completed successfully!");
-        setSinglebill(data.updatedBill); //redirect to sales [id]
+        router.push(`/${params.auth}/V4/Sales/Sales/${Encrypt(bill._id)}`);
       } else {
         throw new Error(data.error || "An error occurred.");
       }
@@ -484,6 +484,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       router.refresh();
     } finally {
       isProcessing = false;
+      router.refresh();
     }
   };
 
