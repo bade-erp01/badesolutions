@@ -100,6 +100,7 @@ export default function Nav1({ page, user, business, IconArray }) {
     { href: "/why-bade", label: "Why Bade?" },
     { href: "/Pricing", label: "Pricing" },
     { href: "/Marketers", label: "Refer & Earn" },
+    { href: "/About_Us", label: "About Us" },
   ];
 
   return (
