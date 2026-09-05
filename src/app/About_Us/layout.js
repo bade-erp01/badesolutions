@@ -1,24 +1,65 @@
-import React from 'react'
-
 export const metadata = {
-  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  description: "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
-  keywords: ["Business Automation", "Enterprise Solutions", "B.A.D.E", "AI-powered Business", "Workflow Optimization", "Process Automation"],
-  author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow",
-  ogTitle: "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
-  ogDescription: "Streamline your business with AI-driven automation, real-time insights, and scalability",
-  ogImage: "/assets/bade.png",
-  ogUrl: "https://badesolutions.com.ng",
-  twitterCard: "favicon.ico",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription: "Automate and optimize your enterprise with cutting-edge business solutions",
-  twitterImage: "favicon.ico",
-  favicon: "favicon.ico",
+  title: "About Us | Business Automated Dynamic Enterprise [B.A.D.E]",
+  description:
+    "Learn about BADE Technologies — a forward-thinking tech company delivering intelligent, scalable, and user-friendly ERP solutions. Built on innovation, integrity, and impact.",
+  keywords: [
+    "About BADE",
+    "BADE Technologies",
+    "Business Automated Dynamic Enterprise",
+    "ERP Company",
+    "Enterprise Resource Planning",
+    "Business Automation Company",
+    "About Us",
+  ],
+  authors: [{ name: "Business Automated Dynamic Enterprise" }],
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  metadataBase: new URL("https://badesolutions.com.ng"),
+  alternates: {
+    canonical: "/about",
+  },
+
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://badesolutions.com.ng/about",
+    siteName: "B.A.D.E Technologies",
+    title: "About Us | BADE Technologies",
+    description:
+      "Discover who we are, what we do, and why businesses choose BADE for intelligent ERP solutions that drive growth and efficiency.",
+    images: [
+      {
+        url: "/assets/bade.png",
+        width: 1200,
+        height: 630,
+        alt: "About BADE Technologies",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us | BADE Technologies",
+    description:
+      "Learn about BADE — delivering intelligent, scalable ERP solutions built on innovation, integrity, and impact.",
+    images: ["/assets/bade.png"],
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
-export default function layout({children}) {
-  return (
-    <>{children}</>
-  )
+export default function AboutPage({children}) {
+  return (<>{children}</>);
 }
