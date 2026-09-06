@@ -33,6 +33,10 @@ import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/components/UserProvider";
 
 export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
+  const [searchRef, setSearchRef] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [billList, setBillList] = useState([]);
   const [nextCursor, setNextCursor] = useState(null);
   const [hasMore, setHasMore] = useState(false);
@@ -62,6 +66,9 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         });
 
         if (cursor) queryParams.set("cursor", cursor);
+        if (searchRef) queryParams.set("searchRef", searchRef);
+        if (startDate) queryParams.set("startDate", startDate);
+        if (endDate) queryParams.set("endDate", endDate);
 
         const response = await axios.get(
           `${baseUrl}/api/Invoice?${queryParams.toString()}`,
@@ -95,10 +102,10 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         setIsLoadingMore(false);
       }
     },
-    [baseUrl, userData]
+    [baseUrl, userData, searchRef, startDate, endDate]
   );
 
-  // Initial load + auto-refresh (only while user has NOT loaded more pages and data <= 20)
+  // Initial load + auto-refresh (only while user has NOT loaded more pages)
   useEffect(() => {
     let intervalId;
 
@@ -108,8 +115,8 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
 
       clearInterval(intervalId);
       intervalId = setInterval(() => {
-        // Only auto-refresh if the user hasn't clicked "Load More" and bill list length <= 20
-        if (!hasLoadedMore.current && billList.length <= itemsPerPage) {
+        // Only auto-refresh if the user hasn't clicked "Load More"
+        if (!hasLoadedMore.current) {
           fetchBills({ append: false });
         }
       }, 60000);
@@ -137,7 +144,7 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
       stopAutoRefresh();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [fetchBills, billList.length, itemsPerPage]);
+  }, [fetchBills]);
 
   const handleLoadMore = () => {
     if (!hasMore || !nextCursor || isLoadingMore) return;
@@ -170,9 +177,7 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle className="text-lg sm:text-xl">Sales Management</CardTitle>
           <Badge variant="secondary" className="text-xs w-fit">
-            {billList.length <= itemsPerPage && !hasLoadedMore.current
-              ? "Auto refresh is enabled"
-              : "Auto refresh is disabled"}
+            Auto refresh is enabled
           </Badge>
         </CardHeader>
 
