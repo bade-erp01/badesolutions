@@ -43,7 +43,8 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Track whether the user has already clicked "Load More"
+  // Once the user clicks "Load More", auto-refresh is permanently disabled
+  // until filters change (or you force a full reset).
   const hasLoadedMore = useRef(false);
 
   const { user } = useUser();
@@ -52,12 +53,14 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
   const itemsPerPage = 20;
 
   const fetchBills = useCallback(
-    async ({ cursor = null, append = false } = {}) => {
+    async ({ cursor = null, append = false, isAutoRefresh = false } = {}) => {
+      // Never auto-refresh after the user has loaded more pages
+      if (isAutoRefresh && hasLoadedMore.current) return;
+
       if (append) {
         setIsLoadingMore(true);
       } else {
         setIsLoading(true);
-        hasLoadedMore.current = false; // reset when doing a fresh fetch
       }
 
       try {
@@ -93,7 +96,7 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         setHasMore(Boolean(data.hasMore));
 
         if (append) {
-          hasLoadedMore.current = true;
+          hasLoadedMore.current = true; // ← stop auto-refresh from now on
         }
       } catch (error) {
         // console.error(error);
@@ -105,20 +108,22 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
     [baseUrl, userData, searchRef, startDate, endDate]
   );
 
-  // Initial load + auto-refresh (only while user has NOT loaded more pages)
+  // ────────────────────────────────────────────────
+  // Initial load + auto-refresh
+  // Auto-refresh is skipped as soon as the user has clicked "Load More"
+  // ────────────────────────────────────────────────
   useEffect(() => {
     let intervalId;
 
     const startAutoRefresh = () => {
-      // Always fetch the first page
-      fetchBills({ append: false });
+      // Only do the initial / visibility fetch if user has NOT loaded more
+      if (!hasLoadedMore.current) {
+        fetchBills({ append: false });
+      }
 
       clearInterval(intervalId);
       intervalId = setInterval(() => {
-        // Only auto-refresh if the user hasn't clicked "Load More"
-        if (!hasLoadedMore.current) {
-          fetchBills({ append: false });
-        }
+        fetchBills({ append: false, isAutoRefresh: true });
       }, 60000);
     };
 
@@ -145,6 +150,11 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [fetchBills]);
+
+  // When filters change → reset the "loaded more" flag so auto-refresh can start again
+  useEffect(() => {
+    hasLoadedMore.current = false;
+  }, [searchRef, startDate, endDate]);
 
   const handleLoadMore = () => {
     if (!hasMore || !nextCursor || isLoadingMore) return;
@@ -177,7 +187,9 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle className="text-lg sm:text-xl">Sales Management</CardTitle>
           <Badge variant="secondary" className="text-xs w-fit">
-            Auto refresh is enabled
+            {hasLoadedMore.current
+              ? "Auto refresh paused (Load More active)"
+              : "Auto refresh is enabled"}
           </Badge>
         </CardHeader>
 
