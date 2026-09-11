@@ -1121,7 +1121,6 @@ export function NearbyBusinessesMap() {
 
           setBusinesses(formatted);
         } catch (err) {
-          console.error(err);
           setError(err.message || "Something went wrong");
         } finally {
           setLoading(false);

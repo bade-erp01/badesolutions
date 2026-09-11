@@ -1,10 +1,8 @@
 "use client";
 import Plotly from "plotly.js-dist-min";
 import Swal from "sweetalert2";
-import { useParams, useSearchParams } from "next/navigation";
 import { MapPin } from "lucide-react";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import {
   Encrypt,
@@ -1869,82 +1867,144 @@ export function AssignLicenceButton({ id, url, userToken, bizToken,SessionId }) 
 }
 
 
-export  function LiveLocationMap({userData}) {
-  const [userInfo, setUserInfo] = useState(userData);
-  const [coords, setCoords] = useState({lat: userData.lat, lng: userData.long});
+export function LiveLocationMap({ userData, baseUrl }) {
+  const [coords, setCoords] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  const fetchLocation = async () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported");
-      return;
-    }
+  const intervalRef = useRef(null);
 
-    // get theusers location
-    const Response = await fetch(
-      `${EXPRESS_PRIVATE_URL}/api/user/${Encrypt(userData._id)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
-          access: `${Encrypt(userData._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-        },
+  const fetchLocationFromRedis = async () => {
+    try {
+      setError(null);
+
+      const res = await fetch(
+        `${baseUrl}/api/location/${Encrypt(userData.user._id)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${userData.SessionId}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch location");
       }
-    );
 
-    const request = await Response.json();
-    setUserInfo(Dencrypt(request.employee));
+      const data = await res.json();
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
+      // Expected response from Redis:
+      // { latitude: number, longitude: number, updatedAt: number } or null
+      if (data?.latitude && data?.longitude) {
         setCoords({
-          lat: userInfo.lat,
-          lng: userInfo.long,
+          lat: data.latitude,
+          lng: data.longitude,
         });
-
-      },
-      (error) => {
-        console.error(error);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
+        setLastUpdated(data.updatedAt || Date.now());
+      } else {
+        setCoords(null);
+        setError("No live location available");
       }
-    );
+    } catch (err) {
+      setError("Unable to load live location");
+      setCoords(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchLocation();
+    if (!userData || !baseUrl) return;
 
-    // const interval = setInterval(() => {
-    //   fetchLocation();
-    // }, 60000); // 1 minute
+    // Fetch immediately
+    fetchLocationFromRedis();
 
-    // return () => clearInterval(interval);
-  }, []);
+    // Auto refresh every 2 minutes
+    intervalRef.current = setInterval(() => {
+      fetchLocationFromRedis();
+    }, 2 * 60 * 1000);
 
-  if (!coords) {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [userData, baseUrl]);
+
+  // Loading state
+  if (loading) {
     return (
-      <div className="h-[500px] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="h-[500px] flex flex-col items-center justify-center gap-3 rounded-xl border">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Loading live location...</p>
+      </div>
+    );
+  }
+
+  // Error / No location
+  if (error || !coords) {
+    return (
+      <div className="h-[400px] flex flex-col items-center justify-center gap-4 rounded-xl border bg-muted/20 px-6 text-center">
+        <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center">
+          <AlertCircle className="h-7 w-7 text-muted-foreground" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-medium">Live location unavailable</p>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            {error || "This user has no recent location in Redis."}
+          </p>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={fetchLocationFromRedis}
+          className="gap-2"
+        >
+          <RefreshCcw className="h-4 w-4" />
+          Try again
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Location Details */}
-      <div className="rounded-xl border p-4 bg-background">
-        <div className="flex items-center gap-2 font-medium text-black">
-          <MapPin className="h-5 w-5" />
-          Current Location
+      {/* Header */}
+      <div className="rounded-xl border p-4 bg-card flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 font-medium">
+            <MapPin className="h-5 w-5 text-primary" />
+            Current Live Location
+          </div>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            Auto updates every 2 min
+            {lastUpdated && (
+              <> · Last updated: {new Date(lastUpdated).toLocaleTimeString()}</>
+            )}
+          </p>
         </div>
 
-          <p className="text-xs text-muted-foreground mt-2">
-            Auto Updates every 1min. Last fetched at: {new Date().toLocaleTimeString()}
-          </p>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={fetchLocationFromRedis}
+          className="h-9 w-9"
+        >
+          <RefreshCcw className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Coordinates badge */}
+      <div className="flex gap-2">
+        <Badge variant="secondary">
+          Lat: {coords.lat.toFixed(6)}
+        </Badge>
+        <Badge variant="secondary">
+          Lng: {coords.lng.toFixed(6)}
+        </Badge>
       </div>
 
       {/* Google Map */}
@@ -1955,19 +2015,13 @@ export  function LiveLocationMap({userData}) {
           height="500"
           loading="lazy"
           allowFullScreen
+          className="border-0"
           src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`}
         />
       </div>
     </div>
   );
 }
-
-
-import {
-  Navigation,
-  Building2,
-  RefreshCcw,
-} from "lucide-react";
 
 // Haversine formula to calculate distance in km
 function getDistance(lat1, lon1, lat2, lon2) {
