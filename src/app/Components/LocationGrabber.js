@@ -8,10 +8,14 @@ const GeoUpdater = ({ userData, baseUrl }) => {
   const retryCount = useRef(0);
   const retryTimeout = useRef(null);
   const intervalRef = useRef(null);
-  const hasPrompted = useRef(false); // prevent spamming the prompt
+  const hasPrompted = useRef(false);
 
   useEffect(() => {
     if (!userData || !baseUrl) return;
+    if (!navigator.geolocation) {
+      console.warn("Geolocation not supported");
+      return;
+    }
 
     let isMounted = true;
 
@@ -26,169 +30,129 @@ const GeoUpdater = ({ userData, baseUrl }) => {
       }
     };
 
-    const promptEnableLocation = () => {
+    const promptEnableLocation = (message) => {
       if (hasPrompted.current || !isMounted) return;
       hasPrompted.current = true;
 
       Swal.fire({
         icon: "warning",
-        title: "Location is turned off",
+        title: "Location Required",
         html: `
-          <p style="margin-bottom: 12px;">
-            We need access to your location to update your live position.
-          </p>
-          <p style="font-size: 14px; color: #666;">
-            Please enable location services in your browser or device settings, then click the button below.
+          <p style="margin-bottom: 10px;">${message}</p>
+          <p style="font-size: 13px; color: #666;">
+            Please turn on location services and allow access for this site.
           </p>
         `,
-        confirmButtonText: "Enable Location",
+        confirmButtonText: "Try Again",
         showCancelButton: true,
         cancelButtonText: "Not now",
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
-          // Reset so we can prompt again later if still denied
           hasPrompted.current = false;
-          // This will trigger the browser permission popup again
-          requestLocationPermission();
+          getAndSendLocation(); // try again
         }
       });
     };
 
-    const updateLocation = () => {
-      if (!navigator.geolocation) return;
+    const sendToServer = async (latitude, longitude) => {
+      try {
+        const res = await fetch(`${baseUrl}/api/update-location`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+            access: `${Encrypt(userData.user._id)}`,
+            sessionKey: `Bearer ${userData.SessionId}`,
+          },
+          body: JSON.stringify({ latitude, longitude }),
+        });
 
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+        }
+
+        // Success
+        retryCount.current = 0;
+        hasPrompted.current = false;
+        console.log("Location updated successfully");
+      } catch (err) {
+        console.error("Failed to send location:", err);
+
+        // Retry with exponential backoff
+        retryCount.current += 1;
+        const delay = Math.min(60000, 2000 * 2 ** retryCount.current);
+
+        retryTimeout.current = setTimeout(() => {
+          if (isMounted) getAndSendLocation();
+        }, delay);
+      }
+    };
+
+    const getAndSendLocation = () => {
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        (position) => {
           if (!isMounted) return;
 
           const { latitude, longitude } = position.coords;
+          console.log("Got location:", latitude, longitude);
 
-          try {
-            const res = await fetch(`${baseUrl}/api/update-location`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-                access: `${Encrypt(userData.user._id)}`,
-                sessionKey: `Bearer ${userData.SessionId}`,
-              },
-              body: JSON.stringify({ latitude, longitude }),
-            });
-
-            if (!res.ok) throw new Error("Server responded with error");
-
-            retryCount.current = 0;
-            hasPrompted.current = false; // reset prompt flag on success
-          } catch (err) {
-            retryCount.current += 1;
-            const delay = Math.min(60000, 2000 * 2 ** retryCount.current);
-
-            retryTimeout.current = setTimeout(() => {
-              if (isMounted) updateLocation();
-            }, delay);
-          }
+          sendToServer(latitude, longitude);
         },
         (error) => {
           if (!isMounted) return;
 
-          if (
-            error.code === error.PERMISSION_DENIED ||
-            error.code === error.POSITION_UNAVAILABLE
-          ) {
-            console.warn("Location is off or permission denied");
-            clearTimers();
-            promptEnableLocation();
+          console.error("Geolocation error:", error);
+
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              clearTimers();
+              promptEnableLocation(
+                "Location permission is denied. Please allow location access."
+              );
+              break;
+
+            case error.POSITION_UNAVAILABLE:
+              promptEnableLocation(
+                "Unable to detect your location. Please turn on location services."
+              );
+              break;
+
+            case error.TIMEOUT:
+              // Just retry on timeout
+              retryCount.current += 1;
+              const delay = Math.min(30000, 3000 * retryCount.current);
+              retryTimeout.current = setTimeout(() => {
+                if (isMounted) getAndSendLocation();
+              }, delay);
+              break;
+
+            default:
+              console.warn("Unknown geolocation error");
           }
         },
         {
           enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0,
+          timeout: 20000,
+          maximumAge: 30000, // accept a location up to 30s old
         }
       );
     };
 
     const startTracking = () => {
       clearTimers();
-      updateLocation();
-      intervalRef.current = setInterval(updateLocation, 2 * 60 * 1000);
+
+      // Run immediately
+      getAndSendLocation();
+
+      // Then every 2 minutes
+      intervalRef.current = setInterval(() => {
+        getAndSendLocation();
+      }, 2 * 60 * 1000);
     };
 
-    const stopTracking = () => {
-      clearTimers();
-    };
-
-    const requestLocationPermission = () => {
-      if (!navigator.geolocation) {
-        Swal.fire({
-          icon: "error",
-          title: "Geolocation not supported",
-          text: "Your browser does not support location services.",
-        });
-        return;
-      }
-
-      // This call will show the browser permission popup
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          if (isMounted) startTracking();
-        },
-        (error) => {
-          if (
-            error.code === error.PERMISSION_DENIED ||
-            error.code === error.POSITION_UNAVAILABLE
-          ) {
-            promptEnableLocation();
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0,
-        }
-      );
-    };
-
-    const checkPermissionAndStart = async () => {
-      // Fallback for browsers without Permissions API
-      if (!navigator.permissions) {
-        requestLocationPermission();
-        return;
-      }
-
-      try {
-        const result = await navigator.permissions.query({
-          name: "geolocation",
-        });
-
-        if (result.state === "granted") {
-          startTracking();
-        } else if (result.state === "prompt") {
-          requestLocationPermission();
-        } else {
-          // denied
-          promptEnableLocation();
-        }
-
-        // Listen for changes (user turns location on/off later)
-        result.onchange = () => {
-          if (!isMounted) return;
-
-          if (result.state === "granted") {
-            hasPrompted.current = false;
-            startTracking();
-          } else {
-            stopTracking();
-            promptEnableLocation();
-          }
-        };
-      } catch (err) {
-        requestLocationPermission();
-      }
-    };
-
-    checkPermissionAndStart();
+    // Start
+    startTracking();
 
     return () => {
       isMounted = false;
