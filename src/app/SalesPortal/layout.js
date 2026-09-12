@@ -2,6 +2,7 @@ import React from "react";
 import GeoUpdater from "@/app/Components/LocationGrabber";
 import { fetchUser } from "../../../Functions/whoIsSalesPerson";
 import {Dencrypt} from "../../../Functions/Functions";
+import LocationGuard from "@/app/Components/GpsTracker";
 
 // Prevent static prerendering (session data is only available at request time)
 export const dynamic = "force-dynamic";
@@ -9,10 +10,14 @@ export const dynamic = "force-dynamic";
 export default async function layout({ children }) {
   const userData = await fetchUser();
 
-  const hasValidSession = userData?.user?.SessionId === Dencrypt(userData.SessionId) && userData?.business;
+ const hasValidSession = Boolean(
+    userData?.user?.SessionId &&
+    userData?.business &&
+    userData.user.SessionId === Dencrypt(userData.SessionId)
+  );
 
   return (
-    <>
+    <LocationGuard>
       {hasValidSession && (
         <GeoUpdater
           userData={userData}
@@ -20,6 +25,6 @@ export default async function layout({ children }) {
         />
       )}
       {children}
-    </>
+    </LocationGuard>
   );
 }
