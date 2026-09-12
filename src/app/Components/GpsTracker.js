@@ -1,131 +1,205 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MapPin, RefreshCcw, Loader2, ShieldAlert } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function LocationGuard({ children }) {
   const [status, setStatus] = useState("checking"); // checking | granted | denied | unavailable
   const [isRequesting, setIsRequesting] = useState(false);
+  const pollRef = useRef(null);
 
-  const checkLocation = () => {
+  const checkLocation = (silent = false) => {
     if (!navigator.geolocation) {
       setStatus("unavailable");
       return;
     }
 
-    setIsRequesting(true);
+    if (!silent) setIsRequesting(true);
 
     navigator.geolocation.getCurrentPosition(
       () => {
         setStatus("granted");
         setIsRequesting(false);
-      },
-      (error) => {
-        setIsRequesting(false);
 
-        if (error.code === error.PERMISSION_DENIED) {
-          setStatus("denied");
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          setStatus("denied"); // treat as location off
-        } else {
-          setStatus("denied");
+        // Stop polling once granted
+        if (pollRef.current) {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
         }
+      },
+      () => {
+        setIsRequesting(false);
+        setStatus((prev) => (prev === "granted" ? "granted" : "denied"));
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
+        timeout: 12000,
         maximumAge: 0,
       }
     );
   };
 
   useEffect(() => {
+    // Initial check
     checkLocation();
 
-    // Optional: re-check when user comes back to the tab
+    // Auto-check every 5 seconds while blocked
+    pollRef.current = setInterval(() => {
+      checkLocation(true); // silent check (no loading spinner)
+    }, 5000);
+
+    // Also re-check when user returns to the tab
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
-        checkLocation();
+        checkLocation(true);
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
-  // Still checking
+  // Lock body scroll while blocked
+  useEffect(() => {
+    if (status === "granted") {
+      document.body.style.overflow = "";
+    } else {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [status]);
+
+  // ─── CHECKING ────────────────────────────────────────────────
   if (status === "checking") {
     return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Checking location access…</p>
-      </div>
+      <>
+        <div className="pointer-events-none select-none opacity-30 blur-[1px]">
+          {children}
+        </div>
+
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md">
+          <Card className="w-full max-w-sm mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
+            <CardContent className="flex flex-col items-center gap-4 pt-8 pb-8">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="text-sm text-zinc-400">
+                Checking location access…
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
-  // Location not available on this device/browser
+  // ─── NOT SUPPORTED ───────────────────────────────────────────
   if (status === "unavailable") {
     return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-5 bg-background px-6 text-center">
-        <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
-          <ShieldAlert className="h-8 w-8 text-destructive" />
+      <>
+        <div className="pointer-events-none select-none opacity-30 blur-[2px]">
+          {children}
         </div>
-        <div className="space-y-2 max-w-sm">
-          <h1 className="text-xl font-semibold">Location Not Supported</h1>
-          <p className="text-sm text-muted-foreground">
-            Your browser or device does not support location services. This app requires location access to work.
-          </p>
+
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-md">
+          <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
+            <CardHeader className="items-center text-center space-y-4 pb-2">
+              <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center">
+                <ShieldAlert className="h-8 w-8 text-red-500" />
+              </div>
+              <div className="space-y-2">
+                <CardTitle className="text-xl text-zinc-50">
+                  Location Not Supported
+                </CardTitle>
+                <CardDescription className="text-zinc-400">
+                  Your browser or device does not support location services.
+                  This application cannot be used without it.
+                </CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
         </div>
-      </div>
+      </>
     );
   }
 
-  // Location denied / turned off → BLOCK the app
+  // ─── LOCATION OFF / DENIED → FULL MODAL BLOCK ────────────────
   if (status === "denied") {
     return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-6 bg-background px-6 text-center">
-        <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
-          <MapPin className="h-10 w-10 text-amber-500" />
+      <>
+        <div className="pointer-events-none select-none opacity-40 blur-[2px]">
+          {children}
         </div>
 
-        <div className="space-y-3 max-w-md">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Location is Required
-          </h1>
-          <p className="text-muted-foreground leading-relaxed">
-            This application needs access to your device location to function.
-            Please turn on location services and allow permission for this site.
-          </p>
-        </div>
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-md">
+          <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <CardHeader className="items-center text-center space-y-4 pb-2">
+              <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <MapPin className="h-10 w-10 text-amber-500" />
+              </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-2">
-          <Button
-            onClick={checkLocation}
-            disabled={isRequesting}
-            className="gap-2 min-w-[160px]"
-          >
-            {isRequesting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Checking…
-              </>
-            ) : (
-              <>
-                <RefreshCcw className="h-4 w-4" />
-                Enable Location
-              </>
-            )}
-          </Button>
-        </div>
+              <div className="space-y-2">
+                <CardTitle className="text-2xl text-zinc-50">
+                  Location Required
+                </CardTitle>
+                <CardDescription className="text-zinc-400 leading-relaxed">
+                  You must turn on your device location and allow access to
+                  continue using this application.
+                  <br />
+                  <span className="text-zinc-500 text-xs mt-1 block">
+                    Checking automatically every few seconds…
+                  </span>
+                </CardDescription>
+              </div>
+            </CardHeader>
 
-        <p className="text-xs text-muted-foreground mt-4 max-w-sm">
-          Go to your browser / phone settings → Site settings → Location → Allow
-        </p>
-      </div>
+            <CardContent className="pt-2">
+              <Button
+                size="lg"
+                onClick={() => checkLocation(false)}
+                disabled={isRequesting}
+                className="w-full gap-2 bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
+              >
+                {isRequesting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Checking…
+                  </>
+                ) : (
+                  <>
+                    <RefreshCcw className="h-4 w-4" />
+                    Enable Location
+                  </>
+                )}
+              </Button>
+            </CardContent>
+
+            <CardFooter className="justify-center pb-6">
+              <p className="text-xs text-zinc-500 text-center">
+                Phone Settings → Location → Turn On → Allow for this browser
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
+      </>
     );
   }
 
-  // Location granted → show the app
+  // ─── GRANTED → APP UNLOCKED ──────────────────────────────────
   return children;
 }
