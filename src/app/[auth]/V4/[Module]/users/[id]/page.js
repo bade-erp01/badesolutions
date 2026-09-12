@@ -39,7 +39,6 @@ import {Badge} from "@/components/ui/badge";
 import { KeyRound } from "lucide-react";
 import { RefreshCcw } from "lucide-react";
 import { AlertCircle } from "lucide-react";
-import { MapPin } from "lucide-react";
 
 const formatNumberShort = (num) => {
   if (num >= 1_000_000_000) {
