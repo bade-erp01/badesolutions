@@ -17,6 +17,7 @@ export default function LocationGuard({ children }) {
   const [status, setStatus] = useState("checking"); // checking | granted | denied | unavailable
   const [isRequesting, setIsRequesting] = useState(false);
   const pollRef = useRef(null);
+  const failCount = useRef(0);
 
   const checkLocation = (silent = false) => {
     if (!navigator.geolocation) {
@@ -28,32 +29,44 @@ export default function LocationGuard({ children }) {
 
     navigator.geolocation.getCurrentPosition(
       () => {
+        failCount.current = 0;
         setStatus("granted");
         setIsRequesting(false);
       },
-      () => {
+      (error) => {
         setIsRequesting(false);
-        setStatus("denied"); // ← important: block again if location is turned off
+
+        // Only hard-block on real permission denial
+        if (error.code === error.PERMISSION_DENIED) {
+          setStatus("denied");
+          return;
+        }
+
+        // Timeout / unavailable → don't immediately block
+        failCount.current += 1;
+
+        // Only block after several consecutive hard failures
+        if (failCount.current >= 3) {
+          setStatus("denied");
+        }
+        // otherwise keep current status (stay granted if already granted)
       },
       {
-        enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 0,
+        enableHighAccuracy: false, // more reliable
+        timeout: 20000,
+        maximumAge: 60000, // accept a recent cached position
       }
     );
   };
 
   useEffect(() => {
-    // Initial check
     checkLocation();
 
-    // Keep polling forever (even after granted)
-    // so we detect when the user turns location OFF later
+    // Poll every 10s (less aggressive)
     pollRef.current = setInterval(() => {
-      checkLocation(true); // silent background check
-    }, 5000);
+      checkLocation(true);
+    }, 10000);
 
-    // Re-check when user returns to the tab
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
         checkLocation(true);
@@ -68,34 +81,24 @@ export default function LocationGuard({ children }) {
     };
   }, []);
 
-  // Lock body scroll while blocked
   useEffect(() => {
-    if (status === "granted") {
-      document.body.style.overflow = "";
-    } else {
-      document.body.style.overflow = "hidden";
-    }
-
+    document.body.style.overflow = status === "granted" ? "" : "hidden";
     return () => {
       document.body.style.overflow = "";
     };
   }, [status]);
 
-  // ─── CHECKING ────────────────────────────────────────────────
   if (status === "checking") {
     return (
       <>
         <div className="pointer-events-none select-none opacity-30 blur-[1px]">
           {children}
         </div>
-
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md">
           <Card className="w-full max-w-sm mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
             <CardContent className="flex flex-col items-center gap-4 pt-8 pb-8">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="text-sm text-zinc-400">
-                Checking location access…
-              </p>
+              <p className="text-sm text-zinc-400">Checking location access…</p>
             </CardContent>
           </Card>
         </div>
@@ -103,14 +106,12 @@ export default function LocationGuard({ children }) {
     );
   }
 
-  // ─── NOT SUPPORTED ───────────────────────────────────────────
   if (status === "unavailable") {
     return (
       <>
         <div className="pointer-events-none select-none opacity-30 blur-[2px]">
           {children}
         </div>
-
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-md">
           <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
             <CardHeader className="items-center text-center space-y-4 pb-2">
@@ -123,7 +124,6 @@ export default function LocationGuard({ children }) {
                 </CardTitle>
                 <CardDescription className="text-zinc-400">
                   Your browser or device does not support location services.
-                  This application cannot be used without it.
                 </CardDescription>
               </div>
             </CardHeader>
@@ -133,32 +133,25 @@ export default function LocationGuard({ children }) {
     );
   }
 
-  // ─── LOCATION OFF / DENIED → FULL MODAL BLOCK ────────────────
   if (status === "denied") {
     return (
       <>
         <div className="pointer-events-none select-none opacity-40 blur-[2px]">
           {children}
         </div>
-
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-md">
-          <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
             <CardHeader className="items-center text-center space-y-4 pb-2">
               <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
                 <MapPin className="h-10 w-10 text-amber-500" />
               </div>
-
               <div className="space-y-2">
                 <CardTitle className="text-2xl text-zinc-50">
                   Location Required
                 </CardTitle>
                 <CardDescription className="text-zinc-400 leading-relaxed">
-                  You must turn on your device location and allow access to
-                  continue using this application.
-                  <br />
-                  <span className="text-zinc-500 text-xs mt-1 block">
-                    Checking automatically every few seconds…
-                  </span>
+                  Please allow location access for this site and turn on device
+                  location.
                 </CardDescription>
               </div>
             </CardHeader>
@@ -186,7 +179,7 @@ export default function LocationGuard({ children }) {
 
             <CardFooter className="justify-center pb-6">
               <p className="text-xs text-zinc-500 text-center">
-                Phone Settings → Location → Turn On → Allow for this browser
+                Site settings → Location → Allow
               </p>
             </CardFooter>
           </Card>
@@ -195,6 +188,5 @@ export default function LocationGuard({ children }) {
     );
   }
 
-  // ─── GRANTED → APP UNLOCKED ──────────────────────────────────
   return children;
 }
