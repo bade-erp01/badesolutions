@@ -30,16 +30,10 @@ export default function LocationGuard({ children }) {
       () => {
         setStatus("granted");
         setIsRequesting(false);
-
-        // Stop polling once granted
-        if (pollRef.current) {
-          clearInterval(pollRef.current);
-          pollRef.current = null;
-        }
       },
       () => {
         setIsRequesting(false);
-        setStatus((prev) => (prev === "granted" ? "granted" : "denied"));
+        setStatus("denied"); // ← important: block again if location is turned off
       },
       {
         enableHighAccuracy: true,
@@ -53,12 +47,13 @@ export default function LocationGuard({ children }) {
     // Initial check
     checkLocation();
 
-    // Auto-check every 5 seconds while blocked
+    // Keep polling forever (even after granted)
+    // so we detect when the user turns location OFF later
     pollRef.current = setInterval(() => {
-      checkLocation(true); // silent check (no loading spinner)
+      checkLocation(true); // silent background check
     }, 5000);
 
-    // Also re-check when user returns to the tab
+    // Re-check when user returns to the tab
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
         checkLocation(true);
