@@ -72,7 +72,7 @@ export default async function layout({ params }) {
     !userData?.business ||
     !SessionId ||
     userData.user.status !== "active" ||
-    SessionId !== userData.user.SessionId
+    SessionId !== userData.user.SessionId || !userData.user.isSalesRep
   ) {
     redirect("/SalesPortal/Login");
   }

@@ -45,7 +45,7 @@ export default async function Layout() {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL
 
   // Redirect if either user OR business is missing 
-  if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId) {
+  if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId || !userData.user.isSalesRep) {
     redirect('/SalesPortal/Login');
   }
 
