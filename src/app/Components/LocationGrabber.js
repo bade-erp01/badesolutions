@@ -75,9 +75,7 @@ const GeoUpdater = ({ userData, baseUrl }) => {
         // Success
         retryCount.current = 0;
         hasPrompted.current = false;
-        console.log("Location updated successfully");
       } catch (err) {
-        console.error("Failed to send location:", err);
 
         // Retry with exponential backoff
         retryCount.current += 1;
@@ -95,7 +93,6 @@ const GeoUpdater = ({ userData, baseUrl }) => {
           if (!isMounted) return;
 
           const { latitude, longitude } = position.coords;
-          console.log("Got location:", latitude, longitude);
 
           sendToServer(latitude, longitude);
         },

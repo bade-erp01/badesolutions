@@ -435,7 +435,7 @@ export default function Wrapper({ children }) {
                   </nav>
 
                   {/* Tenant Switch - Mobile only */}
-                  {user?.user?.toogledTenants?.length > 0 && (
+                  {user?.user?.toogledTenants.filter((tenant) => tenant?.tenantIds?.isActive)?.length > 0 && (
                     <div className="p-4 border-t">
                       <div className="tenant-switch space-y-1.5">
                         <div className="text-sm text-muted-foreground">
@@ -449,7 +449,7 @@ export default function Wrapper({ children }) {
                             <SelectValue placeholder="Select tenant..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {user?.user?.toogledTenants?.map((tenant) => (
+                            {user?.user?.toogledTenants?.filter((tenant) => tenant?.tenantIds?.isActive)?.map((tenant) => (
                               <SelectItem
                                 key={tenant?.tenantIds?._id}
                                 value={tenant?.tenantIds?._id}
@@ -470,7 +470,7 @@ export default function Wrapper({ children }) {
               </Sheet>
 
               {/* Tenant Switch - Desktop only */}
-              {user?.user?.toogledTenants?.length > 0 && (
+              {user?.user?.toogledTenants?.filter((tenant) => tenant?.tenantIds?.isActive)?.length > 0 && (
                 <div className="hidden lg:flex items-center">
                   <div className="tenant-switch space-y-0.5">
                     <div className="text-xs text-muted-foreground">
@@ -484,7 +484,7 @@ export default function Wrapper({ children }) {
                         <SelectValue placeholder="Select tenant..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {user?.user?.toogledTenants?.map((tenant) => (
+                        {user?.user?.toogledTenants?.filter((tenant) => tenant?.tenantIds?.isActive)?.map((tenant) => (
                           <SelectItem
                             key={tenant?.tenantIds?._id}
                             value={tenant?.tenantIds?._id}

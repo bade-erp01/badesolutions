@@ -33,6 +33,10 @@ const fetchUser = async () => {
     decodedUser = Dencrypt(userToken);
     const rawUserInfo = await User.findById(decodedUser)
       .select("-password -__v -createdAt -updatedAt -opsCode -Apps")
+      .populate({
+        path: "toogledTenants.tenantIds",
+        select: "companyName tenantId isActive",
+      })
       .lean();
 
     if (!rawUserInfo) {

@@ -12,7 +12,13 @@ import Link from "next/link";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import Marquee from "react-fast-marquee";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   LayoutDashboard,
   Package,
@@ -34,12 +40,12 @@ import {
 } from "lucide-react";
 
 import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../../Functions/Functions";
-import { SuccessToast, plsWait } from "../../../../Functions/Mics";
+import { SuccessToast, plsWait,ErrorMessage } from "../../../../Functions/Mics";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import Nav2 from "@/app/Components/Nav2";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -108,7 +114,7 @@ function getDistance(lat1, lon1, lat2, lon2) {
 export default function DashboardLayout({ userData, baseUrl }) {
   const [open, setOpen] = useState(false);
   const [searchTerm] = useState("");
-
+  const router =  useRouter();
   const languages = useMemo(() => ["es", "en", "de", "fr"], []);
 
   const getRandomLanguage = () =>
@@ -209,6 +215,79 @@ export default function DashboardLayout({ userData, baseUrl }) {
     },
   ];
 
+  const handleTenantSwitch = async (tenantId) => {
+    if (!tenantId || tenantId === userData?.business?.tenantId) return;
+
+    const isDark = document.documentElement.classList.contains("dark");
+
+    const result = await Swal.fire({
+      title: "Switch Tenant?",
+      html: `
+          <div class="py-4">
+            <p class="text-lg text-slate-600 dark:text-slate-400">
+              Are you sure you want to switch to this tenant?
+            </p>
+            <p class="text-sm text-slate-500 dark:text-slate-500 mt-3">
+              You will be logged into the new tenant's workspace.
+            </p>
+          </div>
+        `,
+      imageUrl: userData?.business?.companyLogo || "",
+      imageWidth: 80,
+      imageHeight: 80,
+      imageAlt: "Company Logo",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Switch Tenant",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: isDark ? "#18181b" : "#0f172a",
+      cancelButtonColor: "#ef4444",
+      width: "440px",
+      padding: "2rem",
+      background: isDark ? "#0f172a" : "#ffffff",
+      color: isDark ? "#e2e8f0" : "#0f172a",
+      customClass: {
+        popup: `rounded-3xl shadow-2xl border ${isDark ? "border-slate-700" : "border-slate-200"}`,
+        title: `text-2xl font-semibold ${isDark ? "text-white" : "text-slate-900"}`,
+        htmlContainer: "text-center",
+        confirmButton: "rounded-xl font-medium px-8 py-2.5 text-base",
+        cancelButton: "rounded-xl font-medium px-8 py-2.5 text-base",
+        image: "mx-auto rounded-2xl object-contain",
+      },
+      reverseButtons: true,
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+    });
+
+    if (result.isConfirmed) {
+      plsWait("Please wait while we switch your tenant...");
+
+      try {
+        const response = await fetch(
+          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(userData.user._id)}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              access: `${Encrypt(userData.user._id)}`,
+              sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`,
+            },
+            body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to switch tenant.");
+        }
+
+        SuccessToast("Tenant switched successfully.");
+        router.refresh();
+      } catch (error) {
+        ErrorMessage("An error occurred while switching tenant.");
+      }
+    }
+  };
+
   const SidebarContent = () => (
     <div className="flex h-full flex-col">
       <div className="px-1 pb-4">
@@ -232,7 +311,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   item.active
                     ? "bg-zinc-800 text-white font-medium"
-                    : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-100"
+                    : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-100",
                 )}
               >
                 <item.icon className="h-5 w-5 shrink-0" />
@@ -241,6 +320,35 @@ export default function DashboardLayout({ userData, baseUrl }) {
             ))}
         </nav>
       </ScrollArea>
+
+      {/* Tenant Switch - Mobile only */}
+      {userData?.user?.toogledTenants?.filter(
+        (tenant) => tenant?.tenantIds?.isActive,
+      )?.length > 0 && (
+        <div className="pt-4 border-t border-white/10">
+          <div className="tenant-switch space-y-1.5">
+            <div className="text-sm text-white/60">Switch Tenants</div>
+            <Select
+              value={userData?.business?.tenantId}
+              onValueChange={handleTenantSwitch}
+            >
+              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
+                <SelectValue placeholder="Select tenant..." />
+              </SelectTrigger>
+              <SelectContent>
+                {userData?.user?.toogledTenants?.map((tenant) => (
+                  <SelectItem
+                    key={tenant?.tenantIds?._id}
+                    value={tenant?.tenantIds?._id}
+                  >
+                    {tenant?.tenantIds?.companyName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
 
       <div className="mt-auto pt-6 space-y-3">
         <div className="flex items-center gap-3 rounded-xl bg-zinc-800/80 px-3 py-2.5">
@@ -322,9 +430,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
                 }
                 alt="user"
               />
-              <AvatarFallback>
-                {userData.user.firstName?.[0]}
-              </AvatarFallback>
+              <AvatarFallback>{userData.user.firstName?.[0]}</AvatarFallback>
             </Avatar>
             <div>
               <h2 className="text-xl font-bold tracking-tight">
@@ -362,7 +468,7 @@ export function MainDash({ userData, baseUrl }) {
   const sortedInvoices = useMemo(() => {
     return (
       tenantData?.invoice?.sort(
-        (a, b) => b.billReferenceNo - a.billReferenceNo
+        (a, b) => b.billReferenceNo - a.billReferenceNo,
       ) || []
     );
   }, [tenantData]);
@@ -382,7 +488,7 @@ export function MainDash({ userData, baseUrl }) {
         setTimeout(() => setCurrentPage(page), 300);
       }
     },
-    [totalPages]
+    [totalPages],
   );
 
   useEffect(() => {
@@ -408,7 +514,7 @@ export function MainDash({ userData, baseUrl }) {
         setTenantData(data);
       } catch (err) {
         setError(
-          "The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists."
+          "The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.",
         );
       } finally {
         setLoading(false);
@@ -462,7 +568,7 @@ export function MainDash({ userData, baseUrl }) {
 
     const activityEvents = ["mousemove", "keydown", "scroll", "touchstart"];
     activityEvents.forEach((event) =>
-      window.addEventListener(event, resetInactivityTimer)
+      window.addEventListener(event, resetInactivityTimer),
     );
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -473,7 +579,7 @@ export function MainDash({ userData, baseUrl }) {
       clearInterval(intervalRef.current);
       clearTimeout(inactivityTimer.current);
       activityEvents.forEach((event) =>
-        window.removeEventListener(event, resetInactivityTimer)
+        window.removeEventListener(event, resetInactivityTimer),
       );
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("online", handleOnline);
@@ -535,7 +641,7 @@ export function MainDash({ userData, baseUrl }) {
     const overdueTotal =
       tenantData.Routes?.filter((c) => c.Debt > 0).reduce(
         (sum, c) => sum + (Number(c.Debt) || 0),
-        0
+        0,
       ) || 0;
 
     const pendingTasks =
@@ -568,8 +674,8 @@ export function MainDash({ userData, baseUrl }) {
               <div className="mt-3">
                 {salesIsUp ? (
                   <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/10 gap-1 border-0">
-                    <TrendingUp className="h-3.5 w-3.5" />
-                    +{salesPercentage}% vs yesterday
+                    <TrendingUp className="h-3.5 w-3.5" />+{salesPercentage}% vs
+                    yesterday
                   </Badge>
                 ) : salesIsDown ? (
                   <Badge className="bg-red-500/10 text-red-400 hover:bg-red-500/10 gap-1 border-0">
@@ -699,7 +805,7 @@ export function MainDash({ userData, baseUrl }) {
                             <TableCell>
                               <Link
                                 href={`/${userData.business.companyName}/${Encrypt(
-                                  userData.user._id
+                                  userData.user._id,
                                 )}/bill/bill/${Encrypt(invoice._id)}`}
                                 className="font-medium text-primary hover:underline"
                               >
@@ -814,7 +920,7 @@ export function MainDash({ userData, baseUrl }) {
                                     day: "numeric",
                                     hour: "2-digit",
                                     minute: "2-digit",
-                                  }
+                                  },
                                 )}
                               </p>
                             </div>
@@ -916,10 +1022,7 @@ export function MainDash({ userData, baseUrl }) {
       </p>
       <div className="flex justify-center">
         <Avatar className="h-24 w-24 shadow-lg ring-4 ring-background">
-          <AvatarImage
-            src={userData.business.companyLogo}
-            alt="Company Logo"
-          />
+          <AvatarImage src={userData.business.companyLogo} alt="Company Logo" />
           <AvatarFallback className="text-xl">CO</AvatarFallback>
         </Avatar>
       </div>
@@ -1081,10 +1184,11 @@ export function NearbyBusinessesMap() {
                 "Content-Type": "application/x-www-form-urlencoded",
               },
               body: `data=${encodeURIComponent(query)}`,
-            }
+            },
           );
 
-          if (!response.ok) throw new Error("Failed to fetch nearby businesses");
+          if (!response.ok)
+            throw new Error("Failed to fetch nearby businesses");
 
           const data = await response.json();
 
@@ -1095,7 +1199,7 @@ export function NearbyBusinessesMap() {
                 latitude,
                 longitude,
                 item.lat,
-                item.lon
+                item.lon,
               );
 
               return {
@@ -1133,7 +1237,7 @@ export function NearbyBusinessesMap() {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-      }
+      },
     );
   };
 

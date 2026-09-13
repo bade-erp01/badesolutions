@@ -17,7 +17,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-
+import Swal from "sweetalert2";
 import Nav2 from "@/app/Components/Nav2";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
@@ -32,10 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Card as ShadCard,
-  CardContent,
-} from "@/components/ui/card";
+import { Card as ShadCard, CardContent } from "@/components/ui/card";
 import {
   HoverCard,
   HoverCardContent,
@@ -59,12 +56,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function NavWrapper({ userData, data, navtitle }) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const Data = data || [];
-
   let filteredData = [];
 
   if (navtitle === "Requisitions") {
@@ -87,12 +90,85 @@ export default function NavWrapper({ userData, data, navtitle }) {
     ).sort((a, b) => a.Name?.trim().localeCompare(b.Name?.trim()));
   }
 
+  const handleTenantSwitch = async (tenantId) => {
+    if (!tenantId || tenantId === userData?.business?.tenantId) return;
+
+    const isDark = document.documentElement.classList.contains("dark");
+
+    const result = await Swal.fire({
+      title: "Switch Tenant?",
+      html: `
+        <div class="py-4">
+          <p class="text-lg text-slate-600 dark:text-slate-400">
+            Are you sure you want to switch to this tenant?
+          </p>
+          <p class="text-sm text-slate-500 dark:text-slate-500 mt-3">
+            You will be logged into the new tenant's workspace.
+          </p>
+        </div>
+      `,
+      imageUrl: userData?.business?.companyLogo || "",
+      imageWidth: 80,
+      imageHeight: 80,
+      imageAlt: "Company Logo",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Switch Tenant",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: isDark ? "#18181b" : "#0f172a",
+      cancelButtonColor: "#ef4444",
+      width: "440px",
+      padding: "2rem",
+      background: isDark ? "#0f172a" : "#ffffff",
+      color: isDark ? "#e2e8f0" : "#0f172a",
+      customClass: {
+        popup: `rounded-3xl shadow-2xl border ${isDark ? "border-slate-700" : "border-slate-200"}`,
+        title: `text-2xl font-semibold ${isDark ? "text-white" : "text-slate-900"}`,
+        htmlContainer: "text-center",
+        confirmButton: "rounded-xl font-medium px-8 py-2.5 text-base",
+        cancelButton: "rounded-xl font-medium px-8 py-2.5 text-base",
+        image: "mx-auto rounded-2xl object-contain",
+      },
+      reverseButtons: true,
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+    });
+
+    if (result.isConfirmed) {
+      plsWait("Please wait while we switch your tenant...");
+
+      try {
+        const response = await fetch(
+          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(userData.user._id)}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
+              access: `${Encrypt(userData.user._id)}`,
+              sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`,
+            },
+            body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to switch tenant.");
+        }
+
+        SuccessToast("Tenant switched successfully.");
+        router.refresh();
+      } catch (error) {
+        ErrorMessage("An error occurred while switching tenant.");
+      }
+    }
+  };
+
   const navItems = [
     {
       href: "/SalesPortal/Dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
-      show: userData.user.c_levelDash,
+      show: userData?.user?.c_levelDash,
       active: navtitle === "Dashboard",
     },
     {
@@ -134,7 +210,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
       href: "/SalesPortal/Inventory",
       label: "Inventory",
       icon: Warehouse,
-      show: !!userData.user.workLocation,
+      show: !!userData?.user?.workLocation,
       active: navtitle === "Inventory",
     },
   ];
@@ -177,6 +253,35 @@ export default function NavWrapper({ userData, data, navtitle }) {
           )}
         </nav>
       </ScrollArea>
+
+      {/* Tenant Switch - Mobile only */}
+      {userData?.user?.toogledTenants?.filter(
+        (tenant) => tenant?.tenantIds?.isActive,
+      )?.length > 0 && (
+        <div className="pt-4 border-t border-white/10">
+          <div className="tenant-switch space-y-1.5">
+            <div className="text-sm text-white/60">Switch Tenants</div>
+            <Select
+              value={userData?.business?.tenantId}
+              onValueChange={handleTenantSwitch}
+            >
+              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
+                <SelectValue placeholder="Select tenant..." />
+              </SelectTrigger>
+              <SelectContent>
+                {userData?.user?.toogledTenants?.map((tenant) => (
+                  <SelectItem
+                    key={tenant?.tenantIds?._id}
+                    value={tenant?.tenantIds?._id}
+                  >
+                    {tenant?.tenantIds?.companyName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
 
       {/* User footer */}
       <div className="mt-auto pt-6 space-y-3">

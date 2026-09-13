@@ -37,10 +37,9 @@ const fetchUser = async () => {
     const rawUserInfo = await User.findById(decodedUser)
     .select("-password -__v -createdAt -updatedAt -opsCode")
     .populate({
-      path: "toogledTenants.tenantIds", // drill down into the subdocument field
-      model: "Business",            // explicitly tell Mongoose which model to use
-      select: "tenantId companyName _id email"
-    }).lean();
+        path: "toogledTenants.tenantIds",
+        select: "companyName tenantId isActive",
+      }).lean();
 
     if (!rawUserInfo) {
       return { error: "User information not found." };
