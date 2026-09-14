@@ -64,7 +64,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
     if (request.ok) {
       setOpen(false);
       router.push(
-        `/${Params.auth}/${Params.Tenant}/${Params.module}/Forms/transfer/${response.data}`
+        `/${Params.auth}/V4/transfer/transfer/${response.data}`
       );
     } else {
       ErrorMessage("Something went wrong");
