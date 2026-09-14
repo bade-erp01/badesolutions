@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,10 @@ import { Menu } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../../lib/User";
 
+// Normalize ids (ObjectId / string)
+const toId = (v) =>
+  v && typeof v === "object" ? String(v) : v != null ? String(v) : "";
+
 export default function Wrapper({ children }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -60,6 +64,28 @@ export default function Wrapper({ children }) {
   const [searchTerm, setSearchTerm] = useState("");
   const page = Params.Module;
   const dispatch = useDispatch();
+
+  // Active tenants from toogledTenants
+  const activeTenants = useMemo(() => {
+    return (
+      user?.user?.toogledTenants?.filter(
+        (tenant) => tenant?.tenantIds?.isActive
+      ) ?? []
+    );
+  }, [user?.user?.toogledTenants]);
+
+  // Selected value must come from the toogledTenants array
+  const selectedTenantId = useMemo(() => {
+    const currentBusinessId = toId(
+      user?.business?.tenantId ?? user?.business?._id
+    );
+
+    const match = activeTenants.find(
+      (tenant) => toId(tenant?.tenantIds?._id) === currentBusinessId
+    );
+
+    return match ? toId(match.tenantIds._id) : undefined;
+  }, [activeTenants, user?.business?.tenantId, user?.business?._id]);
 
   // Driver.js Tour
   const startTour = () => {
@@ -167,7 +193,7 @@ export default function Wrapper({ children }) {
   };
 
   const handleTenantSwitch = async (tenantId) => {
-    if (!tenantId || tenantId === user?.business?.tenantId) return;
+    if (!tenantId || toId(tenantId) === toId(user?.business?.tenantId)) return;
 
     const isDark = document.documentElement.classList.contains("dark");
 
@@ -434,25 +460,25 @@ export default function Wrapper({ children }) {
                     )}
                   </nav>
 
-                  {/* Tenant Switch - Mobile only */}
-                  {user?.user?.toogledTenants.filter((tenant) => tenant?.tenantIds?.isActive)?.length > 0 && (
+                  {/* Tenant Switch - Mobile */}
+                  {activeTenants.length > 0 && (
                     <div className="p-4 border-t">
                       <div className="tenant-switch space-y-1.5">
                         <div className="text-sm text-muted-foreground">
                           Switch Tenants
                         </div>
                         <Select
-                          value={user?.business?.tenantId}
+                          value={selectedTenantId}
                           onValueChange={handleTenantSwitch}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select tenant..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {user?.user?.toogledTenants?.filter((tenant) => tenant?.tenantIds?.isActive)?.map((tenant) => (
+                            {activeTenants.map((tenant) => (
                               <SelectItem
-                                key={tenant?.tenantIds?._id}
-                                value={tenant?.tenantIds?._id}
+                                key={toId(tenant?.tenantIds?._id)}
+                                value={toId(tenant?.tenantIds?._id)}
                               >
                                 {tenant?.tenantIds?.companyName}
                               </SelectItem>
@@ -469,25 +495,25 @@ export default function Wrapper({ children }) {
                 </SheetContent>
               </Sheet>
 
-              {/* Tenant Switch - Desktop only */}
-              {user?.user?.toogledTenants?.filter((tenant) => tenant?.tenantIds?.isActive)?.length > 0 && (
+              {/* Tenant Switch - Desktop */}
+              {activeTenants.length > 0 && (
                 <div className="hidden lg:flex items-center">
                   <div className="tenant-switch space-y-0.5">
                     <div className="text-xs text-muted-foreground">
                       Switch Tenants
                     </div>
                     <Select
-                      value={tenant?.tenantIds?.companyName}
+                      value={selectedTenantId}
                       onValueChange={handleTenantSwitch}
                     >
                       <SelectTrigger className="w-44 h-9">
                         <SelectValue placeholder="Select tenant..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {user?.user?.toogledTenants?.filter((tenant) => tenant?.tenantIds?.isActive)?.map((tenant) => (
+                        {activeTenants.map((tenant) => (
                           <SelectItem
-                            key={tenant?.tenantIds?._id}
-                            value={tenant?.tenantIds?._id}
+                            key={toId(tenant?.tenantIds?._id)}
+                            value={toId(tenant?.tenantIds?._id)}
                           >
                             {tenant?.tenantIds?.companyName}
                           </SelectItem>
