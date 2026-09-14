@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Encrypt } from "../../../Functions/Functions";
 import { ErrorMessage, plsWait } from "../../../Functions/Mics";
+import Swal from "sweetalert2";
 
 // shadcn/ui components
 import {
@@ -63,6 +64,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
 
     if (request.ok) {
       setOpen(false);
+      Swal.close();
       router.push(
         `/${Params.auth}/V4/transfer/transfer/${response.data}`
       );
