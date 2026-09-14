@@ -509,7 +509,7 @@ export default function TransferPage({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+    <div className="w-full px-3 sm:px-6 py-6 sm:py-10">
       <Card className="border bg-card text-card-foreground shadow-sm">
         <CardContent className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
           {/* Status */}
