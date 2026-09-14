@@ -477,7 +477,7 @@ export default function Wrapper({ children }) {
                       Switch Tenants
                     </div>
                     <Select
-                      value={user?.business?.tenantId}
+                      value={tenant?.tenantIds?.companyName}
                       onValueChange={handleTenantSwitch}
                     >
                       <SelectTrigger className="w-44 h-9">
