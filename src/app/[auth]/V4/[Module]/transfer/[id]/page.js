@@ -1,22 +1,52 @@
 "use client";
-import { React, useState ,useRef} from "react";
+
+import { useState } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
 import moment from "moment";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Encrypt,
   ErrorMessage,
   SuccessToast,
   plsWait,
 } from "../../../../../../../Functions/Mics";
+import { totalInWords } from "../../../../../../../Functions/Functions";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
-  totalInWords,
-} from "../../../../../../../Functions/Functions";
-import Link from "next/link"
-import { TrashIcon,KeyIcon,CheckBadgeIcon, PencilIcon,PaperClipIcon,ArrowTrendingUpIcon,PrinterIcon} from "@heroicons/react/24/solid";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Trash2,
+  KeyRound,
+  BadgeCheck,
+  Pencil,
+  TrendingUp,
+  Printer,
+  AlertTriangle,
+} from "lucide-react";
 
 export default function TransferPage({
   user,
@@ -25,31 +55,52 @@ export default function TransferPage({
   bill,
   products,
   Whouse,
-  EXPRESS_PRIVATE_URL
+  EXPRESS_PRIVATE_URL,
 }) {
   const [Singlebill, setsingleBill] = useState(bill);
   const [cust] = useState(customer);
   const [productList] = useState(products);
-  Swal.close();
-  const router = useRouter(); 
+  const router = useRouter();
+
+  const statusLower = (Singlebill?.status || "").toLowerCase();
+  const currencySymbol = Business?.currency?.currency?.Symbol || "";
+
+  const statusVariant = (status) => {
+    const s = (status || "").toLowerCase();
+    if (s === "draft") return "secondary";
+    if (s === "pending") return "outline";
+    if (s === "approved") return "default";
+    if (s.includes("posted") || s === "completed") return "default";
+    if (s === "declined" || s === "cancelled") return "destructive";
+    return "secondary";
+  };
 
   const handleProductSelection = async (productId) => {
+    if (!productId) return;
     plsWait("Adding product to list");
-    
-    const cleanedProducts = await productList.find((product) => {
-      return product?.ACDcode === productId || product?.ADCcode === productId;
-    });
-   
+
+    const cleanedProducts = productList.find(
+      (product) =>
+        product?.ACDcode === productId || product?.ADCcode === productId
+    );
+
+    if (!cleanedProducts?._id) {
+      ErrorMessage("Product not found");
+      return;
+    }
+
     try {
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(Singlebill._id)}?product=${Encrypt(cleanedProducts._id)}`,
+        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(
+          Singlebill._id
+        )}?product=${Encrypt(cleanedProducts._id)}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
             access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
           },
         }
       );
@@ -57,11 +108,11 @@ export default function TransferPage({
       const data = await res.json();
 
       if (data.message) {
-        SuccessToast(data.message); // Replace with your custom ShowServerResponse
+        SuccessToast(data.message);
         router.refresh();
         window.location.reload();
       } else {
-        throw new Error(data.error); // Replace with your custom serverError
+        throw new Error(data.error);
       }
     } catch (error) {
       ErrorMessage(error.message);
@@ -72,26 +123,26 @@ export default function TransferPage({
     try {
       plsWait("Removing product from cart");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransfer/${
-        Encrypt(bill._id)
-      }?items=${encodeURIComponent(Encrypt(id))}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransfer/${Encrypt(
+        bill._id
+      )}?items=${encodeURIComponent(Encrypt(id))}`;
 
       const response = await fetch(url, {
         method: "DELETE",
-         headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+        },
       });
 
       const data = await response.json();
 
       if (data.message) {
-        SuccessToast(data.message); 
+        SuccessToast(data.message);
         router.refresh();
-        window.location.reload(); // Consider using router.reload() if you're using Next.js router
+        window.location.reload();
       } else {
         throw new Error(data.error || "Unknown error occurred");
       }
@@ -100,7 +151,7 @@ export default function TransferPage({
     }
   };
 
-  const DeleteDraftPo = async (id, userId) => {
+  const DeleteDraftPo = async (id) => {
     try {
       const result = await Swal.fire({
         title: "Are you sure?",
@@ -112,11 +163,9 @@ export default function TransferPage({
         confirmButtonText: "Yes, delete it!",
       });
 
-      if (!result.isConfirmed) {
-        return;
-      }
+      if (!result.isConfirmed) return;
 
-      plsWait("Deleteing Transfer...");
+      plsWait("Deleting Transfer...");
 
       const url = `${EXPRESS_PRIVATE_URL}/api/DraftTranfer/${encodeURIComponent(
         Encrypt(id)
@@ -124,20 +173,18 @@ export default function TransferPage({
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+        },
       });
 
       const data = await response.json();
 
       if (data.message) {
         SuccessToast(data.message);
-        setTimeout(() => {
-          router.back();
-        }, 2000);
+        setTimeout(() => router.back(), 2000);
       } else {
         throw new Error(data.error || "Something went wrong");
       }
@@ -148,7 +195,7 @@ export default function TransferPage({
 
   const handleQtyChange = async (newQty, lineId, field) => {
     try {
-      plsWait('updating...');
+      plsWait("updating...");
 
       const url = `${EXPRESS_PRIVATE_URL}/api/Virtual/Product/TransferForm/${encodeURIComponent(
         Encrypt(Singlebill._id)
@@ -158,26 +205,26 @@ export default function TransferPage({
 
       const response = await fetch(url, {
         method: "PATCH",
-         headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+        },
       });
 
       const data = await response.json();
 
       if (data.message) {
         SuccessToast(data.message);
-        location.reload(); // Or use router.refresh() if you're in App Router
+        location.reload();
       } else {
         throw new Error(data.error || "Update failed");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
       router.refresh();
-      location.reload(); 
+      location.reload();
     }
   };
 
@@ -185,7 +232,7 @@ export default function TransferPage({
     try {
       const result = await Swal.fire({
         title: "Are you sure?",
-        text: "Do you want to proceed with updating this Request for Purchase?",
+        text: "Do you want to proceed with updating this transfer?",
         icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -194,25 +241,23 @@ export default function TransferPage({
         cancelButtonText: "Cancel",
       });
 
-      if (!result.isConfirmed) {
-        return;
-      }
+      if (!result.isConfirmed) return;
 
-      plsWait("Updating Request for Purchase");
+      plsWait("Updating transfer...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Transfer/${Encrypt(Singlebill._id)}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
+      const url = `${EXPRESS_PRIVATE_URL}/api/Transfer/${Encrypt(
+        Singlebill._id
+      )}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
 
       const response = await fetch(url, {
         method: "PATCH",
-        body: JSON.stringify({
-          status: status,
-        }),
-         headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
+        body: JSON.stringify({ status }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+        },
       });
 
       const data = await response.json();
@@ -220,7 +265,7 @@ export default function TransferPage({
       if (data.message) {
         SuccessToast(data.message);
         window.location.reload();
-        router.refresh(); // Or use router.refresh() if you're in App Router
+        router.refresh();
       } else {
         throw new Error(data.error || "Update failed");
       }
@@ -229,70 +274,61 @@ export default function TransferPage({
     }
   };
 
-  // generate pdf
   const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
-      return new Promise((resolve, reject) => {
-        const img = new window.Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-  
-          // Draw image
-          ctx.drawImage(img, 0, 0);
-  
-          // 💧 Add watermark (bottom right)
-  
-          ctx.font = "italic bold 16px 'Courier New'";
-          ctx.textAlign = "center"; // Or "left" depending on your layout
-          ctx.textBaseline = "bottom";
-          ctx.fillStyle = "rgba(109, 107, 107, 0.59)"; // Semi-transparent white
-          ctx.globalAlpha = 0.5; // Semi-transparent watermark
-          ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10); // Centered horizontally, 10px from bottom
-  
-          // Convert to PNG
-          resolve(canvas.toDataURL("image/png"));
-        };
-        img.onerror = () => reject(new Error("Image loading failed"));
-        img.src = src;
-      });
-    };
-  
-    // 📄 Full PDF generator
-    const generatePdf = async ({business = Business, bill = Singlebill}) => {
-      try {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        ctx.font = "italic bold 16px 'Courier New'";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillStyle = "rgba(109, 107, 107, 0.59)";
+        ctx.globalAlpha = 0.5;
+        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => reject(new Error("Image loading failed"));
+      img.src = src;
+    });
+  };
+
+  const generatePdf = async ({
+    business = Business,
+    bill: pdfBill = Singlebill,
+  } = {}) => {
+    try {
       plsWait("Setting things up, Ensure your printer is connected ⌛...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
-    
+
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 10;
       let currentY = margin;
-    
-      // 🖼️ Logo
+
       if (business.companyLogo) {
         try {
-        const logo = await loadImageAsDataURL(business.companyLogo);
-        doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-        } catch (err) {
-        // console.warn("Logo failed to load");
-        }
+          const logo = await loadImageAsDataURL(business.companyLogo);
+          doc.addImage(logo, "JPEG", 10, 12, 30, 30);
+        } catch (_) {}
       }
-    
-      // Header: Company name (KEEP BOLD)
+
       doc.setFontSize(16).setFont("helvetica", "bold");
       doc.text(business.companyName || "", pageWidth - 10, 12, {
         align: "right",
       });
-    
-      // Rest of document should be NORMAL font (no bold)
+
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8).setTextColor(0, 0, 0);
       doc.text(
-        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
+        `${business.shopAddress || ""}, ${business.companyState || ""}, ${
+          business.companyCity || ""
+        }`,
         pageWidth - 10,
         20,
         { align: "right" }
@@ -301,592 +337,697 @@ export default function TransferPage({
       doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
         align: "right",
       });
-    
+
       currentY = 50;
-    
-      // Title (KEEP BOLD)
+
       doc.setFont("helvetica", "bold").setFontSize(17).setTextColor(0, 0, 0);
       doc.text(`Product Transfer`, 10, currentY);
-      // Switch back to normal for everything else
       doc.setFont("helvetica", "normal");
       currentY += 10;
-    
-      // Left Column: Customer Info
+
       doc.setFontSize(13).setTextColor(0, 0, 0);
-      doc.text(`${bill.billReferenceNo}`, 10, currentY);
+      doc.text(`${pdfBill.billReferenceNo}`, 10, currentY);
       doc.setFontSize(8);
-      doc.text(`Source:${Singlebill.from.WHName?.toUpperCase()}`, 10, currentY + 6);
-      doc.text(`Destination: ${Singlebill.to.WHName?.toUpperCase() || ""}`, 10, currentY + 12);
-    
+      doc.text(
+        `Source:${Singlebill.from.WHName?.toUpperCase()}`,
+        10,
+        currentY + 6
+      );
+      doc.text(
+        `Destination: ${Singlebill.to.WHName?.toUpperCase() || ""}`,
+        10,
+        currentY + 12
+      );
+
       currentY += 2;
-    
-      // 🧾 Bill Metadata
+
       autoTable(doc, {
         startY: currentY,
         tableWidth: 80,
         margin: { left: pageWidth - 90 },
         head: [],
         body: [
-        ["Transfer Date:", moment(bill.transferedDate).format("YYYY-MM-DD") || ""],
-        ["Receieve Date:", moment(bill.recievedDate).format("YYYY-MM-DD") || ""],
-        ["Status:", bill.status],
+          [
+            "Transfer Date:",
+            moment(pdfBill.transferedDate).format("YYYY-MM-DD") || "",
+          ],
+          [
+            "Receieve Date:",
+            moment(pdfBill.recievedDate).format("YYYY-MM-DD") || "",
+          ],
+          ["Status:", pdfBill.status],
         ],
         theme: "plain",
         styles: { fontSize: 9, cellPadding: 1, fontStyle: "normal" },
         columnStyles: {
-        0: { halign: "right" },
-        1: { halign: "right" },
+          0: { halign: "right" },
+          1: { halign: "right" },
         },
       });
       currentY = doc.lastAutoTable.finalY + 10;
-    
-      // 📊 Invoice Table (all normal)
+
       autoTable(doc, {
         startY: currentY,
         head: [
-        [
-          "#",
-          "Product",
-          "Code",
-          "Batch",
-          "Trace",
-          "Expiry Date",
-          "Price",
-          "Case",
-          "Pcs",
-          "Total",
+          [
+            "#",
+            "Product",
+            "Code",
+            "Batch",
+            "Trace",
+            "Expiry Date",
+            "Price",
+            "Case",
+            "Pcs",
+            "Total",
+          ],
         ],
-        ],
-        body: bill.orders.map((ord, i) => [
-        i + 1,
-        `${ord.item?.Name}`,
-        ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-        ord.BatchNo || "N/A",
-        ord.Status || "",
-        ord.ExpDate || "N/A",
-        ord.VendorPrice?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || 0,
-        ord.Qty || 0,
-        ord.pcsReq || 0,
-        ord.total?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) || 0,
+        body: pdfBill.orders.map((ord, i) => [
+          i + 1,
+          `${ord.item?.Name}`,
+          ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
+          ord.BatchNo || "N/A",
+          ord.Status || "",
+          ord.ExpDate || "N/A",
+          ord.VendorPrice?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }) || 0,
+          ord.Qty || 0,
+          ord.pcsReq || 0,
+          ord.total?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }) || 0,
         ]),
         theme: "grid",
         styles: { fontSize: 9, fontStyle: "normal" },
         headStyles: { fontStyle: "normal" },
       });
       currentY = doc.lastAutoTable.finalY + 10;
-    
-      // 💰 Summary Table
+
       autoTable(doc, {
         startY: currentY,
         tableWidth: 76,
         margin: { left: pageWidth - 90 },
         head: [["Subtotal", "Logistics", "Total Due"]],
         body: [
-        [
-          bill.subTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
-          bill.shippingFee?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
-          bill.grandTotal?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"
-        ],
+          [
+            pdfBill.subTotal?.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }) || "0.00",
+            pdfBill.shippingFee?.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }) || "0.00",
+            pdfBill.grandTotal?.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }) || "0.00",
+          ],
         ],
         theme: "grid",
         styles: { fontSize: 9, cellPadding: 1, fontStyle: "normal" },
         headStyles: { fontStyle: "normal" },
         columnStyles: {
-        0: { halign: "right" },
-        1: { halign: "right" },
+          0: { halign: "right" },
+          1: { halign: "right" },
         },
       });
       currentY = doc.lastAutoTable.finalY + 10;
-    
-      // ✍️ Signatures & Words (normal)
+
       doc.setFontSize(10).setFont("helvetica", "normal");
       doc.text(
-        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
+        `${totalInWords(pdfBill.grandTotal, business.currency?.currency)}`,
         margin,
         currentY
       );
       currentY += 10;
-      doc.text(`Remarks:${bill.Remarks}`, margin, currentY);
+      doc.text(`Remarks:${pdfBill.Remarks}`, margin, currentY);
       currentY += 10;
-      doc.text(
-        `Approved By:`,
-        margin,
-        currentY
-      );
+      doc.text(`Approved By:`, margin, currentY);
       currentY += 10;
-      doc.text(
-        `${Singlebill.from.WHName} Sign & Date: `,
-        margin,
-        currentY
-      );
+      doc.text(`${Singlebill.from.WHName} Sign & Date: `, margin, currentY);
       currentY += 10;
       if (business.invoicePolicy) {
         doc.text(`${Singlebill.to.WHName} Sign & Date: `, margin, currentY);
         currentY += 10;
       }
-    
-      // 📎 Footer
+
       doc.setFontSize(9).setFont("helvetica", "normal");
-      doc.text(`Generated on Business Automated Dynamic Enterprise`, margin, pageHeight - 20);
-    
-      // 📄 Page Numbers
+      doc.text(
+        `Generated on Business Automated Dynamic Enterprise`,
+        margin,
+        pageHeight - 20
+      );
+
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.text(
-        `Page ${i} of ${totalPages}`,
-        pageWidth - 20,
-        pageHeight - 10,
-        { align: "right" }
-        );
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10, {
+          align: "right",
+        });
       }
-    
-      // 🖨️ Preview or Save
+
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
       const win = window.open(url, "_blank");
-    
+
       if (win) {
         win.onload = () => {
-        Swal.close();
-        win.print();
+          Swal.close();
+          win.print();
         };
       } else {
-        doc.save(`${bill.customerName || "Purchase"}.pdf`);
+        doc.save(`${pdfBill.customerName || "Purchase"}.pdf`);
         Swal.close();
       }
-      } catch (error) {
+    } catch (error) {
       Swal.close();
-      // console.error("Error generating PDF:", error);
-      }
-    };
-  
+    }
+  };
 
   return (
-    <>
-      <div className="px-6 py-10 bg-white shadow-lg animate__animated animate__fadeIn invoicecontainer border border-gray-200">
-        {/* Top Controls */}
-        <div className="flex items-center justify-between mb-8">
-          <span
-            className={`text-shadow-black text-purple-300 px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border `}
-          >
-            {Singlebill.status}
-          </span>
-        </div>
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+      <Card className="border bg-card text-card-foreground shadow-sm">
+        <CardContent className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+          {/* Status */}
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <Badge
+              variant={statusVariant(Singlebill.status)}
+              className="px-3 py-1 text-sm font-semibold capitalize"
+            >
+              {Singlebill.status}
+            </Badge>
+          </div>
 
-        {/* Company + Customer Info */}
-        <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
-          <div className="flex items-start gap-6 w-full md:w-auto">
-            <Image
-              src={Business.companyLogo}
-              width={90}
-              height={90}
-              alt="logo"
-              priority
-            />
-            <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                {Business.companyName}
+          {/* Company + route info */}
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 border-y py-6">
+            <div className="flex items-start gap-4 min-w-0">
+              {Business?.companyLogo && (
+                <Image
+                  src={Business.companyLogo}
+                  width={72}
+                  height={72}
+                  alt="logo"
+                  priority
+                  className="rounded-md object-contain shrink-0"
+                />
+              )}
+              <div className="space-y-1 min-w-0">
+                <h3 className="text-xl sm:text-2xl font-bold tracking-tight truncate">
+                  {Business.companyName}
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground font-medium">
+                  Source: {Singlebill.from?.WHName}
+                </p>
+                <p className="font-semibold text-sm sm:text-base">
+                  {Singlebill.billReferenceNo}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-left md:text-right space-y-1 shrink-0">
+              <h3 className="text-lg sm:text-xl font-bold tracking-tight">
+                Destination: {Singlebill.to?.WHName?.toUpperCase()}
               </h3>
-              <p className="text-gray-500 text-xl font-semibold">
-                Source: {Singlebill.from.WHName}
+              <p className="text-sm text-muted-foreground">
+                {new Date(Singlebill.transferedDate).toLocaleDateString()}
               </p>
-              <h2 className={`mt-3 font-bold text-base`}>
-                {Singlebill.billReferenceNo}
-              </h2>
             </div>
           </div>
 
-          <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
-            <h3 className="text-xl font-bold text-gray-900 tracking-tight">
-             Destination: {Singlebill.to.WHName.toUpperCase()}
-            </h3>
-            <p>
-              <span className="mr-1">🗓️</span>
-              {new Date(Singlebill.transferedDate).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-          <div className="flex justify-evenly items-center gap-4">
-            {user.raiseLpo &&
-              Singlebill.status.toLowerCase() === "draft" && (
-              <button
-                onClick={() => updateRFP("Pending")}
-                    title="Process this draft to order"
-                    className="group inline-flex items-center justify-center gap-3 px-3 py-3 rounded-lg bg-gray-600 text-white font-semibold hover:shadow-xl  transition duration-200 ease-in-out text-xs"
-                  >
-                    <KeyIcon className="h-6 w-6 text-white" />
-                    <span>Lock Request</span>
-                  </button>
-                  )}
-
-
-                 {user.allowInternalTransfers && Singlebill.status.toLowerCase() === "pending" && (
-                  <button
-                  onClick={() => updateRFP("Draft")}
-                  title="Set this purchase request back to draft"
-                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gray-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
-                  >
-                 <PencilIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200 text-xs" />
-                  <span>Set to Draft</span>
-                  </button>
-                )}
-
-                {user.allowInternalTransfers && Singlebill.status.toLowerCase() === "pending" && (
-                  <button
-                  onClick={() => updateRFP("approved")}
-                  title="Approve this purchase request"
-                   className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gray-600 text-white font-medium shadow-md hover:shadow-lg  transition-all duration-200 ease-in-out"
-                  >
-                 <CheckBadgeIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200 text-xs" />
-                  <span>1st Approval</span>
-                  </button>
-                )}
-
-                {user.allowInternalTransfers && Singlebill.status.toLowerCase() === "approved" && (
-                  <>
-                  <button
-                  onClick={() => updateRFP("POSTED TO WAREHOUSE")}
-                  title="Update warehouse inventory items"
-                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-teal-600 to-teal-500 text-white font-semibold shadow-md hover:shadow-lg hover:from-teal-500 hover:to-teal-400 transition-all duration-200 ease-in-out text-xs"
-                  >
-                <ArrowTrendingUpIcon className="h-5 w-5 text-white group-hover:text-white transition-colors duration-200" />
-                  <span>Update Inventory</span>
-                </button>
-
-                {/* Declined */}
-                <button
-                  onClick={() => updateRFP("Declined")}
-                  title="Declined transfer request"
-                  className="group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold shadow-md hover:shadow-lg hover:from-red-500 hover:to-red-400 transition-all duration-200 ease-in-out text-xs"
-                  >
-                  <span>Declined Transfer</span>
-                </button>
-                </>
-                )}
-                
-                {user.raiseLpo &&
-                  Singlebill.status.toLowerCase() === "draft" && (
-                  <button
-                    title="Delete this draft"
-                    onClick={() => DeleteDraftPo(Singlebill._id)}
-                    className="inline-flex items-center justify-center bg-red-300 border-2 px-3 py-3 rounded-lg text-white font-semibold hover:shadow-xl hover:bg-red-200 transition duration-200 ease-in-out text-xs"
-                  >
-                    Delete
-                    <TrashIcon className="h-6 w-6 text-white" />
-                  </button>
-                  )}
-                </div>
-
-                {/* Print Button */}
-          {bill.status.toLowerCase() !== "draft" && (
-            <button
-              onClick={generatePdf}
-              title={`Download and Print ${Singlebill.status}`}
-              className=" group inline-flex items-center rounded-lg justify-center gap-3 px-6 py-3 bg-gray-600 text-white font-semibold border transition duration-200 ease-in-out text-xs"
-            >
-              <span>Print</span>
-              <PrinterIcon className="h-5 w-5 text-white" />
-            </button>
-          )}
-        </div>
-
-        {/* Print Button */}
-        {/* Product Table */}
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white mb-8">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
-              <tr>
-                {[
-                  "Product",
-                  "Photo",
-                  "Trace",
-                  "Code",
-                  "Case",
-                  "Pcs",
-                  "Batch",
-                  "eXPIRY DATE",
-                  "Price",
-                  `Total (${Business.currency?.currency.Symbol})`,
-                  " ",
-                ].map((th, i) => (
-                  <th
-                    key={i}
-                    className="px-4 py-3 font-semibold whitespace-nowrap text-center"
-                  >
-                    {th}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="text-gray-800">
-              {Singlebill.orders.map((bill) => (
-                <tr
-                  key={bill._id}
-                  className="border-t hover:bg-orange-50 transition"
-                  title={bill.item.Name}
+          {/* Action buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              {user.raiseLpo && statusLower === "draft" && (
+                <Button
+                  size="sm"
+                  onClick={() => updateRFP("Pending")}
+                  title="Process this draft to order"
                 >
-                  <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center text-xs">
-                    <Link
-                      href={`/${Business.companyName}/${Encrypt(user._id)}/product/product/${Encrypt(bill.item._id)}`}
-                      className="hover:underline"
-                    >
-                      {bill.item.Name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2 text-center">
+                  <KeyRound className="h-4 w-4 mr-2" />
+                  Lock Request
+                </Button>
+              )}
+
+              {user.allowInternalTransfers && statusLower === "pending" && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => updateRFP("Draft")}
+                  title="Set this transfer back to draft"
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Set to Draft
+                </Button>
+              )}
+
+              {user.allowInternalTransfers && statusLower === "pending" && (
+                <Button
+                  size="sm"
+                  onClick={() => updateRFP("approved")}
+                  title="Approve this transfer request"
+                >
+                  <BadgeCheck className="h-4 w-4 mr-2" />
+                  1st Approval
+                </Button>
+              )}
+
+              {user.allowInternalTransfers && statusLower === "approved" && (
+                <>
+                  <Button
+                    size="sm"
+                    className="bg-teal-600 hover:bg-teal-500 text-white"
+                    onClick={() => updateRFP("POSTED TO WAREHOUSE")}
+                    title="Update warehouse inventory items"
+                  >
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Update Inventory
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => updateRFP("Declined")}
+                    title="Decline transfer request"
+                  >
+                    Decline Transfer
+                  </Button>
+                </>
+              )}
+
+              {user.raiseLpo && statusLower === "draft" && (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => DeleteDraftPo(Singlebill._id)}
+                  title="Delete this draft"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              )}
+            </div>
+
+            {statusLower !== "draft" && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => generatePdf({})}
+                title={`Download and Print ${Singlebill.status}`}
+                className="w-full sm:w-auto"
+              >
+                <Printer className="h-4 w-4 mr-2" />
+                Print
+              </Button>
+            )}
+          </div>
+
+          {/* ========== DESKTOP TABLE ========== */}
+          <div className="hidden md:block overflow-x-auto rounded-lg border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product</TableHead>
+                  <TableHead className="text-center">Photo</TableHead>
+                  <TableHead className="text-center">Trace</TableHead>
+                  <TableHead className="text-center">Code</TableHead>
+                  <TableHead className="text-center">Case</TableHead>
+                  <TableHead className="text-center">Pcs</TableHead>
+                  <TableHead className="text-center">Batch</TableHead>
+                  <TableHead className="text-center">Expiry</TableHead>
+                  <TableHead className="text-center">Price</TableHead>
+                  <TableHead className="text-right">
+                    Total ({currencySymbol})
+                  </TableHead>
+                  <TableHead className="w-10" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Singlebill.orders?.map((line) => (
+                  <TableRow key={line._id}>
+                    <TableCell className="font-medium text-primary max-w-[180px]">
+                      <Link
+                        href={`/${Business.companyName}/${Encrypt(
+                          user._id
+                        )}/product/product/${Encrypt(line.item._id)}`}
+                        className="hover:underline line-clamp-2"
+                      >
+                        {line.item?.Name}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Image
+                        src={
+                          line.item?.image ||
+                          line.item?.QrCode ||
+                          "/preview.png"
+                        }
+                        width={38}
+                        height={38}
+                        alt="preview"
+                        className="rounded-md mx-auto object-cover"
+                      />
+                    </TableCell>
+                    <TableCell className="text-center text-xs">
+                      {line.Status}
+                    </TableCell>
+                    <TableCell className="text-center text-xs">
+                      {line?.item?.ADCcode || line?.item?.ACDcode}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {statusLower === "draft" ? (
+                        <Input
+                          type="number"
+                          step="any"
+                          defaultValue={line.Qty || 0}
+                          className="w-16 h-8 text-center mx-auto"
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (e.target.value !== "") {
+                              handleQtyChange(
+                                isNaN(val) || val < 0 ? 0 : val,
+                                Encrypt(line._id),
+                                "Qty"
+                              );
+                            }
+                          }}
+                        />
+                      ) : (
+                        line.Qty
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center text-xs">
+                      {Business.subscriptionplan === "Standard"
+                        ? line.pcs || 0
+                        : 0}
+                    </TableCell>
+                    <TableCell className="text-center text-xs">
+                      {line.BatchNo || "N/A"}
+                    </TableCell>
+                    <TableCell className="text-center text-xs">
+                      {line.ExpDate || "N/A"}
+                    </TableCell>
+                    <TableCell className="text-center text-xs">
+                      {line.buyingPrice}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-xs">
+                      {currencySymbol}
+                      {Number(line.total || 0).toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      {user.raiseInvoice && statusLower === "draft" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          title="Remove product from cart"
+                          onClick={() => removeLineItem(line._id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* ========== MOBILE CARDS ========== */}
+          <div className="md:hidden space-y-3">
+            {Singlebill.orders?.map((line) => (
+              <Card key={line._id} className="overflow-hidden">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-start gap-3">
                     <Image
                       src={
-                        bill.item.image || bill.item.QrCode || "/preview.png"
+                        line.item?.image || line.item?.QrCode || "/preview.png"
                       }
-                      width={38}
-                      height={38}
+                      width={48}
+                      height={48}
                       alt="preview"
-                      className="rounded-md "
+                      className="rounded-md object-cover shrink-0"
                     />
-                  </td>
-                  <td className="px-4 py-2 text-center">{bill.Status}</td>
-                  <td className="px-4 py-2 text-center text-xs">{bill?.item?.ADCcode || bill?.item?.ACDcode}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {Singlebill.status.toLowerCase() === "draft" ? (
-                     <input
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        href={`/${Business.companyName}/${Encrypt(
+                          user._id
+                        )}/product/product/${Encrypt(line.item._id)}`}
+                        className="font-medium text-primary hover:underline text-sm line-clamp-2"
+                      >
+                        {line.item?.Name}
+                      </Link>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {line?.item?.ADCcode || line?.item?.ACDcode || "—"}
+                      </p>
+                    </div>
+                    {user.raiseInvoice && statusLower === "draft" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive shrink-0"
+                        onClick={() => removeLineItem(line._id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Trace</p>
+                      <p className="font-medium">{line.Status || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Batch</p>
+                      <p className="font-medium">{line.BatchNo || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Expiry</p>
+                      <p className="font-medium">{line.ExpDate || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Price</p>
+                      <p className="font-medium">{line.buyingPrice}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Case</p>
+                      {statusLower === "draft" ? (
+                        <Input
+                          type="number"
+                          step="any"
+                          defaultValue={line.Qty || 0}
+                          className="h-8 w-20 mt-0.5"
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (e.target.value !== "") {
+                              handleQtyChange(
+                                isNaN(val) || val < 0 ? 0 : val,
+                                Encrypt(line._id),
+                                "Qty"
+                              );
+                            }
+                          }}
+                        />
+                      ) : (
+                        <p className="font-medium">{line.Qty}</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Pcs</p>
+                      <p className="font-medium">
+                        {Business.subscriptionplan === "Standard"
+                          ? line.pcs || 0
+                          : 0}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-1 border-t">
+                    <span className="text-xs text-muted-foreground">Line total</span>
+                    <span className="font-bold">
+                      {currencySymbol}
+                      {Number(line.total || 0).toFixed(2)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Add product (draft only) */}
+          {statusLower === "draft" && (
+            <div className="space-y-2">
+              <Label>
+                {productList?.length
+                  ? `Select from ${productList.length} products`
+                  : "No products available"}
+              </Label>
+
+              {/* Mobile: Select */}
+              <div className="md:hidden">
+                <Select onValueChange={(val) => handleProductSelection(val)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose product..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {productList?.map((product) => (
+                      <SelectItem
+                        key={product._id}
+                        value={product?.ADCcode || product?.ACDcode || product._id}
+                      >
+                        {product?.productName || product?.Name} — [C:
+                        {product.currentQty}, P:{product.pcs}]
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Desktop: datalist search */}
+              <div className="hidden md:block">
+                <Input
+                  type="text"
+                  list="productsList"
+                  placeholder="Type to search products..."
+                  className="max-w-md"
+                  onBlur={(e) => {
+                    if (e.target.value.trim() !== "") {
+                      handleProductSelection(e.target.value);
+                    }
+                    e.target.value = "";
+                  }}
+                />
+                <datalist id="productsList">
+                  {productList?.map((product) => (
+                    <option
+                      key={product._id}
+                      value={product?.ACDcode || product?.ADCcode}
+                    >
+                      {product?.productName || product?.Name} — [C:
+                      {product.currentQty}, P:{product.pcs}]
+                    </option>
+                  ))}
+                </datalist>
+              </div>
+            </div>
+          )}
+
+          {/* Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base sm:text-lg">
+                  Transfer Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <strong>
+                    {currencySymbol}
+                    {Number(Singlebill.subTotal || 0).toFixed(2)}
+                  </strong>
+                </div>
+
+                <div className="flex justify-between items-center gap-4">
+                  <span className="text-muted-foreground shrink-0">
+                    Shipping & Offloading
+                  </span>
+                  {Singlebill.status === "Draft" ? (
+                    <Input
                       type="number"
-                      step="any"
-                      defaultValue={bill.Qty || 0}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
+                      defaultValue={Singlebill.shippingFee || 0}
+                      className="w-24 h-8 text-right"
                       onBlur={(e) => {
                         const val = parseFloat(e.target.value);
-                        if(val !==""){
                         handleQtyChange(
-                          isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                          Encrypt(bill._id),
-                          "Qty"
-                        );
-                      }
-                      }}
-                    />
-                    ) : (
-                      bill.Qty
-                    )}
-                  </td>
-                  {Business.subscriptionplan === "Standard" ?(
-                  <td>
-                  {Singlebill.status.toLowerCase() === "draft" ? (
-                    //  <input
-                    //   defaultValue={bill.pcs || 0}
-                    //   type="number"
-                    //   step="any"
-                    //   className="w-16 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50 text-xs"
-                    //   onBlur={(e) => {
-                    //     const val = parseFloat(e.target.value);
-                    //     if(val !==""){
-                    //       handleQtyChange(
-                    //         isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                    //         Encrypt(bill._id),
-                    //         "Pcs"
-                    //       );
-                    //     }
-                    //   }}
-                    // />
-                    <td className="px-4 py-2 text-center text-xs">
-                        {bill.pcs || 0}
-                    </td> // placeholder till i figure transfer deductions
-                    ) : (
-                      <td className="px-4 py-2 text-center text-xs">
-                        {bill.pcs || 0}
-                      </td>
-                    )}
-                  </td>
-                  ):(
-                    <td className="px-4 py-2 text-center text-xs">
-                         0
-                    </td>
-                  )}
-                  <td className="px-4 py-2 text-center">
-                     {bill.BatchNo || "N/A"}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {bill.ExpDate || "N/A"}
-                  </td>
-                  <td className="px-4 py-2 text-center text-xs">
-                    {bill.buyingPrice}
-                  </td>
-                  <td className="px-4 py-2 font-bold text-right text-xs">
-                    {Business.currency?.currency.Symbol}
-                    {bill.total?.toFixed(2)}
-                  </td>
-                  {user.raiseInvoice &&
-                    Singlebill.status.toLowerCase() === "draft" && (
-                      <td
-                        title={`Click to remove product from cart`}
-                      >
-                        <button onClick={() => removeLineItem(bill._id)}>
-                          <TrashIcon className="w-5 h-5 text-red-500" />
-                        </button>
-                      </td>
-                    )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {Singlebill.status.toLowerCase() === "draft" && (
-          <div className="mb-8">
-            {/* Dropdown for small screens */}
-            <div className="block md:hidden">
-              <label
-                htmlFor="productDropdown"
-                className="block mb-2 text-sm font-medium text-gray-700"
-              >
-                Select from {productList.length} Product
-              </label>
-              <select
-                onBlur={(e) => handleProductSelection(e.target.value)}
-                id="productDropdown"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
-              >
-                <option value={""}>Choose...</option>
-                {productList.map((product) => (
-                    <option key={product._id} value={product?.ADCcode || product?.ACDcode}>
-                      {product?.productName} - [C:{product.currentQty}, P:{product.pcs} ]
-                    </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Datalist for medium and larger screens */}
-            <div className="hidden md:block">
-              <label
-                htmlFor="productDatalist"
-                className="block mb-2 text-sm font-medium text-gray-700"
-              >
-                Search from {productList.length} Products
-              </label>
-              <input
-                onBlur={(e) => {
-                  if (e.target.value.trim() !== "") {
-                    handleProductSelection(e.target.value);
-                  }
-                  e.target.value = ""; // Reset the input value to an empty string
-                }}
-                type="text"
-                list="productsList"
-                id="productDatalist"
-                className="w-70 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200"
-                placeholder="Type to search products..."
-              />
-              <datalist id="productsList">
-                {productList.map((product) => (
-                    <option key={product._id} value={product?.ACDcode || product?.ADCcode}>
-                      {product?.productName} - [C:{product.currentQty}, P:{product.pcs} ]
-                    </option>
-                ))}
-              </datalist>
-            </div>
-          </div>
-        )}
-
-        {/* Summary Section */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-          <div className="bg-gradient-to-br from-white via-orange-50 to-white rounded-xl border border-orange-100 shadow p-6">
-            <h3 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">
-              Transfer Summary
-            </h3>
-            <div className="space-y-2 text-gray-700">
-              <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <strong>
-                  {Business.currency?.currency.Symbol}
-                  {Singlebill.subTotal.toFixed(2)}
-                </strong>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping & Offloading Fee:</span>
-                {Singlebill.status === "Draft" ? (
-                  <input
-                    type="number"
-                    defaultValue={Singlebill.shippingFee || 0}
-                    className="w-24 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    onBlur={(e) => {
-                      const val = parseFloat(e.target.value);
-                      handleQtyChange(
-                          isNaN(val) || val < 0 ? 0 : val, // sanitized value
+                          isNaN(val) || val < 0 ? 0 : val,
                           "",
                           "ShipingFee"
                         );
-                    }}
-                  />
-                ) : (
-                  <strong>
-                    {Business.currency?.currency.Symbol}
-                    {Singlebill.shippingFee.toFixed(2)}
-                  </strong>
-                )}
-              </div>
-              <div className="flex justify-between">
-                <span>Remark:</span>
-                {Singlebill.status === "Draft" ? (
-                  <textarea
-                    className="w-full ml-2 px-2 py-1 border border-gray-300 rounded text-center bg-gray-50"
-                    defaultValue={Singlebill.Remarks || ""}
-                    onBlur={(e) => {
-                      const val = e.target.value.trim(); // Optional: remove extra spaces
-                      handleQtyChange(
-                          val, // sanitized value
-                          "",
-                          "Remarks"
-                        );
-                    }}
-                  />
-                ) : (
-                <p>
-                 {Singlebill.Remarks || ""}
+                      }}
+                    />
+                  ) : (
+                    <strong>
+                      {currencySymbol}
+                      {Number(Singlebill.shippingFee || 0).toFixed(2)}
+                    </strong>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-muted-foreground">Remark</span>
+                  {Singlebill.status === "Draft" ? (
+                    <Textarea
+                      className="min-h-[72px]"
+                      defaultValue={Singlebill.Remarks || ""}
+                      onBlur={(e) => {
+                        handleQtyChange(e.target.value.trim(), "", "Remarks");
+                      }}
+                    />
+                  ) : (
+                    <p className="text-sm">{Singlebill.Remarks || "—"}</p>
+                  )}
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-between text-base font-bold">
+                  <span>Grand Total</span>
+                  <span>
+                    {currencySymbol}
+                    {Number(Singlebill.grandTotal || 0).toFixed(2)}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base sm:text-lg">
+                  Total In Words
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="italic text-sm sm:text-base text-primary">
+                  {totalInWords(
+                    Singlebill.grandTotal,
+                    Business.currency?.currency
+                  )}
                 </p>
-                )}
-              </div>
-              <div className="flex justify-between text-lg font-bold mt-4 border-t pt-2">
-                <span>Grand Total:</span>
-                <span>
-                  {Business.currency?.currency.Symbol}
-                  {Singlebill.grandTotal?.toFixed(2)}
-                </span>
-              </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Attention */}
+          <div className="flex flex-col sm:flex-row justify-between gap-6 pt-2">
+            <div className="max-w-md space-y-2">
+              <h4 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                Attention
+              </h4>
+              <p className="text-sm text-destructive">
+                Please ensure to verify all entries. Once this transfer is
+                processed, it is irreversible.
+              </p>
+            </div>
+            <div className="sm:text-right">
+              <p className="font-semibold text-sm text-muted-foreground">
+                {Singlebill.billReferenceNo}
+              </p>
             </div>
           </div>
 
-          {/* Words representation */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow p-6 text-gray-700 flex flex-col justify-between">
-            <h3 className="text-lg font-bold mb-4">Total In Words</h3>
-            <p className="italic text-base text-orange-700">
-              {totalInWords(Singlebill.grandTotal, Business.currency?.currency)}
-            </p>
+          <div className="pt-4 border-t text-center text-xs text-muted-foreground tracking-wide">
+            {Singlebill.billReferenceNo}
           </div>
-        </div>
-
-        {/* Signature & T&C */}
-        <div className="mt-12 flex flex-col md:flex-row justify-between items-start gap-10">
-          <div className="max-w-md">
-            <h4 className="font-semibold text-gray-700 mb-2">Attention ⚠️</h4>
-            <p className="text-sm text-red-600 mb-4">
-              Please ensure to verify all entries. Once this transfer is processed, it's inreversable.</p>
-          </div>
-          <div className="text-right">
-            <h4 className="font-semibold text-gray-700 mb-2"> {Singlebill.billReferenceNo}</h4>
-            <p className="text-sm font-medium text-gray-800">
-             
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Reference */}
-        <div className="mt-12 pt-8 border-t text-center text-sm text-gray-400 tracking-wide">
-          {Singlebill.billReferenceNo}
-        </div>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
