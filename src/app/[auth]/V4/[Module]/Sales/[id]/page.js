@@ -347,7 +347,7 @@ export default function InvoicePage({
       if (data && data.result) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         Router.push(
-          `/${path.auth}/V4/${path.Module}/${path.Module}/Sales/Draft/${Encrypt(
+          `/${path.auth}/V4/Sales/Sales/Draft/${Encrypt(
             data.result,
           )}`,
         );
