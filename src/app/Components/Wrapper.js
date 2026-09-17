@@ -536,6 +536,7 @@ export default function Wrapper({ children }) {
                 !pathname.includes("product-transfer") &&
                 !pathname.includes("Forms") &&
                 !pathname.includes("inventory") &&
+                !pathname.includes("pos") &&
                 pathname !== `/${Params.auth}/V4/Settings` &&
                 Params.Module !== `accounting` && (
                   <form
