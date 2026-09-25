@@ -11,7 +11,7 @@ import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import Footer2 from "../Components/Footer2";
 import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-// shadcn/ui imports
+import OneSignal from "react-onesignal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -118,10 +118,16 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         throw new Error("Invalid login response");
       }
 
-      // ensure to logout old session cookies
-      await dispatch(logoutAction());
       
       const decryptedUser = Dencrypt(data.Newcustomer);
+      
+      await Promise.all([
+        // ensure to logout old session cookies
+        dispatch(logoutAction()),
+        // create the user push notification 
+        OneSignal.login(String(decryptedUser)),
+        OneSignal.User.addTag("_id", decryptedUser)
+      ])
 
       dispatch(
         loginSuccess({
