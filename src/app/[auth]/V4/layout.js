@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import Wrapper from "@/app/Components/Wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
@@ -6,6 +6,7 @@ import { UserProvider } from "@/components/UserProvider";
 import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
 import { redirect } from "next/navigation";
+import OneSignalProvider from "@/app/Components/OneSignalProvider";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -69,12 +70,12 @@ export default async function layout({ children }) {
   }
 
   return (
-    <ThemeProvider>
-      <UserProvider user={userData}>
-        <Wrapper>
-          {children}
-        </Wrapper>
-      </UserProvider>
-    </ThemeProvider>
+    <OneSignalProvider>
+      <ThemeProvider>
+        <UserProvider user={userData}>
+          <Wrapper>{children}</Wrapper>
+        </UserProvider>
+      </ThemeProvider>
+    </OneSignalProvider>
   );
 }

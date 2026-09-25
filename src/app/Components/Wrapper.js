@@ -323,7 +323,7 @@ export default function Wrapper({ children }) {
 
               return (
                 <Button
-                  key={item.url}
+                  key={item.url || item.url}
                   disabled={isActive}
                   variant={isActive ? "destructive" : "ghost"}
                   className="w-full justify-start cursor-pointer"
@@ -345,7 +345,7 @@ export default function Wrapper({ children }) {
 
                 return (
                   <Button
-                    key={item._id}
+                    key={item._id || item.url}
                     disabled={isActive}
                     variant={isActive ? "destructive" : "ghost"}
                     className="w-full justify-start cursor-pointer"
