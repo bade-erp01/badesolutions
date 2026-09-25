@@ -1,25 +1,38 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import OneSignal from "react-onesignal";
 
 export default function OneSignalProvider({ children }) {
+  const initialized = useRef(false);
+
   useEffect(() => {
-    // Must only run in the browser
     if (typeof window === "undefined") return;
+    if (initialized.current) return; // prevent double init (React Strict Mode)
+    initialized.current = true;
+
+    const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+
+    if (!appId) {
+      console.error("OneSignal: NEXT_PUBLIC_ONESIGNAL_APP_ID is missing");
+      return;
+    }
 
     OneSignal.init({
-      appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
-      // Required for localhost testing
-    //   allowLocalhostAsSecureOrigin: true,
-      // Optional: shows the bell icon
+      appId,
+    //   allowLocalhostAsSecureOrigin: true, // required for localhost
+      serviceWorkerPath: "/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/" },
       notifyButton: {
-        enable: true,
+        enable: true, // shows the bell so you can see it works
       },
-      // Only needed if the worker is NOT at the site root
-    //   serviceWorkerPath: "OneSignalSDKWorker.js",
-    //   serviceWorkerParam: { scope: "/" },
-    });
+    })
+      .then(() => {
+        console.log("OneSignal: initialized successfully");
+      })
+      .catch((err) => {
+        console.error("OneSignal: init failed", err);
+      });
   }, []);
 
   return children;
