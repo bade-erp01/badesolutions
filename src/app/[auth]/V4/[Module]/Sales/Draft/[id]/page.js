@@ -109,190 +109,692 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
   // ==================== PDF GENERATOR ====================
   const generatePdf = async (business, customer, billData) => {
-    try {
-      plsWait("Setting things up ⌛...");
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+  try {
+    plsWait("Preparing quotation ⌛...");
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
 
-      if (business.companyLogo) {
-        try {
-          const logo = await loadImageAsDataURL(business.companyLogo);
-          doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-        } catch {
-          console.warn("Logo failed to load");
-        }
-      }
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-      doc.setFontSize(16).setFont("helvetica", "bold");
-      doc.text(business.companyName || "", pageWidth - 10, 12, {
-        align: "right",
+    const BLACK = [25, 25, 25];
+    const DARK = [45, 45, 45];
+    const GREY = [105, 105, 105];
+    const LIGHT_GREY = [225, 225, 225];
+    const VERY_LIGHT = [248, 248, 248];
+    const WHITE = [255, 255, 255];
+
+    const safeNumber = (value) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    };
+
+    const money = (value) => {
+      return safeNumber(value).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
+    };
 
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(
-        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
-        pageWidth - 10,
-        20,
-        { align: "right" },
-      );
-      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
-        align: "right",
-      });
+    const drawLine = (y, x1 = 10, x2 = pageWidth - 10) => {
+      doc.setDrawColor(...LIGHT_GREY);
+      doc.setLineWidth(0.25);
+      doc.line(x1, y, x2, y);
+    };
 
-      let currentY = 50;
+    let logoWidth = 0;
 
-      doc.setFontSize(15).setFont("helvetica", "bold");
-      doc.text("QUOTATION", 10, currentY);
-      currentY += 10;
-
-      doc.setFont("helvetica", "bold").setFontSize(13);
-      doc.text(`${billData.customerName?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(8);
-      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
-      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(
-        `Contact Person: ${customer?.contactPerson || billData.customerName || "N/A"}`,
-        10,
-        currentY + 18,
-      );
-      doc.text(
-        `Download Date: ${moment().format("YYYY-MM-DD")}`,
-        10,
-        currentY + 24,
-      );
-
+    if (business.companyLogo) {
       try {
-        const qrDataURL = await QRCode.toDataURL(
-          "https://badesolutions.com.ng",
+        const logo = await loadImageAsDataURL(
+          business.companyLogo,
         );
-        doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
+
+        doc.addImage(
+          logo,
+          "JPEG",
+          10,
+          10,
+          28,
+          20,
+          undefined,
+          "FAST",
+        );
+
+        logoWidth = 34;
       } catch {
-        console.warn("QR code failed");
+        console.warn("Logo failed to load");
       }
-
-      currentY += 30;
-
-      autoTable(doc, {
-        startY: currentY,
-        head: [
-          [
-            "#",
-            "Product",
-            "Code",
-            "Price",
-            "Promo",
-            "CASE",
-            "PCS",
-            "VAT",
-            "Total",
-          ],
-        ],
-        body: billData.orders.map((ord, i) => [
-          i + 1,
-          ord.item?.Name || "N/A",
-          ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-          ord.priceListPrice || 0,
-          ord.promotionData || 0,
-          ord.Qty || 0,
-          ord.pcsReq || 0,
-          ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
-          ord.total?.toFixed(2) || "0.00",
-        ]),
-        theme: "grid",
-        styles: { fontSize: 9 },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 76,
-        margin: { left: pageWidth - 90 },
-        body: [
-          [
-            "Tax Rate",
-            `${billData.taxRate ? billData.taxRate?.toFixed(2) : 0} (inc in sub.)`,
-          ],
-          ["Subtotal", billData.subTotal?.toFixed(2) || "0.00"],
-          [
-            "Discount",
-            billData.discount ? billData.discount?.toFixed(2) : "0.00",
-          ],
-          ["Total Due", billData.grandTotal?.toFixed(2) || "0.00"],
-        ],
-        theme: "grid",
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      doc.setFontSize(10);
-      doc.text(
-        `${totalInWords(billData.grandTotal, business.currency?.currency)}`,
-        10,
-        currentY,
-      );
-      currentY += 10;
-      doc.text("Authorized signatories", 10, currentY);
-      currentY += 10;
-      doc.text(
-        `${business.companyName.toLowerCase()} _______________________________`,
-        10,
-        currentY,
-      );
-      currentY += 10;
-      doc.text(
-        "Customer Sign & Date _______________________________",
-        10,
-        currentY,
-      );
-      currentY += 10;
-      if (business.invoicePolicy) {
-        doc.text(business.invoicePolicy, 10, currentY);
-      }
-
-      doc.setFontSize(9);
-      doc.text(
-        `Kindly note that this ${billData.billStatus} is invalid after ${moment().format("l")}`,
-        10,
-        pageHeight - 20,
-      );
-
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.text(
-          `Page ${i} of ${totalPages}`,
-          pageWidth - 20,
-          pageHeight - 10,
-          { align: "right" },
-        );
-      }
-
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const win = window.open(url, "_blank");
-
-      if (win) {
-        win.onload = () => {
-          Swal.close();
-          win.print();
-        };
-      } else {
-        doc.save(`${billData.customerName || "invoice"}.pdf`);
-        Swal.close();
-      }
-    } catch (error) {
-      Swal.close();
-      console.error("Error generating PDF:", error);
     }
-  };
+
+    const companyX = 10 + logoWidth;
+
+    doc.setTextColor(...BLACK);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+
+    doc.text(
+      business.companyName || "",
+      companyX,
+      15,
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GREY);
+
+    const address = [
+      business.shopAddress,
+      business.companyCity,
+      business.companyState,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    if (address) {
+      doc.text(address, companyX, 20);
+    }
+
+    if (business.email) {
+      doc.text(business.email, companyX, 24.5);
+    }
+
+    if (business.Tel) {
+      doc.text(`Tel: ${business.Tel}`, companyX, 29);
+    }
+
+    doc.setFillColor(...BLACK);
+
+    doc.roundedRect(
+      pageWidth - 76,
+      10,
+      66,
+      24,
+      2,
+      2,
+      "F",
+    );
+
+    doc.setTextColor(...WHITE);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+
+    doc.text(
+      "QUOTATION",
+      pageWidth - 43,
+      19,
+      {
+        align: "center",
+      },
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+
+    doc.text(
+      `Date: ${moment().format("DD MMM YYYY")}`,
+      pageWidth - 43,
+      25,
+      {
+        align: "center",
+      },
+    );
+
+    doc.text(
+      Singlebill?.billStatus
+        ? `Status: ${billData.billStatus}`
+        : "Status: Pending",
+      pageWidth - 43,
+      29,
+      {
+        align: "center",
+      },
+    );
+
+    drawLine(39);
+
+    let currentY = 47;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text("QUOTATION FOR", 10, currentY);
+
+    currentY += 7;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...BLACK);
+
+    doc.text(
+      (
+        billData?.customerName ||
+        customer?.companyName ||
+        ""
+      ).toUpperCase(),
+      10,
+      currentY,
+    );
+
+    currentY += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GREY);
+
+    if (customer?.billingAddress) {
+      doc.text(
+        customer.billingAddress,
+        10,
+        currentY,
+      );
+
+      currentY += 4;
+    }
+
+    if (customer?.phone) {
+      doc.text(
+        `Phone: ${customer.phone}`,
+        10,
+        currentY,
+      );
+
+      currentY += 4;
+    }
+
+    doc.text(
+      `Contact: ${
+        customer?.contactPerson ||
+        billData?.customerName ||
+        "N/A"
+      }`,
+      10,
+      currentY,
+    );
+
+    try {
+      const qrDataURL = await QRCode.toDataURL(
+        "https://badesolutions.com.ng",
+        {
+          margin: 1,
+          width: 150,
+        },
+      );
+
+      doc.addImage(
+        qrDataURL,
+        "PNG",
+        pageWidth - 38,
+        43,
+        26,
+        26,
+      );
+    } catch {
+      console.warn("QR code failed");
+    }
+
+    currentY = 77;
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: {
+        left: 10,
+        right: 10,
+      },
+      head: [
+        [
+          "#",
+          "PRODUCT / DESCRIPTION",
+          "CODE",
+          "PRICE",
+          "PROMO",
+          "CASE",
+          "PCS",
+          "VAT",
+          "TOTAL",
+        ],
+      ],
+      body: Singlebill.orders.map((ord, index) => [
+        index + 1,
+        ord.item?.Name || "N/A",
+        ord.item?.ACDcode ||
+          ord.item?.ADCcode ||
+          "N/A",
+        money(ord.priceListPrice),
+        money(ord.promotionData),
+        safeNumber(ord.Qty),
+        safeNumber(ord.pcsReq),
+        money(
+          ord.item?.VAT?.$numberDecimal ??
+            ord.item?.VAT ??
+            0,
+        ),
+        money(ord.total),
+      ]),
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 7,
+        textColor: DARK,
+        lineColor: [215, 215, 215],
+        lineWidth: 0.2,
+        cellPadding: 2.2,
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: BLACK,
+        textColor: WHITE,
+        fontStyle: "bold",
+        fontSize: 6.5,
+        halign: "center",
+        valign: "middle",
+        cellPadding: 2.5,
+      },
+      alternateRowStyles: {
+        fillColor: VERY_LIGHT,
+      },
+      columnStyles: {
+        0: {
+          cellWidth: 8,
+          halign: "center",
+        },
+        1: {
+          cellWidth: 45,
+          fontStyle: "bold",
+        },
+        2: {
+          cellWidth: 22,
+          halign: "center",
+        },
+        3: {
+          cellWidth: 20,
+          halign: "right",
+        },
+        4: {
+          cellWidth: 19,
+          halign: "right",
+        },
+        5: {
+          cellWidth: 13,
+          halign: "center",
+        },
+        6: {
+          cellWidth: 13,
+          halign: "center",
+        },
+        7: {
+          cellWidth: 18,
+          halign: "right",
+        },
+        8: {
+          cellWidth: 24,
+          halign: "right",
+          fontStyle: "bold",
+        },
+      },
+    });
+
+    currentY = doc.lastAutoTable.finalY + 8;
+
+    const summaryWidth = 78;
+    const summaryX =
+      pageWidth - 10 - summaryWidth;
+
+    if (currentY > pageHeight - 90) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...BLACK);
+
+    doc.text(
+      "QUOTATION SUMMARY",
+      summaryX,
+      currentY,
+    );
+
+    currentY += 4;
+
+    drawLine(
+      currentY,
+      summaryX,
+      pageWidth - 10,
+    );
+
+    currentY += 6;
+
+    const taxRate = safeNumber(
+      Singlebill.taxRate,
+    );
+
+    const subtotal = safeNumber(
+      Singlebill.subTotal,
+    );
+
+    const discount = safeNumber(
+      Singlebill.discount,
+    );
+
+    const grandTotal = safeNumber(
+      Singlebill.grandTotal,
+    );
+
+    const summaryRow = (
+      label,
+      value,
+      bold = false,
+    ) => {
+      doc.setFont(
+        "helvetica",
+        bold ? "bold" : "normal",
+      );
+
+      doc.setFontSize(bold ? 8 : 7.5);
+
+      doc.setTextColor(
+        ...(bold ? BLACK : GREY),
+      );
+
+      doc.text(
+        label,
+        summaryX,
+        currentY,
+      );
+
+      doc.text(
+        value,
+        pageWidth - 10,
+        currentY,
+        {
+          align: "right",
+        },
+      );
+
+      currentY += bold ? 7 : 5.5;
+    };
+
+    summaryRow(
+      "Tax Rate",
+      `${taxRate.toFixed(2)}%`,
+    );
+
+    summaryRow(
+      "Subtotal",
+      money(subtotal),
+    );
+
+    summaryRow(
+      "Discount",
+      money(discount),
+    );
+
+    doc.setFillColor(...BLACK);
+
+    doc.roundedRect(
+      summaryX - 2,
+      currentY - 2,
+      summaryWidth + 2,
+      12,
+      1.5,
+      1.5,
+      "F",
+    );
+
+    doc.setTextColor(...WHITE);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+
+    doc.text(
+      "TOTAL QUOTATION",
+      summaryX + 2,
+      currentY + 5.5,
+    );
+
+    doc.text(
+      money(grandTotal),
+      pageWidth - 12,
+      currentY + 5.5,
+      {
+        align: "right",
+      },
+    );
+
+    currentY += 20;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      "AMOUNT IN WORDS",
+      10,
+      currentY,
+    );
+
+    currentY += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...DARK);
+
+    const amountWords = totalInWords(
+      grandTotal,
+      business.currency?.currency,
+    );
+
+    const words = doc.splitTextToSize(
+      amountWords || "N/A",
+      pageWidth - 20,
+    );
+
+    doc.text(
+      words,
+      10,
+      currentY,
+    );
+
+    currentY +=
+      words.length * 4 + 8;
+
+    if (business.invoicePolicy) {
+      const policyLines =
+        doc.splitTextToSize(
+          business.invoicePolicy,
+          pageWidth - 28,
+        );
+
+      const policyHeight =
+        policyLines.length * 4 + 10;
+
+      doc.setFillColor(...VERY_LIGHT);
+
+      doc.roundedRect(
+        10,
+        currentY,
+        pageWidth - 20,
+        policyHeight,
+        2,
+        2,
+        "F",
+      );
+
+      doc.setFont(
+        "helvetica",
+        "bold",
+      );
+
+      doc.setFontSize(7);
+      doc.setTextColor(...BLACK);
+
+      doc.text(
+        "TERMS / QUOTATION POLICY",
+        15,
+        currentY + 6,
+      );
+
+      doc.setFont(
+        "helvetica",
+        "normal",
+      );
+
+      doc.setFontSize(7);
+      doc.setTextColor(...GREY);
+
+      doc.text(
+        policyLines,
+        15,
+        currentY + 11,
+      );
+
+      currentY += policyHeight + 8;
+    }
+
+    if (currentY > pageHeight - 55) {
+      doc.addPage();
+      currentY = 25;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      "AUTHORIZATION",
+      10,
+      currentY,
+    );
+
+    currentY += 9;
+
+    const signatureWidth = 75;
+
+    doc.setDrawColor(...DARK);
+    doc.setLineWidth(0.3);
+
+    doc.line(
+      10,
+      currentY + 12,
+      10 + signatureWidth,
+      currentY + 12,
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      business.companyName ||
+        "Authorized Representative",
+      10,
+      currentY + 17,
+    );
+
+    const customerSignatureX =
+      pageWidth - 10 - signatureWidth;
+
+    doc.line(
+      customerSignatureX,
+      currentY + 12,
+      pageWidth - 10,
+      currentY + 12,
+    );
+
+    doc.text(
+      "Customer Signature & Date",
+      customerSignatureX,
+      currentY + 17,
+    );
+
+    const totalPages =
+      doc.internal.getNumberOfPages();
+
+    for (
+      let page = 1;
+      page <= totalPages;
+      page++
+    ) {
+      doc.setPage(page);
+
+      doc.setDrawColor(...LIGHT_GREY);
+      doc.setLineWidth(0.25);
+
+      doc.line(
+        10,
+        pageHeight - 16,
+        pageWidth - 10,
+        pageHeight - 16,
+      );
+
+      doc.setFont(
+        "helvetica",
+        "normal",
+      );
+
+      doc.setFontSize(6.5);
+      doc.setTextColor(...GREY);
+
+      doc.text(
+        `Quotation generated by ${
+          business.companyName || "Business"
+        }`,
+        10,
+        pageHeight - 10,
+      );
+
+      doc.text(
+        `Page ${page} of ${totalPages}`,
+        pageWidth - 10,
+        pageHeight - 10,
+        {
+          align: "right",
+        },
+      );
+    }
+
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
+
+    if (win) {
+      win.onload = () => {
+        Swal.close();
+
+        setTimeout(() => {
+          win.print();
+        }, 300);
+      };
+    } else {
+      doc.save(
+        `${
+          Singlebill.customerName ||
+          "quotation"
+        }-quotation.pdf`,
+      );
+
+      Swal.close();
+    }
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 60000);
+  } catch (error) {
+    Swal.close();
+
+    Swal.fire({
+      icon: "error",
+      title: "Quotation Error",
+      text: "Unable to generate the quotation PDF.",
+    });
+  }
+};
 
   // ==================== HANDLERS ====================
   const handleProductSelection = async (productId) => {
@@ -716,7 +1218,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
           {isDraft && (
             <button
               title={`Download and Print ${Singlebill.billStatus}`}
-              onClick={() => generatePdf(Business, Singlebill.customer, bill)}
+              onClick={() => generatePdf(Business, Singlebill.customer, Singlebill)}
               className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 transition ml-auto"
             >
               <PrinterIcon className="h-5 w-5" />
