@@ -110,19 +110,18 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
       try {
         await OneSignal.init({
           appId,
-          allowLocalhostAsSecureOrigin: true, // needed for local testing
+          // allowLocalhostAsSecureOrigin: true, // needed for local testing
           // serviceWorkerPath: "/OneSignalSDKWorker.js", // if you use a custom path
         });
         oneSignalReady.current = true;
-        console.log("[OneSignal] initialized");
       } catch (err) {
-        console.error("[OneSignal] init failed:", err);
+        // console.error("[OneSignal] init failed:", err);
       }
     })();
   }, []);
 
   const registerOneSignal = async (user) => {
-    if (!user?._id) return;
+    // if (!user?._id) return;
 
     try {
       if (oneSignalInitPromise.current) {
@@ -137,25 +136,23 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
       // 2. Ask for permission (required for Web Push)
       const permission = await OneSignal.Notifications.requestPermission();
-      console.log("[OneSignal] permission:", permission);
 
       if (permission !== true && permission !== "granted") {
-        console.warn("[OneSignal] user did not allow notifications");
+        console.warn("user did not allow notifications");
         return;
       }
 
       // 3. Optional: confirm subscription exists
       const isPushEnabled = await OneSignal.User.PushSubscription.optedIn;
-      console.log("[OneSignal] optedIn:", isPushEnabled);
+      // console.log("[OneSignal] optedIn:", isPushEnabled);
 
       if (!isPushEnabled) {
         await OneSignal.User.PushSubscription.optIn();
       }
 
       await OneSignal.User.addTag("_id", externalId);
-      console.log("[OneSignal] linked + subscribed:", externalId);
     } catch (err) {
-      console.error("[OneSignal] register failed:", err);
+      // console.error("[OneSignal] register failed:", err);
     }
   };
 
