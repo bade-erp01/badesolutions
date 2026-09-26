@@ -120,13 +120,20 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
       
       const decryptedUser = Dencrypt(data.Newcustomer);
+
       
       await Promise.all([
         // ensure to logout old session cookies
         dispatch(logoutAction()),
+
         // create the user push notification 
+         OneSignal.init({
+            appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
+        }),
+
         OneSignal.login(String(decryptedUser)),
-        OneSignal.User.addTag("_id", decryptedUser)
+
+        OneSignal.User.addTag("_id", String(decryptedUser))
       ])
 
       dispatch(
