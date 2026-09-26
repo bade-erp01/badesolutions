@@ -21,12 +21,12 @@ export default function AccountingERP() {
   const Params = useParams();
 
   const modules = [
-    { label: "Equity", id: "dashboard", icon: BarChart3, badge: "Core", url:"Equity" },
-    { label: "Accounts Receivable", id: "ar", icon: Users, badge: "New", url:"Receivables" },
+    { label: "Equity", id: "dashboard", icon: BarChart3, badge: "Beta", url:"Equity" },
+    { label: "Accounts Receivable", id: "ar", icon: Users, badge: "Core", url:"Receivables" },
     { label: "Accounts Payable", id: "ap", icon: CreditCard, badge: "Core", url:"Payables" },
     { label: "Balance Sheet", id: "balance-sheet", icon: FileText, badge: "Core", url:"BalanceSheet" },
-    { label: "Income Statement", id: "income-statement", icon: TrendingUp, badge: "Core", url:"P&L" },
-    { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Core", url:"Chart-Of-Accounts" },
+    { label: "Income Statement", id: "income-statement", icon: TrendingUp, badge: "Beta", url:"P&L" },
+    { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Beta", url:"Chart-Of-Accounts" },
     { label: "Bank Account", id:"Bank-Accounts", icon: Building, badge:"Core", url:"Bank-Accounts"},
     { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll"},
   ];
