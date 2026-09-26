@@ -85,202 +85,725 @@ export default function InvoicePage({
 
   //  Full PDF generator (unchanged)
   const generatePdf = async (business, customer, bill) => {
-    try {
-      plsWait("Setting things up, Ensure your printer is connected ⌛...");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+  try {
+    plsWait("Setting things up, Ensure your printer is connected ⌛...");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 10;
-      let currentY = margin;
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
 
-      if (business.companyLogo) {
-        try {
-          const logo = await loadImageAsDataURL(business.companyLogo);
-          doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-        } catch (err) {
-          console.warn("Logo failed to load");
-        }
-      }
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 10;
 
-      doc.setFontSize(16).setFont("helvetica", "bold");
-      doc.text(business.companyName || "", pageWidth - 10, 12, {
-        align: "right",
+    const BLUE = [37, 99, 235];
+    const DARK_BLUE = [29, 78, 216];
+    const LIGHT_BLUE = [239, 246, 255];
+    const PALE_BLUE = [248, 250, 255];
+    const DARK = [31, 41, 55];
+    const GREY = [100, 116, 139];
+    const LIGHT_GREY = [226, 232, 240];
+    const WHITE = [255, 255, 255];
+
+    const safeNumber = (value) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    };
+
+    const money = (value) =>
+      safeNumber(value).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
 
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(
-        `${business.shopAddress || ""} ${business.companyState || ""}, ${
-          business.companyCity || ""
-        }`,
-        pageWidth - 10,
-        20,
-        { align: "right" },
-      );
-      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
-        align: "right",
-      });
+    const drawLine = (y, x1 = margin, x2 = pageWidth - margin) => {
+      doc.setDrawColor(...LIGHT_GREY);
+      doc.setLineWidth(0.25);
+      doc.line(x1, y, x2, y);
+    };
 
-      currentY = 50;
+    const drawLabel = (text, x, y) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.5);
+      doc.setTextColor(...GREY);
+      doc.text(text.toUpperCase(), x, y);
+    };
 
-      doc.setFontSize(17).setTextColor(0, 0, 0).setFont("helvetica", "bold");
-      doc.text(
-        `${bill.billStatus?.slice(0, 3).toUpperCase()}/${bill.billReferenceNo}`,
-        10,
-        currentY,
-      );
-      currentY += 10;
+    let currentY = margin;
 
-      doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(7).setTextColor(0, 0, 0);
-      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
-      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(
-        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
-        10,
-        currentY + 18,
-      );
-      doc.text(
-        `Download Date: ${moment().format("YYYY-MM-DD")}`,
-        10,
-        currentY + 24,
-      );
+    let logoWidth = 0;
 
-      currentY += 2;
-
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          ["Waybill No:", bill.WayBillNo || ""],
-          ["Order Date:", bill.startDate || ""],
-          [
-            "Invoice Date:",
-            moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || "",
-          ],
-        ],
-        theme: "plain",
-        styles: { fontSize: 7, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        head: [
-          [
-            "#",
-            "Product",
-            "Code",
-            "Price",
-            "Promo",
-            "Case",
-            "Pcs",
-            "VAT",
-            "Total",
-          ],
-        ],
-        body: bill.orders
-          .filter((entry) => entry.Qty > 0 || entry.pcsReq > 0)
-          .map((ord, i) => [
-            i + 1,
-            `${ord.item?.Name} - [${ord.item?.Pieces} pcs]`,
-            ord.item?.ACDcode || "N/A",
-            ord.priceListPrice?.toFixed(2) || 0,
-            ord.promotionData || 0,
-            ord.Qty,
-            ord.pcsReq || 0,
-            ord.vat > 0 ? ord.item?.VAT?.$numberDecimal : 0,
-            ord.total?.toFixed(2) || 0,
-          ]),
-        theme: "grid",
-        styles: { fontSize: 7 },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          ["Tax Rate", `${bill.taxRate.toFixed(2) || 0} (inc in sub.)`],
-          ["Subtotal", bill.subTotal.toFixed(2) || 0],
-          ["Discount", bill.discount.toFixed(2) || 0],
-          ["Total Due", bill.grandTotal.toFixed(2) || 0],
-        ],
-        theme: "grid",
-        styles: { fontSize: 7, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      doc.setFontSize(7);
-      doc.text(
-        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
-        margin,
-        currentY,
-      );
-      currentY += 10;
-      doc.text("Authorized Signatures", margin, currentY);
-      currentY += 10;
-      doc.text(
-        `${business.companyName.toLowerCase()} _______________________________`,
-        margin,
-        currentY,
-      );
-      currentY += 10;
-      doc.text(
-        "Customer Sign & Date _______________________________",
-        margin,
-        currentY,
-      );
-      currentY += 10;
-      if (business.invoicePolicy) {
-        doc.text(business.invoicePolicy, margin, currentY);
-        currentY += 10;
-      }
-
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.text(
-          `Page ${i} of ${totalPages}`,
-          pageWidth - 20,
-          pageHeight - 10,
-          { align: "right" },
+    if (business.companyLogo) {
+      try {
+        const logo = await loadImageAsDataURL(
+          business.companyLogo,
         );
-      }
 
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const win = window.open(url, "_blank");
+        doc.addImage(
+          logo,
+          "JPEG",
+          margin,
+          10,
+          28,
+          22,
+          undefined,
+          "FAST",
+        );
 
-      if (win) {
-        win.onload = () => {
-          Swal.close();
-          win.print();
-        };
-      } else {
-        doc.save(`${bill.customerName || "invoice"}.pdf`);
-        Swal.close();
+        logoWidth = 34;
+      } catch {
+        console.warn("Logo failed to load");
       }
-    } catch (error) {
-      Swal.close();
-      console.error("Error generating PDF:", error);
     }
-  };
+
+    const companyX = margin + logoWidth;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(...DARK);
+
+    doc.text(
+      business.companyName || "",
+      companyX,
+      15,
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GREY);
+
+    const companyAddress = [
+      business.shopAddress,
+      business.companyCity,
+      business.companyState,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    if (companyAddress) {
+      doc.text(companyAddress, companyX, 20);
+    }
+
+    if (business.email) {
+      doc.text(business.email, companyX, 24.5);
+    }
+
+    if (business.Tel) {
+      doc.text(
+        `Tel: ${business.Tel}`,
+        companyX,
+        29,
+      );
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.setTextColor(...BLUE);
+
+    doc.text(
+      `${bill.billStatus?.slice(0, 3).toUpperCase() || "INV"}`,
+      pageWidth - margin,
+      15,
+      {
+        align: "right",
+      },
+    );
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...DARK);
+
+    doc.text(
+      `Ref: ${bill.billReferenceNo || "N/A"}`,
+      pageWidth - margin,
+      21,
+      {
+        align: "right",
+      },
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      `Date: ${moment().format("DD MMM YYYY")}`,
+      pageWidth - margin,
+      26,
+      {
+        align: "right",
+      },
+    );
+
+    doc.setDrawColor(...BLUE);
+    doc.setLineWidth(0.8);
+    doc.line(
+      margin,
+      37,
+      pageWidth - margin,
+      37,
+    );
+
+    currentY = 46;
+
+    drawLabel("Bill To", margin, currentY);
+
+    currentY += 6;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+
+    doc.text(
+      bill.customerName?.toUpperCase() || "",
+      margin,
+      currentY,
+    );
+
+    currentY += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...GREY);
+
+    if (customer?.billingAddress) {
+      doc.text(
+        customer.billingAddress,
+        margin,
+        currentY,
+      );
+      currentY += 4;
+    }
+
+    if (customer?.phone) {
+      doc.text(
+        `Phone: ${customer.phone}`,
+        margin,
+        currentY,
+      );
+      currentY += 4;
+    }
+
+    doc.text(
+      `Contact Person: ${
+        customer?.contactPerson ||
+        bill.customerName ||
+        "N/A"
+      }`,
+      margin,
+      currentY,
+    );
+
+    const infoX = pageWidth - 85;
+    const infoY = 46;
+
+    drawLabel("Document Information", infoX, infoY);
+
+    autoTable(doc, {
+      startY: infoY + 3,
+      tableWidth: 75,
+      margin: {
+        left: infoX,
+      },
+      head: [],
+      body: [
+        ["Waybill No.", bill.WayBillNo || "N/A"],
+        ["Order Date", bill.startDate || "N/A"],
+        [
+          "Invoice Date",
+          bill.DELIVERYDATE
+            ? moment(bill.DELIVERYDATE).format("DD MMM YYYY")
+            : "N/A",
+        ],
+      ],
+      theme: "plain",
+      styles: {
+        font: "helvetica",
+        fontSize: 7,
+        textColor: DARK,
+        cellPadding: 1.5,
+      },
+      columnStyles: {
+        0: {
+          cellWidth: 30,
+          fontStyle: "bold",
+          textColor: GREY,
+        },
+        1: {
+          cellWidth: 45,
+          halign: "right",
+        },
+      },
+    });
+
+    currentY = Math.max(
+      currentY + 8,
+      doc.lastAutoTable.finalY + 8,
+    );
+
+    const orders = Array.isArray(bill.orders)
+      ? bill.orders.filter(
+          (entry) =>
+            safeNumber(entry.Qty) > 0 ||
+            safeNumber(entry.pcsReq) > 0,
+        )
+      : [];
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: {
+        left: margin,
+        right: margin,
+      },
+      head: [
+        [
+          "#",
+          "Product",
+          "Code",
+          "Price",
+          "Promo",
+          "Case",
+          "Pcs",
+          "VAT",
+          "Total",
+        ],
+      ],
+      body: orders.map((ord, i) => [
+        i + 1,
+        `${ord.item?.Name || "N/A"}${
+          ord.item?.Pieces
+            ? ` - [${ord.item.Pieces} pcs]`
+            : ""
+        }`,
+        ord.item?.ACDcode ||
+          ord.item?.ADCcode ||
+          "N/A",
+        money(ord.priceListPrice),
+        money(ord.promotionData),
+        safeNumber(ord.Qty),
+        safeNumber(ord.pcsReq),
+        ord.vat > 0
+          ? money(
+              ord.item?.VAT?.$numberDecimal ??
+                ord.item?.VAT ??
+                0,
+            )
+          : "0.00",
+        money(ord.total),
+      ]),
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 6.8,
+        textColor: DARK,
+        lineColor: LIGHT_GREY,
+        lineWidth: 0.2,
+        cellPadding: 2,
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: BLUE,
+        textColor: WHITE,
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 6.5,
+        halign: "center",
+        valign: "middle",
+        cellPadding: 2.5,
+      },
+      alternateRowStyles: {
+        fillColor: PALE_BLUE,
+      },
+      columnStyles: {
+        0: {
+          cellWidth: 8,
+          halign: "center",
+        },
+        1: {
+          cellWidth: 47,
+          fontStyle: "bold",
+        },
+        2: {
+          cellWidth: 20,
+          halign: "center",
+        },
+        3: {
+          cellWidth: 19,
+          halign: "right",
+        },
+        4: {
+          cellWidth: 18,
+          halign: "right",
+        },
+        5: {
+          cellWidth: 13,
+          halign: "center",
+        },
+        6: {
+          cellWidth: 13,
+          halign: "center",
+        },
+        7: {
+          cellWidth: 17,
+          halign: "right",
+        },
+        8: {
+          cellWidth: 23,
+          halign: "right",
+          fontStyle: "bold",
+          textColor: DARK_BLUE,
+        },
+      },
+      didParseCell: (data) => {
+        if (
+          data.section === "body" &&
+          data.column.index === 8
+        ) {
+          data.cell.styles.textColor = DARK_BLUE;
+          data.cell.styles.fontStyle = "bold";
+        }
+      },
+    });
+
+    currentY = doc.lastAutoTable.finalY + 8;
+
+    const summaryWidth = 78;
+    const summaryX =
+      pageWidth - margin - summaryWidth;
+
+    if (currentY > pageHeight - 85) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...DARK);
+
+    doc.text(
+      "PAYMENT SUMMARY",
+      summaryX,
+      currentY,
+    );
+
+    currentY += 4;
+
+    doc.setDrawColor(...BLUE);
+    doc.setLineWidth(0.5);
+    doc.line(
+      summaryX,
+      currentY,
+      pageWidth - margin,
+      currentY,
+    );
+
+    currentY += 6;
+
+    const summaryRow = (
+      label,
+      value,
+      emphasized = false,
+    ) => {
+      doc.setFont(
+        "helvetica",
+        emphasized ? "bold" : "normal",
+      );
+
+      doc.setFontSize(
+        emphasized ? 8 : 7.2,
+      );
+
+      doc.setTextColor(
+        ...(emphasized ? DARK : GREY),
+      );
+
+      doc.text(
+        label,
+        summaryX,
+        currentY,
+      );
+
+      doc.text(
+        value,
+        pageWidth - margin,
+        currentY,
+        {
+          align: "right",
+        },
+      );
+
+      currentY += emphasized ? 7 : 5.5;
+    };
+
+    summaryRow(
+      "Tax Rate",
+      `${safeNumber(bill.taxRate).toFixed(2)}%`,
+    );
+
+    summaryRow(
+      "Subtotal",
+      money(bill.subTotal),
+    );
+
+    summaryRow(
+      "Discount",
+      money(bill.discount),
+    );
+
+    currentY += 1;
+
+    doc.setFillColor(...LIGHT_BLUE);
+
+    doc.roundedRect(
+      summaryX - 2,
+      currentY - 2,
+      summaryWidth + 2,
+      13,
+      1.5,
+      1.5,
+      "F",
+    );
+
+    doc.setTextColor(...DARK_BLUE);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+
+    doc.text(
+      "TOTAL DUE",
+      summaryX + 3,
+      currentY + 6,
+    );
+
+    doc.setFontSize(9);
+
+    doc.text(
+      money(bill.grandTotal),
+      pageWidth - margin - 3,
+      currentY + 6,
+      {
+        align: "right",
+      },
+    );
+
+    currentY += 21;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.8);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      "AMOUNT IN WORDS",
+      margin,
+      currentY,
+    );
+
+    currentY += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.2);
+    doc.setTextColor(...DARK);
+
+    const amountWords = totalInWords(
+      bill.grandTotal,
+      business.currency?.currency,
+    );
+
+    const amountLines = doc.splitTextToSize(
+      amountWords || "N/A",
+      pageWidth - 20,
+    );
+
+    doc.text(
+      amountLines,
+      margin,
+      currentY,
+    );
+
+    currentY +=
+      amountLines.length * 4 + 7;
+
+    if (business.invoicePolicy) {
+      const policyLines =
+        doc.splitTextToSize(
+          business.invoicePolicy,
+          pageWidth - 30,
+        );
+
+      const policyHeight =
+        policyLines.length * 4 + 10;
+
+      if (
+        currentY + policyHeight >
+        pageHeight - 65
+      ) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      doc.setFillColor(...PALE_BLUE);
+      doc.setDrawColor(...LIGHT_GREY);
+
+      doc.roundedRect(
+        margin,
+        currentY,
+        pageWidth - 20,
+        policyHeight,
+        2,
+        2,
+        "FD",
+      );
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.8);
+      doc.setTextColor(...DARK_BLUE);
+
+      doc.text(
+        "TERMS & CONDITIONS",
+        margin + 5,
+        currentY + 6,
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(6.8);
+      doc.setTextColor(...GREY);
+
+      doc.text(
+        policyLines,
+        margin + 5,
+        currentY + 11,
+      );
+
+      currentY += policyHeight + 8;
+    }
+
+    if (currentY > pageHeight - 55) {
+      doc.addPage();
+      currentY = 25;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      "AUTHORIZED SIGNATURES",
+      margin,
+      currentY,
+    );
+
+    currentY += 10;
+
+    const signatureWidth = 72;
+    const rightSignatureX =
+      pageWidth - margin - signatureWidth;
+
+    doc.setDrawColor(...DARK);
+    doc.setLineWidth(0.3);
+
+    doc.line(
+      margin,
+      currentY,
+      margin + signatureWidth,
+      currentY,
+    );
+
+    doc.line(
+      rightSignatureX,
+      currentY,
+      pageWidth - margin,
+      currentY,
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.8);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      business.companyName ||
+        "Authorized Representative",
+      margin,
+      currentY + 5,
+    );
+
+    doc.text(
+      "Customer Signature & Date",
+      rightSignatureX,
+      currentY + 5,
+    );
+
+    const totalPages =
+      doc.internal.getNumberOfPages();
+
+    for (
+      let i = 1;
+      i <= totalPages;
+      i++
+    ) {
+      doc.setPage(i);
+
+      doc.setDrawColor(...LIGHT_GREY);
+      doc.setLineWidth(0.25);
+
+      doc.line(
+        margin,
+        pageHeight - 15,
+        pageWidth - margin,
+        pageHeight - 15,
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(6.2);
+      doc.setTextColor(...GREY);
+
+      doc.text(
+        `${business.companyName || "Business"} • ${bill.billReferenceNo || ""}`,
+        margin,
+        pageHeight - 9,
+      );
+
+      doc.text(
+        `Page ${i} of ${totalPages}`,
+        pageWidth - margin,
+        pageHeight - 9,
+        {
+          align: "right",
+        },
+      );
+    }
+
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
+
+    if (win) {
+      win.onload = () => {
+        Swal.close();
+
+        setTimeout(() => {
+          win.print();
+        }, 300);
+      };
+    } else {
+      doc.save(
+        `${bill.customerName || "invoice"}.pdf`,
+      );
+      Swal.close();
+    }
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 60000);
+  } catch (error) {
+    Swal.close();
+    console.error(
+      "Error generating PDF:",
+      error,
+    );
+  }
+};
 
   const config = {
     headers: {
