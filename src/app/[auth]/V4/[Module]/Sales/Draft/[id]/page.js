@@ -108,7 +108,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
   };
 
   // ==================== PDF GENERATOR ====================
-  const generatePdf = async (business, customer, billData) => {
+const generatePdf = async (business, customer, billData) => {
   try {
     plsWait("Preparing quotation ⌛...");
     await new Promise((resolve) => setTimeout(resolve, 800));
@@ -205,60 +205,32 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
     }
 
     if (business.Tel) {
-      doc.text(`Tel: ${business.Tel}`, companyX, 29);
+      doc.text(
+        `Tel: ${business.Tel}`,
+        companyX,
+        29,
+      );
     }
-
-    doc.setFillColor(...BLACK);
-
-    doc.roundedRect(
-      pageWidth - 76,
-      10,
-      66,
-      24,
-      2,
-      2,
-      "F",
-    );
-
-    doc.setTextColor(...WHITE);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(15);
-
-    doc.text(
-      "QUOTATION",
-      pageWidth - 43,
-      19,
-      {
-        align: "center",
-      },
-    );
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-
-    doc.text(
-      `Date: ${moment().format("DD MMM YYYY")}`,
-      pageWidth - 43,
-      25,
-      {
-        align: "center",
-      },
-    );
-
-    doc.text(
-      Singlebill?.billStatus
-        ? `Status: ${billData.billStatus}`
-        : "Status: Pending",
-      pageWidth - 43,
-      29,
-      {
-        align: "center",
-      },
-    );
 
     drawLine(39);
 
-    let currentY = 47;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(...BLACK);
+
+    doc.text("QUOTATION", 10, 47);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREY);
+
+    doc.text(
+      `Date: ${moment().format("DD MMM YYYY")}`,
+      10,
+      53,
+    );
+
+    let currentY = 63;
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7);
@@ -339,7 +311,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       console.warn("QR code failed");
     }
 
-    currentY = 77;
+    currentY = 87;
 
     autoTable(doc, {
       startY: currentY,
@@ -497,7 +469,9 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
         bold ? "bold" : "normal",
       );
 
-      doc.setFontSize(bold ? 8 : 7.5);
+      doc.setFontSize(
+        bold ? 8 : 7.5,
+      );
 
       doc.setTextColor(
         ...(bold ? BLACK : GREY),
@@ -787,6 +761,11 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
     }, 60000);
   } catch (error) {
     Swal.close();
+
+    console.error(
+      "Error generating quotation PDF:",
+      error,
+    );
 
     Swal.fire({
       icon: "error",
