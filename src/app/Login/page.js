@@ -1,385 +1,1394 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import Nav1 from "../Components/Nav1";
 import Image from "next/image";
 import Link from "next/link";
-import Footer1 from "../Components/Footer1";
-import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
-import { loginSuccess, loginFailure } from "../../../lib/User";
-import { useDispatch, useSelector } from "react-redux";
-import { Encrypt, Dencrypt } from "../../../Functions/Functions";
-import Footer2 from "../Components/Footer2";
-import { useRouter, useParams } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  LockKeyhole,
+  Mail,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  LogOut,
+} from "lucide-react";
+
+import Nav1 from "../Components/Nav1";
+import Footer1 from "../Components/Footer1";
+
+import { SuccessToast, ErrorMessage } from "../../../Functions/Mics";
+
+import {
+  loginSuccess,
+  loginFailure,
+  logout as logoutAction,
+} from "../../../lib/User";
+
+import {
+  Encrypt,
+  Dencrypt,
+} from "../../../Functions/Functions";
+
 import OneSignal from "react-onesignal";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
-import { logout as logoutAction } from "../../../lib/User";
 
-export default function Login({ userInfo, businessInfo, url, SessionId }) {
+export default function Login({
+  userInfo,
+  businessInfo,
+  url,
+  SessionId,
+}) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const path = useParams();
+
   const [date, setDate] = useState("");
   const [weekday, setWeekday] = useState("");
   const [time, setTime] = useState("");
-  const [location, setLocation] = useState("Loading location...");
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [location, setLocation] = useState("Your area");
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
   const [showSplash, setShowSplash] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  /*
+   * ============================================================
+   * DATE / LOCATION
+   * ============================================================
+   */
+
   useEffect(() => {
     const now = new Date();
-    setDate(now.getDate() + getOrdinal(now.getDate()));
-    setWeekday(now.toLocaleDateString(undefined, { weekday: "short" }));
-    setTime(
-      now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
+
+    const day = now.getDate();
+
+    setDate(`${day}${getOrdinal(day)}`);
+
+    setWeekday(
+      now.toLocaleDateString(undefined, {
+        weekday: "long",
+      }),
     );
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const { latitude, longitude } = pos.coords;
-          try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-            );
-            const data = await res.json();
-            setLocation(
-              data.address.city ||
-                data.address.town ||
-                data.address.village ||
-                data.address.state ||
-                "Your area",
-            );
-          } catch {
-            setLocation("Your area");
-          }
-        },
-        () => setLocation("Your area"),
-      );
-    } else {
+    setTime(
+      now.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    );
+
+    if (!navigator.geolocation) {
       setLocation("Your area");
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              "Location lookup failed",
+            );
+          }
+
+          const data = await response.json();
+
+          setLocation(
+            data?.address?.city ||
+              data?.address?.town ||
+              data?.address?.village ||
+              data?.address?.state ||
+              "Your area",
+          );
+        } catch {
+          setLocation("Your area");
+        }
+      },
+      () => {
+        setLocation("Your area");
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 8000,
+        maximumAge: 300000,
+      },
+    );
   }, []);
 
-  function getOrdinal(n) {
-    if (n > 3 && n < 21) return "th";
-    switch (n % 10) {
+  function getOrdinal(number) {
+    if (number > 3 && number < 21) {
+      return "th";
+    }
+
+    switch (number % 10) {
       case 1:
         return "st";
+
       case 2:
         return "nd";
+
       case 3:
         return "rd";
+
       default:
         return "th";
     }
   }
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  /*
+   * ============================================================
+   * FORM
+   * ============================================================
+   */
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  /*
+   * ============================================================
+   * ONESIGNAL
+   * ============================================================
+   */
 
-    if (!formData.email || !formData.password) {
-      return ErrorMessage("Email and password are required");
+  const registerOneSignal = async (user) => {
+    try {
+      if (!user?._id) {
+        return;
+      }
+
+      const appId =
+        process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+
+      if (!appId) {
+        
+        return;
+      }
+
+      /*
+       * Initialize OneSignal
+       */
+      await OneSignal.init({
+        appId,
+      });
+
+      /*
+       * Associate the OneSignal subscription
+       * with the authenticated BADE user.
+       */
+      await OneSignal.login(
+        String(user._id),
+      );
+
+      /*
+       * Optional tag.
+       *
+       * This can be useful when you want to
+       * filter/segment users in OneSignal.
+       */
+      await OneSignal.User.addTag(
+        "_id",
+        String(user._id),
+      );
+
+    } catch (error) {
+
+    }
+  };
+
+  /*
+   * ============================================================
+   * LOGIN
+   * ============================================================
+   */
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (
+      !formData.email ||
+      !formData.password
+    ) {
+      ErrorMessage(
+        "Email and password are required",
+      );
+
+      return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(`${url}/api/v1/Login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+
+      /*
+       * Authenticate with BADE backend
+       */
+      const response = await fetch(
+        `${url}/api/v1/Login`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            formData: Encrypt(formData),
+          }),
         },
-        body: JSON.stringify({
-          formData: Encrypt(formData),
-        }),
-      });
+      );
 
       let data;
+
       try {
         data = await response.json();
       } catch {
-        throw new Error("Invalid server response");
+        throw new Error(
+          "Invalid server response",
+        );
       }
 
+      /*
+       * Login failed
+       */
       if (!response.ok) {
-        throw new Error(data?.error || "Login failed");
+        throw new Error(
+          data?.error || "Login failed",
+        );
       }
 
-      if (!data?.Newcustomer || !data?.Tenant) {
-        throw new Error("Invalid login response");
+      /*
+       * Validate login response
+       */
+      if (
+        !data?.Newcustomer ||
+        !data?.Tenant
+      ) {
+        throw new Error(
+          "Invalid login response",
+        );
       }
 
-      
-      const decryptedUser = Dencrypt(data.Newcustomer);
+      /*
+       * Decrypt user
+       */
+      const decryptedUser = Dencrypt(
+        data.Newcustomer,
+      );
 
-      
-      await Promise.all([
-        // ensure to logout old session cookies
-        dispatch(logoutAction()),
+      /*
+       * Clear any previous session first.
+       */
+      await dispatch(
+        logoutAction(),
+      );
 
-        // create the user push notification 
-         OneSignal.init({
-            appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
-        }),
+      /*
+       * Register the authenticated user
+       * with OneSignal.
+       *
+       * This is deliberately separate from Redux
+       * because OneSignal is an external side effect.
+       */
+      await registerOneSignal(
+        decryptedUser,
+      );
 
-        OneSignal.login(String(decryptedUser)),
-
-        OneSignal.User.addTag("_id", String(decryptedUser))
-      ])
-
+      /*
+       * Store the authenticated BADE session.
+       */
       dispatch(
         loginSuccess({
           user: decryptedUser,
+
           business: data.Tenant,
-          SessionId: data.SessionId,
-          rustyRoof: data.rustyRoof,
+
+          SessionId:
+            data.SessionId,
+
+          rustyRoof:
+            data.rustyRoof,
         }),
       );
 
+      /*
+       * Clear form
+       */
+      setFormData({
+        email: "",
+        password: "",
+      });
+
+      /*
+       * Show splash
+       */
       setShowSplash(true);
-      setFormData({ email: "", password: "" });
 
-      const sanitizedCompanyName = data.Tenant.toLowerCase()
-        .trim()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
+      /*
+       * Build dashboard URL
+       */
+      const sanitizedCompanyName =
+        data.Tenant
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(
+            /[^a-z0-9-]/g,
+            "",
+          );
 
-      const dashboardUrl = `/${sanitizedCompanyName}/V4`;
+      const dashboardUrl =
+        `/${sanitizedCompanyName}/V4`;
 
+      /*
+       * Redirect after splash
+       */
       setTimeout(() => {
         setLoading(false);
-        window.location.assign(dashboardUrl);
+
+        window.location.assign(
+          dashboardUrl,
+        );
       }, 5000);
     } catch (error) {
-      setShowSplash(false);
-      setLoading(false);
-      setFormData({ email: "", password: "" });
+      console.error(
+        "Login error:",
+        error,
+      );
 
-      ErrorMessage(error.message || "Something went wrong");
-      dispatch(loginFailure(error.message || "Login failed"));
+      setShowSplash(false);
+
+      setLoading(false);
+
+      setFormData({
+        email: "",
+        password: "",
+      });
+
+      ErrorMessage(
+        error?.message ||
+          "Something went wrong",
+      );
+
+      dispatch(
+        loginFailure(
+          error?.message ||
+            "Login failed",
+        ),
+      );
     }
   };
 
+  /*
+   * ============================================================
+   * SESSION
+   * ============================================================
+   */
+
   const isLoggedIn =
-    userInfo && businessInfo && SessionId === userInfo?.SessionId;
+    userInfo &&
+    businessInfo &&
+    SessionId === userInfo?.SessionId;
 
   const logout = async () => {
     try {
-      SuccessToast("Signing out...");
+      SuccessToast(
+        "Signing out...",
+      );
 
-      await dispatch(logoutAction());
+      /*
+       * Clear Redux session.
+       */
+      await dispatch(
+        logoutAction(),
+      );
 
-      SuccessToast("You have been logged out successfully.");
+      SuccessToast(
+        "You have been logged out successfully.",
+      );
 
-      router.push("/");
-    } catch (e) {
-      ErrorMessage("Logout failed. Please try again.");
+     router.push('/')
+    } catch (error) {
+      ErrorMessage(
+        "Logout failed. Please try again.",
+      );
     }
   };
 
+  /*
+   * ============================================================
+   * UI
+   * ============================================================
+   */
+
   return (
-    <div
-      className="min-h-screen bg-cover bg-fixed bg-no-repeat"
+    <main
+      className="
+        min-h-screen
+        bg-cover
+        bg-center
+        bg-fixed
+        bg-no-repeat
+        text-zinc-950
+      "
       style={{
-        backgroundImage: "url('/bg.jpg')",
+        backgroundImage:
+          "url('/bg.jpg')",
       }}
     >
-      <AnimatePresence>{showSplash && <BadeSplashScreen />}</AnimatePresence>
+      {/* =====================================================
+          SPLASH
+      ====================================================== */}
+
+      <AnimatePresence>
+        {showSplash && (
+          <BadeSplashScreen />
+        )}
+      </AnimatePresence>
+
+      {/* =====================================================
+          NAVIGATION
+      ====================================================== */}
 
       <Nav1
         user={userInfo}
         business={businessInfo}
-        page={userInfo ? "dashboard" : "Bade"}
+        page={
+          userInfo
+            ? "dashboard"
+            : "Bade"
+        }
       />
 
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
-          {!isLoggedIn ? (
-            <Card className="w-[380px] max-w-full backdrop-blur-md border-0 shadow-2xl">
-              <CardHeader className="flex flex-row items-center justify-between pb-6">
-                <Link href="/" className="flex items-center gap-3">
-                  <Image
-                    src="/bade.jpg"
-                    alt="Bade Logo"
-                    width={48}
-                    height={48}
-                    className="rounded-xl shadow-sm"
-                  />
-                </Link>
-                <h2 className="text-3xl font-semibold text-gray-900">Log in</h2>
-              </CardHeader>
+      {/* =====================================================
+          MAIN
+      ====================================================== */}
 
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      name="email"
-                      placeholder="you@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="h-12  border-gray-200 focus:border-gray-400"
+      <section
+        className="
+          relative
+          min-h-[calc(100vh-80px)]
+          overflow-hidden
+          bg-white/10
+        "
+      >
+        {/* Very subtle overlay.
+            The original bg.jpg remains visible. */}
+
+        <div className="pointer-events-none absolute inset-0 bg-white/10" />
+
+        <div
+          className="
+            relative
+            mx-auto
+            flex
+            min-h-[calc(100vh-80px)]
+            max-w-7xl
+            items-center
+            px-4
+            py-10
+            sm:px-6
+            lg:px-8
+          "
+        >
+          {!isLoggedIn ? (
+            <div
+              className="
+                grid
+                w-full
+                items-center
+                gap-10
+                lg:grid-cols-[1.05fr_0.95fr]
+                lg:gap-20
+              "
+            >
+              {/* =================================================
+                  LEFT SIDE
+              ================================================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  x: -30,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                transition={{
+                  duration: 0.6,
+                }}
+                className="hidden lg:block"
+              >
+                <div className="max-w-xl">
+                  {/* Logo */}
+
+                  <div className="mb-10 flex items-center gap-4">
+                    <div
+                      className="
+                        flex
+                        h-14
+                        w-14
+                        items-center
+                        justify-center
+                        overflow-hidden
+                        rounded-2xl
+                        bg-black
+                        shadow-xl
+                      "
+                    >
+                      <Image
+                        src="/bade.jpg"
+                        alt="B.A.D.E"
+                        width={56}
+                        height={56}
+                        className="
+                          h-full
+                          w-full
+                          object-cover
+                        "
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-lg font-bold tracking-tight">
+                        B.A.D.E
+                      </p>
+
+                      <p
+                        className="
+                          text-xs
+                          uppercase
+                          tracking-[0.2em]
+                          text-zinc-500
+                        "
+                      >
+                        Enterprise Platform
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Heading */}
+
+                  <h1
+                    className="
+                      text-5xl
+                      font-semibold
+                      leading-[1.05]
+                      tracking-[-0.04em]
+                      text-zinc-950
+                      xl:text-6xl
+                    "
+                  >
+                    Everything your
+                    <br />
+                    business needs,
+                    <span className="block text-zinc-400">
+                      in one place.
+                    </span>
+                  </h1>
+
+                  <p
+                    className="
+                      mt-7
+                      max-w-lg
+                      text-base
+                      leading-7
+                      text-zinc-600
+                    "
+                  >
+                    Access your business
+                    operations, workflows,
+                    reports and enterprise
+                    tools through one secure
+                    workspace.
+                  </p>
+
+                  {/* Features */}
+
+                  <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                    <Feature
+                      icon={
+                        <ShieldCheck className="h-5 w-5" />
+                      }
+                      title="Secure workspace"
+                      description="Your business data stays protected."
+                    />
+
+                    <Feature
+                      icon={
+                        <Sparkles className="h-5 w-5" />
+                      }
+                      title="Built for velocity"
+                      description="Move from operations to insights faster."
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Password</Label>
+                  {/* Date / Location */}
+
+                  <div
+                    className="
+                      mt-12
+                      rounded-3xl
+                      border
+                      border-black/5
+                      bg-white/75
+                      p-6
+                      shadow-sm
+                      backdrop-blur-xl
+                    "
+                  >
+                    <div className="flex items-end justify-between gap-5">
+                      <div>
+                        <p
+                          className="
+                            text-xs
+                            font-medium
+                            uppercase
+                            tracking-[0.2em]
+                            text-zinc-400
+                          "
+                        >
+                          Today
+                        </p>
+
+                        <div
+                          className="
+                            mt-2
+                            text-3xl
+                            font-semibold
+                            tracking-tight
+                          "
+                        >
+                          {weekday}
+                        </div>
+
+                        <div className="text-lg text-zinc-400">
+                          {date}
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-2xl font-medium tracking-tight">
+                          {time}
+                        </p>
+
+                        <div
+                          className="
+                            mt-2
+                            flex
+                            items-center
+                            justify-end
+                            gap-1.5
+                            text-xs
+                            text-zinc-500
+                          "
+                        >
+                          <MapPin className="h-3.5 w-3.5" />
+
+                          <span>
+                            {location}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* =================================================
+                  LOGIN CARD
+              ================================================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 25,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.6,
+                  delay: 0.1,
+                }}
+                className="w-full"
+              >
+                <div className="mx-auto w-full max-w-md">
+                  <div
+                    className="
+                      rounded-[2rem]
+                      border
+                      border-black/10
+                      bg-white/95
+                      p-6
+                      shadow-[0_25px_80px_-30px_rgba(0,0,0,0.4)]
+                      backdrop-blur-xl
+                      sm:p-8
+                    "
+                  >
+                    {/* Mobile Logo */}
+
+                    <div className="mb-8 flex items-center justify-between lg:hidden">
                       <Link
-                        href="/auth/Forgot_password"
-                        className="text-sm hover:text-indigo-400 hover:underline"
+                        href="/"
+                        className="flex items-center gap-3"
                       >
-                        Forgot password?
+                        <div
+                          className="
+                            flex
+                            h-11
+                            w-11
+                            overflow-hidden
+                            rounded-xl
+                            bg-black
+                          "
+                        >
+                          <Image
+                            src="/bade.jpg"
+                            alt="B.A.D.E"
+                            width={44}
+                            height={44}
+                            className="
+                              h-full
+                              w-full
+                              object-cover
+                            "
+                          />
+                        </div>
+
+                        <div>
+                          <p className="font-bold">
+                            B.A.D.E
+                          </p>
+
+                          <p
+                            className="
+                              text-[10px]
+                              uppercase
+                              tracking-widest
+                              text-zinc-400
+                            "
+                          >
+                            Enterprise
+                          </p>
+                        </div>
                       </Link>
                     </div>
-                    <Input
-                      id="password"
-                      type="password"
-                      name="password"
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                      className="h-12  border-gray-200 focus:border-gray-400"
-                    />
-                  </div>
 
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-12 text-base font-medium text-gray-50 bg-black hover:bg-gray-900 transition-all"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Sign in"
-                    )}
-                  </Button>
-                  <Link
-                    href="/SalesPortal"
-                    className="mt-2 inline-block w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white border border-white/20 rounded py-3 px-6 font-medium  transition"
-                  >
-                    Access Sale portal →
-                  </Link>
-                </form>
+                    {/* Header */}
 
-                {/* Event Card */}
-                <div className="mt-8 bg-white rounded-3xl p-8 relative overflow-hidden border border-gray-100">
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full opacity-60 blur-2xl" />
-
-                  <div className="flex justify-between gap-4 items-start relative z-10">
-                    <div>
-                      <div className="text-4xl font-bold text-gray-800 leading-none">
-                        {weekday}
+                    <div className="mb-8">
+                      <div
+                        className="
+                          mb-5
+                          flex
+                          h-12
+                          w-12
+                          items-center
+                          justify-center
+                          rounded-2xl
+                          bg-zinc-950
+                          text-white
+                          shadow-lg
+                        "
+                      >
+                        <LockKeyhole className="h-5 w-5" />
                       </div>
-                      <div className="text-3xl font-light text-gray-400 -mt-1">
-                        {date}
-                      </div>
+
+                      <h2
+                        className="
+                          text-3xl
+                          font-semibold
+                          tracking-[-0.03em]
+                        "
+                      >
+                        Welcome back
+                      </h2>
+
+                      <p
+                        className="
+                          mt-2
+                          text-sm
+                          leading-6
+                          text-zinc-500
+                        "
+                      >
+                        Sign in to continue to
+                        your business workspace.
+                      </p>
                     </div>
-                    <div className="text-right text-sm text-gray-600 mt-2">
+
+                    {/* Form */}
+
+                    <form
+                      onSubmit={handleSubmit}
+                      className="space-y-5"
+                    >
+                      {/* Email */}
+
                       <div>
-                        {time}
-                        <br />
-                        <span className="text-xs text-gray-500">
-                          How&apos;s {location} today?
-                        </span>
+                        <label
+                          htmlFor="email"
+                          className="
+                            mb-2
+                            block
+                            text-sm
+                            font-medium
+                            text-zinc-800
+                          "
+                        >
+                          Email address
+                        </label>
+
+                        <div className="relative">
+                          <Mail
+                            className="
+                              pointer-events-none
+                              absolute
+                              left-4
+                              top-1/2
+                              h-4
+                              w-4
+                              -translate-y-1/2
+                              text-zinc-400
+                            "
+                          />
+
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            autoComplete="email"
+                            placeholder="you@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            disabled={loading}
+                            required
+                            className="
+                              h-12
+                              rounded-xl
+                              border-zinc-200
+                              bg-zinc-50
+                              pl-11
+                              shadow-none
+                              transition
+                              focus-visible:border-zinc-400
+                              focus-visible:ring-1
+                              focus-visible:ring-zinc-400
+                            "
+                          />
+                        </div>
                       </div>
+
+                      {/* Password */}
+
+                      <div>
+                        <div className="mb-2 flex items-center justify-between">
+                          <label
+                            htmlFor="password"
+                            className="
+                              text-sm
+                              font-medium
+                              text-zinc-800
+                            "
+                          >
+                            Password
+                          </label>
+
+                          <Link
+                            href="/auth/Forgot_password"
+                            className="
+                              text-xs
+                              font-medium
+                              text-zinc-500
+                              transition
+                              hover:text-zinc-950
+                          "
+                          >
+                            Forgot password?
+                          </Link>
+                        </div>
+
+                        <div className="relative">
+                          <LockKeyhole
+                            className="
+                              pointer-events-none
+                              absolute
+                              left-4
+                              top-1/2
+                              h-4
+                              w-4
+                              -translate-y-1/2
+                              text-zinc-400
+                            "
+                          />
+
+                          <Input
+                            id="password"
+                            name="password"
+                            type={
+                              showPassword
+                                ? "text"
+                                : "password"
+                            }
+                            autoComplete="current-password"
+                            placeholder="Enter your password"
+                            value={
+                              formData.password
+                            }
+                            onChange={
+                              handleChange
+                            }
+                            disabled={loading}
+                            required
+                            className="
+                              h-12
+                              rounded-xl
+                              border-zinc-200
+                              bg-zinc-50
+                              pl-11
+                              pr-11
+                              shadow-none
+                              transition
+                              focus-visible:border-zinc-400
+                              focus-visible:ring-1
+                              focus-visible:ring-zinc-400
+                            "
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowPassword(
+                                (previous) =>
+                                  !previous,
+                              )
+                            }
+                            className="
+                              absolute
+                              right-3
+                              top-1/2
+                              -translate-y-1/2
+                              rounded-lg
+                              p-1.5
+                              text-zinc-400
+                              transition
+                              hover:bg-zinc-200
+                              hover:text-zinc-900
+                            "
+                            aria-label={
+                              showPassword
+                                ? "Hide password"
+                                : "Show password"
+                            }
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Login Button */}
+
+                      <Button
+                        type="submit"
+                        disabled={loading}
+                        className="
+                          group
+                          h-12
+                          w-full
+                          rounded-xl
+                          bg-zinc-950
+                          text-sm
+                          font-medium
+                          text-white
+                          shadow-lg
+                          shadow-zinc-950/10
+                          transition-all
+                          hover:bg-zinc-800
+                        "
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2
+                              className="
+                                mr-2
+                                h-4
+                                w-4
+                                animate-spin
+                              "
+                            />
+
+                            Signing you in...
+                          </>
+                        ) : (
+                          <>
+                            Sign in
+
+                            <ArrowRight
+                              className="
+                                ml-2
+                                h-4
+                                w-4
+                                transition-transform
+                                group-hover:translate-x-1
+                              "
+                            />
+                          </>
+                        )}
+                      </Button>
+
+                      {/* Divider */}
+
+                      <div className="relative py-1">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-zinc-100" />
+                        </div>
+
+                        <div className="relative flex justify-center">
+                          <span
+                            className="
+                              bg-white
+                              px-3
+                              text-[10px]
+                              uppercase
+                              tracking-widest
+                              text-zinc-400
+                            "
+                          >
+                            Or
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Sales Portal */}
+
+                      <Link
+                        href="/SalesPortal"
+                        className="
+                          group
+                          flex
+                          h-12
+                          w-full
+                          items-center
+                          justify-center
+                          gap-2
+                          rounded-xl
+                          border
+                          border-zinc-200
+                          bg-white
+                          text-sm
+                          font-medium
+                          text-zinc-800
+                          transition
+                          hover:border-zinc-300
+                          hover:bg-zinc-50
+                        "
+                      >
+                        Access Sales Portal
+
+                        <ArrowRight
+                          className="
+                            h-4
+                            w-4
+                            transition-transform
+                            group-hover:translate-x-1
+                          "
+                        />
+                      </Link>
+                    </form>
+
+                    {/* Footer */}
+
+                    <div className="mt-8 border-t border-zinc-100 pt-6">
+                      <p
+                        className="
+                          text-center
+                          text-[11px]
+                          leading-5
+                          text-zinc-400
+                        "
+                      >
+                        Business Automated
+                        Dynamic Enterprise
+                      </p>
                     </div>
                   </div>
+
+                  {/* Refer and Earn */}
 
                   <Link
                     href="/Marketers"
-                    className="mt-8 inline-block w-full text-center bg-black text-white border border-white/20 rounded-full py-3 px-6 font-medium hover:bg-gray-900 transition"
+                    className="
+                      group
+                      mt-4
+                      flex
+                      items-center
+                      justify-center
+                      gap-2
+                      rounded-2xl
+                      border
+                      border-black/5
+                      bg-white/80
+                      px-5
+                      py-4
+                      text-xs
+                      font-medium
+                      text-zinc-600
+                      shadow-sm
+                      backdrop-blur
+                      transition
+                      hover:bg-white
+                      hover:text-zinc-950
+                    "
                   >
-                    Refer and Earn →
+                    Refer and Earn
+
+                    <ArrowRight
+                      className="
+                        h-3.5
+                        w-3.5
+                        transition-transform
+                        group-hover:translate-x-1
+                      "
+                    />
                   </Link>
                 </div>
-
-                <p className="text-center text-xs text-gray-400 mt-6">
-                  Business Automated Dynamic Enterprise!
-                </p>
-              </CardContent>
-            </Card>
+              </motion.div>
+            </div>
           ) : (
-            <Card className="max-w-sm w-full bg-white shadow-xl p-6 flex items-center gap-5">
-              <Image
-                src={
-                  userInfo?.image || businessInfo?.companyLogo || "/bade.jpg"
-                }
-                alt="User"
-                width={72}
-                height={72}
-                className="rounded-2xl shadow-md object-cover"
-              />
-              <div>
-                <h3 className="font-semibold text-xl text-amber-950">
-                  Welcome back, {userInfo?.firstName || "User"}!
-                </h3>
-                <p className="text-gray-600 mt-1">Glad to see you again.</p>
-              </div>
-              <Button
-                type="button"
-                onClick={() => logout()}
-                className="w-full h-12 text-base font-medium bg-red-500 hover:bg-red-600 transition-all"
+            /* =================================================
+               ALREADY LOGGED IN
+            ================================================== */
+
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.97,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              className="mx-auto w-full max-w-lg"
+            >
+              <div
+                className="
+                  rounded-[2rem]
+                  border
+                  border-black/5
+                  bg-white/95
+                  p-8
+                  shadow-[0_25px_80px_-30px_rgba(0,0,0,0.3)]
+                  backdrop-blur-xl
+                "
               >
-                logout
-              </Button>
-            </Card>
+                <div className="flex items-start gap-5">
+                  <Image
+                    src={
+                      userInfo?.image ||
+                      businessInfo?.companyLogo ||
+                      "/bade.jpg"
+                    }
+                    alt="User"
+                    width={76}
+                    height={76}
+                    className="
+                      h-[76px]
+                      w-[76px]
+                      rounded-2xl
+                      object-cover
+                      shadow-md
+                    "
+                  />
+
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className="
+                        text-xs
+                        font-medium
+                        uppercase
+                        tracking-[0.15em]
+                        text-zinc-400
+                      "
+                    >
+                      Active session
+                    </p>
+
+                    <h3
+                      className="
+                        mt-1
+                        truncate
+                        text-xl
+                        font-semibold
+                        tracking-tight
+                      "
+                    >
+                      Welcome back,{" "}
+                      {userInfo?.firstName ||
+                        "User"}
+                    </h3>
+
+                    <p className="mt-1 text-sm text-zinc-500">
+                      {businessInfo?.companyName ||
+                        "Your business workspace"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                  <Link
+                    href="/"
+                    className="
+                      flex
+                      h-12
+                      items-center
+                      justify-center
+                      rounded-xl
+                      border
+                      border-zinc-200
+                      text-sm
+                      font-medium
+                      transition
+                      hover:bg-zinc-50
+                    "
+                  >
+                    Home
+                  </Link>
+
+                  <Button
+                    type="button"
+                    onClick={logout}
+                    className="
+                      h-12
+                      rounded-xl
+                      bg-red-500
+                      text-white
+                      hover:bg-red-600
+                    "
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+
+                    Sign out
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           )}
         </div>
+      </section>
 
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 -z-10 flex items-end justify-center pointer-events-none">
-          <div className="w-[420px] h-[420px] bg-gradient-to-br from-[#f5ede7] to-[#e7e3df] rounded-full absolute left-1/2 -translate-x-1/2 bottom-0 blur-3xl opacity-70" />
-          <div className="w-40 h-40 bg-gradient-to-br from-orange-200 to-orange-400 rounded-full absolute left-12 bottom-12 blur-2xl opacity-60" />
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-300 rounded-full absolute right-20 bottom-24 blur-xl opacity-50" />
-        </div>
+      {/* =====================================================
+          FOOTER
+      ====================================================== */}
+
+      <Footer1 />
+    </main>
+  );
+}
+
+/*
+ * ============================================================
+ * FEATURE COMPONENT
+ * ============================================================
+ */
+
+function Feature({
+  icon,
+  title,
+  description,
+}) {
+  return (
+    <div className="flex gap-3">
+      <div
+        className="
+          flex
+          h-10
+          w-10
+          shrink-0
+          items-center
+          justify-center
+          rounded-xl
+          bg-white
+          shadow-sm
+          ring-1
+          ring-black/5
+        "
+      >
+        {icon}
       </div>
 
-      {userInfo && businessInfo ? <Footer2 /> : <Footer1 />}
+      <div>
+        <p className="text-sm font-semibold text-zinc-800">
+          {title}
+        </p>
+
+        <p className="mt-1 text-xs leading-5 text-zinc-500">
+          {description}
+        </p>
+      </div>
     </div>
   );
 }
 
-// demo screen brfore login
+/*
+ * ============================================================
+ * BADE SPLASH SCREEN
+ * ============================================================
+ */
+
 export function BadeSplashScreen() {
-  const [visible, setVisible] = useState(true);
-  const [glow, setGlow] = useState(false);
-  const timeout = 10000;
+  const [visible, setVisible] =
+    useState(true);
+
+  const [glow, setGlow] =
+    useState(false);
+
+  const timeout = 5000;
 
   useEffect(() => {
     const glowTimer = setTimeout(() => {
       setGlow(true);
-    }, 1800);
+    }, 1200);
 
-    let navigationTimer;
-
-    const redirectTimer = setTimeout(() => {
-      setVisible(false);
-    }, timeout);
+    const redirectTimer =
+      setTimeout(() => {
+        setVisible(false);
+      }, timeout);
 
     return () => {
       clearTimeout(glowTimer);
-      clearTimeout(redirectTimer);
-
-      if (navigationTimer) {
-        clearTimeout(navigationTimer);
-      }
+      clearTimeout(
+        redirectTimer,
+      );
     };
   }, []);
 
@@ -387,57 +1396,208 @@ export function BadeSplashScreen() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black"
+          initial={{
+            opacity: 1,
+          }}
+          exit={{
+            opacity: 0,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
+          className="
+            fixed
+            inset-0
+            z-[9999]
+            flex
+            items-center
+            justify-center
+            overflow-hidden
+            bg-zinc-950
+          "
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_60%)]" />
+          {/* Background glow */}
+
+          <div
+            className="
+              absolute
+              inset-0
+              bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_55%)]
+            "
+          />
 
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative flex flex-col items-center"
+            initial={{
+              scale: 0.85,
+              opacity: 0,
+            }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+            }}
+            transition={{
+              duration: 0.8,
+              ease: "easeOut",
+            }}
+            className="
+              relative
+              flex
+              flex-col
+              items-center
+            "
           >
-            <div className="absolute inset-0 rounded-full bg-white/10 blur-3xl" />
+            {/* Logo */}
+
+            <div
+              className="
+                absolute
+                inset-0
+                rounded-full
+                bg-white/10
+                blur-3xl
+              "
+            />
+
+            <motion.div
+              animate={{
+                scale: glow
+                  ? [1, 1.04, 1]
+                  : 1,
+              }}
+              transition={{
+                duration: 1.8,
+                repeat: glow
+                  ? Infinity
+                  : 0,
+                ease: "easeInOut",
+              }}
+              className="
+                relative
+                flex
+                h-20
+                w-20
+                items-center
+                justify-center
+                overflow-hidden
+                rounded-3xl
+                bg-white
+                shadow-2xl
+              "
+            >
+              <Image
+                src="/bade.jpg"
+                alt="B.A.D.E"
+                width={80}
+                height={80}
+                className="
+                  h-full
+                  w-full
+                  object-cover
+                "
+              />
+            </motion.div>
+
+            {/* Brand */}
 
             <motion.h1
               animate={{
                 textShadow: glow
                   ? [
-                      "0 0 10px rgba(255,255,255,0.5)",
-                      "0 0 25px rgba(255,255,255,0.8)",
-                      "0 0 50px rgba(255,255,255,1)",
+                      "0 0 10px rgba(255,255,255,0.2)",
+                      "0 0 30px rgba(255,255,255,0.5)",
+                      "0 0 50px rgba(255,255,255,0.8)",
                     ]
                   : "0 0 0px rgba(255,255,255,0)",
-                scale: glow ? [1, 1.03, 1] : 1,
               }}
               transition={{
                 duration: 1.5,
-                repeat: glow ? Infinity : 0,
+                repeat: glow
+                  ? Infinity
+                  : 0,
                 ease: "easeInOut",
               }}
-              className="relative text-xl font-black uppercase tracking-[0.4em] text-white md:text-md"
+              className="
+                relative
+                mt-7
+                text-2xl
+                font-black
+                uppercase
+                tracking-[0.4em]
+                text-white
+              "
             >
               B.A.D.E
             </motion.h1>
 
+            {/* Description */}
+
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mt-4 text-center text-sm uppercase tracking-[0.3em] text-zinc-500"
+              initial={{
+                opacity: 0,
+                y: 10,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                delay: 0.4,
+              }}
+              className="
+                mt-3
+                text-center
+                text-[10px]
+                uppercase
+                tracking-[0.3em]
+                text-zinc-500
+              "
             >
-              Business Automated Dynamic Enterprise
+              Business Automated
+              Dynamic Enterprise
             </motion.p>
 
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "220px" }}
-              transition={{ duration: timeout / 1000, ease: "linear" }}
-              className="mt-8 h-0.5 rounded-full bg-white/70"
-            />
+            {/* Progress */}
+
+            <div
+              className="
+                mt-10
+                h-[2px]
+                w-[220px]
+                overflow-hidden
+                rounded-full
+                bg-white/10
+              "
+            >
+              <motion.div
+                initial={{
+                  width: 0,
+                }}
+                animate={{
+                  width: "100%",
+                }}
+                transition={{
+                  duration:
+                    timeout / 1000,
+                  ease: "linear",
+                }}
+                className="
+                  h-full
+                  bg-white
+                "
+              />
+            </div>
+
+            <p
+              className="
+                mt-4
+                text-[10px]
+                uppercase
+                tracking-[0.25em]
+                text-zinc-600
+              "
+            >
+              Preparing your workspace
+            </p>
           </motion.div>
         </motion.div>
       )}
