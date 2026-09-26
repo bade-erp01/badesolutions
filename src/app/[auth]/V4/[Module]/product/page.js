@@ -9,7 +9,7 @@ import BulkUpdate from "@/app/Components/bulkUpdate";
 import { Encrypt } from "../../../../../../Functions/Functions";
 import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
 import AddPriceListModal from "@/app/Components/PricelistCreate";
-import { Plus,Package } from "lucide-react";
+import { Plus, Package } from "lucide-react";
 import Notch from "@/app/Components/Notch";
 
 export const metadata = {
@@ -66,7 +66,7 @@ export default async function Productlayout({ children, params }) {
         access: `${Encrypt(userData.user._id)}`,
         sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
       },
-      next: { revalidate: 120 }, // cache for 1 minutes
+      next: { revalidate: 120 },
     });
 
     if (!res.ok) throw new Error("Failed to fetch product data");
@@ -74,24 +74,32 @@ export default async function Productlayout({ children, params }) {
     const { productList, vendorList, storeList } = await res.json();
 
     return (
-      <div className="flex flex-col min-h-screen overflow-hidden">
-        {/* Sidebar */}
+      <div className="flex min-h-screen flex-col overflow-hidden bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
         <Notch>
           {userData?.user?.createProduct && (
             <Link
               href={`/${moduleList.auth}/V4/Forms/product`}
-              className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+              className="flex items-center gap-3 rounded-md p-3 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 shrink-0 text-zinc-600 dark:text-zinc-300" />
               <span className="text-xs">New Product</span>
             </Link>
           )}
 
           {userData?.user?.ReportUser && (
             <>
-              <StockReportModal baseUrl={baseUrl} userData={userData} />
-              <StockandSalesReport baseUrl={baseUrl} userData={userData} />
+              <StockReportModal
+                key="stock-report"
+                baseUrl={baseUrl}
+                userData={userData}
+              />
+              <StockandSalesReport
+                key="stock-sales"
+                baseUrl={baseUrl}
+                userData={userData}
+              />
               <PurchaseDumpModal
+                key="purchase-dump"
                 business={userData.business}
                 EXPRESS_PRIVATE_URL={baseUrl}
                 Products={productList}
@@ -99,7 +107,10 @@ export default async function Productlayout({ children, params }) {
                 vendorsData={vendorList}
                 userData={userData}
               />
-              <ProductXLSXDownload productList={productList} />
+              <ProductXLSXDownload
+                key="xlsx"
+                productList={productList}
+              />
             </>
           )}
 
@@ -115,7 +126,6 @@ export default async function Productlayout({ children, params }) {
           )}
         </Notch>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           {productList.length > 0 ? (
             <>
@@ -123,7 +133,7 @@ export default async function Productlayout({ children, params }) {
                 <ProductSalesChart productsList={productList} />
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
+              <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
                 {productList
                   .sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
                   .map((element) => (
@@ -137,21 +147,21 @@ export default async function Productlayout({ children, params }) {
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-              <div className="w-20 h-20 rounded-full bg-gray-800/60 flex items-center justify-center mb-6">
-                <Package className="h-10 w-10 text-gray-400" />
+            <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800/60">
+                <Package className="h-10 w-10 text-zinc-500 dark:text-zinc-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+              <h3 className="mb-2 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
                 No products yet
               </h3>
-              <p className="text-sm text-gray-400 max-w-sm mb-6">
-                Get started by adding your first product. Once you create one,
-                it will appear here.
+              <p className="mb-6 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+                Get started by adding your first product. Once you create one, it
+                will appear here.
               </p>
               {userData?.user?.createProduct && (
                 <Link
                   href={`/${moduleList.auth}/V4/Forms/product`}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition"
+                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                 >
                   <Plus className="h-4 w-4" />
                   Create Product
@@ -163,6 +173,10 @@ export default async function Productlayout({ children, params }) {
       </div>
     );
   } catch (err) {
-    return <div className="">Failed to load. Please try again later.</div>;
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center p-6 text-sm text-zinc-600 dark:text-zinc-300">
+        Failed to load. Please try again later.
+      </div>
+    );
   }
 }

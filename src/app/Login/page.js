@@ -121,38 +121,36 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
   }, []);
 
   const registerOneSignal = async (user) => {
-    // if (!user?._id) return;
-
     try {
-      if (oneSignalInitPromise.current) {
-        await oneSignalInitPromise.current;
-      }
-      if (!oneSignalReady.current) return;
+     
+      const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 
-      const externalId = String(user._id);
-
-      // 1. Link identity
-      await OneSignal.login(externalId);
-
-      // 2. Ask for permission (required for Web Push)
-      const permission = await OneSignal.Notifications.requestPermission();
-
-      if (permission !== true && permission !== "granted") {
-        console.warn("user did not allow notifications");
+      if (!appId) {
+        
         return;
       }
 
-      // 3. Optional: confirm subscription exists
-      const isPushEnabled = await OneSignal.User.PushSubscription.optedIn;
-      // console.log("[OneSignal] optedIn:", isPushEnabled);
+      /*
+       * Initialize OneSignal
+       */
+      await OneSignal.init({ appId });
 
-      if (!isPushEnabled) {
-        await OneSignal.User.PushSubscription.optIn();
-      }
+      /*
+       * Associate the OneSignal subscription
+       * with the authenticated BADE user.
+       */
+      await OneSignal.login( String(user._id) );
 
-      await OneSignal.User.addTag("_id", externalId);
-    } catch (err) {
-      // console.error("[OneSignal] register failed:", err);
+      /*
+       * Optional tag.
+       *
+       * This can be useful when you want to
+       * filter/segment users in OneSignal.
+       */
+      await OneSignal.User.addTag( "_id", String(user._id));
+
+    } catch (error) {
+
     }
   };
 
