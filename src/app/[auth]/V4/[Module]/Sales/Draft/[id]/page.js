@@ -225,7 +225,7 @@ const generatePdf = async (business, customer, billData) => {
     doc.setTextColor(...GREY);
 
     doc.text(
-      `Date: ${moment().format("DD MMM YYYY")}`,
+      `Print Date: ${moment().format("DD MMM YYYY")}`,
       10,
       53,
     );

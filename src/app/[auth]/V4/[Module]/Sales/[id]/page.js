@@ -314,7 +314,7 @@ const generatePdf = async (business, customer, bill) => {
     doc.setTextColor(...GREY);
 
     doc.text(
-      `Date: ${moment().format(
+      `Print Date: ${moment().format(
         "DD MMM YYYY"
       )}`,
       pageWidth - margin,
