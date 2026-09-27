@@ -1186,8 +1186,8 @@ const generatePdf = async (business, customer, bill) => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageWidth = doc.internal.pageSize.getWidth();   // ~210
-    const pageHeight = doc.internal.pageSize.getHeight(); // ~297
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 14;
     const contentWidth = pageWidth - margin * 2;
     let y = margin;
@@ -1230,7 +1230,6 @@ const generatePdf = async (business, customer, bill) => {
       }
     }
 
-    // Company block — right aligned
     const rightX = pageWidth - margin;
     setBold(14);
     doc.text(business?.companyName || "Company", rightX, headerTop + 5, {
@@ -1284,7 +1283,6 @@ const generatePdf = async (business, customer, bill) => {
     const colRightW = contentWidth * 0.42;
     const rightColX = pageWidth - margin - colRightW;
 
-    // Left — Deliver to
     setMuted(7);
     doc.text("DELIVER TO", margin, y);
     setBold(11);
@@ -1314,7 +1312,6 @@ const generatePdf = async (business, customer, bill) => {
     setMuted(7.5);
     doc.text(`Printed: ${moment().format("DD MMM YYYY, HH:mm")}`, margin, custY);
 
-    // Right — document meta (compact table)
     autoTable(doc, {
       startY: y - 2,
       margin: { left: rightColX, right: margin },
@@ -1354,17 +1351,6 @@ const generatePdf = async (business, customer, bill) => {
     });
 
     y = Math.max(custY, doc.lastAutoTable.finalY) + 8;
-
-    // Optional QR (small, top-right of items area)
-    try {
-      const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng", {
-        margin: 1,
-        width: 120,
-      });
-      doc.addImage(qrDataURL, "PNG", pageWidth - margin - 18, y - 2, 18, 18);
-    } catch (_) {
-      /* ignore */
-    }
 
     // ── ITEMS TABLE ──────────────────────────────────────────
     const orderRows = (bill?.orders || [])
@@ -1412,34 +1398,46 @@ const generatePdf = async (business, customer, bill) => {
         4: { cellWidth: 16, halign: "center" },
       },
       didDrawPage: (data) => {
-        // Footer on every page
         const ph = doc.internal.pageSize.getHeight();
         const pw = doc.internal.pageSize.getWidth();
         const pageNo = doc.internal.getCurrentPageInfo().pageNumber;
 
         doc.setDrawColor(210, 210, 210);
         doc.setLineWidth(0.3);
-        doc.line(margin, ph - 14, pw - margin, ph - 14);
+        doc.line(margin, ph - 16, pw - margin, ph - 16);
 
+        // Invoice policy (left)
         doc.setFont("helvetica", "normal");
         doc.setFontSize(7);
         doc.setTextColor(120, 120, 120);
         doc.text(
           business?.invoicePolicy || "Thank you for your business.",
           margin,
-          ph - 9,
-          { maxWidth: pw * 0.65 },
+          ph - 11,
+          { maxWidth: pw * 0.45 },
         );
-        doc.text(`Page ${pageNo}`, pw - margin, ph - 9, { align: "right" });
+
+        // Branding (center)
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7.5);
+        doc.setTextColor(0, 82, 155);
+        doc.text("Powered by badesolutions.com.ng", pw / 2, ph - 11, {
+          align: "center",
+        });
+
+        // Page number (right)
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(120, 120, 120);
+        doc.text(`Page ${pageNo}`, pw - margin, ph - 11, { align: "right" });
       },
     });
 
     y = doc.lastAutoTable.finalY + 10;
 
     // ── ACKNOWLEDGEMENT / SIGNATURES ─────────────────────────
-    // Ensure room for signatures; add page if needed
     const sigBlockHeight = 62;
-    if (y + sigBlockHeight > pageHeight - 20) {
+    if (y + sigBlockHeight > pageHeight - 22) {
       doc.addPage();
       y = margin + 4;
     }
@@ -1496,9 +1494,13 @@ const generatePdf = async (business, customer, bill) => {
         1: { cellWidth: contentWidth * 0.62 },
       },
       didParseCell: (data) => {
-        // Light bottom border under each row
         if (data.section === "body") {
-          data.cell.styles.lineWidth = { bottom: 0.25, top: 0, left: 0, right: 0 };
+          data.cell.styles.lineWidth = {
+            bottom: 0.25,
+            top: 0,
+            left: 0,
+            right: 0,
+          };
           data.cell.styles.lineColor = [220, 220, 220];
         }
       },
@@ -1520,6 +1522,7 @@ const generatePdf = async (business, customer, bill) => {
       Swal.close();
     }
   } catch (error) {
+    console.error("Error generating Waybill:", error);
     ErrorMessage?.(error?.message || "Failed to generate waybill");
   } finally {
     Swal.close();
