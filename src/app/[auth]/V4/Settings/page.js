@@ -604,7 +604,7 @@ function CompanyProfileForm({ data, userData }) {
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
-                      {module.installed ? "Installed" : "Not Installed"}
+                      {"Installed" }
                     </span>
                   </div>
                 </CardHeader>
