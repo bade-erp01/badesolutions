@@ -15,7 +15,8 @@ import {
   RefreshCw,
   AlertTriangle,
 } from 'lucide-react';
-
+import { Encrypt } from "../../../../../../Functions/Mics";
+import { useUser } from "@/components/UserProvider";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,23 +38,9 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
 
-// ============== SAMPLE DATA ==============
-const INITIAL_PRODUCTS = [
-  { id: '1', name: 'Coca-Cola 50cl', price: 250, category: 'Drinks', barcode: '5449000000996', stock: 120 },
-  { id: '2', name: 'Indomie Chicken', price: 180, category: 'Food', barcode: '8998866101015', stock: 200 },
-  { id: '3', name: 'Peak Milk 400g', price: 1850, category: 'Dairy', barcode: '8711000523102', stock: 45 },
-  { id: '4', name: 'Golden Penny Spaghetti', price: 950, category: 'Food', barcode: '6154000012345', stock: 80 },
-  { id: '5', name: 'Dangote Sugar 1kg', price: 1200, category: 'Food', barcode: '6151100123456', stock: 60 },
-  { id: '6', name: 'Lux Soap', price: 450, category: 'Toiletries', barcode: '8901030865123', stock: 90 },
-  { id: '7', name: 'Closeup Toothpaste', price: 650, category: 'Toiletries', barcode: '8901030654321', stock: 70 },
-  { id: '8', name: 'Eva Water 75cl', price: 150, category: 'Drinks', barcode: '6154000987654', stock: 150 },
-  { id: '9', name: 'Bournvita 500g', price: 3200, category: 'Drinks', barcode: '5000112587456', stock: 35 },
-  { id: '10', name: 'Power Oil 1L', price: 2800, category: 'Food', barcode: '6154000112233', stock: 40 },
-  { id: '11', name: 'Ariel Detergent 1kg', price: 2100, category: 'Toiletries', barcode: '5413149310123', stock: 55 },
-  { id: '12', name: 'Maggi Cube (x50)', price: 1100, category: 'Food', barcode: '7613034621456', stock: 100 },
-];
-
+// ============== CONSTANTS ==============
 const TAX_RATE = 0.075; // 7.5%
 const LOW_STOCK_THRESHOLD = 10;
 
@@ -65,34 +52,40 @@ const STORAGE_KEYS = {
   LAST_SYNC: 'pos_last_sync',
 };
 
-// ============== SIMULATED BACKEND (replace with real API later) ==============
-const api = {
-  // Pull latest stock from server
-  async fetchProducts() {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 600));
-    // In real app → return await fetch('/api/products').then(r => r.json())
-    const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  },
+// ============== NORMALIZE API PRODUCT ==============
+function normalizeProduct(raw) {
+  const item = raw.item || raw;
+  const id = String(item._id || raw.productId || '');
+  const name = item.Name || item.name || 'Unnamed Product';
+  const category = item.category || 'Uncategorized';
+  const price = Number(item.Pricelist1 ?? item.Pricelist2 ?? item.Pricelist3 ?? 0) || 0;
+  const stock = Number(raw.Case ?? item.virtualQty ?? 0) || 0;
+  const pcs = Number(raw.pcs ?? 0) || 0;
+  const piecesPerCase = Number(item.Pieces ?? 1) || 1;
+  const umo = item.UMO || 'UNIT';
+  const image = item.image || null;
+  const barcode = item.ACDcode || item.product_code || item.Manufacture_code || id;
+  const vat = Number(item.VAT?.$numberDecimal ?? item.VAT ?? TAX_RATE * 100) / 100;
 
-  // Push a sale to the server (and deduct stock on server)
-  async syncSale(sale) {
-    await new Promise((r) => setTimeout(r, 400));
-    // In real app → return await fetch('/api/sales', { method: 'POST', body: JSON.stringify(sale) })
-    console.log('Synced sale to server:', sale.id);
-    return { success: true };
-  },
-
-  // Update stock on server
-  async updateStock(productId, newStock) {
-    await new Promise((r) => setTimeout(r, 200));
-    return { success: true };
-  },
-};
+  return {
+    id,
+    name,
+    category,
+    price,
+    stock,
+    pcs,
+    piecesPerCase,
+    umo,
+    image,
+    barcode,
+    vat,
+    _raw: raw,
+  };
+}
 
 // ============== COMPONENT ==============
 export default function POS() {
+  const { user } = useUser();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
@@ -109,21 +102,42 @@ export default function POS() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [lastSyncTime, setLastSyncTime] = useState(null);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
   const searchInputRef = useRef(null);
   const printRef = useRef(null);
 
-  // ============== INVENTORY HELPERS ==============
-  const loadProducts = useCallback(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    if (saved) {
-      setProducts(JSON.parse(saved));
-    } else {
-      setProducts(INITIAL_PRODUCTS);
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+  // ============== API ==============
+  const fetchProducts = useCallback(async () => {
+    const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Pos/products`, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
+        access: `${Encrypt(user.user._id)}`,
+        sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+      },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch products: ${res.status}`);
     }
+
+    const data = await res.json();
+    console.log(data);
+
+    const list = Array.isArray(data) ? data : data.data ?? data.products ?? [];
+    return list.map(normalizeProduct);
+  }, [user]);
+
+  const syncSale = useCallback(async (sale) => {
+    await new Promise((r) => setTimeout(r, 400));
+    console.log('Synced sale to server:', sale.id);
+    return { success: true };
   }, []);
 
+  // ============== INVENTORY HELPERS ==============
   const saveProducts = useCallback((updatedProducts) => {
     setProducts(updatedProducts);
     localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(updatedProducts));
@@ -138,7 +152,6 @@ export default function POS() {
     setPendingCount(sales.length);
   };
 
-  // Deduct stock locally (called on every completed sale)
   const deductStock = useCallback((items) => {
     setProducts((prev) => {
       const updated = prev.map((p) => {
@@ -153,31 +166,27 @@ export default function POS() {
     });
   }, []);
 
-  // ============== SYNC LOGIC ==============
+  // ============== SYNC / LOAD ==============
   const syncInventory = useCallback(async () => {
     if (!navigator.onLine) return;
 
     setIsSyncing(true);
     try {
-      // 1. Sync pending offline sales
       const pending = getPendingSales();
       const stillPending = [];
 
       for (const sale of pending) {
         try {
-          await api.syncSale(sale);
-          // Successfully synced → stock already deducted locally
-        } catch (err) {
-          stillPending.push(sale); // keep for next try
+          await syncSale(sale);
+        } catch {
+          stillPending.push(sale);
         }
       }
       savePendingSales(stillPending);
 
-      // 2. Pull latest stock from server
-      const serverProducts = await api.fetchProducts();
+      const serverProducts = await fetchProducts();
       saveProducts(serverProducts);
 
-      // 3. Update last sync time
       const now = new Date().toISOString();
       localStorage.setItem(STORAGE_KEYS.LAST_SYNC, now);
       setLastSyncTime(now);
@@ -191,13 +200,47 @@ export default function POS() {
     } finally {
       setIsSyncing(false);
     }
-  }, [saveProducts]);
+  }, [fetchProducts, saveProducts, syncSale]);
+
+  const loadProducts = useCallback(async () => {
+    setIsLoadingProducts(true);
+
+    const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+    if (saved) {
+      try {
+        setProducts(JSON.parse(saved));
+      } catch {
+        // ignore
+      }
+    }
+
+    if (navigator.onLine) {
+      try {
+        const serverProducts = await fetchProducts();
+        saveProducts(serverProducts);
+
+        const now = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEYS.LAST_SYNC, now);
+        setLastSyncTime(now);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+        if (!saved) {
+          setScanFeedback({
+            type: 'error',
+            message: 'Could not load products. Check your connection.',
+          });
+          setTimeout(() => setScanFeedback(null), 3000);
+        }
+      }
+    }
+
+    setIsLoadingProducts(false);
+  }, [fetchProducts, saveProducts]);
 
   // ============== INIT ==============
   useEffect(() => {
     loadProducts();
 
-    // Load cart
     const savedCart = localStorage.getItem(STORAGE_KEYS.CART);
     if (savedCart) {
       try {
@@ -205,19 +248,14 @@ export default function POS() {
       } catch {}
     }
 
-    // Load pending count + last sync
     setPendingCount(getPendingSales().length);
     const last = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
     if (last) setLastSyncTime(last);
 
-    // Online / Offline listeners
     const updateOnlineStatus = () => {
       const online = navigator.onLine;
       setIsOnline(online);
-      if (online) {
-        // Auto-sync when coming back online
-        syncInventory();
-      }
+      if (online) syncInventory();
     };
 
     window.addEventListener('online', updateOnlineStatus);
@@ -258,9 +296,12 @@ export default function POS() {
       lastKeyTime = now;
 
       if (e.key === 'Enter') {
-        if (barcode.length >= 6) {
+        if (barcode.length >= 4) {
           const product = products.find(
-            (p) => p.barcode === barcode || p.id === barcode
+            (p) =>
+              p.barcode === barcode ||
+              p.id === barcode ||
+              (p.barcode && p.barcode.toLowerCase().includes(barcode.toLowerCase()))
           );
 
           if (product) {
@@ -280,7 +321,7 @@ export default function POS() {
         return;
       }
 
-      if (/^[0-9]$/.test(e.key)) {
+      if (/^[0-9A-Za-z.\-']$/.test(e.key)) {
         barcode += e.key;
       }
     };
@@ -291,15 +332,18 @@ export default function POS() {
 
   // ============== COMPUTED ==============
   const categories = useMemo(() => {
-    const cats = Array.from(new Set(products.map((p) => p.category)));
-    return ['All', ...cats];
+    const cats = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+    return ['All', ...cats.sort()];
   }, [products]);
 
   const filteredProducts = useMemo(() => {
+    const q = search.toLowerCase().trim();
     return products.filter((p) => {
       const matchesSearch =
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        (p.barcode && p.barcode.includes(search));
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        (p.barcode && p.barcode.toLowerCase().includes(q)) ||
+        p.id.toLowerCase().includes(q);
       const matchesCategory = category === 'All' || p.category === category;
       return matchesSearch && matchesCategory;
     });
@@ -332,11 +376,10 @@ export default function POS() {
       const existing = prev.find((i) => i.id === product.id);
       const currentQty = existing ? existing.quantity : 0;
 
-      // Prevent overselling
       if (currentQty + 1 > product.stock) {
         setScanFeedback({
           type: 'error',
-          message: `Only ${product.stock} left in stock`,
+          message: `Only ${product.stock} ${product.umo || 'unit'}(s) left in stock`,
         });
         setTimeout(() => setScanFeedback(null), 2000);
         return prev;
@@ -388,7 +431,6 @@ export default function POS() {
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
-    // Final stock check
     for (const item of cart) {
       const product = products.find((p) => p.id === item.id);
       if (!product || product.stock < item.quantity) {
@@ -416,22 +458,18 @@ export default function POS() {
       synced: false,
     };
 
-    // 1. Deduct stock immediately (local)
     deductStock(cart);
 
-    // 2. Save sale
     const history = JSON.parse(localStorage.getItem('pos_sales') || '[]');
     history.unshift(sale);
     localStorage.setItem('pos_sales', JSON.stringify(history.slice(0, 200)));
 
-    // 3. If offline → queue for later sync
     if (!isOnline) {
       const pending = getPendingSales();
       pending.push(sale);
       savePendingSales(pending);
     } else {
-      // Try to sync immediately
-      api.syncSale(sale).catch(() => {
+      syncSale(sale).catch(() => {
         const pending = getPendingSales();
         pending.push(sale);
         savePendingSales(pending);
@@ -455,20 +493,18 @@ export default function POS() {
 
   // ============== RENDER ==============
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="h-screen bg-background text-foreground flex flex-col font-sans overflow-hidden">
       {/* ========== HEADER ========== */}
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
+      <header className="shrink-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
-            
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold tracking-tight">Point of Sale</h1>
-              <p className="text-xs text-muted-foreground">powered by Bade </p>
+              <p className="text-xs text-muted-foreground">powered by Bade</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Sync Button */}
             <Button
               variant="outline"
               size="sm"
@@ -543,9 +579,10 @@ export default function POS() {
       )}
 
       {/* ========== MAIN LAYOUT ========== */}
-      <div className="flex-1 flex overflow-hidden print:hidden">
-        {/* LEFT: Products */}
-        <div className="flex-1 flex flex-col p-4 sm:p-6 overflow-hidden">
+      <div className="flex-1 flex min-h-0 overflow-hidden print:hidden">
+        {/* LEFT: Products – independent scroll */}
+        <div className="flex-1 flex flex-col min-h-0 p-4 sm:p-6 overflow-hidden">
+          {/* Search + Categories (fixed) */}
           <div className="mb-4 space-y-3 shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -560,96 +597,120 @@ export default function POS() {
               />
             </div>
 
-            <ScrollArea className="w-full whitespace-nowrap">
-              <div className="flex gap-2 pb-1">
+            <div className="w-full overflow-x-auto overflow-y-hidden scrollbar-hide">
+              <div className="flex gap-2 pb-1 min-w-max">
                 {categories.map((cat) => (
                   <Button
                     key={cat}
                     variant={category === cat ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setCategory(cat)}
-                    className="rounded-full shrink-0"
+                    className="rounded-full shrink-0 whitespace-nowrap"
                   >
                     {cat}
                   </Button>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           </div>
 
-          <ScrollArea className="flex-1">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-4">
-              {filteredProducts.map((product) => {
-                const isOutOfStock = product.stock <= 0;
-                const isLowStock = product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD;
+          {/* Product grid – scrolls independently */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              {isLoadingProducts && products.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                  <RefreshCw className="h-10 w-10 mb-3 animate-spin opacity-50" />
+                  <p>Loading products...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-4 pr-3">
+                    {filteredProducts.map((product) => {
+                      const isOutOfStock = product.stock <= 0;
+                      const isLowStock =
+                        product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD;
 
-                return (
-                  <Card
-                    key={product.id}
-                    className={cn(
-                      'cursor-pointer transition-all hover:shadow-md active:scale-[0.98]',
-                      isOutOfStock
-                        ? 'opacity-60 cursor-not-allowed'
-                        : 'hover:border-primary'
-                    )}
-                    onClick={() => !isOutOfStock && addToCart(product)}
-                  >
-                    <CardContent className="p-3 flex flex-col h-full">
-                      <div className="bg-muted/50 rounded-lg h-20 sm:h-24 flex items-center justify-center mb-3 relative">
-                        <span className="text-3xl font-bold text-muted-foreground/40">
-                          {product.name.charAt(0)}
-                        </span>
-                        {isOutOfStock && (
-                          <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-lg">
-                            <span className="text-xs font-semibold text-destructive">
-                              OUT OF STOCK
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="font-medium text-sm line-clamp-2 leading-tight flex-1">
-                        {product.name}
-                      </div>
-                      <div className="mt-2 flex items-center justify-between gap-1">
-                        <span className="text-primary font-bold text-sm sm:text-base">
-                          ₦{product.price.toLocaleString()}
-                        </span>
-                        <Badge
-                          variant={
-                            isOutOfStock
-                              ? 'destructive'
-                              : isLowStock
-                              ? 'secondary'
-                              : 'secondary'
-                          }
+                      return (
+                        <Card
+                          key={product.id}
                           className={cn(
-                            'text-[10px] px-1.5 gap-0.5',
-                            isLowStock && !isOutOfStock && 'bg-amber-500/20 text-amber-700 dark:text-amber-400'
+                            'cursor-pointer transition-all hover:shadow-md active:scale-[0.98]',
+                            isOutOfStock
+                              ? 'opacity-60 cursor-not-allowed'
+                              : 'hover:border-primary'
                           )}
+                          onClick={() => !isOutOfStock && addToCart(product)}
                         >
-                          {isLowStock && !isOutOfStock && (
-                            <AlertTriangle className="h-3 w-3" />
-                          )}
-                          {product.stock}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                          <CardContent className="p-3 flex flex-col h-full">
+                            <div className="bg-muted/50 rounded-lg h-20 sm:h-24 flex items-center justify-center mb-3 relative overflow-hidden">
+                              {product.image ? (
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="h-full w-full object-contain"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-3xl font-bold text-muted-foreground/40">
+                                  {product.name?.charAt(0) ?? '?'}
+                                </span>
+                              )}
+                              {isOutOfStock && (
+                                <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-lg">
+                                  <span className="text-xs font-semibold text-destructive">
+                                    OUT OF STOCK
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="font-medium text-sm line-clamp-2 leading-tight flex-1">
+                              {product.name}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground mt-0.5">
+                              {product.umo}
+                            </div>
+                            <div className="mt-2 flex items-center justify-between gap-1">
+                              <span className="text-primary font-bold text-sm sm:text-base">
+                                ₦{Number(product.price).toLocaleString()}
+                              </span>
+                              <Badge
+                                variant={isOutOfStock ? 'destructive' : 'secondary'}
+                                className={cn(
+                                  'text-[10px] px-1.5 gap-0.5',
+                                  isLowStock &&
+                                    !isOutOfStock &&
+                                    'bg-amber-500/20 text-amber-700 dark:text-amber-400'
+                                )}
+                              >
+                                {isLowStock && !isOutOfStock && (
+                                  <AlertTriangle className="h-3 w-3" />
+                                )}
+                                {product.stock}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
 
-            {filteredProducts.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                <Search className="h-12 w-12 mb-3 opacity-40" />
-                <p>No products found</p>
-              </div>
-            )}
-          </ScrollArea>
+                  {filteredProducts.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                      <Search className="h-12 w-12 mb-3 opacity-40" />
+                      <p>No products found</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </ScrollArea>
+          </div>
         </div>
 
-        {/* RIGHT: Cart (Desktop) */}
-        <aside className="hidden lg:flex w-full max-w-md border-l bg-card flex-col">
+        {/* RIGHT: Cart (Desktop) – independent scroll */}
+        <aside className="hidden lg:flex w-full max-w-md border-l bg-card flex-col min-h-0 shrink-0">
+          {/* Cart header */}
           <div className="px-4 py-3 border-b flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <ShoppingCart className="h-5 w-5" />
@@ -667,72 +728,83 @@ export default function POS() {
             </Button>
           </div>
 
-          <ScrollArea className="flex-1">
-            <div className="p-3 space-y-2">
-              {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                  <ShoppingCart className="h-14 w-14 mb-3 opacity-30" />
-                  <p className="font-medium">Cart is empty</p>
-                  <p className="text-sm">Scan or add products</p>
-                </div>
-              ) : (
-                cart.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 rounded-xl bg-muted/40 p-3"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{item.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        ₦{item.price.toLocaleString()} each
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      >
-                        <Minus className="h-3.5 w-3.5" />
-                      </Button>
-                      <Input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(item.id, parseInt(e.target.value) || 1)
-                        }
-                        className="w-12 h-8 text-center px-1"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-
-                    <div className="text-right w-20">
-                      <div className="font-semibold text-sm">
-                        ₦{(item.price * item.quantity).toLocaleString()}
-                      </div>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-xs text-destructive hover:underline mt-0.5"
-                      >
-                        Remove
-                      </button>
-                    </div>
+          {/* Cart items – scrolls independently */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-3 space-y-2">
+                {cart.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                    <ShoppingCart className="h-14 w-14 mb-3 opacity-30" />
+                    <p className="font-medium">Cart is empty</p>
+                    <p className="text-sm">Scan or add products</p>
                   </div>
-                ))
-              )}
-            </div>
-          </ScrollArea>
+                ) : (
+                  cart.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl bg-muted/40 p-3 space-y-2"
+                    >
+                      {/* Name + line total */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm leading-snug line-clamp-2">
+                            {item.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            ₦{Number(item.price).toLocaleString()} / {item.umo || 'unit'}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="font-semibold text-sm whitespace-nowrap">
+                            ₦{(item.price * item.quantity).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
 
+                      {/* Quantity controls + remove */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </Button>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateQuantity(item.id, parseInt(e.target.value) || 1)
+                            }
+                            className="w-12 h-8 text-center px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-xs text-destructive hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+
+          {/* Cart footer (fixed) */}
           <div className="border-t p-4 space-y-3 bg-muted/20 shrink-0">
             <div className="flex items-center gap-2">
               <Select value={discountType} onValueChange={setDiscountType}>
@@ -815,56 +887,77 @@ export default function POS() {
             </div>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 px-4">
-            <div className="py-3 space-y-2">
-              {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                  <ShoppingCart className="h-14 w-14 mb-3 opacity-30" />
-                  <p>Cart is empty</p>
-                </div>
-              ) : (
-                cart.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 rounded-xl bg-muted/40 p-3"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{item.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        ₦{item.price.toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      >
-                        <Minus className="h-3.5 w-3.5" />
-                      </Button>
-                      <span className="w-8 text-center text-sm font-medium">
-                        {item.quantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-sm">
-                        ₦{(item.price * item.quantity).toLocaleString()}
-                      </div>
-                    </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full px-4">
+              <div className="py-3 space-y-2">
+                {cart.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                    <ShoppingCart className="h-14 w-14 mb-3 opacity-30" />
+                    <p>Cart is empty</p>
                   </div>
-                ))
-              )}
-            </div>
-          </ScrollArea>
+                ) : (
+                  cart.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl bg-muted/40 p-3 space-y-2"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm leading-snug line-clamp-2">
+                            {item.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            ₦{Number(item.price).toLocaleString()} / {item.umo || 'unit'}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="font-semibold text-sm whitespace-nowrap">
+                            ₦{(item.price * item.quantity).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </Button>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateQuantity(item.id, parseInt(e.target.value) || 1)
+                            }
+                            className="w-12 h-8 text-center px-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-xs text-destructive hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
 
           <div className="border-t p-4 space-y-3 shrink-0">
             <div className="flex items-center gap-2">
@@ -1027,10 +1120,15 @@ export default function POS() {
             <tbody>
               {(lastSale?.items || cart).map((item) => (
                 <tr key={item.id} className="border-b border-gray-300">
-                  <td className="py-3 text-base">{item.name}</td>
+                  <td className="py-3 text-base">
+                    {item.name}
+                    {item.umo && (
+                      <span className="text-sm text-gray-500 ml-1">({item.umo})</span>
+                    )}
+                  </td>
                   <td className="py-3 text-center text-base">{item.quantity}</td>
                   <td className="py-3 text-right text-base">
-                    ₦{item.price.toLocaleString()}
+                    ₦{Number(item.price).toLocaleString()}
                   </td>
                   <td className="py-3 text-right text-base font-medium">
                     ₦{(item.price * item.quantity).toLocaleString()}
@@ -1101,6 +1199,15 @@ export default function POS() {
       </div>
 
       <style jsx global>{`
+        /* Hide scrollbar but keep scroll functionality */
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
         @media print {
           @page {
             size: A3 portrait;
