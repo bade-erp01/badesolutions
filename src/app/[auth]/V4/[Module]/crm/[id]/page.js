@@ -171,57 +171,57 @@ export default function CustomerForm({
 
   // ==================== HANDLERS ====================
   const UpdateCustomerBalance = async (value, field) => {
-  try {
-    const result = await Swal.fire({
-      title: "Confirm Sensitive Operation",
-      html: `
-        <div class="text-sm space-y-2 text-left">
-          <p>You are about to update a customer's financial balance.</p>
-          <p>This action is <strong>irreversible</strong> and may affect financial records.</p>
-        </div>
-      `,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#22c55e",
-      cancelButtonColor: "#f97316",
-      confirmButtonText: "Yes, Proceed!",
-      cancelButtonText: "Cancel",
-    });
+    try {
+      const result = await Swal.fire({
+        title: "Confirm Sensitive Operation",
+        html: `
+          <div class="text-sm space-y-2 text-left">
+            <p>You are about to update a customer's financial balance.</p>
+            <p>This action is <strong>irreversible</strong> and may affect financial records.</p>
+          </div>
+        `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#22c55e",
+        cancelButtonColor: "#f97316",
+        confirmButtonText: "Yes, Proceed!",
+        cancelButtonText: "Cancel",
+      });
 
-    if (!result.isConfirmed) return;
+      if (!result.isConfirmed) return;
 
-    plsWait("Please wait...This should only take a bit.");
+      plsWait("Please wait...This should only take a bit.");
 
-    const response = await fetch(
-      `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
-        userInfo.user._id,
-      )}/${Encrypt(cust._id)}/${field}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-          access: `${Encrypt(userInfo.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
+          userInfo.user._id,
+        )}/${Encrypt(cust._id)}/${field}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
+            access: `${Encrypt(userInfo.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
+          },
+          body: JSON.stringify({
+            id: Encrypt(cust._id),
+            [field]: value,
+          }),
         },
-        body: JSON.stringify({
-          id: Encrypt(cust._id),
-          [field]: value, // only sends Debt or creditLimit (whichever is in `field`)
-        }),
-      },
-    );
+      );
 
-    const data = await response.json();
-    if (response.ok) {
-      SuccessToast(data.message);
-      navigation.refresh();
-    } else {
-      throw new Error(data.error || "Update Failed");
+      const data = await response.json();
+      if (response.ok) {
+        SuccessToast(data.message);
+        navigation.refresh();
+      } else {
+        throw new Error(data.error || "Update Failed");
+      }
+    } catch (error) {
+      ErrorMessage(error.message);
     }
-  } catch (error) {
-    ErrorMessage(error.message);
-  }
-};
+  };
 
   let jsPDF;
   if (typeof window !== "undefined") {
@@ -403,17 +403,11 @@ export default function CustomerForm({
       if (name === "attachment") {
         setAttachment(files[0]);
       }
+    } else if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-  };
-
-  // Helper for Select components (shadcn)
-  const handleSelectChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -490,10 +484,26 @@ export default function CustomerForm({
     }
   };
 
+  // Shared Tailwind classes matching shadcn look
+  const inputCls =
+    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+  const selectCls =
+    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+  const btnCls =
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 px-3";
+  const btnPrimary = `${btnCls} bg-primary text-primary-foreground hover:bg-primary/90`;
+  const btnOutline = `${btnCls} border border-input bg-background hover:bg-accent hover:text-accent-foreground`;
+  const btnDestructive = `${btnCls} bg-destructive text-destructive-foreground hover:bg-destructive/90`;
+  const btnGreen = `${btnCls} bg-green-600 text-white hover:bg-green-700`;
+  const labelCls = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
+  const cardCls = "rounded-lg border bg-card text-card-foreground shadow-sm";
+  const badgeCls =
+    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full space-y-6 p-3 sm:p-5 text-sm"
+      className="w-full min-w-0 space-y-6 p-3 sm:p-5 text-sm overflow-x-hidden"
     >
       {/* Top Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -501,22 +511,25 @@ export default function CustomerForm({
           Registration Date:{" "}
           {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
         </p>
-        <Badge
-          variant={cust.Debt < 0 ? "default" : "destructive"}
-          className="w-fit text-sm px-4 py-1.5"
+        <span
+          className={`${badgeCls} w-fit text-sm px-4 py-1.5 ${
+            cust.Debt < 0
+              ? "border-transparent bg-primary text-primary-foreground"
+              : "border-transparent bg-destructive text-destructive-foreground"
+          }`}
         >
           ₦
           {cust.Debt?.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
-        </Badge>
+        </span>
       </div>
 
       {/* Avatar + Attachment */}
       <div className="flex flex-col sm:flex-row gap-6 items-start">
         <div className="flex items-center gap-4">
-          <div className="w-24 h-24 rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center">
+          <div className="w-24 h-24 rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center shrink-0">
             {cust.image ? (
               <Image
                 width={96}
@@ -530,70 +543,55 @@ export default function CustomerForm({
               <span className="text-xs text-muted-foreground">No Image</span>
             )}
           </div>
-          <div className="space-y-1.5">
-            <Label>Profile Image</Label>
-            <Input
+          <div className="space-y-1.5 min-w-0">
+            <label className={labelCls}>Profile Image</label>
+            <input
               type="file"
               name="Image"
               accept="image/*"
               onChange={handleChange}
-              className="cursor-pointer"
+              className={`${inputCls} cursor-pointer`}
             />
           </div>
         </div>
-
-        {/* <div className="hidden lg:block flex-1 space-y-1.5">
-          <Label>Attach Document</Label>
-          <Input
-            type="file"
-            name="attachment"
-            onChange={handleChange}
-            className="cursor-pointer"
-          />
-          {attachment && (
-            <p className="text-xs text-muted-foreground">
-              Selected: <strong>{attachment.name}</strong>
-            </p>
-          )}
-        </div> */}
       </div>
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className={cardCls}>
+        <div className="flex flex-col space-y-1.5 p-6 pb-3">
+          <h3 className="text-base font-semibold leading-none tracking-tight">
+            Quick Actions
+          </h3>
+        </div>
+        <div className="p-6 pt-0">
           <div className="flex flex-wrap gap-2">
             {userInfo.user.raiseInvoice &&
               !cust.blocked &&
               cust.location &&
               cust.priceList && (
-                <Button
-                  onClick={handleCreateInvoice}
-                  size="sm"
+                <button
                   type="button"
-                  className="gap-2"
+                  onClick={handleCreateInvoice}
+                  className={btnPrimary}
                 >
                   <Plus className="w-4 h-4" />
                   Create Invoice
-                </Button>
+                </button>
               )}
 
-            <Button
-              onClick={() => GenerateSummary(Encrypt(cust._id))}
-              variant="outline"
-              size="sm"
+            <button
               type="button"
-              className="gap-2"
+              onClick={() => GenerateSummary(Encrypt(cust._id))}
+              className={btnOutline}
             >
               <PrinterIcon className="w-4 h-4" />
               Print Statement
-            </Button>
+            </button>
 
             {userInfo.user.postPayment && !cust.blocked && cust.BankJournal && (
               <>
-                <Button
+                <button
+                  type="button"
                   onClick={() =>
                     postPayment(
                       Encrypt(cust._id),
@@ -601,14 +599,11 @@ export default function CustomerForm({
                       config,
                     )
                   }
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  className="gap-2"
+                  className={btnOutline}
                 >
                   <WalletIcon className="w-4 h-4" />
                   Register Down Payment
-                </Button>
+                </button>
 
                 {userInfo.business.subscriptionplan === "Standard" && (
                   <InvoicePaymentForm
@@ -653,8 +648,8 @@ export default function CustomerForm({
               </Link>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Dashboard Stats */}
       <DashboardStats
@@ -666,85 +661,98 @@ export default function CustomerForm({
       />
 
       {/* Sales Insight */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
+      <div className={cardCls}>
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-base font-semibold leading-none tracking-tight">
             Month-on-Month Sales Insight for {cust.Username}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h3>
+        </div>
+        <div className="p-6 pt-0">
           <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* ========== MAIN ACCORDION ========== */}
-      <Accordion type="multiple" className="w-full space-y-3">
-        {/* FORM */}
-        <AccordionItem value="form" className="border rounded-lg px-4">
-          <AccordionTrigger className="text-base font-semibold hover:no-underline">
-            Form
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 pt-2 pb-4">
+      {/* ========== SECTIONS ========== */}
+      <div className="w-full min-w-0 space-y-3">
+        {/* FORM — pure HTML details */}
+        <details className="group border rounded-lg px-4 min-w-0 open:bg-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold select-none [&::-webkit-details-marker]:hidden">
+            <span>Form</span>
+            <svg
+              className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+
+          <div className="pb-4 space-y-6">
             {/* Identity */}
             <div className="space-y-3">
               <h4 className="font-medium text-sm text-muted-foreground">
                 Identity
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label>Business Name</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Business Name</label>
+                  <input
                     name="Username"
                     value={formData.Username || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Customer Code</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Customer Code</label>
+                  <input
                     name="CustomerCode"
                     value={formData.CustomerCode || ""}
                     disabled
                     readOnly
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Tax Identification Number</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Tax Identification Number</label>
+                  <input
                     name="TIN"
                     value={formData.TIN || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Industry</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Industry</label>
+                  <input
                     name="industryType"
                     value={formData.industryType || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Customer Type</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0 sm:col-span-2">
+                  <label className={labelCls}>Customer Type</label>
+                  <select
+                    name="customerType"
                     value={formData.customerType || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("customerType", val)
-                    }
+                    onChange={handleChange}
+                    className={`${selectCls} max-w-xs`}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Business">Business</SelectItem>
-                      <SelectItem value="Individual">Individual</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select type</option>
+                    <option value="Business">Business</option>
+                    <option value="Individual">Individual</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            <Separator />
+            <hr className="border-border" />
 
             {/* Contact */}
             <div className="space-y-3">
@@ -752,35 +760,38 @@ export default function CustomerForm({
                 Contact Info
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label>Email</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Email</label>
+                  <input
                     name="Email"
                     type="email"
                     value={formData.Email || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Phone</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Phone</label>
+                  <input
                     name="phone"
                     value={formData.phone || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Contact Person</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Contact Person</label>
+                  <input
                     name="contactPerson"
                     value={formData.contactPerson || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
               </div>
             </div>
 
-            <Separator />
+            <hr className="border-border" />
 
             {/* Location */}
             <div className="space-y-3">
@@ -788,76 +799,80 @@ export default function CustomerForm({
                 Location
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <Label>Country</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Country</label>
+                  <input
                     name="country"
                     value={formData.country || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>State</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>State</label>
+                  <select
+                    name="state"
                     value={formData.state || formData.State || ""}
-                    onValueChange={(val) => handleSelectChange("state", val)}
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {States.map((s, i) => (
-                        <SelectItem key={i} value={s.value || s}>
-                          {s.label || s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select state</option>
+                    {States.map((s, i) => (
+                      <option key={i} value={s.value || s}>
+                        {s.label || s}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Address</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Address</label>
+                  <input
                     name="billingAddress"
                     value={formData.billingAddress || formData.street || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Region</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Region</label>
+                  <input
                     name="Region"
                     value={formData.Region || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Merchandiser</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Merchandiser</label>
+                  <input
                     name="merchandiser"
                     value={formData.merchandiser || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Latitude</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Latitude</label>
+                  <input
                     name="latitude"
                     value={formData.latitude || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Longitude</Label>
-                  <Input
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Longitude</label>
+                  <input
                     name="longitude"
                     value={formData.longitude || ""}
                     onChange={handleChange}
+                    className={inputCls}
                   />
                 </div>
               </div>
             </div>
 
-            <Separator />
+            <hr className="border-border" />
 
             {/* Financials */}
             <div className="space-y-3">
@@ -865,10 +880,9 @@ export default function CustomerForm({
                 Financials
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Debt */}
                 {userInfo.user.isAdmin ? (
-                  <Card className="p-4 space-y-3">
-                    <Label>
+                  <div className={`${cardCls} p-4 space-y-3 w-full min-w-0`}>
+                    <label className={labelCls}>
                       {cust.lastPayDate &&
                       cust.Debt > 0 &&
                       moment(cust.lastPayDate).isValid()
@@ -877,8 +891,8 @@ export default function CustomerForm({
                             "days",
                           )} day(s) ago`
                         : "Not in Debt"}
-                    </Label>
-                    <Input
+                    </label>
+                    <input
                       type="number"
                       step="any"
                       value={BalanceData.Debt}
@@ -886,21 +900,21 @@ export default function CustomerForm({
                         const parsed = parseFloat(e.target.value) || 0;
                         setBalanceData((prev) => ({ ...prev, Debt: parsed }));
                       }}
+                      className={inputCls}
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="destructive"
-                      className="w-full"
+                      className={`${btnDestructive} w-full`}
                       onClick={() =>
                         UpdateCustomerBalance(BalanceData.Debt, "Debt")
                       }
                     >
                       Update Balance
-                    </Button>
-                  </Card>
+                    </button>
+                  </div>
                 ) : (
-                  <div className="space-y-1.5">
-                    <Label>
+                  <div className="space-y-1.5 min-w-0">
+                    <label className={labelCls}>
                       {cust.lastPayDate &&
                       cust.Debt > 0 &&
                       moment(cust.lastPayDate).isValid()
@@ -909,20 +923,19 @@ export default function CustomerForm({
                             "days",
                           )} day(s) ago`
                         : "Not in Debt"}
-                    </Label>
+                    </label>
                     <div className="px-3 py-2 border rounded-md bg-muted/50 font-medium">
                       {formData.Debt?.toLocaleString()}
                     </div>
                   </div>
                 )}
 
-                {/* Credit Limit */}
                 {cust.isVerified && (
                   <>
                     {userInfo.user.EditCreditLimit ? (
-                      <Card className="p-4 space-y-3">
-                        <Label>Credit Limit</Label>
-                        <Input
+                      <div className={`${cardCls} p-4 space-y-3 w-full min-w-0`}>
+                        <label className={labelCls}>Credit Limit</label>
+                        <input
                           type="number"
                           step="any"
                           min={0}
@@ -936,112 +949,100 @@ export default function CustomerForm({
                             }
                             setcreditLimit(parsed);
                           }}
+                          className={inputCls}
                         />
-                        <Button
+                        <button
                           type="button"
-                          className="w-full bg-green-600 hover:bg-green-700"
+                          className={`${btnGreen} w-full`}
                           onClick={() =>
                             UpdateCustomerBalance(creditLimit, "creditLimit")
                           }
                         >
                           Update Credit Limit
-                        </Button>
-                      </Card>
+                        </button>
+                      </div>
                     ) : (
-                      <div className="space-y-1.5">
-                        <Label>Credit Limit</Label>
+                      <div className="space-y-1.5 min-w-0">
+                        <label className={labelCls}>Credit Limit</label>
                         <div className="px-3 py-2 border rounded-md bg-muted/50 font-medium">
                           {formData.creditLimit?.toLocaleString()}
                         </div>
                       </div>
                     )}
 
-                    <div className="space-y-1.5">
-                      <Label>Credit Rating</Label>
-                      <Input
+                    <div className="space-y-1.5 min-w-0">
+                      <label className={labelCls}>Credit Rating</label>
+                      <input
                         name="creditRating"
                         type="number"
                         min={0}
                         max={5}
                         value={formData.creditRating || 0}
                         onChange={handleChange}
+                        className={inputCls}
                       />
                     </div>
                   </>
                 )}
 
-                <div className="space-y-1.5">
-                  <Label>PriceList</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>PriceList</label>
+                  <select
+                    name="priceList"
                     value={formData.priceList || ""}
-                    onValueChange={(val) => handleSelectChange("priceList", val)}
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select pricelist" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={cust.priceList}>
-                        {pricelistSetter(cust.priceList, userInfo.business)}
-                      </SelectItem>
-                      {PriceList?.data?.map((pl) => (
-                        <SelectItem key={pl._id} value={pl.Name}>
-                          {pricelistSetter(pl.Name, userInfo.business)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select pricelist</option>
+                    <option value={cust.priceList}>
+                      {pricelistSetter(cust.priceList, userInfo.business)}
+                    </option>
+                    {PriceList?.data?.map((pl) => (
+                      <option key={pl._id} value={pl.Name}>
+                        {pricelistSetter(pl.Name, userInfo.business)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label>Payment Terms</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Payment Terms</label>
+                  <select
+                    name="paymentTerms"
                     value={formData.paymentTerms || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("paymentTerms", val)
-                    }
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select terms" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Cash on Delivery">
-                        Cash on Delivery
-                      </SelectItem>
-                      <SelectItem value="Credit customer">
-                        Credit customer
-                      </SelectItem>
-                      <SelectItem value="Payment before delivery">
-                        Payment before delivery
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select terms</option>
+                    <option value="Cash on Delivery">Cash on Delivery</option>
+                    <option value="Credit customer">Credit customer</option>
+                    <option value="Payment before delivery">
+                      Payment before delivery
+                    </option>
+                  </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label>Journal</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Journal</label>
+                  <select
+                    name="BankJournal"
                     value={formData.BankJournal || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("BankJournal", val)
-                    }
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select journal" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data.Accounts?.map((acc) => (
-                        <SelectItem key={acc._id} value={acc._id}>
-                          {acc.NAME}
-                          {acc._id === cust.BankJournal ? " [CURRENT]" : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select journal</option>
+                    {data.Accounts?.map((acc) => (
+                      <option key={acc._id} value={acc._id}>
+                        {acc.NAME}
+                        {acc._id === cust.BankJournal ? " [CURRENT]" : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
 
-            <Separator />
+            <hr className="border-border" />
 
             {/* Status Flags */}
             <div className="space-y-3">
@@ -1050,45 +1051,43 @@ export default function CustomerForm({
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {cust.Email && (
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="NewsFeedSubscription"
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="NewsFeedSubscription"
                       checked={!!formData.NewsFeedSubscription}
-                      onCheckedChange={(val) =>
-                        handleSelectChange("NewsFeedSubscription", val)
-                      }
+                      onChange={handleChange}
+                      className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
                     />
-                    <Label htmlFor="NewsFeedSubscription">
-                      Send quarterly statement
-                    </Label>
-                  </div>
+                    <span className={labelCls}>Send quarterly statement</span>
+                  </label>
                 )}
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="isVerified"
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="isVerified"
                     checked={!!formData.isVerified}
-                    onCheckedChange={(val) =>
-                      handleSelectChange("isVerified", val)
-                    }
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
                   />
-                  <Label htmlFor="isVerified">Verified</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="blocked"
+                  <span className={labelCls}>Verified</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="blocked"
                     checked={!!formData.blocked}
-                    onCheckedChange={(val) =>
-                      handleSelectChange("blocked", val)
-                    }
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
                   />
-                  <Label htmlFor="blocked">
+                  <span className={labelCls}>
                     {formData.blocked ? "Unblock Customer" : "Block Customer"}
-                  </Label>
-                </div>
+                  </span>
+                </label>
               </div>
             </div>
 
-            <Separator />
+            <hr className="border-border" />
 
             {/* Services */}
             <div className="space-y-3">
@@ -1096,90 +1095,78 @@ export default function CustomerForm({
                 Services
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label>Sales Person</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Sales Person</label>
+                  <select
+                    name="salesPerson"
                     value={formData.salesPerson || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("salesPerson", val)
-                    }
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select sales person" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {salesPerson.map((p) => (
-                        <SelectItem key={p._id} value={p._id}>
-                          {p.firstName} {p.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select sales person</option>
+                    {salesPerson.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {p.firstName} {p.lastName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label>Manager</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Manager</label>
+                  <select
+                    name="accountManager"
                     value={formData.accountManager || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("accountManager", val)
-                    }
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select manager" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {salesPerson.map((p) => (
-                        <SelectItem key={p._id} value={p._id}>
-                          {p.firstName} {p.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select manager</option>
+                    {salesPerson.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {p.firstName} {p.lastName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label>Service Warehouse</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Service Warehouse</label>
+                  <select
+                    name="location"
                     value={formData.location || ""}
-                    onValueChange={(val) => handleSelectChange("location", val)}
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select warehouse" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data.wh?.map((w) => (
-                        <SelectItem key={w._id} value={w._id}>
-                          {w.WHName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select warehouse</option>
+                    {data.wh?.map((w) => (
+                      <option key={w._id} value={w._id}>
+                        {w.WHName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label>Preferred Shipping Method</Label>
-                  <Select
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Preferred Shipping Method</label>
+                  <select
+                    name="preferredShippingMethod"
                     value={formData.preferredShippingMethod || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("preferredShippingMethod", val)
-                    }
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Air">Air</SelectItem>
-                      <SelectItem value="Sea">Sea</SelectItem>
-                      <SelectItem value="Land">Land</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select method</option>
+                    <option value="Air">Air</option>
+                    <option value="Sea">Sea</option>
+                    <option value="Land">Land</option>
+                  </select>
                 </div>
 
                 {userInfo.user._id === cust.accountManager &&
                   userInfo.business.subscriptionplan === "Standard" && (
-                    <div className="space-y-1.5">
-                      <Label>Assign days for sale rep visit</Label>
+                    <div className="space-y-1.5 min-w-0">
+                      <label className={labelCls}>
+                        Assign days for sale rep visit
+                      </label>
                       <DaySelector
                         useCase="RouteDays"
                         userData={userInfo}
@@ -1189,190 +1176,200 @@ export default function CustomerForm({
                     </div>
                   )}
 
-                <div className="space-y-1.5">
-                  <Label>Subscription Plan</Label>
-                  <Select
-                    value={formData.Subscription?._id || ""}
-                    onValueChange={(val) =>
-                      handleSelectChange("Subscription", val)
-                    }
+                <div className="space-y-1.5 min-w-0">
+                  <label className={labelCls}>Subscription Plan</label>
+                  <select
+                    name="Subscription"
+                    value={formData.Subscription?._id || formData.Subscription || ""}
+                    onChange={handleChange}
+                    className={selectCls}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select plan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data?.Subscription?.map((sub) => (
-                        <SelectItem key={sub._id} value={sub._id}>
-                          {sub.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select plan</option>
+                    {data?.Subscription?.map((sub) => (
+                      <option key={sub._id} value={sub._id}>
+                        {sub.title}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        </details>
 
-        {/* LEDGER */}
-        <AccordionItem value="ledger" className="border rounded-lg px-4">
-          <AccordionTrigger className="text-base font-semibold hover:no-underline">
-            Ledger
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-4">
-            <Card className="border-0 shadow-none">
-              <CardHeader className="p-3">
-                <CardTitle className="text-lg">Transaction History</CardTitle>
-                <CardDescription>
-                  {cust.Username} account transactions and balances
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                {data?.transcations?.length > 0 ? (
-                  <>
-                    <div className="overflow-x-auto rounded-lg border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Ref No</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Credit</TableHead>
-                            <TableHead>Debit</TableHead>
-                            <TableHead className="text-right">
-                              Balance
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {currentRows.map((tx, idx) => (
-                            <TableRow key={idx}>
-                              <TableCell
-                                className="max-w-[180px] truncate font-medium"
-                                title={tx.ReferenceNo}
-                              >
-                                {tx.ReferenceNo.length > 35
-                                  ? `${tx.ReferenceNo.substring(0, 35)}...`
-                                  : tx.ReferenceNo}
-                              </TableCell>
-                              <TableCell>
-                                {moment(tx.Date).format("MMM D, YYYY")}
-                              </TableCell>
-                              <TableCell>
-                                {tx.CreditAmount > 0 ? (
-                                  <Badge
-                                    variant="secondary"
-                                    className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                                  >
-                                    CR: {tx.CreditAmount?.toLocaleString()}
-                                  </Badge>
-                                ) : (
-                                  "—"
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                {tx.DebitAmount > 0 ? (
-                                  <Badge
-                                    variant="destructive"
-                                    className="bg-rose-500/10 text-rose-700 dark:text-rose-400"
-                                  >
-                                    DR: {tx.DebitAmount?.toLocaleString()}
-                                  </Badge>
-                                ) : (
-                                  "—"
-                                )}
-                              </TableCell>
-                              <TableCell
-                                className={`text-right font-bold ${
-                                  tx.Balance < 0
-                                    ? "text-emerald-600 dark:text-emerald-400"
-                                    : ""
-                                }`}
-                              >
-                                {tx.Balance?.toLocaleString()}
-                              </TableCell>
+        {/* LEDGER — only place that keeps shadcn components */}
+        <Accordion type="multiple" className="w-full min-w-0">
+          <AccordionItem value="ledger" className="border rounded-lg px-4 min-w-0">
+            <AccordionTrigger className="text-base font-semibold hover:no-underline">
+              Ledger
+            </AccordionTrigger>
+            <AccordionContent className="pt-2 pb-4">
+              <Card className="border-0 shadow-none">
+                <CardHeader className="p-3">
+                  <CardTitle className="text-lg">Transaction History</CardTitle>
+                  <CardDescription>
+                    {cust.Username} account transactions and balances
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  {data?.transcations?.length > 0 ? (
+                    <>
+                      <div className="overflow-x-auto rounded-lg border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Ref No</TableHead>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Credit</TableHead>
+                              <TableHead>Debit</TableHead>
+                              <TableHead className="text-right">
+                                Balance
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-
-                    <ExcelDownloadBtn
-                      data={data?.transcations || []}
-                      page={`${cust.Username.substring(0, 8)} transaction`}
-                    />
-
-                    {cust.Debt < 0 ? (
-                      <Alert className="border-purple-300 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-800">
-                        <AlertCircle className="h-4 w-4 text-purple-700 dark:text-purple-400" />
-                        <AlertTitle>Business Debt Notice</AlertTitle>
-                        <AlertDescription>
-                          <strong>{userInfo.business.companyName}</strong> owes{" "}
-                          <strong>{cust.Username}</strong>{" "}
-                          <strong>{cust.Debt?.toLocaleString()}</strong>.
-                        </AlertDescription>
-                      </Alert>
-                    ) : (
-                      <Alert className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800">
-                        <AlertCircle className="h-4 w-4 text-yellow-700 dark:text-yellow-400" />
-                        <AlertTitle>Outstanding Debt</AlertTitle>
-                        <AlertDescription>
-                          <strong>{cust.Username}</strong> owes your business{" "}
-                          <strong>{cust.Debt?.toLocaleString()}</strong>.
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <p className="text-sm text-muted-foreground">
-                        Page {currentPage} of {totalPages || 1}
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          type="button"
-                          onClick={() =>
-                            setCurrentPage((p) => Math.max(p - 1, 1))
-                          }
-                          disabled={currentPage === 1}
-                        >
-                          Previous
-                        </Button>
-                        <Button
-                          size="sm"
-                          type="button"
-                          onClick={() =>
-                            setCurrentPage((p) =>
-                              Math.min(p + 1, totalPages),
-                            )
-                          }
-                          disabled={
-                            currentPage === totalPages || totalPages === 0
-                          }
-                        >
-                          Next
-                        </Button>
+                          </TableHeader>
+                          <TableBody>
+                            {currentRows.map((tx, idx) => (
+                              <TableRow key={idx}>
+                                <TableCell
+                                  className="max-w-[180px] truncate font-medium"
+                                  title={tx.ReferenceNo}
+                                >
+                                  {tx.ReferenceNo.length > 35
+                                    ? `${tx.ReferenceNo.substring(0, 35)}...`
+                                    : tx.ReferenceNo}
+                                </TableCell>
+                                <TableCell>
+                                  {moment(tx.Date).format("MMM D, YYYY")}
+                                </TableCell>
+                                <TableCell>
+                                  {tx.CreditAmount > 0 ? (
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                    >
+                                      CR: {tx.CreditAmount?.toLocaleString()}
+                                    </Badge>
+                                  ) : (
+                                    "—"
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {tx.DebitAmount > 0 ? (
+                                    <Badge
+                                      variant="destructive"
+                                      className="bg-rose-500/10 text-rose-700 dark:text-rose-400"
+                                    >
+                                      DR: {tx.DebitAmount?.toLocaleString()}
+                                    </Badge>
+                                  ) : (
+                                    "—"
+                                  )}
+                                </TableCell>
+                                <TableCell
+                                  className={`text-right font-bold ${
+                                    tx.Balance < 0
+                                      ? "text-emerald-600 dark:text-emerald-400"
+                                      : ""
+                                  }`}
+                                >
+                                  {tx.Balance?.toLocaleString()}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex h-32 items-center justify-center rounded-lg border border-dashed">
-                    <p className="text-sm text-muted-foreground italic">
-                      No recent transactions found.
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
 
-        {/* GEO */}
-        <AccordionItem value="geo" className="border rounded-lg px-4">
-          <AccordionTrigger className="text-base font-semibold hover:no-underline">
-            Geo‑coordinates
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-4">
+                      <ExcelDownloadBtn
+                        data={data?.transcations || []}
+                        page={`${cust.Username.substring(0, 8)} transaction`}
+                      />
+
+                      {cust.Debt < 0 ? (
+                        <Alert className="border-purple-300 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-800">
+                          <AlertCircle className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                          <AlertTitle>Business Debt Notice</AlertTitle>
+                          <AlertDescription>
+                            <strong>{userInfo.business.companyName}</strong> owes{" "}
+                            <strong>{cust.Username}</strong>{" "}
+                            <strong>{cust.Debt?.toLocaleString()}</strong>.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <Alert className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800">
+                          <AlertCircle className="h-4 w-4 text-yellow-700 dark:text-yellow-400" />
+                          <AlertTitle>Outstanding Debt</AlertTitle>
+                          <AlertDescription>
+                            <strong>{cust.Username}</strong> owes your business{" "}
+                            <strong>{cust.Debt?.toLocaleString()}</strong>.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <p className="text-sm text-muted-foreground">
+                          Page {currentPage} of {totalPages || 1}
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            type="button"
+                            onClick={() =>
+                              setCurrentPage((p) => Math.max(p - 1, 1))
+                            }
+                            disabled={currentPage === 1}
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            size="sm"
+                            type="button"
+                            onClick={() =>
+                              setCurrentPage((p) =>
+                                Math.min(p + 1, totalPages),
+                              )
+                            }
+                            disabled={
+                              currentPage === totalPages || totalPages === 0
+                            }
+                          >
+                            Next
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex h-32 items-center justify-center rounded-lg border border-dashed">
+                      <p className="text-sm text-muted-foreground italic">
+                        No recent transactions found.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* GEO — pure HTML details */}
+        <details className="group border rounded-lg px-4 min-w-0 open:bg-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold select-none [&::-webkit-details-marker]:hidden">
+            <span>Geo‑coordinates</span>
+            <svg
+              className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+          <div className="pb-4">
             <div className="w-full h-64 sm:h-80 rounded-lg overflow-hidden border">
               {cust.latitude && cust.longitude ? (
                 <iframe
@@ -1392,76 +1389,100 @@ export default function CustomerForm({
                 />
               )}
             </div>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        </details>
 
-        {/* SALES PIPELINE */}
-        <AccordionItem value="pipeline" className="border rounded-lg px-4">
-          <AccordionTrigger className="text-base font-semibold hover:no-underline">
-            Sales Pipeline
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-4">
+        {/* SALES PIPELINE — pure HTML details */}
+        <details className="group border rounded-lg px-4 min-w-0 open:bg-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold select-none [&::-webkit-details-marker]:hidden">
+            <span>Sales Pipeline</span>
+            <svg
+              className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+          <div className="pb-4">
             <CustomerSales
               Sales={Sales}
               customer={cust}
               business={userInfo.business}
               Rep={salesPerson}
             />
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        </details>
 
-        {/* SUPPORT TICKETS */}
-        <AccordionItem value="tickets" className="border rounded-lg px-4">
-          <AccordionTrigger className="text-base font-semibold hover:no-underline">
-            {data.SupportTicket?.length || 0} Support Tickets
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-4">
-            <div className="max-h-80 overflow-y-auto space-y-3">
-              {data.SupportTicket?.length > 0 ? (
-                data.SupportTicket.map((ticket, index) => (
-                  <Card key={index} className="p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant="secondary">{ticket.status}</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {ticket.TicketId}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(ticket.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <span className="text-xs font-medium">{ticket.SLA}</span>
+        {/* SUPPORT TICKETS — pure HTML details */}
+        <details className="group border rounded-lg px-4 min-w-0 open:bg-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold select-none [&::-webkit-details-marker]:hidden">
+            <span>{data.SupportTicket?.length || 0} Support Tickets</span>
+            <svg
+              className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+          <div className="pb-4 max-h-80 overflow-y-auto space-y-3">
+            {data.SupportTicket?.length > 0 ? (
+              data.SupportTicket.map((ticket, index) => (
+                <div key={index} className={`${cardCls} p-3`}>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        className={`${badgeCls} border-transparent bg-secondary text-secondary-foreground`}
+                      >
+                        {ticket.status}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {ticket.TicketId}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(ticket.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
-                    <p className="text-sm whitespace-pre-line">
-                      {ticket.comment}
-                    </p>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-8 border border-dashed rounded-lg text-muted-foreground text-sm">
-                  No support tickets.
+                    <span className="text-xs font-medium">{ticket.SLA}</span>
+                  </div>
+                  <p className="text-sm whitespace-pre-line">{ticket.comment}</p>
                 </div>
-              )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+              ))
+            ) : (
+              <div className="text-center py-8 border border-dashed rounded-lg text-muted-foreground text-sm">
+                No support tickets.
+              </div>
+            )}
+          </div>
+        </details>
+      </div>
 
       {/* Save Buttons */}
       {userInfo.user.editCustomer && (
-        <Button type="submit" className="bg-green-600 hover:bg-green-700">
+        <button type="submit" className={btnGreen}>
           Save Changes
-        </Button>
+        </button>
       )}
 
       {userInfo.user.raiseInvoice && !userInfo.user.editCustomer && (
-        <Button
+        <button
           type="button"
           onClick={updateServiceLocation}
-          className="bg-green-600 hover:bg-green-700"
+          className={btnGreen}
         >
           Save Changes
-        </Button>
+        </button>
       )}
 
       <p className="text-sm italic text-muted-foreground">
