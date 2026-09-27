@@ -70,7 +70,7 @@ export default async function layout({ children }) {
   }
 
   return (
-    <OneSignalProvider>
+    <OneSignalProvider user={userData}>
       <ThemeProvider>
         <UserProvider user={userData}>
           <Wrapper>{children}</Wrapper>

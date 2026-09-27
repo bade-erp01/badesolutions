@@ -3,37 +3,71 @@
 import { useEffect, useRef } from "react";
 import OneSignal from "react-onesignal";
 
-export default function OneSignalProvider({ children }) {
+export default function OneSignalProvider({ children, user }) {
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (initialized.current) return; // prevent double init (React Strict Mode)
-    initialized.current = true;
+    const initializeOneSignal = async () => {
+      if (typeof window === "undefined") return;
+      if (initialized.current) return;
 
-    const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+      const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 
-    if (!appId) {
-      console.error("OneSignal: NEXT_PUBLIC_ONESIGNAL_APP_ID is missing");
-      return;
-    }
+      if (!appId) {
+        return;
+      }
 
-    OneSignal.init({
-      appId,
-    //   allowLocalhostAsSecureOrigin: true, // required for localhost
-      serviceWorkerPath: "/OneSignalSDKWorker.js",
-      serviceWorkerParam: { scope: "/" },
-      notifyButton: {
-        enable: true, // shows the bell so you can see it works
-      },
-    })
-      .then(() => {
-        console.log("OneSignal: initialized successfully");
-      })
-      .catch((err) => {
-        console.error("OneSignal: init failed", err);
-      });
+      try {
+        await OneSignal.init({
+          appId,
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          serviceWorkerParam: {
+            scope: "/",
+          },
+          notifyButton: {
+            enable: true,
+          },
+        });
+
+        initialized.current = true;
+
+      } catch (error) {
+        // console.error(
+        //   "OneSignal initialization failed:",
+        //   error
+        // );
+      }
+    };
+
+    initializeOneSignal();
   }, []);
+
+  useEffect(() => {
+    if (!initialized.current) return;
+    
+    if (!user) return;
+
+    const identifyUser = async () => {
+      try {
+        const userId = String(user.user._id);
+
+        await OneSignal.login(userId);
+
+        await OneSignal.User.addTags({
+          _id: userId,
+          tenantId: String(user.tenantId || ""),
+        });
+
+      } catch (error) {
+        // console.error(
+        //   "OneSignal user identification failed:",
+        //   error
+        // );
+      }
+    };
+
+    identifyUser();
+  }, [user]);
 
   return children;
 }

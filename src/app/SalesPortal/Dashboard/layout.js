@@ -6,6 +6,7 @@ import TenantPage from "./page"
 import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
 import { Dencrypt } from "../../../../Functions/Functions"
+import OneSignalProvider from "@/app/Components/OneSignalProvider";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -57,9 +58,9 @@ export default async function Layout() {
   }
 
   return (
-    <>
+    <OneSignalProvider user={userData}>
       <CookiesPolicyAlert />
       <TenantPage userData={userData} baseUrl={baseUrl}/>
-    </>
+    </OneSignalProvider>
   );
 }
