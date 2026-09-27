@@ -1181,210 +1181,350 @@ const generatePdf = async (business, customer, bill) => {
   };
 
   const printWayBill = async (business, customer, bill, userInfo) => {
-    try {
-      plsWait("Setting things up, Ensure your printer is connected⌛...");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+  try {
+    plsWait("Preparing waybill… Ensure your printer is connected.");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 10;
-      let currentY = margin;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();   // ~210
+    const pageHeight = doc.internal.pageSize.getHeight(); // ~297
+    const margin = 14;
+    const contentWidth = pageWidth - margin * 2;
+    let y = margin;
 
-      if (business.companyLogo) {
-        try {
-          const logoDataURL = await loadImageAsDataURL(business.companyLogo);
-          const logoWidth = pageWidth * 0.2;
-          const logoHeight = logoWidth * 0.75;
-          doc.addImage(
-            logoDataURL,
-            "JPEG",
-            margin,
-            currentY,
-            logoWidth,
-            logoHeight,
-          );
-        } catch (imgErr) {
-          console.warn("Logo failed to load:", imgErr.message);
-        }
-      }
-
-      doc.setFontSize(17);
-      doc.setFont("helvetica", "bold");
-      doc.text(business.companyName, pageWidth - margin, currentY + 5, {
-        align: "right",
-      });
-      doc.setFontSize(10);
-      const address = `${business.shopAddress} ${business.companyCity} ${business.companyState}`;
-      const wrappedAddress = doc.splitTextToSize(
-        address.toLowerCase(),
-        pageWidth * 0.5,
-      );
-      doc.text(wrappedAddress, pageWidth - margin, currentY + 12, {
-        align: "right",
-      });
-      doc.text(`${business.email}`, pageWidth - margin, currentY + 20, {
-        align: "right",
-      });
-      doc.text(`(${business.Tel})`, pageWidth - margin, currentY + 26, {
-        align: "right",
-      });
-      doc.text(
-        `Invoiced By: ${bill.RaiseBy}`,
-        pageWidth - margin,
-        currentY + 32,
-        { align: "right" },
-      );
-
-      currentY += 50;
-
-      const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng");
-      doc.addImage(qrDataURL, "PNG", pageWidth - margin - 30, currentY, 30, 30);
-
-      doc.setFontSize(17);
-      doc.setFont("helvetica", "bold");
-      doc.text(`${bill.WayBillNo}`, margin, currentY);
+    // ── helpers ──────────────────────────────────────────────
+    const setNormal = (size = 9) => {
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(13);
-      doc.text(
-        `${bill.customerName?.toUpperCase() || ""}`,
-        margin,
-        currentY + 8,
-      );
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
-      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(
-        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
-        10,
-        currentY + 18,
-      );
-      doc.text(
-        `Download Date: ${moment().format("YYYY-MM-DD")}`,
-        10,
-        currentY + 24,
-      );
+      doc.setFontSize(size);
+      doc.setTextColor(33, 33, 33);
+    };
+    const setBold = (size = 9) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(size);
+      doc.setTextColor(33, 33, 33);
+    };
+    const setMuted = (size = 8) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(size);
+      doc.setTextColor(100, 100, 100);
+    };
+    const hLine = (atY) => {
+      doc.setDrawColor(210, 210, 210);
+      doc.setLineWidth(0.3);
+      doc.line(margin, atY, pageWidth - margin, atY);
+    };
 
-      autoTable(doc, {
-        startY: currentY + 30,
-        tableWidth: 80,
-        margin: { left: pageWidth - pageWidth * 0.4 - margin },
-        body: [
-          [
-            `${bill.billStatus} No:`,
-            `${bill.billStatus?.slice(0, 3).toUpperCase()}/${
-              bill.billReferenceNo
-            }`,
-          ],
-          ["Order Date:", bill.startDate || ""],
-          [
-            "Invoice Date:",
-            moment(bill.DELIVERYDATE).format("YYYY-MM-DD") || "",
-          ],
-        ],
-        theme: "plain",
-        styles: { fontSize: 7, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
+    // ── HEADER: Logo (left) + Company (right) ────────────────
+    const headerTop = y;
+    let logoBottom = headerTop;
 
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 5,
-        head: [["#", "Product", "Code", "Case", "Pcs"]],
-        body: bill.orders
-          .filter((entry) => entry.Qty > 0 || entry.pcsReq > 0)
-          .map((ord, i) => [
-            i + 1,
-            ord.item?.Name,
-            ord.item?.ADCcode || ord.item?.ACDcode || "N/A",
-            ord.Qty,
-            ord.pcsReq || 0,
-          ]),
-        theme: "grid",
-        styles: {
-          fontSize: 7,
-          cellPadding: 3,
-          halign: "start",
-          valign: "middle",
-          lineColor: [200, 200, 200],
-          lineWidth: 0.2,
-        },
-        headStyles: {
-          fillColor: [0, 102, 204],
-          textColor: 255,
-          fontStyle: "bold",
-        },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245],
-        },
-        didDrawPage: function (data) {
-          const pageSize = doc.internal.pageSize;
-          const pageHeight = pageSize.height || pageSize.getHeight();
-          const pageWidth = pageSize.width || pageSize.getWidth();
-          const pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
-
-          doc.setFontSize(7);
-          doc.text(`${business.invoicePolicy}`, margin, pageHeight - 10);
-          doc.text(`Page ${pageNumber}`, pageWidth - 60, pageHeight - 10);
-        },
-      });
-
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 5,
-        margin: { left: margin },
-        body: [
-          [{ content: "Approved By Sign & Date:", colSpan: 2 }],
-          [{ content: "Supplied By Sign & Date:", colSpan: 2 }],
-          [{ content: "Checked By:", colSpan: 2 }],
-          [
-            {
-              content: `Driver Name, Sign & Date: _${bill.DriverName},___________________________`,
-              colSpan: 2,
-            },
-          ],
-          [
-            {
-              content: `Vehicle Number: ______________${bill.vehicleNumber}____________`,
-              colSpan: 2,
-            },
-          ],
-          [
-            {
-              content: `Customer Sign & Date: ____________________________________________`,
-              colSpan: 2,
-            },
-          ],
-          [{ content: `Comment: ${bill.DeliveryComment}`, colSpan: 2 }],
-        ],
-        theme: "striped",
-        styles: {
-          fontSize: 7,
-          cellPadding: 4,
-          textColor: [0, 0, 0],
-          lineColor: [200, 200, 200],
-          lineWidth: 0.5,
-        },
-      });
-
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const win = window.open(url, "_blank");
-      if (win) {
-        win.onload = () => {
-          Swal.close();
-          win.print();
-        };
-      } else {
-        doc.save(`${bill.customerName || "invoice"}.pdf`);
-        Swal.close();
+    if (business?.companyLogo) {
+      try {
+        const logoDataURL = await loadImageAsDataURL(business.companyLogo);
+        const logoW = 28;
+        const logoH = 21;
+        doc.addImage(logoDataURL, "JPEG", margin, headerTop, logoW, logoH);
+        logoBottom = headerTop + logoH;
+      } catch (imgErr) {
+        console.warn("Logo failed to load:", imgErr.message);
       }
-    } catch (error) {
-      console.error("Error generating Waybill:", error);
-    } finally {
+    }
+
+    // Company block — right aligned
+    const rightX = pageWidth - margin;
+    setBold(14);
+    doc.text(business?.companyName || "Company", rightX, headerTop + 5, {
+      align: "right",
+    });
+
+    setMuted(8);
+    const addressParts = [
+      business?.shopAddress,
+      [business?.companyCity, business?.companyState].filter(Boolean).join(", "),
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const addressLines = doc.splitTextToSize(addressParts, contentWidth * 0.55);
+    doc.text(addressLines, rightX, headerTop + 11, { align: "right" });
+
+    let companyInfoY = headerTop + 11 + addressLines.length * 3.5;
+    doc.text(
+      [business?.email, business?.Tel ? `(${business.Tel})` : ""]
+        .filter(Boolean)
+        .join("  ·  "),
+      rightX,
+      companyInfoY,
+      { align: "right" },
+    );
+    companyInfoY += 4;
+    setMuted(7.5);
+    doc.text(`Raised by: ${bill?.RaiseBy || "—"}`, rightX, companyInfoY, {
+      align: "right",
+    });
+
+    y = Math.max(logoBottom, companyInfoY) + 8;
+    hLine(y);
+    y += 8;
+
+    // ── TITLE + WAYBILL NO ───────────────────────────────────
+    setBold(16);
+    doc.setTextColor(0, 70, 140);
+    doc.text("WAYBILL", margin, y);
+
+    setBold(11);
+    doc.setTextColor(33, 33, 33);
+    doc.text(bill?.WayBillNo || "—", rightX, y, { align: "right" });
+
+    y += 6;
+    hLine(y);
+    y += 8;
+
+    // ── CUSTOMER (left) + META (right) ───────────────────────
+    const colLeftW = contentWidth * 0.52;
+    const colRightW = contentWidth * 0.42;
+    const rightColX = pageWidth - margin - colRightW;
+
+    // Left — Deliver to
+    setMuted(7);
+    doc.text("DELIVER TO", margin, y);
+    setBold(11);
+    doc.text(
+      (bill?.customerName || customer?.Username || "Customer").toUpperCase(),
+      margin,
+      y + 5,
+    );
+
+    setNormal(8);
+    let custY = y + 10;
+    const billingLines = doc.splitTextToSize(
+      customer?.billingAddress || customer?.shopAddress || "N/A",
+      colLeftW,
+    );
+    doc.text(billingLines, margin, custY);
+    custY += billingLines.length * 3.6 + 1;
+
+    doc.text(`Phone: ${customer?.phone || customer?.Tel || "N/A"}`, margin, custY);
+    custY += 4;
+    doc.text(
+      `Contact: ${customer?.contactPerson || bill?.customerName || "N/A"}`,
+      margin,
+      custY,
+    );
+    custY += 4;
+    setMuted(7.5);
+    doc.text(`Printed: ${moment().format("DD MMM YYYY, HH:mm")}`, margin, custY);
+
+    // Right — document meta (compact table)
+    autoTable(doc, {
+      startY: y - 2,
+      margin: { left: rightColX, right: margin },
+      tableWidth: colRightW,
+      body: [
+        [
+          { content: "Status Ref", styles: { fontStyle: "bold" } },
+          `${(bill?.billStatus || "INV").slice(0, 3).toUpperCase()}/${bill?.billReferenceNo || "—"}`,
+        ],
+        [
+          { content: "Order Date", styles: { fontStyle: "bold" } },
+          bill?.startDate
+            ? moment(bill.startDate).format("DD MMM YYYY")
+            : "—",
+        ],
+        [
+          { content: "Delivery Date", styles: { fontStyle: "bold" } },
+          bill?.DELIVERYDATE
+            ? moment(bill.DELIVERYDATE).format("DD MMM YYYY")
+            : "—",
+        ],
+        [
+          { content: "Status", styles: { fontStyle: "bold" } },
+          bill?.billStatus || "—",
+        ],
+      ],
+      theme: "plain",
+      styles: {
+        fontSize: 8,
+        cellPadding: { top: 1.5, bottom: 1.5, left: 2, right: 2 },
+        textColor: [40, 40, 40],
+      },
+      columnStyles: {
+        0: { cellWidth: colRightW * 0.42, textColor: [90, 90, 90] },
+        1: { cellWidth: colRightW * 0.58, halign: "right" },
+      },
+    });
+
+    y = Math.max(custY, doc.lastAutoTable.finalY) + 8;
+
+    // Optional QR (small, top-right of items area)
+    try {
+      const qrDataURL = await QRCode.toDataURL("https://badesolutions.com.ng", {
+        margin: 1,
+        width: 120,
+      });
+      doc.addImage(qrDataURL, "PNG", pageWidth - margin - 18, y - 2, 18, 18);
+    } catch (_) {
+      /* ignore */
+    }
+
+    // ── ITEMS TABLE ──────────────────────────────────────────
+    const orderRows = (bill?.orders || [])
+      .filter((entry) => Number(entry.Qty) > 0 || Number(entry.pcsReq) > 0)
+      .map((ord, i) => [
+        String(i + 1),
+        ord.item?.Name || "—",
+        ord.item?.ADCcode || ord.item?.ACDcode || "—",
+        String(ord.Qty ?? 0),
+        String(ord.pcsReq ?? 0),
+      ]);
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [["#", "Product", "Code", "Cases", "Pcs"]],
+      body:
+        orderRows.length > 0
+          ? orderRows
+          : [["—", "No items", "—", "—", "—"]],
+      theme: "grid",
+      styles: {
+        fontSize: 8,
+        cellPadding: 2.5,
+        valign: "middle",
+        lineColor: [220, 220, 220],
+        lineWidth: 0.2,
+        textColor: [40, 40, 40],
+      },
+      headStyles: {
+        fillColor: [0, 82, 155],
+        textColor: 255,
+        fontStyle: "bold",
+        fontSize: 8,
+        cellPadding: 3,
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
+      columnStyles: {
+        0: { cellWidth: 10, halign: "center" },
+        1: { cellWidth: "auto" },
+        2: { cellWidth: 28, halign: "center" },
+        3: { cellWidth: 18, halign: "center" },
+        4: { cellWidth: 16, halign: "center" },
+      },
+      didDrawPage: (data) => {
+        // Footer on every page
+        const ph = doc.internal.pageSize.getHeight();
+        const pw = doc.internal.pageSize.getWidth();
+        const pageNo = doc.internal.getCurrentPageInfo().pageNumber;
+
+        doc.setDrawColor(210, 210, 210);
+        doc.setLineWidth(0.3);
+        doc.line(margin, ph - 14, pw - margin, ph - 14);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(120, 120, 120);
+        doc.text(
+          business?.invoicePolicy || "Thank you for your business.",
+          margin,
+          ph - 9,
+          { maxWidth: pw * 0.65 },
+        );
+        doc.text(`Page ${pageNo}`, pw - margin, ph - 9, { align: "right" });
+      },
+    });
+
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── ACKNOWLEDGEMENT / SIGNATURES ─────────────────────────
+    // Ensure room for signatures; add page if needed
+    const sigBlockHeight = 62;
+    if (y + sigBlockHeight > pageHeight - 20) {
+      doc.addPage();
+      y = margin + 4;
+    }
+
+    setBold(9);
+    doc.setTextColor(0, 70, 140);
+    doc.text("ACKNOWLEDGEMENT", margin, y);
+    y += 3;
+    hLine(y);
+    y += 6;
+
+    const sigRows = [
+      ["Approved By (Sign & Date)", ""],
+      ["Supplied By (Sign & Date)", ""],
+      ["Checked By (Sign & Date)", ""],
+      [
+        "Driver Name / Sign & Date",
+        bill?.DriverName ? `${bill.DriverName}` : "",
+      ],
+      [
+        "Vehicle Number",
+        bill?.vehicleNumber ? String(bill.vehicleNumber) : "",
+      ],
+      ["Customer Sign & Date", ""],
+      [
+        "Comment",
+        bill?.DeliveryComment ? String(bill.DeliveryComment) : "",
+      ],
+    ];
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      body: sigRows.map(([label, value]) => [
+        {
+          content: label,
+          styles: { fontStyle: "bold", textColor: [70, 70, 70] },
+        },
+        {
+          content: value || "________________________________",
+          styles: { textColor: value ? [33, 33, 33] : [160, 160, 160] },
+        },
+      ]),
+      theme: "plain",
+      styles: {
+        fontSize: 8,
+        cellPadding: { top: 3.2, bottom: 3.2, left: 2, right: 2 },
+        lineColor: [230, 230, 230],
+        lineWidth: 0.2,
+        valign: "middle",
+      },
+      columnStyles: {
+        0: { cellWidth: contentWidth * 0.38 },
+        1: { cellWidth: contentWidth * 0.62 },
+      },
+      didParseCell: (data) => {
+        // Light bottom border under each row
+        if (data.section === "body") {
+          data.cell.styles.lineWidth = { bottom: 0.25, top: 0, left: 0, right: 0 };
+          data.cell.styles.lineColor = [220, 220, 220];
+        }
+      },
+    });
+
+    // ── Output ───────────────────────────────────────────────
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
+
+    if (win) {
+      win.onload = () => {
+        Swal.close();
+        win.focus();
+        win.print();
+      };
+    } else {
+      doc.save(`${bill?.WayBillNo || bill?.customerName || "waybill"}.pdf`);
       Swal.close();
     }
-  };
+  } catch (error) {
+    ErrorMessage?.(error?.message || "Failed to generate waybill");
+  } finally {
+    Swal.close();
+  }
+};
 
   const ActionBtn = async (orderId, option) => {
     const confirmed = await Swal.fire({
