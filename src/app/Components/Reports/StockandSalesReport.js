@@ -358,7 +358,7 @@ export default function StockandSalesReport({ baseUrl, userData }) {
               "Sales Volume": item.salesVolume || 0,
             }));
 
-            downloadExcel(excelData, `Stock_Sales_${startDate}_to_${endDate}`);
+            downloadExcel(excelData, `Sales-${startDate}-${endDate}`);
           };
 
           document.getElementById("downloadPdfBtn").onclick = () => {
