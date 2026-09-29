@@ -527,7 +527,8 @@ export default function AccessControl({
             />
           </div>
 
-          <div className="flex items-center justify-between w-full max-w-md">
+          {userInfo.isDev && (
+            <div className="flex items-center justify-between w-full max-w-md">
             <label className="text-sm font-medium cursor-pointer" title={`Grant ${formData.firstName} access to sales portal.`}>
               Access sales portal
             </label>
@@ -538,7 +539,8 @@ export default function AccessControl({
                 handleChange(fakeEvent);
               }}
             />
-          </div>
+            </div>
+          )}
         </div>
       </fieldset>
 
