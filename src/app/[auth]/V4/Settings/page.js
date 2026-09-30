@@ -174,7 +174,7 @@ function CompanyProfileForm({ data, userData }) {
       };
 
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/business/update/${Encrypt(formData._id)}`,
+        `${EXPRESS_PRIVATE_URL}/api/account/${Encrypt(formData._id)}`,
         {
           method: "PATCH",
           headers: {
@@ -1193,7 +1193,7 @@ function NotificationSettings({ data, userData, onSubmit }) {
       };
 
       const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/business/update/${Encrypt(data._id)}`,
+        `${EXPRESS_PRIVATE_URL}/api/account/${Encrypt(data._id)}`,
         {
           method: "PATCH",
           headers: {
