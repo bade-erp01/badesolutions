@@ -329,13 +329,13 @@ export default function SingleProductpage({
           </div>
 
           {/* Sales Insight */}
-          {/* <ProductChart
+          <ProductChart
             productId={Backdata._id}
             productName={Backdata.Name}
             umo={Backdata.UMO}
             business={businessInfo}
             user={userInfo}
-          /> */}
+          />
           <div className="border rounded-lg overflow-hidden">
             <span
               onClick={() => setIsOpen3(!isOpen3)}
@@ -1227,62 +1227,39 @@ export function ProductChart({ productId, productName, business, user }) {
 
   // Fetch Data
   useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        setLoading(true);
-        const currentYear = moment().format("YYYY");
-        const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}`;
+  const fetchProductData = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
-          next: { revalidate: 300 },
-        });
+      const currentYear = moment().format("YYYY");
+      const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}&productId=${productId}`;
 
-        const result = await response.json();
-        if (!result?.invoice) return;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
+          access: `${Encrypt(user._id)}`,
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+        },
+      });
 
-        const data = result.invoice.flatMap((invoice) =>
-          invoice.orders.map((order) => ({
-            sold: order.total || 0,
-            InvoiceDate: invoice.startDate,
-            _id: order.item._id,
-          })),
-        );
+      if (!response.ok) throw new Error("Failed to fetch product sales");
 
-        const productSales = data.filter((item) => item._id === productId);
+      const result = await response.json();
 
-        const monthlySales = productSales.reduce((acc, curr) => {
-          const month = moment(curr.InvoiceDate).format("MM");
-          acc[month] = (acc[month] || 0) + curr.sold;
-          return acc;
-        }, {});
+      setMonthlySalesArray(result.monthlySalesArray || []);
+      setTotalSales(result.totalSales || 0);
+    } catch (err) {
+      setError(err.message || "Failed to load product data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // Fill missing months with 0
-        const formattedArray = Array.from({ length: 12 }, (_, i) => {
-          const monthStr = (i + 1).toString().padStart(2, "0");
-          return {
-            month: moment(`${currentYear}-${monthStr}-01`).format("MMM"),
-            sold: monthlySales[monthStr] || 0,
-          };
-        });
-
-        setMonthlySalesArray(formattedArray);
-        setTotalSales(formattedArray.reduce((sum, item) => sum + item.sold, 0));
-      } catch (err) {
-        setError(err.message || "Failed to load product data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProductData();
-  }, [productId, business, user]);
+  if (productId) fetchProductData();
+}, [productId, business, user]);
 
   // Render Plotly Chart
   useEffect(() => {

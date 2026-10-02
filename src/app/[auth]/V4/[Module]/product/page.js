@@ -174,7 +174,7 @@ export default async function Productlayout({ children, params }) {
     );
   } catch (err) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center p-6 text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="">
         Failed to load. Please try again later.
       </div>
     );

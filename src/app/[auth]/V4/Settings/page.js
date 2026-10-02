@@ -52,6 +52,8 @@ export default function SettingsPage({
   businessInfo,
   baseUrl,
   auditLogs = [],
+  customerList,
+  storeList,
 }) {
   const [activeTab, setActiveTab] = useState("general");
   const [users] = useState(
@@ -102,7 +104,12 @@ export default function SettingsPage({
         </div>
 
         {activeTab === "general" && (
-          <CompanyProfileForm data={businessInfo} userData={userData} />
+          <CompanyProfileForm
+            data={businessInfo}
+            userData={userData}
+            customerList={customerList}
+            storeList={storeList}
+          />
         )}
         {activeTab === "users" && <UsersPermissionsPage users={users} />}
         {activeTab === "notifications" && (
@@ -134,11 +141,20 @@ export default function SettingsPage({
 /* ========================================================================
    COMPANY PROFILE FORM
    ======================================================================== */
-function CompanyProfileForm({ data, userData }) {
+function CompanyProfileForm({ data, userData, customerList, storeList }) {
   const router = useRouter();
   const [formData, setFormData] = useState(data || {});
   const [modules] = useState(data?.modules || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Safely extract arrays (handles both { data: [] } and plain arrays)
+  const customers = Array.isArray(customerList)
+    ? customerList
+    : customerList?.data || [];
+
+  const stores = Array.isArray(storeList)
+    ? storeList
+    : storeList?.data || [];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -171,6 +187,8 @@ function CompanyProfileForm({ data, userData }) {
         InvoiceRestriction: !!formData.InvoiceRestriction,
         allowCreditLimit: formData.allowCreditLimit || "",
         clearNotification: formData.clearNotification || "",
+        EcommerceStore: formData.EcommerceStore || "",
+        posBiller: formData.posBiller || "",
       };
 
       const res = await fetch(
@@ -268,7 +286,6 @@ function CompanyProfileForm({ data, userData }) {
             <CardTitle>Company Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            {/* Company Name — read only */}
             <div className="space-y-2">
               <label className={labelCls}>Company Name</label>
               <div className="px-3 py-2 border rounded-md bg-muted/50 font-medium">
@@ -499,6 +516,49 @@ function CompanyProfileForm({ data, userData }) {
                   <option value="Warehouse">Warehouse</option>
                 </select>
               </div>
+
+              <div className="space-y-2">
+                <label htmlFor="EcommerceStore" className={labelCls}>
+                  E-commerce Store
+                </label>
+                <select
+                  id="EcommerceStore"
+                  name="EcommerceStore"
+                  value={formData.EcommerceStore || ""}
+                  onChange={handleChange}
+                  className={selectCls}
+                >
+                  <option value="">Select a warehouse</option>
+                  {stores.map((store) => (
+                    <option key={store._id} value={store._id}>
+                      {store.WHName || store.name || "Unnamed Store"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="posBiller" className={labelCls}>
+                  P.O.S Biller
+                </label>
+                <select
+                  id="posBiller"
+                  name="posBiller"
+                  value={formData.posBiller || ""}
+                  onChange={handleChange}
+                  className={selectCls}
+                >
+                  <option value="">Choose from customer list</option>
+                  {customers.map((customer) => (
+                    <option key={customer._id} value={customer._id}>
+                      {customer.Username ||
+                        customer.customerName ||
+                        customer.name ||
+                        "Unnamed Customer"}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -604,7 +664,7 @@ function CompanyProfileForm({ data, userData }) {
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
-                      {"Installed" }
+                      Installed
                     </span>
                   </div>
                 </CardHeader>
@@ -624,7 +684,6 @@ function CompanyProfileForm({ data, userData }) {
 
 /* ========================================================================
    AUDIT LOGS
-   Sample: { logMsg, date, url, reason }
    ======================================================================== */
 function AuditLogsPanel({ logs = [] }) {
   const [search, setSearch] = useState("");
