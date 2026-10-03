@@ -40,7 +40,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
+import {Separator} from "@/components/ui/separator";
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -55,7 +56,7 @@ export default function MainDash({ userData }) {
   const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
   const MySwal = withReactContent(Swal);
-  const Params = useParams()
+  const Params = useParams();
   const truncate = (str, length = 20) =>
     str && str.length > length ? str.substring(0, length) + "..." : str;
   const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
@@ -142,7 +143,7 @@ export default function MainDash({ userData }) {
           headers: {
             Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
             access: `${Encrypt(userData?.user._id)}`,
-            "sessionKey": `Bearer ${Encrypt(userData.SessionId)}`
+            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
             // cache: "force-cache" // or "default", "reload", "no-store"
           },
         });
@@ -464,9 +465,7 @@ export default function MainDash({ userData }) {
               {/* === TODAY'S SALES TABLE (shadcn) === */}
               <div className="rounded-xl p-6 mt-6  border-0">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold">
-                    Today's Sales
-                  </h3>
+                  <h3 className="text-lg font-semibold">Today's Sales</h3>
                 </div>
 
                 <div className="overflow-hidden border-0">
@@ -476,7 +475,9 @@ export default function MainDash({ userData }) {
                         <TableHead className="w-12">S/N</TableHead>
                         <TableHead>Ref</TableHead>
                         <TableHead>Customer</TableHead>
-                        <TableHead className="text-right">Grand Total</TableHead>
+                        <TableHead className="text-right">
+                          Grand Total
+                        </TableHead>
                         <TableHead>Raised By</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
@@ -493,7 +494,8 @@ export default function MainDash({ userData }) {
                                 href={`/${Params.auth}/V4/Sales/Sales/${Encrypt(invoice._id)}`}
                                 className="text-indigo-600 hover:underline"
                               >
-                                {invoice.billReferenceNo}/{invoice.invoicelocation}
+                                {invoice.billReferenceNo}/
+                                {invoice.invoicelocation}
                               </Link>
                             </TableCell>
                             <TableCell>{invoice.customerName}</TableCell>
@@ -583,7 +585,10 @@ export default function MainDash({ userData }) {
                         {paginatedMonitoredProduct.map((product, index) => (
                           <TableRow key={index} className="">
                             <TableCell className="font-medium">
-                              {(monitoredCurrentPage - 1) * monitoredItemsPerPage + index + 1}
+                              {(monitoredCurrentPage - 1) *
+                                monitoredItemsPerPage +
+                                index +
+                                1}
                             </TableCell>
                             <TableCell className="font-semibold">
                               <Link
@@ -613,28 +618,43 @@ export default function MainDash({ userData }) {
                   {/* Monitored Products Pagination */}
                   <div className="flex justify-center items-center gap-2 mt-6">
                     <button
-                      onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage - 1)}
+                      onClick={() =>
+                        handleMonitoredProductPageChange(
+                          monitoredCurrentPage - 1,
+                        )
+                      }
                       disabled={monitoredCurrentPage === 1}
                       className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors "
                     >
                       Prev
                     </button>
-                    {Array.from({ length: totalMonitoredProductPages }, (_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleMonitoredProductPageChange(i + 1)}
-                        className={`px-4 py-2 rounded-md border transition-colors ${
-                          monitoredCurrentPage === i + 1
-                            ? "bg-indigo-600 border-indigo-600"
-                            : "border-gray-300 "
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
+                    {Array.from(
+                      { length: totalMonitoredProductPages },
+                      (_, i) => (
+                        <button
+                          key={i}
+                          onClick={() =>
+                            handleMonitoredProductPageChange(i + 1)
+                          }
+                          className={`px-4 py-2 rounded-md border transition-colors ${
+                            monitoredCurrentPage === i + 1
+                              ? "bg-indigo-600 border-indigo-600"
+                              : "border-gray-300 "
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ),
+                    )}
                     <button
-                      onClick={() => handleMonitoredProductPageChange(monitoredCurrentPage + 1)}
-                      disabled={monitoredCurrentPage === totalMonitoredProductPages}
+                      onClick={() =>
+                        handleMonitoredProductPageChange(
+                          monitoredCurrentPage + 1,
+                        )
+                      }
+                      disabled={
+                        monitoredCurrentPage === totalMonitoredProductPages
+                      }
                       className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors"
                     >
                       Next
@@ -642,16 +662,11 @@ export default function MainDash({ userData }) {
                   </div>
                 </div>
               )}
-             
             </section>
             <aside className="rounded p-6 border-0 text-xs  animate__animated animate__fadeInRight animate__faster">
-              <h3 className="text-lg font-semibold mb-4">
-                Quick Stats Widget
-              </h3>
+              <h3 className="text-lg font-semibold mb-4">Quick Stats Widget</h3>
               <div className="flex flex-col">
-                <h4 className="text-lg font-semibold mb-4">
-                  Tasks Reminder
-                </h4>
+                <h4 className="text-lg font-semibold mb-4">Tasks Reminder</h4>
 
                 {userData?.user?.TaskLogs &&
                 userData.user.TaskLogs.length > 0 ? (
@@ -663,9 +678,7 @@ export default function MainDash({ userData }) {
                     >
                       <div>
                         <p className="font-medium ">{task.Text}</p>
-                        <p className="text-xs font-semibold">
-                          * {task.notes}
-                        </p>
+                        <p className="text-xs font-semibold">* {task.notes}</p>
                         <p className="text-xs ">
                           Created:{" "}
                           {new Date(task.createdAt).toLocaleString("en-US", {
@@ -694,61 +707,104 @@ export default function MainDash({ userData }) {
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs italic">
-                    No task assigned
-                  </p>
+                  <p className="text-xs italic">No task assigned</p>
                 )}
-
-                {/* <h4 className="text-sm text-gray-500 font-semibold mb-4">
+                
+                <Separator className="my-4" />
+                <h4 className="text-lg font-semibold mb-4">
                   Sales Team Kpi Millestone
-                </h4> */}
+                </h4>
 
-                {/* {tenantData.result.map((person, index) => (
-                  <div
-                    key={index}
-                    className="text-xs bg-white rounded-lg p-4 mb-2 hover:border-gray-200  hover: transition duration-200 animate__animated animate__fadeInRight"
-                    title={`${person.firstName}`}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-semibold text-gray-600 text-right justify-content-end">
-                        {userData.business.currency?.currency.Symbol}
-                        {person.totalSales?.toLocaleString()} /
-                        {userData.business.currency?.currency.Symbol}
-                        {person.salesTarget?.toLocaleString()}
-                      </span>
-                    </div>
+                <div className="w-full">
+                  <div className="max-h-[320px] overflow-y-auto pr-1 space-y-1.5 scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent" style={{
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "#453d46ff transparent",
+                    }}>
+                    {tenantData?.result?.length > 0 ? (
+                      tenantData.result.map((person, index) => {
+                        const percentage = Number(person.percentage) || 0;
+                        const progress = Math.min(Math.max(percentage, 0), 100);
 
-                    <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden mb-1">
-                      <div
-                        className={`h-full ${Math.round(person.percentage) > 50 ? "bg-green-400" : "bg-black"} transition-all duration-300`}
-                        style={{
-                          width: `${Math.min(
-                            Math.round(person.percentage),
-                            100
-                          )}%`,
-                        }}
-                      ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span className="text-gray-700 font-semibold truncate max-w-[100px]">
-                        {truncate(person.firstName, 10)}
-                      </span>
-                      <span className="text-green-600 font-medium text-xs">
-                        {`${parseFloat(person.percentage).toFixed(
-                          2
-                        )}% achieved`}
-                      </span>
-                    </div>
+                        const currency =
+                          userData?.business?.currency?.currency?.Symbol || "";
+
+                        return (
+                          <Card
+                            key={person._id || index}
+                            className="border-border/60 bg-card shadow-none transition-colors duration-200 hover:border-border hover:bg-muted/30 animate__animated animate__fadeInRight"
+                            title={person.firstName}
+                          >
+                            <CardContent className="px-3 py-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="min-w-0 max-w-[100px] truncate text-[11px] font-semibold text-foreground sm:max-w-[140px]">
+                                  {truncate(person.firstName, 10)}
+                                </span>
+
+                                <span className="shrink-0 text-[10px] font-medium text-muted-foreground sm:text-[11px]">
+                                  {currency}
+                                  {Number(
+                                    person.totalSales || 0,
+                                  ).toLocaleString()}
+                                  <span className="mx-1 text-muted-foreground/50">
+                                    /
+                                  </span>
+                                  {currency}
+                                  {Number(
+                                    person.salesTarget || 0,
+                                  ).toLocaleString()}
+                                </span>
+                              </div>
+
+                              <div className="my-1.5 h-1 w-full overflow-hidden rounded-full bg-muted">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    progress > 50
+                                      ? "bg-green-500"
+                                      : "bg-foreground"
+                                  }`}
+                                  style={{
+                                    width: `${progress}%`,
+                                  }}
+                                />
+                              </div>
+
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[10px] text-muted-foreground">
+                                  Target
+                                </span>
+
+                                <span
+                                  className={`text-[10px] font-medium ${
+                                    progress > 50
+                                      ? "text-green-600 dark:text-green-400"
+                                      : "text-muted-foreground"
+                                  }`}
+                                >
+                                  {percentage.toFixed(2)}% achieved
+                                </span>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })
+                    ) : (
+                      <div className="flex h-[160px] items-center justify-center rounded-lg border border-dashed border-border bg-muted/20">
+                        <p className="text-xs text-muted-foreground">
+                          No sales performance data available.
+                        </p>
+                      </div>
+                    )}
                   </div>
-                ))} */}
-                {/* <div className="text-center mt-6 border-bottom ">
+                </div>
+                <div className="text-center mt-6 border-bottom ">
                   <ExcelDownloadBtn
                     data={tenantData.result}
                     page={`Sales Team Performance`}
                   />
-                </div> */}
+                </div>
 
-                <div className="mt-6 border-t-2">
+                <Separator className="my-4" />
+                <div className="mt-6">
                   <h4 className="text-lg font-semibold mb-4">
                     💵 Todays Payments
                   </h4>
@@ -800,7 +856,8 @@ export default function MainDash({ userData }) {
                       </li>
                     )}
                   </ul>
-                  <div className="text-center mt-6 border-bottom ">
+                  <Separator className="my-4" />
+                  <div className="text-center mt-6">
                     <ExcelDownloadBtn
                       data={tenantData.revenuePayments
                         .filter(
@@ -839,19 +896,10 @@ export default function MainDash({ userData }) {
             <div className="w-full text-center mt-3">
               {tenantData.debtorsArray?.length > 0 && (
                 <div className="w-full text-center mt-3">
-                  <Marquee
-                    gradient={false}
-                    speed={30}
-                    className="w-full py-2"
-                  >
-                    <span className="px-2 py-1 rounded mr-2">
-                      ⚠️ Debtors:
-                    </span>
+                  <Marquee gradient={false} speed={30} className="w-full py-2">
+                    <span className="px-2 py-1 rounded mr-2">⚠️ Debtors:</span>
                     {tenantData.debtorsArray.map((debtor) => (
-                      <span
-                        key={debtor._id}
-                        className="mx-1 px-2 py-1 rounded"
-                      >
+                      <span key={debtor._id} className="mx-1 px-2 py-1 rounded">
                         {debtor.Username} owes{" "}
                         {userData.business.currency?.currency.Symbol}
                         {debtor.Debt?.toLocaleString()},
@@ -866,19 +914,12 @@ export default function MainDash({ userData }) {
           {/* produt promo */}
           {tenantData.promotions?.length > 0 && (
             <div className="w-full text-center mt-3">
-              <Marquee
-                gradient={false}
-                speed={40}
-                className="w-full py-2"
-              >
+              <Marquee gradient={false} speed={40} className="w-full py-2">
                 <span className="px-2 py-1 rounded mr-2">
                   🗂️ Products On Promo:
                 </span>
                 {tenantData.promotions.map((product) => (
-                  <span
-                    key={product._id}
-                    className="mx-1 px-2 py-1 rounded"
-                  >
+                  <span key={product._id} className="mx-1 px-2 py-1 rounded">
                     {product.Name}
                   </span>
                 ))}
@@ -893,18 +934,10 @@ export default function MainDash({ userData }) {
           </footer>
 
           {/* pending payment reminder */}
-          {tenantData.revenuePayments.filter((payment) => {
-            payment.collectionRef === "PMNT" &&
-              payment.cr === true &&
-              payment.status === "Pending";
-          }).length > 0 &&
+          {tenantData.PendingPaymenet.length > 0 &&
             userData.user.postPayment && (
               <PendingPaymentReminder
-                data={tenantData.revenuePayments.filter((payment) => {
-                  payment.collectionRef === "PMNT" &&
-                    payment.cr === true &&
-                    payment.status === "Pending";
-                })}
+                data={tenantData.PendingPaymenet}
                 business={userData.business}
               />
             )}
