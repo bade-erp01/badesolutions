@@ -329,13 +329,13 @@ export default function SingleProductpage({
           </div>
 
           {/* Sales Insight */}
-          <ProductChart
+          {/* <ProductChart
             productId={Backdata._id}
             productName={Backdata.Name}
             umo={Backdata.UMO}
             business={businessInfo}
             user={userInfo}
-          />
+          /> */}
           <div className="border rounded-lg overflow-hidden">
             <span
               onClick={() => setIsOpen3(!isOpen3)}
