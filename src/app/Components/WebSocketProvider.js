@@ -13,8 +13,7 @@ import { io } from "socket.io-client";
 import { toast } from "sonner";
 import { Encrypt } from "../../../Functions/Functions";
 
-const SOCKET_URL =
-  process.env.EXPRESS_PRIVATE_URL ;
+const SOCKET_URL = "https://api.badesolutions.com.ng";
 
 const WebSocketContext = createContext(null);
 
