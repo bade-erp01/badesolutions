@@ -14,8 +14,7 @@ import { toast } from "sonner";
 import { Encrypt } from "../../../Functions/Functions";
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_EXPRESS_URL ||
-  process.env.NEXT_PUBLIC_API_URL
+  process.env.EXPRESS_PRIVATE_URL ;
 
 const WebSocketContext = createContext(null);
 
