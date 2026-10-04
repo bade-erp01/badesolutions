@@ -9,6 +9,8 @@ import { Cloud, Sun, CloudRain, Snowflake } from "lucide-react";
 import "animate.css";
 import { Badge } from "@/components/ui/badge";
 
+import InvoiceRealtimeListener from "@/app/Components/InvoiceRealtimeListener";
+
 export default function Dashboard() {
   const { user } = useUser();
   const [weather, setWeather] = useState(null);
@@ -200,7 +202,14 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-
+ <InvoiceRealtimeListener
+        onInvoiceCreated={(invoiceId) => {
+          console.log(
+            "Invoice created:",
+            invoiceId
+          );
+        }}
+      />
       <SubscriptionReminder Business={user.business} />
       <BirthdayGreetings Business={user.business} user={user.user} />
 
