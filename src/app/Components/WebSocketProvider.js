@@ -50,7 +50,7 @@ export function WebSocketProvider({ children, user }) {
     });
   }, []);
 
-  // ========== Professional Toast ==========
+  // ========== Professional Toast + Sound ==========
   const showNotification = useCallback(
     ({
       icon = "info",
@@ -59,9 +59,26 @@ export function WebSocketProvider({ children, user }) {
       actionLabel = null,
       onAction = null,
     }) => {
+      // Play sound
+      try {
+        let soundFile = "/sounds/universfield-system-notification-02-352442.mp3";
+
+        if (icon === "success") soundFile = "/sounds/universfield-system-notification-02-352442.mp3";
+        if (icon === "error") soundFile = "/sounds/universfield-error-notification-012-132111.mp3"; 
+        if (icon === "warning") soundFile = "/sounds/swoosh-sound-effect-for-fight-scenes-or-transitions-2-149890.mp3";
+
+        const audio = new Audio(soundFile);
+        audio.volume = 0.6;
+        audio.play().catch(() => {
+          // Browser may block autoplay until user interacts with the page
+        });
+      } catch (err) {
+        // ignore audio errors
+      }
+
       const options = {
         description: text,
-        duration: 6500,
+        duration: Infinity, // stays until dismissed
       };
 
       // Add "View" button if provided
@@ -159,7 +176,6 @@ export function WebSocketProvider({ children, user }) {
     });
 
     socket.on("disconnect", (reason) => {
-
       if (manuallyClosedRef.current) {
         setStatus("disconnected");
         return;
@@ -246,6 +262,7 @@ export function WebSocketProvider({ children, user }) {
       }
     };
   }, [auth, connect, disconnect]);
+
   // ========== Global Event Listeners ==========
   useEffect(() => {
     const unsubNotification = subscribe("notification", (data) => {
@@ -260,13 +277,14 @@ export function WebSocketProvider({ children, user }) {
       showNotification({
         icon: "info",
         title: "Invoice Notification",
-        text: (data?.message || " "),
+        text: data?.message || " ",
         actionLabel: "View",
         onAction: () => {
-          // Change this to your real invoice route
           const invoiceId = data?._id || data?.id;
           if (invoiceId) {
-            router.push(`/Notification/V4/Sales/Sales/${Encrypt(invoiceId)}`);
+            router.push(
+              `/Notification/V4/Sales/Sales/${Encrypt(invoiceId)}`
+            );
           }
         },
       });
