@@ -12,6 +12,7 @@ import {
 import { io } from "socket.io-client";
 import { toast } from "sonner";
 import { Encrypt } from "../../../Functions/Functions";
+import {useRouter} from "next/navigation";
 
 const SOCKET_URL = "https://api.badesolutions.com.ng";
 
@@ -22,6 +23,7 @@ export function WebSocketProvider({ children, user }) {
   const manuallyClosedRef = useRef(false);
   const listenersRef = useRef(new Map());
   const reconnectAlertShownRef = useRef(false);
+  const router = useRouter();
 
   const [status, setStatus] = useState("disconnected");
 
