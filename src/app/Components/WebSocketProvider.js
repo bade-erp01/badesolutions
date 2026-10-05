@@ -312,6 +312,34 @@ export function WebSocketProvider({ children, user }) {
       });
     });
 
+    const unsubProduct = subscribe("product:notification", (data) => {
+      showNotification({
+        icon: "success",
+        title: "Product Notification",
+        text: data?.message || "A new product notification has been received.",
+        playSound: false, // ← no sound
+      });
+    });
+
+
+    const unsubCustomer = subscribe("customer:new", (data) => {
+      showNotification({
+        icon: "success",
+        title: "Customer Notification",
+        text: data?.message || "A new customer notification has been received.",
+        playSound: true,
+      });
+    });
+
+    const unsubPurchase = subscribe("purchase:new", (data) => {
+      showNotification({
+        icon: "success",
+        title: "Purchase Notification",
+        text: data?.message || "A new purchase notification has been received.",
+        playSound: false, // ← no sound
+      });
+    });
+
     const unsubError = subscribe("error", (data) => {
       if (!data?.message) return;
 
@@ -326,6 +354,9 @@ export function WebSocketProvider({ children, user }) {
       unsubNotification();
       unsubInvoice();
       unsubPayment();
+      unsubProduct();
+      unsubCustomer();
+      unsubPurchase();
       unsubError();
     };
   }, [subscribe, showNotification, router]);
