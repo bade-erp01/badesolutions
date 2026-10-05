@@ -12,7 +12,7 @@ import {
 import { io } from "socket.io-client";
 import { toast } from "sonner";
 import { Encrypt } from "../../../Functions/Functions";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const SOCKET_URL = "https://api.badesolutions.com.ng";
 
@@ -60,22 +60,32 @@ export function WebSocketProvider({ children, user }) {
       text = "",
       actionLabel = null,
       onAction = null,
+      playSound = true, // ← new option
     }) => {
-      // Play sound
-      try {
-        let soundFile = "/sounds/universfield-system-notification-02-352442.mp3";
+      // Play sound only if allowed
+      if (playSound) {
+        try {
+          let soundFile =
+            "/sounds/universfield-system-notification-02-352442.mp3";
 
-        if (icon === "success") soundFile = "/sounds/universfield-system-notification-02-352442.mp3";
-        if (icon === "error") soundFile = "/sounds/universfield-error-notification-012-132111.mp3"; 
-        if (icon === "warning") soundFile = "/sounds/swoosh-sound-effect-for-fight-scenes-or-transitions-2-149890.mp3";
+          if (icon === "success")
+            soundFile =
+              "/sounds/universfield-system-notification-02-352442.mp3";
+          if (icon === "error")
+            soundFile =
+              "/sounds/universfield-error-notification-012-132111.mp3";
+          if (icon === "warning")
+            soundFile =
+              "/sounds/swoosh-sound-effect-for-fight-scenes-or-transitions-2-149890.mp3";
 
-        const audio = new Audio(soundFile);
-        audio.volume = 0.6;
-        audio.play().catch(() => {
-          // Browser may block autoplay until user interacts with the page
-        });
-      } catch (err) {
-        // ignore audio errors
+          const audio = new Audio(soundFile);
+          audio.volume = 0.6;
+          audio.play().catch(() => {
+            // Browser may block autoplay until user interacts with the page
+          });
+        } catch (err) {
+          // ignore audio errors
+        }
       }
 
       const options = {
@@ -281,6 +291,7 @@ export function WebSocketProvider({ children, user }) {
         title: "Invoice Notification",
         text: data?.message || " ",
         actionLabel: "View",
+        playSound: false, // ← no sound
         onAction: () => {
           const invoiceId = data?._id || data?.id;
           if (invoiceId) {
@@ -297,6 +308,7 @@ export function WebSocketProvider({ children, user }) {
         icon: "success",
         title: "Payment Notification",
         text: data?.message || "A new payment has been posted.",
+        playSound: false, // ← no sound
       });
     });
 
@@ -316,7 +328,7 @@ export function WebSocketProvider({ children, user }) {
       unsubPayment();
       unsubError();
     };
-  }, [subscribe, showNotification]);
+  }, [subscribe, showNotification, router]);
 
   const value = useMemo(
     () => ({
