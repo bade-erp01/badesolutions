@@ -22,7 +22,6 @@ export function WebSocketProvider({ children, user }) {
   const socketRef = useRef(null);
   const manuallyClosedRef = useRef(false);
   const listenersRef = useRef(new Map());
-  const reconnectAlertShownRef = useRef(false);
   const router = useRouter();
 
   const [status, setStatus] = useState("disconnected");
@@ -47,12 +46,12 @@ export function WebSocketProvider({ children, user }) {
       try {
         listener(data);
       } catch (error) {
-        // console.error(`WebSocket listener error for ${eventType}:`, error);
+        // fail quietly
       }
     });
   }, []);
 
-  // ========== Professional Toast + Sound ==========
+  // ========== Toast + Sound (only when connected) ==========
   const showNotification = useCallback(
     ({
       icon = "info",
@@ -60,29 +59,33 @@ export function WebSocketProvider({ children, user }) {
       text = "",
       actionLabel = null,
       onAction = null,
-      playSound = true, // ← new option
+      playSound = true,
     }) => {
+      // If socket is not connected, do nothing
+      if (!socketRef.current?.connected) return;
+
       // Play sound only if allowed
       if (playSound) {
         try {
           let soundFile =
             "/sounds/universfield-system-notification-02-352442.mp3";
 
-          if (icon === "success")
+          if (icon === "success") {
             soundFile =
               "/sounds/universfield-system-notification-02-352442.mp3";
-          if (icon === "error")
+          }
+          if (icon === "error") {
             soundFile =
               "/sounds/universfield-error-notification-012-132111.mp3";
-          if (icon === "warning")
+          }
+          if (icon === "warning") {
             soundFile =
               "/sounds/swoosh-sound-effect-for-fight-scenes-or-transitions-2-149890.mp3";
+          }
 
           const audio = new Audio(soundFile);
           audio.volume = 0.6;
-          audio.play().catch(() => {
-            // Browser may block autoplay until user interacts with the page
-          });
+          audio.play().catch(() => {});
         } catch (err) {
           // ignore audio errors
         }
@@ -90,10 +93,9 @@ export function WebSocketProvider({ children, user }) {
 
       const options = {
         description: text,
-        duration: Infinity, // stays until dismissed
+        duration: Infinity,
       };
 
-      // Add "View" button if provided
       if (actionLabel && typeof onAction === "function") {
         options.action = {
           label: actionLabel,
@@ -158,7 +160,6 @@ export function WebSocketProvider({ children, user }) {
 
     socket.on("connect", () => {
       setStatus("connected");
-      reconnectAlertShownRef.current = false;
     });
 
     socket.on("authenticated", (data) => {
@@ -172,19 +173,11 @@ export function WebSocketProvider({ children, user }) {
     socket.on("connect_error", (error) => {
       setStatus("error");
 
+      // Fail quietly — no toast, no sound
       notifyListeners("error", {
         type: "error",
         message: error?.message || "Unable to connect to the realtime server.",
       });
-
-      if (!reconnectAlertShownRef.current) {
-        reconnectAlertShownRef.current = true;
-        showNotification({
-          icon: "warning",
-          title: "Connection Lost",
-          text: "Realtime updates are temporarily unavailable. Reconnecting...",
-        });
-      }
     });
 
     socket.on("disconnect", (reason) => {
@@ -209,6 +202,9 @@ export function WebSocketProvider({ children, user }) {
         return;
       }
 
+      // Extra safety: ignore events if not connected
+      if (!socket.connected) return;
+
       const data =
         payload && typeof payload === "object"
           ? { type: eventName, ...payload }
@@ -217,13 +213,12 @@ export function WebSocketProvider({ children, user }) {
       notifyListeners(eventName, data);
       notifyListeners("message", data);
     });
-  }, [auth, notifyListeners, showNotification]);
+  }, [auth, notifyListeners]);
 
   const sendMessage = useCallback((data) => {
     const socket = socketRef.current;
 
     if (!socket?.connected) {
-      console.warn("Socket is not connected");
       return false;
     }
 
@@ -291,7 +286,7 @@ export function WebSocketProvider({ children, user }) {
         title: "Invoice Notification",
         text: data?.message || " ",
         actionLabel: "View",
-        playSound: false, // ← no sound
+        playSound: false,
         onAction: () => {
           const invoiceId = data?._id || data?.id;
           if (invoiceId) {
@@ -308,7 +303,7 @@ export function WebSocketProvider({ children, user }) {
         icon: "success",
         title: "Payment Notification",
         text: data?.message || "A new payment has been posted.",
-        playSound: false, // ← no sound
+        playSound: false,
       });
     });
 
@@ -316,17 +311,18 @@ export function WebSocketProvider({ children, user }) {
       showNotification({
         icon: "success",
         title: "Product Notification",
-        text: data?.message || "A new product notification has been received.",
-        playSound: false, // ← no sound
+        text:
+          data?.message || "A new product notification has been received.",
+        playSound: false,
       });
     });
-
 
     const unsubCustomer = subscribe("customer:new", (data) => {
       showNotification({
         icon: "success",
         title: "Customer Notification",
-        text: data?.message || "A new customer notification has been received.",
+        text:
+          data?.message || "A new customer notification has been received.",
         playSound: true,
       });
     });
@@ -335,8 +331,9 @@ export function WebSocketProvider({ children, user }) {
       showNotification({
         icon: "success",
         title: "Purchase Notification",
-        text: data?.message || "A new purchase notification has been received.",
-        playSound: false, // ← no sound
+        text:
+          data?.message || "A new purchase notification has been received.",
+        playSound: false,
       });
     });
 
