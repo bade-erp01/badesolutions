@@ -342,8 +342,27 @@ export function WebSocketProvider({ children, user }) {
 
       showNotification({
         icon: "error",
-        title: "Realtime Error",
+        title: "Error",
         text: data.message,
+      });
+    });
+
+    // Daily Business Report
+    const unsubDailyReport = subscribe("daily-report", (data) => {
+      const text = [
+        data?.yesterdaySale,
+        data?.yesterdayRevenue,
+        data?.topDebtor,
+        data?.newCustomers,
+        data?.debtorsCount,
+        data?.TotalDebt,
+      ].filter(Boolean).join("\n");
+
+      showNotification({
+        icon: "info",
+        title: data?.message || "Daily Business Report",
+        text: text || "Yesterday's business report is ready.",
+        playSound: true,
       });
     });
 
@@ -355,6 +374,7 @@ export function WebSocketProvider({ children, user }) {
       unsubCustomer();
       unsubPurchase();
       unsubError();
+      unsubDailyReport();
     };
   }, [subscribe, showNotification, router]);
 
