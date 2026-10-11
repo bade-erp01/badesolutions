@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { Bar, Line, Doughnut } from 'react-chartjs-2';
-import moment from 'moment';
-import Swal from 'sweetalert2';
-import { CursorArrowRaysIcon } from "@heroicons/react/24/outline";
-import withReactContent from 'sweetalert2-react-content';
-import { plsWait, ErrorMessage, Encrypt } from '../../../Functions/Mics';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
+import { Bar, Line, Doughnut } from "react-chartjs-2";
+import moment from "moment";
+import Swal from "sweetalert2";
+import { ChartBarIcon } from "@heroicons/react/24/outline";
+import withReactContent from "sweetalert2-react-content";
+import { plsWait, ErrorMessage, Encrypt } from "../../../Functions/Mics";
+import { motion } from "framer-motion";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,10 +18,9 @@ import {
   ArcElement,
   Tooltip,
   Legend,
-  Filler
-} from 'chart.js';
+  Filler,
+} from "chart.js";
 import { useUser } from "@/components/UserProvider";
-
 
 ChartJS.register(
   CategoryScale,
@@ -35,237 +34,414 @@ ChartJS.register(
   Filler
 );
 
-const statusColors = {
-  Invoice: 'rgba(34,197,94,0.6)',
-  Order: 'rgba(234,179,8,0.6)',
-  Cancelled: 'rgba(239,68,68,0.6)',
-  Unknown: 'rgba(107,114,128,0.6)'
-};
-
 const MySwal = withReactContent(Swal);
 
-const DashboardCharts = ({ baseUrl, triggerButton = true }) => {
+const STATUS_STYLE = {
+  Invoice: "#10b981",
+  Order: "#f59e0b",
+  Cancelled: "#ef4444",
+  Draft: "#94a3b8",
+  Unknown: "#64748b",
+};
+
+const money = (n) =>
+  `₦${Number(n || 0).toLocaleString("en-NG", { maximumFractionDigits: 0 })}`;
+
+const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
   const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState([]);
-  const [selectedYear, setSelectedYear] = useState('All');
+  const [year, setYear] = useState("all");
+  const [range, setRange] = useState("12m");
   const [showModal, setShowModal] = useState(false);
-  const {user} = useUser();
+  const { user } = useUser();
+  const openedRef = useRef(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       plsWait("Loading Report Data...");
+
       const res = await fetch(`${baseUrl}/api/Invoice/report`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
           access: `${Encrypt(user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
+          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch product data");
+      if (!res.ok) throw new Error("Failed to fetch sales data");
 
       const fetchedData = await res.json();
-      // set invoices then trigger showing modal (useEffect will open modal after render)
       setInvoices(fetchedData.invoices || []);
+
+      Swal.close(); // close loader first
+      setLoading(false);
+      openedRef.current = false;
       setShowModal(true);
-      setLoading(false);
     } catch (error) {
-      ErrorMessage(error.message);
+      Swal.close();
       setLoading(false);
+      ErrorMessage(error.message || "Something went wrong");
     }
-  };
+  }, [baseUrl, user]);
 
-  // If component is rendered directly (no trigger button), fetch on mount
   useEffect(() => {
-    if (!triggerButton) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!triggerButton) fetchData();
+  }, [triggerButton, fetchData]);
 
-  const {
-    marginByYearStatus,
-    yoySales,
-    statusCount,
-    totalMargin,
-    totalInvoices,
-    cancelledRate,
-    availableYears
-  } = useMemo(() => {
-    const marginByYearStatus = {};
-    const totalByYear = {};
-    const statusCount = {};
-    let totalMargin = 0;
-    let totalInvoices = invoices.length;
-    let cancelledCount = 0;
+  const stats = useMemo(() => {
+    const cutoff =
+      range === "all"
+        ? null
+        : moment().subtract(Number(range.replace("m", "")), "months");
 
-    invoices.forEach(inv => {
-      const year = moment(inv.startDate).year();
-      const status = inv.billStatus || 'Unknown';
-      const margin = (inv.grandTotal || 0) - (inv.subTotal || 0);
-
-      if (!marginByYearStatus[year]) marginByYearStatus[year] = {};
-      if (!marginByYearStatus[year][status]) marginByYearStatus[year][status] = 0;
-      marginByYearStatus[year][status] += margin;
-
-      if (!totalByYear[year]) totalByYear[year] = 0;
-      totalByYear[year] += inv.grandTotal || 0;
-
-      statusCount[status] = (statusCount[status] || 0) + 1;
-      totalMargin += margin;
-      if (status === 'Cancelled') cancelledCount++;
+    const filtered = invoices.filter((inv) => {
+      const d = moment(inv.startDate);
+      if (!d.isValid()) return false;
+      if (year !== "all" && String(d.year()) !== String(year)) return false;
+      if (cutoff && d.isBefore(cutoff)) return false;
+      return true;
     });
 
-    const sortedYears = Object.keys(totalByYear).sort();
-    const yoySales = sortedYears.map((year, i) => {
-      const current = totalByYear[year];
-      const prev = sortedYears[i - 1] ? totalByYear[sortedYears[i - 1]] : null;
-      const yoy = prev && prev !== 0 ? ((current - prev) / prev) * 100 : 0;
-      return { year, yoy: parseFloat(yoy.toFixed(2)) };
+    const years = [
+      ...new Set(
+        invoices
+          .map((i) => moment(i.startDate).year())
+          .filter((y) => !Number.isNaN(y))
+      ),
+    ].sort();
+
+    let revenue = 0;
+    let completed = 0;
+    let cancelled = 0;
+    let openOrders = 0;
+    const byMonth = {};
+    const byStatus = {};
+    const daily = {};
+
+    filtered.forEach((inv) => {
+      const amount = Number(inv.grandTotal) || 0;
+      const status = inv.billStatus || "Unknown";
+      const mKey = moment(inv.startDate).format("YYYY-MM");
+      const dKey = moment(inv.startDate).format("YYYY-MM-DD");
+
+      revenue += amount;
+      byStatus[status] = (byStatus[status] || 0) + 1;
+      byMonth[mKey] = (byMonth[mKey] || 0) + amount;
+      daily[dKey] = (daily[dKey] || 0) + amount;
+
+      if (status === "Invoice") completed += 1;
+      else if (status === "Cancelled") cancelled += 1;
+      else if (status === "Order") openOrders += 1;
     });
 
-    const cancelledRate = totalInvoices ? ((cancelledCount / totalInvoices) * 100).toFixed(1) : 0;
+    const count = filtered.length;
+    const avgTicket = count ? revenue / count : 0;
+    const cancelRate = count ? (cancelled / count) * 100 : 0;
+    const conversion = count ? (completed / count) * 100 : 0;
+
+    const monthKeys = Object.keys(byMonth).sort();
+    const lastMonths = monthKeys.slice(-8);
+    const dayKeys = Object.keys(daily).sort().slice(-14);
+
+    const prevRevenue =
+      lastMonths.length > 1
+        ? lastMonths
+            .slice(0, Math.floor(lastMonths.length / 2))
+            .reduce((s, k) => s + (byMonth[k] || 0), 0)
+        : 0;
+    const recentRevenue =
+      lastMonths.length > 1
+        ? lastMonths
+            .slice(Math.floor(lastMonths.length / 2))
+            .reduce((s, k) => s + (byMonth[k] || 0), 0)
+        : revenue;
+    const growth =
+      prevRevenue > 0
+        ? ((recentRevenue - prevRevenue) / prevRevenue) * 100
+        : 0;
 
     return {
-      marginByYearStatus,
-      yoySales,
-      statusCount,
-      totalMargin,
-      totalInvoices,
-      cancelledRate,
-      availableYears: ['All', ...sortedYears]
+      years,
+      count,
+      revenue,
+      avgTicket,
+      cancelRate,
+      conversion,
+      completed,
+      cancelled,
+      openOrders,
+      growth,
+      byStatus,
+      monthLabels: lastMonths.map((k) => moment(k).format("MMM YY")),
+      monthValues: lastMonths.map((k) => byMonth[k] || 0),
+      dayLabels: dayKeys.map((k) => moment(k).format("DD MMM")),
+      dayValues: dayKeys.map((k) => daily[k] || 0),
     };
-  }, [invoices]);
+  }, [invoices, year, range]);
 
-  const filteredMarginData = useMemo(() => {
-    const years = selectedYear === 'All' ? Object.keys(marginByYearStatus) : [selectedYear];
-    const statuses = Object.keys(statusColors);
-
-    return {
-      labels: years,
-      datasets: statuses.map(status => ({
-        label: status,
-        data: years.map(year => marginByYearStatus[year]?.[status] || 0),
-        backgroundColor: statusColors[status]
-      }))
-    };
-  }, [selectedYear, marginByYearStatus]);
-
-  const donutData = {
-    labels: Object.keys(statusCount),
-    datasets: [{
-      data: Object.values(statusCount),
-      backgroundColor: Object.keys(statusCount).map(status => statusColors[status] || statusColors.Unknown)
-    }]
+  const chartOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#0f172a",
+        padding: 12,
+        cornerRadius: 10,
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: "#64748b", font: { size: 11 } },
+      },
+      y: {
+        grid: { color: "rgba(148,163,184,0.15)" },
+        ticks: {
+          color: "#64748b",
+          font: { size: 11 },
+          callback: (v) =>
+            v >= 1000000
+              ? `${(v / 1000000).toFixed(1)}M`
+              : v >= 1000
+              ? `${(v / 1000).toFixed(0)}k`
+              : v,
+        },
+      },
+    },
   };
 
-  const areaData = {
-    labels: yoySales.map(d => d.year),
-    datasets: [{
-      label: 'YoY Sales (%)',
-      data: yoySales.map(d => d.yoy),
-      borderColor: '#7D5BA6',
-      backgroundColor: 'rgba(125,91,166,0.2)',
-      fill: true,
-      tension: 0.3
-    }]
+  const barData = {
+    labels: stats.monthLabels,
+    datasets: [
+      {
+        label: "Revenue",
+        data: stats.monthValues,
+        backgroundColor: "rgba(99,102,241,0.75)",
+        borderRadius: 10,
+        barThickness: 28,
+      },
+    ],
+  };
+
+  const lineData = {
+    labels: stats.dayLabels,
+    datasets: [
+      {
+        label: "Daily sales",
+        data: stats.dayValues,
+        borderColor: "#6366f1",
+        backgroundColor: "rgba(99,102,241,0.12)",
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: "#6366f1",
+      },
+    ],
+  };
+
+  const doughnutData = {
+    labels: Object.keys(stats.byStatus),
+    datasets: [
+      {
+        data: Object.values(stats.byStatus),
+        backgroundColor: Object.keys(stats.byStatus).map(
+          (s) => STATUS_STYLE[s] || STATUS_STYLE.Unknown
+        ),
+        borderWidth: 0,
+        hoverOffset: 8,
+      },
+    ],
   };
 
   const modalContent = (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className="p-6 bg-gradient-to-br from-slate-100 to-indigo-50 shadow-xl max-w-6xl mx-auto"
+      transition={{ duration: 0.25 }}
+      className="p-6 bg-gradient-to-br from-slate-100 to-indigo-50 shadow-xl w-full"
     >
-      <h2 className="text-center font-bold text-2xl mb-6 text-gray-600 tracking-wide"> Sales Dashboard</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-700 tracking-wide">
+            Sales Intelligence
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Live snapshot of invoice performance
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-end">
+          <select
+            value={range}
+            onChange={(e) => setRange(e.target.value)}
+            className="px-3 py-2 text-sm rounded-md border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="3m">Last 3 months</option>
+            <option value="6m">Last 6 months</option>
+            <option value="12m">Last 12 months</option>
+            <option value="all">All time</option>
+          </select>
+
+          <select
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="px-3 py-2 text-sm rounded-md border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="all">All years</option>
+            {stats.years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <div className="flex flex-wrap justify-center gap-6 mb-8">
-        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-green-400">
-          <div className="text-sm text-gray-500">Total Margin</div>
-          <div className="text-2xl font-bold text-gray-800 mt-2">₦{totalMargin.toLocaleString()}</div>
+        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-indigo-400">
+          <div className="text-sm text-gray-500">Revenue</div>
+          <div className="text-2xl font-bold text-gray-800 mt-2">
+            {money(stats.revenue)}
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {stats.growth >= 0 ? "+" : ""}
+            {stats.growth.toFixed(1)}% vs earlier half
+          </div>
         </div>
+
         <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-blue-400">
-          <div className="text-sm text-gray-500">Total Invoices</div>
-          <div className="text-2xl font-bold text-gray-800 mt-2">{totalInvoices < 1000 ? totalInvoices : `+${totalInvoices}k`}</div>
+          <div className="text-sm text-gray-500">Invoices</div>
+          <div className="text-2xl font-bold text-gray-800 mt-2">
+            {stats.count.toLocaleString()}
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {stats.completed} completed · {stats.openOrders} open
+          </div>
         </div>
+
+        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-green-400">
+          <div className="text-sm text-gray-500">Avg. Ticket</div>
+          <div className="text-2xl font-bold text-gray-800 mt-2">
+            {money(stats.avgTicket)}
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {stats.conversion.toFixed(1)}% conversion
+          </div>
+        </div>
+
         <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-red-400">
-          <div className="text-sm text-gray-500">Cancelled Rate</div>
-          <div className="text-2xl font-bold text-red-600 mt-2">{cancelledRate}%</div>
+          <div className="text-sm text-gray-500">Cancel Rate</div>
+          <div className="text-2xl font-bold text-red-600 mt-2">
+            {stats.cancelRate.toFixed(1)}%
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {stats.cancelled} cancelled
+          </div>
         </div>
       </div>
 
-      <div className="mb-6 text-center">
-        <label htmlFor="year-select" className="text-sm font-medium text-gray-600 mr-2">Filter by Year:</label>
-        <select
-          id="year-select"
-          value={selectedYear}
-          onChange={e => setSelectedYear(e.target.value)}
-          className="px-3 py-2 text-sm rounded-md border border-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          {availableYears.map(year => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-xl shadow-md p-4 h-[340px]">
-          <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">Sales Margin by Year & Status</h3>
-          <Bar data={filteredMarginData} options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } },
-            scales: { x: { stacked: true }, y: { stacked: true } }
-          }} height={260} />
+      {stats.count === 0 ? (
+        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-16 text-center text-gray-500">
+          No invoices in this window. Try expanding the date range.
         </div>
-        <div className="bg-white rounded-xl shadow-md p-4 h-[340px]">
-          <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">Invoice Status Distribution</h3>
-          <Doughnut data={donutData} options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-          }} height={260} />
-        </div>
-      </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="bg-white rounded-xl shadow-md p-4 h-[380px]">
+              <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">
+                Revenue by Month
+              </h3>
+              <div className="h-[300px]">
+                <Bar data={barData} options={chartOpts} />
+              </div>
+            </div>
 
-      <div className="bg-white rounded-xl shadow-md p-4 h-[340px]">
-        <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">YoY Sales Trend</h3>
-        <Line data={areaData} options={{
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } }
-        }} height={260} />
-      </div>
+            <div className="bg-white rounded-xl shadow-md p-4 h-[380px]">
+              <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">
+                Status Mix
+              </h3>
+              <div className="h-[240px]">
+                <Doughnut
+                  data={doughnutData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "65%",
+                    plugins: {
+                      legend: { display: false },
+                      tooltip: chartOpts.plugins.tooltip,
+                    },
+                  }}
+                />
+              </div>
+              <div className="mt-2 flex flex-wrap justify-center gap-3">
+                {Object.entries(stats.byStatus).map(([status, qty]) => (
+                  <div
+                    key={status}
+                    className="flex items-center gap-2 text-xs text-gray-600"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{
+                        background:
+                          STATUS_STYLE[status] || STATUS_STYLE.Unknown,
+                      }}
+                    />
+                    {status}: <strong>{qty}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-4 h-[380px]">
+            <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">
+              Recent Daily Rhythm
+            </h3>
+            <div className="h-[300px]">
+              <Line data={lineData} options={chartOpts} />
+            </div>
+          </div>
+        </>
+      )}
     </motion.div>
   );
 
-  // Open sweetalert modal after render when showModal becomes true (so modalContent uses updated state)
+  // Same width/height approach as your original
   useEffect(() => {
-    if (!showModal) return;
+    if (!showModal || openedRef.current) return;
+    openedRef.current = true;
 
     MySwal.fire({
       html: modalContent,
       showCloseButton: true,
       showConfirmButton: false,
       customClass: {
-        popup: 'swal2-dashboard-modal',
-        htmlContainer: 'swal2-dashboard-html',
+        popup: "swal2-dashboard-modal",
+        htmlContainer: "swal2-dashboard-html",
       },
-      width: '100vw',
+      width: "100vw",
       padding: 0,
-      background: 'transparent',
-      didOpen: () => {
-        // modal already opening; no-op
+      background: "transparent",
+      didOpen: () => {},
+      willClose: () => {
+        openedRef.current = false;
+        setShowModal(false);
       },
-      willClose: () => setShowModal(false),
     });
-    // close handler: when user closes, willClose sets showModal false
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showModal, modalContent]);
+  }, [showModal]);
+
+  // refresh charts when filters change while modal is open
+  useEffect(() => {
+    if (!showModal || !openedRef.current) return;
+    MySwal.update({ html: modalContent });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, range, stats]);
 
   return (
     <>
@@ -273,10 +449,10 @@ const DashboardCharts = ({ baseUrl, triggerButton = true }) => {
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
+          className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full disabled:opacity-60"
         >
-          <CursorArrowRaysIcon className="h-6 w-6 " />
-          View Sales Dashboard
+          <ChartBarIcon className="h-6 w-6" />
+          {loading ? "Loading..." : "Sales Intelligence"}
         </button>
       )}
       {!triggerButton && modalContent}
@@ -284,4 +460,4 @@ const DashboardCharts = ({ baseUrl, triggerButton = true }) => {
   );
 };
 
-export default DashboardCharts;
+export default SalesDashboard;
