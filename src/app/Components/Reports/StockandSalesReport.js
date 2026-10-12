@@ -5,14 +5,10 @@ import Swal from "sweetalert2";
 import { SwatchIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-
-import { downloadExcel } from "../../../../Functions/Functions";
-import { Encrypt } from "../../../../Functions/Functions";
+import { downloadExcel, Encrypt } from "../../../../Functions/Functions";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-// shadcn components – adjust paths to match your project
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -29,6 +25,82 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
+const idOf = (value) => {
+  if (value == null || value === "") return "";
+  if (typeof value === "object") return String(value._id ?? value.id ?? "");
+  return String(value);
+};
+
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (char) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[char];
+  });
+
+const getStoreProductId = (order) =>
+  idOf(
+    order?.storeProductId ??
+      order?.storeproductId ??
+      order?.item?._id ??
+      order?.item
+  );
+
+const getUnderlyingProductId = (item) =>
+  idOf(item?.productId ?? item?.Product ?? item?.product?._id ?? item?._id);
+
+const getVendorId = (item) =>
+  idOf(item?.Vendor ?? item?.vendorId ?? item?.vendor);
+
+const getStoreId = (item) =>
+  idOf(item?.WHID ?? item?.whId ?? item?.WHIDS ?? item?.storeId);
+
+const getVendorLabel = (item, fallbackMap = new Map()) => {
+  if (item?.vendorName) return item.vendorName;
+  if (item?.Vendor && typeof item.Vendor === "object") {
+    return item.Vendor.Name || item.Vendor.NAME || "";
+  }
+  return fallbackMap.get(getVendorId(item)) || "";
+};
+
+const getStoreLabel = (item, fallbackMap = new Map()) => {
+  if (item?.WHIDS && typeof item.WHIDS === "object") {
+    return item.WHIDS.WHName || "";
+  }
+  if (item?.WHID && typeof item.WHID === "object") {
+    return item.WHID.WHName || "";
+  }
+  return fallbackMap.get(getStoreId(item)) || "";
+};
+
+const getProductLabel = (item, fallbackMap = new Map()) => {
+  if (item?.productName) return item.productName;
+  if (item?.productId && typeof item.productId === "object") {
+    return item.productId.Name || item.productId.name || "";
+  }
+  if (item?.Name) return item.Name;
+  return fallbackMap.get(getUnderlyingProductId(item)) || "";
+};
+
+const groupOptions = (rows, idKey, nameKey) => {
+  const map = new Map();
+  for (const row of rows) {
+    const id = idOf(row[idKey]);
+    if (!id) continue;
+    if (!map.has(id)) {
+      map.set(id, { id, name: row[nameKey] || id });
+    }
+  }
+  return Array.from(map.values()).sort((a, b) =>
+    String(a.name).localeCompare(String(b.name))
+  );
+};
+
 export default function StockandSalesReport({ baseUrl, userData }) {
   const [loading, setLoading] = useState(false);
   const [dateDialogOpen, setDateDialogOpen] = useState(false);
@@ -41,7 +113,553 @@ export default function StockandSalesReport({ baseUrl, userData }) {
       access: `${Encrypt(userData.user._id)}`,
       sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
     }),
-    [userData]
+    [userData?.business?.tenantId, userData?.user?._id, userData?.SessionId]
+  );
+
+  const buildSummaryRows = useCallback(
+    (productList, storeList, vendorList, invoicesAll, purchasesAll, inventory) => {
+      const productNameMap = new Map(
+        (productList || []).map((p) => [idOf(p._id), p.Name || p.name || ""])
+      );
+      const vendorNameMap = new Map(
+        (vendorList || []).map((v) => [idOf(v._id), v.Name || v.NAME || ""])
+      );
+      const storeNameMap = new Map(
+        (storeList || []).map((s) => [idOf(s._id), s.WHName || ""])
+      );
+
+      const inventoryMap = new Map();
+      for (const item of inventory || []) {
+        const id = idOf(item?._id);
+        if (id) inventoryMap.set(id, item);
+      }
+
+      const invoices = (invoicesAll || []).filter((invoice) => {
+        const status = String(invoice.billStatus || "").toLowerCase();
+        return status !== "draft" && status !== "cancelled";
+      });
+
+      const returns = (invoicesAll || []).filter(
+        (invoice) =>
+          String(invoice.billStatus || "").toLowerCase() === "cancelled"
+      );
+
+      const purchases = (purchasesAll || []).filter(
+        (purchase) => purchase.status === "POSTED TO WAREHOUSE"
+      );
+
+      const summaryMap = new Map();
+
+      const ensure = (
+        storeProductId,
+        vendorId,
+        storeId,
+        productId,
+        labels = {}
+      ) => {
+        const id = idOf(storeProductId);
+        if (!id) return null;
+
+        let entry = summaryMap.get(id);
+        if (!entry) {
+          entry = {
+            Product: id,
+            Vendor: idOf(vendorId),
+            Store: idOf(storeId),
+            productId: idOf(productId),
+            vendorName: labels.vendorName || "",
+            storeName: labels.storeName || "",
+            productName: labels.productName || "",
+            PurchCase: 0,
+            PurchPcs: 0,
+            Sold: 0,
+            pcs: 0,
+            rStock: 0,
+            rPcs: 0,
+            Stock: 0,
+            PcsStock: 0,
+            salesVolume: 0,
+          };
+          summaryMap.set(id, entry);
+        } else {
+          if (!entry.Vendor && vendorId) entry.Vendor = idOf(vendorId);
+          if (!entry.Store && storeId) entry.Store = idOf(storeId);
+          if (!entry.productId && productId) entry.productId = idOf(productId);
+          if (!entry.vendorName && labels.vendorName)
+            entry.vendorName = labels.vendorName;
+          if (!entry.storeName && labels.storeName)
+            entry.storeName = labels.storeName;
+          if (!entry.productName && labels.productName)
+            entry.productName = labels.productName;
+        }
+        return entry;
+      };
+
+      for (const purchase of purchases) {
+        if (!Array.isArray(purchase.orders)) continue;
+        for (const order of purchase.orders) {
+          const item = order.item || {};
+          const entry = ensure(
+            getStoreProductId(order),
+            getVendorId(item) || getVendorId(purchase),
+            getStoreId(purchase) || getStoreId(item),
+            getUnderlyingProductId(item),
+            {
+              vendorName:
+                getVendorLabel(item, vendorNameMap) ||
+                getVendorLabel(purchase, vendorNameMap),
+              storeName: getStoreLabel(purchase, storeNameMap),
+              productName: getProductLabel(item, productNameMap),
+            }
+          );
+          if (!entry) continue;
+          entry.PurchCase += Number(order.Qty) || 0;
+          entry.PurchPcs += Number(order.pcs) || 0;
+        }
+      }
+
+      for (const invoice of invoices) {
+        if (!Array.isArray(invoice.orders)) continue;
+        for (const order of invoice.orders) {
+          const item = order.item || {};
+          const entry = ensure(
+            getStoreProductId(order),
+            getVendorId(item),
+            getStoreId(invoice) || getStoreId(item),
+            getUnderlyingProductId(item),
+            {
+              vendorName: getVendorLabel(item, vendorNameMap),
+              storeName: getStoreLabel(invoice, storeNameMap),
+              productName: getProductLabel(item, productNameMap),
+            }
+          );
+          if (!entry) continue;
+          entry.Sold += Number(order.Qty) || 0;
+          entry.pcs += Number(order.pcsReq ?? order.pcs) || 0;
+          entry.salesVolume += Number(order.total) || 0;
+        }
+      }
+
+      for (const invoice of returns) {
+        if (!Array.isArray(invoice.orders)) continue;
+        for (const order of invoice.orders) {
+          const item = order.item || {};
+          const entry = ensure(
+            getStoreProductId(order),
+            getVendorId(item),
+            getStoreId(invoice) || getStoreId(item),
+            getUnderlyingProductId(item),
+            {
+              vendorName: getVendorLabel(item, vendorNameMap),
+              storeName: getStoreLabel(invoice, storeNameMap),
+              productName: getProductLabel(item, productNameMap),
+            }
+          );
+          if (!entry) continue;
+          entry.rStock += Number(order.Qty) || 0;
+          entry.rPcs += Number(order.pcsReq ?? order.pcs) || 0;
+        }
+      }
+
+      for (const [id, entry] of summaryMap) {
+        const inv = inventoryMap.get(id);
+        if (!inv) continue;
+
+        entry.Stock = Number(inv.currentQty) || 0;
+        entry.PcsStock = Number(inv.pcs) || 0;
+
+        if (!entry.productId) entry.productId = getUnderlyingProductId(inv);
+        if (!entry.Vendor) entry.Vendor = getVendorId(inv);
+        if (!entry.Store) entry.Store = getStoreId(inv);
+
+        if (!entry.productName)
+          entry.productName = getProductLabel(inv, productNameMap);
+        if (!entry.vendorName)
+          entry.vendorName = getVendorLabel(inv, vendorNameMap);
+        if (!entry.storeName)
+          entry.storeName = getStoreLabel(inv, storeNameMap);
+      }
+
+      for (const entry of summaryMap.values()) {
+        if (!entry.productName && entry.productId) {
+          entry.productName = productNameMap.get(entry.productId) || "";
+        }
+        if (!entry.vendorName && entry.Vendor) {
+          entry.vendorName = vendorNameMap.get(entry.Vendor) || "";
+        }
+        if (!entry.storeName && entry.Store) {
+          entry.storeName = storeNameMap.get(entry.Store) || "";
+        }
+      }
+
+      return Array.from(summaryMap.values());
+    },
+    []
+  );
+
+  const showReportModal = useCallback(
+    (fetchedData, startDate, endDate) => {
+      const productList = fetchedData.productList || [];
+      const storeList = fetchedData.storeList || [];
+      const vendorList = fetchedData.vendorList || [];
+      const invoicesAll = fetchedData.invoiceList || [];
+      const purchasesAll = fetchedData.PurchaseOrderList || [];
+      const inventory =
+        fetchedData.inventoryItem || fetchedData.ReportInventory || [];
+
+      const allRows = buildSummaryRows(
+        productList,
+        storeList,
+        vendorList,
+        invoicesAll,
+        purchasesAll,
+        inventory
+      );
+
+      const vendorOpts = groupOptions(allRows, "Vendor", "vendorName");
+      const storeOpts = groupOptions(allRows, "Store", "storeName");
+      const productOpts = groupOptions(allRows, "productId", "productName");
+
+      const vendorOptionsHtml = vendorOpts
+        .map(
+          (v) =>
+            `<option value="${escapeHtml(v.id)}">${escapeHtml(
+              v.name || "Unnamed vendor"
+            )}</option>`
+        )
+        .join("");
+
+      const storeOptionsHtml = storeOpts
+        .map(
+          (s) =>
+            `<option value="${escapeHtml(s.id)}">${escapeHtml(
+              s.name || "Unnamed store"
+            )}</option>`
+        )
+        .join("");
+
+      const applyFilters = (filters) => {
+        const vendorFilter = idOf(filters.vendor);
+        const storeFilter = idOf(filters.store);
+        const productFilter = idOf(filters.product);
+
+        return allRows.filter((item) => {
+          if (vendorFilter && idOf(item.Vendor) !== vendorFilter) return false;
+          if (storeFilter && idOf(item.Store) !== storeFilter) return false;
+          if (productFilter && idOf(item.productId) !== productFilter)
+            return false;
+          return true;
+        });
+      };
+
+      Swal.fire({
+        title: "Stock & Sales Report",
+        html: `
+          <div style="font-size:12px;color:#718096;margin-bottom:12px;">
+            Period: <strong>${escapeHtml(startDate)}</strong> → <strong>${escapeHtml(endDate)}</strong>
+          </div>
+
+          <div style="margin-bottom:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;text-align:left;">
+            <div>
+              <label for="vendor" style="font-size:12px;color:#4a5568;">Vendor</label>
+              <select id="vendor" style="width:100%;padding:6px;font-size:12px;border:1px solid #cbd5e0;border-radius:4px;">
+                <option value="">All vendors</option>
+                ${vendorOptionsHtml}
+              </select>
+            </div>
+
+            <div>
+              <label for="store" style="font-size:12px;color:#4a5568;">Store</label>
+              <select id="store" style="width:100%;padding:6px;font-size:12px;border:1px solid #cbd5e0;border-radius:4px;">
+                <option value="">All stores</option>
+                ${storeOptionsHtml}
+              </select>
+            </div>
+
+            <div style="position:relative;">
+              <label for="productSearch" style="font-size:12px;color:#4a5568;">Product</label>
+              <input
+                id="productSearch"
+                type="text"
+                placeholder="Type to search product..."
+                autocomplete="off"
+                style="width:100%;padding:6px;font-size:12px;border:1px solid #cbd5e0;border-radius:4px;box-sizing:border-box;"
+              />
+              <input id="product" type="hidden" value="" />
+              <div
+                id="productDropdown"
+                style="display:none;position:absolute;left:0;right:0;top:100%;z-index:50;max-height:220px;overflow:auto;background:#fff;border:1px solid #cbd5e0;border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,0.12);margin-top:2px;"
+              ></div>
+            </div>
+          </div>
+
+          <div id="reportTable" style="max-height:400px;overflow:auto;border:1px solid #e2e8f0;border-radius:6px;"></div>
+
+          <div style="margin-top:12px;text-align:right;">
+            <button id="downloadExcelBtn" type="button" style="background-color:#2b6cb0;color:white;padding:6px 12px;border-radius:6px;font-size:12px;margin-right:5px;border:none;cursor:pointer;">
+              Download Excel
+            </button>
+            <button id="downloadPdfBtn" type="button" style="background-color:#2b6cb0;color:white;padding:6px 12px;border-radius:6px;font-size:12px;border:none;cursor:pointer;">
+              Download PDF
+            </button>
+          </div>
+        `,
+        width: "95%",
+        showConfirmButton: false,
+        showCloseButton: true,
+        didOpen: () => {
+          const root = Swal.getHtmlContainer();
+          if (!root) return;
+
+          const vendorSelect = root.querySelector("#vendor");
+          const storeSelect = root.querySelector("#store");
+          const productHidden = root.querySelector("#product");
+          const productSearch = root.querySelector("#productSearch");
+          const productDropdown = root.querySelector("#productDropdown");
+          const tableEl = root.querySelector("#reportTable");
+          const excelBtn = root.querySelector("#downloadExcelBtn");
+          const pdfBtn = root.querySelector("#downloadPdfBtn");
+
+          const getFilters = () => ({
+            vendor: idOf(vendorSelect?.value),
+            store: idOf(storeSelect?.value),
+            product: idOf(productHidden?.value),
+          });
+
+          const renderTable = () => {
+            const data = applyFilters(getFilters());
+
+            const rows = data
+              .map(
+                (item) => `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                  <td style="padding:6px;text-align:left;">${escapeHtml(item.productName)}</td>
+                  <td style="padding:6px;text-align:left;">${escapeHtml(item.vendorName)}</td>
+                  <td style="padding:6px;text-align:left;">${escapeHtml(item.storeName)}</td>
+                  <td style="padding:6px;text-align:right;">${item.PurchCase}</td>
+                  <td style="padding:6px;text-align:right;">${item.PurchPcs}</td>
+                  <td style="padding:6px;text-align:right;">${item.Sold}</td>
+                  <td style="padding:6px;text-align:right;">${item.pcs}</td>
+                  <td style="padding:6px;text-align:right;">${item.rStock}</td>
+                  <td style="padding:6px;text-align:right;">${item.rPcs}</td>
+                  <td style="padding:6px;text-align:right;">C: ${item.Stock}, P: ${item.PcsStock}</td>
+                  <td style="padding:6px;text-align:right;">${Number(item.salesVolume || 0).toLocaleString()}</td>
+                </tr>`
+              )
+              .join("");
+
+            if (!tableEl) return;
+
+            tableEl.innerHTML = `
+              <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:1000px;">
+                <thead style="position:sticky;top:0;background:#edf2f7;z-index:1;">
+                  <tr>
+                    <th style="padding:7px;text-align:left;">Product</th>
+                    <th style="padding:7px;text-align:left;">Vendor</th>
+                    <th style="padding:7px;text-align:left;">Store</th>
+                    <th style="padding:7px;text-align:right;">Case Buy</th>
+                    <th style="padding:7px;text-align:right;">Pcs Buy</th>
+                    <th style="padding:7px;text-align:right;">Case Sold</th>
+                    <th style="padding:7px;text-align:right;">Pcs Sold</th>
+                    <th style="padding:7px;text-align:right;">Case Returned</th>
+                    <th style="padding:7px;text-align:right;">Pcs Returned</th>
+                    <th style="padding:7px;text-align:right;">Available Stock</th>
+                    <th style="padding:7px;text-align:right;">Sales Volume</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${
+                    rows ||
+                    `<tr><td colspan="11" style="padding:14px;text-align:center;color:#718096;">No rows match the selected filters.</td></tr>`
+                  }
+                </tbody>
+              </table>
+            `;
+          };
+
+          const renderProductDropdown = (query = "") => {
+            if (!productDropdown) return;
+
+            const q = String(query || "").trim().toLowerCase();
+            const matched = !q
+              ? productOpts.slice(0, 80)
+              : productOpts
+                  .filter((p) =>
+                    String(p.name || "").toLowerCase().includes(q)
+                  )
+                  .slice(0, 80);
+
+            const clearRow = `
+              <div data-id="" data-name="" style="padding:8px 10px;font-size:12px;cursor:pointer;border-bottom:1px solid #edf2f7;color:#2b6cb0;font-weight:600;">
+                All products
+              </div>
+            `;
+
+            const items = matched
+              .map(
+                (p) => `
+                <div data-id="${escapeHtml(p.id)}" data-name="${escapeHtml(
+                  p.name
+                )}" style="padding:8px 10px;font-size:12px;cursor:pointer;border-bottom:1px solid #f1f5f9;">
+                  ${escapeHtml(p.name || p.id)}
+                </div>
+              `
+              )
+              .join("");
+
+            productDropdown.innerHTML =
+              clearRow +
+              (items ||
+                `<div style="padding:10px;font-size:12px;color:#718096;">No products found</div>`);
+            productDropdown.style.display = "block";
+
+            productDropdown.querySelectorAll("[data-id]").forEach((el) => {
+              el.onmouseenter = () => {
+                el.style.background = "#edf2f7";
+              };
+              el.onmouseleave = () => {
+                el.style.background = "#fff";
+              };
+              el.onclick = () => {
+                const id = el.getAttribute("data-id") || "";
+                const name = el.getAttribute("data-name") || "";
+                if (productHidden) productHidden.value = id;
+                if (productSearch) {
+                  productSearch.value = id ? name : "";
+                }
+                productDropdown.style.display = "none";
+                renderTable();
+              };
+            });
+          };
+
+          // Product search wiring
+          if (productSearch) {
+            productSearch.addEventListener("focus", () => {
+              renderProductDropdown(productSearch.value);
+            });
+
+            productSearch.addEventListener("input", () => {
+              // typing clears selected id until user picks from list
+              if (productHidden) productHidden.value = "";
+              renderProductDropdown(productSearch.value);
+              // if input emptied, show all products again
+              if (!productSearch.value.trim()) {
+                renderTable();
+              }
+            });
+
+            productSearch.addEventListener("keydown", (e) => {
+              if (e.key === "Escape") {
+                productDropdown.style.display = "none";
+              }
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const first = productDropdown?.querySelector(
+                  "[data-id]:not([data-id=''])"
+                );
+                if (first) first.click();
+              }
+            });
+          }
+
+          // close dropdown when clicking outside
+          const onDocClick = (e) => {
+            if (!productDropdown || !productSearch) return;
+            if (
+              !productDropdown.contains(e.target) &&
+              e.target !== productSearch
+            ) {
+              productDropdown.style.display = "none";
+            }
+          };
+          document.addEventListener("click", onDocClick);
+
+          renderTable();
+
+          vendorSelect?.addEventListener("change", renderTable);
+          storeSelect?.addEventListener("change", renderTable);
+
+          if (excelBtn) {
+            excelBtn.onclick = () => {
+              const data = applyFilters(getFilters());
+              if (!data.length) {
+                ErrorMessage("No data to export for these filters.");
+                return;
+              }
+
+              downloadExcel(
+                data.map((item) => ({
+                  Product: item.productName,
+                  Vendor: item.vendorName,
+                  Store: item.storeName,
+                  "Case Buy": item.PurchCase,
+                  "Pcs Buy": item.PurchPcs,
+                  "Case Sold": item.Sold,
+                  "Pcs Sold": item.pcs,
+                  "Returned Case": item.rStock,
+                  "Returned Pcs": item.rPcs,
+                  "Inventory Case": item.Stock,
+                  "Inventory Pcs": item.PcsStock,
+                  "Sales Volume": item.salesVolume || 0,
+                })),
+                `Sales-${startDate}-${endDate}`
+              );
+            };
+          }
+
+          if (pdfBtn) {
+            pdfBtn.onclick = () => {
+              const data = applyFilters(getFilters());
+              if (!data.length) {
+                ErrorMessage("No data to export for these filters.");
+                return;
+              }
+
+              const doc = new jsPDF({ orientation: "landscape" });
+              autoTable(doc, {
+                head: [
+                  [
+                    "Product",
+                    "Vendor",
+                    "Store",
+                    "Case Buy",
+                    "Pcs Buy",
+                    "Case Sold",
+                    "Pcs Sold",
+                    "Case Returned",
+                    "Pcs Returned",
+                    "Avail. Case",
+                    "Avail. Pcs",
+                    "Sales Volume",
+                  ],
+                ],
+                body: data.map((item) => [
+                  item.productName,
+                  item.vendorName,
+                  item.storeName,
+                  item.PurchCase,
+                  item.PurchPcs,
+                  item.Sold,
+                  item.pcs,
+                  item.rStock,
+                  item.rPcs,
+                  item.Stock,
+                  item.PcsStock,
+                  Number(item.salesVolume || 0).toLocaleString(),
+                ]),
+                startY: 10,
+                styles: { fontSize: 7, cellPadding: 2 },
+                headStyles: { fillColor: [43, 108, 176] },
+                margin: { left: 8, right: 8 },
+              });
+              doc.save(`Stock_Sales_${startDate}_to_${endDate}.pdf`);
+            };
+          }
+        },
+      });
+    },
+    [buildSummaryRows]
   );
 
   const fetchData = useCallback(
@@ -59,374 +677,40 @@ export default function StockandSalesReport({ baseUrl, userData }) {
         const end = format(range.to, "yyyy-MM-dd");
 
         const res = await fetch(
-          `${baseUrl}/api/Products/report?startDate=${start}&endDate=${end}`,
+          `${baseUrl}/api/Products/report?startDate=${encodeURIComponent(
+            start
+          )}&endDate=${encodeURIComponent(end)}`,
           {
             method: "GET",
             headers: getAuthHeaders(),
           }
         );
 
-        if (!res.ok) throw new Error("Failed to fetch product data");
-
         const fetchedData = await res.json();
+
+        if (!res.ok) {
+          throw new Error(fetchedData?.error || "Failed to fetch product data");
+        }
+
+        Swal.close();
         setDateDialogOpen(false);
         showReportModal(fetchedData, start, end);
       } catch (error) {
-        ErrorMessage(error.message || "Something went wrong");
+        Swal.close();
+        ErrorMessage(error?.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
     },
-    [baseUrl, getAuthHeaders]
-  );
-
-  const buildSummary = useCallback(
-    (
-      productList,
-      storeList,
-      vendorList,
-      invoicesAll,
-      purchasesAll,
-      inventory,
-      filters
-    ) => {
-      const productMap = new Map(productList.map((p) => [p._id, p.Name]));
-      const vendorMap = new Map(vendorList.map((v) => [v._id, v.Name]));
-      const storeMap = new Map(storeList.map((s) => [s._id, s.WHName]));
-      const inventoryMap = new Map(inventory.map((i) => [i._id, i]));
-
-      const invoices = invoicesAll.filter((inv) => {
-        const s = (inv.billStatus || "").toLowerCase();
-        return s !== "draft" && s !== "cancelled";
-      });
-      const returns = invoicesAll.filter(
-        (inv) => (inv.billStatus || "").toLowerCase() === "cancelled"
-      );
-      const purchases = purchasesAll.filter(
-        (po) => po.status === "POSTED TO WAREHOUSE"
-      );
-
-      const summaryMap = new Map();
-
-      const ensure = (id, vendorId, storeId, productId) => {
-        let entry = summaryMap.get(id);
-        if (!entry) {
-          entry = {
-            Product: id,
-            Vendor: vendorId || "",
-            Store: storeId || "",
-            productId: productId || "",
-            PurchCase: 0,
-            PurchPcs: 0,
-            Sold: 0,
-            pcs: 0,
-            rStock: 0,
-            rPcs: 0,
-            Stock: 0,
-            PcsStock: 0,
-            salesVolume: 0,
-          };
-          summaryMap.set(id, entry);
-        }
-        return entry;
-      };
-
-      // purchases
-      for (const purchase of purchases) {
-        if (!Array.isArray(purchase.orders)) continue;
-        for (const order of purchase.orders) {
-          const item = order.item || {};
-          const id = order.storeProductId || order.storeproductId;
-          if (!id) continue;
-          const entry = ensure(id, item.Vendor, purchase.WHID, item._id);
-          entry.PurchCase += order.Qty || 0;
-          entry.PurchPcs += order.pcs || 0;
-        }
-      }
-
-      // invoices (sold + volume)
-      for (const invoice of invoices) {
-        if (!Array.isArray(invoice.orders)) continue;
-        for (const order of invoice.orders) {
-          const item = order.item || {};
-          const id = order.storeProductId || order.storeproductId;
-          if (!id) continue;
-          const entry = ensure(id, item.Vendor, invoice.whId, item._id);
-          entry.Sold += order.Qty || 0;
-          entry.pcs += order.pcsReq || 0;
-          entry.salesVolume += Number(order.total) || 0;
-        }
-      }
-
-      // returns
-      for (const invoice of returns) {
-        if (!Array.isArray(invoice.orders)) continue;
-        for (const order of invoice.orders) {
-          const item = order.item || {};
-          const id = order.storeProductId || order.storeproductId;
-          if (!id) continue;
-          const entry = ensure(id, item.Vendor, invoice.whId, item._id);
-          entry.rStock += order.Qty || 0;
-          entry.rPcs += order.pcsReq || 0;
-        }
-      }
-
-      // inventory
-      for (const [id, entry] of summaryMap) {
-        const inv = inventoryMap.get(id);
-        if (inv) {
-          entry.Stock = inv.currentQty || 0;
-          entry.PcsStock = inv.pcs || 0;
-        }
-      }
-
-      return Array.from(summaryMap.values()).filter((item) => {
-        if (filters.vendor && item.Vendor !== filters.vendor) return false;
-        if (filters.store && item.Store !== filters.store) return false;
-        if (filters.product && item.productId !== filters.product) return false;
-        return true;
-      });
-    },
-    []
-  );
-
-  const showReportModal = useCallback(
-    (fetchedData, startDate, endDate) => {
-      const productList = fetchedData.productList || [];
-      const storeList = fetchedData.storeList || [];
-      const vendorList = fetchedData.vendorList || [];
-      const invoicesAll = fetchedData.invoiceList || [];
-      const purchasesAll = fetchedData.PurchaseOrderList || [];
-      const inventory = fetchedData.ReportInventory || [];
-
-      const productMap = new Map(productList.map((p) => [p._id, p.Name]));
-      const vendorMap = new Map(vendorList.map((v) => [v._id, v.Name]));
-      const storeMap = new Map(storeList.map((s) => [s._id, s.WHName]));
-      const inventoryMap = new Map(inventory.map((i) => [i._id, i]));
-
-      const getProductName = (id) => {
-        const inv = inventoryMap.get(id);
-        return inv ? productMap.get(inv.productId) || "" : "";
-      };
-      const getVendor = (id) => vendorMap.get(id) || "";
-      const getStore = (id) => storeMap.get(id) || "";
-
-      Swal.fire({
-        title: "Stock & Sales Report",
-        html: `
-          <div class="text-xs text-muted-foreground mb-3">
-            Period: <strong>${startDate}</strong> → <strong>${endDate}</strong>
-          </div>
-
-          <div style="margin-bottom: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px;">
-            <div>
-              <label style="font-size: 12px; color: #4a5568;">Vendor</label>
-              <select id="vendor" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
-                <option value="">All</option>
-                ${vendorList
-                  .map((v) => `<option value="${v._id}">${v.Name}</option>`)
-                  .join("")}
-              </select>
-            </div>
-            <div>
-              <label style="font-size: 12px; color: #4a5568;">Store</label>
-              <select id="store" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
-                <option value="">All</option>
-                ${storeList
-                  .map((s) => `<option value="${s._id}">${s.WHName}</option>`)
-                  .join("")}
-              </select>
-            </div>
-            <div>
-              <label style="font-size: 12px; color: #4a5568;">Product</label>
-              <select id="product" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
-                <option value="">All</option>
-                ${productList
-                  .map((p) => `<option value="${p._id}">${p.Name}</option>`)
-                  .join("")}
-              </select>
-            </div>
-          </div>
-
-          <div id="reportTable" style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;"></div>
-
-          <div style="margin-top: 12px; text-align: right;">
-            <button id="downloadExcelBtn" class="swal2-confirm swal2-styled" style="background-color:#2b6cb0;color:white;padding:6px 12px;border-radius:6px;font-size:12px;margin-right:5px;">
-              ⬇ Download Excel
-            </button>
-            <button id="downloadPdfBtn" class="swal2-confirm swal2-styled" style="background-color:#2b6cb0;color:white;padding:6px 12px;border-radius:6px;font-size:12px;">
-              ⬇ Download PDF
-            </button>
-          </div>
-        `,
-        width: "85%",
-        showConfirmButton: false,
-        didOpen: () => {
-          const renderTable = () => {
-            const filters = {
-              vendor: document.getElementById("vendor")?.value,
-              store: document.getElementById("store")?.value,
-              product: document.getElementById("product")?.value,
-            };
-
-            const data = buildSummary(
-              productList,
-              storeList,
-              vendorList,
-              invoicesAll,
-              purchasesAll,
-              inventory,
-              filters
-            );
-
-            const rows = data
-              .map(
-                (item) => `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                  <td style="padding: 6px;">${getProductName(item.Product)}</td>
-                  <td style="padding: 6px;">${getVendor(item.Vendor)}</td>
-                  <td style="padding: 6px;">${getStore(item.Store)}</td>
-                  <td style="padding: 6px; text-align: right;">${item.PurchCase}</td>
-                  <td style="padding: 6px; text-align: right;">${item.PurchPcs}</td>
-                  <td style="padding: 6px; text-align: right;">${item.Sold}</td>
-                  <td style="padding: 6px; text-align: right;">${item.pcs}</td>
-                  <td style="padding: 6px; text-align: right;">${item.rStock}</td>
-                  <td style="padding: 6px; text-align: right;">${item.rPcs}</td>
-                  <td style="padding: 6px; text-align: right;">C:${item.Stock}, P:${item.PcsStock}</td>
-                  <td style="padding: 6px; text-align: right;">${(item.salesVolume || 0).toLocaleString()}</td>
-                </tr>
-              `
-              )
-              .join("");
-
-            document.getElementById("reportTable").innerHTML = `
-              <table style="width:100%; border-collapse: collapse; font-size: 12px;">
-                <thead style="position: sticky; top: 0; background-color: #edf2f7;">
-                  <tr>
-                    <th style="padding: 6px; text-align: left;">Product</th>
-                    <th style="padding: 6px; text-align: left;">Vendor</th>
-                    <th style="padding: 6px; text-align: left;">Store</th>
-                    <th style="padding: 6px; text-align: right;">Case [Buy]</th>
-                    <th style="padding: 6px; text-align: right;">Pcs [Buy]</th>
-                    <th style="padding: 6px; text-align: right;">Case [Sell]</th>
-                    <th style="padding: 6px; text-align: right;">Pcs [Sell]</th>
-                    <th style="padding: 6px; text-align: right;">Case Rtnd</th>
-                    <th style="padding: 6px; text-align: right;">Pcs Rtnd</th>
-                    <th style="padding: 6px; text-align: right;">Avail. Stock</th>
-                    <th style="padding: 6px; text-align: right;">Sales Volume</th>
-                  </tr>
-                </thead>
-                <tbody>${rows}</tbody>
-              </table>
-            `;
-          };
-
-          renderTable();
-
-          ["vendor", "store", "product"].forEach((id) => {
-            document.getElementById(id)?.addEventListener("change", renderTable);
-          });
-
-          document.getElementById("downloadExcelBtn").onclick = () => {
-            const filters = {
-              vendor: document.getElementById("vendor")?.value,
-              store: document.getElementById("store")?.value,
-              product: document.getElementById("product")?.value,
-            };
-            const data = buildSummary(
-              productList,
-              storeList,
-              vendorList,
-              invoicesAll,
-              purchasesAll,
-              inventory,
-              filters
-            );
-
-            const excelData = data.map((item) => ({
-              Product: getProductName(item.Product),
-              Vendor: getVendor(item.Vendor),
-              Store: getStore(item.Store),
-              "Case Buy": item.PurchCase,
-              "Pcs Buy": item.PurchPcs,
-              "Case Sell": item.Sold,
-              "Pcs Sell": item.pcs,
-              "Rtnd Case": item.rStock,
-              "Rtnd Pcs": item.rPcs,
-              "Invty Case": item.Stock,
-              "Invty Pcs": item.PcsStock,
-              "Sales Volume": item.salesVolume || 0,
-            }));
-
-            downloadExcel(excelData, `Sales-${startDate}-${endDate}`);
-          };
-
-          document.getElementById("downloadPdfBtn").onclick = () => {
-            const filters = {
-              vendor: document.getElementById("vendor")?.value,
-              store: document.getElementById("store")?.value,
-              product: document.getElementById("product")?.value,
-            };
-            const data = buildSummary(
-              productList,
-              storeList,
-              vendorList,
-              invoicesAll,
-              purchasesAll,
-              inventory,
-              filters
-            );
-
-            const pdfData = data.map((item) => [
-              getProductName(item.Product),
-              getVendor(item.Vendor),
-              getStore(item.Store),
-              item.PurchCase,
-              item.PurchPcs,
-              item.Sold,
-              item.pcs,
-              item.rStock,
-              item.rPcs,
-              `C:${item.Stock}`,
-              `P:${item.PcsStock}`,
-              (item.salesVolume || 0).toLocaleString(),
-            ]);
-
-            const doc = new jsPDF({ orientation: "landscape" });
-            autoTable(doc, {
-              head: [
-                [
-                  "Product",
-                  "Vendor",
-                  "Store",
-                  "Case Buy",
-                  "Pcs Buy",
-                  "Case Sell",
-                  "Pcs Sell",
-                  "Case Rtnd",
-                  "Pcs Rtnd",
-                  "Avail.C",
-                  "Avail.P",
-                  "Sales Volume",
-                ],
-              ],
-              body: pdfData,
-              startY: 10,
-              styles: { fontSize: 7 },
-            });
-            doc.save(`Stock_Sales_${startDate}_to_${endDate}.pdf`);
-          };
-        },
-      });
-    },
-    [buildSummary]
+    [baseUrl, getAuthHeaders, showReportModal]
   );
 
   return (
     <>
       <button
+        type="button"
         onClick={() => setDateDialogOpen(true)}
-        className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition text-xs w-full"
+        className="flex w-full items-center gap-3 rounded-md p-3 text-xs transition hover:bg-gray-700"
         disabled={loading}
       >
         <SwatchIcon className="h-5 w-5" />
@@ -444,6 +728,7 @@ export default function StockandSalesReport({ baseUrl, userData }) {
               <PopoverTrigger asChild>
                 <Button
                   id="date"
+                  type="button"
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
@@ -479,10 +764,15 @@ export default function StockandSalesReport({ baseUrl, userData }) {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDateDialogOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDateDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button
+              type="button"
               onClick={() => dateRange && fetchData(dateRange)}
               disabled={!dateRange?.from || !dateRange?.to || loading}
             >

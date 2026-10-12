@@ -1,7 +1,7 @@
 
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import BackButton from "@/app/Components/BackBotton";
-import SalesDashboard from "@/app/Components/Salesddash";
+import DashboardCharts from "@/app/Components/Salesddash";
 import InvoiceLandingPage from "./page";
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
@@ -76,7 +76,7 @@ export default async function Employeelayout({ children, params }) {
             )}
 
             {userData?.user?.c_levelDash && (
-              <SalesDashboard  business={userData.business} baseUrl={baseUrl} />
+              <DashboardCharts  business={userData.business} baseUrl={baseUrl} />
             )}
         </Notch>
 
