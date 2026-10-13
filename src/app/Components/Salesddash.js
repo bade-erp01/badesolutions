@@ -50,8 +50,7 @@ const money = (n) =>
 const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
   const [loading, setLoading] = useState(false);
   const [invoices, setInvoices] = useState([]);
-  const [year, setYear] = useState("all");
-  const [range, setRange] = useState("12m");
+  const [range, setRange] = useState("6m"); // default to full 6-month window
   const [showModal, setShowModal] = useState(false);
   const { user } = useUser();
   const openedRef = useRef(false);
@@ -61,22 +60,36 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
       setLoading(true);
       plsWait("Loading Report Data...");
 
-      const res = await fetch(`${baseUrl}/api/Invoice/report`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-          access: `${Encrypt(user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      // Always last 6 months → today
+      const endDate = moment().format("YYYY-MM-DD");
+      const startDate = moment().subtract(6, "months").format("YYYY-MM-DD");
 
-      if (!res.ok) throw new Error("Failed to fetch sales data");
+      const res = await fetch(
+        `${baseUrl}/api/Invoice/report?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
+            access: `${Encrypt(user.user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        let message = "Failed to fetch sales data";
+        try {
+          const err = await res.json();
+          message = err.error || err.message || message;
+        } catch (_) {}
+        throw new Error(message);
+      }
 
       const fetchedData = await res.json();
       setInvoices(fetchedData.invoices || []);
 
-      Swal.close(); // close loader first
+      Swal.close();
       setLoading(false);
       openedRef.current = false;
       setShowModal(true);
@@ -92,26 +105,18 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
   }, [triggerButton, fetchData]);
 
   const stats = useMemo(() => {
+    // Client-side sub-filter inside the already-fetched 6-month window
     const cutoff =
-      range === "all"
+      range === "6m"
         ? null
         : moment().subtract(Number(range.replace("m", "")), "months");
 
     const filtered = invoices.filter((inv) => {
       const d = moment(inv.startDate);
       if (!d.isValid()) return false;
-      if (year !== "all" && String(d.year()) !== String(year)) return false;
       if (cutoff && d.isBefore(cutoff)) return false;
       return true;
     });
-
-    const years = [
-      ...new Set(
-        invoices
-          .map((i) => moment(i.startDate).year())
-          .filter((y) => !Number.isNaN(y))
-      ),
-    ].sort();
 
     let revenue = 0;
     let completed = 0;
@@ -164,7 +169,6 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
         : 0;
 
     return {
-      years,
       count,
       revenue,
       avgTicket,
@@ -180,7 +184,7 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
       dayLabels: dayKeys.map((k) => moment(k).format("DD MMM")),
       dayValues: dayKeys.map((k) => daily[k] || 0),
     };
-  }, [invoices, year, range]);
+  }, [invoices, range]);
 
   const chartOpts = {
     responsive: true,
@@ -257,6 +261,10 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
     ],
   };
 
+  const periodLabel = `${moment()
+    .subtract(6, "months")
+    .format("DD MMM YYYY")} → ${moment().format("DD MMM YYYY")}`;
+
   const modalContent = (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
@@ -270,7 +278,7 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
             Sales Intelligence
           </h2>
           <p className="text-sm text-gray-500 mt-1">
-            Live snapshot of invoice performance
+            Last 6 months · {periodLabel}
           </p>
         </div>
 
@@ -282,21 +290,6 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
           >
             <option value="3m">Last 3 months</option>
             <option value="6m">Last 6 months</option>
-            <option value="12m">Last 12 months</option>
-            <option value="all">All time</option>
-          </select>
-
-          <select
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="px-3 py-2 text-sm rounded-md border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="all">All years</option>
-            {stats.years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
           </select>
         </div>
       </div>
@@ -411,7 +404,6 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
     </motion.div>
   );
 
-  // Same width/height approach as your original
   useEffect(() => {
     if (!showModal || openedRef.current) return;
     openedRef.current = true;
@@ -436,12 +428,11 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
-  // refresh charts when filters change while modal is open
   useEffect(() => {
     if (!showModal || !openedRef.current) return;
     MySwal.update({ html: modalContent });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, range, stats]);
+  }, [range, stats]);
 
   return (
     <>
