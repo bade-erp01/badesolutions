@@ -475,7 +475,7 @@ export default function TransitPage({
 
   return (
     <>
-      <div className="px-6 py-10 bg-white shadow-2xl animate__animated animate__fadeIn border border-gray-200">
+      <div className="px-4 sm:px-6 py-6 sm:py-10 bg-white shadow-2xl animate__animated animate__fadeIn border border-gray-200">
         {/* Top Controls */}
         <div className="flex items-center justify-between mb-8">
           <span
@@ -486,8 +486,8 @@ export default function TransitPage({
         </div>
 
         {/* Company + Customer Info */}
-        <div className="flex flex-wrap justify-between gap-10 border-t border-b py-8 mb-6">
-          <div className="flex items-start gap-6 w-full md:w-auto">
+        <div className="flex flex-wrap justify-between gap-6 md:gap-10 border-t border-b py-6 sm:py-8 mb-6">
+          <div className="flex items-start gap-4 sm:gap-6 w-full md:w-auto">
             <Image
               src={Business.companyLogo}
               width={90}
@@ -495,20 +495,20 @@ export default function TransitPage({
               alt="logo"
               priority
             />
-            <div className="text-sm text-gray-700 space-y-1">
-              <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            <div className="text-sm text-gray-700 space-y-1 min-w-0">
+              <h3 className="text-xl sm:text-2xl break-words font-extrabold text-gray-900 tracking-tight">
                 {Business.companyName}
               </h3>
-              <p className="text-gray-500 text-xl font-semibold">
+              <p className="text-gray-500 text-lg sm:text-xl font-semibold break-words">
                 {Singlebill.Vendor.Name}
               </p>
-              <h2 className={`mt-3 font-bold text-base`}>
+              <h2 className={`mt-3 font-bold text-base break-all`}>
                 {Singlebill.billReferenceNo}
               </h2>
             </div>
           </div>
 
-          <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto min-w-[220px]">
+          <div className="text-right text-sm text-gray-700 space-y-1 w-full md:w-auto md:min-w-[220px]">
             <h3 className="text-xl font-bold text-gray-900 tracking-tight">
               {Singlebill.WHID.WHName.toUpperCase()}
             </h3>
@@ -520,7 +520,7 @@ export default function TransitPage({
         </div>
 
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-          <div className="flex justify-evenly items-center gap-4">
+          <div className="flex flex-wrap justify-evenly items-center gap-4">
             {user.raiseLpo && Singlebill.status.toLowerCase() === "draft" && (
               <button
                 onClick={() => updateRFP("Pending")}

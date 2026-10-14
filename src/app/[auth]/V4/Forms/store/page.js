@@ -153,7 +153,7 @@ export default function StoreForm({business, user}) {
                 >
                  State
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 grid grid-cols-1">
                   <select
                     id="Region"
                     name="Region"
@@ -170,7 +170,7 @@ export default function StoreForm({business, user}) {
                   </select>
                   <ChevronDownIcon
                     aria-hidden="true"
-                    className="pointer-events-auto col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                    className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
                   />
                 </div>
               </div>

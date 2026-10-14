@@ -91,18 +91,18 @@ export default function Page({
   };
 
   return (
-    <div className="w-full border p-2">
+    <div className="w-full border p-3 sm:p-4">
       <form className="space-y-10" onSubmit={handleSubmit} autoComplete="off">
         {/* Header */}
         <div className="border-b pb-4">
-          <h2 className="text-2xl font-bold  tracking-tight">New Expense</h2>
+          <h2 className="text-xl sm:text-2xl font-bold  tracking-tight">New Expense</h2>
           <p className="text-sm  mt-1">
             Fill in the details below to record a new expense.
           </p>
         </div>
 
         {/* Form Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Beneficiary */}
           <div>
             <label
@@ -291,7 +291,7 @@ export default function Page({
               onChange={handleChange}
               value={formData.remarks || ""}
               placeholder="Write a remark or note to approval office..."
-              className="w-full rounded-md px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="w-full rounded-md px-3 py-2 text-base sm:text-sm shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             />
             {errors.remarks && (
               <p className="text-xs text-red-500 mt-1">{errors.remarks}</p>
@@ -302,7 +302,7 @@ export default function Page({
         {/* Submit Button */}
         <div className="flex justify-end mt-10">
           {userData.expenseUser && (
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Submitting..." : "Submit Expense for Approval"}
             </Button>

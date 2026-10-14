@@ -129,8 +129,8 @@ export default function Page({ data, baseUrl, subscribers }) {
       <div className="">
         <Card>
           <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">{formData.title}</CardTitle>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <CardTitle className="text-xl min-w-0 break-words">{formData.title}</CardTitle>
               <Badge
                 variant={
                   formData.status === "pending" ? "secondary" : "default"
@@ -405,7 +405,7 @@ export default function Page({ data, baseUrl, subscribers }) {
                 </div>
                 <div className="sm:col-span-2">
                   <span className="font-medium text-foreground">ID:</span>{" "}
-                  <span className="font-mono text-xs">
+                  <span className="font-mono text-xs break-all">
                     {typeof data._id === "object"
                       ? data._id.$oid || data._id
                       : data._id}
@@ -414,7 +414,7 @@ export default function Page({ data, baseUrl, subscribers }) {
               </div>
             </CardContent>
 
-            <CardFooter className="flex justify-end gap-3 border-t pt-6">
+            <CardFooter className="flex flex-wrap justify-end gap-3 border-t pt-6">
               <Button type="button" variant="outline">
                 Cancel
               </Button>

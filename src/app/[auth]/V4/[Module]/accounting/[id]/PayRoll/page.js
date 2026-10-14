@@ -153,15 +153,15 @@ export default function PayrollDashboard() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Payroll</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Payroll</h1>
           <p className="text-muted-foreground mt-1">Overview</p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
             Export CSV
@@ -279,7 +279,7 @@ function PayrollTableContent({ user }) {
   return (
     <>
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {kpiData.map((kpi, index) => (
           <Card key={index} className="border">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -287,7 +287,7 @@ function PayrollTableContent({ user }) {
               <kpi.icon className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{kpi.value}</div>
+              <div className="text-2xl lg:text-3xl font-bold break-all">{kpi.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -299,7 +299,7 @@ function PayrollTableContent({ user }) {
             <TableHead>Title</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Pay-slip Entries</TableHead>
-            <TableHead>Salary Paid</TableHead>
+            <TableHead className="text-right">Salary Paid</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Processed By</TableHead>
           </TableRow>
@@ -318,7 +318,7 @@ function PayrollTableContent({ user }) {
                 </TableCell>
                 <TableCell>{moment(emp.date).format("YYYY-MM")}</TableCell>
                 <TableCell>{emp.entries?.length || 0}</TableCell>
-                <TableCell className="font-mono">
+                <TableCell className="text-right font-mono">
                   ₦{emp.totalAmount?.toLocaleString() || "0"}
                 </TableCell>
                 <TableCell>

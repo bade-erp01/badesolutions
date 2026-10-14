@@ -50,7 +50,7 @@ export default function SingleProductpage({
 
   return (
     <Suspense fallback={<SuspenenseFallBack pagedata={`${data.Name}`} />}>
-      <div className="m-5 p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
+      <div className="m-0 sm:m-5 p-3 sm:p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
         <form className="space-y-5 mx-auto">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <span
@@ -61,7 +61,7 @@ export default function SingleProductpage({
           </div>
 
           {/* Avatar & Attachment */}
-          <div className="flex flex-wrap gap-8 items-center py-4">
+          <div className="flex flex-wrap gap-4 sm:gap-8 items-center py-4">
             {/* Avatar */}
             <div className="flex items-center space-x-6">
               <div className="w-28 h-28 rounded overflow-hidden flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function SingleProductpage({
             </div>
 
             {/* Divider */}
-            <div className="hidden md:block h-24 border-l border-gray-200 mx-6"></div>
+            <div className="hidden md:block h-24 border-l border-gray-200 mx-2"></div>
 
             {/* qrcode */}
             {data.QrCode && (
@@ -112,7 +112,7 @@ export default function SingleProductpage({
           <div className="border rounded-lg overflow-hidden">
             <span
               onClick={() => setIsOpen3(!isOpen3)}
-              className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+              className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
             >
               <h2 className="text-base/7 font-semibold text-gray-900">
                 Product Information
@@ -134,12 +134,12 @@ export default function SingleProductpage({
               </svg>
             </span>
             <div
-              className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+              className={`px-3 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
                 isOpen3 ? "block" : "hidden"
               }`}
             >
-              <div className="border-b bg- border-gray-900/10 pb-12">
-                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="border-b bg- border-gray-900/10 pb-8 sm:pb-12">
+                <div className="mt-4 sm:mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="Name"
@@ -148,7 +148,7 @@ export default function SingleProductpage({
                       Name
                     </label>
                     <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-gray-900 break-words">
                         {formData.Name}
                       </h3>
                     </div>
@@ -162,7 +162,7 @@ export default function SingleProductpage({
                       Product Code
                     </label>
                     <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-gray-900 break-words">
                         {formData.ADCcode || formData.ACDcode}
                       </h3>
                     </div>
@@ -176,7 +176,7 @@ export default function SingleProductpage({
                       Product category
                     </label>
                     <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-gray-900 break-words">
                         {formData.category}
                       </h3>
                     </div>
@@ -261,7 +261,7 @@ export default function SingleProductpage({
                     </label>
                     <div className="mt-2">
                       <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.VAT.$numberDecimal}
+                        {formData.VAT?.$numberDecimal}
                       </h5>
                     </div>
                   </div>
@@ -273,7 +273,7 @@ export default function SingleProductpage({
             <div className="border rounded-lg overflow-hidden">
               <span
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+                className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
               >
                 <h2 className="text-base/7 font-semibold text-gray-900">
                  Rates & Discounts
@@ -295,7 +295,7 @@ export default function SingleProductpage({
                 </svg>
               </span>
               <div
-                className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+                className={`px-3 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
                   isOpen ? "block" : "hidden"
                 }`}
               >
@@ -415,16 +415,20 @@ function ProductChart({ productId, productName, umo, business, user }) {
         {
           x: NDxArray,
           y: NDyArray,
-          type: "scabarter",
+          type: "scatter",
           mode: "lines+markers",
           marker: { color: chartColor },
         },
       ];
       setTotalSales(chartTitle);
 
-      const layoutPlot = { title: chartTitle };
+      const layoutPlot = {
+        title: chartTitle,
+        autosize: true,
+        margin: { l: 48, r: 16, t: 64, b: 40 },
+      };
 
-      Plotly.newPlot("myPlot", dataPlot, layoutPlot);
+      Plotly.newPlot("myPlot", dataPlot, layoutPlot, { responsive: true });
     }
   }, [loading, monthlySalesArray, business]);
 
@@ -432,28 +436,27 @@ function ProductChart({ productId, productName, umo, business, user }) {
     <>
       {/* Show error if exists */}
       {errormssg ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-red-500 text-lg font-semibold">{errormssg}</div>
+        <div className="flex items-center justify-center min-h-[50dvh] px-4">
+          <div className="text-red-500 text-base sm:text-lg font-semibold text-center break-words">{errormssg}</div>
         </div>
       ) : // No error: show loading spinner or chart
       loading ? (
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-[50dvh]">
           <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
         </div>
       ) : (
         <div id="code">
-          <p className="text-md font-semibold text-gray-700 mb-1">
+          <div className="text-base font-semibold text-gray-700 mb-1 break-words">
             📈 Sales Insight for {productName},{tottalSales}
             <hr />
             <br />
-          </p>
+          </div>
           <i className="text-gray-500 text-sm">
             Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
           </i>
           <div
             id="myPlot"
-            className=""
-            style={{ width: "100%", height: "400px" }}
+            className="h-[300px] w-full sm:h-[400px]"
           />
         </div>
       )}
@@ -566,7 +569,7 @@ export function CommentForm({ userData, product }) {
   return (
     <Card className="max-w-full mx-auto shadow-lg">
       <CardHeader>
-        <CardTitle>Submit a Review for {product.Name.toLowerCase()}</CardTitle>
+        <CardTitle className="break-words">Submit a Review for {product.Name?.toLowerCase()}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -584,7 +587,7 @@ export function CommentForm({ userData, product }) {
 
         <div className="space-y-2">
           <Label htmlFor="rating">Rating</Label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {[1, 2, 3, 4, 5].map((value) => (
               <button
                 key={value}
@@ -607,7 +610,7 @@ export function CommentForm({ userData, product }) {
       <CardFooter className="flex justify-end">
         <Button
           onClick={handleSubmit}
-          type="submit"
+          type="button"
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           Submit Review
@@ -633,7 +636,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
         formData.PriceLists.map((price, idx) => (
           <Card
             key={idx}
-            className="group w-full max-w-xs rounded-sm hover:shadow-md hover:border-border transition-all duration-300 bg-white"
+            className="group w-full sm:max-w-xs rounded-sm hover:shadow-md hover:border-border transition-all duration-300 bg-white"
           >
             <CardContent className="p-3 space-y-2">
               {/* Header */}
@@ -669,7 +672,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   value={price.price || ""}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="h-8 w-30 text-sm"
+                  className="h-9 w-full text-base sm:h-8 sm:text-sm"
                 />
               </div>
 
@@ -689,7 +692,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   value={price.promo}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="h-8 w-30 text-sm"
+                  className="h-9 w-full text-base sm:h-8 sm:text-sm"
                 />
               </div>
 
@@ -707,7 +710,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   type="date"
                   value={moment(price.PromoDate).format("YYYY-MM-DD")}
                   onChange={handleChange}
-                  className="h-8 w-30 text-xs"
+                  className="h-9 w-full text-base sm:h-8 sm:text-xs"
                 />
               </div>
 
@@ -717,7 +720,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
               <div className="flex items-center justify-between gap-2">
                 <Label
                   htmlFor={`vat-${price.Name}`}
-                  className="text-[10px] text-muted-foreground cursor-pointer"
+                  className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer"
                 >
                   <Checkbox
                     id={`vat-${price.Name}`}

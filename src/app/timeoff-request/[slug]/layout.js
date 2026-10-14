@@ -101,8 +101,8 @@ export default async function Layout({ params }) {
     <>
       <nav className="sticky top-0 z-20 w-full border-b border-slate-200 bg-[#fcfcfcda] p-3 backdrop-blur shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex flex-1 justify-start">
-            <h1 className="text-md font-black tracking-tight text-slate-900">
+          <div className="flex min-w-0 flex-1 justify-start">
+            <h1 className="truncate text-base font-black tracking-tight text-slate-900">
               Timeout Invitation
             </h1>
           </div>

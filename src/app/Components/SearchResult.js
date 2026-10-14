@@ -114,9 +114,9 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
       )}
 
       {/* Main content row */}
-      <div className="flex items-center gap-4 ">
-        <MagnifyingGlassIcon className="h-7 w-7 text-purple-400" />
-        <CardContent className="flex flex-col justify-center w-full p-0">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+        <MagnifyingGlassIcon className="h-7 w-7 shrink-0 text-purple-400" />
+        <CardContent className="flex flex-col justify-center w-full min-w-0 p-0">
           <HoverCard>
             <HoverCardTrigger asChild>
               <Link href={link} className="block w-full">
@@ -124,13 +124,13 @@ const SearchCard = ({ data, module, UserData, selected, onToggle, showCheckbox }
                   {truncate(title)}
                 </CardTitle>
                 <Separator className="my-2" />
-                <Badge variant={subtitle === "Cancelled" ? "destructive" : "outline"}>
+                <Badge variant={subtitle === "Cancelled" ? "destructive" : "outline"} className="max-w-full truncate">
                   {subtitle}
                 </Badge>
               </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-64">
-              <p className="text-sm font-medium">{title}</p>
+              <p className="text-sm font-medium break-words">{title}</p>
               <Separator className="my-2" />
               <Badge variant={subtitle === "Cancelled" ? "destructive" : "outline"}>
                   {subtitle}

@@ -121,8 +121,9 @@ export default function DebtorsReportModal({ data, business, users }) {
     Swal.fire({
       title: "Debtors Report",
       html: `
-        <div style="margin-bottom: 10px; display: flex; gap: 10px;">
-          <div style="flex: 1;">
+        <style> @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
+        <div style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+          <div style="flex: 1 1 140px;">
             <label style="font-size: 12px; font-weight: 600;">Debtors</label><br/>
             <select id="customerFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
@@ -137,7 +138,7 @@ export default function DebtorsReportModal({ data, business, users }) {
                 .join("")}
             </select>
           </div>
-           <div style="flex: 1;">
+           <div style="flex: 1 1 140px;">
             <label style="font-size: 12px; font-weight: 600;">Rep</label><br/>
             <select id="salePersonFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
@@ -152,7 +153,7 @@ export default function DebtorsReportModal({ data, business, users }) {
                 .join("")}
             </select>
           </div>
-          <div style="flex: 1;">
+          <div style="flex: 1 1 140px;">
             <label style="font-size: 12px; font-weight: 600;">Debt Days</label><br/>
             <select id="debtDaysFilter" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
               <option value="">All</option>
@@ -162,7 +163,7 @@ export default function DebtorsReportModal({ data, business, users }) {
               <option value="90+">Over 90 Days</option>
             </select>
           </div>
-           <div style="flex: 1;">
+           <div style="flex: 1 1 140px;">
             <label style="font-weight: 600; font-size: 12px;">PriceList</label><br/>
             <select id="PriceList" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
              <option value="">All</option>
@@ -195,14 +196,14 @@ export default function DebtorsReportModal({ data, business, users }) {
             <tbody id="debtorsTableBody"></tbody>
             <tfoot>
               <tr style="background-color: #f0f0f0; font-weight: bold;">
-                <td colspan="5">Total Debt</td>
+                <td colspan="6">Total Debt</td>
                 <td id="totalDebtCell"></td>
-                <td colspan="4"></td>
+                <td colspan="3"></td>
               </tr>
             </tfoot>
           </table>
         </div>
-        <div style="margin-top: 12px; text-align: right;">
+        <div style="margin-top: 12px; text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px;">
           <button
             id="downloadRepExcel"
             style="background-color: #000000; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s ease;"
@@ -214,7 +215,7 @@ export default function DebtorsReportModal({ data, business, users }) {
 
           <button
             id="downloadDebtorsExcel"
-            style="background-color: #000000; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s ease; margin-left: 10px;"
+            style="background-color: #000000; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s ease;"
             onmouseover="this.style.backgroundColor='#333333'"
             onmouseout="this.style.backgroundColor='#000000'"
           >
@@ -223,7 +224,7 @@ export default function DebtorsReportModal({ data, business, users }) {
 
           <button
             id="downloadDebtorsPDF"
-            style="background-color: #000000; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s ease; margin-left: 10px;"
+            style="background-color: #000000; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s ease;"
             onmouseover="this.style.backgroundColor='#333333'"
             onmouseout="this.style.backgroundColor='#000000'"
           >
@@ -231,7 +232,7 @@ export default function DebtorsReportModal({ data, business, users }) {
           </button>
         </div>
       `,
-      width: "80%",
+      width: "max(80%, min(95vw, 640px))",
       showConfirmButton: false,
       didOpen: () => {
         const tableBody = document.getElementById("debtorsTableBody");

@@ -204,11 +204,11 @@ export default function SingleVendorpage({
 
   return (
     <>
-      <div className="p-6 rounded-xl shadow-xl border">
+      <div className="p-4 sm:p-6 rounded-xl shadow-xl border">
         <form className="space-y-8" onSubmit={handleSubmit}>
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h4 className="text-2xl font-bold">
+            <h4 className="text-xl sm:text-2xl font-bold break-words min-w-0">
               {Backdata.Name?.charAt(0).toUpperCase() + Backdata.Name?.slice(1)}
             </h4>
             <div className="px-6 py-2 rounded-full font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -341,7 +341,7 @@ export default function SingleVendorpage({
                     Pay Supplier
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>Register Payment</DialogTitle>
                   </DialogHeader>

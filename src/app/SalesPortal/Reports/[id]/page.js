@@ -407,7 +407,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
 
           return (
             <div key={f.toUpdate} className="space-y-1">
-              <span className="flex items-center gap-1 text-[10px] uppercase text-muted-foreground font-medium">
+              <span className="flex items-center gap-1 text-[11px] uppercase text-muted-foreground font-medium">
                 {f.label}
                 {isSaving && (
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
@@ -421,7 +421,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
                   min={f.type === "number" ? 0 : undefined}
                   disabled={isSaving}
                   className={cn(
-                    "h-8 w-full text-center text-xs",
+                    "h-9 w-full text-center text-base sm:h-8 sm:text-xs",
                     isSaving && "opacity-60",
                   )}
                   onBlur={(e) => {
@@ -492,7 +492,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
         {canEdit && (
           <Card className="p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
+              <div className="space-y-1 min-w-0">
                 <Label className="text-sm font-medium">Upload Images</Label>
                 <p className="text-xs text-muted-foreground">
                   Max {MAX_IMAGES} · PNG/JPG · 5MB each · {totalImageCount}/
@@ -555,7 +555,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
                     <button
                       type="button"
                       onClick={() => removeNewImage(img.id)}
-                      className="absolute top-1 right-1 h-6 w-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 h-7 w-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -574,7 +574,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             {Singlebill.status === "Pending" && (
               <Button
-                onClick={() => submitEntry({ status: "Submited" })}
+                onClick={() => submitEntry({ status: "Submitted" })}
                 className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
               >
                 Close card
@@ -660,7 +660,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
           {filteredInventory.length > 0 && (
             <>
               <Separator />
-              <div className="flex items-center justify-center gap-3 py-4 px-4">
+              <div className="flex flex-wrap items-center justify-center gap-3 py-4 px-4">
                 <Button
                   variant="outline"
                   size="sm"
@@ -708,7 +708,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
             value={remark}
             disabled={!canEdit}
             onChange={(e) => handleRemarkChange(e.target.value)}
-            className="min-h-[100px] resize-y text-sm"
+            className="min-h-[100px] resize-y text-base sm:text-sm"
           />
         </div>
 
@@ -747,7 +747,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
                       <button
                         type="button"
                         onClick={() => removeExistingImage(src)}
-                        className="absolute top-1.5 right-1.5 h-7 w-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1.5 right-1.5 h-8 w-8 rounded-full bg-black/60 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -774,7 +774,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
                   <button
                     type="button"
                     onClick={() => removeNewImage(img.id)}
-                    className="absolute top-1.5 right-1.5 h-7 w-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1.5 right-1.5 h-8 w-8 rounded-full bg-black/60 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>

@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar"
 
 export default function CalendarDemo({ employee }) {
   const [date, setDate] = useState(new Date())
-  const [leaveArray] = useState(employee.Leave)
+  const [leaveArray] = useState(employee?.Leave || [])
   const [selectedLeaves, setSelectedLeaves] = useState([])
 
   // Generate all dates between startDate and endDate
@@ -63,7 +63,7 @@ export default function CalendarDemo({ employee }) {
           highlighted: highlightedDates.map((h) => h.date),
         }}
         modifiersClassNames={{
-          highlighted: `${status === "Approved" ? "bg-green-500" : "bg-gray-500"} text-white rounded`,
+          highlighted: "bg-gray-500 text-white rounded",
         }}
         components={{
           DayContent: ({ date, modifiers }) => {

@@ -88,9 +88,9 @@ export default function AddPriceListModal({baseUrl,userData}) {
       </DialogTrigger>
 
       {/* MODAL APPEARS ON CLICK */}
-      <DialogContent className="sm:max-w-md max-w-lg w-full rounded-sm">
+      <DialogContent className="sm:max-w-md w-full rounded-sm">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">
+          <DialogTitle className="text-xl sm:text-2xl font-semibold">
             Add New Pricelist
           </DialogTitle>
           <DialogDescription>

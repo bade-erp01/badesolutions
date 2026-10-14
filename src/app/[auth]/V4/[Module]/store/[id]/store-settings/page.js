@@ -131,7 +131,7 @@ export default function Page({ staffs, store, currentStoreKeeper, EXPRESS_PRIVAT
               </div>
 
               {/* Status */}
-              <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
                 <div>
                   <Label>Store Status</Label>
                   <p className="text-sm text-muted-foreground">

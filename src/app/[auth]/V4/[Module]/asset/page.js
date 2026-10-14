@@ -142,7 +142,7 @@ export default async function AssetLayout({ children, params }) {
       </Notch>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <UiCard className="shadow-sm">
           <CardHeader>
             <CardTitle>Asset Management</CardTitle>
@@ -153,17 +153,17 @@ export default async function AssetLayout({ children, params }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {/* Total Assets */}
               <UiCard className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-gray-900">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <p className="text-sm text-muted-foreground">Total Assets</p>
-                  <p className="text-3xl font-bold mt-2">{totalAssets}</p>
+                  <p className="text-2xl lg:text-3xl font-bold mt-2 break-all">{totalAssets}</p>
                 </CardContent>
               </UiCard>
 
               {/* Total Value */}
               <UiCard className="bg-gradient-to-br from-green-50 to-white dark:from-green-950 dark:to-gray-900">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <p className="text-sm text-muted-foreground">Total Asset Value</p>
-                  <p className="text-3xl font-bold mt-2">
+                  <p className="text-2xl lg:text-3xl font-bold mt-2 break-all">
                     ₦{totalValue.toLocaleString()}
                   </p>
                 </CardContent>
@@ -171,17 +171,17 @@ export default async function AssetLayout({ children, params }) {
 
               {/* Depreciated Assets */}
               <UiCard className="bg-gradient-to-br from-orange-50 to-white dark:from-orange-950 dark:to-gray-900">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <p className="text-sm text-muted-foreground">Depreciated Assets</p>
-                  <p className="text-3xl font-bold mt-2 text-orange-600">{depreciatedAssets}</p>
+                  <p className="text-2xl lg:text-3xl font-bold mt-2 break-all text-orange-600">{depreciatedAssets}</p>
                 </CardContent>
               </UiCard>
 
               {/* Running / Active Assets */}
               <UiCard className="bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950 dark:to-gray-900">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <p className="text-sm text-muted-foreground">Running Assets</p>
-                  <p className="text-3xl font-bold mt-2 text-emerald-600">{runningAssets}</p>
+                  <p className="text-2xl lg:text-3xl font-bold mt-2 break-all text-emerald-600">{runningAssets}</p>
                 </CardContent>
               </UiCard>
             </div>
@@ -194,7 +194,7 @@ export default async function AssetLayout({ children, params }) {
                 <TableRow>
                   <TableHead>Asset Name</TableHead>
                   <TableHead>Code</TableHead>
-                  <TableHead>Value</TableHead>
+                  <TableHead className="text-right">Value</TableHead>
                   <TableHead>Acquisition Date</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -209,7 +209,7 @@ export default async function AssetLayout({ children, params }) {
                         </Link>
                       </TableCell>
                       <TableCell>{asset.AssetCode || "—"}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
                         {asset.CurrentValue 
                           ? `₦${Number(asset.CurrentValue).toLocaleString()}`
                           : "—"}

@@ -65,6 +65,7 @@ import {
 } from "@/components/ui/select";
 
 export default function NavWrapper({ userData, data, navtitle }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const Data = data || [];
@@ -210,7 +211,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
       href: "/SalesPortal/Inventory",
       label: "Inventory",
       icon: Warehouse,
-      show: !!userData?.user?.workLocation,
+      show: false,
       active: navtitle === "Inventory",
     },
   ];
@@ -242,7 +243,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
                 )}
               >
                 <item.icon className="h-5 w-5 shrink-0" />
-                <span>{item.label}</span>
+                <span className="truncate">{item.label}</span>
               </Link>
             ))}
 
@@ -326,7 +327,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="left"
-          className="w-72 border-r border-white/10 bg-zinc-950/95 p-0 text-white backdrop-blur-xl [&>button]:hidden"
+          className="w-72 max-w-[85vw] border-r border-white/10 bg-zinc-950/95 p-0 text-white backdrop-blur-xl [&>button]:hidden"
         >
           <div className="flex items-center justify-between px-5 py-4">
             <SheetHeader className="p-0">
@@ -345,7 +346,7 @@ export default function NavWrapper({ userData, data, navtitle }) {
             </SheetClose>
           </div>
           <Separator className="bg-white/10" />
-          <div className="h-[calc(100vh-73px)] px-4 py-4">
+          <div className="h-[calc(100dvh-73px)] px-4 py-4">
             <SidebarContent />
           </div>
         </SheetContent>
@@ -466,7 +467,7 @@ export function DialogDemo({ userData }) {
 
       <DialogContent className="sm:max-w-xl overflow-hidden rounded-2xl p-0">
         {/* Header */}
-        <div className="relative bg-zinc-950 px-6 py-6 text-white">
+        <div className="relative bg-zinc-950 px-4 py-5 sm:px-6 sm:py-6 text-white">
           <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
           <DialogHeader className="relative z-10">
             <DialogTitle className="text-xl font-semibold tracking-tight">
@@ -476,7 +477,7 @@ export function DialogDemo({ userData }) {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-5 px-6 py-6">
+          <div className="space-y-5 px-4 py-5 sm:px-6 sm:py-6">
             <div className="space-y-2">
               <Label htmlFor="Username">Business Name</Label>
               <Input
@@ -542,7 +543,7 @@ export function DialogDemo({ userData }) {
             </div>
           </div>
 
-          <DialogFooter className="border-t bg-muted/40 px-6 py-4">
+          <DialogFooter className="gap-2 border-t bg-muted/40 px-4 py-4 sm:px-6">
             <DialogClose asChild>
               <Button type="button" variant="outline">
                 Cancel
@@ -608,7 +609,7 @@ export function Card({ data, module }) {
               </div>
 
               <div className="min-w-0 flex-1 space-y-1">
-                <p className="truncate text-sm font-semibold leading-none">
+                <p className="truncate text-sm font-semibold leading-tight">
                   {truncate(title)}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
@@ -620,7 +621,7 @@ export function Card({ data, module }) {
         </Link>
       </HoverCardTrigger>
 
-      <HoverCardContent className="w-64" side="top">
+      <HoverCardContent className="w-64 max-w-[calc(100vw-2rem)] break-words" side="top">
         <div className="space-y-1.5">
           <p className="text-sm font-semibold">{title}</p>
           <p className="text-xs text-muted-foreground">{subtitle}</p>

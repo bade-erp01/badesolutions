@@ -123,11 +123,11 @@ function GeneralSalesMargin({
       <div className="space-y-8 animate__animated animate__fadeInUp">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">General Sales Margin</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">General Sales Margin</h2>
             <p>Overall performance • {format(new Date(), "yyyy")}</p>
           </div>
         </div>
-        <div className="h-[420px] flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl border">
+        <div className="h-[300px] sm:h-[420px] flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 rounded-3xl border">
           <div className="text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-zinc-400 mx-auto"></div>
             <p className="mt-4 text-sm text-zinc-500">Loading sales analytics...</p>
@@ -141,26 +141,26 @@ function GeneralSalesMargin({
     <div className="space-y-8 animate__animated animate__fadeInUp">
       {/* Header + KPIs */}
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">General Sales Margin</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">General Sales Margin</h2>
           <p>Overall performance • {format(new Date(), "yyyy")}</p>
         </div>
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
 
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 w-full">
           {/* last year sales */}
-          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800">
             <p className="text-sm">Total Revenue • {prevYear}</p>
-            <p className="text-xl font-semibold mt-1">₦{prevTotal.toLocaleString()}</p>
+            <p className="text-xl font-semibold mt-1 break-all">₦{prevTotal.toLocaleString()}</p>
           </div>
           
           {/* Total Revenue */}
-          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800">
             <p className="text-sm">Total Revenue • {format(new Date(), "yyyy")}</p>
-            <p className="text-xl font-semibold mt-1 text-green-600">₦{totalRevenue.toLocaleString()}</p>
+            <p className="text-xl font-semibold mt-1 break-all text-green-600">₦{totalRevenue.toLocaleString()}</p>
           </div>
 
           {/* YoY Growth */}
-          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800">
             <p className="text-sm">YoY Growth</p>
             <p className={`text-xl font-semibold mt-1 ${parseFloat(yoyGrowth) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
               {parseFloat(yoyGrowth) >= 0 ? "+" : ""}
@@ -170,7 +170,7 @@ function GeneralSalesMargin({
           </div>
 
           {/* MoM Growth */}
-          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]">
+          <div className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800">
             <p className="text-sm">MoM Growth</p>
             <p className={`text-xl font-semibold mt-1 ${parseFloat(momGrowth) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
               {parseFloat(momGrowth) >= 0 ? "+" : ""}
@@ -184,12 +184,12 @@ function GeneralSalesMargin({
       {error && <div className="text-red-600 bg-red-50 p-4 rounded-xl">{error}</div>}
 
       {/* Chart */}
-      <div className="dark:bg-zinc-900 rounded-3xl border p-6">
+      <div className="dark:bg-zinc-900 rounded-3xl border p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-semibold text-lg">Monthly Sales Trend for {format(new Date(), "yyyy")}</h3>
         </div>
 
-        <div className="w-full h-[380px]">
+        <div className="w-full h-[280px] sm:h-[380px]">
           <Bar
             data={{
               labels: chartData.map((d) => d.month),

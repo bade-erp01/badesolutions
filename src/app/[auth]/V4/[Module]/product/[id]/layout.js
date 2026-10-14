@@ -75,7 +75,7 @@ export default async function layout({ params, children }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col min-w-0">
       <Notch>
         <BackButton />
         <hr />
@@ -104,7 +104,7 @@ export default async function layout({ params, children }) {
       </Notch>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <SingleProductpage
           userInfo={userInfo.user}
           businessInfo={userInfo.business}

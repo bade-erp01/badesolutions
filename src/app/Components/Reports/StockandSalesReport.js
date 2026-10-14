@@ -355,6 +355,7 @@ export default function StockandSalesReport({ baseUrl, userData }) {
       Swal.fire({
         title: "Stock & Sales Report",
         html: `
+          <style> @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
           <div style="font-size:12px;color:#718096;margin-bottom:12px;">
             Period: <strong>${escapeHtml(startDate)}</strong> → <strong>${escapeHtml(endDate)}</strong>
           </div>

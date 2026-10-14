@@ -71,24 +71,24 @@ export default function BecomeMarketerPage() {
       <section className="relative overflow-hidden border-b border-zinc-200">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-zinc-100" />
 
-        <div className="relative max-w-7xl mx-auto px-4 py-24">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 py-14 sm:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* LEFT */}
             <div>
               <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-sm font-medium text-blue-700 mb-6">
                 BADE Partner Program
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-tight">
-                Become a BADE marketer
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-tight">
+                Join the BADE team.
               </h1>
 
-              <p className="mt-6 text-lg text-zinc-600 leading-relaxed max-w-xl">
+              <p className="mt-6 text-base sm:text-lg text-zinc-600 leading-relaxed max-w-xl">
                 Help businesses modernize operations with BADE ERP while earning
                 recurring commissions and growing your professional network.
               </p>
 
-              <div className="mt-10 grid grid-cols-2 gap-4">
+              <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   {
                     icon: TrendingUp,
@@ -111,12 +111,12 @@ export default function BecomeMarketerPage() {
                     key={i}
                     className="rounded-2xl border-zinc-200 shadow-sm"
                   >
-                    <CardContent className="p-5 flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <CardContent className="p-4 sm:p-5 flex items-center gap-4">
+                      <div className="h-12 w-12 shrink-0 rounded-xl bg-blue-100 flex items-center justify-center">
                         <item.icon className="h-5 w-5 text-blue-700" />
                       </div>
 
-                      <div>
+                      <div className="min-w-0">
                         <p className="font-medium text-sm">{item.title}</p>
                       </div>
                     </CardContent>
@@ -133,17 +133,18 @@ export default function BecomeMarketerPage() {
                   alt="marketing"
                   width={1200}
                   height={900}
-                  className="w-full h-[650px] object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="w-full h-[320px] sm:h-[450px] lg:h-[650px] object-cover"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                <div className="absolute bottom-0 p-8 text-white">
-                  <p className="text-sm uppercase tracking-[0.3em] text-blue-200">
+                <div className="absolute bottom-0 p-5 sm:p-8 text-white">
+                  <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-blue-200">
                     Partner with BADE
                   </p>
 
-                  <h3 className="text-3xl font-semibold mt-3">
+                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold mt-3">
                     Build income by connecting businesses to modern ERP systems.
                   </h3>
                 </div>
@@ -154,10 +155,10 @@ export default function BecomeMarketerPage() {
       </section>
 
       {/* FORM */}
-      <section className="py-24 bg-zinc-50">
+      <section className="py-14 sm:py-24 bg-zinc-50">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl font-semibold tracking-tight">
+          <div className="text-center mb-10 sm:mb-14">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">
               Apply to become a marketer
             </h2>
 
@@ -168,10 +169,10 @@ export default function BecomeMarketerPage() {
           </div>
 
           <Card className="rounded-3xl border border-zinc-200 shadow-xl bg-white">
-            <CardContent className="p-8 md:p-10">
+            <CardContent className="p-5 sm:p-8 md:p-10">
               <form
                 onSubmit={handleSubmit}
-                className="grid md:grid-cols-2 gap-8"
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
               >
                 {/* FULL NAME */}
                 <div className="space-y-2">
@@ -261,7 +262,7 @@ export default function BecomeMarketerPage() {
                   <Label>Marketing channel</Label>
 
                   <Select onValueChange={handleSelect}>
-                    <SelectTrigger className="h-12 rounded-xl">
+                    <SelectTrigger className="w-full h-12 data-[size=default]:h-12 rounded-xl">
                       <SelectValue placeholder="Select marketing type" />
                     </SelectTrigger>
 
@@ -346,10 +347,10 @@ export default function BecomeMarketerPage() {
       </section>
 
       {/* BENEFITS */}
-      <section className="py-24">
+      <section className="py-14 sm:py-24">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl font-semibold">
+          <div className="text-center mb-10 sm:mb-14">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold">
               Why partner with BADE?
             </h2>
 
@@ -358,7 +359,7 @@ export default function BecomeMarketerPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
                 icon: BadgeDollarSign,
@@ -382,12 +383,12 @@ export default function BecomeMarketerPage() {
                 key={i}
                 className="rounded-3xl border-zinc-200 shadow-sm"
               >
-                <CardContent className="p-8">
+                <CardContent className="p-6 sm:p-8">
                   <div className="h-14 w-14 rounded-2xl bg-blue-100 flex items-center justify-center">
                     <item.icon className="h-6 w-6 text-blue-700" />
                   </div>
 
-                  <h3 className="mt-6 text-xl font-semibold">
+                  <h3 className="mt-6 text-lg sm:text-xl font-semibold">
                     {item.title}
                   </h3>
 

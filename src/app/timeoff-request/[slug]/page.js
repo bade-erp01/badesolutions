@@ -93,16 +93,16 @@ export default function Page({user,baseUrl}) {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-100 flex items-center justify-center px-4 py-10">
+    <main className="min-h-dvh bg-zinc-100 flex items-center justify-center px-4 py-6 sm:py-10">
       <Card className="w-full max-w-3xl shadow-2xl rounded-3xl border-zinc-200">
         <CardHeader className="space-y-3 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-900 text-white">
             <CalendarDays className="h-7 w-7" />
           </div>
-          <CardTitle className="text-3xl font-semibold tracking-tight text-zinc-900">
+          <CardTitle className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
             Time Off Request
           </CardTitle>
-          <CardDescription className="text-base text-zinc-600 max-w-xl mx-auto">
+          <CardDescription className="text-sm sm:text-base text-zinc-600 max-w-xl mx-auto">
             Submit your leave request for approval. Complete the form below.
           </CardDescription>
         </CardHeader>
@@ -112,7 +112,7 @@ export default function Page({user,baseUrl}) {
             <div className="">
               <div className="space-y-2">
                 <Label>Full Name</Label>
-               <p className="font-semibold p-1 w-full border rounded"> {user.firstName} {user.lastName}</p>
+               <p className="font-semibold p-1 w-full border rounded break-words"> {user.firstName} {user.lastName}</p>
               </div>
             </div>
 
@@ -126,7 +126,7 @@ export default function Page({user,baseUrl}) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label>Reference No:</Label>
-               <p className="text-sm p-1 font-bold"> {form.RefNo }</p>
+               <p className="text-sm p-1 font-bold break-all"> {form.RefNo }</p>
               </div>
             </div>
 
@@ -137,7 +137,7 @@ export default function Page({user,baseUrl}) {
                   onValueChange={(val) => handleChange("leaveType", val)}
                   value={form.leaveType}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select leave type" />
                   </SelectTrigger>
                   <SelectContent>

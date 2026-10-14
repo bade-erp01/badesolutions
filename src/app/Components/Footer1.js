@@ -69,11 +69,11 @@ export default function Footer2() {
             type="email"
             id="email"
             placeholder="you@example.com"
-            className="w-full px-4 py-2 rounded-l-md bg-gray-800 text-white border border-gray-700 focus:outline-none"
+            className="w-full min-w-0 px-4 py-2 rounded-l-md bg-gray-800 text-white border border-gray-700 focus:outline-none"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-500 transition"
+            className="shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-500 transition"
           >
             Subscribe
           </button>

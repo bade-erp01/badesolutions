@@ -53,11 +53,11 @@ export default function InventoryTable({ data }) {
   };
 
   return (
-    <div className="p-4 rounded-xl">
+    <div className="p-0 sm:p-4 rounded-xl">
       {/* Warehouse Header + Search */}
       <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-semibold ">
+          <h3 className="text-xl sm:text-2xl font-semibold break-words">
             {data.Store?.WHName || "Warehouse Inventory"}
           </h3>
           <p className="text-sm mt-1">
@@ -177,7 +177,7 @@ export default function InventoryTable({ data }) {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12">
+                <TableCell colSpan={10} className="text-center py-12">
                   No products found matching your search.
                 </TableCell>
               </TableRow>
@@ -188,7 +188,7 @@ export default function InventoryTable({ data }) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6 px-2">
+        <div className="flex items-center justify-between gap-2 mt-6 px-2">
           <Button
             variant="outline"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

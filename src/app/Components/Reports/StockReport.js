@@ -191,7 +191,7 @@ export default function StockReportModal({ baseUrl, userData }) {
     };
 
     const htmlContent = `
-      <style> tr:hover { background-color: #f7fafc; } </style>
+      <style> tr:hover { background-color: #f7fafc; } @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
       <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px;">
         <div>
           <label style="font-weight: 600; font-size: 12px;">Vendors</label><br/>
@@ -267,7 +267,7 @@ export default function StockReportModal({ baseUrl, userData }) {
     Swal.fire({
       title: "Inventory Valuation Report",
       html: htmlContent,
-      width: "80%",
+      width: "max(80%, min(95vw, 640px))",
       showConfirmButton: false,
       showCloseButton: true,
       didOpen: () => {

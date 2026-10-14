@@ -146,7 +146,7 @@ export default function LocationGuard({ children }) {
                 <MapPin className="h-10 w-10 text-amber-500" />
               </div>
               <div className="space-y-2">
-                <CardTitle className="text-2xl text-zinc-50">
+                <CardTitle className="text-xl sm:text-2xl text-zinc-50">
                   Location Required
                 </CardTitle>
                 <CardDescription className="text-zinc-400 leading-relaxed">

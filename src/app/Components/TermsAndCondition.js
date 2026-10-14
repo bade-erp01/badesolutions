@@ -38,7 +38,7 @@ export default function TermsAndConditionsLink({ BusinessPlan }) {
       showConfirmButton: false,
       showCancelButton: false,
       width: "680px",
-      padding: "2rem",
+      padding: window.innerWidth < 640 ? "1.25rem" : "2rem",
       background: isDark ? "#0f172a" : "#ffffff",
       color: isDark ? "#e2e8f0" : "#0f172a",
       backdrop: isDark 
@@ -51,7 +51,7 @@ export default function TermsAndConditionsLink({ BusinessPlan }) {
             ? "border-slate-700 bg-slate-900" 
             : "border-slate-200 bg-white"
         }`,
-        title: `text-2xl font-semibold mb-6 ${
+        title: `text-xl sm:text-2xl font-semibold mb-6 ${
           isDark ? "text-white" : "text-slate-900"
         }`,
         htmlContainer: "text-inherit",

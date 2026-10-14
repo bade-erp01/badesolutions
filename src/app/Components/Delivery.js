@@ -89,13 +89,13 @@ export default function DeliveryModal({ id, user, business }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold ">
+            <DialogTitle className="text-xl sm:text-2xl font-bold ">
               Invoice Details
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 text-left ">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label className="mb-2">Invoice Date *</Label>
                 <Input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} />
@@ -106,7 +106,7 @@ export default function DeliveryModal({ id, user, business }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label className="mb-2">Driver Name *</Label>
                 <Input type="text" placeholder="Enter full name" value={driverName} onChange={(e) => setDriverName(e.target.value)} />

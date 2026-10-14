@@ -47,7 +47,7 @@ export default function VendorCreditnoteTable({ data,vendorsList }) {
   
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-3 bg-gray-300">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-3 bg-gray-300">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-black mb-2">{Path.id}</h1>
@@ -58,7 +58,7 @@ export default function VendorCreditnoteTable({ data,vendorsList }) {
       {/* Table */}
       <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+          <table className="w-full min-w-[640px] text-sm text-left">
             <thead className="text-xs uppercase bg-gray-900 text-gray-300">
               <tr>
                 <th className="px-6 py-4 font-medium">Ref #</th>
@@ -72,7 +72,7 @@ export default function VendorCreditnoteTable({ data,vendorsList }) {
             <tbody className="divide-y divide-gray-700 text-xs">
               {filteredNotes.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-400">
+                  <td colSpan="6" className="px-6 py-8 text-center text-gray-400">
                     <div className="flex flex-col items-center">
                       <svg className="w-12 h-12 mb-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -120,7 +120,7 @@ export default function VendorCreditnoteTable({ data,vendorsList }) {
 
       {/* Pagination */}
       {filteredNotes.length > 0 && (
-        <div className="flex justify-between items-center mt-6 bg-gray-800 px-6 py-4 rounded-lg">
+        <div className="flex justify-between items-center gap-2 mt-6 bg-gray-800 px-3 sm:px-6 py-4 rounded-lg">
           <button
             className="px-4 py-2 bg-gray-700 rounded-md text-gray-300 hover:bg-gray-600 
                      disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"

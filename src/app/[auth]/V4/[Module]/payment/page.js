@@ -75,7 +75,7 @@ export default async function paymentlayout({ children, params }) {
     const parsedUsers = JSON.parse(StringedUser);
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col">
         {/* Sidebar (collapsible on mobile) */}
         <Notch
           className={`bg-[#1e1e20]/80 backdrop-blur-lg

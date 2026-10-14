@@ -28,14 +28,14 @@ function CustomerCard({ customer, index, today }) {
     <Card className="shadow-md">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <CardHeader className="flex flex-row items-center gap-4 cursor-pointer">
-            <Avatar>
+          <CardHeader className="flex flex-row items-center gap-3 sm:gap-4 cursor-pointer">
+            <Avatar className="shrink-0">
               <AvatarFallback>
                 {customer.Username?.trim().charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <CardTitle>
+            <div className="flex-1 min-w-0">
+              <CardTitle className="break-words">
                 <Link
                   href={`/SalesPortal/Customers/${Encrypt(customer._id)}`}
                   className="hover:underline"
@@ -47,7 +47,7 @@ function CustomerCard({ customer, index, today }) {
             </div>
             {/* Arrow icon */}
             <svg
-              className={`w-5 h-5 transform transition-transform duration-300 ${
+              className={`w-5 h-5 shrink-0 transform transition-transform duration-300 ${
                 isOpen ? "rotate-180" : ""
               }`}
               fill="none"
@@ -70,31 +70,31 @@ function CustomerCard({ customer, index, today }) {
           <CardContent className="flex flex-col md:flex-row md:gap-6 mt-4">
             {/* Customer Info */}
             <div className="md:w-1/2 space-y-3 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">Code:</span>
                 <Badge variant="secondary">{customer.CustomerCode}</Badge>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">Contact Person:</span>
                 <Badge variant="outline">{customer.ContactPerson}</Badge>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">Tel:</span>
                 <Badge variant="outline">{customer.phone}</Badge>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">Address:</span>
-                <span variant="secondary" className={`flex-wrap`}>
+                <span className="min-w-0 break-words">
                   {customer.deliveryAddress || customer.billingAddress}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium">Email:</span>
-                <Badge variant="outline">{customer.Email}</Badge>
+                <Badge variant="outline" className="max-w-full whitespace-normal break-all">{customer.Email}</Badge>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -148,13 +148,13 @@ export default function Page({ userInfo, data }) {
   const today = moment().format("dddd").toLowerCase();
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-3 sm:p-6 bg-gray-50 min-h-dvh">
       <h2 className="text-sm font-bold mb-2">
         {moment().format("dddd")}s Route Plan
       </h2>
 
       {data && data.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {data.map((customer, index) => (
             <CustomerCard
               key={customer._id || index}

@@ -46,8 +46,8 @@ export default async function Employeelayout({ children, params }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
-      <div className="flex flex-1 text-white bt-2 ">
+    <div className="flex flex-col min-w-0">
+      <div className="flex flex-1 min-w-0 text-white bt-2 ">
         <Notch>
             <BackButton />
             {userData?.user?.ReportUser && (
@@ -80,7 +80,7 @@ export default async function Employeelayout({ children, params }) {
             )}
         </Notch>
 
-        <main className="flex-2">
+        <main className="flex-2 min-w-0">
           {children}
         </main>
       </div>

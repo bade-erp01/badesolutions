@@ -129,13 +129,13 @@ export default function NewCustomerForm({
       <div className="">   {/* ← Wider form */}
         <Card className="shadow-xl border">
           <CardHeader className="rounded-t-lg">
-            <CardTitle className="text-3xl font-bold">New Customer</CardTitle>
-            <CardDescription className=" text-base">
+            <CardTitle className="text-2xl sm:text-3xl font-bold">New Customer</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Please provide accurate customer information to ensure smooth onboarding.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-8">
+          <CardContent className="p-4 sm:p-6 lg:p-8">
             <form onSubmit={handleSubmit} autoComplete="off" className="space-y-8">
               {/* Server Messages */}
               {serverMsg && (
@@ -156,7 +156,7 @@ export default function NewCustomerForm({
                 </Alert>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Name */}
                 <div className="space-y-2">
                   <Label htmlFor="Name" className="text-sm font-semibold">
@@ -241,7 +241,7 @@ export default function NewCustomerForm({
                     value={formData.salesPerson || ""}
                     onValueChange={(value) => handleSelectChange("salesPerson", value)}
                   >
-                    <SelectTrigger className={errors.salesPerson ? "border-red-500" : ""}>
+                    <SelectTrigger className={`w-full ${errors.salesPerson ? "border-red-500" : ""}`}>
                       <SelectValue placeholder="Choose Sales Person" />
                     </SelectTrigger>
                     <SelectContent>
@@ -264,7 +264,7 @@ export default function NewCustomerForm({
                     value={formData.Manager || ""}
                     onValueChange={(value) => handleSelectChange("Manager", value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select Account Manager" />
                     </SelectTrigger>
                     <SelectContent>
@@ -301,7 +301,7 @@ export default function NewCustomerForm({
                     type="submit"
                     disabled={loading}
                     size="lg"
-                    className="min-w-[220px]"
+                    className="w-full sm:w-auto sm:min-w-[220px]"
                   >
                     {loading ? (
                       <>

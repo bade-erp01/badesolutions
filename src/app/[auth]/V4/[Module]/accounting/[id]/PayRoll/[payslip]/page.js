@@ -154,9 +154,9 @@ export default function PayrollPage() {
     : 0;
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
+    <div className="container mx-auto py-2 sm:py-6 lg:py-8 px-0 sm:px-4 space-y-6 sm:space-y-8">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">
@@ -165,7 +165,7 @@ export default function PayrollPage() {
             <Users className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{totalEmployees}</div>
+            <div className="text-2xl lg:text-3xl font-bold break-all">{totalEmployees}</div>
           </CardContent>
         </Card>
 
@@ -177,7 +177,7 @@ export default function PayrollPage() {
             <DollarSign className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl lg:text-3xl font-bold break-all">
               ₦{totalGross.toLocaleString()}
             </div>
           </CardContent>
@@ -191,7 +191,7 @@ export default function PayrollPage() {
             <TrendingUp className="h-5 w-5 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-emerald-600">
+            <div className="text-2xl lg:text-3xl font-bold break-all text-emerald-600">
               ₦{totalNetPayable.toLocaleString()}
             </div>
           </CardContent>
@@ -205,7 +205,7 @@ export default function PayrollPage() {
             <AlertCircle className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl lg:text-3xl font-bold break-all">
               ₦{avgNetPay.toLocaleString()}
             </div>
           </CardContent>
@@ -215,9 +215,9 @@ export default function PayrollPage() {
       {/* Main Table Card */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-3xl font-bold">
+          <div className="flex justify-between items-start sm:items-center gap-3">
+            <div className="min-w-0">
+              <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">
                 {payroll.title.toUpperCase()}
               </CardTitle>
               <p className="text-muted-foreground">

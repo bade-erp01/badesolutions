@@ -498,11 +498,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-full p-6 bg-[#fafafa] shadow-2xl border space-y-8 text-xs border-2 mr-3 ml-3"
+      className="max-w-full min-w-0 p-3 sm:p-6 bg-[#fafafa] shadow-2xl border space-y-6 sm:space-y-8 text-xs border-2 sm:mx-3"
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <span className="text-sm text-gray-600 italic">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <span className="text-sm text-gray-600 italic break-words">
             Registration Date:{" "}
             {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
           </span>
@@ -510,8 +510,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         <span
           className={`px-5 py-1.5 rounded-full font-semibold text-base tracking-wide shadow-sm border ${
             cust.Debt < 0
-              ? "text-md text-green-700 bg-green-100 border border-green-600 rounded-full px-4 py-2"
-              : "text-md text-red-700 bg-red-100 border border-red-300 rounded-full px-4 py-2"
+              ? "text-base text-green-700 bg-green-100 border border-green-600 rounded-full px-4 py-2"
+              : "text-base text-red-700 bg-red-100 border border-red-300 rounded-full px-4 py-2"
           }`}
         >
           {cust.Debt?.toLocaleString(undefined, {
@@ -523,14 +523,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
       {/* Quick Actions */}
       <Section title="⚙️ Quick Actions">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-2 sm:gap-4">
           {userInfo.user.raiseInvoice &&
             !cust.blocked &&
             cust.location &&
             cust.priceList && (
               <span
                 onClick={handleCreateInvoice}
-                className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-label="Create Invoice"
               >
                 <svg
@@ -555,7 +555,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
           <span
             onClick={() => GenerateSummary(Encrypt(cust._id))}
-            className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="Print Statement"
           >
             <PrinterIcon className="h-5 w-5 text-white" />
@@ -574,7 +574,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     config,
                   )
                 }
-                className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 aria-label="Register Payment"
               >
                 <WalletIcon className="h-5 w-5 text-white" />
@@ -597,7 +597,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       <div className="border rounded-lg overflow-hidden ">
         <span
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+          className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">Form</h2>
           <svg
@@ -617,11 +617,11 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+          className={`px-2 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
             isOpen ? "block" : "hidden"
           }`}
         >
-          <div className="bg-gray-50 p-3">
+          <div className="bg-gray-50 p-2 sm:p-3 space-y-4">
             {/* Identity */}
             <Section title="Identity">
               <Grid>
@@ -659,7 +659,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     name="customerType"
                     value={formData.customerType || ""}
                     onChange={handleChange}
-                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 text-base sm:text-sm"
                   >
                     <option value={cust.customerType}>
                       {cust.customerType || "Choose..."}
@@ -773,7 +773,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                       : "Not in Debt"}
                   </label>
 
-                  <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                  <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide break-words">
                     {formData.Debt?.toLocaleString()}
                   </div>
                 </div>
@@ -783,7 +783,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     Credit Limit
                   </label>
 
-                  <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide">
+                  <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 shadow-inner font-medium text-base tracking-wide break-words">
                     {formData.creditLimit?.toLocaleString()}
                   </div>
                 </div>
@@ -797,7 +797,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     name="paymentTerms"
                     value={formData.paymentTerms || ""}
                     onChange={handleChange}
-                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 text-base sm:text-sm"
                   >
                     <option
                       value={cust.paymentTerms}
@@ -840,7 +840,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     name="preferredShippingMethod"
                     value={formData.preferredShippingMethod || ""}
                     onChange={handleChange}
-                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+                    className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 text-base sm:text-sm"
                   >
                     <option value={cust.preferredShippingMethod}>
                       {cust.preferredShippingMethod || "Select one"}
@@ -859,7 +859,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       <div className="border rounded-lg overflow-hidden ">
         <span
           onClick={() => setisOpen2(!isOpen2)}
-          className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+          className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">Ledger</h2>
           <svg
@@ -879,16 +879,16 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+          className={`px-2 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
             isOpen2 ? "block" : "hidden"
           }`}
         >
           {/* Recent Transactions */}
           <Section title="">
-            <div className="bg-gray-50 rounded-lg p-4 shadow overflow-x-auto">
+            <div className="bg-gray-50 rounded-lg p-2 sm:p-4 shadow overflow-x-auto">
               {data && data.transcations.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm text-gray-700">
+                  <table className="min-w-full whitespace-nowrap text-sm text-gray-700">
                     <thead>
                       <tr className="bg-gray-100 text-left">
                         <th className="px-2 py-1">Ref No</th>
@@ -944,12 +944,12 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                     <caption>
                       <div className="space-y-2 mt-2">
                         {cust.Debt < 0 ? (
-                          <p className="text-sm text-yellow-700 bg-purple-300 border border-purple-600 rounded-md px-4 py-2">
+                          <p className="whitespace-normal text-sm text-yellow-700 bg-purple-300 border border-purple-600 rounded-md px-4 py-2">
                             💡 Kindly Note that {userInfo.business.companyName}{" "}
                             owes {cust.Username} <strong>{cust.Debt}</strong>.
                           </p>
                         ) : (
-                          <p className="text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2">
+                          <p className="whitespace-normal text-sm text-red-700 bg-yellow-100 border border-red-300 rounded-md px-4 py-2">
                             ⚠️ Kindly Note that {cust.Username} owes your
                             Business <strong>{cust.Debt}</strong>.
                           </p>
@@ -972,13 +972,13 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                   </table>
 
                   {/* Pagination Controls */}
-                  <div className="flex justify-between items-center mt-4 text-sm">
+                  <div className="flex justify-between items-center gap-2 mt-4 text-sm">
                     <span
                       onClick={() =>
                         setCurrentPage((prev) => Math.max(prev - 1, 1))
                       }
                       disabled={currentPage === 1}
-                      className="px-3 py-1 bg-gray-400 rounded disabled:opacity-50"
+                      className={`px-3 py-2 bg-gray-400 rounded cursor-pointer ${currentPage === 1 ? "opacity-50" : ""}`}
                     >
                       Previous
                     </span>
@@ -992,7 +992,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                         setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                       }
                       disabled={currentPage === totalPages}
-                      className="px-3 py-1 bg-gray-500 rounded disabled:opacity-50"
+                      className={`px-3 py-2 bg-gray-500 rounded cursor-pointer ${currentPage === totalPages ? "opacity-50" : ""}`}
                     >
                       Next
                     </span>
@@ -1010,7 +1010,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       <div className="border rounded-lg overflow-hidden ">
         <span
           onClick={() => setisOpen3(!isOpen3)}
-          className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+          className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">
             Geo‑coordinates
@@ -1032,15 +1032,15 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+          className={`px-2 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
             isOpen3 ? "block" : "hidden"
           }`}
         >
           {/* Activity Log */}
           <Section title="">
-            <div className="bg-gray-50 rounded-lg p-4 overflow-x-auto">
+            <div className="bg-gray-50 rounded-lg p-2 sm:p-4 overflow-x-auto">
               {/* display shop location on google maps here */}
-              <div className="w-full h-96 rounded-lg overflow-hidden shadow-md">
+              <div className="w-full h-64 sm:h-96 rounded-lg overflow-hidden shadow-md">
                 {cust.latitude && cust.longitude ? (
                   <iframe
                     title="Customer Location"
@@ -1066,7 +1066,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       <div className="border rounded-lg overflow-hidden">
         <span
           onClick={() => setisOpen4(!isOpen4)}
-          className="w-full px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium hover:bg-gray-100 transition"
+          className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
         >
           <h2 className="text-base/7 font-semibold text-gray-900">
             Sales Pipeline
@@ -1088,7 +1088,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           </svg>
         </span>
         <div
-          className={`px-4 py-3 text-gray-600 transition-all duration-300 ${
+          className={`px-2 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
             isOpen4 ? "block" : "hidden"
           }`}
         >
@@ -1107,14 +1107,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
         <div className="pt-4">
           <button
             type="submit"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 transition"
+            className="w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 transition"
           >
             Save Changes
           </button>
         </div>
       )}
 
-      <span className="text-sm text-gray-600 italic">
+      <span className="block text-sm text-gray-600 italic break-words">
         Last updated:{" "}
         {moment(cust.updatedAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
       </span>
@@ -1127,15 +1127,22 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 function Section({ title, children }) {
   return (
     <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+      <h3 className="text-base sm:text-lg font-semibold text-gray-700">{title}</h3>
       {children}
     </div>
   );
 }
 
+const gridColumnClasses = {
+  1: "md:grid-cols-1",
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+};
+
 function Grid({ children, columns = 2 }) {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-${columns} gap-4`}>
+    <div className={`grid grid-cols-1 ${gridColumnClasses[columns] || "md:grid-cols-2"} gap-4`}>
       {children}
     </div>
   );
@@ -1160,7 +1167,7 @@ function Input({
         onChange={onChange}
         disabled={disabled}
         readOnly={readonly}
-        className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800"
+        className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 text-base sm:text-sm"
       />
     </div>
   );
@@ -1187,7 +1194,7 @@ function Selects({
         onChange={onChange}
         disabled={disabled}
         readOnly={readonly}
-        className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="mt-1 w-full border border-gray-300 px-3 py-2 rounded-md bg-gray-50 text-gray-800 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
         <option value={value}>-- {value} --</option>
         {options.map((opt, index) => (
@@ -1202,13 +1209,13 @@ function Selects({
 
 function Checkbox({ label, name, checked, onChange }) {
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center gap-2">
       <input
         type="checkbox"
         name={name}
         checked={checked}
         onChange={onChange}
-        className="h-4 w-4 border-gray-300 rounded text-orange-600"
+        className="h-5 w-5 shrink-0 border-gray-300 rounded text-orange-600"
       />
       <label className="text-sm text-gray-700">{label}</label>
     </div>
@@ -1365,13 +1372,13 @@ export function TextareaButton({ user, cust }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <Button className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <QuestionMarkCircleIcon className="h-6 w-6 text-white" />
           Open a support ticket
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="w-full max-w-sm">
+      <DialogContent className="w-full sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>New Ticket</DialogTitle>
         </DialogHeader>
@@ -1467,7 +1474,7 @@ export function MyComponent({ cust, userInfo }) {
   return (
     <span
       onClick={handleCreateInvoice}
-      className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
+      className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-700 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
       aria-label="Create Invoice"
     >
       <CameraIcon className="h-5 w-5 text-white" />
@@ -1600,7 +1607,7 @@ export function GeoButton({ userData, cust }) {
         type="button"
         onClick={() => setOpenConfirm(true)}
         disabled={loading}
-        className="flex items-center gap-2 p-3 rounded-md bg-gray-700 hover:bg-gray-800 text-white w-full"
+        className="flex h-auto items-center gap-2 p-3 rounded-md bg-gray-700 hover:bg-gray-800 text-white w-full whitespace-normal"
       >
         {loading ? (
           <>

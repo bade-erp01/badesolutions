@@ -42,29 +42,29 @@ export default function Page({ data,userData,baseurl }) {
   };
 
   return (
-    <div className="p-6 w-full bg-white shadow-lg rounded-lg">
+    <div className="p-4 sm:p-6 w-full bg-white shadow-lg rounded-lg">
       {/* Header */}
       <div className="border-b pb-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Vendor Debit Note</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Vendor Debit Note</h1>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Left Column */}
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-gray-600">Credit Note ID</label>
-            <p className="mt-1 text-gray-800">{data?.CreditId}</p>
+            <p className="mt-1 text-gray-800 break-words">{data?.CreditId}</p>
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-600">Customer</label>
-            <p className="mt-1 text-gray-800">{data?.customer}</p>
+            <p className="mt-1 text-gray-800 break-words">{data?.customer}</p>
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-600">Total Amount</label>
-            <p className="mt-1 text-gray-800">₦{data?.Total?.toLocaleString()}</p>
+            <p className="mt-1 text-gray-800 break-words">₦{data?.Total?.toLocaleString()}</p>
           </div>
 
           <div>
@@ -85,30 +85,30 @@ export default function Page({ data,userData,baseurl }) {
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium text-gray-600">Date</label>
-            <p className="mt-1 text-gray-800">
+            <p className="mt-1 text-gray-800 break-words">
               {new Date(data?.Date).toLocaleDateString()}
             </p>
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-600">Raised By</label>
-            <p className="mt-1 text-gray-800">{data?.raisedBy}</p>
+            <p className="mt-1 text-gray-800 break-words">{data?.raisedBy}</p>
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-600">Approved By</label>
-            <p className="mt-1 text-gray-800">{data?.ApprovedBy}</p>
+            <p className="mt-1 text-gray-800 break-words">{data?.ApprovedBy}</p>
           </div>
 
           <div>
             <label className="text-sm font-medium text-gray-600">Remarks</label>
-            <p className="mt-1 text-gray-800">{data?.reference}</p>
+            <p className="mt-1 text-gray-800 break-words">{data?.reference}</p>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-8 flex gap-4">
+      <div className="mt-8 flex flex-wrap gap-4">
        {data?.status ==="Closed" && (
          <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"

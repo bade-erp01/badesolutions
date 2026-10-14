@@ -23,7 +23,7 @@ export default function ExpenseCategoriesModal({
           <thead style="background-color: #edf2f7;">
             <tr>
               <th style="padding: 6px; text-align: left;">Name</th>
-              <th style="padding: 6px text-align: center;">Grouped as</th>
+              <th style="padding: 6px; text-align: center;">Grouped as</th>
               <th style="padding: 6px; text-align: right;">Status</th>
             </tr>
           </thead>
@@ -52,7 +52,7 @@ export default function ExpenseCategoriesModal({
           </tbody>
         </table>
       `,
-      width: "50%",
+      width: "max(50%, min(95vw, 640px))",
       showConfirmButton: true,
       confirmButtonText: "Close",
       didOpen: () => {

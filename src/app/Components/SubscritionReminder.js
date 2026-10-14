@@ -9,8 +9,8 @@ const SubscriptionReminder = ({ Business }) => {
   const MySwal = withReactContent(Swal);
 
   useEffect(() => {
-    if (moment(Business.subscriptionEndDate).isValid()) {
-      const diffDays = moment(Business.subscriptionEndDate).diff(moment(), 'days');
+    if (moment(Business?.subscriptionEndDate).isValid()) {
+      const diffDays = moment(Business?.subscriptionEndDate).diff(moment(), 'days');
 
       if (diffDays >= 0 && diffDays < 30) {
         setDaysLeft(diffDays);
@@ -27,7 +27,7 @@ const SubscriptionReminder = ({ Business }) => {
           },
           html: `
             <div style="display: flex; align-items: center;">
-              <img src="${Business.companyLogo}" alt="Company Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;" />
+              <img src="${Business.companyLogo}" alt="Company Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;" />
               <div style="text-align: left;">
                 <strong style="font-size: 14px;">${Business.companyName}</strong><br/>
                 <span style="font-size: 14px;">Your subscription expires in <strong>${diffDays}</strong> day(s)</span>
@@ -37,7 +37,7 @@ const SubscriptionReminder = ({ Business }) => {
         });
       }
     }
-  }, [Business.subscriptionEndDate]);
+  }, [Business?.subscriptionEndDate]);
 
   return null; // This component only triggers the toast
 };

@@ -290,7 +290,7 @@ const PurchaseDumpModal = ({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+      <DialogContent className="sm:max-w-lg border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <DialogHeader>
           <DialogTitle className="text-zinc-900 dark:text-zinc-50">
             Purchase Dump Filters
@@ -350,7 +350,7 @@ const PurchaseDumpModal = ({
               onChange={(e) =>
                 setFilters((f) => ({ ...f, store: e.target.value }))
               }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             >
               <option value="">-- Select Store --</option>
               {StoreList.map((s) => (
@@ -374,7 +374,7 @@ const PurchaseDumpModal = ({
               onChange={(e) =>
                 setFilters((f) => ({ ...f, supplier: e.target.value }))
               }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             >
               <option value="">-- All Suppliers --</option>
               {Vendors.map((v) => (
@@ -398,7 +398,7 @@ const PurchaseDumpModal = ({
               onChange={(e) =>
                 setFilters((f) => ({ ...f, product: e.target.value }))
               }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             >
               <option value="">-- All Products --</option>
               {[...ProductList]

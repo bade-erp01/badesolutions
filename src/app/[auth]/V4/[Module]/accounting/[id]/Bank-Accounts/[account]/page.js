@@ -33,10 +33,10 @@ export default function Page({ data }) {
   )
 
   return (
-    <div className="min-h-screen p-6 space-y-6">
+    <div className="p-0 sm:p-4 lg:p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold mb-2">{Account.NAME}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-2 break-words">{Account.NAME}</h1>
         <p className="text-sm text-muted-foreground">
           Showing {payments.length} most recent account entries.
         </p>
@@ -49,7 +49,7 @@ export default function Page({ data }) {
             <TableRow>
               {["Desc", "Ref", "Status", "Date", "Dr", "Cr", "Bal."].map(
                 (header) => (
-                  <TableHead key={header}>{header}</TableHead>
+                  <TableHead key={header} className={["Dr", "Cr", "Bal."].includes(header) ? "text-right" : undefined}>{header}</TableHead>
                 )
               )}
             </TableRow>
@@ -69,13 +69,13 @@ export default function Page({ data }) {
                 <TableCell className="truncate">
                   {new Date(item.PaymentDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="text-right font-medium">
                   {item.drAmount.toLocaleString()}
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="text-right font-medium">
                   {item.crAmount.toLocaleString()}
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="text-right font-medium">
                   {item.previousBalance.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -86,7 +86,7 @@ export default function Page({ data }) {
 
       {/* Pagination */}
       <Pagination>
-        <PaginationContent>
+        <PaginationContent className="flex-wrap">
           <PaginationItem>
             <PaginationPrevious
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

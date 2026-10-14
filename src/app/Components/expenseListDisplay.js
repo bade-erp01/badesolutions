@@ -81,7 +81,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-wrap justify-between items-center gap-2">
             <div>
               <CardTitle>Expenses</CardTitle>
               <CardDescription>
@@ -154,7 +154,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
               </div>
 
               {/* Pagination */}
-              <div className="flex items-center justify-between mt-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6">
                 <p className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
                   {Math.min(currentPage * itemsPerPage, totalInvoices)} of {totalInvoices} entries

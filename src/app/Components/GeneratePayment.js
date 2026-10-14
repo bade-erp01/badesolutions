@@ -106,7 +106,7 @@ export default function GeneralPaymentMargin({
       <div className="space-y-8 animate__animated animate__fadeInUp">
         <div className="flex justify-between items-end">
           <div>
-            <h2 className="text-3xl font-bold">General Payment Margin</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">General Payment Margin</h2>
             <p>Overall Collection Performance • {moment().format("YYYY")}</p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function GeneralPaymentMargin({
     <div className="space-y-8 animate__animated animate__fadeInUp">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">General Payment Margin</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">General Payment Margin</h2>
           <p>Overall Collection Performance • {moment().format("YYYY")}</p>
         </div>
 

@@ -139,7 +139,7 @@ export default function Page({
   };
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full sm:p-4">
       <Card>
         <CardHeader>
           <CardTitle>Equity Table</CardTitle>
@@ -163,7 +163,7 @@ export default function Page({
                     <TableHead>Raised By</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Transaction</TableHead>
-                    <TableHead>Amount</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
                     <TableHead className="w-[180px]">
                       Actions
                     </TableHead>
@@ -223,7 +223,7 @@ export default function Page({
                           </Badge>
                         </TableCell>
 
-                        <TableCell className="font-semibold">
+                        <TableCell className="text-right font-semibold">
                           ₦{formatAmount(item.amount)}
                         </TableCell>
 
@@ -301,7 +301,7 @@ export default function Page({
 
             {/* Pagination */}
 
-            <div className="flex items-center justify-between border-t p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t p-3 sm:p-4">
               <div className="text-sm text-muted-foreground">
                 Page {currentPage} of {totalPages}
               </div>

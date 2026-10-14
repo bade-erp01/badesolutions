@@ -174,7 +174,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
       </Notch>
 
       {/* Main Content - Table */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <Card>
           <CardHeader>
             <CardTitle>Product Transfers</CardTitle>
@@ -237,7 +237,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 mt-6">
                 <p className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
                   {Math.min(currentPage * itemsPerPage, filteredPurchases.length)} of{" "}

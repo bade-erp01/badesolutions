@@ -122,12 +122,12 @@ const ProductSalesChart = ({ productsList }) => {
 
   return (
     <div className="bg-white dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-zinc-950 
-                    rounded-md p-6 md:p-8 shadow-xl border border-slate-200 dark:border-slate-700/50 mb-3">
+                    rounded-md p-4 sm:p-6 md:p-8 shadow-xl border border-slate-200 dark:border-slate-700/50 mb-3">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-orange-100 dark:bg-orange-500/10 rounded-2xl">
+          <div className="shrink-0 p-3 bg-orange-100 dark:bg-orange-500/10 rounded-2xl">
             <ChartBarIcon className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
@@ -142,26 +142,26 @@ const ProductSalesChart = ({ productsList }) => {
           <div className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">
             TOTAL UNITS SOLD
           </div>
-          <div className="text-4xl font-mono font-bold text-slate-900 dark:text-white tracking-tighter">
+          <div className="text-3xl sm:text-4xl font-mono font-bold text-slate-900 dark:text-white tracking-tighter">
             {totalSales.toLocaleString()}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         {/* Chart Area */}
-        <div className="lg:col-span-7 bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 md:p-6">
-          <div className="h-[460px] md:h-[520px]">
+        <div className="lg:col-span-7 min-w-0 bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 sm:p-5 md:p-6">
+          <div className="h-[360px] sm:h-[460px] md:h-[520px]">
             <Bar data={data} options={options} />
           </div>
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 min-w-0 space-y-6">
           {/* Best Seller */}
           {bestSeller && (
             <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-amber-900/30 dark:to-orange-900/20 
-                            border border-orange-200 dark:border-orange-500/30 rounded-3xl p-7 relative">
+                            border border-orange-200 dark:border-orange-500/30 rounded-3xl p-4 sm:p-7 relative">
               <div className="absolute top-5 right-5">
                 <TrophyIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" />
               </div>
@@ -172,17 +172,17 @@ const ProductSalesChart = ({ productsList }) => {
                 </div>
               </div>
 
-              <div className="flex gap-5">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
                 <Image
                   src={bestSeller.image || "/preview.png"}
                   alt={bestSeller.Name}
                   width={140}
                   height={140}
-                  className="w-32 h-32 md:w-36 md:h-36 object-cover rounded-2xl border border-orange-300 dark:border-orange-400 shadow-md"
+                  className="shrink-0 w-32 h-32 md:w-36 md:h-36 object-cover rounded-2xl border border-orange-300 dark:border-orange-400 shadow-md"
                 />
 
-                <div className="pt-1">
-                  <h4 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                <div className="pt-1 min-w-0">
+                  <h4 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight break-words">
                     {bestSeller.Name}
                   </h4>
                   <p className="text-2xl font-mono font-semibold text-orange-600 dark:text-orange-400 mt-1">
@@ -204,7 +204,7 @@ const ProductSalesChart = ({ productsList }) => {
           )}
 
           {/* Top 5 */}
-          <div className="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-3xl p-6">
+          <div className="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-3xl p-4 sm:p-6">
             <h5 className="font-semibold text-slate-700 dark:text-slate-300 mb-5 flex items-center gap-2">
               TOP 5 PRODUCTS
               <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
@@ -212,8 +212,8 @@ const ProductSalesChart = ({ productsList }) => {
 
             <div className="space-y-4">
               {top10.slice(0, 5).map((product, idx) => (
-                <div key={idx} className="flex items-center gap-4 group">
-                  <div className="w-8 h-8 flex items-center justify-center bg-slate-200 dark:bg-slate-800 text-orange-600 dark:text-orange-400 font-bold rounded-2xl text-sm">
+                <div key={idx} className="flex items-center gap-3 sm:gap-4 group">
+                  <div className="shrink-0 w-8 h-8 flex items-center justify-center bg-slate-200 dark:bg-slate-800 text-orange-600 dark:text-orange-400 font-bold rounded-2xl text-sm">
                     #{idx + 1}
                   </div>
 
@@ -222,7 +222,7 @@ const ProductSalesChart = ({ productsList }) => {
                     alt={product.Name}
                     width={48}
                     height={48}
-                    className="w-12 h-12 object-cover rounded-xl"
+                    className="shrink-0 w-12 h-12 object-cover rounded-xl"
                   />
 
                   <div className="flex-1 min-w-0">
@@ -234,7 +234,7 @@ const ProductSalesChart = ({ productsList }) => {
                     </p>
                   </div>
 
-                  <div className="font-mono font-bold text-xl text-slate-900 dark:text-white">
+                  <div className="shrink-0 font-mono font-bold text-lg sm:text-xl text-slate-900 dark:text-white">
                     {product.TotalSale}
                   </div>
                 </div>

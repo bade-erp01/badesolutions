@@ -68,7 +68,7 @@ export default async function Vendorlayout({ params }) {
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Total Vendors Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -76,7 +76,7 @@ export default async function Vendorlayout({ params }) {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{totalVendors}</div>
+            <div className="text-2xl lg:text-3xl font-bold break-all">{totalVendors}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Total registered vendors
             </p>
@@ -90,7 +90,7 @@ export default async function Vendorlayout({ params }) {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl lg:text-3xl font-bold break-all">
               ₦{totalPayable.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -111,7 +111,7 @@ export default async function Vendorlayout({ params }) {
                 <TableHead>Office Address</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
-                <TableHead>Balance</TableHead>
+                <TableHead className="text-right">Balance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -132,7 +132,7 @@ export default async function Vendorlayout({ params }) {
                     <TableCell>{vendor.Address || "N/A"}</TableCell>
                     <TableCell>{vendor.email || "N/A"}</TableCell>
                     <TableCell>{vendor.vendor_tel || "N/A"}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           (vendor.Balance || 0) < 0

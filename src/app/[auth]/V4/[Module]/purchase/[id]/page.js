@@ -677,7 +677,7 @@ export default function DraftPurchasePage({
                   className="rounded-md object-contain shrink-0"
                 />
               )}
-              <div className="space-y-1 text-sm">
+              <div className="space-y-1 text-sm min-w-0 break-words">
                 <h3 className="text-base sm:text-lg font-bold tracking-tight">
                   {Business.companyName}
                 </h3>
@@ -880,7 +880,7 @@ export default function DraftPurchasePage({
                                 type="number"
                                 defaultValue={line.Qty}
                                 disabled={isUpdating || isUpdatingAnyLine}
-                                className="w-16 h-8 text-center text-xs"
+                                className="w-16 h-8 text-center text-base md:text-xs"
                                 onBlur={(e) => {
                                   const val = parseFloat(e.target.value);
                                   handleQtyChange(
@@ -908,7 +908,7 @@ export default function DraftPurchasePage({
                                   type="number"
                                   defaultValue={line.pcs || 0}
                                   disabled={isUpdating || isUpdatingAnyLine}
-                                  className="w-16 h-8 text-center text-xs"
+                                  className="w-16 h-8 text-center text-base md:text-xs"
                                   onBlur={(e) => {
                                     const val = parseFloat(e.target.value);
                                     handleQtyChange(
@@ -937,7 +937,7 @@ export default function DraftPurchasePage({
                               type="text"
                               defaultValue={line.BatchNo}
                               disabled={isUpdating || isUpdatingAnyLine}
-                              className="w-24 h-8 text-center text-xs mx-auto"
+                              className="w-24 h-8 text-center text-base md:text-xs mx-auto"
                               onBlur={(e) =>
                                 handleQtyChange(e.target.value.trim(), line._id, "BatchNo")
                               }
@@ -954,7 +954,7 @@ export default function DraftPurchasePage({
                               type="date"
                               defaultValue={line.ExpDate}
                               disabled={isUpdating || isUpdatingAnyLine}
-                              className="w-32 h-8 text-center text-xs mx-auto"
+                              className="w-32 h-8 text-center text-base md:text-xs mx-auto"
                               onBlur={(e) =>
                                 handleQtyChange(e.target.value, line._id, "ExpDate")
                               }
@@ -1131,7 +1131,7 @@ export default function DraftPurchasePage({
                     <Textarea
                       defaultValue={Singlebill.Remarks || ""}
                       disabled={isUpdatingAnyLine}
-                      className="min-h-[60px] text-sm"
+                      className="min-h-[60px] text-base md:text-sm"
                       onBlur={(e) =>
                         setsingleBill({ ...Singlebill, Remarks: e.target.value })
                       }

@@ -152,9 +152,9 @@ export default function ReplenishFeature({
         </DialogHeader>
 
         <div className="space-y-5 py-4">
-          <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/40">
-            <div>
-              <p className="font-medium text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 bg-muted/40">
+            <div className="min-w-0">
+              <p className="font-medium text-sm break-words">
                 {storeProduct.productName}
               </p>
 

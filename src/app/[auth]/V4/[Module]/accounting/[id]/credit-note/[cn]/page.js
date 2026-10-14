@@ -169,25 +169,25 @@ export default function Page({ data, userData, baseurl }) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold tracking-tight">Credit Note Details</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight">Credit Note Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Info Grid - UI unchanged */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             <div className="space-y-6">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Credit Note ID</p>
-                <p className="text-xl font-semibold mt-1">{data?.CreditId}</p>
+                <p className="text-lg sm:text-xl font-semibold mt-1 break-all">{data?.CreditId}</p>
               </div>
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Customer</p>
-                <p className="mt-1 text-lg">{data?.customer}</p>
+                <p className="mt-1 text-base sm:text-lg break-words">{data?.customer}</p>
               </div>
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
-                <p className="text-xl font-bold mt-1">₦{data?.Total?.toLocaleString()}</p>
+                <p className="text-lg sm:text-xl font-bold mt-1 break-words">₦{data?.Total?.toLocaleString()}</p>
               </div>
 
               <div>
@@ -204,7 +204,7 @@ export default function Page({ data, userData, baseurl }) {
             <div className="space-y-6">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Date</p>
-                <p className="mt-1 text-lg">
+                <p className="mt-1 text-base sm:text-lg break-words">
                   {new Date(data?.Date).toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
@@ -216,22 +216,22 @@ export default function Page({ data, userData, baseurl }) {
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Credit Account</p>
-                <p className="mt-1 text-lg">{data?.bankID?.bankName}</p>
+                <p className="mt-1 text-base sm:text-lg break-words">{data?.bankID?.bankName}</p>
               </div>
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Raised By</p>
-                <p className="mt-1 text-lg">{data?.raisedBy}</p>
+                <p className="mt-1 text-base sm:text-lg break-words">{data?.raisedBy}</p>
               </div>
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Approved By</p>
-                <p className="mt-1 text-lg">{data?.ApprovedBy || 'Not Approved Yet'}</p>
+                <p className="mt-1 text-base sm:text-lg break-words">{data?.ApprovedBy || 'Not Approved Yet'}</p>
               </div>
 
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Remarks</p>
-                <p className="mt-1 text-lg">{data?.reference || 'No remarks provided'}</p>
+                <p className="mt-1 text-base sm:text-lg break-words">{data?.reference || 'No remarks provided'}</p>
               </div>
             </div>
           </div>

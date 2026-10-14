@@ -72,7 +72,7 @@ export default async function Layout({ params }) {
   const invoice = await verifyBillStoreKeeper.json();
 
   if(!verifyBillStoreKeeper.ok) return (
-    <div className="bg-white flex items-center justify-center min-h-screen">
+    <div className="bg-white flex items-center justify-center min-h-dvh px-4">
       <div className="text-center">
         {/* <!-- Large 404 --> */}
         <h1 className="inline-block border-r border-gray-300 mr-5 pr-6 text-lg font-bold align-top cursor-pointer">

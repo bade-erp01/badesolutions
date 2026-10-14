@@ -251,7 +251,7 @@ export default function PaymentListPage({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="h-24 text-center text-muted-foreground"
                   >
                     No payments found

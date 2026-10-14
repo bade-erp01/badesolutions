@@ -88,11 +88,11 @@ export default async function paymentlayout({ children, params }) {
                         width={60}
                         height={60}
                         alt={"photo"}
-                        className="rounded-md object-cover w-16 h-16"
+                        className="rounded-md object-cover w-16 h-16 shrink-0"
                         quality={100}
                         priority={true}
                       />
-                      <div className="flex flex-col justify-center w-full">
+                      <div className="flex flex-col justify-center w-full min-w-0">
                         <p className=" font-semibold  truncate text-xs">
                           {account.NAME}
                         </p>
@@ -107,7 +107,7 @@ export default async function paymentlayout({ children, params }) {
               </div>
             ) : (
               <div className="w-full h-full flex flex-col justify-center items-center">
-                <h1 className="text-2xl font-bold text-gray-500">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-500 text-center">
                   No Bank Accounts Found
                 </h1>
                 <p className="text-gray-400 mt-2">

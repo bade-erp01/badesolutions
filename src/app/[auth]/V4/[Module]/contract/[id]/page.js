@@ -181,18 +181,18 @@ export default function ContractDetailsPage({
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors">
-      <main className="px-4 sm:px-6 py-8 space-y-6">
+    <div className="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors">
+      <main className="px-0 sm:px-6 py-2 sm:py-8 space-y-6">
         {/* Hero Status Card */}
         <section className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/5 dark:from-violet-500/10 dark:to-fuchsia-500/10 pointer-events-none" />
 
-          <div className="relative p-6 sm:p-8">
+          <div className="relative p-4 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div>
-                    <h1 className="text-lg font-semibold tracking-tight">
+                    <h1 className="text-lg font-semibold tracking-tight break-all">
                       {contract.contractNumber}
                     </h1>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -201,7 +201,7 @@ export default function ContractDetailsPage({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <span
                     className={`
                     inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase
@@ -222,7 +222,7 @@ export default function ContractDetailsPage({
                 </div>
 
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight break-all">
                     {formatCurrency(contract.totalContractAmount)}
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
@@ -245,7 +245,7 @@ export default function ContractDetailsPage({
 
             {/* Progress */}
             <div className="mt-8">
-              <div className="flex items-center justify-between text-sm mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm mb-2">
                 <span className="font-medium text-zinc-700 dark:text-zinc-300">
                   Installment Progress
                 </span>
@@ -277,7 +277,7 @@ export default function ContractDetailsPage({
               </div>
 
               <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                <div className="px-6 py-4 flex items-center justify-between">
+                <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
                   <span className="text-sm text-zinc-500 dark:text-zinc-400">
                     Principal Amount
                   </span>
@@ -285,7 +285,7 @@ export default function ContractDetailsPage({
                     {formatCurrency(contract.principalAmount)}
                   </span>
                 </div>
-                <div className="px-6 py-4 flex items-center justify-between">
+                <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
                   <span className="text-sm text-zinc-500 dark:text-zinc-400">
                     Installment Fee
                   </span>
@@ -293,7 +293,7 @@ export default function ContractDetailsPage({
                     + {formatCurrency(contract.installmentFee)}
                   </span>
                 </div>
-                <div className="px-6 py-4 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50">
+                <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-4 bg-zinc-50 dark:bg-zinc-800/50">
                   <span className="text-sm font-medium">
                     Total Contract Residues{" "}
                   </span>

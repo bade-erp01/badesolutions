@@ -103,7 +103,7 @@ const FinancialOverview = ({ data, url, userData }) => {
         <div className=" space-y-6">
 
           {/* HERO */}
-          <div className="relative overflow-hidden rounded-3xl border border-zinc-200 p-8 shadow-sm">
+          <div className="relative overflow-hidden rounded-3xl border border-zinc-200 p-4 sm:p-6 lg:p-8 shadow-sm">
 
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,0,0,0.04),transparent_35%)]" />
 
@@ -134,14 +134,14 @@ const FinancialOverview = ({ data, url, userData }) => {
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search account..."
                   type="search"
-                  className="pl-11 h-12 rounded-2xl border-zinc-200focus-visible:ring-0 focus-visible:border-zinc-300 shadow-sm"
+                  className="pl-11 h-12 rounded-2xl border-zinc-200 focus-visible:ring-0 focus-visible:border-zinc-300 shadow-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* METRICS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
             <MetricCard
               title="Assets"
@@ -230,7 +230,7 @@ const FinancialOverview = ({ data, url, userData }) => {
                             </Badge>
                           </TableCell>
 
-                          <TableCell className="text-right pr-8 text-md">
+                          <TableCell className="text-right pr-8 text-base">
                             <div className="flex flex-col items-end">
                               <span className="font-semibold ">
                                 <span className="text-sm">
@@ -283,19 +283,19 @@ function MetricCard({ title, value, icon }) {
 
       <CardContent className="p-5">
 
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <p className="text-sm ">
               {title}
             </p>
 
-            <h3 className="text-xl font-bold  tracking-tight">
+            <h3 className="text-lg sm:text-xl font-bold  tracking-tight break-all">
               ₦{Number(value || 0).toLocaleString()}
             </h3>
           </div>
 
-          <div className="h-11 w-11 rounded-2xl border border-zinc-200 flex items-center justify-center ">
+          <div className="h-11 w-11 shrink-0 rounded-2xl border border-zinc-200 flex items-center justify-center ">
             {icon}
           </div>
         </div>

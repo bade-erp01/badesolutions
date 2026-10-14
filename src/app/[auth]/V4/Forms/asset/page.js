@@ -128,7 +128,11 @@ export default function Page({ userInfo, baseUrl, StoresList }) {
                   Location of use
                 </label>
                 <div className="mt-2">
-                  <Select onValueChange={handleChange}>
+                  <Select
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, Location: value }))
+                    }
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Choose a Location" />
                     </SelectTrigger>

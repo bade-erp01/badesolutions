@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
             zIndex: -2,
           }}>
       <Nav1 />
-      <div className="min-h-screen flex items-center justify-center  p-4 animate__animated animate__zoomInDown">
+      <div className="min-h-dvh flex items-center justify-center p-4 animate__animated animate__zoomInDown">
         <div className="max-w-4xl w-full flex flex-col md:flex-row items-center bg-white shadow-lg">
           {/* Left Section: Illustration */}
           <div className="hidden md:flex w-1/2 items-center justify-center p-8">
@@ -75,8 +75,8 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Right Section: Forgot Password Form */}
-          <div className="w-full md:w-1/2 p-8 ">
-            <h1 className="text-3xl font-bold text-gray-800">
+          <div className="w-full md:w-1/2 p-6 sm:p-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               Forgot Password?
             </h1>
             <p className="text-gray-500 mt-2">
@@ -92,12 +92,12 @@ export default function ForgotPasswordPage() {
                 required
                 autoComplete="email"
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 mb-4"
+                className="w-full px-4 py-2.5 bg-gray-200 rounded-md text-base sm:text-sm focus:ring-2 focus:ring-blue-500 mb-4"
               />
 
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2 rounded-md mt-4 hover:bg-gray-800 transition"
+                className="w-full bg-black text-white py-3 sm:py-2.5 rounded-md mt-4 hover:bg-gray-800 transition"
               >
                 Send Reset Link
               </button>

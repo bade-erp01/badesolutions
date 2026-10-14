@@ -17,10 +17,10 @@ const ExpenseCategoryModal = ({ baseUrl,userData }) => {
       html: `
          <input 
         id="tagName" 
-        class="swal2-input w-48 px-2 py-1 text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+        class="swal2-input w-48 px-2 py-1 text-base sm:text-sm rounded-md border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
         placeholder="Enter tag name" 
         />
-        <div class="flex justify-around mt-3 text-sm">
+        <div class="flex flex-wrap justify-around gap-2 mt-3 text-sm">
         <label class="flex items-center gap-2">
             <input type="radio" name="expenseType" value="Direct" checked />
             <span class="font-medium">Direct Expense</span>

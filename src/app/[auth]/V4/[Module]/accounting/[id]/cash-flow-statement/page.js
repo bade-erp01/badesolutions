@@ -99,14 +99,14 @@ export default function CashFlowStatement() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/30 p-3 md:p-6">
+    <div className="bg-muted/30 p-0 sm:p-3 md:p-6">
       <div className="mx-auto max-w-7xl space-y-6">
         {/* HEADER */}
         <Card className="border-none shadow-lg">
           <CardHeader className="space-y-3">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle className="text-lg md:text-md font-bold tracking-tight">
+                <CardTitle className="text-lg md:text-xl font-bold tracking-tight">
                   Cash Flow Statement
                 </CardTitle>
 
@@ -348,7 +348,7 @@ export default function CashFlowStatement() {
         {/* CASH SUMMARY */}
         <Card className="shadow-lg border-2">
           <CardHeader>
-            <CardTitle className="text-xl">
+            <CardTitle className="text-lg md:text-xl">
               Cash Summary
             </CardTitle>
           </CardHeader>
@@ -372,7 +372,7 @@ export default function CashFlowStatement() {
 
             <Separator />
 
-            <div className="flex items-center justify-between text-lg font-bold">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-base sm:text-lg font-bold">
               <span>Closing Cash Balance</span>
 
               <Amount value={closingBalance} />

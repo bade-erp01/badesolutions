@@ -269,7 +269,7 @@ export default function SingleProductpage({
       <div className="p-4 rounded border-0 border-2-black animate__animated animate__fadeInUpBig animate__delay-2s">
         <form className="space-y-5 mx-auto" onSubmit={handleSubmit}>
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <h3 className="text-2xl font-semibold tracking-tight">
+            <h3 className="text-xl sm:text-2xl font-semibold tracking-tight min-w-0 break-words">
               {data.Name.charAt(0).toUpperCase() + data.Name.slice(1)}
             </h3>
             <Badge
@@ -283,7 +283,7 @@ export default function SingleProductpage({
           {/* Avatar & Attachment */}
           <div className="flex flex-wrap gap-8 items-center py-4">
             {/* Avatar */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-6 max-w-full">
               <div
                 onClick={() => {
                   uploadFiles(Encrypt(data._id), "product");
@@ -296,7 +296,7 @@ export default function SingleProductpage({
                   layout="intrinsic"
                   src={data.image || "/preview.png"}
                   alt="Avatar"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="max-w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="eager"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   quality={100}
@@ -984,7 +984,7 @@ export default function SingleProductpage({
                   name="Description"
                   onChange={handleChange}
                   value={formData.Description}
-                  className="w-full h-32 p-3 border border-dashed border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full h-32 p-3 text-base sm:text-sm border border-dashed border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="Enter your text here..."
                 />
               </div>
@@ -1537,7 +1537,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   value={price.price || ""}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="h-8 w-30 text-sm"
+                  className="h-8 w-30 text-base sm:text-sm"
                 />
               </div>
 
@@ -1557,7 +1557,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   value={price.promo}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="h-8 w-30 text-sm"
+                  className="h-8 w-30 text-base sm:text-sm"
                 />
               </div>
 
@@ -1575,7 +1575,7 @@ export function ProductPriceList({ initialData, Biz, user }) {
                   type="date"
                   value={moment(price.PromoDate).format("YYYY-MM-DD")}
                   onChange={handleChange}
-                  className="h-8 w-30 text-xs"
+                  className="h-8 w-30 text-base sm:text-xs"
                 />
               </div>
 

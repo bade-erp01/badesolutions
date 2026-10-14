@@ -58,13 +58,13 @@ export default function CustomersPage({ data }) {
   return (
     <div className="bg-background text-foreground space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
             <CardTitle>Total Receivables</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
+            <p className="text-xl sm:text-2xl font-bold break-all">
               ₦{totalReceivables.toLocaleString()}
             </p>
           </CardContent>
@@ -75,7 +75,7 @@ export default function CustomersPage({ data }) {
             <CardTitle>Total Debtors</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{totalDebtors}</p>
+            <p className="text-xl sm:text-2xl font-bold break-all">{totalDebtors}</p>
           </CardContent>
         </Card>
 
@@ -85,7 +85,7 @@ export default function CustomersPage({ data }) {
             <CardTitle className="text-red-600 dark:text-red-400">Bad Debt</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <p className="text-xl sm:text-2xl font-bold break-all text-red-600 dark:text-red-400">
               ₦{totalBadDebt.toLocaleString()}
             </p>
             <p className="text-sm text-red-500 mt-1">
@@ -108,7 +108,7 @@ export default function CustomersPage({ data }) {
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Debt</TableHead>
+                <TableHead className="text-right">Debt</TableHead>
                 <TableHead>Last Payment</TableHead>
                 <TableHead>Count</TableHead>
               </TableRow>
@@ -133,7 +133,7 @@ export default function CustomersPage({ data }) {
                     <TableCell>
                       <Badge variant="secondary">{cust.category}</Badge>
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="text-right font-medium">
                       ₦{cust.Debt.toLocaleString()}
                     </TableCell>
                     <TableCell>{cust.lastPayDate}</TableCell>
@@ -148,12 +148,12 @@ export default function CustomersPage({ data }) {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-2 py-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-2 py-4">
               <div className="text-sm text-muted-foreground">
                 Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
                 {Math.min(currentPage * itemsPerPage, debtors.length)} of {debtors.length} entries
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                 <Button
                   variant="outline"
                   size="sm"

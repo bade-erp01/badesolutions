@@ -23,7 +23,7 @@ const PendingPaymentReminder = ( {data, business }) => {
             <div style="display: flex; align-items: center;">
                 <img src="${business?.companyLogo || ""}" 
                     alt="Company Logo" 
-                    style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #b22222;" />
+                    style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #b22222; flex-shrink: 0;" />
                 <div style="text-align: left; line-height: 1.5;">
                 <strong style="font-size: 16px; color: #b22222; text-transform: uppercase;">
                     ⚠️ Payment Alert

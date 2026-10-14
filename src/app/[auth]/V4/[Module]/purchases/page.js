@@ -232,7 +232,7 @@ export default function Storelayout({
         </div>
 
         {/* Date Range */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
           <div>
             <Label className="text-white/70 text-sm mb-1.5 flex items-center gap-1.5">
               <CalendarDaysIcon className="h-4 w-4" /> Start Date
@@ -255,12 +255,12 @@ export default function Storelayout({
       </Notch>
 
       {/* ==================== SHADCN KPI CARDS ==================== */}
-      <div className="px-6 -mt-4 mb-8">
+      <div className="sm:px-6 -mt-4 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-muted-foreground">Posted to Inventory</p>
-              <p className="text-4xl font-semibold mt-3 text-indigo-600">
+              <p className="text-3xl sm:text-4xl font-semibold mt-3 text-indigo-600">
                 {postedToWarehouseCount}
               </p>
             </CardContent>
@@ -269,7 +269,7 @@ export default function Storelayout({
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-muted-foreground">Approved</p>
-              <p className="text-4xl font-semibold mt-3 text-emerald-600">
+              <p className="text-3xl sm:text-4xl font-semibold mt-3 text-emerald-600">
                 {approvedCount}
               </p>
             </CardContent>
@@ -278,7 +278,7 @@ export default function Storelayout({
           {/* <Card>
             <CardContent className="p-6">
               <p className="text-sm text-muted-foreground">Pending</p>
-              <p className="text-4xl font-semibold mt-3 text-amber-600">
+              <p className="text-3xl sm:text-4xl font-semibold mt-3 text-amber-600">
                 {pendingCount}
               </p>
             </CardContent>
@@ -296,7 +296,7 @@ export default function Storelayout({
       </div>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <div className="rounded-xl border border-white/10 bg-card overflow-hidden">
           <Table>
             <TableHeader>

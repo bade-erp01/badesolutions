@@ -1586,11 +1586,11 @@ function SalePersonChart({ customerId, customerName,userInfo, business, custList
   return (
     <>
       {errorMsg ? (
-        <div className="flex justify-center items-center min-h-screen text-red-500 text-lg">
+        <div className="flex justify-center items-center min-h-[50vh] text-red-500 text-lg">
           {errorMsg}
         </div>
       ) : loading ? (
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center min-h-[50vh]">
           <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
         </div>
       ) : (
@@ -1617,14 +1617,14 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 export function DashboardStats({ Sales_Target,todaysSale,custList }) {
   return (
-    <div className="grid grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {/* Today's Sales */}
       <Card>
         <CardHeader>
           <CardTitle>Today's Sales</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">₦{formatNumberShort(todaysSale)}</p>
+          <p className="text-xl sm:text-2xl font-bold">₦{formatNumberShort(todaysSale)}</p>
         </CardContent>
       </Card>
 
@@ -1634,7 +1634,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
           <CardTitle>Customers Assigned</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">{formatNumberShort(custList.length)}</p>
+          <p className="text-xl sm:text-2xl font-bold">{formatNumberShort(custList.length)}</p>
         </CardContent>
       </Card>
 
@@ -1644,7 +1644,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
           <CardTitle>Total Debt</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">₦{formatNumberShort(custList.reduce((acc, curr) => acc + curr.Debt, 0))}</p>
+          <p className="text-xl sm:text-2xl font-bold">₦{formatNumberShort(custList.reduce((acc, curr) => acc + curr.Debt, 0))}</p>
         </CardContent>
       </Card>
 
@@ -1976,7 +1976,7 @@ export function LiveLocationMap({ userData, baseUrl }) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="rounded-xl border p-4 bg-card flex items-center justify-between">
+      <div className="rounded-xl border p-4 bg-card flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 font-medium">
             <MapPin className="h-5 w-5 text-primary" />
@@ -2001,7 +2001,7 @@ export function LiveLocationMap({ userData, baseUrl }) {
       </div>
 
       {/* Coordinates badge */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Badge variant="secondary">
           Lat: {coords.lat.toFixed(6)}
         </Badge>
@@ -2018,7 +2018,7 @@ export function LiveLocationMap({ userData, baseUrl }) {
           height="500"
           loading="lazy"
           allowFullScreen
-          className="border-0"
+          className="border-0 h-[350px] sm:h-[500px]"
           src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`}
         />
       </div>

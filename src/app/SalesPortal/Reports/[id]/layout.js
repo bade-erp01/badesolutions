@@ -117,13 +117,13 @@ export default async function layout({ params }) {
   const isPending = stock?.status?.toLowerCase() === "pending";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       {/* Sticky Header */}
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           {/* Left – Stock ref info */}
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar className="h-9 w-9 border shadow-sm">
+            <Avatar className="h-9 w-9 shrink-0 border shadow-sm">
               <AvatarImage
                 src={userData.business?.companyLogo}
                 alt={userData.business?.companyName}

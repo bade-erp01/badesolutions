@@ -34,11 +34,11 @@ import { useUser } from "@/components/UserProvider";
 
 /* Shared Tailwind classes */
 const inputCls =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 const selectCls =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 const textareaCls =
-  "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+  "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 const labelCls =
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
 const badgeCls =
@@ -77,10 +77,10 @@ export default function SettingsPage({
         [];
 
   return (
-    <div className="w-full min-h-0 flex-1 overflow-y-auto">
-      <div className="p-4 sm:p-6 space-y-6 max-w-[1600px]">
+    <div className="w-full min-w-0">
+      <div className="space-y-6 max-w-[1600px]">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1>
           <p className="mt-2 text-muted-foreground">
             Manage dashboard preferences and system configuration.
           </p>
@@ -577,7 +577,7 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
             </span>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex justify-between items-start gap-2">
+            <div className="flex flex-wrap justify-between items-start gap-2">
               <div>
                 <p className="text-sm text-muted-foreground">Plan</p>
                 <p className="font-semibold text-lg">
@@ -589,7 +589,7 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
               </span>
             </div>
             <hr className="border-border" />
-            <div className="flex justify-between gap-2 text-sm">
+            <div className="flex flex-wrap justify-between gap-2 text-sm">
               <div>
                 Amount: ₦
                 {Number(formData.SubcriptionAmount || 0).toLocaleString()}
@@ -597,7 +597,7 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
               <div>Pending License: {formData.Pendinglicense}</div>
             </div>
             <hr className="border-border" />
-            <div className="flex justify-between gap-2 text-sm">
+            <div className="flex flex-wrap justify-between gap-2 text-sm">
               <div>Notifications Token</div>
               <div className="font-bold">0</div>
             </div>
@@ -655,8 +655,8 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
             {modules.map((module, index) => (
               <Card key={module._id || index} className="border">
                 <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="font-semibold">{module.Name}</div>
+                  <div className="flex flex-wrap justify-between items-start gap-2">
+                    <div className="font-semibold min-w-0 break-words">{module.Name}</div>
                     <span
                       className={`${badgeCls} border-transparent ${
                         module.installed
@@ -969,7 +969,7 @@ function UsersPermissionsPage({ users }) {
                         </div>
                         <a
                           href={`mailto:${user.Email}`}
-                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all"
                         >
                           {user.Email}
                         </a>
@@ -1024,7 +1024,7 @@ function UsersPermissionsPage({ users }) {
                 {Math.min(currentPage * pageSize, filteredUsers.length)} of{" "}
                 {filteredUsers.length} users
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1080,8 +1080,8 @@ function UsersPermissionsPage({ users }) {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-background text-foreground rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden border shadow-xl flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b shrink-0">
+          <div className="bg-background text-foreground rounded-2xl w-full max-w-lg max-h-[90dvh] overflow-hidden border shadow-xl flex flex-col">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b shrink-0">
               <div className="flex items-center gap-3">
                 <UserPlus className="h-6 w-6 text-primary" />
                 <h2 className="text-xl font-semibold">Add New User</h2>
@@ -1100,7 +1100,7 @@ function UsersPermissionsPage({ users }) {
 
             <form
               onSubmit={handleAddUser}
-              className="p-6 space-y-5 overflow-y-auto"
+              className="p-4 sm:p-6 space-y-5 overflow-y-auto"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">

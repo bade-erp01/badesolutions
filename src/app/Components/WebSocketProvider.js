@@ -14,7 +14,10 @@ import { toast } from "sonner";
 import { Encrypt } from "../../../Functions/Functions";
 import { useRouter } from "next/navigation";
 
-const SOCKET_URL = "https://api.badesolutions.com.ng";
+const SOCKET_URL =
+  process.env.EXPRESS_PRIVATE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:3000";
 
 const WebSocketContext = createContext(null);
 
@@ -270,6 +273,7 @@ export function WebSocketProvider({ children, user }) {
     };
   }, [auth, connect, disconnect]);
 
+  
   // ========== Global Event Listeners ==========
   useEffect(() => {
     const unsubNotification = subscribe("notification", (data) => {

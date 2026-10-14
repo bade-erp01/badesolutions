@@ -26,15 +26,15 @@ export default function LandingPage() {
       <Nav1 />
 
       {/* HERO */}
-      <section className="max-w-6xl mx-auto px-4 py-20 text-center">
+      <section className="max-w-6xl mx-auto px-4 py-12 sm:py-20 text-center">
         <Badge className="mb-4">ERP Platform</Badge>
 
-        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-tight leading-tight">
           Control your business from{" "}
           <span className="text-blue-600">one system</span>
         </h1>
 
-        <p className="mt-6 text-lg text-zinc-500 max-w-2xl mx-auto">
+        <p className="mt-6 text-base sm:text-lg text-zinc-500 max-w-2xl mx-auto">
           Finance, inventory, HR, and sales — fully integrated into a single
           enterprise platform built for structured operations regardless of your business sector.
         </p>
@@ -51,17 +51,17 @@ export default function LandingPage() {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => router.push("/Marketers")}
+            onClick={() => router.push("/Careers")}
             className="rounded-xl"
           >
-           Refer & Earn
+           Careers
           </Button>
         </div>
       </section>
 
       {/* BENTO GRID  */}
-      <section className="max-w-6xl mx-auto px-4 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[220px]">
+      <section className="max-w-6xl mx-auto px-4 pb-12 sm:pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(220px,auto)]">
           {/* DASHBOARD */}
           <Card className="md:col-span-2 md:row-span-2 overflow-hidden relative">
             <Image
@@ -72,8 +72,8 @@ export default function LandingPage() {
             />
             <div className="absolute inset-0 bg-black/40" />
 
-            <CardContent className="relative z-10 text-white p-6">
-              <h3 className="text-2xl font-semibold">Real-time dashboard</h3>
+            <CardContent className="relative z-10 text-white p-4 sm:p-6">
+              <h3 className="text-xl sm:text-2xl font-semibold">Real-time dashboard</h3>
               <p className="text-sm mt-2 text-zinc-200 max-w-md">
                 Monitor Sales operations, financial reporting, and inventory from a unified
                 command center.
@@ -183,7 +183,7 @@ export default function LandingPage() {
 
           {/* ANALYTICS */}
           <Card className="md:col-span-2 overflow-hidden border border-zinc-200 bg-gradient-to-br from-white via-zinc-50 to-zinc-100 shadow-sm hover:shadow-md transition-all duration-300">
-            <CardContent className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <CardContent className="p-4 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
               {/* LEFT CONTENT */}
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 shadow-sm">
@@ -191,11 +191,11 @@ export default function LandingPage() {
                   Cloud Infrastructure
                 </div>
 
-                <h3 className="mt-5 text-3xl font-semibold tracking-tight text-zinc-900">
+                <h3 className="mt-5 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
                   Cloud-based ERP Software
                 </h3>
 
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   {[
                     "Real-time reporting",
                     "Multi-user access",
@@ -219,9 +219,9 @@ export default function LandingPage() {
       <TrustedBusinessesSection />
 
       {/* VALUE SECTION */}
-      <section className="bg-zinc-50 py-20">
+      <section className="bg-zinc-50 py-12 sm:py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold">
+          <h2 className="text-2xl sm:text-3xl font-semibold">
             Designed for operational clarity
           </h2>
 
@@ -232,8 +232,8 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 text-center">
-        <h2 className="text-3xl font-semibold">
+      <section className="py-12 sm:py-20 px-4 text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold">
           Start managing your business properly
         </h2>
 
@@ -273,11 +273,11 @@ const logos = [
 
 export function TrustedBusinessesSection() {
   return (
-    <section className="bg-zinc-50 py-20">
+    <section className="bg-zinc-50 py-12 sm:py-20">
       <div className="max-w-6xl mx-auto px-4">
         {/* Heading */}
         <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
             Trusted by growing businesses
           </h2>
 
@@ -288,9 +288,9 @@ export function TrustedBusinessesSection() {
         </div>
 
         {/* Main Layout */}
-        <div className="mt-14 grid lg:grid-cols-3 gap-6">
+        <div className="mt-10 sm:mt-14 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LOGO CAROUSEL */}
-          <Card className="lg:col-span-2 rounded-3xl border border-zinc-200 shadow-sm overflow-hidden bg-white">
+          <Card className="lg:col-span-2 min-w-0 rounded-3xl border border-zinc-200 shadow-sm overflow-hidden bg-white">
             <CardHeader>
               <CardTitle>Organizations using BADE</CardTitle>
 

@@ -315,7 +315,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
                 )}
               >
                 <item.icon className="h-5 w-5 shrink-0" />
-                <span>{item.label}</span>
+                <span className="truncate">{item.label}</span>
               </Link>
             ))}
         </nav>
@@ -392,7 +392,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="left"
-          className="w-72 border-r border-zinc-800 bg-zinc-950 p-0 text-zinc-100 [&>button]:hidden"
+          className="w-72 max-w-[85vw] border-r border-zinc-800 bg-zinc-950 p-0 text-zinc-100 [&>button]:hidden"
         >
           <div className="flex items-center justify-between px-5 py-4">
             <SheetHeader className="p-0">
@@ -411,7 +411,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
             </SheetClose>
           </div>
           <Separator className="bg-zinc-800" />
-          <div className="h-[calc(100vh-73px)] px-4 py-4">
+          <div className="h-[calc(100dvh-73px)] px-4 py-4">
             <SidebarContent />
           </div>
         </SheetContent>
@@ -421,7 +421,7 @@ export default function DashboardLayout({ userData, baseUrl }) {
       <main className="flex-1 m-3">
         <header className="mb-6">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border-2 border-border shadow-md">
+            <Avatar className="h-10 w-10 shrink-0 border-2 border-border shadow-md">
               <AvatarImage
                 src={
                   userData.business.companyLogo ||
@@ -432,8 +432,8 @@ export default function DashboardLayout({ userData, baseUrl }) {
               />
               <AvatarFallback>{userData.user.firstName?.[0]}</AvatarFallback>
             </Avatar>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight break-words">
                 {getLocalizedGreeting(userData.user.firstName)}
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -651,17 +651,17 @@ export function MainDash({ userData, baseUrl }) {
     return (
       <div className="space-y-6 text-sm">
         {/* KPI Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
           {/* Today's Sales */}
           <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
             <div className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
             <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Today’s Sales
                   </p>
-                  <p className="text-2xl font-bold tracking-tight">
+                  <p className="text-2xl font-bold tracking-tight break-words">
                     {currency}
                     {formatNumberShort(todaySales)}
                   </p>
@@ -695,12 +695,12 @@ export function MainDash({ userData, baseUrl }) {
           <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
             <div className="absolute left-0 top-0 h-full w-1 bg-violet-500" />
             <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Overdue Payments
                   </p>
-                  <p className="text-2xl font-bold tracking-tight">
+                  <p className="text-2xl font-bold tracking-tight break-words">
                     {currency}
                     {overdueTotal.toLocaleString()}
                   </p>
@@ -720,12 +720,12 @@ export function MainDash({ userData, baseUrl }) {
           <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
             <div className="absolute left-0 top-0 h-full w-1 bg-sky-500" />
             <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Today’s Route
                   </p>
-                  <p className="text-2xl font-bold tracking-tight">
+                  <p className="text-2xl font-bold tracking-tight break-words">
                     {tenantData.Routes?.length || 0}
                   </p>
                 </div>
@@ -743,12 +743,12 @@ export function MainDash({ userData, baseUrl }) {
           <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
             <div className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
             <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Pending Tasks
                   </p>
-                  <p className="text-2xl font-bold tracking-tight">
+                  <p className="text-2xl font-bold tracking-tight break-words">
                     {pendingTasks}
                   </p>
                 </div>
@@ -768,7 +768,7 @@ export function MainDash({ userData, baseUrl }) {
           {/* Left Column */}
           <section className="lg:col-span-2 space-y-6">
             <Card className="border-border/40 bg-card/60">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <GenerealSalesMargin
                   yearlysales={tenantData.yearlysales}
                   warehouses={tenantData.warehouses}
@@ -847,7 +847,7 @@ export function MainDash({ userData, baseUrl }) {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-1.5 mt-5">
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 mt-5">
                     <Button
                       variant="outline"
                       size="sm"
@@ -1015,7 +1015,7 @@ export function MainDash({ userData, baseUrl }) {
 
   // Non C-Level Fallback
   return (
-    <section className="w-full max-w-3xl mx-auto py-16 px-6 text-center space-y-8">
+    <section className="w-full max-w-3xl mx-auto py-10 sm:py-16 px-4 sm:px-6 text-center space-y-8">
       <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
         Track your sales performance, manage customer relationships, optimize
         your routes, and monitor your daily activities all in one place.
@@ -1053,7 +1053,7 @@ export function ChartRadialShape({ data }) {
     visitors: { label: "Sales" },
     safari: {
       label: "Target set",
-      color: "hsl(var(--chart-2))",
+      color: "var(--chart-2)",
     },
   };
 
@@ -1122,12 +1122,12 @@ export function ChartRadialShape({ data }) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-center leading-snug font-medium">
           You have completed {(data?.totalSales || 0).toLocaleString()} /{" "}
           {(data?.salesTarget || 0).toLocaleString()}
           <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
+        <div className="leading-none text-center text-muted-foreground">
           {data?.percentage || "0.00"}% of target achieved
         </div>
       </CardFooter>
@@ -1296,8 +1296,8 @@ export function NearbyBusinessesMap() {
   return (
     <Card className="border-border/40 bg-card/60 overflow-hidden">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
             <CardTitle className="text-base flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary" />
               Nearby Businesses
@@ -1310,7 +1310,7 @@ export function NearbyBusinessesMap() {
             variant="ghost"
             size="icon"
             onClick={fetchNearbyBusinesses}
-            className="h-8 w-8"
+            className="h-9 w-9 shrink-0"
           >
             <RefreshCcw className={cn("h-4 w-4", loading && "animate-spin")} />
           </Button>
@@ -1370,7 +1370,7 @@ export function NearbyBusinessesMap() {
                       {biz.address}
                     </p>
 
-                    <div className="flex items-center gap-2 pt-0.5">
+                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
                       <Badge
                         variant="outline"
                         className="text-[10px] px-1.5 py-0 h-5 font-medium border-blue-500/30 text-blue-400"
@@ -1391,7 +1391,7 @@ export function NearbyBusinessesMap() {
                       href={`https://www.google.com/maps/dir/?api=1&destination=${biz.latitude},${biz.longitude}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 mt-1.5 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="inline-flex items-center gap-1.5 mt-1.5 py-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
                     >
                       <Navigation className="h-3 w-3" />
                       Directions

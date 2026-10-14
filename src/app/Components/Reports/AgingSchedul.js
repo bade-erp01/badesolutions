@@ -101,7 +101,7 @@ export default function ReceivablesAgingModal({ data }) {
           </button>
         </div>
       `,
-      width: "50%",
+      width: "max(50%, min(95vw, 640px))",
       showConfirmButton: false,
       didOpen: () => {
         const clean = Object.entries(getAgingBuckets()).map(

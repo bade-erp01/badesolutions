@@ -24,15 +24,15 @@ export default function UserNotification({ user }) {
               <div class="flex items-start gap-3 p-4 mb-3 rounded-lg shadow-sm ${
                 n.status === "Unseen" ? "bg-yellow-50" : "bg-gray-50"
               }">
-                <div class="flex-1">
-                  <div class="font-medium text-sm text-gray-800">${n.Title}</div>
+                <div class="flex-1 min-w-0 text-left">
+                  <div class="font-medium text-sm text-gray-800 break-words">${n.Title}</div>
                   ${
                     n.BASE_URL
                       ? `<a href="${n.BASE_URL}" class="text-blue-600 text-xs underline mt-1 inline-block">View Details</a>`
                       : ""
                   }
                 </div>
-                <span class="text-xs px-2 py-1 rounded-full ${
+                <span class="shrink-0 text-xs px-2 py-1 rounded-full ${
                   n.status === "Unseen"
                     ? "bg-yellow-200 text-yellow-800"
                     : "bg-gray-200 text-gray-600"
@@ -43,14 +43,14 @@ export default function UserNotification({ user }) {
               .join("");
 
       const paginationControls = `
-        <div class="flex justify-between items-center mt-4">
-          <button id="prevPage" class="px-3 py-1 text-sm rounded-md ${
+        <div class="flex justify-between items-center gap-2 mt-4">
+          <button id="prevPage" class="px-3 py-2 text-sm rounded-md ${
             currentPage === 1
               ? "bg-gray-200 text-gray-400 cursor-not-allowed"
               : "bg-blue-600 text-white hover:bg-blue-700"
           }">Prev</button>
           <span class="text-sm text-gray-600">Page ${currentPage} of ${totalPages}</span>
-          <button id="nextPage" class="px-3 py-1 text-sm rounded-md ${
+          <button id="nextPage" class="px-3 py-2 text-sm rounded-md ${
             currentPage === totalPages
               ? "bg-gray-200 text-gray-400 cursor-not-allowed"
               : "bg-blue-600 text-white hover:bg-blue-700"
@@ -60,7 +60,7 @@ export default function UserNotification({ user }) {
 
       Swal.update({
         html: `
-          <div class="max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div class="max-h-[60dvh] sm:max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             ${htmlContent}
           </div>
           ${totalPages > 1 ? paginationControls : ""}

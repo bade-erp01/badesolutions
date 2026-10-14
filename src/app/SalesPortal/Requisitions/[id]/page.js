@@ -572,7 +572,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                 className="object-cover w-full h-full"
               />
             </div>
-            <div className="min-w-0 space-y-1 text-sm">
+            <div className="w-full min-w-0 space-y-1 text-sm sm:w-auto">
               <h3 className="text-sm sm:text-base font-extrabold tracking-tight truncate">
                 {Singlebill.customerName?.toUpperCase()}
               </h3>
@@ -584,7 +584,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                   {Singlebill.customer?.Email || "N/A"}
                 </a>
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground break-words">
                 {Singlebill.customer?.phone}
               </p>
               <p className="truncate text-xs sm:text-sm text-muted-foreground">
@@ -689,7 +689,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                           type="number"
                           defaultValue={line.Qty || 0}
                           min={0}
-                          className="h-8 w-14 sm:w-16 mx-auto text-center text-xs"
+                          className="h-9 w-16 mx-auto px-1 text-center text-base sm:h-8 sm:text-xs"
                           onBlur={(e) => {
                             let val = e.target.value;
                             if (val < 0) val = 0;
@@ -714,7 +714,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                           type="number"
                           defaultValue={line.pcsReq || 0}
                           min={0}
-                          className="h-8 w-14 sm:w-16 mx-auto text-center text-xs"
+                          className="h-9 w-16 mx-auto px-1 text-center text-base sm:h-8 sm:text-xs"
                           onBlur={(e) => {
                             let val = e.target.value;
                             if (val < 0) val = 0;
@@ -753,7 +753,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          className="h-9 w-9 text-destructive hover:text-destructive"
                           onClick={() => removeLineItem(line._id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -826,7 +826,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                     align="start"
                   >
                     <Command>
-                      <CommandInput placeholder="Search product..." />
+                      <CommandInput placeholder="Search product..." className="text-base sm:text-sm" />
                       <CommandList>
                         <CommandEmpty>No products found.</CommandEmpty>
                         <CommandGroup>
@@ -910,21 +910,21 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
               <CardTitle className="text-base sm:text-lg">Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-xs sm:text-sm">
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-2">
                 <span className="text-muted-foreground">Subtotal:</span>
                 <strong>
                   {currency}
                   {(Singlebill.subTotal - Singlebill.taxRate).toFixed(2)}
                 </strong>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-2">
                 <span className="text-muted-foreground">Tax Rate:</span>
                 <strong>
                   {currency}
                   {Singlebill.taxRate?.toFixed(2)}
                 </strong>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-2">
                 <span className="text-muted-foreground">Shipping Fee:</span>
                 <strong>
                   {currency}
@@ -932,7 +932,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                 </strong>
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-between text-sm sm:text-base font-bold">
+              <div className="flex justify-between gap-2 text-sm sm:text-base font-bold">
                 <span>Grand Total:</span>
                 <span>
                   {currency}
@@ -961,7 +961,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
 
         {/* Terms + Issued by */}
         <div className="mt-8 sm:mt-12 flex flex-col md:flex-row justify-between items-start gap-6 sm:gap-10">
-          <div className="max-w-md space-y-2">
+          <div className="max-w-md min-w-0 space-y-2 break-words">
             <h4 className="font-semibold text-sm sm:text-base">
               Terms & Conditions
             </h4>
@@ -985,7 +985,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
             </p>
           ) : (
             <h2
-              className={`mt-2 sm:mt-3 font-bold text-sm sm:text-base tracking-wide ${
+              className={`mt-2 sm:mt-3 font-bold text-sm sm:text-base tracking-wide break-words ${
                 isCancelled ? "text-destructive" : "text-foreground"
               }`}
             >

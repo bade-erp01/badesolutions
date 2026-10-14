@@ -52,7 +52,7 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
             "Content-Type": "application/json",
              Authorization: `Bearer ${Encrypt(UserData.business.tenantId)}`,
              access: `${Encrypt(UserData.user._id)}`,
-             sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
+             sessionKey: `Bearer ${Encrypt(UserData.SessionId)}`
            },
           body: JSON.stringify({ ids: Encrypt(selectedIds) }),
         });
@@ -106,7 +106,7 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
   if (loading) {
     return (
       <div className="w-full flex flex-col items-center justify-between">
-        <p className="text-sm text-gray-800">
+        <p className="text-sm text-gray-800 text-center break-words">
           Searching for{" "}
           <span className="text-purple-600 font-bold">
             &lsquo;{searchTerm}&lsquo;
@@ -122,7 +122,7 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
     <div>
       <div className="flex flex-col items-center">
         {filteredModules.length > 0 ? (
-          <Badge variant="outline" className="text-sm mb-4">
+          <Badge variant="outline" className="text-sm mb-4 max-w-full whitespace-normal text-center">
             Showing Search result for{" "}
             <span className="text-purple-600 font-bold">
               &lsquo;{searchTerm}&lsquo;
@@ -133,9 +133,9 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
         
 
         <div
-          className="grid gap-6 w-full"
+          className="grid gap-4 sm:gap-6 w-full"
           style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(250px, 100%), 1fr))",
           }}
         >
           {filteredModules.length > 0 ? (
@@ -162,7 +162,7 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
                 loading="eager"
                 priority
               />
-              <p className="text-lg text-gray-600 mb-2">
+              <p className="text-base sm:text-lg text-gray-600 mb-2 text-center break-words">
                 No results found for{" "}
                 <strong className="text-purple-700">
                   &lsquo;{searchTerm}&lsquo;

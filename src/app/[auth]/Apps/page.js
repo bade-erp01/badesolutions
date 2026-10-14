@@ -47,9 +47,9 @@ const ModulesPage = ({ userInfo }) => {
         business={userInfo.business}
         page={`App Store`}
       /> */}
-      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 pt-20">
+      <div className="min-h-dvh bg-linear-to-br from-slate-50 via-white to-slate-100 pt-20">
         {/* Hero Section */}
-        <div className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-24">
+        <div className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-12 sm:py-24">
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-0 right-0 w-96 h-96 bg-slate-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
@@ -61,22 +61,22 @@ const ModulesPage = ({ userInfo }) => {
               Explore Our Ecosystem
             </Badge>
 
-            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
               Powerful Modules for{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-slate-900">
                 Your Business
               </span>
             </h1>
 
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
               Unlock the full potential of your business with our expertly
               crafted modules. From seamless integrations to advanced
               functionalities, designed to streamline operations and drive
               growth.
             </p>
 
-            <div className="flex items-center justify-center gap-2 text-sm text-slate-500 pt-4">
-              <Shield className="w-4 h-4" />
+            <div className="flex items-center justify-center gap-2 text-center text-sm text-slate-500 pt-4">
+              <Shield className="w-4 h-4 shrink-0" />
               Secured with industry-leading standards
             </div>
           </div>
@@ -84,7 +84,7 @@ const ModulesPage = ({ userInfo }) => {
 
         {/* Modules Grid */}
         {isMounted && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dummyData.map((item, index) => (
                 <ModuleCard
@@ -158,13 +158,13 @@ const ModuleCard = ({ item, userInfo }) => {
   if (!isMounted) return null;
 
   return (
-    <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:scale-105 animate__animated animate__fadeInUp animate__faster">
+    <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl md:hover:scale-105 animate__animated animate__fadeInUp animate__faster">
       {/* Background gradient effect */}
       <div className="absolute inset-0 bg-linear-to-br from-slate-50 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <CardHeader className="relative z-10">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex min-w-0 items-center gap-3 flex-1">
             {item.icon && (
               <Image
                 src={
@@ -175,11 +175,11 @@ const ModuleCard = ({ item, userInfo }) => {
                 alt={item.Name}
                 width={48}
                 height={48}
-                className="rounded-lg"
+                className="shrink-0 rounded-lg"
               />
             )}
-            <div className="flex-1">
-              <CardTitle className="text-xl text-slate-900">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-lg sm:text-xl text-slate-900 break-words">
                 {item.Name}
               </CardTitle>
               {item.installed && (
@@ -210,7 +210,7 @@ const ModuleCard = ({ item, userInfo }) => {
                     <DialogTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="justify-start text-left h-auto p-2 hover:bg-slate-100"
+                        className="justify-start text-left h-auto min-h-10 p-2 whitespace-normal hover:bg-slate-100"
                         onClick={() => AppDescription(app, item.Name)}
                       >
                         <Image
@@ -218,7 +218,7 @@ const ModuleCard = ({ item, userInfo }) => {
                           width={20}
                           height={20}
                           alt={app.Name}
-                          className="mr-2"
+                          className="mr-2 shrink-0"
                         />
                         <span className="text-sm text-slate-700">
                           {app.Name}
@@ -265,7 +265,7 @@ const ModuleCard = ({ item, userInfo }) => {
         {/* Pricing & CTA */}
         {!item.installed && (
           <>
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-medium">Price</p>
                 <p className="text-2xl font-bold text-slate-900">

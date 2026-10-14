@@ -167,6 +167,7 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
       html: `
         <style>
           tr:hover { background-color: #f7fafc; }
+          @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } }
           .logistics-filter {
             padding: 8px;
             font-size: 12px;

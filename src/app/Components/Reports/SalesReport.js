@@ -192,7 +192,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
     Swal.fire({
       title: "Sales Report",
       html: `
-        <style> tr:hover { background-color: #f7fafc; } </style>
+        <style> tr:hover { background-color: #f7fafc; } @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
         <div style="font-size:12px;color:#64748b;margin-bottom:10px;text-align:left;">
           Period: <strong>${startDate}</strong> → <strong>${endDate}</strong>
         </div>

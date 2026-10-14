@@ -72,7 +72,7 @@ export default async function StoreLayout2({ children, params }) {
   const data = await res.json(); 
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col">
       <Notch>
         <BackButton />
         <hr />

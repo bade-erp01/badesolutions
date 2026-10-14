@@ -1788,7 +1788,7 @@ const generatePdf = async (business, customer, bill) => {
               quality={100}
               className="rounded-md shrink-0"
             />
-            <div className="text-sm space-y-1">
+            <div className="text-sm space-y-1 min-w-0 break-words">
               <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">
                 {userInfo.business.companyName}
               </h3>
@@ -1884,10 +1884,10 @@ const generatePdf = async (business, customer, bill) => {
                   className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold text-xs sm:text-sm transition"
                 >
                   <ArrowUturnLeftIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden xs:inline">
+                  <span className="hidden sm:inline">
                     Cancel {Singlebill.billStatus}/{Singlebill.billReferenceNo}
                   </span>
-                  <span className="xs:hidden">Cancel</span>
+                  <span className="sm:hidden">Cancel</span>
                 </button>
 
                 {userInfo.user.cancelInvoice &&
@@ -2183,8 +2183,8 @@ const generatePdf = async (business, customer, bill) => {
               key={bill._id}
               className="border border-border rounded-lg bg-card p-4 space-y-3"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-3 min-w-0">
+                <div className="flex items-center gap-3 min-w-0">
                   <Image
                     src={bill.item.image || bill.item.QrCode || "/preview.png"}
                     width={48}
@@ -2270,7 +2270,7 @@ const generatePdf = async (business, customer, bill) => {
                           userInfo.business.companyName,
                         );
                       }}
-                      className="w-full px-2 py-1.5 border border-border rounded text-center bg-background text-sm"
+                      className="w-full px-2 py-1.5 border border-border rounded text-center bg-background text-base sm:text-sm"
                     />
                   </div>
                   {userInfo.business.allowSkuSplitting && (
@@ -2293,7 +2293,7 @@ const generatePdf = async (business, customer, bill) => {
                             userInfo.business.companyName,
                           );
                         }}
-                        className="w-full px-2 py-1.5 border border-border rounded text-center bg-background text-sm"
+                        className="w-full px-2 py-1.5 border border-border rounded text-center bg-background text-base sm:text-sm"
                       />
                     </div>
                   )}

@@ -24,7 +24,7 @@ export default function TaskAssigner({users, userInfo , EXPRESS_PRIVATE_URL}) {
             <div class="flex flex-col gap-5 text-left text-gray-700 p-2">
                 <div class="space-y-2">
                 <label for="swal-select1" class="block text-sm font-semibold text-gray-800">Activity</label>
-                <select id="swal-select1" class="w-full px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 font-medium">
+                <select id="swal-select1" class="w-full px-4 py-2.5 text-base bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 font-medium">
                     <option value="" disabled selected>Select Activity</option>
                     <option value="Meeting">📅 Meeting</option>
                     <option value="Call">📞 Call</option>
@@ -37,18 +37,18 @@ export default function TaskAssigner({users, userInfo , EXPRESS_PRIVATE_URL}) {
                 </div>
                 <div class="space-y-2">
                 <label for="swal-assign" class="block text-sm font-semibold text-gray-800">Assign To</label>
-                <select id="swal-assign" class="w-full px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 font-medium">
+                <select id="swal-assign" class="w-full px-4 py-2.5 text-base bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 font-medium">
                     <option value="" disabled selected>Select assignee</option>
                     ${userList.map(emp => `<option value="${emp._id}">${emp.firstName} ${emp.lastName}</option>`).join('')}
                 </select>
                 </div>
                 <div class="space-y-2">
                 <label for="swal-input3" class="block text-sm font-semibold text-gray-800">Date</label>
-                <input type="date" id="swal-input3" class="w-full px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700" />
+                <input type="date" id="swal-input3" class="w-full px-4 py-2.5 text-base bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700" />
                 </div>
                 <div class="space-y-2">
                 <label for="swal-textarea" class="block text-sm font-semibold text-gray-800">Additional Notes</label>
-                <textarea id="swal-textarea" class="w-full px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 resize-none" rows="3" placeholder="Add any additional notes..."></textarea>
+                <textarea id="swal-textarea" class="w-full px-4 py-2.5 text-base bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 resize-none" rows="3" placeholder="Add any additional notes..."></textarea>
                 </div>
             </div>
             `,

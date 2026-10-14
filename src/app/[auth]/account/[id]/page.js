@@ -177,11 +177,11 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-full p-6 bg-background shadow-2xl border rounded-xl space-y-8 text-sm m-2"
+      className="max-w-full p-4 sm:p-6 bg-background shadow-2xl border rounded-xl space-y-6 sm:space-y-8 text-sm sm:m-2"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Business Profile
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -191,7 +191,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
 
         <Badge
           variant={formData.isVerified ? "default" : "destructive"}
-          className="text-base px-6 py-1.5 font-semibold"
+          className="text-sm sm:text-base px-4 sm:px-6 py-1.5 font-semibold"
         >
           {formData.isVerified ? "Verified Account" : "Not Verified"}
         </Badge>
@@ -200,10 +200,10 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
       {/* Avatar & Quick Links */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-8 items-center">
+          <div className="flex flex-wrap gap-4 sm:gap-8 items-center">
             {/* Avatar */}
-            <div className="flex items-center gap-6">
-              <div className="w-28 h-28 rounded-full overflow-hidden bg-muted border-4 border-border shadow-sm flex items-center justify-center">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 shrink-0 rounded-full overflow-hidden bg-muted border-4 border-border shadow-sm flex items-center justify-center">
                 {formData.companyLogo ? (
                   <Image
                     width={200}
@@ -235,22 +235,23 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
             <div className="hidden md:block h-24 border-l border-border mx-6" />
 
             {/* Add User Button */}
-            <Link
-              href={`/${data?.companyName
-                .toLowerCase()
-                .replace(/\s+/g, "-")
-                .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                userInfo?.user._id,
-              )}/Module/Forms/employee`}
+            <Button
+              asChild
+              className="flex items-center gap-2 text-base h-12 px-6"
+              size="lg"
             >
-              <Button
-                className="flex items-center gap-2 text-base h-12 px-6"
-                size="lg"
+              <Link
+                href={`/${data?.companyName
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
+                  userInfo?.user._id,
+                )}/Module/Forms/employee`}
               >
                 <UserPlusIcon className="h-5 w-5" />
                 Add User
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -269,7 +270,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
             )}
 
             {userInfo.user.isAdmin && formData.subscriptionplan === "Basic" && (
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button type="button" variant="outline" className="flex items-center gap-2">
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -328,7 +329,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
               value={formData.BusinessType}
               onValueChange={(value) => handleSelectChange("BusinessType", value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select business type" />
               </SelectTrigger>
               <SelectContent>
@@ -428,7 +429,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
                 if (selected) handlecurrencyChange(selected);
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
               <SelectContent>
@@ -449,7 +450,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
                 handleSelectChange("allowCreditLimit", value)
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select credit option" />
               </SelectTrigger>
               <SelectContent>
@@ -558,7 +559,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
                 handleSelectChange("clearNotification", value)
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select notification policy" />
               </SelectTrigger>
               <SelectContent>
@@ -625,11 +626,11 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
 
       {/* Submit */}
       {userInfo.user.isAdmin && (
-        <div className="flex justify-end pt-4">
+        <div className="flex sm:justify-end pt-4">
           <Button
             type="submit"
             size="lg"
-            className="px-10 text-base font-medium"
+            className="w-full sm:w-auto px-10 text-base font-medium"
           >
             Save Changes
           </Button>

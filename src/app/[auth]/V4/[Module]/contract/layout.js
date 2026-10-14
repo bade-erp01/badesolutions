@@ -5,7 +5,7 @@ import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 
 export default async function Layout({ children }) {
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col">
       <Notch>
         <BackButton />
         <hr />

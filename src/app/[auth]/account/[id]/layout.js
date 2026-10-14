@@ -80,17 +80,17 @@ export default async function SetUpLayout({ children, params }) {
   if (!business) return notFound();
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col min-h-dvh overflow-hidden">
       <Nav1
         user={userData.user}
         business={userData.business}
         page={`${business.companyName}`}
       />
 
-      <div className="flex flex-1 text-white bt-2">
+      <div className="flex flex-1 flex-col md:flex-row text-white bt-2">
         {/* Sidebar (collapsible on mobile) */}
         <aside
-          className="w-70 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 max-h-[83dvh] md:block"
+          className="w-full md:w-70 md:shrink-0 bg-[#1e1e20]/70 backdrop-blur-md text-white px-4 py-6 transition-all duration-300 md:max-h-[83dvh] md:block"
           style={{ overflowY: "auto" }}
         >
           <BackButton />
@@ -101,7 +101,7 @@ export default async function SetUpLayout({ children, params }) {
               href={`/`}
               className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-700 transition"
             >
-              <h3 className=" text-xs">
+              <h3 className="text-xs break-words">
                 Next Renual Fee: ₦{business.SubcriptionAmount.toLocaleString()}
               </h3>
             </Link>
@@ -129,7 +129,7 @@ export default async function SetUpLayout({ children, params }) {
                 scrollbarColor: "#4B5563 transparent",
               }}
             >
-              <table className="min-w-full text-xs divide-y divide-gray-700">
+              <table className="min-w-full whitespace-nowrap text-xs divide-y divide-gray-700">
                 <thead>
                   <tr className="bg-gray-800 text-gray-200">
                     <th className="py-2 px-4 text-left">Date</th>
@@ -139,17 +139,17 @@ export default async function SetUpLayout({ children, params }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {business.PaymentLogs?.map((log, index) => (
+                  {business.PaymentLogs?.length ? business.PaymentLogs.map((log, index) => (
                     <tr key={index} className="border-b border-gray-700">
                       <td className="py-2 px-4 italic">{log.date}</td>
                       <td className="py-2 px-4 italic">{log.ref}</td>
                       <td className="py-2 px-4 italic">{log.amount}</td>
                       <td className="py-2 px-4 italic">{log.status}</td>
                     </tr>
-                  )) || (
+                  )) : (
                     <tr>
                       <td
-                        colSpan="3"
+                        colSpan="4"
                         className="py-3 px-4 text-sm text-center text-gray-400"
                       >
                         No payment logs available
@@ -163,15 +163,15 @@ export default async function SetUpLayout({ children, params }) {
             <div className="flex items-center gap-3 bg-white shadow-md p-4 rounded-md">
               <div className="shrink-0 w-10 h-10 overflow-hidden rounded-full border border-gray-300">
                 <Image
-                  height={10}
-                  width={10}
+                  height={40}
+                  width={40}
                   src={business.currency?.currency.Flag}
                   alt={`${business.currency?.currency.CountryName} Flag`}
                   className="w-full h-full object-cover"
                 />
               </div>
 
-              <span className="text-lg font-semibold text-gray-800">
+              <span className="min-w-0 truncate text-lg font-semibold text-gray-800">
                 {business.currency?.currency.CountryName}
               </span>
 
@@ -180,8 +180,8 @@ export default async function SetUpLayout({ children, params }) {
           </nav>
         </aside>{" "}
         {/* Main Content Area */}
-        <main className="flex-1 ">
-          <section className="w-full p-2 max-w-7xl flex flex-col gap-6 rounded-lg  relative z-10 max-h-[83dvh] overflow-y-auto">
+        <main className="flex-1 min-w-0">
+          <section className="w-full p-2 max-w-7xl flex flex-col gap-6 rounded-lg relative z-10 md:max-h-[83dvh] md:overflow-y-auto">
             <BusinessDatas
               data={business}
               userInfo={userData}

@@ -18,7 +18,7 @@ export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    onSearchChange?.(searchTerm);
+    if (typeof onSearchChange === "function") onSearchChange(searchTerm);
   };
 
   return (
@@ -54,14 +54,14 @@ export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
         )}
 
         {/* Right – Menu Toggle */}
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {/* Mobile search trigger could go here later */}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleToggle}
             aria-label={isOpen ? "Close menu" : "Open menu"}
-            className="h-9 w-9"
+            className="h-10 w-10 shrink-0"
           >
             {isOpen ? (
               <X className="h-5 w-5" />
@@ -86,7 +86,7 @@ export default function Nav2({ onToggleSideNav, navtitle, onSearchChange }) {
                 className="pl-9 h-9"
               />
             </div>
-            <Button type="submit" size="sm">
+            <Button type="submit" size="sm" className="h-9 shrink-0">
               Search
             </Button>
           </form>

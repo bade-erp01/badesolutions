@@ -302,7 +302,7 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
                         </div>
 
                         <div className="space-y-1">
-                          <p className="font-medium text-sm">{bill.customerName}</p>
+                          <p className="font-medium text-sm break-words">{bill.customerName}</p>
                           <p className="text-xs text-muted-foreground">
                             {bill.startDate}
                           </p>
@@ -310,7 +310,7 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
 
                         <Separator />
 
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm [&>*]:min-w-0">
                           <div>
                             <p className="text-xs text-muted-foreground">Store</p>
                             <p className="font-medium truncate">

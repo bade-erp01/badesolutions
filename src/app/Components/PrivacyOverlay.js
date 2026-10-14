@@ -134,7 +134,7 @@ export default function PrivacyIdleOverlay({
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-2xl"
           >
             <Card className="w-[95%] max-w-md shadow-2xl border border-white/10 bg-gray-900/95 backdrop-blur-3xl">
-              <CardContent className="p-8 flex flex-col items-center text-center">
+              <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center">
                 {/* Avatar */}
                 <Avatar className="mb-6 h-20 w-20 border-2 border-white/20">
                   <AvatarImage
@@ -147,11 +147,11 @@ export default function PrivacyIdleOverlay({
                   </AvatarFallback>
                 </Avatar>
 
-                <h1 className="text-3xl font-semibold tracking-tight text-white">
+                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
                   Privacy Mode
                 </h1>
 
-                <p className="mt-3 text-lg text-white/80">
+                <p className="mt-3 text-base sm:text-lg text-white/80">
                   Your session has been locked due to inactivity.
                 </p>
 

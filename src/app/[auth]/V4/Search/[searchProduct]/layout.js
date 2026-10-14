@@ -49,7 +49,7 @@ export default async function searchLayout({children, params }) {
   const { data } = await axios.get(url,config);
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col min-w-0">
         {/* Main Content Area */}
         <main className="flex-1 ">
           <SearchResultPage result={data} linkData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL}/>

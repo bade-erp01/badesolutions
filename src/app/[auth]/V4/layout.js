@@ -24,7 +24,6 @@ export const metadata = {
   ],
   author: "Business Automated Dynamic Enterprise",
   robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1",
   ogTitle:
     "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
   ogDescription:

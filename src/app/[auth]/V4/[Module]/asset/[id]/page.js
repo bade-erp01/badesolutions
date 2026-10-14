@@ -94,15 +94,15 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
   };
 
   return (
-    <div className="flex flex-col overflow-hidden">
-      <div className="flex-1 p-4 overflow-hidden">
+    <div className="flex flex-col">
+      <div className="flex-1 p-0 sm:p-4 min-w-0">
         <Card className="shadow-xl border-0 flex flex-col">
           <form onSubmit={handleSubmit} className="flex flex-col flex-1">
             {/* Header */}
             <CardHeader className="border-b pb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <CardTitle className="text-3xl">{formData.Name}</CardTitle>
+                <div className="min-w-0">
+                  <CardTitle className="text-2xl sm:text-3xl break-words">{formData.Name}</CardTitle>
                   <CardDescription className="mt-1">
                     Asset Code: <span className="font-mono font-medium">{formData.AssetCode}</span>
                   </CardDescription>
@@ -123,7 +123,7 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
             </CardHeader>
 
             {/* Scrollable Content Area */}
-            <CardContent className="flex-1 overflow-hidden">
+            <CardContent className="flex-1">
               {/* Image & Basic Info */}
               <div className="flex flex-col p-3 sm:flex-row items-start gap-6">
                 <div className="w-40 h-40 rounded-2xl overflow-hidden border bg-muted flex-shrink-0">
@@ -140,7 +140,7 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
                 <div className="space-y-4 flex-1 pt-2">
                   <div>
                     <Label className="text-muted-foreground">Current Location</Label>
-                    <p className="text-xl font-medium mt-1">{formData.Location?.WHName || "Not Assigned"}</p>
+                    <p className="text-lg sm:text-xl font-medium mt-1 break-words">{formData.Location?.WHName || "Not Assigned"}</p>
                   </div>
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
                 <>
                   <Separator />
                   <div>
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                       <h3 className="font-semibold text-lg">Depreciation Schedule</h3>
                       <p className="text-sm text-muted-foreground">
                         Page {currentPage} of {totalPages}

@@ -46,17 +46,17 @@ const AccountActivation = () => {
   return (
     <>
     <Nav1/>
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-dvh bg-gray-100 px-4 py-8">
       <div className="shadow-md rounded-lg pb-8 max-w-md w-full bg-yellow-600">
-        <form className="flex flex-col items-center " onSubmit={handleSubmit}>
+        <form className="flex flex-col items-center px-5 sm:px-8" onSubmit={handleSubmit}>
           {token ? (
-            <Image height={10} width={10}
+            <Image height={240} width={400}
             src="/Thank you hanging sign on yellow background for business, marketing, flyers, banners, presentations and posters_ illustration.jpg"
             alt="Logo"
-            className="w-100 h-60 mb-4 object-contain"
+            className="w-full max-w-100 h-48 sm:h-60 mb-4 object-contain"
           />
           ):null}
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 text-center">
             Account Activation!
           </h1>
           <p className="text-white text-center mb-6">
@@ -66,7 +66,7 @@ const AccountActivation = () => {
           </p>
          {token ? (
         <button
-            className="bg-emerald-900 text-white px-6 py-2 rounded-lg shadow-md hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:bg-emerald-600"
+            className="bg-emerald-900 text-white px-6 py-3 sm:py-2 rounded-lg shadow-md hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:bg-emerald-600"
         >
             Activate Account
         </button>

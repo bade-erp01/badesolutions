@@ -174,11 +174,11 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Business Overview</h1>
-          <Badge variant="ghost" className="text-muted-foreground mt-1 text-sm">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Business Overview</h1>
+          <Badge variant="ghost" className="text-muted-foreground mt-1 text-sm whitespace-normal h-auto text-left">
             {getLocalizedGreeting(user?.user?.firstName)}
           </Badge>
         </div>
@@ -210,8 +210,8 @@ export default function Dashboard() {
           );
         }}
       />
-      <SubscriptionReminder Business={user.business} />
-      <BirthdayGreetings Business={user.business} user={user.user} />
+      <SubscriptionReminder Business={user?.business} />
+      <BirthdayGreetings Business={user?.business} user={user?.user} />
 
       {/* Dashboards */}
        {user?.user?.c_levelDash ? (
@@ -230,18 +230,18 @@ export function DemoDashboardPlaceholder() {
     <div className="space-y-8 animate__animated animate__fadeInUp">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <p className="text-md text-zinc-500">
+          <p className="text-base text-zinc-500">
             You’re viewing a sample dashboard • Access Restricted
           </p>
       </div>
 
       {/* KPI Cards (Skeletons) */}
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {["Total Revenue", "YoY Growth", "MoM Growth", "Top Warehouse"].map(
           (label, idx) => (
             <div
               key={idx}
-              className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-[180px]"
+              className="dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-w-0"
             >
               <p className="text-sm">{label}</p>
               <div className="mt-2 h-6 w-24 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
@@ -252,13 +252,13 @@ export function DemoDashboardPlaceholder() {
       </div>
 
       {/* Chart Placeholder */}
-      <div className="dark:bg-zinc-900 rounded-3xl border p-6">
+      <div className="dark:bg-zinc-900 rounded-3xl border p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-semibold text-lg">Monthly Sales Trend (Demo)</h3>
         </div>
 
-        <div className="w-full h-[380px] flex items-center justify-center">
-          <div className="grid grid-cols-12 gap-2 w-full h-full items-end">
+        <div className="w-full h-[260px] sm:h-[380px] flex items-center justify-center">
+          <div className="grid grid-cols-12 gap-1 sm:gap-2 w-full h-full items-end">
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}

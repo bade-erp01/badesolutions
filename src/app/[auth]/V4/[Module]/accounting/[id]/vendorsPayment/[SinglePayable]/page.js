@@ -98,7 +98,7 @@ const Delete = async () => {
   };
   
   return (
-    <section className="  p-6 md:p-10 bg-white shadow-md rounded-xl animate__animated animate__fadeIn">
+    <section className="  p-4 sm:p-6 md:p-10 bg-white shadow-md rounded-xl animate__animated animate__fadeIn">
           {/* Header Section */}
           <div className="flex flex-col items-center mb-8">
             
@@ -109,9 +109,9 @@ const Delete = async () => {
                 height={90}
                 className="rounded-xl object-contain"
               />
-            <h2 className="mt-4 text-2xl font-semibold text-gray-800">{payment?.vendor?.Name.toUpperCase() || 'Vendor'}</h2>
+            <h2 className="mt-4 text-xl sm:text-2xl font-semibold text-gray-800 text-center break-words">{payment?.vendor?.Name?.toUpperCase() || 'Vendor'}</h2>
             <p className="text-sm text-gray-500">
-              <strong>{payment?.billReferenceNo.toUpperCase()}</strong>
+              <strong>{payment?.billReferenceNo?.toUpperCase()}</strong>
             </p>
             <p className="text-sm text-gray-500">
               <strong>Bank:</strong> {payment?.bankAccount?.NAME || 'Unavailable'}
@@ -169,7 +169,7 @@ function Detail({ label, value }) {
   return (
     <div>
       <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
-      <p className="text-md text-gray-800">{value || '—'}</p>
+      <p className="text-base text-gray-800 break-words">{value || '—'}</p>
     </div>
   );
 }

@@ -68,7 +68,7 @@ export default async function crmLayout({ params }) {
   const moduleParams = await params;
 
   return (
-    <div className="h-screen">
+    <div className="min-w-0">
       <div className="">
         {/* Sidebar */}
         <Notch>
@@ -136,7 +136,7 @@ export default async function crmLayout({ params }) {
         </Notch>
 
         {/* Main Content */}
-        <main className="overflow-y-auto">
+        <main className="min-w-0">
           <Suspense fallback={<SuspenenseFallBack pagedata={"Customer"} />}>
             <section className="w-full flex flex-col gap-6 rounded-lg">
               {customerList.length === 0 ? (

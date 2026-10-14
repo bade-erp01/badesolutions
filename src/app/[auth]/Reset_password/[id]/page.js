@@ -137,7 +137,7 @@ const PasswordReset = () => {
       <Nav1 />
 
       <div
-        className="min-h-screen flex items-center justify-center px-4 py-10 bg-cover bg-center bg-fixed"
+        className="min-h-dvh flex items-center justify-center px-4 py-8 sm:py-10 bg-cover bg-center md:bg-fixed"
         style={{ backgroundImage: "url('/bg.jpg')" }}
       >
         <Card className="w-full max-w-lg bg-background/95 backdrop-blur-md shadow-2xl">
@@ -146,7 +146,7 @@ const PasswordReset = () => {
               <LockKeyhole className="h-8 w-8 text-primary" />
             </div>
 
-            <CardTitle className="text-3xl">Reset Password</CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl">Reset Password</CardTitle>
             <CardDescription>
               Create a secure password for your account
             </CardDescription>
@@ -156,9 +156,10 @@ const PasswordReset = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* New Password */}
               <div className="space-y-2">
-                <Label>New Password</Label>
+                <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
                   <Input
+                    id="newPassword"
                     type={showPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -193,9 +194,9 @@ const PasswordReset = () => {
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-sm">
                     {item.valid ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-muted-foreground" />
+                      <XCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
                     )}
                     <span className={item.valid ? "text-green-600" : "text-muted-foreground"}>
                       {item.label}
@@ -206,9 +207,10 @@ const PasswordReset = () => {
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <Label>Confirm Password</Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
                   <Input
+                    id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}

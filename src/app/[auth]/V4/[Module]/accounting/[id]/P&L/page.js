@@ -186,7 +186,7 @@ export default function Page({ baseUrl, userData, data }) {
               onValueChange={(value) => {
 
                 // Convert value to number (e.g. "6" → 6)
-                const monthNum = Number(value + 1); // Add 1 because month index is 0-based
+                const monthNum = Number(value) + 1; // Add 1 because month index is 0-based
 
                 // Find the matching report entry
                 const matchedEntry = report.find(
@@ -217,11 +217,11 @@ export default function Page({ baseUrl, userData, data }) {
         </Notch>
 
         {/* MAIN */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle>
-                <Badge variant="outline" className="text-sm">
+                <Badge variant="outline" className="text-sm whitespace-normal text-left">
                   {selectedMonth?.period
                     ? `P&L Summary for ${moment(selectedMonth?.generatedAt).month() + 1}-${moment(selectedMonth?.period).year()}`
                     : "P&L Summary"}{" "}
@@ -354,10 +354,10 @@ export default function Page({ baseUrl, userData, data }) {
                   </TableRow>
 
                   <TableRow>
-                    <TableCell className="font-bold text-lg">
+                    <TableCell className="font-bold text-base sm:text-lg">
                       Net Profit
                     </TableCell>
-                    <TableCell className="text-right font-bold text-lg">
+                    <TableCell className="text-right font-bold text-base sm:text-lg">
                       {currency}
                       {selectedMonth?.totals?.netIncome || 0}
                     </TableCell>

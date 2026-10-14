@@ -129,14 +129,14 @@ export default function ProductForm({
       <div className="">
         <Card className="shadow-xl">
           <CardHeader className="rounded-t-lg">
-            <CardTitle className="text-3xl">Create Product</CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl">Create Product</CardTitle>
             <p className="mt-2">
               Ensure to provide correct information for your product
             </p>
           </CardHeader>
           <Separator />
 
-          <CardContent className="p-8">
+          <CardContent className="p-4 sm:p-6 lg:p-8">
             <form onSubmit={handleSubmit} className="space-y-10">
               {/* Product Information */}
               <div>
@@ -144,7 +144,7 @@ export default function ProductForm({
                   Product Information
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="Name">Product Name</Label>
                     <Input
@@ -221,7 +221,7 @@ export default function ProductForm({
                       disabled={isLoading}
                       required
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Vendor..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -319,7 +319,7 @@ export default function ProductForm({
               {/* Submit Button with Loading */}
               <div className="flex justify-end pt-6 border-t">
                 {user.createProduct && (
-                  <Button type="submit" size="lg" disabled={isLoading}>
+                  <Button type="submit" size="lg" disabled={isLoading} className="w-full sm:w-auto">
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />

@@ -483,16 +483,16 @@ export default function InvoicePage({ invoice }) {
 
   // ========== UI ==========
   return (
-    <div className="flex flex-col min-h-screen m-6">
+    <div className="flex flex-col min-h-dvh p-3 sm:p-6">
       <Card className="shadow-sm">
         <CardHeader className="pb-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-xl text-blue-600">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <CardTitle className="text-lg sm:text-xl text-blue-600 break-words">
                 {inv.billStatus?.slice(0, 3).toUpperCase()}/
                 {inv.billReferenceNo}
               </CardTitle>
-              <CardDescription className="mt-1 space-y-1">
+              <CardDescription className="mt-1 space-y-1 break-words">
                 <p>
                   Customer:{" "}
                   <span className="font-medium text-foreground">
@@ -516,7 +516,7 @@ export default function InvoicePage({ invoice }) {
               </CardDescription>
             </div>
 
-            <Badge variant="secondary" className="text-base px-3 py-1">
+            <Badge variant="secondary" className="self-start text-sm sm:text-base px-3 py-1">
               ₦
               {Number(inv.grandTotal || 0).toLocaleString(undefined, {
                 minimumFractionDigits: 2,
@@ -537,8 +537,8 @@ export default function InvoicePage({ invoice }) {
                 <div className="space-y-3 pt-2">
                   {inv.orders?.map((order, i) => (
                     <div key={i} className="rounded-lg border bg-muted/40 p-4">
-                      <h4 className="font-medium">{order.item?.Name}</h4>
-                      <div className="mt-1 grid grid-cols-3 gap-2 text-sm text-muted-foreground">
+                      <h4 className="font-medium break-words">{order.item?.Name}</h4>
+                      <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-muted-foreground">
                         <span>Case: {order.Qty}</span>
                         <span>Pieces: {order.pcsReq || 0}</span>
                         <span className="font-medium text-foreground">
@@ -569,7 +569,7 @@ export default function InvoicePage({ invoice }) {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label>Delivery Date</Label>
-                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm">
+                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm break-words">
                     {inv.DELIVERYDATE
                       ? new Date(inv.DELIVERYDATE).toLocaleString("en-US", {
                           year: "numeric",
@@ -582,21 +582,21 @@ export default function InvoicePage({ invoice }) {
 
                 <div className="space-y-1.5">
                   <Label>Delivery Fee</Label>
-                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm">
+                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm break-words">
                     ₦{Number(inv.shippingFee || 0).toLocaleString()}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label>Driver Name</Label>
-                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm">
+                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm break-words">
                     {inv.DriverName || "N/A"}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label>Driver Contact</Label>
-                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm">
+                  <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-sm break-words">
                     {inv.DriverNumber || "N/A"}
                   </div>
                 </div>
@@ -611,7 +611,7 @@ export default function InvoicePage({ invoice }) {
 
               <div className="space-y-1.5">
                 <Label>Delivery Remarks</Label>
-                <div className="min-h-[80px] rounded-md border bg-muted/50 px-3 py-2.5 text-sm">
+                <div className="min-h-[80px] rounded-md border bg-muted/50 px-3 py-2.5 text-sm break-words">
                   {inv.DeliveryComment || "—"}
                 </div>
               </div>
@@ -624,7 +624,7 @@ export default function InvoicePage({ invoice }) {
               variant="default"
               onClick={() => generatePdf(biz, inv.customer, inv)}
             >
-              <PrinterIcon className="h-7 w-7" />
+              <PrinterIcon className="h-5 w-5" />
               Print {inv.billStatus}
             </Button>
             {/* Print Buttons (Invoice only) */}
@@ -634,7 +634,7 @@ export default function InvoicePage({ invoice }) {
                 variant="secondary"
                 onClick={() => printWayBill(biz, inv.customer, inv)}
               >
-                <PrinterIcon className="mr-2 h-5 w-5" />
+                <PrinterIcon className="h-5 w-5" />
                 Print WB/{inv.WayBillNo}
               </Button>
             )}

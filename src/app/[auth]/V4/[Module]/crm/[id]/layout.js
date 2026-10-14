@@ -55,7 +55,7 @@ export default async function StoreLayout2({ params }) {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden">
+    <div className="flex flex-col min-w-0">
 
         <Notch>
           <BackButton />
@@ -127,7 +127,7 @@ export default async function StoreLayout2({ params }) {
         </Notch>
 
         {/* Main Content */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
             <Suspense
               fallback={
                 <SuspenenseFallBack pagedata={`${data.result?.Username}`} />

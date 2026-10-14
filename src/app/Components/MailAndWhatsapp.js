@@ -62,7 +62,7 @@ const MailAndWhatsapp = ({
 
     return (
         <TooltipProvider delayDuration={300}>
-            <div className="flex items-center gap-2 mt-3">
+            <div className="flex flex-wrap items-center gap-2 mt-3">
                 
                 {/* Email Button */}
                 <Tooltip>

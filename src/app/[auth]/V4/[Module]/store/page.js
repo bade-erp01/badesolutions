@@ -96,7 +96,7 @@ export default async function storelayout({ children, params }) {
   const stores = StoreList || [];
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col">
       {/* Sidebar */}
       <Notch>
         {userData.user.isAdmin && (
@@ -153,10 +153,10 @@ export default async function storelayout({ children, params }) {
       </Notch>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <UiCard className="shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex flex-wrap items-center justify-between gap-2">
               Stores Overview
               <Badge variant="secondary">{stores.length} Stores</Badge>
             </CardTitle>
@@ -183,7 +183,7 @@ export default async function storelayout({ children, params }) {
                           {store.WHName || "Unnamed Store"}
                         </Link>
                       </TableCell>
-                      <TableCell>{store.InvoiceNo.toUpperCase() || "—"}</TableCell>
+                      <TableCell>{store.InvoiceNo?.toUpperCase() || "—"}</TableCell>
                       <TableCell>{store.Address || "—"}</TableCell>
                       <TableCell>
                         {store.Tel || store.Email || "—"}

@@ -97,14 +97,14 @@ export default async function layout({ params }) {
   return (
     <div className="">
      <nav className="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200 shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
             {/* Left: Username */}
-            <h1 className="text-lg font-semibold tracking-tight text-slate-900">
+            <h1 className="min-w-0 truncate text-base sm:text-lg font-semibold tracking-tight text-slate-900">
             Todays Routes 
             </h1>
 
             {/* Right: Back button */}
-            <div className="flex items-center">
+            <div className="flex shrink-0 items-center">
             <BackButton />
             </div>
         </div>

@@ -140,7 +140,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-fixed bg-no-repeat"
+      className="min-h-dvh bg-cover bg-center bg-no-repeat md:bg-fixed"
       style={{
         backgroundImage:
           "url('/kvistholt-photography-oZPwn40zCK4-unsplash.jpg')",
@@ -148,13 +148,13 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     >
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-xl">SP</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
                 SalesPortal
               </h1>
               <p className="text-xs text-slate-500 -mt-1">
@@ -165,8 +165,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         </div>
       </nav>
 
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="flex flex-col md:flex-row gap-8 items-end relative z-10">
+      <div className="relative overflow-hidden min-h-dvh flex items-center justify-center p-4">
+        <div className="flex flex-col md:flex-row gap-8 items-center md:items-end relative z-10 w-full md:w-auto">
           {!isLoggedIn ? (
             <Card className="w-[380px] max-w-full bg-white/95 backdrop-blur-lg border-0 shadow-2xl">
               <CardHeader className="flex flex-row items-center justify-between pb-6">
@@ -179,7 +179,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                     className="rounded-xl"
                   />
                 </Link>
-                <h2 className="text-3xl font-semibold text-slate-900">Log in</h2>
+                <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900">Log in</h2>
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -238,10 +238,10 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
                 {/* Date & Location Card */}
                 <Card className="bg-white border border-slate-100">
-                  <CardContent className="p-8 relative overflow-hidden">
+                  <CardContent className="p-5 sm:p-8 relative overflow-hidden">
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 bg-gradient-to-br from-slate-700 to-slate-500 rounded-full opacity-60 blur-2xl" />
 
-                    <div className="flex justify-between items-start relative z-10">
+                    <div className="flex justify-between items-start gap-3 relative z-10">
                       <div>
                         <div className="text-4xl font-bold text-slate-800 leading-none">
                           {weekday}
@@ -250,7 +250,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                           {date}
                         </div>
                       </div>
-                      <div className="text-right text-sm text-slate-600">
+                      <div className="text-right text-sm text-slate-600 min-w-0 break-words">
                         {time}
                         <br />
                         <span className="text-xs">How&apos;s {location} today?</span>
@@ -258,10 +258,10 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                     </div>
 
                     <Link
-                      href="/Marketers"
+                      href="/Careers"
                       className="mt-8 block w-full text-center bg-slate-900 text-white rounded-full py-3 font-medium hover:bg-slate-800 transition"
                     >
-                      Refer and Earn →
+                      Careers →
                     </Link>
                   </CardContent>
                 </Card>
@@ -272,8 +272,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
               </CardContent>
             </Card>
           ) : (
-            <Card className="max-w-sm w-full bg-white shadow-2xl p-8">
-              <div className="flex items-center gap-5">
+            <Card className="max-w-sm w-full bg-white shadow-2xl p-5 sm:p-8">
+              <div className="flex items-center gap-4 sm:gap-5">
                 <Image
                   src={
                     userInfo?.image ||
@@ -283,10 +283,10 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                   alt="Profile"
                   width={72}
                   height={72}
-                  className="rounded-2xl shadow-md"
+                  className="rounded-2xl shadow-md shrink-0"
                 />
                 <div>
-                  <h3 className="text-2xl font-semibold text-slate-900">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 break-words">
                     Welcome back, {userInfo?.firstName || "Sales Rep"}!
                   </h3>
                   <p className="text-slate-600 mt-1">Glad to see you again</p>
@@ -307,7 +307,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
         {/* Decorative Elements */}
         <div className="absolute inset-0 -z-10 flex items-end justify-center pointer-events-none">
-          <div className="w-[420px] h-[420px] bg-gradient-to-br from-slate-100 to-slate-200 rounded-full absolute left-1/2 -translate-x-1/2 bottom-0 blur-3xl opacity-70" />
+          <div className="w-[min(420px,100vw)] h-[420px] bg-gradient-to-br from-slate-100 to-slate-200 rounded-full absolute left-1/2 -translate-x-1/2 bottom-0 blur-3xl opacity-70" />
           <div className="w-40 h-40 bg-gradient-to-br from-slate-300 to-slate-400 rounded-full absolute left-12 bottom-12 blur-2xl opacity-60" />
         </div>
       </div>

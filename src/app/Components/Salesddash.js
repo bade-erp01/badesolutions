@@ -270,11 +270,11 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.25 }}
-      className="p-6 bg-gradient-to-br from-slate-100 to-indigo-50 shadow-xl w-full"
+      className="p-3 sm:p-6 bg-gradient-to-br from-slate-100 to-indigo-50 shadow-xl w-full"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-700 tracking-wide">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-700 tracking-wide">
             Sales Intelligence
           </h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -286,7 +286,7 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
           <select
             value={range}
             onChange={(e) => setRange(e.target.value)}
-            className="px-3 py-2 text-sm rounded-md border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 text-base sm:text-sm rounded-md border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="3m">Last 3 months</option>
             <option value="6m">Last 6 months</option>
@@ -294,10 +294,10 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 mb-8">
-        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-indigo-400">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <div className="bg-white shadow-md rounded-xl p-4 sm:p-6 w-full min-w-0 text-center border-t-4 border-indigo-400">
           <div className="text-sm text-gray-500">Revenue</div>
-          <div className="text-2xl font-bold text-gray-800 mt-2">
+          <div className="text-xl sm:text-2xl font-bold text-gray-800 mt-2 break-words">
             {money(stats.revenue)}
           </div>
           <div className="text-xs text-gray-400 mt-1">
@@ -306,9 +306,9 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-blue-400">
+        <div className="bg-white shadow-md rounded-xl p-4 sm:p-6 w-full min-w-0 text-center border-t-4 border-blue-400">
           <div className="text-sm text-gray-500">Invoices</div>
-          <div className="text-2xl font-bold text-gray-800 mt-2">
+          <div className="text-xl sm:text-2xl font-bold text-gray-800 mt-2 break-words">
             {stats.count.toLocaleString()}
           </div>
           <div className="text-xs text-gray-400 mt-1">
@@ -316,9 +316,9 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-green-400">
+        <div className="bg-white shadow-md rounded-xl p-4 sm:p-6 w-full min-w-0 text-center border-t-4 border-green-400">
           <div className="text-sm text-gray-500">Avg. Ticket</div>
-          <div className="text-2xl font-bold text-gray-800 mt-2">
+          <div className="text-xl sm:text-2xl font-bold text-gray-800 mt-2 break-words">
             {money(stats.avgTicket)}
           </div>
           <div className="text-xs text-gray-400 mt-1">
@@ -326,9 +326,9 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-xl p-6 w-64 text-center border-t-4 border-red-400">
+        <div className="bg-white shadow-md rounded-xl p-4 sm:p-6 w-full min-w-0 text-center border-t-4 border-red-400">
           <div className="text-sm text-gray-500">Cancel Rate</div>
-          <div className="text-2xl font-bold text-red-600 mt-2">
+          <div className="text-xl sm:text-2xl font-bold text-red-600 mt-2 break-words">
             {stats.cancelRate.toFixed(1)}%
           </div>
           <div className="text-xs text-gray-400 mt-1">
@@ -338,13 +338,13 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
       </div>
 
       {stats.count === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-16 text-center text-gray-500">
+        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-8 sm:p-16 text-center text-gray-500">
           No invoices in this window. Try expanding the date range.
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="bg-white rounded-xl shadow-md p-4 h-[380px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
+            <div className="bg-white rounded-xl shadow-md p-4 h-[380px] min-w-0">
               <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">
                 Revenue by Month
               </h3>
@@ -353,7 +353,7 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-4 h-[380px]">
+            <div className="bg-white rounded-xl shadow-md p-4 h-[380px] min-w-0">
               <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">
                 Status Mix
               </h3>
@@ -391,7 +391,7 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-4 h-[380px]">
+          <div className="bg-white rounded-xl shadow-md p-4 h-[380px] min-w-0">
             <h3 className="text-center text-lg font-semibold mb-2 text-gray-700">
               Recent Daily Rhythm
             </h3>

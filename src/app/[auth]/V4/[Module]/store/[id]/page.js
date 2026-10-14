@@ -76,7 +76,7 @@ export default async function page({ children, params }) {
   const data = await res.json();
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col">
       {/* Sidebar */}
       <Notch>
         <BackButton />
@@ -132,7 +132,7 @@ export default async function page({ children, params }) {
       </Notch>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 min-w-0">
         <div className="overflow-y-auto">
           {/* Chart */}
           {userData?.user?.c_levelDash && (

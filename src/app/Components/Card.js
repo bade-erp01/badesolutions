@@ -62,7 +62,7 @@ const Card = ({ data, module, url }) => {
                           rounded-xl shadow-sm hover:shadow-md 
                           transition-all duration-200 
                           animate__animated animate__fadeInUp 
-                          min-h-[88px] p-4 group"
+                          min-h-[88px] p-3 sm:p-4 group"
           >
             <div className="relative flex-shrink-0">
               <Image
@@ -104,11 +104,11 @@ const Card = ({ data, module, url }) => {
               width={72}
               height={72}
               alt={title}
-              className="rounded-xl object-cover shadow-md ring-1 ring-gray-200 dark:ring-slate-700"
+              className="shrink-0 rounded-xl object-cover shadow-md ring-1 ring-gray-200 dark:ring-slate-700"
               quality={100}
             />
-            <div className="flex-1">
-              <p className="font-semibold text-lg text-gray-900 dark:text-white leading-tight">
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-lg text-gray-900 dark:text-white leading-tight break-words">
                 {title}
               </p>
               {data.ADCcode || data.ACDcode ? (
@@ -121,14 +121,14 @@ const Card = ({ data, module, url }) => {
 
           <Separator className="dark:bg-slate-700" />
 
-          <div className="text-sm text-gray-600 dark:text-slate-300">
+          <div className="text-sm text-gray-600 dark:text-slate-300 break-words">
             {subtitle || "No additional information"}
           </div>
 
           {/* Extra Info Badges */}
           <div className="flex flex-wrap gap-2 pt-2">
             {data.Email && (
-              <div className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-3 py-1.5 rounded-lg">
+              <div className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-3 py-1.5 rounded-lg break-all">
                 {data.Email}
               </div>
             )}

@@ -84,7 +84,7 @@ export default function Nav1({ page, user, business, IconArray }) {
   if (!hydrated) {
     return (
       <div className="p-4 space-y-4 animate-pulse">
-        <div className="h-4 bg-gray-300 rounded w-80"></div>
+        <div className="h-4 bg-gray-300 rounded w-80 max-w-full"></div>
       </div>
     );
   }
@@ -99,7 +99,7 @@ export default function Nav1({ page, user, business, IconArray }) {
   const publicLinks = [
     { href: "/why-bade", label: "Why Bade?" },
     { href: "/Pricing", label: "Pricing" },
-    { href: "/Marketers", label: "Refer & Earn" },
+    { href: "/Careers", label: "Careers" },
     { href: "/About_Us", label: "About Us" },
   ];
 
@@ -162,7 +162,7 @@ export default function Nav1({ page, user, business, IconArray }) {
           </div>
 
           {/* RIGHT */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {/* PUBLIC LINKS - Desktop */}
             {!business || !user ? (
               <>
@@ -291,7 +291,7 @@ export default function Nav1({ page, user, business, IconArray }) {
                     </Button>
                   </PopoverTrigger>
 
-                  <PopoverContent className="w-80 rounded-3xl border-0 p-0 shadow-2xl backdrop-blur-xl">
+                  <PopoverContent className="w-80 max-w-[calc(100vw-1rem)] rounded-3xl border-0 p-0 shadow-2xl backdrop-blur-xl">
                     <div className="overflow-hidden rounded-3xl">
                       {/* TOP */}
                       <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 p-5 text-white">

@@ -157,6 +157,7 @@ function showExpenseSwal(data) {
         title: "Expense Report",
         width: "90%",
         html: `
+            <style> @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
             <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
                 <div>
                     <label style="font-weight: 600; font-size: 12px;">Filter by Store</label><br/>

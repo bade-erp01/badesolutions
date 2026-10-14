@@ -257,7 +257,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+    <main className="min-h-dvh bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
       <AnimatePresence>{showSplash && <BadeSplashScreen />}</AnimatePresence>
 
       <Nav1
@@ -266,7 +266,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         page={userInfo ? "dashboard" : "Bade"}
       />
 
-      <section className="relative min-h-[calc(100vh-80px)] overflow-hidden">
+      <section className="relative min-h-[calc(100dvh-80px)] overflow-hidden">
         {/* Soft background — works in light & dark */}
         <div
           className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90 dark:opacity-80"
@@ -274,7 +274,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         />
         <div className="pointer-events-none absolute inset-0 dark:bg-gradient-to-b dark:from-zinc-950/90 dark:via-zinc-950/80 dark:to-zinc-950" />
 
-        <div className="relative mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl items-center px-4 py-10 sm:px-6 lg:px-8">
+        <div className="relative mx-auto flex min-h-[calc(100dvh-80px)] max-w-7xl items-center px-4 py-8 sm:py-10 sm:px-6 lg:px-8">
           {!isLoggedIn ? (
             <div className="grid w-full items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
               {/* LEFT */}
@@ -363,7 +363,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                 className="w-full"
               >
                 <div className="mx-auto w-full max-w-md">
-                  <div className="rounded-[1.75rem] border border-zinc-200/90 bg-white/95 p-6 shadow-xl shadow-zinc-950/5 backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-900/95 dark:shadow-black/40 sm:p-8">
+                  <div className="rounded-[1.75rem] border border-zinc-200/90 bg-white/95 p-5 shadow-xl shadow-zinc-950/5 backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-900/95 dark:shadow-black/40 sm:p-8">
                     <div className="mb-8 flex items-center justify-between lg:hidden">
                       <Link href="/" className="flex items-center gap-3">
                         <div className="flex h-11 w-11 overflow-hidden rounded-xl bg-zinc-950 dark:bg-white">
@@ -388,7 +388,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-950 text-white shadow-lg dark:bg-white dark:text-zinc-950">
                         <LockKeyhole className="h-5 w-5" />
                       </div>
-                      <h2 className="text-3xl font-semibold tracking-[-0.03em]">
+                      <h2 className="text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
                         Welcome back
                       </h2>
                       <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
@@ -422,7 +422,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                       </div>
 
                       <div>
-                        <div className="mb-2 flex items-center justify-between">
+                        <div className="mb-2 flex items-center justify-between gap-3">
                           <label
                             htmlFor="password"
                             className="text-sm font-medium text-zinc-800 dark:text-zinc-200"
@@ -431,7 +431,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                           </label>
                           <Link
                             href="/auth/Forgot_password"
-                            className="text-xs font-medium text-zinc-500 transition hover:text-zinc-950 dark:hover:text-white"
+                            className="shrink-0 text-xs font-medium text-zinc-500 transition hover:text-zinc-950 dark:hover:text-white"
                           >
                             Forgot password?
                           </Link>
@@ -513,10 +513,10 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                   </div>
 
                   <Link
-                    href="/Marketers"
+                    href="/Careers"
                     className="group mt-4 flex items-center justify-center gap-2 rounded-2xl border border-zinc-200/80 bg-white/80 px-5 py-4 text-xs font-medium text-zinc-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white"
                   >
-                    Refer and Earn
+                    Careers
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>
@@ -529,8 +529,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
               animate={{ opacity: 1, scale: 1 }}
               className="mx-auto w-full max-w-lg"
             >
-              <div className="rounded-[1.75rem] border border-zinc-200/80 bg-white/95 p-8 shadow-xl backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-900/95">
-                <div className="flex items-start gap-5">
+              <div className="rounded-[1.75rem] border border-zinc-200/80 bg-white/95 p-5 shadow-xl backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-900/95 sm:p-8">
+                <div className="flex items-start gap-4 sm:gap-5">
                   <Image
                     src={
                       userInfo?.image ||
@@ -540,7 +540,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                     alt="User"
                     width={76}
                     height={76}
-                    className="h-[76px] w-[76px] rounded-2xl object-cover shadow-md"
+                    className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-md sm:h-[76px] sm:w-[76px]"
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
@@ -549,7 +549,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
                     <h3 className="mt-1 truncate text-xl font-semibold tracking-tight">
                       Welcome back, {userInfo?.firstName || "User"}
                     </h3>
-                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-1 truncate text-sm text-zinc-500 dark:text-zinc-400">
                       {businessInfo?.companyName || "Your business workspace"}
                     </p>
                   </div>
@@ -628,7 +628,7 @@ export function BadeSplashScreen() {
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative flex flex-col items-center"
+            className="relative flex flex-col items-center px-6"
           >
             <motion.div
               animate={{ scale: glow ? [1, 1.04, 1] : 1 }}
@@ -658,7 +658,7 @@ export function BadeSplashScreen() {
               Business Automated Dynamic Enterprise
             </p>
 
-            <div className="mt-10 h-[2px] w-[220px] overflow-hidden rounded-full bg-white/10">
+            <div className="mt-10 h-[2px] w-[220px] max-w-full overflow-hidden rounded-full bg-white/10">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}

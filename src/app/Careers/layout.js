@@ -109,25 +109,19 @@ export const metadata = {
 
   manifest: "/site.webmanifest",
 
-  themeColor: "#ffffff",
-
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
-
   verification: {
     google: "google-site-verification-code",
   },
 };
 
+export const viewport = {
+  themeColor: "#ffffff",
+};
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-white text-zinc-900 antialiased">
-        {children}
-      </body>
-    </html>
+    <div className="bg-white text-zinc-900 antialiased">
+      {children}
+    </div>
   );
 }

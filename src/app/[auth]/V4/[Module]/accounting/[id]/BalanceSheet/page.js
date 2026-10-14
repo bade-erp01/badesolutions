@@ -150,27 +150,27 @@ export default function BalanceSheet({ data, baseUrl, userData }) {
         </Notch>
 
         {/* Main Content */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <div className="">
               <Card className="border-0">
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold text-center ">
+                  <CardTitle className="text-lg sm:text-xl font-bold text-center ">
                     Balance Sheet Overview
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {/* Financial Data */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center mb-8">
                     <Card className=" border-gray-100">
                       <CardHeader>
-                        <CardTitle className=" text-md">
+                        <CardTitle className=" text-base">
                           Assets
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <Badge
                           variant="default"
-                          className="text-xl font-bold text-purple-400"
+                          className="text-lg sm:text-xl font-bold max-w-full whitespace-normal break-all text-purple-400"
                         >
                           {Assets}
                         </Badge>
@@ -182,14 +182,14 @@ export default function BalanceSheet({ data, baseUrl, userData }) {
                     </Card>
                     <Card className="border-gray-100">
                       <CardHeader>
-                        <CardTitle className=" text-md">
+                        <CardTitle className=" text-base">
                           Liabilities
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <Badge
                           variant="default"
-                          className="text-xl font-bold text-red-400"
+                          className="text-lg sm:text-xl font-bold max-w-full whitespace-normal break-all text-red-400"
                         >
                           {liability}
                         </Badge>
@@ -197,14 +197,14 @@ export default function BalanceSheet({ data, baseUrl, userData }) {
                     </Card>
                     <Card className="border-gray-100">
                       <CardHeader>
-                        <CardTitle className=" text-md">
+                        <CardTitle className=" text-base">
                           Equity
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <Badge
                           variant="default"
-                          className="text-xl font-bold text-green-400"
+                          className="text-lg sm:text-xl font-bold max-w-full whitespace-normal break-all text-green-400"
                         >
                           {equity}
                         </Badge>
@@ -216,7 +216,7 @@ export default function BalanceSheet({ data, baseUrl, userData }) {
                   <h2 className="text-xs text-center mb-4 ">
                     Financial Trends
                   </h2>
-                  <div className="h-80 p-2 rounded-md">
+                  <div className="h-64 sm:h-80 p-2 rounded-md">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -250,7 +250,7 @@ export default function BalanceSheet({ data, baseUrl, userData }) {
                   </div>
                   <Separator className="my-2" />
                 </CardContent>
-                <footer className="backdrop-blur-md  px-4 py-4 flex items-center justify-between">
+                <footer className="backdrop-blur-md  px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   {/* Export Button */}
                   <BalanceSheetExport chartData={balanceData} />
                   <div className="flex items-center gap-2">
@@ -401,7 +401,7 @@ export function BalanceSheetExport({ chartData }) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">
+      <h2 className="text-base sm:text-lg font-semibold">
         Download Balance Sheet
       </h2>
       <Select
@@ -410,7 +410,7 @@ export function BalanceSheetExport({ chartData }) {
           handleExport(value); // trigger download immediately
         }}
       >
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-full sm:w-[200px]">
           <SelectValue placeholder="Select Month" />
         </SelectTrigger>
         <SelectContent>

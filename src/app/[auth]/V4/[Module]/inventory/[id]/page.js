@@ -107,7 +107,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
           </div>
 
           {/* isActivated toggle */}
-          <div className="col-span-2 flex items-center space-x-2 pt-2">
+          <div className="md:col-span-2 flex items-center space-x-2 pt-2">
             <Switch
               id="isActivated"
               checked={formData.isActivated}
@@ -121,7 +121,7 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
           </div>
 
            {/* Display as featured product */}
-          <div className="col-span-2 flex items-center space-x-2 pt-2">
+          <div className="md:col-span-2 flex items-center space-x-2 pt-2">
             <Switch
               id="featured"
               checked={formData.featured}

@@ -1105,7 +1105,7 @@ const generatePdf = async (business, customer, billData) => {
               alt="logo"
               className="rounded-md shrink-0"
             />
-            <div className="text-sm space-y-1">
+            <div className="text-sm space-y-1 min-w-0 break-words">
               <h3 className="text-base sm:text-lg font-extrabold text-foreground">
                 {userInfo.business.companyName}
               </h3>
@@ -1426,7 +1426,7 @@ const generatePdf = async (business, customer, billData) => {
                   )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-2 gap-3 text-sm [&>*]:min-w-0">
                 <div>
                   <p className="text-xs text-muted-foreground">Case</p>
                   {(Singlebill.means ?? "") !== "Ecomm" &&
@@ -1449,7 +1449,7 @@ const generatePdf = async (business, customer, billData) => {
                           userInfo.business.companyName,
                         );
                       }}
-                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background"
+                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background text-base sm:text-sm"
                     />
                   ) : (
                     <p className="font-medium">{billItem.Qty}</p>
@@ -1477,7 +1477,7 @@ const generatePdf = async (business, customer, billData) => {
                           userInfo.business.companyName,
                         );
                       }}
-                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background"
+                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background text-base sm:text-sm"
                     />
                   ) : (
                     <p className="font-medium">{billItem.pcsReq || 0}</p>
@@ -1505,7 +1505,7 @@ const generatePdf = async (business, customer, billData) => {
                           userInfo.business.companyName,
                         );
                       }}
-                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background"
+                      className="w-full mt-1 px-2 py-1.5 border border-border rounded text-center bg-background text-base sm:text-sm"
                     />
                   ) : (
                     <p className="font-medium">
@@ -1541,7 +1541,7 @@ const generatePdf = async (business, customer, billData) => {
                     handleProductSelection(e.target.value);
                   }
                 }}
-                className="w-full px-4 py-2.5 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full px-4 py-2.5 border border-border rounded-md bg-background text-foreground text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">Choose product...</option>
                 {products.map((product) => (
@@ -1613,7 +1613,7 @@ const generatePdf = async (business, customer, billData) => {
                   <input
                     type="number"
                     defaultValue={Singlebill.discount || 0}
-                    className="w-24 px-2 py-1 border border-border rounded text-center bg-background"
+                    className="w-24 px-2 py-1 border border-border rounded text-center bg-background text-base sm:text-sm"
                     onBlur={(e) => {
                       const val = parseFloat(e.target.value);
                       if (val < 0) return;
@@ -1714,7 +1714,7 @@ const generatePdf = async (business, customer, billData) => {
 export function ProgressDemo({ count }) {
   return (
     <div className="w-full max-w-md mx-auto space-y-4">
-      <h2 className="text-md font-semibold">{200 - count} Order available </h2>
+      <h2 className="text-base font-semibold">{200 - count} Order available </h2>
       <Progress
         value={(count / 200) * 100}
         className="h-4  [&>div]:bg-yellow-500"

@@ -84,7 +84,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
     Swal.fire({
       title: "Payable Transactions",
       html: `
-        <style> tr:hover { background-color: #f7fafc; } </style>
+        <style> tr:hover { background-color: #f7fafc; } @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
         <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
           <div>
             <label style="font-weight: 600; font-size: 12px;">Start Date</label><br/>
@@ -140,7 +140,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
         </div>
         <div id="tableDownloadBtn" style="margin-top: 12px; text-align: right;"></div>
       `,
-      width: "75%",
+      width: "max(75%, min(95vw, 640px))",
       showConfirmButton: false,
       didOpen: () => {
         const tableBody = document.getElementById("paymentTableBody");

@@ -90,8 +90,8 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
           </DialogHeader>
 
           <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1 min-w-0">
                 <label className="text-sm font-medium">From</label>
                 <Select onValueChange={setFrom}>
                   <SelectTrigger>
@@ -107,7 +107,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
                 </Select>
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <label className="text-sm font-medium">To</label>
                 <Select onValueChange={setTo}>
                   <SelectTrigger>
@@ -136,7 +136,7 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
 
             <Card className="p-4 text-sm">
               <strong>Preview:</strong>
-              <div className="flex justify-between mt-2">
+              <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 mt-2">
                 <span>From: {getStore(from)}</span>
                 <span>To: {getStore(to)}</span>
                 <span>Date: {date}</span>

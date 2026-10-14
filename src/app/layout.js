@@ -19,7 +19,6 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
 
   description:
     "B.A.D.E is a cloud-based ERP platform for Nigerian and African businesses. Manage inventory, accounting, HR, payroll, sales, CRM, warehouses, and operations from one secure enterprise system.",
-  manifest: "/public/manifest.json",
 
   keywords: [
     "ERP software Nigeria",
@@ -124,6 +123,8 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
 };
 
 export const viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#0f172a",
 };
 
@@ -131,18 +132,17 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <link rel="manifest" href="/site.webmanifest" />
       <body
         className={`
           ${geistSans.variable} 
           ${geistMono.variable} 
           ${inter.className} 
           ${dmSans.variable} 
-          text-sm sm:text-xs md:text-sm lg:text-base 
-          antialiased
+          text-sm lg:text-base
+          antialiased overflow-x-hidden
         `}
       >
-        <div className="min-h-screen flex flex-col isolate bg-gray-100">
+        <div className="relative min-h-dvh flex flex-col isolate bg-gray-100">
           <div
             aria-hidden="true"
             className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"

@@ -148,7 +148,7 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="bg-background py-2 sm:py-8 px-0 sm:px-4">
       <div className="">
         <Card className="shadow-lg">
           <CardHeader className="text-center pb-8 border-b">
@@ -181,12 +181,12 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label>Reference Number</Label>
-                <p className="text-xl font-semibold">{expense?.refNo}</p>
+                <p className="text-lg sm:text-xl font-semibold break-all">{expense?.refNo}</p>
               </div>
 
               <div className="space-y-2">
                 <Label>Payee</Label>
-                <p className="font-medium">{expense.payee}</p>
+                <p className="font-medium break-words">{expense.payee}</p>
               </div>
 
               <div className="space-y-2">

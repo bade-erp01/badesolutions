@@ -493,7 +493,7 @@ export default function POS() {
 
   // ============== RENDER ==============
   return (
-    <div className="h-screen bg-background text-foreground flex flex-col font-sans overflow-hidden">
+    <div className="lg:h-[calc(100dvh-8rem)] min-w-0 bg-background text-foreground flex flex-col font-sans lg:overflow-hidden">
       {/* ========== HEADER ========== */}
       <header className="shrink-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
@@ -579,9 +579,9 @@ export default function POS() {
       )}
 
       {/* ========== MAIN LAYOUT ========== */}
-      <div className="flex-1 flex min-h-0 overflow-hidden print:hidden">
+      <div className="flex-1 flex min-h-0 lg:overflow-hidden print:hidden">
         {/* LEFT: Products – independent scroll */}
-        <div className="flex-1 flex flex-col min-h-0 p-4 sm:p-6 overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 min-w-0 p-3 sm:p-6 lg:overflow-hidden">
           {/* Search + Categories (fixed) */}
           <div className="mb-4 space-y-3 shrink-0">
             <div className="relative">
@@ -615,7 +615,7 @@ export default function POS() {
           </div>
 
           {/* Product grid – scrolls independently */}
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 lg:overflow-hidden">
             <ScrollArea className="h-full">
               {isLoadingProducts && products.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -624,7 +624,7 @@ export default function POS() {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-4 pr-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 pb-4 pr-0 lg:pr-3">
                     {filteredProducts.map((product) => {
                       const isOutOfStock = product.stock <= 0;
                       const isLowStock =
@@ -709,7 +709,7 @@ export default function POS() {
         </div>
 
         {/* RIGHT: Cart (Desktop) – independent scroll */}
-        <aside className="hidden lg:flex w-full max-w-md border-l bg-card flex-col min-h-0 shrink-0">
+        <aside className="hidden lg:flex w-80 xl:w-96 border-l bg-card flex-col min-h-0 shrink-0">
           {/* Cart header */}
           <div className="px-4 py-3 border-b flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
@@ -865,11 +865,25 @@ export default function POS() {
         </aside>
       </div>
 
+      {cart.length > 0 && (
+        <div className="lg:hidden sticky bottom-0 z-30 border-t bg-background/95 backdrop-blur p-3 pr-24 print:hidden">
+          <Button
+            size="lg"
+            className="w-full h-12 font-semibold"
+            onClick={() => setMobileCartOpen(true)}
+          >
+            <ShoppingCart className="h-5 w-5 mr-2" />
+            {cartCount} • ₦
+            {total.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          </Button>
+        </div>
+      )}
+
       {/* ========== MOBILE CART ========== */}
       <Dialog open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
-        <DialogContent className="max-w-md h-[90vh] flex flex-col p-0 gap-0 sm:rounded-2xl">
+        <DialogContent className="sm:max-w-md h-[90dvh] flex flex-col p-0 gap-0 sm:rounded-2xl">
           <DialogHeader className="px-4 py-3 border-b shrink-0">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2 pr-8">
               <DialogTitle className="flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5" />
                 Current Sale
@@ -1076,7 +1090,7 @@ export default function POS() {
             )}
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setShowCheckout(false)}>
               Cancel
             </Button>

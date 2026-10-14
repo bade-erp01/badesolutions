@@ -20,28 +20,28 @@ export default function SalesPortalLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-dvh bg-slate-50 text-slate-900">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-xl">SP</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">SalesPortal</h1>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">SalesPortal</h1>
               <p className="text-xs text-slate-500 -mt-1">by BADE</p>
             </div>
           </div>
 
-          <Button asChild size="lg" className="font-semibold">
+          <Button asChild size="lg" className="font-semibold shrink-0 px-4 sm:px-8">
             <Link href="/SalesPortal/Login">Login to Portal</Link>
           </Button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white py-24 px-6 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white py-16 sm:py-24 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/salesfolks.jpg')] bg-cover bg-center opacity-30" />
         
         <div className="relative max-w-4xl mx-auto text-center">
@@ -49,18 +49,18 @@ export default function SalesPortalLanding() {
             Sales Team Management Platform
           </Badge>
 
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mb-6">
             Manage Your Sales Team.<br />
             Close More Deals.
           </h1>
 
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
+          <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10">
             Real-time visibility into your sales reps&apos; activity, 
             pipeline progress, and performance — all in one powerful platform.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild className="text-lg h-14 px-10">
+            <Button size="lg" asChild className="text-base sm:text-lg h-12 sm:h-14 px-8 sm:px-10">
               <Link href="/Pricing">Get Started </Link>
             </Button>
             {/* <Button size="lg" variant="outline" className="text-lg h-14 px-10 border-white/30 text-white hover:bg-white/10">
@@ -71,10 +71,10 @@ export default function SalesPortalLanding() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold tracking-tight mb-4">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               Everything your sales team needs
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto">
@@ -82,11 +82,11 @@ export default function SalesPortalLanding() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-10">
+              <CardContent className="p-6 sm:p-10">
                 
-                <h3 className="text-2xl font-semibold mb-3">Lead & Pipeline Management</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3">Lead & Pipeline Management</h3>
                 <p className="text-slate-600">
                   Track every lead, manage your sales pipeline, and ensure no opportunity slips through.
                 </p>
@@ -94,9 +94,9 @@ export default function SalesPortalLanding() {
             </Card>
 
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-10">
+              <CardContent className="p-6 sm:p-10">
                
-                <h3 className="text-2xl font-semibold mb-3">Real-time Activity Tracking</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3">Real-time Activity Tracking</h3>
                 <p className="text-slate-600">
                   Monitor calls, meetings, follow-ups, and field activities of your sales reps live.
                 </p>
@@ -104,9 +104,9 @@ export default function SalesPortalLanding() {
             </Card>
 
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-10">
+              <CardContent className="p-6 sm:p-10">
              
-                <h3 className="text-2xl font-semibold mb-3">Performance Analytics</h3>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-3">Performance Analytics</h3>
                 <p className="text-slate-600">
                   Deep insights into individual and team performance with clear KPIs and leaderboards.
                 </p>
@@ -117,11 +117,11 @@ export default function SalesPortalLanding() {
       </section>
 
       {/* Why Choose Section */}
-      <section className="py-20 px-6 bg-slate-50">
+      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
-              <h2 className="text-4xl font-bold tracking-tight mb-8">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-8">
                 Built for Sales Managers who want results
               </h2>
               <ul className="space-y-8">
@@ -143,7 +143,7 @@ export default function SalesPortalLanding() {
             </div>
 
             <Card className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white border-0 shadow-2xl">
-              <CardContent className="p-12">
+              <CardContent className="p-6 sm:p-12">
                 <p className="text-lg leading-relaxed">
                   “SalesPortal transformed how we manage our field sales team. 
                   We now have complete visibility into daily activities and 
@@ -163,13 +163,13 @@ export default function SalesPortalLanding() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-slate-900 text-white py-20 px-6">
+      <section className="bg-slate-900 text-white py-14 sm:py-20 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to take control of your sales team?</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to take control of your sales team?</h2>
           <p className="text-slate-400 mb-10 text-lg">
             Join hundreds of sales managers already using SalesPortal to boost performance.
           </p>
-          <Button size="lg" asChild className="text-lg px-12 h-14 bg-emerald-600 hover:bg-emerald-700">
+          <Button size="lg" asChild className="text-base sm:text-lg px-8 sm:px-12 h-12 sm:h-14 bg-emerald-600 hover:bg-emerald-700">
             <Link href="/SalesPortal/Login">Access SalesPortal Now</Link>
           </Button>
         </div>

@@ -43,8 +43,8 @@ export default async function layout({ children, params }) {
   const businessData = JSON.parse(StringedBusiness);
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
-        <main className="flex-1 ">
+    <div className="flex flex-col min-w-0">
+        <main className="flex-1 min-w-0">
               <SingleEmployeeView
                 userInfo={userInfo.user}
                 businessInfo={userInfo.business}

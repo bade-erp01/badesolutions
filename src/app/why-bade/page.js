@@ -51,14 +51,14 @@ export default function WhyBADE() {
 
       <main className="flex-1">
         {/* HERO */}
-        <section className="max-w-5xl mx-auto px-4 py-20 text-center">
+        <section className="max-w-5xl mx-auto px-4 py-12 sm:py-20 text-center">
           <Badge className="mb-4">Why B.A.D.E</Badge>
 
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
             Built for businesses that need structure and control
           </h1>
 
-          <p className="mt-6 text-lg text-zinc-500 max-w-2xl mx-auto">
+          <p className="mt-6 text-base sm:text-lg text-zinc-500 max-w-2xl mx-auto">
             Most businesses struggle with scattered tools, poor visibility, and
             inefficient workflows. B.A.D.E solves this by unifying your
             operations into a single, structured system.
@@ -66,13 +66,13 @@ export default function WhyBADE() {
         </section>
 
         {/* CORE PROBLEM */}
-        <section className="bg-zinc-50 py-16">
+        <section className="bg-zinc-50 py-12 sm:py-16">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-semibold">
+            <h2 className="text-2xl sm:text-3xl font-semibold">
               The problem with traditional systems
             </h2>
 
-            <div className="mt-12 grid md:grid-cols-3 gap-6 text-left">
+            <div className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
               {[
                 ["Fragmented tools", "Multiple systems that don’t communicate"],
                 [
@@ -93,10 +93,10 @@ export default function WhyBADE() {
         </section>
 
         {/* SOLUTION */}
-        <section className="py-20">
+        <section className="py-12 sm:py-20">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-semibold">How B.A.D.E solves it</h2>
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-semibold">How B.A.D.E solves it</h2>
 
               <p className="text-zinc-500 mt-4 max-w-2xl mx-auto">
                 A unified ERP platform designed to streamline operations,
@@ -104,7 +104,7 @@ export default function WhyBADE() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Centralized operations</CardTitle>
@@ -136,15 +136,15 @@ export default function WhyBADE() {
         </section>
 
         {/* DIFFERENTIATORS */}
-        <section className="bg-zinc-50 py-20">
+        <section className="bg-zinc-50 py-12 sm:py-20">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-semibold">
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-semibold">
                 What makes B.A.D.E different
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 [
                   "Built for Nigerian businesses",
@@ -175,13 +175,13 @@ export default function WhyBADE() {
         </section>
 
         {/* USE CASES */}
-        <section className="py-20">
+        <section className="py-12 sm:py-20">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-semibold">Who is it for</h2>
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl font-semibold">Who is it for</h2>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 [
                   "SMEs",
@@ -205,13 +205,13 @@ export default function WhyBADE() {
         </section>
 
         {/* TESTIMONIALS */}
-        <section className="max-w-full mb-28 overflow-hidden">
+        <section className="max-w-full mb-16 sm:mb-28 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-center mb-14"
+            className="text-center mb-10 sm:mb-14 px-4"
           >
-            <h2 className="text-3xl font-semibold tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
               What our clients say
             </h2>
             <p className="text-zinc-500 mt-3 text-sm">
@@ -231,7 +231,7 @@ export default function WhyBADE() {
             {[...testimonials, ...testimonials].map((t, i) => (
               <div
                 key={i}
-                className="min-w-[300px] md:min-w-[360px] bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm"
+                className="shrink-0 min-w-[260px] sm:min-w-[300px] md:min-w-[360px] bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm"
               >
                 <p className="text-sm text-zinc-600 leading-relaxed">
                   “{t.text}”
@@ -260,8 +260,8 @@ export default function WhyBADE() {
         </section>
 
         {/* CTA */}
-        <section className="py-20 text-center">
-          <h2 className="text-3xl font-semibold">
+        <section className="py-12 sm:py-20 px-4 text-center">
+          <h2 className="text-2xl sm:text-3xl font-semibold">
             Ready to structure your business?
           </h2>
 

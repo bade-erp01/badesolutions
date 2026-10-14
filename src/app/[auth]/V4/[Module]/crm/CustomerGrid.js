@@ -37,10 +37,10 @@ selectedLetter
   const alphabet = [...specials, ...numbers, ...uppercase];
 
   return (
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap pr-12 sm:pr-20">
       {/* Card Grid */}
       {filteredCustomers.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-2 flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 flex-1 min-w-0">
           {filteredCustomers.map((element) => (
             <Card
               key={element._id}
@@ -60,7 +60,7 @@ selectedLetter
 
       {/* Alphabet Sidebar */}
       <div
-        className="fixed right-0 top-20 bottom-30 h-148 w-16 flex flex-col items-center space-y-2 bg-white/80 shadow-md p-2"
+        className="fixed right-0 top-20 bottom-24 w-10 sm:w-16 z-30 flex flex-col items-center space-y-2 bg-white/80 shadow-md p-2"
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: "#4B5563 transparent",
@@ -84,7 +84,7 @@ selectedLetter
         {/* Reset option */}
         <button
           onClick={() => setSelectedLetter(null)}
-          className="mt-4 px-1 py-1 rounded bg-red-400 text-black twxt-xs"
+          className="mt-4 px-1 py-1 rounded bg-red-400 text-black text-xs"
         >
           Reset
         </button>

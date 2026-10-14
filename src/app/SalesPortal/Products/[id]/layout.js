@@ -121,13 +121,13 @@ export default async function layout({ params }) {
   const product = data?.product;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       {/* Sticky Header */}
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           {/* Left – Product info */}
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar className="h-9 w-9 border shadow-sm">
+            <Avatar className="h-9 w-9 shrink-0 border shadow-sm">
               <AvatarImage
                 src={product?.image || product?.Image || "/preview.png"}
                 alt={product?.Name}
@@ -170,7 +170,7 @@ export default async function layout({ params }) {
       </header>
 
       {/* Page Content */}
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
         <SingleProductpage
           userInfo={userData.user}
           businessInfo={userData.business}

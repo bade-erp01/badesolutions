@@ -64,7 +64,7 @@ export default function CreditnoteTable({ data }) {
     <div className="bg-background space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Credit Notes</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Credit Notes</h1>
         <p className="text-muted-foreground mt-2">
           Manage and track your credit notes issued to customers
         </p>

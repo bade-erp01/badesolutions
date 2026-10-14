@@ -147,7 +147,7 @@ export default function AnimatedCarousel() {
                 <img
                   src={slide.image}
                   alt={`Slide ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
+                  className="w-full h-[220px] sm:h-[320px] lg:h-[400px] object-cover"
                 />
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}

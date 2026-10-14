@@ -4,7 +4,7 @@ import React from "react";
 export default function Tenanterror({ error }) {
 
   return (
-    <div className="bg-white flex items-center justify-center min-h-screen">
+    <div className="bg-white flex items-center justify-center min-h-dvh px-4">
       <div className="text-center">
         {/* <!-- Large 503 --> */}
         <h3 className="inline-block border-r border-gray-300 mr-5 pr-6 text-lg font-bold align-top cursor-pointer">

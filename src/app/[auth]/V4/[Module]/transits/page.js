@@ -86,7 +86,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
   };
 
   return (
-    <div className="flex flex-col max-h-[83dvh] overflow-hidden min-h-screen">
+    <div className="flex flex-col">
         {/* Sidebar Filters */}
         <Notch>
           <BackButton />
@@ -146,7 +146,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
                 setVendorFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-base sm:text-sm outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">All stores</option>
               {Stores?.map((v) => (
@@ -171,7 +171,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
                   setStartDate(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none"
+                className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-base sm:text-sm outline-none"
               />
             </div>
 
@@ -187,14 +187,14 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
                   setEndDate(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-sm outline-none"
+                className="w-full px-3 py-2 rounded-md bg-[#0f1113] border border-white/10 text-base sm:text-sm outline-none"
               />
             </div>
           </div>
         </Notch>
 
         {/* Main Content */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -250,7 +250,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
           </Card>
 
           {/* Pagination */}
-          <div className="mt-6 flex items-center justify-between">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
             <div className="text-sm text-gray-600">
               Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
               {Math.min(currentPage * itemsPerPage, filteredPurchases.length)} of {filteredPurchases.length}

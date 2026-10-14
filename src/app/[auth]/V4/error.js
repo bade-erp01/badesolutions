@@ -11,16 +11,16 @@ export default function Tenanterror({ error }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-[60dvh]">
       <div className="text-center">
         {/* <!-- Large 404 --> */}
-        <h1  onClick={handleRefresh} className="inline-block border-r border-gray-300 mr-5 pr-6 text-lg font-bold align-top cursor-pointer">
+        <h1  onClick={handleRefresh} className="inline-block border-r border-gray-300 mr-3 pr-3 sm:mr-5 sm:pr-6 text-lg font-bold align-top cursor-pointer">
           Try again?
         </h1>
 
         {/* <!-- Message --> */}
         <div className="inline-block text-left">
-          <h2 className="text-sm font-normalmb-2">
+          <h2 className="text-sm font-normal mb-2">
             Sorry, We couldn’t complete your request..!
           </h2>
         </div>

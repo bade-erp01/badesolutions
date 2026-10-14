@@ -88,14 +88,14 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
   };
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex bg-background">
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-w-0">
         {/* Header */}
 
         <div className="p-2 space-y-6">
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground">CURRENT PAYABLE</CardTitle>
@@ -177,7 +177,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm text-muted-foreground">
                 Showing page {currentPage} of {totalPages}
               </p>

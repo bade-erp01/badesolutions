@@ -300,13 +300,13 @@ export default function MainDash({ userData }) {
           }}
         >
           {/* KPI */}
-          <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-6">
+          <section className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-4 mb-6">
             {/* SALES */}
             <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white ">
               <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
 
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div>
+              <CardHeader className="flex flex-row items-center justify-between gap-3 pb-2">
+                <div className="min-w-0">
                   <CardDescription className="text-emerald-100">
                     Today's Sales
                   </CardDescription>
@@ -319,14 +319,14 @@ export default function MainDash({ userData }) {
                   </CardTitle>
                 </div>
 
-                <div className="rounded-2xl bg-white/20 p-3 backdrop-blur-md">
+                <div className="shrink-0 rounded-2xl bg-white/20 p-3 backdrop-blur-md">
                   <ArrowTrendingUpIcon className="h-7 w-7" />
                 </div>
               </CardHeader>
 
               <CardContent>
                 <div
-                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs ${
+                  className={`inline-flex max-w-full items-center gap-2 rounded-full px-3 py-1 text-xs ${
                     Number(tenantData.TodaySale) >
                     Number(tenantData.yesterdaySale)
                       ? "bg-white/20"
@@ -368,8 +368,8 @@ export default function MainDash({ userData }) {
 
             {/* REVENUE */}
             <Card className="border">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
+              <CardHeader className="flex flex-row items-center justify-between gap-3">
+                <div className="min-w-0">
                   <CardDescription>Revenue</CardDescription>
 
                   <CardTitle className="mt-3 text-4xl font-white">
@@ -380,7 +380,7 @@ export default function MainDash({ userData }) {
                   </CardTitle>
                 </div>
 
-                <div className="rounded-2xl bg-violet-100 p-3">
+                <div className="shrink-0 rounded-2xl bg-violet-100 p-3">
                   <BanknotesIcon className="h-7 w-7 text-black" />
                 </div>
               </CardHeader>
@@ -394,8 +394,8 @@ export default function MainDash({ userData }) {
 
             {/* PURCHASE */}
             <Card className="border-0  border">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
+              <CardHeader className="flex flex-row items-center justify-between gap-3">
+                <div className="min-w-0">
                   <CardDescription>Purchases</CardDescription>
 
                   <CardTitle className="mt-3 text-4xl ">
@@ -406,7 +406,7 @@ export default function MainDash({ userData }) {
                   </CardTitle>
                 </div>
 
-                <div className="rounded-2xl bg-amber-100 p-3">
+                <div className="shrink-0 rounded-2xl bg-amber-100 p-3">
                   <ShoppingBagIcon className="h-7 w-7 text-black" />
                 </div>
               </CardHeader>
@@ -420,8 +420,8 @@ export default function MainDash({ userData }) {
 
             {/* EXPENSE */}
             <Card className="border ">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
+              <CardHeader className="flex flex-row items-center justify-between gap-3">
+                <div className="min-w-0">
                   <CardDescription>Expenses</CardDescription>
 
                   <CardTitle className="mt-3 text-4xl  ">
@@ -429,7 +429,7 @@ export default function MainDash({ userData }) {
                   </CardTitle>
                 </div>
 
-                <div className="rounded-2xl bg-rose-100 p-3">
+                <div className="shrink-0 rounded-2xl bg-rose-100 p-3">
                   <ArrowTrendingDownIcon className="h-7 w-7 text-black" />
                 </div>
               </CardHeader>
@@ -444,7 +444,7 @@ export default function MainDash({ userData }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}
-            <section className="lg:col-span-2">
+            <section className="lg:col-span-2 min-w-0">
               <div className=" rounded p-3  mb-3 ">
                 {/* Chart */}
                 <GenerealSalesMargin
@@ -463,7 +463,7 @@ export default function MainDash({ userData }) {
                 />
               </div>
               {/* === TODAY'S SALES TABLE (shadcn) === */}
-              <div className="rounded-xl p-6 mt-6  border-0">
+              <div className="rounded-xl p-3 sm:p-6 mt-6  border-0">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold">Today's Sales</h3>
                 </div>
@@ -529,7 +529,7 @@ export default function MainDash({ userData }) {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex justify-center items-center gap-2 mt-6">
+                <div className="flex flex-wrap justify-center items-center gap-2 mt-6">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -562,7 +562,7 @@ export default function MainDash({ userData }) {
 
               {/* === MONITORED PRODUCTS TABLE (shadcn) === */}
               {sortedMonitoredProducts.length > 0 && (
-                <div className="rounded-xl p-6 mt-6  border-0">
+                <div className="rounded-xl p-3 sm:p-6 mt-6  border-0">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold">
                       Monitored Products
@@ -616,7 +616,7 @@ export default function MainDash({ userData }) {
                   </div>
 
                   {/* Monitored Products Pagination */}
-                  <div className="flex justify-center items-center gap-2 mt-6">
+                  <div className="flex flex-wrap justify-center items-center gap-2 mt-6">
                     <button
                       onClick={() =>
                         handleMonitoredProductPageChange(
@@ -663,7 +663,7 @@ export default function MainDash({ userData }) {
                 </div>
               )}
             </section>
-            <aside className="rounded p-6 border-0 text-xs  animate__animated animate__fadeInRight animate__faster">
+            <aside className="min-w-0 rounded p-3 sm:p-6 border-0 text-xs  animate__animated animate__fadeInRight animate__faster">
               <h3 className="text-lg font-semibold mb-4">Quick Stats Widget</h3>
               <div className="flex flex-col">
                 <h4 className="text-lg font-semibold mb-4">Tasks Reminder</h4>
@@ -740,7 +740,7 @@ export default function MainDash({ userData }) {
                                   {truncate(person.firstName, 10)}
                                 </span>
 
-                                <span className="shrink-0 text-[10px] font-medium text-muted-foreground sm:text-[11px]">
+                                <span className="shrink-0 text-[11px] font-medium text-muted-foreground">
                                   {currency}
                                   {Number(
                                     person.totalSales || 0,
@@ -769,12 +769,12 @@ export default function MainDash({ userData }) {
                               </div>
 
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[11px] text-muted-foreground">
                                   Target
                                 </span>
 
                                 <span
-                                  className={`text-[10px] font-medium ${
+                                  className={`text-[11px] font-medium ${
                                     progress > 50
                                       ? "text-green-600 dark:text-green-400"
                                       : "text-muted-foreground"
@@ -834,7 +834,7 @@ export default function MainDash({ userData }) {
                         .map((payment) => (
                           <li
                             key={payment._id}
-                            className="flex items-center justify-between px-4 py-2 shadow-sm rounded-md border border-gray-200 hover: hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
+                            className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 shadow-sm rounded-md border border-gray-200 hover: hover:border-green-400 transition-all  animate__animated animate__fadeInRight animate__faster"
                           >
                             <div className="flex flex-col">
                               <span className="text-sm font-semibold font-mono">
@@ -845,7 +845,7 @@ export default function MainDash({ userData }) {
                                 {payment.collectionRef}/{payment.type}
                               </span>
                             </div>
-                            <span className="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">
+                            <span className="shrink-0 text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">
                               Ref: {payment.paymentReferenceNo.slice(0, 6)}
                             </span>
                           </li>
@@ -934,7 +934,7 @@ export default function MainDash({ userData }) {
           </footer>
 
           {/* pending payment reminder */}
-          {tenantData.PendingPaymenet.length > 0 &&
+          {tenantData.PendingPaymenet?.length > 0 &&
             userData.user.postPayment && (
               <PendingPaymentReminder
                 data={tenantData.PendingPaymenet}
@@ -951,9 +951,9 @@ export default function MainDash({ userData }) {
             backgroundPosition: "center",
           }}
         >
-          <section className="w-full max-w-4xl p-9">
+          <section className="w-full max-w-4xl p-4 sm:p-9">
             <div className="text-center space-y-6">
-              <p className="text-gray-600 max-w-2xl mx-auto text-md">
+              <p className="text-gray-600 max-w-2xl mx-auto text-base">
                 Track your sales performance, manage customer relationships, and
                 monitor your daily activities all in one place.
               </p>

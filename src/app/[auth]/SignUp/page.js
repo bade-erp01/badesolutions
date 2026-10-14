@@ -111,10 +111,10 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+    <div className="min-h-dvh bg-zinc-950 text-white flex flex-col">
       <Nav1 />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-16">
+      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-16">
         <div className="w-full max-w-6xl grid lg:grid-cols-2 rounded-3xl overflow-hidden border border-zinc-800 shadow-xl">
 
           {/* LEFT PANEL */}
@@ -145,8 +145,8 @@ useEffect(() => {
           </div>
 
           {/* RIGHT PANEL */}
-          <div className="bg-white text-black flex items-center">
-            <Card className="w-full max-w-md mx-auto border-none shadow-none">
+          <div className="bg-white text-black flex items-center py-4 sm:py-8">
+            <Card className="w-full min-w-0 max-w-md mx-auto border-none shadow-none">
               
               <CardHeader>
                 <CardTitle className="text-2xl">

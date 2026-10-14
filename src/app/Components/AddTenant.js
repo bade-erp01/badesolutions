@@ -74,7 +74,7 @@ export default function CreateBusinessTenantModal() {
       {/* MODAL */}
       <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl">
+          <DialogTitle className="flex items-center gap-2 text-xl sm:text-2xl">
             <Building2 className="h-6 w-6 text-primary" />
             Create Business Tenant
           </DialogTitle>
@@ -85,14 +85,14 @@ export default function CreateBusinessTenantModal() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-8 py-4">
+        <div className="space-y-6 py-4 sm:space-y-8">
           {/* BUSINESS DETAILS */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">
               Business Information
             </h3>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Business Name</Label>
 
@@ -156,20 +156,21 @@ export default function CreateBusinessTenantModal() {
               new tenant database.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {availableCollections.map((collection) => (
                 <div
                   key={collection}
                   className="flex items-center space-x-3 rounded-xl border p-4 hover:bg-muted transition"
                 >
                   <Checkbox
+                    id={`clone-${collection.replace(/\s+/g, "-")}`}
                     checked={collections.includes(collection)}
                     onCheckedChange={() =>
                       toggleCollection(collection)
                     }
                   />
 
-                  <Label className="cursor-pointer">
+                  <Label htmlFor={`clone-${collection.replace(/\s+/g, "-")}`} className="cursor-pointer">
                     {collection}
                   </Label>
                 </div>
@@ -178,8 +179,8 @@ export default function CreateBusinessTenantModal() {
           </div>
 
           {/* PRICE BOX */}
-          <div className="rounded-2xl border bg-muted/50 p-6">
-            <div className="flex justify-between items-center">
+          <div className="rounded-2xl border bg-muted/50 p-4 sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
               <div>
                 <h4 className="font-semibold">
                   Tenant Setup Fee
@@ -190,7 +191,7 @@ export default function CreateBusinessTenantModal() {
                 </p>
               </div>
 
-              <div className="text-3xl font-bold">
+              <div className="text-2xl font-bold sm:text-3xl">
                 ₦150,000
               </div>
             </div>
@@ -205,7 +206,7 @@ export default function CreateBusinessTenantModal() {
             Cancel
           </Button>
 
-          <Button onClick={handleSubmit}>
+          <Button onClick={handleSubmit} className="h-auto min-h-9 whitespace-normal">
             Create New Business Tenant @ ₦150,000
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

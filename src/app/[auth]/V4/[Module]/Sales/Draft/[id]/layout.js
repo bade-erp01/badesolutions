@@ -31,7 +31,7 @@ export default async function StoreLayout2({ params }) {
     return (
       <div className="flex flex-col">
         {/* Main Content (Right Side) */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <DraftInvoicePage
             user={userData.user}
             customer={data.cust}

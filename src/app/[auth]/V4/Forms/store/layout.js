@@ -64,7 +64,7 @@ export default async function StoreLayout({ children, params }) {
   const Params = await params;
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col min-w-0">
       <Notch>
         <BackButton />
         <hr />

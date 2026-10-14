@@ -74,6 +74,22 @@ export default function Wrapper({ children }) {
     );
   }, [user?.user?.toogledTenants]);
 
+  const navApps = useMemo(() => {
+    if (user?.business?.subscriptionplan?.trim() === "Basic") {
+      return [
+        { Name: "CRM", url: "crm" },
+        { Name: "Product Management", url: "product" },
+        { Name: "Cash Register", url: "payment" },
+        { Name: "Stores Operations", url: "store" },
+      ];
+    }
+    return (
+      user?.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) =>
+        a.Name.localeCompare(b.Name),
+      ) ?? []
+    );
+  }, [user?.business?.subscriptionplan, user?.user?.Apps]);
+
   // Selected value must come from the toogledTenants array
   const selectedTenantId = useMemo(() => {
     const currentBusinessId = toId(
@@ -267,9 +283,9 @@ export default function Wrapper({ children }) {
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-dvh bg-background">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex w-64 border-r bg-card flex-col">
+      <div className="hidden lg:flex w-64 shrink-0 border-r bg-card flex-col">
         {/* Logo */}
         <div className="p-5 border-b sidebar-logo">
           <div className="flex items-center gap-3">
@@ -298,65 +314,24 @@ export default function Wrapper({ children }) {
             <BackButton />
           )}
 
-          {/* Basic Plan */}
-          {user.business?.subscriptionplan?.trim() === "Basic" &&
-            [
-              {
-                name: "CRM",
-                url: "crm",
-              },
-              {
-                name: "Product Management",
-                url: "product",
-              },
-              {
-                name: "Cash Register",
-                url: "payment",
-              },
-              {
-                name: "Stores Operations",
-                url: "store",
-              },
-            ].map((item) => {
-              const isActive =
-                pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
+          {navApps.map((item) => {
+            const isActive =
+              pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
 
-              return (
-                <Button
-                  key={item.url || item.url}
-                  disabled={isActive}
-                  variant={isActive ? "destructive" : "ghost"}
-                  className="w-full justify-start cursor-pointer"
-                  onClick={() =>
-                    router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
-                  }
-                >
-                  {item.name}
-                </Button>
-              );
-            })}
-
-          {user.businessInfo?.subscriptionplan?.trim() !== "Basic" &&
-            user.user?.Apps?.filter((app) => app.url !== "employee")
-              .sort((a, b) => a.Name.localeCompare(b.Name))
-              .map((item) => {
-                const isActive =
-                  pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
-
-                return (
-                  <Button
-                    key={item._id || item.url}
-                    disabled={isActive}
-                    variant={isActive ? "destructive" : "ghost"}
-                    className="w-full justify-start cursor-pointer"
-                    onClick={() =>
-                      router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
-                    }
-                  >
-                    {item.Name}
-                  </Button>
-                );
-              })}
+            return (
+              <Button
+                key={item._id || item.url}
+                disabled={isActive}
+                variant={isActive ? "destructive" : "ghost"}
+                className="w-full justify-start cursor-pointer"
+                onClick={() =>
+                  router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
+                }
+              >
+                {item.Name}
+              </Button>
+            );
+          })}
 
           {pathname !== `/${Params.auth}/V4` && (
             <Button
@@ -369,6 +344,14 @@ export default function Wrapper({ children }) {
               Business Overview
             </Button>
           )}
+          <Button
+            variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
+            disabled={pathname === `/${Params.auth}/V4/Assistant`}
+            className="w-full justify-start cursor-pointer"
+            onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
+          >
+            Invoice Assistant
+          </Button>
         </nav>
 
         <div className="p-1 border-t w-full user-profile">
@@ -377,10 +360,10 @@ export default function Wrapper({ children }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
         {/* ========== TOP HEADER ========== */}
-        <div className="border-b bg-card px-3 sm:px-4 py-3">
-          <div className="flex items-center gap-3">
+        <div className="border-b bg-card px-2 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* ===== LEFT ZONE ===== */}
             <div className="flex items-center gap-3 shrink-0">
               {/* Mobile Menu */}
@@ -395,7 +378,7 @@ export default function Wrapper({ children }) {
                   </Button>
                 </SheetTrigger>
 
-                <SheetContent side="left" className="w-72 p-0">
+                <SheetContent side="left" className="w-72 p-0 gap-0 overflow-hidden">
                   <SheetHeader className="p-5 border-b">
                     <SheetTitle className="flex items-center gap-3">
                       <Avatar className="h-8 w-8 shadow-sm">
@@ -422,15 +405,13 @@ export default function Wrapper({ children }) {
                       user.user &&
                       pathname !== `/${Params.auth}/V4` && <BackButton />}
 
-                    {user.user?.Apps?.filter((app) => app.url !== "employee")
-                      .sort((a, b) => a.Name.localeCompare(b.Name))
-                      .map((item) => {
+                    {navApps.map((item) => {
                         const isActive =
                           pathname ===
                           `/${Params.auth}/V4/${item.url}/${item.url}`;
                         return (
                           <Button
-                            key={item._id}
+                            key={item._id || item.url}
                             disabled={isActive}
                             variant={isActive ? "destructive" : "ghost"}
                             className="w-full justify-start cursor-pointer"
@@ -458,6 +439,14 @@ export default function Wrapper({ children }) {
                         Business Overview
                       </Button>
                     )}
+                    <Button
+                      variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
+                      disabled={pathname === `/${Params.auth}/V4/Assistant`}
+                      className="w-full justify-start cursor-pointer"
+                      onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
+                    >
+                      Invoice Assistant
+                    </Button>
                   </nav>
 
                   {/* Tenant Switch - Mobile */}
@@ -531,6 +520,7 @@ export default function Wrapper({ children }) {
                 user.user &&
                 pathname !== `/${Params.auth}/V4` &&
                 !pathname.includes("Search") &&
+                !pathname.includes("Assistant") &&
                 !pathname.includes("store") &&
                 !pathname.includes("purchases") &&
                 !pathname.includes("product-transfer") &&
@@ -553,7 +543,7 @@ export default function Wrapper({ children }) {
                         className="pl-9 h-9"
                       />
                     </div>
-                    <Button type="submit" size="sm" className="h-9 shrink-0">
+                    <Button type="submit" size="sm" className="h-9 shrink-0 hidden sm:inline-flex">
                       Search
                     </Button>
                   </form>
@@ -583,7 +573,7 @@ export default function Wrapper({ children }) {
         </div>
 
         {/* Main View */}
-        <div className="flex-1 overflow-auto p-4 space-y-8 view">
+        <div className="flex-1 min-w-0 overflow-auto p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8 view">
           <PrivacyIdleOverlay
             idleTimeMs={300000}
             userData={user}
@@ -683,10 +673,10 @@ export function UserProfile({ user, biz }) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-80 rounded-sm" align="end">
+      <DropdownMenuContent className="w-72 sm:w-80 max-w-[calc(100vw-1rem)] rounded-sm" align="end">
         <DropdownMenuLabel>
           <div className="flex flex-col">
-            <span className="font-semibold">{user.Email}</span>
+            <span className="font-semibold truncate">{user.Email}</span>
             <span className="text-xs text-muted-foreground">
               {user.firstName} {user.lastName}
             </span>
@@ -697,7 +687,7 @@ export function UserProfile({ user, biz }) {
 
         <DropdownMenuItem>
           <Bell className="mr-2 h-4 w-4" />
-          {user.Notification.length} Notification
+          {user.Notification?.length ?? 0} Notification
         </DropdownMenuItem>
 
         {user.isAdmin && (

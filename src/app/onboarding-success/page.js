@@ -65,7 +65,7 @@ export default function OnboardingSuccess() {
     <>
       <Nav1 />
 
-      <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-zinc-50 via-white to-blue-50">
+      <main className="relative min-h-dvh overflow-hidden bg-gradient-to-br from-zinc-50 via-white to-blue-50">
         {/* Background Glow */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-0 left-0 h-[400px] w-[400px] rounded-full bg-blue-200/30 blur-3xl" />
@@ -75,22 +75,22 @@ export default function OnboardingSuccess() {
           <div className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-200/20 blur-3xl" />
         </div>
 
-        <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-20">
+        <div className="relative z-10 flex min-h-dvh items-center justify-center px-4 py-10 sm:py-20">
           <Card className="w-full max-w-2xl overflow-hidden rounded-[2rem] border-0 bg-white/90 shadow-2xl backdrop-blur-xl">
             {/* TOP HEADER */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 px-8 py-12 text-white">
+            <div className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 px-5 py-8 sm:px-8 sm:py-12 text-white">
               <div className="absolute inset-0 opacity-20 bg-[url('/grid.svg')]" />
 
               <div className="relative z-10 flex flex-col items-center text-center">
-                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-500/20 backdrop-blur-md">
-                  <CheckCircle2 className="h-14 w-14 text-emerald-400" />
+                <div className="mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-emerald-500/20 backdrop-blur-md">
+                  <CheckCircle2 className="h-12 w-12 sm:h-14 sm:w-14 text-emerald-400" />
                 </div>
 
-                <Badge className="rounded-full bg-white/10 px-4 py-1 text-white hover:bg-white/10">
+                <Badge className="rounded-full bg-white/10 px-4 py-1 text-white whitespace-normal hover:bg-white/10">
                   Business Onboarding Complete
                 </Badge>
 
-                <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-5xl">
+                <h1 className="mt-6 text-3xl sm:text-4xl font-semibold tracking-tight md:text-5xl">
                   Welcome to BADE
                 </h1>
 
@@ -102,20 +102,20 @@ export default function OnboardingSuccess() {
             </div>
 
             {/* BODY */}
-            <CardContent className="space-y-8 p-8 md:p-10">
+            <CardContent className="space-y-6 sm:space-y-8 p-5 sm:p-8 md:p-10">
               {/* MESSAGE */}
-              <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center">
+              <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-4 sm:p-6">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="flex shrink-0 items-center justify-center">
                     <MailCheck className="h-6 w-6 text-blue-600" />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-lg font-semibold text-zinc-900">
                       Activation Email Sent
                     </h3>
 
-                    <p className="mt-2 leading-relaxed text-zinc-600">
+                    <p className="mt-2 text-sm sm:text-base leading-relaxed text-zinc-600">
                       We’ve sent an activation email to your registered business
                       address. Please check your inbox and follow the
                       instructions to activate your workspace and begin using
@@ -126,7 +126,7 @@ export default function OnboardingSuccess() {
               </div>
 
               {/* FEATURES */}
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
                   <Sparkles className="mb-4 h-8 w-8 text-violet-600" />
 

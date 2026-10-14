@@ -168,20 +168,20 @@ const StoreChart = ({ productsList }) => {
   return (
     <div className="space-y-6">
       {/* Main Card */}
-      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm dark:shadow-xl transition-all">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-xl">
+      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-sm dark:shadow-xl transition-all">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="shrink-0 p-2 bg-blue-500/10 rounded-xl">
               <ChartBarIcon className="h-7 w-7 text-blue-500" />
             </div>
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground">Store Inventory Overview</h3>
+            <div className="min-w-0">
+              <h3 className="text-lg sm:text-2xl font-semibold text-foreground">Store Inventory Overview</h3>
               <p className="text-sm text-muted-foreground">Real-time stock levels • Top performers</p>
             </div>
           </div>
           
           {bestSeller && (
-            <div className="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full">
+            <div className="hidden sm:flex shrink-0 items-center gap-2 text-xs font-medium px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full">
             
               {sortedProducts.length} active products
             </div>
@@ -189,13 +189,13 @@ const StoreChart = ({ productsList }) => {
         </div>
 
         {/* Chart Container */}
-        <div className="relative bg-muted/30 rounded-xl border border-border p-4 min-h-[420px] mb-8">
+        <div className="relative bg-muted/30 rounded-xl border border-border p-2 sm:p-4 h-[320px] sm:h-[420px] mb-8">
           <Line data={data} options={options} />
         </div>
 
         {/* Best Seller Highlight */}
         {bestSeller && (
-          <div className="bg-gradient-to-br from-card to-muted/50 border border-border rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
+          <div className="bg-gradient-to-br from-card to-muted/50 border border-border rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
               <Image
                 src={bestSeller.image || "/preview.png"}
@@ -209,12 +209,12 @@ const StoreChart = ({ productsList }) => {
               </div>
             </div>
 
-            <div className="flex-1 text-center md:text-left">
+            <div className="flex-1 min-w-0 text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 px-4 py-1 rounded-full text-sm font-semibold mb-3">
                 MOST STOCKED PRODUCT
               </div>
               
-              <h4 className="text-2xl font-bold text-foreground mb-2 leading-tight">
+              <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-2 leading-tight break-words">
                 {bestSeller.productName}
               </h4>
               

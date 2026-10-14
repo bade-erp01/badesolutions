@@ -64,9 +64,9 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
   }
 
   return (
-    <div className="container max-w-full py-8">
+    <div className="container max-w-full py-2 sm:py-8">
       <Card>
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Image
               src={payment.image || "https://img.icons8.com/hands/100/card-in-use.png"}
@@ -142,7 +142,7 @@ function Detail({ label, value }) {
   return (
     <div>
       <p className="text-xs font-medium text-muted-foreground uppercase">{label}</p>
-      <p className="text-sm font-semibold">{value || "—"}</p>
+      <p className="text-sm font-semibold break-words">{value || "—"}</p>
     </div>
   )
 }
