@@ -25,15 +25,15 @@ export default function AboutUs() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.25),transparent)]" />
 
-        <div className="relative mx-auto max-w-6xl px-6 py-24 sm:py-28 lg:py-36">
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-28 lg:py-36">
           <div className="max-w-3xl">
             <p className="mb-5 text-sm font-medium uppercase tracking-[0.2em] text-indigo-300/90">
               About Us
             </p>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
               BADE is redefining business operations with intelligent ERP solutions
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-relaxed text-slate-300 sm:text-xl">
+            <p className="mt-7 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg lg:text-xl">
               We are redefining how businesses operate by delivering intelligent,
               scalable, and user-friendly ERP solutions. Our mission is to empower
               organizations to streamline operations, improve efficiency, and unlock
@@ -43,7 +43,7 @@ export default function AboutUs() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28 space-y-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20 lg:py-28 space-y-16 sm:space-y-28">
         {/* Who We Are – Bento style */}
         <div>
           <div className="mb-10">
@@ -51,15 +51,15 @@ export default function AboutUs() {
               <Globe className="h-4 w-4" />
               Who We Are
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
               Built on innovation, integrity & impact
             </h2>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:grid-rows-2">
             {/* Large text block */}
-            <div className="flex flex-col justify-center rounded-3xl bg-slate-50 p-8 md:col-span-5 md:row-span-2 lg:p-10">
-              <p className="text-lg leading-relaxed text-slate-600">
+            <div className="flex flex-col justify-center rounded-3xl bg-slate-50 p-6 sm:p-8 md:col-span-5 md:row-span-2 lg:p-10">
+              <p className="text-base sm:text-lg leading-relaxed text-slate-600">
                 BADE is a forward-thinking ERP built on innovation,
                 integrity, and impact. We bring together a team of engineers,
                 designers, and business strategists passionate about solving
@@ -81,7 +81,7 @@ export default function AboutUs() {
             </div>
 
             {/* Large image */}
-            <div className="relative overflow-hidden rounded-3xl md:col-span-7 md:row-span-2">
+            <div className="relative min-h-[260px] sm:min-h-[320px] overflow-hidden rounded-3xl md:col-span-7 md:row-span-2">
               <Image
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
                 alt="BADE team collaboration"
@@ -102,21 +102,21 @@ export default function AboutUs() {
               <Rocket className="h-4 w-4" />
               What We Do
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
               Complete ERP solutions that scale with you
             </h2>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:grid-rows-2">
             {/* Large featured card */}
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 p-8 text-white sm:col-span-2 lg:col-span-7 lg:row-span-2">
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 sm:p-8 text-white sm:col-span-2 lg:col-span-7 lg:row-span-2">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
               <div className="relative flex h-full flex-col justify-between">
                 <div>
                   <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
                     <Settings className="h-6 w-6" />
                   </div>
-                  <h3 className="text-2xl font-bold">ERP Solutions</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold">ERP Solutions</h3>
                   <p className="mt-4 max-w-md text-indigo-100 leading-relaxed">
                     Robust systems that integrate finance, HR, supply chain, sales,
                     and operations into one seamless platform.
@@ -130,7 +130,7 @@ export default function AboutUs() {
             </div>
 
             {/* Smaller cards */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:shadow-md lg:col-span-5">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-sm transition hover:shadow-md lg:col-span-5">
               <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                 <Users className="h-5 w-5" />
               </div>
@@ -141,7 +141,7 @@ export default function AboutUs() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:shadow-md lg:col-span-5">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-sm transition hover:shadow-md lg:col-span-5">
               <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                 <Cloud className="h-5 w-5" />
               </div>
@@ -154,8 +154,8 @@ export default function AboutUs() {
           </div>
 
           {/* Support card full width under */}
-          <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-7 sm:flex sm:items-center sm:justify-between sm:gap-8">
-            <div className="flex items-start gap-5">
+          <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-7 sm:flex sm:items-center sm:justify-between sm:gap-8">
+            <div className="flex items-start gap-4 sm:gap-5">
               <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                 <Headphones className="h-5 w-5" />
               </div>
@@ -179,7 +179,7 @@ export default function AboutUs() {
               <Lightbulb className="h-4 w-4" />
               Our Values
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
               What drives everything we build
             </h2>
           </div>
@@ -225,7 +225,7 @@ export default function AboutUs() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-6">
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                   <span className="mb-2 block text-xs font-semibold tracking-widest text-indigo-300">
                     0{index + 1}
                   </span>
@@ -240,7 +240,7 @@ export default function AboutUs() {
         </div>
 
         {/* Why Choose BADE */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 px-8 py-14 text-white sm:px-12 lg:px-16 lg:py-16">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 px-5 py-10 text-white sm:px-12 sm:py-14 lg:px-16 lg:py-16">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.2),transparent_60%)]" />
 
           <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
@@ -249,10 +249,10 @@ export default function AboutUs() {
                 <Star className="h-4 w-4" />
                 Why Choose BADE
               </div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
                 More than an ERP — a strategic partner
               </h2>
-              <p className="mt-5 text-lg text-slate-300">
+              <p className="mt-5 text-base sm:text-lg text-slate-300">
                 With BADE, you gain a partner committed to your success. Our solutions
                 help businesses:
               </p>
