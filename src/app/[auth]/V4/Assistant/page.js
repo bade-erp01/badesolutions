@@ -17,13 +17,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/components/UserProvider";
-import {EXPRESS_PRIVATE_URL,Encrypt} from "../../../../../Functions/Functions"
+import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../../../Functions/Functions";
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
 const SUGGESTIONS = [
+  // Financial statements
+  "What was our profit last month?",
+  "Compare our profit for the last three months",
+  "What were our biggest expenses last month?",
+  "Show me our balance sheet",
+  "How much do we have in the bank right now?",
+  "What is our gross margin this month so far?",
+  // Day-to-day
   "Which customers owe us the most money right now?",
   "How much did we collect in payments this month, cash vs transfer?",
   "Show the 5 largest invoices this year",
@@ -42,6 +50,8 @@ const TOOL_LABELS = {
   search_payments: "Checked payments",
   stock_levels: "Checked stock",
   search_employees: "Looked up staff",
+  get_income_statement: "Prepared the income statement",
+  get_balance_sheet: "Prepared the balance sheet",
   propose_change: "Checked the requested change",
 };
 
@@ -59,6 +69,7 @@ const mdComponents = {
   h1: ({ node, ...p }) => <h3 className="mb-2 mt-1 font-semibold" {...p} />,
   h2: ({ node, ...p }) => <h3 className="mb-2 mt-1 font-semibold" {...p} />,
   h3: ({ node, ...p }) => <h3 className="mb-2 mt-1 font-semibold" {...p} />,
+  h4: ({ node, ...p }) => <h4 className="mb-1 mt-1 font-medium" {...p} />,
   hr: () => <hr className="my-2 border-border" />,
   code: ({ node, ...p }) => <code className="rounded bg-muted px-1 py-0.5 text-[0.85em]" {...p} />,
   table: ({ node, ...p }) => (
@@ -157,7 +168,7 @@ export default function AssistantPage() {
 
   const send = async (question) => {
     const AGENT_URL = `${EXPRESS_PRIVATE_URL}/api/Invoice/agent`;
-    const REQUEST_TIMEOUT_MS = 90000; // answers take 3-25s; the backend may queue a request for up to 15s
+    const REQUEST_TIMEOUT_MS = 90000; // financial statements can take up to ~40s; the backend may also queue for 15s
     const MAX_HISTORY = 10;
 
     const content = (question ?? input).trim();
@@ -200,7 +211,7 @@ export default function AssistantPage() {
 
       if (!res.ok) {
         let message = body.error || `Request failed (${res.status}).`;
-        if (res.status === 401) message = "Your session has expired. Please sign in again.";
+        if (res.status === 401) message = body.error || "Your session has expired. Please sign in again.";
         if ((res.status === 429 || res.status === 503) && body.retryAfter) {
           message = `${body.error || "The assistant is busy."} Try again in ${body.retryAfter} seconds.`;
         }
@@ -245,7 +256,7 @@ export default function AssistantPage() {
   };
 
   return (
-    <div className=" w-full space-y-4">
+    <div className="w-full space-y-4">
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
@@ -255,9 +266,9 @@ export default function AssistantPage() {
                 Kamsi, your business assistant
               </CardTitle>
               <CardDescription className="mt-1 text-sm">
-                Ask about {user?.business?.companyName || "your"} invoices, customer balances, payments, stock and staff
-                in plain language. Kamsi reads your records and can check a change for you, but never changes anything
-                itself.
+                Ask about {user?.business?.companyName || "your"} invoices, customer balances, payments, stock, staff,
+                profit and loss, and the balance sheet in plain language. Kamsi reads your records and can check a change
+                for you, but never changes anything itself.
               </CardDescription>
             </div>
             {messages.length > 0 && (
@@ -355,7 +366,7 @@ export default function AssistantPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="e.g. What does Acme Ltd still owe us?"
+              placeholder="e.g. What was our profit last month?"
               rows={2}
               maxLength={2000}
               disabled={busy}
