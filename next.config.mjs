@@ -7,6 +7,12 @@ const withPWA = nextPWA({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development", // disables PWA in dev
+  // Next 15 app router doesn't serve app-build-manifest.json; precaching it 404s
+  // and aborts the whole service worker install.
+  buildExcludes: [/app-build-manifest\.json$/],
+  fallbacks: {
+    document: "/offline",
+  },
 });
 
 const nextConfig = {

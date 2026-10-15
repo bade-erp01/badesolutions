@@ -20,9 +20,10 @@ export default function OneSignalProvider({ children, user }) {
       try {
         await OneSignal.init({
           appId,
-          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          // Own scope so it doesn't replace the next-pwa worker (/sw.js) at "/".
+          serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js",
           serviceWorkerParam: {
-            scope: "/",
+            scope: "/push/onesignal/",
           },
           notifyButton: {
             enable: true,

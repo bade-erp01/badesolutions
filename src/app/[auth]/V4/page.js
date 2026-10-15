@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import MainDash from "@/app/Components/MainDash";
 import { useUser } from "@/components/UserProvider";
 import moment from "moment";
@@ -35,7 +35,7 @@ export default function Dashboard() {
   const fetchWeather = async (lat, lon) => {
     try {
       const res = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`,
       );
 
       if (!res.ok) throw new Error("Weather fetch failed");
@@ -56,7 +56,7 @@ export default function Dashboard() {
       // Try to get city name (reverse geocoding)
       try {
         const geoRes = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
         );
         const geoData = await geoRes.json();
         setLocationName(geoData.city || geoData.locality || "");
@@ -81,10 +81,11 @@ export default function Dashboard() {
 
   const getWeatherIcon = (code) => {
     if ([0].includes(code)) return <Sun className="w-5 h-5 text-amber-500" />;
-    if ([1, 2, 3].includes(code)) return <Cloud className="w-5 h-5 text-gray-500" />;
-    if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) 
+    if ([1, 2, 3].includes(code))
+      return <Cloud className="w-5 h-5 text-gray-500" />;
+    if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code))
       return <CloudRain className="w-5 h-5 text-blue-500" />;
-    if ([71, 73, 75, 85, 86].includes(code)) 
+    if ([71, 73, 75, 85, 86].includes(code))
       return <Snowflake className="w-5 h-5 text-sky-300" />;
     return <Cloud className="w-5 h-5 text-gray-500" />;
   };
@@ -104,7 +105,7 @@ export default function Dashboard() {
       (error) => {
         console.warn("Geolocation denied or unavailable", error);
         setLoadingWeather(false);
-      }
+      },
     );
   }, []);
 
@@ -114,55 +115,59 @@ export default function Dashboard() {
       hour >= 5 && hour < 12
         ? "morning"
         : hour >= 12 && hour < 17
-        ? "afternoon"
-        : hour >= 17 && hour < 22
-        ? "evening"
-        : "generic";
+          ? "afternoon"
+          : hour >= 17 && hour < 22
+            ? "evening"
+            : "generic";
 
     const greetings = {
-      en: { 
-        morning: "Good morning", 
-        afternoon: "Good afternoon", 
-        evening: "Good evening", 
-        generic: "Hello" 
+      en: {
+        morning: "Good morning",
+        afternoon: "Good afternoon",
+        evening: "Good evening",
+        generic: "Hello",
       },
-      // fr: { 
-      //   morning: "Bonjour", 
-      //   afternoon: "Bon après-midi", 
-      //   evening: "Bonsoir", 
-      //   generic: "Salut" 
+      // fr: {
+      //   morning: "Bonjour",
+      //   afternoon: "Bon après-midi",
+      //   evening: "Bonsoir",
+      //   generic: "Salut"
       // },
-      // es: { 
-      //   morning: "Buenos días", 
-      //   afternoon: "Buenas tardes", 
-      //   evening: "Buenas noches", 
-      //   generic: "Hola" 
+      // es: {
+      //   morning: "Buenos días",
+      //   afternoon: "Buenas tardes",
+      //   evening: "Buenas noches",
+      //   generic: "Hola"
       // },
-      // de: { 
-      //   morning: "Guten Morgen", 
-      //   afternoon: "Guten Tag", 
-      //   evening: "Guten Abend", 
-      //   generic: "Hallo" 
+      // de: {
+      //   morning: "Guten Morgen",
+      //   afternoon: "Guten Tag",
+      //   evening: "Guten Abend",
+      //   generic: "Hallo"
       // },
-      yo: { // Yoruba
+      yo: {
+        // Yoruba
         morning: "Ẹ káàárọ̀",
         afternoon: "Ẹ káàsán",
         evening: "Ẹ káalẹ́",
         generic: "Báwo ni?",
       },
-      ha: { // Hausa
+      ha: {
+        // Hausa
         morning: "Ina kwana",
         afternoon: "Ina wuni",
         evening: "Barka da yamma",
         generic: "Sannu",
       },
-      ig: { // Igbo
+      ig: {
+        // Igbo
         morning: "Ụtụtụ ọma",
         afternoon: "Ehihie ọma",
         evening: "Mgbede ọma",
         generic: "Kedu",
       },
-      pi: { // Nigerian Pidgin English
+      pi: {
+        // Nigerian Pidgin English
         morning: "Good morning o",
         afternoon: "Good afternoon o",
         evening: "Good evening o",
@@ -177,8 +182,13 @@ export default function Dashboard() {
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Business Overview</h1>
-          <Badge variant="ghost" className="text-muted-foreground mt-1 text-sm whitespace-normal h-auto text-left">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Business Overview
+          </h1>
+          <Badge
+            variant="ghost"
+            className="text-muted-foreground mt-1 text-sm whitespace-normal h-auto text-left"
+          >
             {getLocalizedGreeting(user?.user?.firstName)}
           </Badge>
         </div>
@@ -202,37 +212,32 @@ export default function Dashboard() {
           </div>
         )}
       </div>
- <InvoiceRealtimeListener
+      <InvoiceRealtimeListener
         onInvoiceCreated={(invoiceId) => {
-          console.log(
-            "Invoice created:",
-            invoiceId
-          );
+          console.log("Invoice created:", invoiceId);
         }}
       />
       <SubscriptionReminder Business={user?.business} />
       <BirthdayGreetings Business={user?.business} user={user?.user} />
 
       {/* Dashboards */}
-       {user?.user?.c_levelDash ? (
+      {user?.user?.c_levelDash ? (
         <MainDash userData={user} />
       ) : (
         <DemoDashboardPlaceholder />
       )}
-      
     </div>
   );
 }
-
 
 export function DemoDashboardPlaceholder() {
   return (
     <div className="space-y-8 animate__animated animate__fadeInUp">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <p className="text-base text-zinc-500">
-            You’re viewing a sample dashboard • Access Restricted
-          </p>
+        <p className="text-base text-zinc-500">
+          You’re viewing a sample dashboard • Access Restricted
+        </p>
       </div>
 
       {/* KPI Cards (Skeletons) */}
@@ -247,7 +252,7 @@ export function DemoDashboardPlaceholder() {
               <div className="mt-2 h-6 w-24 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
               <p className="text-xs mt-1 text-zinc-400">Sample data</p>
             </div>
-          )
+          ),
         )}
       </div>
 

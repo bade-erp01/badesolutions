@@ -17,6 +17,7 @@ import {
   LogOut,
   Settings,
   Bell,
+  Sparkles
 } from "lucide-react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useRouter, usePathname, useParams } from "next/navigation";
@@ -344,14 +345,17 @@ export default function Wrapper({ children }) {
               Business Overview
             </Button>
           )}
-          <Button
-            variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
-            disabled={pathname === `/${Params.auth}/V4/Assistant`}
-            className="w-full justify-start cursor-pointer"
-            onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
-          >
-            Invoice Assistant
-          </Button>
+
+          {user.user.isDev && (
+            <Button
+              variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
+              disabled={pathname === `/${Params.auth}/V4/Assistant`}
+              className="w-full justify-start cursor-pointer"
+              onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
+            >
+              Try Kamsi Ai <Sparkles className="h-5 w-5 shrink-0" />
+            </Button>
+          )}
         </nav>
 
         <div className="p-1 border-t w-full user-profile">

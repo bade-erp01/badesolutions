@@ -105,19 +105,26 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
   },
 
   icons: {
-    icon: "/favicon.ico",
+    icon: [{ url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" }],
     shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 
-  manifest: "/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "BADE",
+    statusBarStyle: "black-translucent",
+  },
+
+  formatDetection: {
+    telephone: false,
+  },
 
   verification: {
     google: "YOUR_GOOGLE_SEARCH_CONSOLE_CODE",
   },
 
   other: {
-    "theme-color": "#ffffff",
     "color-scheme": "light",
   },
 };
