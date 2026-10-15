@@ -16,6 +16,7 @@ import {
   PaperClipIcon,
   ArrowTrendingUpIcon,
   PrinterIcon,
+  ArrowUturnLeftIcon,
 } from "@heroicons/react/24/solid";
 import { Loader2 } from "lucide-react";
 
@@ -56,6 +57,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+// ──────────────────────────────────────────────
+// PDF helpers
+// ──────────────────────────────────────────────
+const PDF_BRAND = [15, 76, 92]; // deep teal
+const PDF_INK = [33, 37, 41];
+const PDF_MUTED = [108, 117, 125];
+const PDF_LINE = [222, 226, 230];
+const PDF_TINT = [243, 247, 248];
+
+const money = (n) =>
+  Number(n || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+// jsPDF's built-in fonts cannot draw symbols such as ₦, so the PDF uses the
+// currency code (or an ASCII symbol like $) instead.
+const pdfCurrency = (currency) => {
+  const c = currency || {};
+  const code = c.code || c.Code || c.cc || c.currencyCode;
+  if (code) return String(code).toUpperCase();
+  if (c.Symbol && /^[\x20-\x7E]+$/.test(c.Symbol)) return c.Symbol;
+  return "NGN";
+};
+
+const STATUS_STAMP = {
+  draft: { text: "DRAFT", color: [173, 181, 189] },
+  pending: { text: "PENDING", color: [173, 181, 189] },
+  reversed: { text: "REVERSED", color: [220, 53, 69] },
+  "declined by storekeeper": { text: "DECLINED", color: [220, 53, 69] },
+};
 
 export default function DraftPurchasePage({
   user,
@@ -452,172 +485,372 @@ export default function DraftPurchasePage({
     }
   };
 
+  // Admin only: undo a purchase posted to the warehouse (stock, vendor balance, journal)
+  const reversePO = async () => {
+    if (isUpdatingAnyLine || !user.isAdmin) return;
+
+    const { value: reason, isConfirmed } = await Swal.fire({
+      title: "Reverse this purchase?",
+      html: `This removes every product on <b>${Singlebill.billReferenceNo}</b> from the warehouse, reduces the vendor's balance by <b>${Business.currency?.currency?.Symbol || ""}${money(Singlebill.grandTotal)}</b> and reverses the purchase journal.<br/><br/>It cannot be posted again afterwards.`,
+      icon: "warning",
+      input: "textarea",
+      inputLabel: "Reason for reversal",
+      inputPlaceholder: "e.g. wrong quantities received",
+      inputValidator: (value) => (!value?.trim() ? "Please give a reason" : undefined),
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, reverse it",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      plsWait("Reversing purchase");
+      const response = await fetch(
+        `${EXPRESS_PRIVATE_URL}/api/purchase/${encodeURIComponent(Singlebill._id)}/reverse`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ reason: reason.trim() }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
+            access: `${Encrypt(user._id)}`,
+            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
+            "idempotency-key": `reverse-${Singlebill._id}-${crypto.randomUUID()}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok && data.message) {
+        SuccessToast(`${Singlebill.billReferenceNo} reversed`);
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        throw new Error(data.error || "Reversal failed");
+      }
+    } catch (error) {
+      ErrorMessage(error.message || "Network error");
+    }
+  };
+
   // ──────────────────────────────────────────────
   // PDF generation
   // ──────────────────────────────────────────────
-  const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
-    return new Promise((resolve, reject) => {
+
+  // Loads an image and returns it as a PNG data URL with its natural size,
+  // so the logo can be scaled without distortion.
+  const loadImageAsDataURL = (src) =>
+    new Promise((resolve, reject) => {
       const img = new window.Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
         const canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-
-        ctx.drawImage(img, 0, 0);
-        ctx.font = "italic bold 16px 'Courier New'";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillStyle = "rgba(109, 107, 107, 0.59)";
-        ctx.globalAlpha = 0.5;
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10);
-        resolve(canvas.toDataURL("image/png"));
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        resolve({ dataUrl: canvas.toDataURL("image/png"), width: img.width, height: img.height });
       };
       img.onerror = () => reject(new Error("Image loading failed"));
       img.src = src;
     });
-  };
 
   const generatePdf = async ({ business = Business, bill = Singlebill } = {}) => {
     if (isUpdatingAnyLine) return;
 
     try {
-      plsWait("Setting things up, Ensure your printer is connected ⌛...");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      plsWait("Preparing your purchase order ⌛...");
 
-      const doc = new jsPDF();
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 10;
-      let currentY = margin;
+      const margin = 14;
+      const contentWidth = pageWidth - margin * 2;
+      const cur = pdfCurrency(business.currency?.currency);
+      const vendor = cust || (typeof bill.Vendor === "object" ? bill.Vendor : {}) || {};
+      const statusKey = String(bill.status || "").toLowerCase();
+      const stamp = STATUS_STAMP[statusKey];
+      const generatedBy = `${user.firstName || ""} ${user.lastName || ""}`.trim();
 
+      // ── Header band ───────────────────────────
+      doc.setFillColor(...PDF_BRAND);
+      doc.rect(0, 0, pageWidth, 4, "F");
+
+      let logoBottom = 12;
       if (business.companyLogo) {
         try {
           const logo = await loadImageAsDataURL(business.companyLogo);
-          doc.addImage(logo, "JPEG", 10, 12, 30, 30);
+          const maxW = 32;
+          const maxH = 22;
+          const scale = Math.min(maxW / logo.width, maxH / logo.height);
+          const w = logo.width * scale;
+          const h = logo.height * scale;
+          doc.addImage(logo.dataUrl, "PNG", margin, 10, w, h);
+          logoBottom = 10 + h;
         } catch {
           console.warn("Logo failed to load");
         }
       }
 
-      doc.setFontSize(16).setFont("helvetica", "bold");
-      doc.text(business.companyName || "", pageWidth - 10, 12, { align: "right" });
+      // Company details (right)
+      doc.setTextColor(...PDF_INK).setFont("helvetica", "bold").setFontSize(14);
+      doc.text(business.companyName || "", pageWidth - margin, 14, { align: "right" });
+      doc.setFont("helvetica", "normal").setFontSize(8.5).setTextColor(...PDF_MUTED);
+      const companyLines = [
+        [business.shopAddress || business.Address, business.companyCity || business.CompanyCity, business.companyState]
+          .filter(Boolean)
+          .join(", "),
+        [business.Tel && `Tel: ${business.Tel}`, business.email].filter(Boolean).join("   |   "),
+      ].filter(Boolean);
+      companyLines.forEach((line, i) => {
+        doc.text(line, pageWidth - margin, 19.5 + i * 4.5, { align: "right" });
+      });
 
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(
-        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
-        pageWidth - 10,
-        20,
-        { align: "right" }
-      );
-      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, { align: "right" });
+      // Title
+      let y = Math.max(logoBottom, 19.5 + companyLines.length * 4.5) + 8;
+      doc.setDrawColor(...PDF_LINE).setLineWidth(0.3);
+      doc.line(margin, y - 4, pageWidth - margin, y - 4);
+      doc.setFont("helvetica", "bold").setFontSize(20).setTextColor(...PDF_BRAND);
+      doc.text("PURCHASE ORDER", margin, y + 5);
 
-      currentY = 50;
-
-      doc.setFontSize(17).setTextColor(0, 0, 0).setFont("helvetica", "bold");
-      doc.text(`${bill.billReferenceNo}`, 10, currentY);
-      currentY += 10;
-
-      doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-      doc.text(`${bill.Vendor.Name?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(`${bill.Vendor?.Address || "N/A"}`, 10, currentY + 6);
-      doc.text(`${bill.Vendor?.vendor_tel || "N/A"}`, 10, currentY + 12);
-
-      currentY += 2;
-
+      // Document meta (right of title)
       autoTable(doc, {
-        startY: currentY,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          ["Store:", Whouse.WHName || ""],
-          ["Receive Date:", moment(bill.recievedDate).format("YYYY-MM-DD") || ""],
-          ["Status:", bill.status],
-        ],
+        startY: y - 1,
+        margin: { left: pageWidth - margin - 72 },
+        tableWidth: 72,
         theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: {halign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        head: [["#", "Product", "Code", "Batch", "Expiry Date", "Price", "Case", "Pcs", "Total"]],
-        body: bill.orders.map((ord, i) => [
-          i + 1,
-          `${ord.item?.productName}`,
-          ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-          ord.BatchNo || "N/A",
-          ord.ExpDate || "N/A",
-          ord.VendorPrice?.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }) || 0,
-          ord.Qty || 0,
-          ord.pcsReq || 0,
-          ord.total?.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }) || 0,
-        ]),
-        theme: "grid",
-        styles: { fontSize: 9 },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 76,
-        margin: { left: pageWidth - 90 },
-        head: [["Subtotal", "Logistics", "Total Due"]],
         body: [
-          [
-            bill.subTotal?.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) || "0.00",
-            bill.shippingFee?.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) || "0.00",
-            bill.grandTotal?.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) || "0.00",
-          ],
+          ["PO Number", bill.billReferenceNo || "—"],
+          ["Date", bill.recievedDate ? moment(bill.recievedDate).format("DD MMM YYYY") : "—"],
+          ["Status", String(bill.status || "—").toUpperCase()],
         ],
-        theme: "grid",
-        styles: { fontSize: 9, cellPadding: 1 },
+        styles: { fontSize: 8.5, cellPadding: { top: 0.8, bottom: 0.8, left: 2, right: 0 }, textColor: PDF_INK },
         columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: {halign: "right" },
+          0: { fontStyle: "bold", textColor: PDF_MUTED, cellWidth: 26 },
+          1: { halign: "right", fontStyle: "bold" },
         },
       });
-      currentY = doc.lastAutoTable.finalY + 10;
+      y = Math.max(doc.lastAutoTable.finalY, y + 8) + 6;
 
-      doc.setFontSize(10);
-      doc.text(
-        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
-        margin,
-        currentY
+      // ── Supplier / Deliver-to boxes ───────────
+      const boxGap = 6;
+      const boxW = (contentWidth - boxGap) / 2;
+      const boxes = [
+        {
+          title: "SUPPLIER",
+          lines: [
+            [String(vendor.Name || vendor.NAME || "—").toUpperCase(), true],
+            [vendor.Address || vendor.address, false],
+            [vendor.vendor_tel && `Tel: ${vendor.vendor_tel}`, false],
+            [vendor.email && `Email: ${vendor.email}`, false],
+          ],
+        },
+        {
+          title: "DELIVER TO",
+          lines: [
+            [String(Whouse?.WHName || "—").toUpperCase(), true],
+            [business.companyName, false],
+            [[Whouse?.Address || Whouse?.address, Whouse?.City].filter(Boolean).join(", "), false],
+            [business.Tel && `Tel: ${business.Tel}`, false],
+          ],
+        },
+      ];
+      const boxH = 30;
+      boxes.forEach((box, i) => {
+        const x = margin + i * (boxW + boxGap);
+        doc.setFillColor(...PDF_TINT).setDrawColor(...PDF_LINE);
+        doc.roundedRect(x, y, boxW, boxH, 1.5, 1.5, "FD");
+        doc.setFont("helvetica", "bold").setFontSize(7.5).setTextColor(...PDF_BRAND);
+        doc.text(box.title, x + 4, y + 6);
+        let ly = y + 12;
+        box.lines
+          .filter(([text]) => text)
+          .forEach(([text, bold]) => {
+            doc.setFont("helvetica", bold ? "bold" : "normal")
+              .setFontSize(bold ? 10 : 8.5)
+              .setTextColor(...(bold ? PDF_INK : PDF_MUTED));
+            const wrapped = doc.splitTextToSize(String(text), boxW - 8).slice(0, 2);
+            doc.text(wrapped, x + 4, ly);
+            ly += wrapped.length * (bold ? 5 : 4.2);
+          });
+      });
+      y += boxH + 8;
+
+      // ── Line items ────────────────────────────
+      const orders = bill.orders || [];
+      autoTable(doc, {
+        startY: y,
+        margin: { left: margin, right: margin, top: 18, bottom: 22 },
+        head: [["#", "Description", "Code", "Batch", "Expiry", "Case", "Pcs", `Unit Price (${cur})`, `Amount (${cur})`]],
+        body: orders.map((ord, i) => [
+          i + 1,
+          String(ord.item?.productName || "").trim(),
+          ord.item?.ADCcode || ord.item?.ACDcode || "—",
+          ord.BatchNo || "—",
+          ord.ExpDate ? moment(ord.ExpDate).format("DD/MM/YYYY") : "—",
+          Number(ord.Qty || 0).toLocaleString(),
+          Number(ord.pcs || 0).toLocaleString(),
+          money(ord.buyingPrice),
+          money(ord.total),
+        ]),
+        foot: [[
+          "",
+          `${orders.length} item${orders.length === 1 ? "" : "s"}`,
+          "",
+          "",
+          "",
+          orders.reduce((s, o) => s + Number(o.Qty || 0), 0).toLocaleString(),
+          orders.reduce((s, o) => s + Number(o.pcs || 0), 0).toLocaleString(),
+          "",
+          money(orders.reduce((s, o) => s + Number(o.total || 0), 0)),
+        ]],
+        theme: "striped",
+        showFoot: "lastPage",
+        styles: { fontSize: 8, cellPadding: 2, textColor: PDF_INK, lineColor: PDF_LINE, lineWidth: 0.1, valign: "middle" },
+        headStyles: { fillColor: PDF_BRAND, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+        footStyles: { fillColor: [233, 236, 239], textColor: PDF_INK, fontStyle: "bold" },
+        alternateRowStyles: { fillColor: [250, 251, 252] },
+        columnStyles: {
+          0: { halign: "center", cellWidth: 8 },
+          1: { cellWidth: "auto" },
+          2: { cellWidth: 20 },
+          3: { cellWidth: 18 },
+          4: { halign: "center", cellWidth: 19 },
+          5: { halign: "right", cellWidth: 12 },
+          6: { halign: "right", cellWidth: 10 },
+          7: { halign: "right", cellWidth: 24 },
+          8: { halign: "right", cellWidth: 27 },
+        },
+        didParseCell: (data) => {
+          if (data.section === "head" && data.column.index >= 5) data.cell.styles.halign = "right";
+          if (data.section === "head" && data.column.index === 4) data.cell.styles.halign = "center";
+        },
+      });
+      y = doc.lastAutoTable.finalY + 6;
+
+      // keep the totals + words + remarks block together
+      const ensureSpace = (needed) => {
+        if (y + needed > pageHeight - 24) {
+          doc.addPage();
+          y = 20;
+        }
+      };
+
+      // ── Totals ────────────────────────────────
+      ensureSpace(40);
+      const discount = Number(bill.discount || 0);
+      const shipping = Number(bill.shippingFee || 0);
+      const lineTotal = orders.reduce((s, o) => s + Number(o.total || 0), 0);
+      const totalsRows = [
+        ["Subtotal", money(bill.subTotal || lineTotal)],
+        ...(discount ? [["Discount", `- ${money(discount)}`]] : []),
+        ["Shipping & Offloading", money(shipping)],
+      ];
+      autoTable(doc, {
+        startY: y,
+        margin: { left: pageWidth - margin - 80 },
+        tableWidth: 80,
+        theme: "plain",
+        body: totalsRows,
+        foot: [[`TOTAL (${cur})`, money(bill.grandTotal)]],
+        styles: { fontSize: 9, cellPadding: { top: 1.5, bottom: 1.5, left: 3, right: 3 }, textColor: PDF_INK },
+        columnStyles: { 0: { textColor: PDF_MUTED }, 1: { halign: "right" } },
+        footStyles: { fillColor: PDF_BRAND, textColor: 255, fontStyle: "bold", fontSize: 10.5 },
+        didParseCell: (data) => {
+          if (data.section === "foot" && data.column.index === 1) data.cell.styles.halign = "right";
+        },
+      });
+      const totalsBottom = doc.lastAutoTable.finalY;
+
+      // Amount in words (left of totals)
+      doc.setFont("helvetica", "bold").setFontSize(7.5).setTextColor(...PDF_BRAND);
+      doc.text("AMOUNT IN WORDS", margin, y + 4);
+      doc.setFont("helvetica", "italic").setFontSize(9).setTextColor(...PDF_INK);
+      const words = doc.splitTextToSize(
+        String(totalInWords(bill.grandTotal, business.currency?.currency) || ""),
+        contentWidth - 90
       );
-      currentY += 10;
-      doc.text(`Remarks: ${bill.Remarks}`, margin, currentY);
+      doc.text(words, margin, y + 9.5);
+      y = Math.max(totalsBottom, y + 9.5 + words.length * 4.2) + 8;
 
+      // ── Remarks / reversal note ───────────────
+      const notes = [];
+      if (bill.Remarks) notes.push(["REMARKS", bill.Remarks]);
+      if (statusKey === "reversed") {
+        notes.push([
+          "REVERSAL",
+          `Reversed${bill.reversedAt ? ` on ${moment(bill.reversedAt).format("DD MMM YYYY, HH:mm")}` : ""}.${bill.reversalReason ? ` Reason: ${bill.reversalReason}` : ""} Stock, vendor balance and the purchase journal have been reversed.`,
+        ]);
+      }
+      notes.forEach(([label, text]) => {
+        const lines = doc.splitTextToSize(String(text), contentWidth - 8);
+        const h = 9 + lines.length * 4.2;
+        ensureSpace(h + 4);
+        const danger = label === "REVERSAL";
+        doc.setFillColor(...(danger ? [253, 236, 238] : PDF_TINT)).setDrawColor(...(danger ? [245, 194, 199] : PDF_LINE));
+        doc.roundedRect(margin, y, contentWidth, h, 1.5, 1.5, "FD");
+        doc.setFont("helvetica", "bold").setFontSize(7.5).setTextColor(...(danger ? [176, 42, 55] : PDF_BRAND));
+        doc.text(label, margin + 4, y + 5);
+        doc.setFont("helvetica", "normal").setFontSize(8.5).setTextColor(...PDF_INK);
+        doc.text(lines, margin + 4, y + 10);
+        y += h + 5;
+      });
+
+      // ── Signatures ────────────────────────────
+      ensureSpace(30);
+      y = Math.max(y + 6, 0);
+      const sigW = (contentWidth - 2 * 10) / 3;
+      ["Prepared by", "Approved by", "Received by (Store)"].forEach((label, i) => {
+        const x = margin + i * (sigW + 10);
+        doc.setDrawColor(...PDF_MUTED).setLineWidth(0.3);
+        doc.line(x, y + 12, x + sigW, y + 12);
+        doc.setFont("helvetica", "bold").setFontSize(8).setTextColor(...PDF_INK);
+        doc.text(label, x, y + 17);
+        doc.setFont("helvetica", "normal").setFontSize(7.5).setTextColor(...PDF_MUTED);
+        doc.text("Name, signature & date", x, y + 21);
+      });
+
+      // ── Every page: stamp, running header, footer ──
       const totalPages = doc.internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10, {
-          align: "right",
-        });
+
+        if (stamp) {
+          doc.saveGraphicsState();
+          doc.setGState(new doc.GState({ opacity: 0.12 }));
+          doc.setFont("helvetica", "bold").setFontSize(80).setTextColor(...stamp.color);
+          doc.text(stamp.text, pageWidth / 2, pageHeight / 2, { align: "center", angle: 35 });
+          doc.restoreGraphicsState();
+        }
+
+        if (i > 1) {
+          doc.setFillColor(...PDF_BRAND);
+          doc.rect(0, 0, pageWidth, 4, "F");
+          doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(...PDF_INK);
+          doc.text(`Purchase Order ${bill.billReferenceNo || ""}`, margin, 12);
+          doc.setFont("helvetica", "normal").setTextColor(...PDF_MUTED);
+          doc.text(business.companyName || "", pageWidth - margin, 12, { align: "right" });
+        }
+
+        doc.setDrawColor(...PDF_LINE).setLineWidth(0.3);
+        doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+        doc.setFont("helvetica", "normal").setFontSize(7.5).setTextColor(...PDF_MUTED);
+        doc.text(
+          `${bill.billReferenceNo || ""}  ·  Generated ${moment().format("DD MMM YYYY, HH:mm")}${generatedBy ? ` by ${generatedBy}` : ""}`,
+          margin,
+          pageHeight - 9
+        );
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 9, { align: "right" });
       }
+
+      // ── Output ────────────────────────────────
+      doc.setProperties({
+        title: `Purchase Order ${bill.billReferenceNo || ""}`,
+        subject: "Purchase Order",
+        author: business.companyName || "",
+        creator: "B.A.D.E",
+      });
 
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
@@ -628,19 +861,23 @@ export default function DraftPurchasePage({
           Swal.close();
           win.print();
         };
+        Swal.close();
       } else {
-        doc.save(`${bill.customerName || "Purchase"}.pdf`);
+        doc.save(`PO-${bill.billReferenceNo || "purchase"}.pdf`);
         Swal.close();
       }
     } catch (error) {
       Swal.close();
       console.error("Error generating PDF:", error);
+      ErrorMessage("Could not generate the PDF");
     }
   };
 
   const isDraft = Singlebill.status?.toLowerCase() === "draft";
   const isPending = Singlebill.status?.toLowerCase() === "pending";
   const isApproved = Singlebill.status?.toLowerCase() === "approved";
+  const isPosted = Singlebill.status === "POSTED TO WAREHOUSE";
+  const isReversed = Singlebill.status === "Reversed";
 
   return (
     <div className="w-full sm:px-6 sm:py-10">
@@ -656,6 +893,8 @@ export default function DraftPurchasePage({
                   ? "outline"
                   : isApproved
                   ? "default"
+                  : isReversed
+                  ? "destructive"
                   : "secondary"
               }
               className="text-sm px-3 py-1"
@@ -663,6 +902,15 @@ export default function DraftPurchasePage({
               {Singlebill.status}
             </Badge>
           </div>
+
+          {/* Reversal notice */}
+          {isReversed && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              This purchase was reversed
+              {Singlebill.reversedAt ? ` on ${moment(Singlebill.reversedAt).format("DD MMM YYYY, HH:mm")}` : ""}.
+              {Singlebill.reversalReason ? ` Reason: ${Singlebill.reversalReason}` : ""}
+            </div>
+          )}
 
           {/* Company + Vendor Info */}
           <div className="flex flex-col lg:flex-row justify-between gap-6 lg:gap-10 border-y border-border py-6">
@@ -798,6 +1046,19 @@ export default function DraftPurchasePage({
                 >
                   <ArrowTrendingUpIcon className="h-4 w-4" />
                   Update Inventory
+                </Button>
+              )}
+
+              {user.isAdmin && isPosted && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={isUpdatingAnyLine}
+                  onClick={reversePO}
+                  className="gap-2"
+                >
+                  <ArrowUturnLeftIcon className="h-4 w-4" />
+                  Reverse Purchase
                 </Button>
               )}
             </div>
@@ -1173,7 +1434,7 @@ export default function DraftPurchasePage({
                 Please ensure all documents are attached before finalizing the purchase request.
               </p>
               <div className="space-y-2">
-                {Singlebill.Attachment?.map((file, index) => (
+                {Singlebill.Attachment?.filter(Boolean).map((file, index) => (
                   <div
                     key={index}
                     className="flex items-center gap-2 p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors"
@@ -1189,7 +1450,7 @@ export default function DraftPurchasePage({
                     </Link>
                   </div>
                 ))}
-                {(!Singlebill.Attachment || Singlebill.Attachment.length === 0) && (
+                {(!Singlebill.Attachment || Singlebill.Attachment.filter(Boolean).length === 0) && (
                   <p className="text-xs text-muted-foreground">No attachments yet.</p>
                 )}
               </div>
