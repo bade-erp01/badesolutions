@@ -52,6 +52,7 @@ import {
 import { Menu } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../../lib/User";
+import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
 
 // Normalize ids (ObjectId / string)
 const toId = (v) =>
@@ -284,7 +285,7 @@ export default function Wrapper({ children }) {
   };
 
   return (
-    <div className="flex h-dvh bg-background">
+    <div className="flex h-[calc(100dvh-var(--push-banner-h,0px))] bg-background">
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex w-64 shrink-0 border-r bg-card flex-col">
         {/* Logo */}
@@ -643,6 +644,7 @@ export function UserProfile({ user, biz }) {
 
   const logout = async () => {
     try {
+      await logoutOneSignal();
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");
       router.push("/Login");

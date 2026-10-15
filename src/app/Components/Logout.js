@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { logout as logoutAction } from "../../../lib/User";
 import { SuccessToast, ErrorMessage } from "../../../Functions/Mics";
+import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
 
 import { Button } from "@/components/ui/button";
 import { Loader2, LogOut } from "lucide-react";
@@ -22,6 +23,7 @@ export default function Logout({ userData }) {
 
       SuccessToast("Signing out...");
 
+      await logoutOneSignal();
       await dispatch(logoutAction());
 
       SuccessToast("You have been logged out successfully.");

@@ -1,74 +1,140 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import OneSignal from "react-onesignal";
 
+const LOG_PREFIX = "[OneSignal]";
+export const PUSH_PROMPT_KEY_PREFIX = "bade:push-prompt-last:";
+
+// One init per page load, shared by every caller (strict mode double effects,
+// the provider and the logout helper). Reset to null on failure so a later
+// call can retry.
+let initPromise = null;
+// External ID we've already logged in as during this page load.
+let loggedInAs = null;
+
+export function initOneSignal() {
+  if (typeof window === "undefined") return Promise.resolve(false);
+
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+  if (!appId) {
+    console.warn(`${LOG_PREFIX} NEXT_PUBLIC_ONESIGNAL_APP_ID is not set; push is disabled.`);
+    return Promise.resolve(false);
+  }
+
+  // react-onesignal rejects init on browsers without web push (e.g. iOS Safari
+  // outside an installed PWA). That's expected, not an error.
+  if (!OneSignal.Notifications.isPushSupported()) return Promise.resolve(false);
+
+  if (!initPromise) {
+    initPromise = OneSignal.init({
+      appId,
+      // Own scope so it doesn't replace the next-pwa worker (/sw.js) at "/".
+      serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js",
+      serviceWorkerParam: {
+        scope: "/push/onesignal/",
+      },
+      persistNotification: true,
+      notifyButton: {
+        enable: true,
+      },
+    })
+      .then(() => true)
+      .catch((error) => {
+        // Survives HMR, where this module resets but react-onesignal's doesn't.
+        if (String(error).includes("already initialized")) return true;
+        console.error(`${LOG_PREFIX} init failed:`, error);
+        initPromise = null;
+        return false;
+      });
+  }
+
+  return initPromise;
+}
+
+const withTimeout = (promise, ms) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`timed out after ${ms}ms`)), ms),
+    ),
+  ]);
+
+// Call from every logout handler, before navigating away. Never throws and
+// gives up after a few seconds so it can't block logout.
+export async function logoutOneSignal() {
+  try {
+    const ready = await withTimeout(initOneSignal(), 5000);
+    if (!ready) return;
+    await withTimeout(OneSignal.logout(), 3000);
+    if (loggedInAs) {
+      try {
+        localStorage.removeItem(`${PUSH_PROMPT_KEY_PREFIX}${loggedInAs}`);
+      } catch {
+        /* storage unavailable */
+      }
+    }
+    loggedInAs = null;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} logout failed:`, error);
+  }
+}
+
+const OneSignalContext = createContext({
+  status: "pending", // "pending" | "ready" | "unavailable"
+  userId: "",
+});
+
+export const useOneSignal = () => useContext(OneSignalContext);
+
+// `user` is the fetchUser() payload: { user: { _id, tenantId, ... }, business, SessionId }.
 export default function OneSignalProvider({ children, user }) {
-  const initialized = useRef(false);
+  const userId = user?.user?._id ? String(user.user._id) : "";
+  const tenantId = String(
+    user?.user?.tenantId ?? user?.business?.tenantId ?? user?.tenantId ?? "",
+  );
+
+  const [status, setStatus] = useState("pending");
 
   useEffect(() => {
-    const initializeOneSignal = async () => {
-      if (typeof window === "undefined") return;
-      if (initialized.current) return;
+    let cancelled = false;
 
-      const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-
-      if (!appId) {
+    const sync = async () => {
+      const ready = await initOneSignal();
+      if (cancelled) return;
+      if (!ready) {
+        setStatus("unavailable");
         return;
       }
 
       try {
-        await OneSignal.init({
-          appId,
-          // Own scope so it doesn't replace the next-pwa worker (/sw.js) at "/".
-          serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js",
-          serviceWorkerParam: {
-            scope: "/push/onesignal/",
-          },
-          notifyButton: {
-            enable: true,
-          },
-        });
-
-        initialized.current = true;
-
+        if (userId) {
+          if (loggedInAs !== userId) {
+            await OneSignal.login(userId);
+            loggedInAs = userId;
+          }
+          await OneSignal.User.addTags({ _id: userId, tenantId });
+        } else if (loggedInAs) {
+          await OneSignal.logout();
+          loggedInAs = null;
+        }
       } catch (error) {
-        // console.error(
-        //   "OneSignal initialization failed:",
-        //   error
-        // );
+        console.error(`${LOG_PREFIX} user ${userId ? "login" : "logout"} failed:`, error);
       }
+
+      if (!cancelled) setStatus("ready");
     };
 
-    initializeOneSignal();
-  }, []);
+    sync();
 
-  useEffect(() => {
-    if (!initialized.current) return;
-    
-    if (!user) return;
-
-    const identifyUser = async () => {
-      try {
-        const userId = String(user.user._id);
-
-        await OneSignal.login(userId);
-
-        await OneSignal.User.addTags({
-          _id: userId,
-          tenantId: String(user.tenantId || ""),
-        });
-
-      } catch (error) {
-        // console.error(
-        //   "OneSignal user identification failed:",
-        //   error
-        // );
-      }
+    return () => {
+      cancelled = true;
     };
+  }, [userId, tenantId]);
 
-    identifyUser();
-  }, [user]);
-
-  return children;
+  return (
+    <OneSignalContext.Provider value={{ status, userId }}>
+      {children}
+    </OneSignalContext.Provider>
+  );
 }

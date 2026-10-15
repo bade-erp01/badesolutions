@@ -8,6 +8,7 @@ import RenewSubscription from "@/app/Components/RenewSubcription";
 import { redirect } from "next/navigation";
 import { WebSocketProvider } from "@/app/Components/WebSocketProvider";
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
+import PushNotificationGate from "@/app/Components/PushNotificationGate";
 import { Toaster } from "sonner";
 
 export const metadata = {
@@ -96,6 +97,7 @@ export default async function layout({ children }) {
             },
           }}
         />
+        <PushNotificationGate />
         <ThemeProvider>
           <UserProvider user={userData}>
             <Wrapper>{children}</Wrapper>

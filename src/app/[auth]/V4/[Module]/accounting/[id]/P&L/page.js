@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import Nav1 from "@/app/Components/Nav1";
-import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 
 import {
@@ -14,8 +12,13 @@ import {
 import { Dencrypt } from "../../../../../../../../Functions/Functions";
 
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
-import { Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import Notch from "@/app/Components/Notch";
+import {
+  downloadIncomeStatement,
+  formatAmount,
+  toNumber,
+} from "@/app/Components/Reports/IncomeStatementPdf";
 /* shadcn/ui */
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +59,7 @@ import {
   SelectContent,
   SelectItem,
   SelectValue,
-} from "@/components/ui/select"; 
+} from "@/components/ui/select";
 
 const months = [
   "January",
@@ -73,17 +76,79 @@ const months = [
   "December",
 ];
 
+// The API answers { data: <encrypted array> }; the layout passes that raw
+// response, the client re-fetch passes the decrypted array.
+function toReport(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (!payload) return [];
+  if (typeof payload === "string") {
+    try {
+      return toReport(Dencrypt(payload));
+    } catch {
+      return [];
+    }
+  }
+  if (typeof payload === "object" && "data" in payload) return toReport(payload.data);
+  return [];
+}
+
+// 1-12 for a snapshot. `generatedAt` holds the month number; fall back to a
+// date in case a snapshot stores one.
+function monthOf(entry) {
+  const n = Number(entry?.generatedAt);
+  if (Number.isInteger(n) && n >= 1 && n <= 12) return n;
+  const d = moment(entry?.generatedAt);
+  return d.isValid() ? d.month() + 1 : null;
+}
+
+function Amount({ value, currency, className = "" }) {
+  const negative = toNumber(value) < 0;
+  return (
+    <span
+      className={`whitespace-nowrap tabular-nums ${negative ? "text-red-600" : ""} ${className}`}
+    >
+      {formatAmount(value, currency)}
+    </span>
+  );
+}
+
 export default function Page({ baseUrl, userData, data }) {
-  const [report, setReport] = useState(data || []);
+  const [report, setReport] = useState(() => toReport(data));
+  const [reportYear, setReportYear] = useState(moment().year());
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+  const [monthIndex, setMonthIndex] = useState("");
 
   const [dates, setDates] = useState({
     period: "",
   });
 
   const currency = userData?.business?.currency?.currency?.Symbol || "₦";
+
+  // month number (1-12) -> snapshot
+  const snapshotsByMonth = useMemo(() => {
+    const map = new Map();
+    for (const entry of report) {
+      const m = monthOf(entry);
+      if (m) map.set(m, entry);
+    }
+    return map;
+  }, [report]);
+
+  // Default to the latest month that has a snapshot.
+  useEffect(() => {
+    if (!snapshotsByMonth.size) {
+      setMonthIndex("");
+      return;
+    }
+    const latest = Math.max(...snapshotsByMonth.keys());
+    setMonthIndex(String(latest - 1));
+  }, [snapshotsByMonth]);
+
+  const selectedMonth =
+    monthIndex === "" ? null : snapshotsByMonth.get(Number(monthIndex) + 1) || null;
+  const totals = selectedMonth?.totals || {};
 
   async function GeneratePNLSummary() {
     try {
@@ -110,9 +175,14 @@ export default function Page({ baseUrl, userData, data }) {
         },
       );
 
+      if (!res.ok) {
+        throw new Error("Could not generate the income statement.");
+      }
+
       const { data } = await res.json();
 
-      setReport(Dencrypt(data));
+      setReport(toReport(data));
+      setReportYear(Number(period));
       SuccessToast("Income statement generated");
       setOpenDialog(false);
     } catch (err) {
@@ -121,6 +191,31 @@ export default function Page({ baseUrl, userData, data }) {
       setLoading(false);
     }
   }
+
+  async function handleDownload() {
+    if (!selectedMonth) {
+      ErrorMessage("Select a month with a P&L snapshot first.");
+      return;
+    }
+    try {
+      setDownloading(true);
+      await downloadIncomeStatement({
+        totals,
+        year: reportYear,
+        monthIndex: Number(monthIndex),
+        business: userData.business,
+        currencySymbol: currency,
+      });
+    } catch (err) {
+      ErrorMessage(err.message || "Could not create the PDF.");
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  const periodLabel = selectedMonth
+    ? `${months[Number(monthIndex)]} ${reportYear}`
+    : null;
 
   return (
     <div className="flex flex-col">
@@ -181,35 +276,23 @@ export default function Page({ baseUrl, userData, data }) {
           {/* months */}
          {report.length > 0 && (
            <div className="space-y-4 w-full rounded p-4">
-            <h2 className="text-sm">Select P&L month</h2>
-            <Select
-              onValueChange={(value) => {
-
-                // Convert value to number (e.g. "6" → 6)
-                const monthNum = Number(value) + 1; // Add 1 because month index is 0-based
-
-                // Find the matching report entry
-                const matchedEntry = report.find(
-                  (entry) => Number(entry.generatedAt) === monthNum
-                );
-
-                if (matchedEntry) {
-                  setSelectedMonth(matchedEntry); // set the actual report entry
-                } else {
-                  ErrorMessage("No snapshot for selected P&L month.");
-                }
-              }}
-              className="w-full"
-            >
+            <h2 className="text-sm">Select P&L month ({reportYear})</h2>
+            <Select value={monthIndex} onValueChange={setMonthIndex}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Select Month" />
               </SelectTrigger>
               <SelectContent>
-                {months.map((m, idx) => (
-                  <SelectItem key={m} value={idx}>
-                    {m}
-                  </SelectItem>
-                ))}
+                {months.map((m, idx) => {
+                  const hasData = snapshotsByMonth.has(idx + 1);
+                  return (
+                    <SelectItem key={m} value={String(idx)} disabled={!hasData}>
+                      {m}
+                      {!hasData && (
+                        <span className="ml-2 text-xs text-muted-foreground">No data</span>
+                      )}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -219,15 +302,26 @@ export default function Page({ baseUrl, userData, data }) {
         {/* MAIN */}
         <main className="flex-1 min-w-0">
           <Card className="shadow-lg">
-            <CardHeader>
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
               <CardTitle>
                 <Badge variant="outline" className="text-sm whitespace-normal text-left">
-                  {selectedMonth?.period
-                    ? `P&L Summary for ${moment(selectedMonth?.generatedAt).month() + 1}-${moment(selectedMonth?.period).year()}`
-                    : "P&L Summary"}{" "}
+                  {periodLabel ? `P&L Summary for ${periodLabel}` : "P&L Summary"}{" "}
                   — {userData.business.companyName}
                 </Badge>
               </CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownload}
+                disabled={!selectedMonth || downloading}
+              >
+                {downloading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <Download />
+                )}
+                Download income statement
+              </Button>
             </CardHeader>
 
             <CardContent>
@@ -251,16 +345,14 @@ export default function Page({ baseUrl, userData, data }) {
                   <TableRow>
                     <TableCell>[A] Revenue</TableCell>
                     <TableCell className="text-right">
-                      {currency}
-                      {selectedMonth?.totals?.revenue || 0}
+                      <Amount value={totals.revenue} currency={currency} />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[B] Returns [less]</TableCell>
                     <TableCell className="text-right">
-                      {currency}
-                      {selectedMonth?.totals?.salesReturns || 0}
+                      <Amount value={totals.salesReturns} currency={currency} />
                     </TableCell>
                   </TableRow>
 
@@ -273,32 +365,25 @@ export default function Page({ baseUrl, userData, data }) {
                       <Accordion type="single" collapsible>
                         <AccordionItem value="cogs">
                           <AccordionTrigger className="justify-end">
-                            {currency}
-                            {selectedMonth?.totals?.COGS.toFixed(2) || 0}
+                            <Amount value={totals.COGS} currency={currency} />
                           </AccordionTrigger>
                           <AccordionContent>
-                            <div className="space-y-2 text-left">
-                              <p>
-                                Opening Inventory: {currency}
-                                {selectedMonth?.totals?.OpeningInvntry || 0}
-                              </p>
-                              <p>
-                                + Net Purchase: {currency}
-                                {selectedMonth?.totals?.netPurchase || 0}
-                              </p>
-                              <p>
-                                + Goods in Transit: {currency}
-                                {selectedMonth?.totals?.gitTotal || 0}
-                              </p>
-                              <p className="font-bold">
-                                C.O.G.A.S: {currency}
-                                {selectedMonth?.totals?.COGAS || 0}
-                              </p>
-                              <p>
-                                - Closing Inventory: {currency}
-                                {selectedMonth?.totals?.closingInvntry || 0}
-                              </p>
-                            </div>
+                            <dl className="ml-auto max-w-xs space-y-2 text-sm">
+                              {[
+                                ["Opening Inventory", totals.OpeningInvntry],
+                                ["+ Net Purchase", totals.netPurchase],
+                                ["+ Goods in Transit", totals.gitTotal],
+                                ["C.O.G.A.S", totals.COGAS, "font-bold"],
+                                ["- Closing Inventory", totals.closingInvntry],
+                              ].map(([label, value, cls]) => (
+                                <div key={label} className={`flex justify-between gap-4 ${cls || ""}`}>
+                                  <dt className="text-left">{label}</dt>
+                                  <dd>
+                                    <Amount value={value} currency={currency} />
+                                  </dd>
+                                </div>
+                              ))}
+                            </dl>
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
@@ -308,48 +393,42 @@ export default function Page({ baseUrl, userData, data }) {
                   <TableRow>
                     <TableCell>[D] Gross Profit</TableCell>
                     <TableCell className="text-right">
-                      {currency}
-                      {selectedMonth?.totals?.grossProfit || 0}
+                      <Amount value={totals.grossProfit} currency={currency} />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[E] Operating Expenses</TableCell>
                     <TableCell className="text-right font-semibold">
-                      {currency}
-                      {selectedMonth?.totals?.operatingExpenses || 0}
+                      <Amount value={totals.operatingExpenses} currency={currency} />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[F] EBIT</TableCell>
                     <TableCell className="text-right">
-                      {currency}
-                      {selectedMonth?.totals?.ebit || 0}
+                      <Amount value={totals.ebit} currency={currency} />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[G] Other income</TableCell>
                     <TableCell className="text-right">
-                      {currency}
-                      {selectedMonth?.totals?.otherIncome || 0}
+                      <Amount value={totals.otherIncome} currency={currency} />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[H] Interest</TableCell>
                     <TableCell className="text-right">
-                      {currency}
-                      {selectedMonth?.totals?.interest || 0}
+                      <Amount value={totals.interest} currency={currency} />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[I] Taxes</TableCell>
                     <TableCell className="text-right font-semibold">
-                      {currency}
-                      {selectedMonth?.totals?.taxes || 0}
+                      <Amount value={totals.taxes} currency={currency} />
                     </TableCell>
                   </TableRow>
 
@@ -358,8 +437,7 @@ export default function Page({ baseUrl, userData, data }) {
                       Net Profit
                     </TableCell>
                     <TableCell className="text-right font-bold text-base sm:text-lg">
-                      {currency}
-                      {selectedMonth?.totals?.netIncome || 0}
+                      <Amount value={totals.netIncome} currency={currency} />
                     </TableCell>
                   </TableRow>
                 </TableBody>

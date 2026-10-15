@@ -7,6 +7,8 @@ import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
 import { Dencrypt } from "../../../../Functions/Functions"
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
+import PushNotificationGate from "@/app/Components/PushNotificationGate";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -59,6 +61,8 @@ export default async function Layout() {
 
   return (
     <OneSignalProvider user={userData}>
+      <Toaster position="top-right" closeButton />
+      <PushNotificationGate />
       <CookiesPolicyAlert />
       <TenantPage userData={userData} baseUrl={baseUrl}/>
     </OneSignalProvider>

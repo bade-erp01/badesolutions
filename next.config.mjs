@@ -10,6 +10,8 @@ const withPWA = nextPWA({
   // Next 15 app router doesn't serve app-build-manifest.json; precaching it 404s
   // and aborts the whole service worker install.
   buildExcludes: [/app-build-manifest\.json$/],
+  // Keep the OneSignal worker (its own scope) out of the next-pwa precache.
+  publicExcludes: ["!noprecache/**/*", "!push/**/*"],
   fallbacks: {
     document: "/offline",
   },

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import OneSignal from "react-onesignal";
+import { logoutOneSignal } from "../Components/OneSignalProvider";
 
 import {
   ArrowRight,
@@ -47,9 +47,6 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
   const [showSplash, setShowSplash] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // OneSignal: init only once
-  const oneSignalReady = useRef(false);
-  const oneSignalInitPromise = useRef(null);
 
   /* ---------- DATE / LOCATION ---------- */
   useEffect(() => {
@@ -101,59 +98,6 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     }
   }
 
-  /* ---------- ONESIGNAL: init once ---------- */
-  useEffect(() => {
-    const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-    if (!appId || typeof window === "undefined") return;
-
-    oneSignalInitPromise.current = (async () => {
-      try {
-        await OneSignal.init({
-          appId,
-          // allowLocalhostAsSecureOrigin: true, // needed for local testing
-          // serviceWorkerPath: "/OneSignalSDKWorker.js", // if you use a custom path
-        });
-        oneSignalReady.current = true;
-      } catch (err) {
-        // console.error("[OneSignal] init failed:", err);
-      }
-    })();
-  }, []);
-
-  const registerOneSignal = async (user) => {
-    try {
-     
-      const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-
-      if (!appId) {
-        
-        return;
-      }
-
-      /*
-       * Initialize OneSignal
-       */
-      await OneSignal.init({ appId });
-
-      /*
-       * Associate the OneSignal subscription
-       * with the authenticated BADE user.
-       */
-      await OneSignal.login( String(user._id) );
-
-      /*
-       * Optional tag.
-       *
-       * This can be useful when you want to
-       * filter/segment users in OneSignal.
-       */
-      await OneSignal.User.addTag( "_id", String(user._id));
-
-    } catch (error) {
-
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -196,11 +140,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
       await dispatch(logoutAction());
 
-      // Link OneSignal BEFORE redirect (critical)
-      await registerOneSignal(decryptedUser);
-
-      // Small delay so OneSignal can persist the external_id
-      await new Promise((r) => setTimeout(r, 800));
+      // OneSignal login (external_id) happens in OneSignalProvider on the
+      // dashboard, which this page hard-navigates to.
 
       dispatch(
         loginSuccess({
@@ -239,14 +180,7 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
 
   const logout = async () => {
     try {
-      // Optional: unlink OneSignal on logout
-      try {
-        if (oneSignalReady.current) {
-          await OneSignal.logout();
-        }
-      } catch {
-        /* ignore */
-      }
+      await logoutOneSignal();
 
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");
