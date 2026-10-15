@@ -443,14 +443,16 @@ export default function Wrapper({ children }) {
                         Business Overview
                       </Button>
                     )}
-                    <Button
-                      variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
-                      disabled={pathname === `/${Params.auth}/V4/Assistant`}
-                      className="w-full justify-start cursor-pointer"
-                      onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
-                    >
-                      Invoice Assistant
-                    </Button>
+                    {user.user.isDev && (
+                      <Button
+                        variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
+                        disabled={pathname === `/${Params.auth}/V4/Assistant`}
+                        className="w-full justify-start cursor-pointer"
+                        onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
+                      >
+                        Try Kamsi Ai <Sparkles className="h-5 w-5 shrink-0" />
+                      </Button>
+                    )}
                   </nav>
 
                   {/* Tenant Switch - Mobile */}
