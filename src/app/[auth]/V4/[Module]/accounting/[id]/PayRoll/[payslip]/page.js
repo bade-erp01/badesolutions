@@ -359,7 +359,7 @@ export default function PayrollPage() {
   const who = (p) => [p?.firstName, p?.lastName].filter(Boolean).join(" ");
 
   return (
-    <div className="container mx-auto space-y-6 px-0 py-2 sm:px-4 sm:py-6 lg:py-8">
+    <div className="space-y-6 px-0 py-2 sm:px-4 sm:py-6 lg:py-8">
       {/* Header */}
       <Card>
         <CardHeader className="space-y-4">
