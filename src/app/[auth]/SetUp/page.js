@@ -1,424 +1,652 @@
-import Footer1 from '@/app/Components/Footer1'
-import Nav1 from '@/app/Components/Nav1'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
+"use client"
 
-export default function SetUp() {
+import { useState, useRef, useMemo } from "react"
+import {
+  Camera,
+  Building2,
+  Globe,
+  MapPin,
+  Phone,
+  Mail,
+  CheckCircle2,
+  Package,
+  Circle,
+} from "lucide-react"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+
+import Footer1 from "@/app/Components/Footer1"
+
+export default function SetUp({ company }) {
+  const data = company || {
+    companyName: "",
+    email: "",
+    Tel: "",
+    companyLogo: "",
+    shopAddress: "",
+    companyState: "",
+    companyCity: "",
+    website: "",
+    BusinessType: "",
+    industryType: "",
+    invoicePolicy: "",
+    allowPriceChangeOnInvoice: false,
+    allowSkuSplitting: false,
+    monthlyCutStatement: false,
+    dailyReport: false,
+    autoLog: false,
+    clearNotification: "Daily",
+    modules: [],
+  }
+
+  const allowedModules = ["Stores Operations", "Product Management", "CRM"]
+
+  const installedModules = (data.modules || [])
+    .filter((mod) => allowedModules.includes(mod.Name))
+    .map((mod) => ({
+      ...mod,
+      installed: true,
+    }))
+
+  const [preview, setPreview] = useState(data.companyLogo || null)
+  const [form, setForm] = useState({
+    companyName: data.companyName || "",
+    email: data.email || "",
+    Tel: data.Tel || "",
+    shopAddress: data.shopAddress || "",
+    companyState: data.companyState || "",
+    companyCity: data.companyCity || "",
+    website: data.website || "",
+    BusinessType: data.BusinessType || "",
+    industryType: data.industryType || "",
+    invoicePolicy: data.invoicePolicy || "",
+    allowPriceChangeOnInvoice: data.allowPriceChangeOnInvoice || false,
+    allowSkuSplitting: data.allowSkuSplitting || false,
+    monthlyCutStatement: data.monthlyCutStatement || false,
+    dailyReport: data.dailyReport || false,
+    autoLog: data.autoLog || false,
+    clearNotification: data.clearNotification || "Daily",
+  })
+
+  const fileInputRef = useRef(null)
+
+  // ---------- Progress calculation (only mandatory fields) ----------
+  const steps = useMemo(() => {
+    const hasLogo = Boolean(preview)
+    const hasBasicInfo =
+      form.companyName.trim() !== "" &&
+      form.email.trim() !== "" &&
+      form.Tel.trim() !== ""
+    const hasAddress =
+      form.shopAddress.trim() !== "" &&
+      form.companyCity.trim() !== "" &&
+      form.companyState.trim() !== ""
+    const hasBusinessDetails =
+      form.BusinessType.trim() !== "" && form.industryType.trim() !== ""
+
+    return [
+      { id: "logo", label: "Company Logo", completed: hasLogo },
+      { id: "basic", label: "Basic Information", completed: hasBasicInfo },
+      { id: "address", label: "Business Address", completed: hasAddress },
+      {
+        id: "details",
+        label: "Business Details",
+        completed: hasBusinessDetails,
+      },
+    ]
+  }, [preview, form])
+
+  const completedCount = steps.filter((s) => s.completed).length
+  const progress = Math.round((completedCount / steps.length) * 100)
+  const isFullyComplete = progress === 100
+
+  // ---------- Handlers ----------
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSwitch = (name, checked) => {
+    setForm((prev) => ({ ...prev, [name]: checked }))
+  }
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const url = URL.createObjectURL(file)
+      setPreview(url)
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!isFullyComplete) return
+    console.log("Activate account with:", { ...form, companyLogo: preview })
+  }
+
   return (
-    <>
-   <Nav1 page={"Business Profile"}/>
-    <section className="min-h-screen flex flex-col  bg-gradient-to-r from-gray-100 via-gray-200 px-4 py-8  text-xs">
-        <form>
-      <div className="space-y-12 m-auto">
-        <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">Business Profile</h2>
-          <p className="mt-1 text-sm/6 text-gray-600">
-            This information will be displayed publicly so be careful what you share.
+    <div className="relative min-h-dvh overflow-hidden bg-background">
+      {/* Abstract decorative blobs */}
+      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-muted/60 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 top-1/3 h-80 w-80 rounded-full bg-muted/40 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-20 left-1/4 h-72 w-72 rounded-full bg-muted/30 blur-3xl" />
+
+      {/* Subtle grid pattern */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <div className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        {/* Page Header + Progress */}
+        <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 sm:mb-10">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Business Profile Setup
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Complete all required steps below to activate your account.
           </p>
 
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-4">
-              <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
-                Username
-              </label>
-              <div className="mt-2">
-                <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-                  <div className="shrink-0 text-base text-gray-500 select-none sm:text-sm/6">workcation.com/</div>
+          {/* Progress bar */}
+          <div className="mt-6 space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">Setup Progress</span>
+              <span className="text-muted-foreground">{progress}% complete</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+
+            {/* Step indicators */}
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+              {steps.map((step) => (
+                <div
+                  key={step.id}
+                  className="flex items-center gap-1.5 text-xs sm:text-sm"
+                >
+                  {step.completed ? (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span
+                    className={
+                      step.completed
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    {step.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* ========== BUSINESS INFORMATION ========== */}
+          <Card className="relative animate-in fade-in slide-in-from-bottom-6 duration-700 overflow-hidden border shadow-sm">
+            <div className="absolute inset-x-0 top-0 h-1 bg-foreground" />
+            <CardHeader>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <CardTitle>Business Information</CardTitle>
+                  <CardDescription>
+                    This information appears on invoices, receipts and
+                    customer-facing documents.
+                  </CardDescription>
+                </div>
+                {steps.find((s) => s.id === "basic")?.completed &&
+                  steps.find((s) => s.id === "logo")?.completed && (
+                    <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
+                      <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                      Completed
+                    </Badge>
+                  )}
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-8">
+              {/* Logo Upload */}
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
+                <div className="relative group">
+                  <Avatar className="h-24 w-24 rounded-xl ring-2 ring-background shadow-md">
+                    {preview ? (
+                      <AvatarImage
+                        src={preview}
+                        alt="Company logo"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="rounded-xl bg-muted">
+                        <Building2 className="h-10 w-10 text-muted-foreground" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-foreground text-background shadow-md transition hover:scale-110"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
+
                   <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    placeholder="janesmith"
-                    className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                </div>
+
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-medium">
+                    Company Logo <span className="text-destructive">*</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Recommended size 400×400px. PNG or JPG.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Change logo
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Basic Info */}
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">
+                    Company Name <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="companyName"
+                    name="companyName"
+                    value={form.companyName}
+                    onChange={handleChange}
+                    placeholder="Enter company name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">
+                    Email <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      className="pl-9"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="Enter email address"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="Tel">
+                  Phone Numbers <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="Tel"
+                    name="Tel"
+                    className="pl-9"
+                    value={form.Tel}
+                    onChange={handleChange}
+                    placeholder="Enter phone number(s)"
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="col-span-full">
-              <label htmlFor="about" className="block text-sm/6 font-medium text-gray-900">
-                About
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="about"
-                  name="about"
-                  rows={3}
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                  defaultValue={''}
-                />
+              <div className="space-y-2">
+                <Label htmlFor="website">Website</Label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="website"
+                    name="website"
+                    className="pl-9"
+                    value={form.website}
+                    onChange={handleChange}
+                    placeholder="Enter website URL"
+                  />
+                </div>
               </div>
-              <p className="mt-3 text-sm/6 text-gray-600">Write a few sentences about yourself.</p>
-            </div>
 
-            <div className="col-span-full">
-              <label htmlFor="photo" className="block text-sm/6 font-medium text-gray-900">
-                Photo
-              </label>
-              <div className="mt-2 flex items-center gap-x-3">
-                <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
-                <button
-                  type="button"
-                  className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-                >
-                  Change
-                </button>
-              </div>
-            </div>
+              <Separator />
 
-            <div className="col-span-full">
-              <label htmlFor="cover-photo" className="block text-sm/6 font-medium text-gray-900">
-                Cover photo
-              </label>
-              <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                <div className="text-center">
-                  <PhotoIcon aria-hidden="true" className="mx-auto size-12 text-gray-300" />
-                  <div className="mt-4 flex text-sm/6 text-gray-600">
-                    <label
-                      htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
+              {/* Address */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="flex items-center gap-2 text-sm font-medium">
+                    <MapPin className="h-4 w-4" />
+                    Business Address
+                  </h3>
+                  {steps.find((s) => s.id === "address")?.completed && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-emerald-100 text-emerald-700"
                     >
-                      <span>Upload a file</span>
-                      <input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
+                      <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                      Done
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="shopAddress">
+                    Street Address <span className="text-destructive">*</span>
+                  </Label>
+                  <Textarea
+                    id="shopAddress"
+                    name="shopAddress"
+                    value={form.shopAddress}
+                    onChange={handleChange}
+                    placeholder="Enter street address"
+                    className="min-h-[80px] resize-none"
+                  />
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="companyCity">
+                      City <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="companyCity"
+                      name="companyCity"
+                      value={form.companyCity}
+                      onChange={handleChange}
+                      placeholder="Enter city"
+                    />
                   </div>
-                  <p className="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="companyState">
+                      State <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="companyState"
+                      name="companyState"
+                      value={form.companyState}
+                      onChange={handleChange}
+                      placeholder="Enter state"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">Personal Information</h2>
-          <p className="mt-1 text-sm/6 text-gray-600">Use a permanent address where you can receive mail.</p>
+              <Separator />
 
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-3">
-              <label htmlFor="first-name" className="block text-sm/6 font-medium text-gray-900">
-                First name
-              </label>
-              <div className="mt-2">
-                <input
-                  id="first-name"
-                  name="first-name"
-                  type="text"
-                  autoComplete="given-name"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              {/* Business Type & Industry */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-medium">Business Details</h3>
+                  {steps.find((s) => s.id === "details")?.completed && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-emerald-100 text-emerald-700"
+                    >
+                      <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                      Done
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>
+                      Business Type <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={form.BusinessType}
+                      onValueChange={(value) =>
+                        setForm((prev) => ({ ...prev, BusinessType: value }))
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select business type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Business">Business</SelectItem>
+                        <SelectItem value="Individual">Individual</SelectItem>
+                        <SelectItem value="Partnership">Partnership</SelectItem>
+                        <SelectItem value="LLC">LLC</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="industryType">
+                      Industry <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="industryType"
+                      name="industryType"
+                      value={form.industryType}
+                      onChange={handleChange}
+                      placeholder="Enter industry"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Invoice Policy */}
+              <div className="space-y-2">
+                <Label htmlFor="invoicePolicy">
+                  Invoice Policy / Footer Note
+                </Label>
+                <Textarea
+                  id="invoicePolicy"
+                  name="invoicePolicy"
+                  value={form.invoicePolicy}
+                  onChange={handleChange}
+                  placeholder="Enter invoice footer note"
+                  className="min-h-[80px] resize-none"
                 />
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="sm:col-span-3">
-              <label htmlFor="last-name" className="block text-sm/6 font-medium text-gray-900">
-                Last name
-              </label>
-              <div className="mt-2">
-                <input
-                  id="last-name"
-                  name="last-name"
-                  type="text"
-                  autoComplete="family-name"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
+          {/* ========== INSTALLED MODULES ========== */}
+          <Card className="relative animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 overflow-hidden border shadow-sm">
+            <div className="absolute inset-x-0 top-0 h-1 bg-foreground" />
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                Installed Modules
+              </CardTitle>
+              <CardDescription>
+                These modules are currently active on your account.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              {installedModules.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No modules installed yet.
+                </p>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {installedModules.map((mod) => (
+                    <div
+                      key={mod._id}
+                      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                    >
+                      <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-muted blur-2xl transition group-hover:bg-muted/80" />
+
+                      <div className="relative flex items-start justify-between">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted transition group-hover:scale-105">
+                          <img
+                            src={mod.icon}
+                            alt={mod.Name}
+                            className="h-8 w-8 object-contain"
+                          />
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-300"
+                        >
+                          <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                          Installed
+                        </Badge>
+                      </div>
+
+                      <div className="relative">
+                        <h4 className="font-semibold tracking-tight">
+                          {mod.Name}
+                        </h4>
+                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                          {mod.Description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ========== PREFERENCES ========== */}
+          <Card className="relative animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300 overflow-hidden border shadow-sm">
+            <div className="absolute inset-x-0 top-0 h-1 bg-foreground" />
+            <CardHeader>
+              <CardTitle>Preferences</CardTitle>
+              <CardDescription>
+                Control how your system behaves. (Optional)
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                {[
+                  {
+                    key: "allowPriceChangeOnInvoice",
+                    label: "Allow price change on invoice",
+                    desc: "Staff can edit prices when creating invoices",
+                  },
+                  {
+                    key: "allowSkuSplitting",
+                    label: "Allow SKU splitting",
+                    desc: "Split products into smaller units",
+                  },
+                  {
+                    key: "monthlyCutStatement",
+                    label: "Monthly cut statement",
+                    desc: "Automatically generate monthly statements",
+                  },
+                  {
+                    key: "dailyReport",
+                    label: "Daily report",
+                    desc: "Send daily sales summary",
+                  },
+                  {
+                    key: "autoLog",
+                    label: "Auto log activity",
+                    desc: "Automatically record user actions",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.key}
+                    className="flex items-center justify-between gap-4 rounded-xl border bg-muted/40 px-4 py-3 transition hover:bg-muted/70"
+                  >
+                    <div className="min-w-0 space-y-0.5">
+                      <Label htmlFor={item.key} className="cursor-pointer">{item.label}</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {item.desc}
+                      </p>
+                    </div>
+                    <Switch
+                      id={item.key}
+                      className="shrink-0"
+                      checked={form[item.key]}
+                      onCheckedChange={(checked) =>
+                        handleSwitch(item.key, checked)
+                      }
+                    />
+                  </div>
+                ))}
               </div>
-            </div>
 
-            <div className="sm:col-span-4">
-              <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label htmlFor="country" className="block text-sm/6 font-medium text-gray-900">
-                Country
-              </label>
-              <div className="mt-2 grid grid-cols-1">
-                <select
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
-                  className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              <div className="space-y-2 pt-2">
+                <Label>Clear notifications</Label>
+                <Select
+                  value={form.clearNotification}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, clearNotification: value }))
+                  }
                 >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
-                </select>
-                <ChevronDownIcon
-                  aria-hidden="true"
-                  className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                />
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Daily">Daily</SelectItem>
+                    <SelectItem value="Weekly">Weekly</SelectItem>
+                    <SelectItem value="Monthly">Monthly</SelectItem>
+                    <SelectItem value="Never">Never</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
+            </CardContent>
 
-            <div className="col-span-full">
-              <label htmlFor="street-address" className="block text-sm/6 font-medium text-gray-900">
-                Street address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="street-address"
-                  name="street-address"
-                  type="text"
-                  autoComplete="street-address"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
+            <CardFooter className="flex flex-col-reverse gap-3 border-t bg-muted/30 px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+              <Button type="button" variant="outline">
+                Cancel
+              </Button>
 
-            <div className="sm:col-span-2 sm:col-start-1">
-              <label htmlFor="city" className="block text-sm/6 font-medium text-gray-900">
-                City
-              </label>
-              <div className="mt-2">
-                <input
-                  id="city"
-                  name="city"
-                  type="text"
-                  autoComplete="address-level2"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label htmlFor="region" className="block text-sm/6 font-medium text-gray-900">
-                State / Province
-              </label>
-              <div className="mt-2">
-                <input
-                  id="region"
-                  name="region"
-                  type="text"
-                  autoComplete="address-level1"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label htmlFor="postal-code" className="block text-sm/6 font-medium text-gray-900">
-                ZIP / Postal code
-              </label>
-              <div className="mt-2">
-                <input
-                  id="postal-code"
-                  name="postal-code"
-                  type="text"
-                  autoComplete="postal-code"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">Notifications</h2>
-          <p className="mt-1 text-sm/6 text-gray-600">
-            We&lsquo;ll always let you know about important changes, but you pick what else you want to hear about.
-          </p>
-
-          <div className="mt-10 space-y-10">
-            <fieldset>
-              <legend className="text-sm/6 font-semibold text-gray-900">By email</legend>
-              <div className="mt-6 space-y-6">
-                <div className="flex gap-3">
-                  <div className="flex h-6 shrink-0 items-center">
-                    <div className="group grid size-4 grid-cols-1">
-                      <input
-                        defaultChecked
-                        id="comments"
-                        name="comments"
-                        type="checkbox"
-                        aria-describedby="comments-description"
-                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                      />
-                      <svg
-                        fill="none"
-                        viewBox="0 0 14 14"
-                        className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                      >
-                        <path
-                          d="M3 8L6 11L11 3.5"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-checked:opacity-100"
-                        />
-                        <path
-                          d="M3 7H11"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-indeterminate:opacity-100"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="text-sm/6">
-                    <label htmlFor="comments" className="font-medium text-gray-900">
-                      Comments
-                    </label>
-                    <p id="comments-description" className="text-gray-500">
-                      Get notified when someones posts a comment on a posting.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex h-6 shrink-0 items-center">
-                    <div className="group grid size-4 grid-cols-1">
-                      <input
-                        id="candidates"
-                        name="candidates"
-                        type="checkbox"
-                        aria-describedby="candidates-description"
-                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                      />
-                      <svg
-                        fill="none"
-                        viewBox="0 0 14 14"
-                        className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                      >
-                        <path
-                          d="M3 8L6 11L11 3.5"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-checked:opacity-100"
-                        />
-                        <path
-                          d="M3 7H11"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-indeterminate:opacity-100"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="text-sm/6">
-                    <label htmlFor="candidates" className="font-medium text-gray-900">
-                      Candidates
-                    </label>
-                    <p id="candidates-description" className="text-gray-500">
-                      Get notified when a candidate applies for a job.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex h-6 shrink-0 items-center">
-                    <div className="group grid size-4 grid-cols-1">
-                      <input
-                        id="offers"
-                        name="offers"
-                        type="checkbox"
-                        aria-describedby="offers-description"
-                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                      />
-                      <svg
-                        fill="none"
-                        viewBox="0 0 14 14"
-                        className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                      >
-                        <path
-                          d="M3 8L6 11L11 3.5"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-checked:opacity-100"
-                        />
-                        <path
-                          d="M3 7H11"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-indeterminate:opacity-100"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="text-sm/6">
-                    <label htmlFor="offers" className="font-medium text-gray-900">
-                      Offers
-                    </label>
-                    <p id="offers-description" className="text-gray-500">
-                      Get notified when a candidate accepts or rejects an offer.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend className="text-sm/6 font-semibold text-gray-900">Push notifications</legend>
-              <p className="mt-1 text-sm/6 text-gray-600">These are delivered via SMS to your mobile phone.</p>
-              <div className="mt-6 space-y-6">
-                <div className="flex items-center gap-x-3">
-                  <input
-                    defaultChecked
-                    id="push-everything"
-                    name="push-notifications"
-                    type="radio"
-                    className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                  />
-                  <label htmlFor="push-everything" className="block text-sm/6 font-medium text-gray-900">
-                    Everything
-                  </label>
-                </div>
-                <div className="flex items-center gap-x-3">
-                  <input
-                    id="push-email"
-                    name="push-notifications"
-                    type="radio"
-                    className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                  />
-                  <label htmlFor="push-email" className="block text-sm/6 font-medium text-gray-900">
-                    Same as email
-                  </label>
-                </div>
-                <div className="flex items-center gap-x-3">
-                  <input
-                    id="push-nothing"
-                    name="push-notifications"
-                    type="radio"
-                    className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                  />
-                  <label htmlFor="push-nothing" className="block text-sm/6 font-medium text-gray-900">
-                    No push notifications
-                  </label>
-                </div>
-              </div>
-            </fieldset>
-          </div>
-        </div>
+              {/* Only show Activate button at 100% */}
+              {isFullyComplete && (
+                <Button
+                  type="submit"
+                  className="animate-in fade-in zoom-in-95 duration-300"
+                >
+                  Activate my account
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+        </form>
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" className="text-sm/6 font-semibold text-gray-900">
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Save
-        </button>
-      </div>
-    </form>
-    </section>
-    <Footer1 />
-    </>
+      <Footer1 />
+    </div>
   )
 }

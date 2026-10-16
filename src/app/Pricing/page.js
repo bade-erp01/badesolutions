@@ -4,7 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Nav1 from "../Components/Nav1";
 import Footer1 from "../Components/Footer1";
-import Link from "next/link"
+import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -27,11 +27,10 @@ export default function Pricing() {
     <div className="min-h-screen bg-[#f8f9fb] text-zinc-900 flex flex-col">
       <Nav1 />
 
-      <main className="flex-1 px-4 py-10">
-
+      <main className="flex-1 px-4 py-8 sm:py-10">
         {/* HEADER */}
         <div className="max-w-3xl mx-auto text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
             Simple, scalable pricing
           </h1>
           <p className="mt-4 text-zinc-500 text-base">
@@ -40,8 +39,7 @@ export default function Pricing() {
         </div>
 
         {/* PRICING */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
           {/* BASIC */}
           <Card className="rounded-3xl border border-zinc-200 bg-white shadow-sm hover:shadow-md transition">
             <CardHeader>
@@ -50,12 +48,6 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* <div> */}
-                {/* <p className="text-3xl font-semibold">₦139,750</p> */}
-                {/* <p className="text-3xl font-semibold">₦420,000 </p>
-                <p className="text-sm text-zinc-500"> current promo :10% off </p>
-              </div> */}
-
               {/* promo div */}
               <div className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100/60 p-5 shadow-sm">
                 {/* Glow */}
@@ -63,52 +55,31 @@ export default function Pricing() {
 
                 <div className="relative flex items-start justify-between gap-4">
                   <div className="space-y-2">
-                    <div className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-                      🎉 Limited Promo Active
+                    <div>
+                      <p className="text-3xl font-semibold"> ₦29,170</p>
+                      <p className="text-sm text-zinc-500">/ Monthly</p>
                     </div>
-
-                    <div className="space-y-1">
-                      {/* Old price */}
-                      <p className="text-sm text-zinc-400 line-through">
-                        ₦385,902
-                      </p>
-
-                      {/* Promo price */}
-                      <h2 className="text-4xl font-bold tracking-tight text-zinc-900">
-                        ₦350,820
-                      </h2>
-
-                      <p className="text-sm text-zinc-600">
-                        Save <span className="font-semibold text-emerald-700">10%[₦35,082]</span> on Basic plan.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Promo badge */}
-                  <div className="rounded-2xl bg-emerald-600 px-4 py-3 text-center text-white shadow-lg">
-                    <p className="text-xs uppercase tracking-wider opacity-80">
-                      Promo
-                    </p>
-
-                    <p className="text-2xl font-bold leading-none">
-                      10%
-                    </p>
-
-                    <p className="text-xs opacity-80 mt-1">
-                      OFF
-                    </p>
                   </div>
                 </div>
               </div>
               <Button
                 className="w-full rounded-xl"
+                variant="secondary"
                 onClick={() => router.push("/auth/SignUp?plan=Basic")}
               >
                 Get started
               </Button>
 
+              <Button
+                className="w-full rounded-xl"
+                variant="default"
+                onClick={() => router.push("/")}
+              >
+                Watch Demo
+              </Button>
+
               <ul className="text-sm text-zinc-600 space-y-2">
-                <li>Sales module access</li>
+                <li>Sales module access only</li>
                 <li>Limited API access</li>
                 <li>4 active users</li>
                 <li>Email support</li>
@@ -117,7 +88,7 @@ export default function Pricing() {
           </Card>
 
           {/* STANDARD */}
-          <Card className="relative rounded-3xl border border-zinc-900 bg-white shadow-lg scale-[1.03]">
+          <Card className="relative rounded-3xl border border-zinc-900 bg-white shadow-lg md:scale-[1.03]">
             <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-zinc-900 text-white">
               Most Popular
             </Badge>
@@ -128,10 +99,11 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* <div>
-                <p className="text-3xl font-semibold">₦332,820</p>
-                <p className="text-sm text-zinc-500">Yearly</p>
-              </div> */}
+              <div className="rounded-2xl bg-emerald-600 px-4 py-3 text-center text-white shadow-lg">
+                <p className="text-xl sm:text-2xl font-bold leading-none">
+                  Get 1 Month Free Trial
+                </p>
+              </div>
 
               {/* <Button
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
@@ -142,21 +114,26 @@ export default function Pricing() {
 
               <Button
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+                asChild
               >
                 <Link
-                  href="mailto:Operations@badesolutions.com.ng"
+                  href="https://wa.me/2347044889034?text=hello%20sales%2C%20i%27d%20like%20to%20book%20a%20demo"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Contact Sales
                 </Link>
               </Button>
 
               <ul className="text-sm text-zinc-600 space-y-2">
+                <li>Financial module</li>
+                <li>Sales module</li>
+                <li>Access to app store</li>
+                <li>10 active users</li>
+                <li>Access to Sales Portal</li>
+                <li>Free Training & onboarding</li>
+                <li>Priority email support</li>
                 <li>Multi-business management</li>
-                <li>Private cloud backup</li>
-                <li>Financial API integrations</li>
-                <li>Custom module support</li>
-                <li>6 active users</li>
-                <li>Training & onboarding</li>
               </ul>
             </CardContent>
           </Card>
@@ -169,12 +146,14 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-
               <Button
                 className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+                asChild
               >
                 <Link
-                  href="mailto:Operations@badesolutions.com.ng"
+                  href="https://wa.me/2347044889034?text=hello%20sales%2C%20i%27d%20like%20to%20book%20a%20demo"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Contact Sales
                 </Link>
@@ -184,35 +163,25 @@ export default function Pricing() {
                 Custom pricing based on your business needs.
               </p>
               <ul className="text-sm text-zinc-600 space-y-2">
+                <li>Financial module</li>
+                <li>Sales module</li>
+                <li>H.R module</li>
+                <li>Custom deployment</li>
                 <li>Unlimited users</li>
                 <li>Dedicated VPS</li>
-                <li>Custom deployment</li>
                 <li>AI-powered business model</li>
                 <li>Priority support</li>
                 <li>Full API access</li>
+                <li>Private cloud backup</li>
               </ul>
             </CardContent>
           </Card>
         </div>
 
         {/* FOOTER NOTE */}
-        <div className="text-center mt-20 text-sm text-zinc-500">
-          <p>
-            Support:{" "}
-            <a
-              href="mailto:Operations@badesolutions.com.ng"
-              className="underline text-zinc-900"
-            >
-              Operations@badesolutions.com.ng
-            </a>
-          </p>
-
-          <p className="mt-4">
-            Fully built ERP tailored for your operations.
-          </p>
-
+        <div className="text-center mt-12 sm:mt-20 text-sm text-zinc-500">
+          <p className="mt-4">Fully built ERP tailored for your operations.</p>
         </div>
-
       </main>
 
       <Footer1 />
