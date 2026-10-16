@@ -25,11 +25,11 @@ import {
   ErrorMessage,
   SuccessToast,
   plsWait,
-} from "../../../../../../../Functions/Mics";
+} from "../../../../../Functions/Mics";
 import {
   totalInWords,
   EXPRESS_PRIVATE_URL,
-} from "../../../../../../../Functions/Functions";
+} from "../../../../../Functions/Functions";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
