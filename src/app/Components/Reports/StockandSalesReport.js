@@ -24,13 +24,24 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const idOf = (value) => {
   if (value == null || value === "") return "";
   if (typeof value === "object") return String(value._id ?? value.id ?? "");
   return String(value);
 };
+
+const escapeHtml = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (char) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[char];
+  });
 
 const getStoreProductId = (order) =>
   idOf(
@@ -426,21 +437,20 @@ export default function StockandSalesReport({ baseUrl, userData }) {
                   <td style="padding:6px;text-align:left;">${escapeHtml(item.productName)}</td>
                   <td style="padding:6px;text-align:left;">${escapeHtml(item.vendorName)}</td>
                   <td style="padding:6px;text-align:left;">${escapeHtml(item.storeName)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(item.PurchCase)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(item.PurchPcs)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(item.Sold)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(item.pcs)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(item.rStock)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(item.rPcs)}</td>
-                  <td style="padding:6px;text-align:right;">C: ${escapeHtml(item.Stock)}, P: ${escapeHtml(item.PcsStock)}</td>
-                  <td style="padding:6px;text-align:right;">${escapeHtml(Number(item.salesVolume || 0).toLocaleString())}</td>
+                  <td style="padding:6px;text-align:right;">${item.PurchCase}</td>
+                  <td style="padding:6px;text-align:right;">${item.PurchPcs}</td>
+                  <td style="padding:6px;text-align:right;">${item.Sold}</td>
+                  <td style="padding:6px;text-align:right;">${item.pcs}</td>
+                  <td style="padding:6px;text-align:right;">${item.rStock}</td>
+                  <td style="padding:6px;text-align:right;">${item.rPcs}</td>
+                  <td style="padding:6px;text-align:right;">C: ${item.Stock}, P: ${item.PcsStock}</td>
+                  <td style="padding:6px;text-align:right;">${Number(item.salesVolume || 0).toLocaleString()}</td>
                 </tr>`
               )
               .join("");
 
             if (!tableEl) return;
 
-            // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
             tableEl.innerHTML = `
               <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:1000px;">
                 <thead style="position:sticky;top:0;background:#edf2f7;z-index:1;">
@@ -498,7 +508,6 @@ export default function StockandSalesReport({ baseUrl, userData }) {
               )
               .join("");
 
-            // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
             productDropdown.innerHTML =
               clearRow +
               (items ||

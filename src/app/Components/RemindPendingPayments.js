@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { escapeHtml } from "@/lib/security/escapeHtml";
-import { safeUrl } from "@/lib/security/safeUrl";
 // Ensure Animate.css is imported globally: import 'animate.css';
 
 const PendingPaymentReminder = ( {data, business }) => {
@@ -23,7 +21,7 @@ const PendingPaymentReminder = ( {data, business }) => {
         background: "#f9f9f9", // softer background color
         html: `
             <div style="display: flex; align-items: center;">
-                <img src="${escapeHtml(safeUrl(business?.companyLogo || "", ""))}" 
+                <img src="${business?.companyLogo || ""}" 
                     alt="Company Logo" 
                     style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #b22222; flex-shrink: 0;" />
                 <div style="text-align: left; line-height: 1.5;">
@@ -31,7 +29,7 @@ const PendingPaymentReminder = ( {data, business }) => {
                     ⚠️ Payment Alert
                 </strong><br/>
                 <span style="font-size: 15px; color: #000; font-weight: 600;">
-                    You have <strong style="color:#d32f2f;">${escapeHtml(pendingPayments.length)}</strong> payment(s) awaiting approval.
+                    You have <strong style="color:#d32f2f;">${pendingPayments.length}</strong> payment(s) awaiting approval.
                 </span><br/>
                 <span style="font-size: 14px; color: #444;">
                     👉 Kindly visit your <strong style="color:#b22222;">Cash Register</strong> to update payment status 

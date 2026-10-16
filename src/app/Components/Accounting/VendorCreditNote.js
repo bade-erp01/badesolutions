@@ -11,7 +11,6 @@ import {
     Encrypt,
 } from "../../../../Functions/Mics";
 import { useRouter, useParams } from "next/navigation";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const MySwal = withReactContent(Swal);
 
@@ -29,7 +28,7 @@ const VendorCreditNoteModal = ({
         const customerOptions = customers
             .map(
                 (c) =>
-                    `<option value="${escapeHtml(c._id)}" class="py-2 px-3">${escapeHtml(c.Name)}</option>`
+                    `<option value="${c._id}" class="py-2 px-3">${c.Name}</option>`
             )
             .join("");
 
@@ -79,14 +78,13 @@ const VendorCreditNoteModal = ({
                 window.filterCustomers = function (searchTerm) {
                     const dropdown = document.getElementById("customerDropdown");
                     if (dropdown) {
-                        // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
                         dropdown.innerHTML = customers
                             .filter((c) =>
                                 c.Name.toLowerCase().includes(searchTerm.toLowerCase())
                             )
                             .map(
                                 (c) =>
-                                    `<option value="${escapeHtml(c._id)}" class="py-2 px-3">${escapeHtml(c.Name)}</option>`
+                                    `<option value="${c._id}" class="py-2 px-3">${c.Name}</option>`
                             )
                             .join("");
                     }

@@ -2,8 +2,6 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { escapeHtml } from "@/lib/security/escapeHtml";
-import { safeUrl } from "@/lib/security/safeUrl";
 import { Bar } from "react-chartjs-2";
 import { StarIcon, ChartBarIcon, TrophyIcon } from "@heroicons/react/24/solid";
 import {
@@ -94,10 +92,10 @@ const ProductSalesChart = ({ productsList }) => {
 
           tooltipEl.innerHTML = `
             <div class="flex gap-4 items-center min-w-[240px]">
-              <img src="${escapeHtml(safeUrl(imageUrl))}" alt="${escapeHtml(product.Name)}" class="w-16 h-16 object-cover rounded-2xl" />
+              <img src="${imageUrl}" alt="${product.Name}" class="w-16 h-16 object-cover rounded-2xl" />
               <div>
-                <div class="font-bold text-base">${escapeHtml(product.Name)}</div>
-                <div class="text-xl font-mono font-semibold text-orange-500">${escapeHtml(product.TotalSale)} units</div>
+                <div class="font-bold text-base">${product.Name}</div>
+                <div class="text-xl font-mono font-semibold text-orange-500">${product.TotalSale} units</div>
               </div>
             </div>
           `;

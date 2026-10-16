@@ -4,7 +4,6 @@ import moment from "moment";
 import { useState } from "react";
 import {downloadExcel} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function PaymentTableModal({ dataArray, banks, customers, Employees }) {
 
@@ -46,17 +45,17 @@ export default function PaymentTableModal({ dataArray, banks, customers, Employe
       .map(
         (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
-        <td style="padding: 4px;">${escapeHtml(index + 1)}</td>
-        <td style="padding: 4px; text-align: left;">${escapeHtml(item.paymentReferenceNo.trim())}</td>
-        <td style="padding: 4px;">${escapeHtml(getCustomer(item.customer))}</td>
-        <td style="padding: 4px;">${escapeHtml(item.type)}</td>
-        <td style="padding: 4px;">${escapeHtml(getBankAccount(item.bankAccount))}</td>
-        <td style="padding: 4px;">${escapeHtml(item.Accountant)}</td>
-        <td style="padding: 4px;">${escapeHtml(moment(item.PaymentDate).format("YYYY-MM-DD"))}</td>
-        <td style="padding: 4px;">${escapeHtml(item.crAmount.toLocaleString())}</td>
+        <td style="padding: 4px;">${index + 1}</td>
+        <td style="padding: 4px; text-align: left;">${item.paymentReferenceNo.trim()}</td>
+        <td style="padding: 4px;">${getCustomer(item.customer)}</td>
+        <td style="padding: 4px;">${item.type}</td>
+        <td style="padding: 4px;">${getBankAccount(item.bankAccount)}</td>
+        <td style="padding: 4px;">${item.Accountant}</td>
+        <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
+        <td style="padding: 4px;">${item.crAmount.toLocaleString()}</td>
         <td style="padding: 4px;">
           <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-            ${escapeHtml(item.status.toUpperCase())}
+            ${item.status.toUpperCase()}
           </span>
         </td>
       </tr>
@@ -92,7 +91,7 @@ export default function PaymentTableModal({ dataArray, banks, customers, Employe
             <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
               ${customersList
-                .map((c) => `<option value="${escapeHtml(c._id)}">${escapeHtml(c.Username)}</option>`)
+                .map((c) => `<option value="${c._id}">${c.Username}</option>`)
                 .join("")}
             </select>
           </div>
@@ -101,7 +100,7 @@ export default function PaymentTableModal({ dataArray, banks, customers, Employe
             <select id="bankFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
               ${bankList
-                .map((b) => `<option value="${escapeHtml(b._id)}">${escapeHtml(b.bankName)}</option>`)
+                .map((b) => `<option value="${b._id}">${b.bankName}</option>`)
                 .join("")}
             </select>
           </div>
@@ -164,7 +163,6 @@ export default function PaymentTableModal({ dataArray, banks, customers, Employe
         };
 
         const updateTable = (filtered) => {
-          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           tableBody.innerHTML = generateTableRows(filtered);
 
           const downloadContainer = document.getElementById("tableDownloadBtn");

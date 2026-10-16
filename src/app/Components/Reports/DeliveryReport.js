@@ -17,7 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function DeliveryRportModal({ user, business, baseUrl }) {
   const [filteredData, setFilteredData] = useState([]);
@@ -140,22 +139,22 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
         (item, index) => `
           <tr style="border-bottom: 1px solid #e2e8f0;">
             <td style="padding: 8px;">${index + 1}</td>
-            <td style="padding: 8px; text-align: left;">${escapeHtml(item.billReferenceNo?.trim() || "")}</td>
-            <td style="padding: 8px;">${escapeHtml(item.customer?.Username || "")}</td>
-            <td style="padding: 8px;">${escapeHtml(getSTore(item.whId))}</td>
-            <td style="padding: 8px;">${escapeHtml(getUser(item.invoicerId))}</td>
-            <td style="padding: 8px;">${escapeHtml(getUser(item.salesPerson))}</td>
-            <td style="padding: 8px;">${escapeHtml(item.DELIVERYDATE ? moment(item.DELIVERYDATE).format("YYYY-MM-DD") : "")}</td>
-            <td style="padding: 8px;">${escapeHtml(item.DriverNumber || "")}</td>
+            <td style="padding: 8px; text-align: left;">${item.billReferenceNo?.trim() || ""}</td>
+            <td style="padding: 8px;">${item.customer?.Username || ""}</td>
+            <td style="padding: 8px;">${getSTore(item.whId)}</td>
+            <td style="padding: 8px;">${getUser(item.invoicerId)}</td>
+            <td style="padding: 8px;">${getUser(item.salesPerson)}</td>
+            <td style="padding: 8px;">${item.DELIVERYDATE ? moment(item.DELIVERYDATE).format("YYYY-MM-DD") : ""}</td>
+            <td style="padding: 8px;">${item.DriverNumber || ""}</td>
             <td style="padding: 8px;">
               <span style="padding: 3px 8px; border-radius: 10px; font-size: 11px; background: #f1f5f9;">
-                ${escapeHtml((item.billStatus || "").toUpperCase())}
+                ${(item.billStatus || "").toUpperCase()}
               </span>
             </td>
-            <td style="padding: 8px;">${escapeHtml(item.DriverName || "")}</td>
-            <td style="padding: 8px;">${escapeHtml(item.vehicleNumber || "")}</td>
-            <td style="padding: 8px;">${escapeHtml(item.WayBillNo || "")}</td>
-            <td style="padding: 8px;">${escapeHtml(item.shippingFee?.toLocaleString() || "")}</td>
+            <td style="padding: 8px;">${item.DriverName || ""}</td>
+            <td style="padding: 8px;">${item.vehicleNumber || ""}</td>
+            <td style="padding: 8px;">${item.WayBillNo || ""}</td>
+            <td style="padding: 8px;">${item.shippingFee?.toLocaleString() || ""}</td>
           </tr>
         `
       )
@@ -187,7 +186,7 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
 
         <div style="margin-bottom: 12px; padding: 10px; background: #f8fafc; border-radius: 8px; text-align: left; font-size: 12px;">
           <strong>Report period:</strong>
-          ${escapeHtml(startDate)} to ${escapeHtml(endDate)}
+          ${startDate} to ${endDate}
         </div>
 
         <div style="margin-bottom: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; text-align: left;">
@@ -210,7 +209,7 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
                 )
                 .map(
                   (c) =>
-                    `<option value="${escapeHtml(c._id)}">${escapeHtml(c.Username || "")}</option>`
+                    `<option value="${c._id}">${c.Username || ""}</option>`
                 )
                 .join("")}
             </select>
@@ -222,7 +221,7 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
               <option value="">All stores</option>
               ${StoresList.map(
                 (store) =>
-                  `<option value="${escapeHtml(store._id)}">${escapeHtml(store.WHName || "")}</option>`
+                  `<option value="${store._id}">${store.WHName || ""}</option>`
               ).join("")}
             </select>
           </div>
@@ -234,7 +233,7 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
               ${(usersList || [])
                 .map(
                   (item) =>
-                    `<option value="${escapeHtml(item._id)}">${escapeHtml(item.firstName || "")} ${escapeHtml(item.lastName || "")}</option>`
+                    `<option value="${item._id}">${item.firstName || ""} ${item.lastName || ""}</option>`
                 )
                 .join("")}
             </select>
@@ -275,7 +274,6 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
         const originalData = [...initialData];
 
         const updateTable = (data) => {
-          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           tableBody.innerHTML = generateTableRows(data);
 
           const downloadContainer = document.getElementById("tableDownloadBtn");

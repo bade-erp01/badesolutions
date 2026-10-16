@@ -2,7 +2,6 @@ import { Geist, Geist_Mono, Inter, DM_Sans } from "next/font/google";
 import "./globals.css";
 import ClientProvider from "./ClientProvider";
 import { Analytics } from "@vercel/analytics/next"
-import { headers } from "next/headers";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -137,12 +136,7 @@ export const viewport = {
 };
 
 
-export default async function RootLayout({ children }) {
-  // The CSP nonce (src/middleware.js) is per request, so pages can't be
-  // prerendered: static HTML would carry no nonce and its scripts would be blocked.
-  // Next adds the nonce to its own scripts; use `x-nonce` for any <Script nonce>.
-  await headers();
-
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body

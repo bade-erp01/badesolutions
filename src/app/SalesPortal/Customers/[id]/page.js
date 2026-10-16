@@ -1044,14 +1044,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
                 {cust.latitude && cust.longitude ? (
                   <iframe
                     title="Customer Location"
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(cust.latitude)},${encodeURIComponent(cust.longitude)}&z=15&output=embed`}
+                    src={`https://www.google.com/maps?q=${cust.latitude},${cust.longitude}&z=15&output=embed`}
                     className="w-full h-full"
                     loading="lazy"
                   ></iframe>
                 ) : (
                   <iframe
                     title="Customer Location"
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(cust.state)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    src={`https://maps.google.com/maps?q=${cust.state}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                     className="w-full h-full"
                     loading="lazy"
                   ></iframe>

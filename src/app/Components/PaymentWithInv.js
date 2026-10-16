@@ -7,7 +7,6 @@ import {useRouter} from "next/navigation";
 import {BanknotesIcon} from "@heroicons/react/24/outline";
 import moment from "moment";
 import {Encrypt} from "../../../Functions/Functions"
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
   const Router = useRouter()
@@ -15,7 +14,7 @@ const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
     // Build invoice options dynamically
     const InvOptions = invoices.sort((a, b) => moment(b.startDate).diff(moment(a.startDate)))
       .map(
-        (c) => `<option className="text-xs" value="${escapeHtml(c._id)}">${escapeHtml(c.billStatus.toUpperCase().slice(0,3))}/${escapeHtml(c.billReferenceNo)}</option>`
+        (c) => `<option className="text-xs" value="${c._id}">${c.billStatus.toUpperCase().slice(0,3)}/${c.billReferenceNo}</option>`
       )
       .join("");
 
@@ -132,11 +131,11 @@ const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
         icon: "success",
         title: "Payment Registered and pending approval",
         html: `
-          <p><strong>Invoice:</strong> ${escapeHtml(formValues.Invoice)}</p>
-          <p><strong>Amount:</strong> ₦${escapeHtml(formValues.amount)}</p>
-          <p><strong>Date:</strong> ${escapeHtml(formValues.date)}</p>
-          <p><strong>Reference:</strong> ${escapeHtml(formValues.reference)}</p>
-          <p><strong>Method:</strong> ${escapeHtml(formValues.type)}</p>
+          <p><strong>Invoice:</strong> ${formValues.Invoice}</p>
+          <p><strong>Amount:</strong> ₦${formValues.amount}</p>
+          <p><strong>Date:</strong> ${formValues.date}</p>
+          <p><strong>Reference:</strong> ${formValues.reference}</p>
+          <p><strong>Method:</strong> ${formValues.type}</p>
         `,
         confirmButtonText: "OK",
       });

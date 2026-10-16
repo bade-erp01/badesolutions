@@ -4,8 +4,6 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import moment from 'moment';
 import confetti from 'canvas-confetti';
-import { escapeHtml } from '@/lib/security/escapeHtml';
-import { safeUrl } from '@/lib/security/safeUrl';
 
 const BirthdayGreetings = ({ user, Business }) => {
   const MySwal = withReactContent(Swal);
@@ -89,11 +87,11 @@ const BirthdayGreetings = ({ user, Business }) => {
         },
         html: `
           <div style="display: flex; align-items: center;">
-            <img src="${escapeHtml(safeUrl(user.image || '/person.png'))}" alt="User Image" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;" />
+            <img src="${user.image || '/person.png'}" alt="User Image" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;" />
             <div style="text-align: left;">
-              <strong style="font-size: 15px;">HAPPY BIRTHDAY ${escapeHtml(user?.firstName?.toUpperCase() || 'User')} 🎉</strong><br/>
+              <strong style="font-size: 15px;">HAPPY BIRTHDAY ${user?.firstName?.toUpperCase() || 'User'} 🎉</strong><br/>
               <span style="font-size: 14px;">
-                ${escapeHtml(randomMessage)}
+                ${randomMessage}
               </span>
             </div>
           </div>

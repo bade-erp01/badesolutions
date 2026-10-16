@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { Encrypt } from "../../../Functions/Functions";
 import Swal from "sweetalert2";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const GeoUpdater = ({ userData, baseUrl }) => {
   const retryCount = useRef(0);
@@ -39,7 +38,7 @@ const GeoUpdater = ({ userData, baseUrl }) => {
         icon: "warning",
         title: "Location Required",
         html: `
-          <p style="margin-bottom: 10px;">${escapeHtml(message)}</p>
+          <p style="margin-bottom: 10px;">${message}</p>
           <p style="font-size: 13px; color: #666;">
             Please turn on location services and allow access for this site.
           </p>

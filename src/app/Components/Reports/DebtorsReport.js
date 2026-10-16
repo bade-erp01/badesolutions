@@ -6,7 +6,6 @@ import { downloadExcel } from "../../../../Functions/Functions";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function DebtorsReportModal({ data, business, users }) {
   const [debtorsList] = useState(
@@ -102,16 +101,16 @@ export default function DebtorsReportModal({ data, business, users }) {
       .map(
         (item, index) => `
         <tr style="border-bottom: 1px solid #e2e8f0;">
-          <td style="padding: 4px;">${escapeHtml(index + 1)}</td>
-          <td style="padding: 4px;">${escapeHtml(item.Username)}</td>
-          <td style="padding: 4px;">${escapeHtml(FilterPriceList(item.priceList))}</td>
-          <td style="padding: 4px;">${escapeHtml(item.CustomerCode || "")}</td>
-          <td style="padding: 4px;">${escapeHtml(FilterSaLePerson(item.salesPerson))}</td>
-          <td style="padding: 4px;">${escapeHtml(item.phone)}</td>
-          <td style="padding: 4px;">${escapeHtml((item.Debt || 0).toLocaleString())}</td>
-          <td style="padding: 4px;">${escapeHtml(item.creditLimit)}</td>
-          <td style="padding: 4px;">${escapeHtml(normalizeDate(item.lastPayDate))}</td>
-          <td style="padding: 4px;">${escapeHtml(calculateDebtDays(item.lastPayDate))}</td>
+          <td style="padding: 4px;">${index + 1}</td>
+          <td style="padding: 4px;">${item.Username}</td>
+          <td style="padding: 4px;">${FilterPriceList(item.priceList)}</td>
+          <td style="padding: 4px;">${item.CustomerCode || ""}</td>
+          <td style="padding: 4px;">${FilterSaLePerson(item.salesPerson)}</td>
+          <td style="padding: 4px;">${item.phone}</td>
+          <td style="padding: 4px;">${(item.Debt || 0).toLocaleString()}</td>
+          <td style="padding: 4px;">${item.creditLimit}</td>
+          <td style="padding: 4px;">${normalizeDate(item.lastPayDate)}</td>
+          <td style="padding: 4px;">${calculateDebtDays(item.lastPayDate)}</td>
         </tr>
       `
       )
@@ -134,7 +133,7 @@ export default function DebtorsReportModal({ data, business, users }) {
                 )
                 .map(
                   (cust) =>
-                    `<option value="${escapeHtml(cust._id)}">${escapeHtml(cust.Username)}</option>`
+                    `<option value="${cust._id}">${cust.Username}</option>`
                 )
                 .join("")}
             </select>
@@ -149,7 +148,7 @@ export default function DebtorsReportModal({ data, business, users }) {
                 )
                 .map(
                   (user) =>
-                    `<option value="${escapeHtml(user._id)}">${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</option>`
+                    `<option value="${user._id}">${user.firstName} ${user.lastName}</option>`
                 )
                 .join("")}
             </select>
@@ -168,13 +167,13 @@ export default function DebtorsReportModal({ data, business, users }) {
             <label style="font-weight: 600; font-size: 12px;">PriceList</label><br/>
             <select id="PriceList" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
              <option value="">All</option>
-             <option value="Pricelist1">${escapeHtml(business.priceList1)}</option>
-             <option value="Pricelist2">${escapeHtml(business.priceList2)}</option>
-             <option value="Pricelist3">${escapeHtml(business.priceList3)}</option>
-             <option value="Pricelist4">${escapeHtml(business.priceList4)}</option>
-             <option value="Pricelist5">${escapeHtml(business.priceList5)}</option>
-             <option value="Pricelist6">${escapeHtml(business.priceList6)}</option>
-             <option value="Pricelist7">${escapeHtml(business.priceList7)}</option>
+             <option value="Pricelist1">${business.priceList1}</option>
+             <option value="Pricelist2">${business.priceList2}</option>
+             <option value="Pricelist3">${business.priceList3}</option>
+             <option value="Pricelist4">${business.priceList4}</option>
+             <option value="Pricelist5">${business.priceList5}</option>
+             <option value="Pricelist6">${business.priceList6}</option>
+             <option value="Pricelist7">${business.priceList7}</option>
             </select>
           </div>
         </div>
@@ -277,7 +276,6 @@ export default function DebtorsReportModal({ data, business, users }) {
             );
           });
 
-          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           tableBody.innerHTML = generateTableRows(filtered);
 
           const totalDebt = filtered.reduce(

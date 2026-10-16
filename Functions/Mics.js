@@ -2,8 +2,6 @@ import Swal from "sweetalert2";
 import "animate.css";
 import jwt from 'jsonwebtoken'
 import {EXPRESS_PRIVATE_URL} from './Functions'
-import { escapeHtml } from "../src/lib/security/escapeHtml";
-import { safeUrl } from "../src/lib/security/safeUrl";
 
 export function SuccessToast(message) {
     Swal.fire({
@@ -12,7 +10,7 @@ export function SuccessToast(message) {
     <div class='flex flex-col items-center'>
       
       <h2 class='text-sm text-gray-600'> ${
-       escapeHtml(message)
+       message
       }</h2>
      
     </div>
@@ -57,7 +55,7 @@ export function ErrorMessage(message) {
 
     Toast.fire({
         icon: "error",
-        title: `${escapeHtml(message)}`
+        title: `${message}`
     });
 }
 
@@ -66,7 +64,7 @@ export async function plsWait(text) {
   await Swal.fire({
     html: `
       <div class="animate__animated animate__fadeInDown" style="font-size: 0.85rem; font-weight: 500; color: #374151;">
-        ${escapeHtml(text)}
+        ${text}
       </div>
     `,
     allowOutsideClick: false,
@@ -88,19 +86,19 @@ export async function AppDescription (params,Module) {
   try {
 
     Swal.fire({
-      title: `<h2 class='text-lg font-bold'>${escapeHtml(params.Name)}</h2>`,
+      title: `<h2 class='text-lg font-bold'>${params.Name}</h2>`,
       html: `
     <div class='flex flex-col items-center'>
       <img src="${
-        escapeHtml(safeUrl(params.icon || "/preview.png"))
-      }" alt="${escapeHtml(params.Name)} image" class='w-48 h-48  object-cover rounded-md mb-4'>
+        params.icon || "/preview.png"
+      }" alt="${params.Name} image" class='w-48 h-48  object-cover rounded-md mb-4'>
       <br/>
       <hr/>
       <p class='text-sm text-gray-600'> ${
-        escapeHtml(params.Description || "No Description")
+        params.Description || "No Description"
       }</p>
       <p class='text-sm text-gray-600'><strong>
-    Origin : ${escapeHtml(Module)}</strong> </p>
+    Origin : ${Module}</strong> </p>
     </div>
   `,
       showCancelButton: false,

@@ -61,11 +61,8 @@ const ChartStyle = ({
     return null
   }
 
-  // CSS custom properties from the developer-written chart config. `<` is
-  // stripped from the output so no value can close the <style> element.
   return (
     <style
-      // eslint-disable-next-line react/no-danger -- constant CSS, `<` removed below
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(([theme, prefix]) => `
@@ -80,8 +77,7 @@ return color ? `  --color-${key}: ${color};` : null
 .join("\n")}
 }
 `)
-          .join("\n")
-          .replace(/</g, ""),
+          .join("\n"),
       }} />
   );
 }

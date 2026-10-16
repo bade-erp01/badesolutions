@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import moment from 'moment';
-import { escapeHtml } from '@/lib/security/escapeHtml';
-import { safeUrl } from '@/lib/security/safeUrl';
 
 const SubscriptionReminder = ({ Business }) => {
   const [daysLeft, setDaysLeft] = useState(null);
@@ -29,10 +27,10 @@ const SubscriptionReminder = ({ Business }) => {
           },
           html: `
             <div style="display: flex; align-items: center;">
-              <img src="${escapeHtml(safeUrl(Business.companyLogo, ""))}" alt="Company Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;" />
+              <img src="${Business.companyLogo}" alt="Company Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;" />
               <div style="text-align: left;">
-                <strong style="font-size: 14px;">${escapeHtml(Business.companyName)}</strong><br/>
-                <span style="font-size: 14px;">Your subscription expires in <strong>${escapeHtml(diffDays)}</strong> day(s)</span>
+                <strong style="font-size: 14px;">${Business.companyName}</strong><br/>
+                <span style="font-size: 14px;">Your subscription expires in <strong>${diffDays}</strong> day(s)</span>
               </div>
             </div>
           `

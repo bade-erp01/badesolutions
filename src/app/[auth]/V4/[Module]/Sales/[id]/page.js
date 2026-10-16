@@ -35,7 +35,6 @@ import {
 import { pricelistSetter } from "../../../../../../../Functions/Functions";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { safeUrl } from "@/lib/security/safeUrl";
 
 export default function InvoicePage({
   userInfo,
@@ -2417,7 +2416,7 @@ const generatePdf = async (business, customer, bill) => {
                         Payment Receipt
                       </p>
                       <Link
-                        href={safeUrl(Singlebill.deliveryOption?.receipt)}
+                        href={Singlebill.deliveryOption?.receipt}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-orange-600 dark:text-orange-400 hover:underline font-medium"

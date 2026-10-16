@@ -1325,7 +1325,7 @@ export function NearbyBusinessesMap() {
             loading="lazy"
             allowFullScreen
             className="border-0"
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(location.latitude)},${encodeURIComponent(location.longitude)}&z=14&output=embed`}
+            src={`https://maps.google.com/maps?q=${location.latitude},${location.longitude}&z=14&output=embed`}
           />
           <div className="absolute top-2 left-2">
             <Badge
@@ -1388,7 +1388,7 @@ export function NearbyBusinessesMap() {
                     </div>
 
                     <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(biz.latitude)},${encodeURIComponent(biz.longitude)}`}
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${biz.latitude},${biz.longitude}`}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 mt-1.5 py-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"

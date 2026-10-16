@@ -2,8 +2,6 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { escapeHtml } from "@/lib/security/escapeHtml";
-import { safeUrl } from "@/lib/security/safeUrl";
 import { Line } from "react-chartjs-2";
 import { StarIcon, ChartBarIcon} from "@heroicons/react/24/solid";
 import {
@@ -106,22 +104,21 @@ const StoreChart = ({ productsList }) => {
           const product = sortedProducts[index];
           const imageUrl = product.image || "/preview.png";
 
-          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           tooltipEl.innerHTML = `
             <div class="bg-card border border-border rounded-xl shadow-xl p-4 w-56 text-sm">
               <div class="flex items-center gap-3">
-                <img src="${escapeHtml(safeUrl(imageUrl))}" alt="${escapeHtml(product.productName)}" 
+                <img src="${imageUrl}" alt="${product.productName}" 
                      class="w-14 h-14 object-cover rounded-lg border border-border" />
                 <div>
-                  <strong class="block text-foreground">${escapeHtml(product.productName)}</strong>
+                  <strong class="block text-foreground">${product.productName}</strong>
                   <div class="text-muted-foreground text-xs mt-1">
-                    ${escapeHtml(product.currentQty)} cases • ${escapeHtml(product.pcs)} pcs
+                    ${product.currentQty} cases • ${product.pcs} pcs
                   </div>
                 </div>
               </div>
               ${product.LastBatchDate ? 
                 `<div class="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
-                  Last purchased: <span class="font-medium">${escapeHtml(product.LastBatchDate)}</span>
+                  Last purchased: <span class="font-medium">${product.LastBatchDate}</span>
                 </div>` : ''}
             </div>
           `;

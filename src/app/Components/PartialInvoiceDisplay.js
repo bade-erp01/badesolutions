@@ -6,7 +6,6 @@ import autoTable from "jspdf-autotable";
 import {totalInWords} from "../../../Functions/Functions";
 import moment from "moment";
 import {plsWait} from "../../../Functions/Mics"
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 
 export default function PartialInvoiceDisplay({data , business}) {
@@ -241,7 +240,7 @@ export default function PartialInvoiceDisplay({data , business}) {
   const showModal = () => {
 
     Swal.fire({
-      title: `${escapeHtml(data.billStatus.slice(0,3).toUpperCase())}/${escapeHtml(data.billReferenceNo)}`,
+      title: `${data.billStatus.slice(0,3).toUpperCase()}/${data.billReferenceNo}`,
       html: `
         <table style="width:100%; border-collapse: collapse; font-size: 13px;">
           <thead style="background-color: #edf2f7;">
@@ -262,16 +261,16 @@ export default function PartialInvoiceDisplay({data , business}) {
             ${data?.orders.filter(ord => ord.RCRT > 0 || ord.RPCS > 0).map(
                 (line, index) => `
               <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 6px;">${escapeHtml(index + 1)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.item.Name)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.returnId)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.item.ADCcode || line.item.ACDcode)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.Qty)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.pcsReq)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.RCRT)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.RPCS)}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.priceListPrice?.toFixed(2))}</td>
-                <td style="padding: 6px; text-align: center;">${escapeHtml(line.total?.toFixed(2))}</td>
+                <td style="padding: 6px;">${index + 1}</td>
+                <td style="padding: 6px; text-align: center;">${line.item.Name}</td>
+                <td style="padding: 6px; text-align: center;">${line.returnId}</td>
+                <td style="padding: 6px; text-align: center;">${line.item.ADCcode || line.item.ACDcode}</td>
+                <td style="padding: 6px; text-align: center;">${line.Qty}</td>
+                <td style="padding: 6px; text-align: center;">${line.pcsReq}</td>
+                <td style="padding: 6px; text-align: center;">${line.RCRT}</td>
+                <td style="padding: 6px; text-align: center;">${line.RPCS}</td>
+                <td style="padding: 6px; text-align: center;">${line.priceListPrice?.toFixed(2)}</td>
+                <td style="padding: 6px; text-align: center;">${line.total?.toFixed(2)}</td>
               </tr>
             `
               )

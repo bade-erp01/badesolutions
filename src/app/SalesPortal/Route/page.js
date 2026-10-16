@@ -123,14 +123,14 @@ function CustomerCard({ customer, index, today }) {
                 {customer.latitude && customer.longitude ? (
                   <iframe
                     title="Customer Location"
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(customer.latitude)},${encodeURIComponent(customer.longitude)}&z=15&output=embed`}
+                    src={`https://www.google.com/maps?q=${customer.latitude},${customer.longitude}&z=15&output=embed`}
                     className="w-full h-full"
                     loading="lazy"
                   ></iframe>
                 ) : (
                   <iframe
                     title="Customer Location"
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(customer.state)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    src={`https://maps.google.com/maps?q=${customer.state}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                     className="w-full h-full"
                     loading="lazy"
                   ></iframe>

@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Printer, CheckCircle, Trash2, RotateCcw } from "lucide-react";
-import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function Page({ data, userData, baseurl }) {
   const Router = useRouter();
@@ -69,11 +68,10 @@ export default function Page({ data, userData, baseurl }) {
       year: 'numeric', month: 'long', day: 'numeric' 
     });
 
-    // eslint-disable-next-line no-unsanitized/method -- every interpolated value is escaped with escapeHtml
     printWindow.document.write(`
       <html>
         <head>
-          <title>Debit Note - ${escapeHtml(data?.DebitId)}</title>
+          <title>Debit Note - ${data?.DebitId}</title>
           <style>
             @page { size: A4; margin: 20mm; }
             body { 
@@ -114,40 +112,40 @@ export default function Page({ data, userData, baseurl }) {
           </style>
         </head>
         <body>
-          <div class="watermark">${escapeHtml(userData.business.companyName || "DEBIT NOTE")}</div>
+          <div class="watermark">${userData.business.companyName || "DEBIT NOTE"}</div>
 
           <div class="header">
             <h1 style="margin:0; font-size:28px;">DEBIT NOTE</h1>
-            <p style="margin:5px 0 0 0;">Ref: <strong>${escapeHtml(data?.DebitId)}</strong></p>
+            <p style="margin:5px 0 0 0;">Ref: <strong>${data?.DebitId}</strong></p>
           </div>
 
           <div class="info-grid">
             <div>
-              <p><strong>Customer:</strong> ${escapeHtml(data?.customer)}</p>
-              <p><strong>Date:</strong> ${escapeHtml(new Date(data?.Date).toLocaleDateString())}</p>
-              <p><strong>Raised By:</strong> ${escapeHtml(data?.raisedBy)}</p>
+              <p><strong>Customer:</strong> ${data?.customer}</p>
+              <p><strong>Date:</strong> ${new Date(data?.Date).toLocaleDateString()}</p>
+              <p><strong>Raised By:</strong> ${data?.raisedBy}</p>
             </div>
             <div>
-              <p><strong>Debit Account:</strong> ${escapeHtml(data?.bankID?.bankName)}</p>
-              <p><strong>Approved By:</strong> ${escapeHtml(data?.ApprovedBy || 'Pending Approval')}</p>
-              <p><strong>Status:</strong> ${escapeHtml(data?.status)}</p>
+              <p><strong>Debit Account:</strong> ${data?.bankID?.bankName}</p>
+              <p><strong>Approved By:</strong> ${data?.ApprovedBy || 'Pending Approval'}</p>
+              <p><strong>Status:</strong> ${data?.status}</p>
             </div>
           </div>
 
           <div class="amount-box">
-            <h2 style="margin:0; font-size:32px;">₦${escapeHtml(data?.Total?.toLocaleString())}</h2>
+            <h2 style="margin:0; font-size:32px;">₦${data?.Total?.toLocaleString()}</h2>
             <p style="margin:8px 0 0 0; font-size:18px;">Total Debit Amount</p>
           </div>
 
           ${data?.reference ? `
           <div>
             <strong>Remarks:</strong><br>
-            ${escapeHtml(data.reference)}
+            ${data.reference}
           </div>` : ''}
 
           <div class="authenticity">
             <p><strong>Authenticity Notice:</strong> This document is computer generated and is invalid without an Authorized signature.</p>
-            <p>Generated on ${escapeHtml(today)} | Document ID: ${escapeHtml(data?.DebitId)}</p>
+            <p>Generated on ${today} | Document ID: ${data?.DebitId}</p>
             <p style="margin-top: 30px;">Thank you for your business.</p>
           </div>
 
