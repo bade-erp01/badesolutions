@@ -5,6 +5,7 @@ import { useState } from "react";
 import {downloadExcel,Dencrypt} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import {plsWait,ErrorMessage,SuccessToast, Encrypt} from "../../../../Functions/Mics"
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function PayableRegister({ customers,userData ,baseUrl}) {
 
@@ -55,20 +56,20 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
       .map(
         (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
-        <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px; text-align: left;">${(item.billReferenceNo || item.paymentReferenceNo || "").toString().trim()}</td>
-        <td style="padding: 4px;">${getCustomer(item.vendor)}</td>
-        <td style="padding: 4px;">${item?.status?.toUpperCase()}</td>
-        <td style="padding: 4px;">${item.AccountatntId || item.Accountant || ""}</td>
-        <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
+        <td style="padding: 4px;">${escapeHtml(index + 1)}</td>
+        <td style="padding: 4px; text-align: left;">${escapeHtml((item.billReferenceNo || item.paymentReferenceNo || "").toString().trim())}</td>
+        <td style="padding: 4px;">${escapeHtml(getCustomer(item.vendor))}</td>
+        <td style="padding: 4px;">${escapeHtml(item?.status?.toUpperCase())}</td>
+        <td style="padding: 4px;">${escapeHtml(item.AccountatntId || item.Accountant || "")}</td>
+        <td style="padding: 4px;">${escapeHtml(moment(item.PaymentDate).format("YYYY-MM-DD"))}</td>
         <td style="padding: 4px;">
         <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-        ${item.ledgerStatus?.toUpperCase() || ""}
+        ${escapeHtml(item.ledgerStatus?.toUpperCase() || "")}
         </span>
         </td>
-        <td style="padding: 4px;">${item.cr ? (item.Amount || item.crAmount || 0).toLocaleString(): (0).toLocaleString()}</td>
-        <td style="padding: 4px;">${item.dr ? (item.Amount || item.drAmount || 0).toLocaleString(): (0).toLocaleString()}</td>
-        <td style="padding: 4px;">${item?.Balance || 0.00}</td>
+        <td style="padding: 4px;">${escapeHtml(item.cr ? (item.Amount || item.crAmount || 0).toLocaleString(): (0).toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml(item.dr ? (item.Amount || item.drAmount || 0).toLocaleString(): (0).toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml(item?.Balance || 0.00)}</td>
       </tr>
     `
       )
@@ -111,7 +112,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
             <select id="customerFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
               ${customersList
-                .map((c) => `<option value="${c._id}">${c.Name}</option>`)
+                .map((c) => `<option value="${escapeHtml(c._id)}">${escapeHtml(c.Name)}</option>`)
                 .join("")}
             </select>
           </div>
@@ -172,6 +173,7 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
         };
 
         const updateTable = (filtered) => {
+          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           tableBody.innerHTML = generateTableRows(filtered);
 
           const downloadContainer = document.getElementById("tableDownloadBtn");

@@ -6,6 +6,7 @@ import { UserProvider } from "@/components/UserProvider";
 import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { WebSocketProvider } from "@/app/Components/WebSocketProvider";
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
 import PushNotificationGate from "@/app/Components/PushNotificationGate";
@@ -41,6 +42,8 @@ export const metadata = {
 
 export default async function layout({ children }) {
   const userData = await fetchUser();
+  // next-themes injects an inline script; it needs the CSP nonce.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const userInfo = userData?.user;
   const businessInfo = userData?.business;
   const SessionId = userData?.SessionId;
@@ -98,7 +101,7 @@ export default async function layout({ children }) {
           }}
         />
         <PushNotificationGate />
-        <ThemeProvider>
+        <ThemeProvider nonce={nonce}>
           <UserProvider user={userData}>
             <Wrapper>{children}</Wrapper>
           </UserProvider>

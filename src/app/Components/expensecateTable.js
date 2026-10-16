@@ -4,6 +4,7 @@ import { TagIcon } from "@heroicons/react/24/outline";
 import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function ExpenseCategoriesModal({
   data,
@@ -32,15 +33,15 @@ export default function ExpenseCategoriesModal({
               .map(
                 (cat, i) => `
               <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 6px; text-align: left;">${cat.NAME}</td>
-                <td style="padding: 6px; text-align: center;">${
+                <td style="padding: 6px; text-align: left;">${escapeHtml(cat.NAME)}</td>
+                <td style="padding: 6px; text-align: center;">${escapeHtml(
                   cat.type
-                } expense</td>
+                )} expense</td>
                 <td style="padding: 6px; text-align: right;">
                   <input 
                     type="checkbox" 
                     id="status-${i}" 
-                    data-id="${cat._id?.$oid || cat._id}" 
+                    data-id="${escapeHtml(cat._id?.$oid || cat._id)}" 
                     ${cat.status ? "checked" : ""} 
                     class="form-checkbox h-4 w-4 text-blue-600"
                   />
@@ -91,13 +92,13 @@ export default function ExpenseCategoriesModal({
                 }
                 
                 Swal.showValidationMessage(
-                  `Status for "${cat.NAME}" updated successfully`
+                  `Status for "${escapeHtml(cat.NAME)}" updated successfully`
                 );
                 setCategories(Dencrypt(response.data))
                 Router.refresh();
               } catch (err) {
                 Swal.showValidationMessage(
-                  `Error updating "${cat.NAME}": ${err.message}`
+                  `Error updating "${escapeHtml(cat.NAME)}": ${escapeHtml(err.message)}`
                 );
                 // revert checkbox if failed
                 e.target.checked = !newStatus;

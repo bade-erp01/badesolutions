@@ -39,6 +39,7 @@ import {Badge} from "@/components/ui/badge";
 import { KeyRound } from "lucide-react";
 import { RefreshCcw } from "lucide-react";
 import { AlertCircle } from "lucide-react";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const formatNumberShort = (num) => {
   if (num >= 1_000_000_000) {
@@ -395,7 +396,7 @@ export default function SingleEmployeeView({
 
         Swal.fire({
           title: "Upload Results",
-          html: `Successfully uploaded ${successfulUploads} file(s).<br>Failed to upload ${failedUploads} file(s).`,
+          html: `Successfully uploaded ${escapeHtml(successfulUploads)} file(s).<br>Failed to upload ${escapeHtml(failedUploads)} file(s).`,
           icon: successfulUploads > 0 ? "success" : "warning",
         });
         location.reload();
@@ -1553,7 +1554,7 @@ function SalePersonChart({ customerId, customerName,userInfo, business, custList
         ];
         const NDyArray = monthlySalesArray.map((item) => item.sold);
         const NDlayout = {
-          title: `${customerName}s P2B Sales Trend for ${currentYear}`,
+          title: `${escapeHtml(customerName)}s P2B Sales Trend for ${escapeHtml(currentYear)}`,
         };
         setTotalSales(`${customerName} P2B Sales Trend for ${currentYear}`);
         const SECdata = [
@@ -2019,7 +2020,7 @@ export function LiveLocationMap({ userData, baseUrl }) {
           loading="lazy"
           allowFullScreen
           className="border-0 h-[350px] sm:h-[500px]"
-          src={`https://maps.google.com/maps?q=${coords.lat},${coords.lng}&z=16&output=embed`}
+          src={`https://maps.google.com/maps?q=${encodeURIComponent(coords.lat)},${encodeURIComponent(coords.lng)}&z=16&output=embed`}
         />
       </div>
     </div>

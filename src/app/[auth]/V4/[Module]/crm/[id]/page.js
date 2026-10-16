@@ -1375,7 +1375,7 @@ export default function CustomerForm({
                 <iframe
                   width="100%"
                   height="100%"
-                  src={`https://www.google.com/maps?q=${cust.latitude},${cust.longitude}&z=15&output=embed`}
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(cust.latitude)},${encodeURIComponent(cust.longitude)}&z=15&output=embed`}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -1383,7 +1383,7 @@ export default function CustomerForm({
               ) : (
                 <iframe
                   title="Customer Location"
-                  src={`https://maps.google.com/maps?q=${cust.state}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(cust.state)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                   className="w-full h-full"
                   loading="lazy"
                 />

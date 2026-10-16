@@ -9,6 +9,7 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
+import { escapeHtml } from "../src/lib/security/escapeHtml";
 
 const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng"
 // const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
@@ -21,7 +22,7 @@ async function termsAndConditions(payload) {
   const { value: accept } = await Swal.fire({
     title: "Terms and Conditions",
     html: `
-      <p> By signing up, you agree to our Terms and conditions for ${payload.plan} plan.</p>
+      <p> By signing up, you agree to our Terms and conditions for ${escapeHtml(payload.plan)} plan.</p>
     `,
     input: "checkbox",
     inputValue: 0,
@@ -100,9 +101,6 @@ function formatMongooseError(err) {
   return "An unexpected error occurred. Please try again.";
 }
 
-
-
-
 // Encrypt data from frontend
 function Dencrypt(payload) {
   const data = jwt.verify(payload,"THESTARTUPWAY");
@@ -110,21 +108,8 @@ function Dencrypt(payload) {
   return data.id || null
 }
 
-function EncryptBAckend(payload) {
-  // encyps data {} objects from back end
-  return jwt.sign(
-    payload,
-    "SWISSFLOWER", //  Use a secure secret key
-    { expiresIn: "3d" } //  Token expires in 3 days
-  );
-}
-
-function DecryptBAckend(payload) {
-  return jwt.verify(payload, "SWISSFLOWER");
-}
 
 // data in rest decrypt
-
  const CryptoJSdecrypt = (encryptedText) => {
   const key = CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY);
   const iv = CryptoJS.enc.Utf8.parse(IV);
@@ -460,10 +445,10 @@ async function postPayment(customerId, user, config) {
       icon: 'success',
       title: 'Payment Registered and pending approval',
       html: `
-        <p><strong>Amount:</strong> ₦${formValues.amount}</p>
-        <p><strong>Date:</strong> ${formValues.date}</p>
-        <p><strong>Reference:</strong> ${formValues.reference}</p>
-        <p><strong>Method:</strong> ${formValues.type}</p>
+        <p><strong>Amount:</strong> ₦${escapeHtml(formValues.amount)}</p>
+        <p><strong>Date:</strong> ${escapeHtml(formValues.date)}</p>
+        <p><strong>Reference:</strong> ${escapeHtml(formValues.reference)}</p>
+        <p><strong>Method:</strong> ${escapeHtml(formValues.type)}</p>
       `,
       confirmButtonText: 'OK'
     });
@@ -595,8 +580,6 @@ const pricelistSetter = (priceList, Business) => {
 module.exports = {
   termsAndConditions,
   Encrypt,
-  EncryptBAckend,
-  DecryptBAckend,
   UpdateEmployeeData,
   UpdateEmployeeModules,
   downloadExcel,

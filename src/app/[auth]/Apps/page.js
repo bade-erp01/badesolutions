@@ -32,6 +32,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ChevronDown, ChevronUp, Shield, Zap } from "lucide-react";
+import { safeUrlOrNull } from "@/lib/security/safeUrl";
 
 const ModulesPage = ({ userInfo }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -145,7 +146,9 @@ const ModuleCard = ({ item, userInfo }) => {
       }
 
       if (response.data) {
-        window.location.href = response.data;
+        const target = safeUrlOrNull(response.data);
+        if (!target) throw new Error("Invalid payment link");
+        window.location.href = target;
       }
     } catch (err) {
       console.log(err.message);

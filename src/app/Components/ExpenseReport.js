@@ -9,6 +9,7 @@ import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
 import { Encrypt } from "../../../Functions/Functions"
 import { plsWait, ErrorMessage } from "../../../Functions/Mics"
+import { escapeHtml } from "@/lib/security/escapeHtml"
 
 const MySwal = withReactContent(Swal)
 
@@ -135,16 +136,16 @@ function showExpenseSwal(data) {
             .map(
                 (item) => `
                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 4px;">${item.refNo}</td>
-                    <td style="padding: 4px;">${item.category.NAME}</td>
-                    <td style="padding: 4px;">${getStoreName(item.WHID)}</td>
-                    <td style="padding: 4px;">${getAccountName(item.BankAccount)}</td>
-                    <td style="padding: 4px;">${item.payee}</td>
-                    <td style="padding: 4px;">${item.payeebankAccount}</td>
-                    <td style="padding: 4px;">${item.category.type}</td>
-                    <td style="padding: 4px;">${item.Date}</td>
-                    <td style="padding: 4px;">${item.status}</td>
-                    <td style="padding: 4px;">${item.Amount}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.refNo)}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.category.NAME)}</td>
+                    <td style="padding: 4px;">${escapeHtml(getStoreName(item.WHID))}</td>
+                    <td style="padding: 4px;">${escapeHtml(getAccountName(item.BankAccount))}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.payee)}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.payeebankAccount)}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.category.type)}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.Date)}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.status)}</td>
+                    <td style="padding: 4px;">${escapeHtml(item.Amount)}</td>
                 </tr>
             `
             )
@@ -163,14 +164,14 @@ function showExpenseSwal(data) {
                     <label style="font-weight: 600; font-size: 12px;">Filter by Store</label><br/>
                     <select id="storeFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
                         <option value="">All Stores</option>
-                        ${StoreList.map((s) => `<option value="${s._id}">${s.WHName}</option>`).join("")}
+                        ${StoreList.map((s) => `<option value="${escapeHtml(s._id)}">${escapeHtml(s.WHName)}</option>`).join("")}
                     </select>
                 </div>
                 <div>
                     <label style="font-weight: 600; font-size: 12px;">Filter by Category</label><br/>
                     <select id="categoryFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
                         <option value="">All Categories</option>
-                        ${categories.map((c) => `<option value="${c}">${c}</option>`).join("")}
+                        ${categories.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("")}
                     </select>
                 </div>
             
@@ -178,14 +179,14 @@ function showExpenseSwal(data) {
                     <label style="font-weight: 600; font-size: 12px;">Filter by Account</label><br/>
                     <select id="accountFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
                         <option value="">All Accounts</option>
-                        ${AccountList.map((a) => `<option value="${a._id}">${a.NAME}</option>`).join("")}
+                        ${AccountList.map((a) => `<option value="${escapeHtml(a._id)}">${escapeHtml(a.NAME)}</option>`).join("")}
                     </select>
                 </div>
                 <div>
                     <label style="font-weight: 600; font-size: 12px;">Filter by Payee</label><br/>
                     <select id="payeeFilter" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
                         <option value="">All Payees</option>
-                        ${payees.map((p) => `<option value="${p}">${p}</option>`).join("")}
+                        ${payees.map((p) => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("")}
                     </select>
                 </div>
             </div>
@@ -217,6 +218,7 @@ function showExpenseSwal(data) {
         didOpen: () => {
             const updateTable = () => {
                 const { html, filtered } = renderTable()
+                // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
                 document.getElementById("tableBody").innerHTML = html
                 document.getElementById("downloadBtn").onclick = () => downloadCSV(filtered)
             }

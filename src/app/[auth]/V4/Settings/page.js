@@ -31,6 +31,7 @@ import {
   EXPRESS_PRIVATE_URL,
 } from "../../../../../Functions/Functions";
 import { useUser } from "@/components/UserProvider";
+import { safeUrl } from "@/lib/security/safeUrl";
 
 /* Shared Tailwind classes */
 const inputCls =
@@ -756,7 +757,7 @@ function AuditLogsPanel({ logs = [] }) {
                     <td className="py-3 px-4">
                       {log.url ? (
                         <a
-                          href={log.url}
+                          href={safeUrl(log.url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 dark:text-blue-400 hover:underline break-all"

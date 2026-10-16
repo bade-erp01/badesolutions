@@ -57,6 +57,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { escapeHtml } from "@/lib/security/escapeHtml";
+import { safeUrl } from "@/lib/security/safeUrl";
 
 // ──────────────────────────────────────────────
 // PDF helpers
@@ -209,7 +211,7 @@ export default function DraftPurchasePage({
 
         Swal.fire({
           title: "Upload Results",
-          html: `Successfully uploaded ${successfulUploads} file(s).<br>Failed to upload ${failedUploads} file(s).`,
+          html: `Successfully uploaded ${escapeHtml(successfulUploads)} file(s).<br>Failed to upload ${escapeHtml(failedUploads)} file(s).`,
           icon: successfulUploads > 0 ? "success" : "warning",
         });
       }
@@ -491,7 +493,7 @@ export default function DraftPurchasePage({
 
     const { value: reason, isConfirmed } = await Swal.fire({
       title: "Reverse this purchase?",
-      html: `This removes every product on <b>${Singlebill.billReferenceNo}</b> from the warehouse, reduces the vendor's balance by <b>${Business.currency?.currency?.Symbol || ""}${money(Singlebill.grandTotal)}</b> and reverses the purchase journal.<br/><br/>It cannot be posted again afterwards.`,
+      html: `This removes every product on <b>${escapeHtml(Singlebill.billReferenceNo)}</b> from the warehouse, reduces the vendor's balance by <b>${escapeHtml(Business.currency?.currency?.Symbol || "")}${escapeHtml(money(Singlebill.grandTotal))}</b> and reverses the purchase journal.<br/><br/>It cannot be posted again afterwards.`,
       icon: "warning",
       input: "textarea",
       inputLabel: "Reason for reversal",
@@ -1441,7 +1443,7 @@ export default function DraftPurchasePage({
                   >
                     <PaperClipIcon className="h-4 w-4 text-muted-foreground shrink-0" />
                     <Link
-                      href={file}
+                      href={safeUrl(file)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline truncate"

@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const PurchaseDumpModal = ({
   business,
@@ -191,7 +192,7 @@ const PurchaseDumpModal = ({
       if (!request.ok) {
         Swal.fire(
           "Error",
-          data.message || "Failed to fetch purchase data.",
+          escapeHtml(data.message || "Failed to fetch purchase data."),
           "error"
         );
         return;
@@ -234,7 +235,7 @@ const PurchaseDumpModal = ({
           <table>
             <thead>
               <tr>${Object.keys(previewData[0])
-                .map((k) => `<th>${k}</th>`)
+                .map((k) => `<th>${escapeHtml(k)}</th>`)
                 .join("")}</tr>
             </thead>
             <tbody>
@@ -244,9 +245,9 @@ const PurchaseDumpModal = ({
                     `<tr>${Object.values(row)
                       .map(
                         (v) =>
-                          `<td>${
+                          `<td>${escapeHtml(
                             v === null || v === undefined ? "" : String(v)
-                          }</td>`
+                          )}</td>`
                       )
                       .join("")}</tr>`
                 )

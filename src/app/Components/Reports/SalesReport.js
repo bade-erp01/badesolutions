@@ -30,6 +30,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const idOf = (val) => {
   if (val == null || val === "") return "";
@@ -151,39 +152,39 @@ export default function SalesRportModal({ user, business, baseUrl }) {
           (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px; text-align: left;">${(
+        <td style="padding: 4px; text-align: left;">${escapeHtml((
           item.billReferenceNo || ""
-        ).trim()}</td>
-        <td style="padding: 4px;">${(item.invoicelocation || "").trim()}</td>
-        <td style="padding: 4px;">${getCustomerName(item)}</td>
-        <td style="padding: 4px;">${getSTore(item.whId)}</td>
-        <td style="padding: 4px;">${getUser(item.invoicerId)}</td>
-        <td style="padding: 4px;">${getUser(item.salesPerson)}</td>
-        <td style="padding: 4px;">${
+        ).trim())}</td>
+        <td style="padding: 4px;">${escapeHtml((item.invoicelocation || "").trim())}</td>
+        <td style="padding: 4px;">${escapeHtml(getCustomerName(item))}</td>
+        <td style="padding: 4px;">${escapeHtml(getSTore(item.whId))}</td>
+        <td style="padding: 4px;">${escapeHtml(getUser(item.invoicerId))}</td>
+        <td style="padding: 4px;">${escapeHtml(getUser(item.salesPerson))}</td>
+        <td style="padding: 4px;">${escapeHtml(
           item.startDate
             ? moment(item.startDate).format("YYYY-MM-DD")
             : ""
-        }</td>
-        <td style="padding: 4px;">${
+        )}</td>
+        <td style="padding: 4px;">${escapeHtml(
           item.DELIVERYDATE
             ? moment(item.DELIVERYDATE).format("YYYY-MM-DD")
             : ""
-        }</td>
+        )}</td>
         <td style="padding: 4px;">
           <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-            ${item.billStatus?.toUpperCase() || ""}
+            ${escapeHtml(item.billStatus?.toUpperCase() || "")}
           </span>
         </td>
-        <td style="padding: 4px;">${pricelistSetter(
+        <td style="padding: 4px;">${escapeHtml(pricelistSetter(
           item.priceList,
           business
-        )}</td>
-        <td style="padding: 4px;">${(item.taxRate ?? 0).toLocaleString()}</td>
-        <td style="padding: 4px;">${(item.discount ?? 0).toLocaleString()}</td>
-        <td style="padding: 4px;">${(item.subTotal ?? 0).toLocaleString()}</td>
-        <td style="padding: 4px;">${(
+        ))}</td>
+        <td style="padding: 4px;">${escapeHtml((item.taxRate ?? 0).toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml((item.discount ?? 0).toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml((item.subTotal ?? 0).toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml((
           item.grandTotal ?? 0
-        ).toLocaleString()}</td>
+        ).toLocaleString())}</td>
       </tr>
     `
         )
@@ -194,7 +195,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
       html: `
         <style> tr:hover { background-color: #f7fafc; } @media (max-width: 639px) { .swal2-html-container input, .swal2-html-container select, .swal2-html-container textarea { font-size: 16px !important; } } </style>
         <div style="font-size:12px;color:#64748b;margin-bottom:10px;text-align:left;">
-          Period: <strong>${startDate}</strong> → <strong>${endDate}</strong>
+          Period: <strong>${escapeHtml(startDate)}</strong> → <strong>${escapeHtml(endDate)}</strong>
         </div>
         <div style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; text-align:left;">
           <div>
@@ -226,9 +227,9 @@ export default function SalesRportModal({ user, business, baseUrl }) {
                 )
                 .map(
                   (c) =>
-                    `<option value="${idOf(c._id)}">${
+                    `<option value="${escapeHtml(idOf(c._id))}">${escapeHtml(
                       c.Username || ""
-                    }</option>`
+                    )}</option>`
                 )
                 .join("")}
             </select>
@@ -240,7 +241,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
               ${stores
                 .map(
                   (b) =>
-                    `<option value="${idOf(b._id)}">${b.WHName || ""}</option>`
+                    `<option value="${escapeHtml(idOf(b._id))}">${escapeHtml(b.WHName || "")}</option>`
                 )
                 .join("")}
             </select>
@@ -252,9 +253,9 @@ export default function SalesRportModal({ user, business, baseUrl }) {
               ${(users || [])
                 .map(
                   (b) =>
-                    `<option value="${idOf(b._id)}">${b.firstName || ""} ${
+                    `<option value="${escapeHtml(idOf(b._id))}">${escapeHtml(b.firstName || "")} ${escapeHtml(
                       b.lastName || ""
-                    }</option>`
+                    )}</option>`
                 )
                 .join("")}
             </select>
@@ -263,13 +264,13 @@ export default function SalesRportModal({ user, business, baseUrl }) {
             <label style="font-weight: 600; font-size: 12px;">PriceList</label><br/>
             <select id="PriceList" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
               <option value="">All</option>
-              <option value="PriceList1">${business.priceList1 || ""}</option>
-              <option value="PriceList2">${business.priceList2 || ""}</option>
-              <option value="PriceList3">${business.priceList3 || ""}</option>
-              <option value="PriceList4">${business.priceList4 || ""}</option>
-              <option value="PriceList5">${business.priceList5 || ""}</option>
-              <option value="PriceList6">${business.priceList6 || ""}</option>
-              <option value="PriceList7">${business.priceList7 || ""}</option>
+              <option value="PriceList1">${escapeHtml(business.priceList1 || "")}</option>
+              <option value="PriceList2">${escapeHtml(business.priceList2 || "")}</option>
+              <option value="PriceList3">${escapeHtml(business.priceList3 || "")}</option>
+              <option value="PriceList4">${escapeHtml(business.priceList4 || "")}</option>
+              <option value="PriceList5">${escapeHtml(business.priceList5 || "")}</option>
+              <option value="PriceList6">${escapeHtml(business.priceList6 || "")}</option>
+              <option value="PriceList7">${escapeHtml(business.priceList7 || "")}</option>
             </select>
           </div>
         </div>
@@ -350,6 +351,7 @@ export default function SalesRportModal({ user, business, baseUrl }) {
         };
 
         const updateTable = (filtered) => {
+          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           if (tableBody) tableBody.innerHTML = generateTableRows(filtered);
 
           const downloadContainer = root.querySelector("#tableDownloadBtn");

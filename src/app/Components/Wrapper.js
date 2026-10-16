@@ -2,6 +2,7 @@
 
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -124,7 +125,7 @@ export default function Wrapper({ children }) {
       {
         element: ".sidebar-logo",
         popover: {
-          title: `How'dy ${user.user.firstName}, Welcome to Bade`,
+          title: `How'dy ${escapeHtml(user.user.firstName)}, Welcome to Bade`,
           description:
             "I’m Kamsi, your personal tour assistant. You’re exploring Bade ERP, version 4.1 — let’s make this journey effortless and exciting.",
           side: "right",

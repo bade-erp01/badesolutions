@@ -5,6 +5,7 @@ import { useState } from "react";
 import { downloadExcel } from "../../../../Functions/Functions";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function PurchaseReportModal({ Stores, Vendors, data }) {
     const [StoresList] = useState(Stores || []);
@@ -28,19 +29,19 @@ export default function PurchaseReportModal({ Stores, Vendors, data }) {
                 .map(
                     (item, index) => `
             <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 4px;">${index + 1}</td>
-                <td style="padding: 4px; text-align: left;">${(item.billReferenceNo || "").trim()}</td>
-                <td style="padding: 4px;">${getCustomer(item.Vendor)}</td>
-                <td style="padding: 4px;">${getStore(item.WHID)}</td>
-                <td style="padding: 4px;">${moment(item.recievedDate).format("YYYY-MM-DD")}</td>
+                <td style="padding: 4px;">${escapeHtml(index + 1)}</td>
+                <td style="padding: 4px; text-align: left;">${escapeHtml((item.billReferenceNo || "").trim())}</td>
+                <td style="padding: 4px;">${escapeHtml(getCustomer(item.Vendor))}</td>
+                <td style="padding: 4px;">${escapeHtml(getStore(item.WHID))}</td>
+                <td style="padding: 4px;">${escapeHtml(moment(item.recievedDate).format("YYYY-MM-DD"))}</td>
                 <td style="padding: 4px;">
                     <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-                        ${item.status?.toUpperCase() || ""}
+                        ${escapeHtml(item.status?.toUpperCase() || "")}
                     </span>
                 </td>
-                <td style="padding: 4px;">${(item.discount ?? 0).toLocaleString()}</td>
-                <td style="padding: 4px;">${(item.subTotal ?? 0).toLocaleString()}</td>
-                <td style="padding: 4px;">${(item.grandTotal ?? 0).toLocaleString()}</td>
+                <td style="padding: 4px;">${escapeHtml((item.discount ?? 0).toLocaleString())}</td>
+                <td style="padding: 4px;">${escapeHtml((item.subTotal ?? 0).toLocaleString())}</td>
+                <td style="padding: 4px;">${escapeHtml((item.grandTotal ?? 0).toLocaleString())}</td>
             </tr>
         `
                 )
@@ -81,7 +82,7 @@ export default function PurchaseReportModal({ Stores, Vendors, data }) {
                             <option value="">All</option>
                             ${customersList
                                 .sort((a, b) => a.Name?.localeCompare(b.Name || "") || 0)
-                                .map((c) => `<option value="${c._id}">${c.Name}</option>`)
+                                .map((c) => `<option value="${escapeHtml(c._id)}">${escapeHtml(c.Name)}</option>`)
                                 .join("")}
                         </select>
                     </div>
@@ -89,7 +90,7 @@ export default function PurchaseReportModal({ Stores, Vendors, data }) {
                         <label style="font-weight: 600; font-size: 12px;">Store</label><br/>
                         <select id="Store" style="padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px; width: 100%;">
                             <option value="">All</option>
-                            ${StoresList.map((b) => `<option value="${b._id}">${b.WHName}</option>`).join("")}
+                            ${StoresList.map((b) => `<option value="${escapeHtml(b._id)}">${escapeHtml(b.WHName)}</option>`).join("")}
                         </select>
                     </div>
                 </div>
@@ -152,6 +153,7 @@ export default function PurchaseReportModal({ Stores, Vendors, data }) {
                 };
 
                 const updateTable = (filtered) => {
+                    // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
                     tableBody.innerHTML = generateTableRows(filtered);
 
                     const downloadContainer = document.getElementById("tableDownloadBtn");

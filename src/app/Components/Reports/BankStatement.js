@@ -4,6 +4,7 @@ import moment from "moment";
 import { useState } from "react";
 import {downloadExcel} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function BankStatement({ dataArray, bank, }) {
 
@@ -17,20 +18,20 @@ export default function BankStatement({ dataArray, bank, }) {
       .map(
         (item, index) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
-        <td style="padding: 4px;">${index + 1}</td>
-        <td style="padding: 4px;">${item.paymentReferenceNo.trim()}</td>
-        <td style="padding: 4px;">${item.collectionRef}</td>
-        <td style="padding: 4px;">${item.type}</td>
-        <td style="padding: 4px;">${item.Accountant}</td>
+        <td style="padding: 4px;">${escapeHtml(index + 1)}</td>
+        <td style="padding: 4px;">${escapeHtml(item.paymentReferenceNo.trim())}</td>
+        <td style="padding: 4px;">${escapeHtml(item.collectionRef)}</td>
+        <td style="padding: 4px;">${escapeHtml(item.type)}</td>
+        <td style="padding: 4px;">${escapeHtml(item.Accountant)}</td>
         <td style="padding: 4px;">
           <span style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
-            ${item.status.toUpperCase()}
+            ${escapeHtml(item.status.toUpperCase())}
           </span>
         </td>
-        <td style="padding: 4px;">${moment(item.PaymentDate).format("YYYY-MM-DD")}</td>
-        <td style="padding: 4px;">${item.drAmount.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.crAmount.toLocaleString()}</td>
-        <td style="padding: 4px;">${item.previousBalance.toLocaleString()}</td>
+        <td style="padding: 4px;">${escapeHtml(moment(item.PaymentDate).format("YYYY-MM-DD"))}</td>
+        <td style="padding: 4px;">${escapeHtml(item.drAmount.toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml(item.crAmount.toLocaleString())}</td>
+        <td style="padding: 4px;">${escapeHtml(item.previousBalance.toLocaleString())}</td>
       </tr>
     `
       )
@@ -102,6 +103,7 @@ export default function BankStatement({ dataArray, bank, }) {
         };
 
         const updateTable = (filtered) => {
+          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           tableBody.innerHTML = generateTableRows(filtered);
 
           const downloadContainer = document.getElementById("tableDownloadBtn");
