@@ -1,6 +1,8 @@
 "use client";
 import Swal from "sweetalert2";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
+import { escapeHtml } from "@/lib/security/escapeHtml";
+import { safeUrl } from "@/lib/security/safeUrl";
 
 export default function UserNotification({ user }) {
   const notifications = user.Notification || [];
@@ -25,10 +27,10 @@ export default function UserNotification({ user }) {
                 n.status === "Unseen" ? "bg-yellow-50" : "bg-gray-50"
               }">
                 <div class="flex-1 min-w-0 text-left">
-                  <div class="font-medium text-sm text-gray-800 break-words">${n.Title}</div>
+                  <div class="font-medium text-sm text-gray-800 break-words">${escapeHtml(n.Title)}</div>
                   ${
                     n.BASE_URL
-                      ? `<a href="${n.BASE_URL}" class="text-blue-600 text-xs underline mt-1 inline-block">View Details</a>`
+                      ? `<a href="${escapeHtml(safeUrl(n.BASE_URL))}" class="text-blue-600 text-xs underline mt-1 inline-block">View Details</a>`
                       : ""
                   }
                 </div>
@@ -36,7 +38,7 @@ export default function UserNotification({ user }) {
                   n.status === "Unseen"
                     ? "bg-yellow-200 text-yellow-800"
                     : "bg-gray-200 text-gray-600"
-                }">${n.status}</span>
+                }">${escapeHtml(n.status)}</span>
               </div>
             `
               )

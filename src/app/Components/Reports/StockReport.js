@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import { plsWait, Encrypt, ErrorMessage } from "../../../../Functions/Mics";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const idOf = (val) => {
   if (val == null) return "";
@@ -166,16 +167,16 @@ export default function StockReportModal({ baseUrl, userData }) {
           (item, index) => `
         <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 4px;">${index + 1}</td>
-          <td style="padding: 4px;">${item.Store || ""}</td>
-          <td style="padding: 4px;">${(item.productName || "").trim()}</td>
-          <td style="padding: 4px;">${item.ADCcode || ""}</td>
-          <td style="padding: 4px;">${item.Vendor || ""}</td>
-          <td style="padding: 4px;">${item.currentQty}</td>
-          <td style="padding: 4px;">${item.pcs}</td>
-          <td style="padding: 4px;">${item.LastBatchDate}</td>
-          <td style="padding: 4px;">${item.ExpDate}</td>
-          <td style="padding: 4px;">${item.VendorPrice}</td>
-          <td style="padding: 4px;">${Number(item.value || 0).toFixed(2)}</td>
+          <td style="padding: 4px;">${escapeHtml(item.Store || "")}</td>
+          <td style="padding: 4px;">${escapeHtml((item.productName || "").trim())}</td>
+          <td style="padding: 4px;">${escapeHtml(item.ADCcode || "")}</td>
+          <td style="padding: 4px;">${escapeHtml(item.Vendor || "")}</td>
+          <td style="padding: 4px;">${escapeHtml(item.currentQty)}</td>
+          <td style="padding: 4px;">${escapeHtml(item.pcs)}</td>
+          <td style="padding: 4px;">${escapeHtml(item.LastBatchDate)}</td>
+          <td style="padding: 4px;">${escapeHtml(item.ExpDate)}</td>
+          <td style="padding: 4px;">${escapeHtml(item.VendorPrice)}</td>
+          <td style="padding: 4px;">${escapeHtml(Number(item.value || 0).toFixed(2))}</td>
         </tr>`
         )
         .join("");
@@ -185,7 +186,7 @@ export default function StockReportModal({ baseUrl, userData }) {
         `
         <tr style="font-weight: bold; background-color: #f1f5f9;">
           <td colspan="10" style="padding: 6px; text-align: right;">Total Stock Value</td>
-          <td style="padding: 6px;">${getTotalValue(rows)}</td>
+          <td style="padding: 6px;">${escapeHtml(getTotalValue(rows))}</td>
         </tr>`
       );
     };
@@ -200,9 +201,8 @@ export default function StockReportModal({ baseUrl, userData }) {
             ${vendorOpts
               .map(
                 (v) =>
-                  `<option value="${String(v.id)}">${(v.name || "").replace(
-                    /</g,
-                    "&lt;"
+                  `<option value="${escapeHtml(String(v.id))}">${escapeHtml(
+                    v.name || ""
                   )}</option>`
               )
               .join("")}
@@ -215,9 +215,8 @@ export default function StockReportModal({ baseUrl, userData }) {
             ${storeOpts
               .map(
                 (s) =>
-                  `<option value="${String(s.id)}">${(s.name || "").replace(
-                    /</g,
-                    "&lt;"
+                  `<option value="${escapeHtml(String(s.id))}">${escapeHtml(
+                    s.name || ""
                   )}</option>`
               )
               .join("")}
@@ -230,9 +229,8 @@ export default function StockReportModal({ baseUrl, userData }) {
             ${productOpts
               .map(
                 (p) =>
-                  `<option value="${String(p.id)}">${(p.name || "").replace(
-                    /</g,
-                    "&lt;"
+                  `<option value="${escapeHtml(String(p.id))}">${escapeHtml(
+                    p.name || ""
                   )}</option>`
               )
               .join("")}
@@ -292,6 +290,7 @@ export default function StockReportModal({ baseUrl, userData }) {
             return true;
           });
 
+          // eslint-disable-next-line no-unsanitized/property -- every interpolated value is escaped with escapeHtml
           if (tableBody) tableBody.innerHTML = generateTableRows(filtered);
           return filtered;
         };
@@ -354,6 +353,7 @@ export default function StockReportModal({ baseUrl, userData }) {
             ErrorMessage("Unable to open print window. Please allow popups.");
             return;
           }
+          // eslint-disable-next-line no-unsanitized/method -- every interpolated value is escaped with escapeHtml
           win.document.write(`
             <html>
               <head>

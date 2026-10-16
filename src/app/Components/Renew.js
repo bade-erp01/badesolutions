@@ -6,6 +6,7 @@ import withReactContent from "sweetalert2-react-content";
 import {useRouter} from "next/navigation"
 import {Encrypt,Dencrypt} from "../../../Functions/Functions"
 import { ErrorMessage, plsWait } from "../../../Functions/Mics";
+import { safeUrl } from "@/lib/security/safeUrl";
 
 const RenewButton = ({id ,baseUrl,User}) => {
   const [user] = useState(Dencrypt(User))
@@ -49,7 +50,7 @@ const RenewButton = ({id ,baseUrl,User}) => {
 
         const response = await InitiatePayment.json()
         if (response.data){
-           router.push(response.data);
+           router.push(safeUrl(response.data));
         }else{
           ErrorMessage(response.error)
         }

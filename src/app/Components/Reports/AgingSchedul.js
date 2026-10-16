@@ -5,6 +5,7 @@ import { useState } from "react";
 import { downloadExcel } from "../../../../Functions/Functions";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function ReceivablesAgingModal({ data }) {
   const [debtorsList] = useState(
@@ -79,8 +80,8 @@ export default function ReceivablesAgingModal({ data }) {
               .map(
                 ([bucket, amount]) => `
               <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 6px;">${bucket}</td>
-                <td style="padding: 6px; text-align: right;">${amount.toLocaleString()}</td>
+                <td style="padding: 6px;">${escapeHtml(bucket)}</td>
+                <td style="padding: 6px; text-align: right;">${escapeHtml(amount.toLocaleString())}</td>
               </tr>
             `
               )

@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import {ErrorMessage,plsWait,SuccessToast} from "../../../Functions/Mics"
 import {Encrypt} from "../../../Functions/Functions"
+import { escapeHtml } from "@/lib/security/escapeHtml";
 import {
   TicketIcon
 } from "@heroicons/react/24/outline";
@@ -39,7 +40,7 @@ export default function TaskAssigner({users, userInfo , EXPRESS_PRIVATE_URL}) {
                 <label for="swal-assign" class="block text-sm font-semibold text-gray-800">Assign To</label>
                 <select id="swal-assign" class="w-full px-4 py-2.5 text-base bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-gray-700 font-medium">
                     <option value="" disabled selected>Select assignee</option>
-                    ${userList.map(emp => `<option value="${emp._id}">${emp.firstName} ${emp.lastName}</option>`).join('')}
+                    ${userList.map(emp => `<option value="${escapeHtml(emp._id)}">${escapeHtml(emp.firstName)} ${escapeHtml(emp.lastName)}</option>`).join('')}
                 </select>
                 </div>
                 <div class="space-y-2">

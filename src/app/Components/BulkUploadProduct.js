@@ -8,6 +8,7 @@ import { CloudArrowUpIcon, DocumentArrowDownIcon } from "@heroicons/react/24/out
 import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../Functions/Functions";
 import { plsWait } from "../../../Functions/Mics";
 import { useRouter } from "next/navigation";
+import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const MySwal = withReactContent(Swal);
 
@@ -34,13 +35,13 @@ const BulkUploader = ({ tenantId, collectionName }) => {
 
   const showPreviewModal = (data) => {
     const tableHeaders = Object.keys(data[0] || {}).map(
-      (key) => `<th style="padding:8px; border-bottom:1px solid #ddd;">${key}</th>`
+      (key) => `<th style="padding:8px; border-bottom:1px solid #ddd;">${escapeHtml(key)}</th>`
     ).join('');
 
     const tableRows = data.map((row, i) => `
       <tr style="background-color:${i % 2 === 0 ? '#fff' : '#f9f9f9'};">
         ${Object.values(row).map(
-          (val) => `<td style="padding:8px; border-bottom:1px solid #eee;">${val}</td>`
+          (val) => `<td style="padding:8px; border-bottom:1px solid #eee;">${escapeHtml(val)}</td>`
         ).join('')}
       </tr>
     `).join('');
