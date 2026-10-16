@@ -1,13 +1,31 @@
-import { Geist, Geist_Mono, Inter, DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import ClientProvider from "./ClientProvider";
 import { Analytics } from "@vercel/analytics/next"
 import { headers } from "next/headers";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-const inter = Inter({ subsets: ["latin"], weight: ["400", "600", "700"] });
-const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
+// Self-hosted (latin, variable weight) instead of next/font/google: the Google
+// loader crashes the build when Google Fonts returns a file URL without an
+// extension ("Cannot read properties of null (reading '1')").
+const geistSans = localFont({
+  src: "./fonts/Geist-Variable.woff2",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+const geistMono = localFont({
+  src: "./fonts/GeistMono-Variable.woff2",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+});
+const inter = localFont({
+  src: "./fonts/inter-latin-wght-normal.woff2",
+  weight: "100 900",
+});
+const dmSans = localFont({
+  src: "./fonts/dm-sans-latin-wght-normal.woff2",
+  variable: "--font-dm-sans",
+  weight: "100 1000",
+});
 
  export const metadata = {
   metadataBase: new URL("https://badesolutions.com.ng"),
