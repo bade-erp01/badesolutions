@@ -19,6 +19,10 @@ export async function serverApi(path, { method = "GET", headers = {}, next, cach
   const sid = store.get(SESSION_COOKIE)?.value;
   const h = { Accept: "application/json", ...headers };
   if (sid) h.Cookie = `${SESSION_COOKIE}=${encodeURIComponent(sid)}`;
+  // Every user's server-rendered page reaches the backend from this host's IP; the shared
+  // secret tells the backend not to count them against one IP's limit (it still limits
+  // each logged-in user). Server-side only: never use a NEXT_PUBLIC_ name for it.
+  if (process.env.INTERNAL_SECRET) h["x-internal-secret"] = process.env.INTERNAL_SECRET;
 
   let res;
   try {
