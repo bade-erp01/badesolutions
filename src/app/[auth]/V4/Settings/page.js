@@ -27,6 +27,7 @@ import {
   plsWait,
 } from "../../../../../Functions/Mics";
 import api from "@/lib/api";
+import BuyLicencesButton from "@/app/Components/BuyLicencesButton";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
 
@@ -578,7 +579,10 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
                 Amount: ₦
                 {Number(formData.SubcriptionAmount || 0).toLocaleString()}
               </div>
-              <div>Pending License: {formData.Pendinglicense}</div>
+              <div className="flex items-center gap-3">
+                <span>Pending License: {formData.Pendinglicense}</span>
+                <BuyLicencesButton plan={formData.subscriptionplan} />
+              </div>
             </div>
             <hr className="border-border" />
             <div className="flex flex-wrap justify-between gap-2 text-sm">

@@ -17,7 +17,6 @@ import {
   Calendar,
   LogOut,
   Settings,
-  Bell,
   Sparkles
 } from "lucide-react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -53,6 +52,7 @@ import { Menu } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../../lib/User";
 import api, { logout as serverLogout } from "@/lib/api";
+import NotificationBell from "@/app/Components/NotificationBell";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
 
 // Normalize ids (ObjectId / string)
@@ -551,6 +551,7 @@ export default function Wrapper({ children }) {
 
             {/* ===== RIGHT ZONE ===== */}
             <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+              <NotificationBell />
               <div className="theme-toggle">
                 <ThemeToggle />
               </div>
@@ -684,11 +685,6 @@ export function UserProfile({ user, biz }) {
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
-
-        <DropdownMenuItem>
-          <Bell className="mr-2 h-4 w-4" />
-          {user.Notification?.length ?? 0} Notification
-        </DropdownMenuItem>
 
         {user.isAdmin && (
           <DropdownMenuItem

@@ -270,11 +270,15 @@ export function WebSocketProvider({ children, user }) {
   
   // ========== Global Event Listeners ==========
   useEffect(() => {
+    // lib/notifications.js notify(): { title, message, url, level }
     const unsubNotification = subscribe("notification", (data) => {
+      const url = typeof data?.url === "string" && data.url.startsWith("/") ? data.url : "";
       showNotification({
-        icon: "info",
-        title: "Notification",
-        text: data?.message || "You have a new notification.",
+        icon: ["success", "warning", "error"].includes(data?.level) ? data.level : "info",
+        title: data?.title || "Notification",
+        text: data?.message && data.message !== data.title ? data.message : "",
+        actionLabel: url ? "View" : null,
+        onAction: url ? () => router.push(url) : null,
       });
     });
 
@@ -394,6 +398,11 @@ export function WebSocketProvider({ children, user }) {
       {children}
     </WebSocketContext.Provider>
   );
+}
+
+/** The realtime context, or null outside WebSocketProvider. */
+export function useOptionalWebSocket() {
+  return useContext(WebSocketContext);
 }
 
 export function useWebSocket() {

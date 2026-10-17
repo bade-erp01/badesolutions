@@ -20,7 +20,7 @@ import {
 import Swal from "sweetalert2";
 import Nav2 from "@/app/Components/Nav2";
 import Logout from "@/app/Components/Logout";
-import UserNotification from "@/app/Components/UserNotification";
+import NotificationBell from "@/app/Components/NotificationBell";
 import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 
 import { Button } from "@/components/ui/button";
@@ -294,9 +294,12 @@ export default function NavWrapper({ userData, data, navtitle }) {
           </div>
         </div>
 
-        {userData?.Notification?.length > 0 && (
-          <UserNotification user={userData} />
-        )}
+        {/* userData is { user, business }: userData.Notification never existed, so this
+            never showed */}
+        <div className="flex items-center gap-2 rounded-md bg-gray-800 px-2 py-1 text-white">
+          <NotificationBell />
+          <span className="text-sm">Notifications</span>
+        </div>
 
         <Logout />
       </div>

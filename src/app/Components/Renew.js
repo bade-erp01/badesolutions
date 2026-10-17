@@ -3,15 +3,14 @@
 import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import {useRouter} from "next/navigation"
 import api from "@/lib/api"
 import { ErrorMessage, plsWait } from "../../../Functions/Mics";
 import { safeUrl } from "@/lib/security/safeUrl";
 
 const RenewButton = ({id ,baseUrl,User}) => {
   const MySwal = withReactContent(Swal);
-  const router = useRouter();
-  const redirectUrl = `/api/Renew/Subscription/${id}`;
+  // works after the subscription has expired too (backend lib/payments/billing.js)
+  const redirectUrl = "/api/v1/billing/subscription";
 
   const handleRenewClick = () => {
     MySwal.fire({
@@ -39,11 +38,11 @@ const RenewButton = ({id ,baseUrl,User}) => {
         plsWait("Initiating secured Payment")
         const InitiatePayment = await api.post(redirectUrl, {});
 
-        const response = InitiatePayment.data || { error: InitiatePayment.error }
-        if (response.data){
-           router.push(safeUrl(response.data));
-        }else{
-          ErrorMessage(response.error)
+        const url = InitiatePayment.ok ? safeUrl(InitiatePayment.data?.url || "") : "";
+        if (url && url !== "#") {
+          window.location.assign(url); // Paystack checkout, then back to the app
+        } else {
+          ErrorMessage(InitiatePayment.error || "Could not start the payment.")
         }
        
       }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Wrapper from "@/app/Components/Wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
@@ -11,6 +11,7 @@ import { WebSocketProvider } from "@/app/Components/WebSocketProvider";
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
 import PushNotificationGate from "@/app/Components/PushNotificationGate";
 import { Toaster } from "sonner";
+import PaymentReturnNotice from "@/app/Components/PaymentReturnNotice";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -64,11 +65,18 @@ export default async function layout({ children }) {
   if (isSubscriptionExpired) {
     // Show renewal component directly
     return (
-      <RenewSubscription
-        business={businessInfo}
-        baseUrl={baseUrl}
-        User={userInfo}
-      />
+      <>
+        {/* result of a renewal that didn't go through */}
+        <Toaster position="top-right" closeButton />
+        <Suspense fallback={null}>
+          <PaymentReturnNotice />
+        </Suspense>
+        <RenewSubscription
+          business={businessInfo}
+          baseUrl={baseUrl}
+          User={userInfo}
+        />
+      </>
     );
   }
 
@@ -99,6 +107,9 @@ export default async function layout({ children }) {
           }}
         />
         <PushNotificationGate />
+        <Suspense fallback={null}>
+          <PaymentReturnNotice />
+        </Suspense>
         <ThemeProvider nonce={nonce}>
           <UserProvider user={userData}>
             <Wrapper>{children}</Wrapper>

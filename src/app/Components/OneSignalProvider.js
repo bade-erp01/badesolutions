@@ -13,12 +13,27 @@ let initPromise = null;
 // External ID we've already logged in as during this page load.
 let loggedInAs = null;
 
+// OneSignal only works on the site URL registered in its dashboard. Elsewhere (localhost,
+// preview deployments) its init doesn't fail cleanly: push looked available, the "turn on
+// notifications" prompt showed and subscribing never finished. Comma-separated hosts.
+const PUSH_HOSTS = (process.env.NEXT_PUBLIC_ONESIGNAL_HOSTS || "badesolutions.com.ng,www.badesolutions.com.ng")
+  .split(",")
+  .map((h) => h.trim().toLowerCase())
+  .filter(Boolean);
+
+const pushAllowedHere = () => PUSH_HOSTS.includes(window.location.hostname.toLowerCase());
+
 export function initOneSignal() {
   if (typeof window === "undefined") return Promise.resolve(false);
 
   const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
   if (!appId) {
     console.warn(`${LOG_PREFIX} NEXT_PUBLIC_ONESIGNAL_APP_ID is not set; push is disabled.`);
+    return Promise.resolve(false);
+  }
+
+  if (!pushAllowedHere()) {
+    console.info(`${LOG_PREFIX} push is off on ${window.location.hostname} (OneSignal is registered for ${PUSH_HOSTS.join(", ")}).`);
     return Promise.resolve(false);
   }
 

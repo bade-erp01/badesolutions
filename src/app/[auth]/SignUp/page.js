@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
+import api from "@/lib/api";
 import Nav1 from "@/app/Components/Nav1";
 import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 
@@ -42,11 +43,24 @@ export default function SignUpPage() {
     email: "",
     Tel: "",
     plan: plan,
-    NumberOfUsers: plan === "Basic" ? 4 : 4 ,//6
-    renewalFee: plan === "Basic" ? 332820 : 332820,
-    totalAmount: plan === "Basic" ? 332820 : 332820,
     referalCode: "",
   });
+
+  // price and seats come from the backend (lib/plans.js); it also decides what is charged
+  const [pricing, setPricing] = useState(null);
+  const [pricingError, setPricingError] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    api.get("/api/v1/plans").then((r) => {
+      if (cancelled) return;
+      const p = r.ok ? r.data?.plans?.find((x) => x.name === plan) : null;
+      if (p) setPricing(p);
+      else setPricingError("We couldn't load the price. Refresh the page to try again.");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [plan]);
 
 
   // scrap user data 
@@ -100,6 +114,7 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await termsAndConditions(formData);
+    if (!res) return; // terms not accepted, or the server's error was already shown
     if (res.data){
       SuccessToast(res.data) 
       router.push("/onboarding-success")
@@ -212,19 +227,26 @@ useEffect(() => {
                   {/* PRICING */}
                   <div className="rounded-xl border p-4 bg-zinc-50">
                     
-                    <p className="text-xs text-zinc-500">
-                      {formData.NumberOfUsers} users included
-                    </p>
+                    {pricing ? (
+                      <>
+                        <p className="text-xs text-zinc-500">
+                          {pricing.users} users included
+                        </p>
 
-                    <p className="text-sm mt-2">
-                      7.5% VAT included.
-                    </p>
-                    <br/>
+                        <p className="text-sm mt-2">
+                          ₦{pricing.monthly.toLocaleString()} × {pricing.months} months
+                          {pricing.vatIncluded && ", 7.5% VAT included."}
+                        </p>
+                        <br/>
 
-                    <p className="text-xs text-zinc-500">Total due</p>
-                    <p className="text-xl font-semibold">
-                      ₦{formData.totalAmount.toLocaleString()}
-                    </p>
+                        <p className="text-xs text-zinc-500">Total due after setup</p>
+                        <p className="text-xl font-semibold">
+                          ₦{pricing.yearly.toLocaleString()}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-zinc-500">{pricingError || "Loading price…"}</p>
+                    )}
                   </div>
 
                   <p className="text-[11px] text-zinc-500">

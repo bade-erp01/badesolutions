@@ -1,7 +1,6 @@
 "use client";
 import "animate.css";
 import React, { useState, useEffect } from "react";
-import dummyData from "../../../data/dummyData.json";
 import Image from "next/image";
 import api from "@/lib/api";
 import Nav1 from "@/app/Components/Nav1";
@@ -35,9 +34,21 @@ import { safeUrlOrNull } from "@/lib/security/safeUrl";
 
 const ModulesPage = ({ userInfo }) => {
   const [isMounted, setIsMounted] = useState(false);
+  // modules and prices from the backend (BadeAdmin "modulecatalogue")
+  const [modules, setModules] = useState(null);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
+    let cancelled = false;
+    api.get("/api/v1/modules").then((r) => {
+      if (cancelled) return;
+      if (r.ok && Array.isArray(r.data?.modules)) setModules(r.data.modules);
+      else setLoadError(r.error || "Could not load the modules.");
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -85,8 +96,11 @@ const ModulesPage = ({ userInfo }) => {
         {/* Modules Grid */}
         {isMounted && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24">
+            {!modules && (
+              <p className="text-center text-sm text-slate-500">{loadError || "Loading modules…"}</p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dummyData.map((item, index) => (
+              {(modules || []).map((item, index) => (
                 <ModuleCard
                   key={item.id || index}
                   item={item}

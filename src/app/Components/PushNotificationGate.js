@@ -23,6 +23,15 @@ const REPROMPT_MS = 30 * 60 * 1000;
 const SETTLE_MS = 1500;
 const PROMPT_STATES = new Set(["can-ask", "blocked", "ios-needs-install"]);
 const UNSUPPORTED_KEY_PREFIX = "bade:push-unsupported-noted:";
+// OneSignal's subscribe step has no timeout of its own: when its service worker can't be
+// registered it never settles and the button used to spin forever.
+const SUBSCRIBE_TIMEOUT_MS = 20000;
+
+const withTimeout = (promise, ms) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
 
 const storage = {
   get(key) {
@@ -221,16 +230,35 @@ export default function PushNotificationGate() {
   }, [showBanner]);
 
   // Must be called straight from a click so Chrome shows the full prompt.
+  // 1. the browser's own permission prompt (always answers: allow, block or dismissed)
+  // 2. then subscribe this device with OneSignal, with a time limit
   const enable = async () => {
     setBusy(true);
     try {
-      if (nativePermission() === "granted") {
-        await OneSignal.User.PushSubscription.optIn();
-      } else {
-        await OneSignal.Notifications.requestPermission();
+      let permission = nativePermission();
+      if (permission !== "granted" && typeof Notification !== "undefined") {
+        permission = await Notification.requestPermission();
       }
+      if (permission === "denied") {
+        setModalOpen(true); // shows how to unblock
+        return;
+      }
+      if (permission !== "granted") {
+        toast.info("Notifications are still off", {
+          description: "Click “Allow” when your browser asks, to get alerts on this device.",
+        });
+        return;
+      }
+      await withTimeout(OneSignal.User.PushSubscription.optIn(), SUBSCRIBE_TIMEOUT_MS);
+      if (OneSignal.User.PushSubscription.optedIn !== true) throw new Error("not subscribed");
     } catch (error) {
       console.error(`${LOG_PREFIX} enabling push failed:`, error);
+      toast.error("Couldn't turn on notifications", {
+        description:
+          error?.message === "timeout"
+            ? "The notification service didn't respond. Check your connection, reload the page and try again."
+            : "Something went wrong on this device. Reload the page and try again.",
+      });
     } finally {
       setBusy(false);
       refresh();

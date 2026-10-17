@@ -44,7 +44,7 @@ import { SuccessToast, plsWait,ErrorMessage } from "../../../../Functions/Mics";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import Nav2 from "@/app/Components/Nav2";
 import Logout from "@/app/Components/Logout";
-import UserNotification from "@/app/Components/UserNotification";
+import NotificationBell from "@/app/Components/NotificationBell";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -360,9 +360,10 @@ export default function DashboardLayout({ userData, baseUrl }) {
           </div>
         </div>
 
-        {userData?.Notification?.length > 0 && (
-          <UserNotification user={userData} />
-        )}
+        <div className="flex items-center gap-2 rounded-md bg-zinc-800 px-2 py-1 text-zinc-100">
+          <NotificationBell />
+          <span className="text-sm">Notifications</span>
+        </div>
 
         <Logout />
       </div>

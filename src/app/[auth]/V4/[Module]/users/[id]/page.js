@@ -40,6 +40,7 @@ import { KeyRound } from "lucide-react";
 import { RefreshCcw } from "lucide-react";
 import { AlertCircle } from "lucide-react";
 import { escapeHtml } from "@/lib/security/escapeHtml";
+import BuyLicencesButton from "@/app/Components/BuyLicencesButton";
 
 const formatNumberShort = (num) => {
   if (num >= 1_000_000_000) {
@@ -1397,6 +1398,11 @@ export default function SingleEmployeeView({
               </>
             )}
             
+            {/* no licence left to give this user: an admin can buy more */}
+            {(!data.firstTimeOnboard && !(businessInfo.Pendinglicense > 0) && userInfo.isAdmin) && (
+              <BuyLicencesButton plan={businessInfo.subscriptionplan} label="Buy licences to add this user" />
+            )}
+
             {data.firstTimeOnboard && (
               <button
                 type="submit"
