@@ -35,6 +35,8 @@ const API_URLS = [
   process.env.EXPRESS_PRIVATE_URL,
   process.env.NEXT_PUBLIC_API_URL,
   process.env.NEXT_PUBLIC_BASE_URL,
+  // the live API, also when the settings above aren't set on the host
+  "https://api.badesolutions.com.ng",
 ];
 
 // Remote image hosts (keep in sync with images.remotePatterns in next.config.mjs).

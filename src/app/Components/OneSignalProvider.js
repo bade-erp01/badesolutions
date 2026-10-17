@@ -26,7 +26,8 @@ const pushAllowedHere = () => PUSH_HOSTS.includes(window.location.hostname.toLow
 export function initOneSignal() {
   if (typeof window === "undefined") return Promise.resolve(false);
 
-  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+  // public app id (sent to every browser anyway); the host setting wins when present
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "7a980c29-14af-4971-beef-de19e16e8d90";
   if (!appId) {
     console.warn(`${LOG_PREFIX} NEXT_PUBLIC_ONESIGNAL_APP_ID is not set; push is disabled.`);
     return Promise.resolve(false);
