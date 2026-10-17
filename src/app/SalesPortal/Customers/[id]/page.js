@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
-import CustomerSales from "@/app/Components/CustomerSales";
+import CustomerSalesLoader from "@/app/Components/CustomerSalesLoader";
 import autoTable from "jspdf-autotable";
 import {
   postPayment,
@@ -78,7 +78,9 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
   });
   const [preview, setPreview] = useState(cust.Image);
   const [attachment, setAttachment] = useState(null);
+  // invoice summaries (no order lines); the sales section loads those when opened
   const Sales = data.Bills || [];
+  const invoicesForTotals = Sales.filter((b) => b.billStatus !== "Cancelled");
 
   // for pagintaion
   const [currentPage, setCurrentPage] = useState(1);
@@ -364,7 +366,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
   // Initialize form data (bankJournal may not exist on cust)
 
-  // Prepare monthly sales data from data.SandS (array of invoices)
+  // Prepare monthly sales data from the invoices (cancelled ones excluded)
   // Prepare monthly sales data for Jan-Dec (month-on-month)
   const monthlySales = Array.from({ length: 12 }, (_, i) => {
     const monthNum = i + 1;
@@ -372,8 +374,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       month: "short",
     }); // "Jan", "Feb", etc.
     // Sum all grandTotal for this month
-    const total = Array.isArray(data.SandS)
-      ? data.SandS.reduce((sum, item) => {
+    const total = Array.isArray(invoicesForTotals)
+      ? invoicesForTotals.reduce((sum, item) => {
           const dateStr = item.createdAt || item.startDate;
           if (dateStr) {
             const d = new Date(dateStr);
@@ -561,7 +563,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       {/* Sales Insight */}
       <Section title={``} className="lg:col-span-2">
         <div className="">
-          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]} />
+          <GenerealSalesMargin yearlysales={Sales} warehouses={[]} />
         </div>
       </Section>
 
@@ -1064,12 +1066,14 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           }`}
         >
           <Section title="">
-            <CustomerSales
-              Sales={Sales}
-              customer={cust}
-              business={userInfo.business}
-              Rep={salesPerson}
-            />
+            {isOpen4 && (
+              <CustomerSalesLoader
+                customerParamId={router.id}
+                customer={cust}
+                business={userInfo.business}
+                Rep={salesPerson}
+              />
+            )}
           </Section>
         </div>
       </div>

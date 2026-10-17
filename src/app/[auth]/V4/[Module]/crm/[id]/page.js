@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import Image from "next/image";
-import CustomerSales from "@/app/Components/CustomerSales";
+import CustomerSalesLoader from "@/app/Components/CustomerSalesLoader";
 import autoTable from "jspdf-autotable";
 import InvoicePaymentForm from "@/app/Components/PaymentWithInv";
 import Link from "next/link";
@@ -85,7 +85,9 @@ export default function CustomerForm({
   });
   const [preview, setPreview] = useState(cust.Image);
   const [attachment, setAttachment] = useState(null);
+  // invoice summaries (no order lines); the Sales Pipeline section loads those when opened
   const Sales = data.Bills || [];
+  const [salesOpened, setSalesOpened] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -624,7 +626,7 @@ export default function CustomerForm({
       {/* Dashboard Stats */}
       <DashboardStats
         cust={cust}
-        todaysSale={data.SandS?.reduce(
+        todaysSale={Sales.filter((b) => b.billStatus !== "Cancelled").reduce(
           (acc, item) => acc + Number(item.grandTotal || 0),
           0,
         )}
@@ -638,7 +640,7 @@ export default function CustomerForm({
           </h3>
         </div>
         <div className="p-6 pt-0">
-          <GenerealSalesMargin yearlysales={data.SandS} warehouses={[]} />
+          <GenerealSalesMargin yearlysales={Sales} warehouses={[]} />
         </div>
       </div>
 
@@ -1362,8 +1364,11 @@ export default function CustomerForm({
           </div>
         </details>
 
-        {/* SALES PIPELINE — pure HTML details */}
-        <details className="group border rounded-lg px-4 min-w-0 open:bg-card">
+        {/* SALES PIPELINE — order lines load the first time it is opened */}
+        <details
+          className="group border rounded-lg px-4 min-w-0 open:bg-card"
+          onToggle={(e) => e.currentTarget.open && setSalesOpened(true)}
+        >
           <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold select-none [&::-webkit-details-marker]:hidden">
             <span>Sales Pipeline</span>
             <svg
@@ -1380,12 +1385,14 @@ export default function CustomerForm({
             </svg>
           </summary>
           <div className="pb-4">
-            <CustomerSales
-              Sales={Sales}
-              customer={cust}
-              business={userInfo.business}
-              Rep={salesPerson}
-            />
+            {salesOpened && (
+              <CustomerSalesLoader
+                customerParamId={router.id}
+                customer={cust}
+                business={userInfo.business}
+                Rep={salesPerson}
+              />
+            )}
           </div>
         </details>
 

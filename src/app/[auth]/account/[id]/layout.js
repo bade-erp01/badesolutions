@@ -141,10 +141,11 @@ export default async function SetUpLayout({ children, params }) {
                 <tbody>
                   {business.PaymentLogs?.length ? business.PaymentLogs.map((log, index) => (
                     <tr key={index} className="border-b border-gray-700">
-                      <td className="py-2 px-4 italic">{log.date}</td>
-                      <td className="py-2 px-4 italic">{log.ref}</td>
-                      <td className="py-2 px-4 italic">{log.amount}</td>
-                      <td className="py-2 px-4 italic">{log.status}</td>
+                      {/* latest 20 entries from GET /api/v1/Session (backend lib/sessionView.js) */}
+                      <td className="py-2 px-4 italic">{log.date ? new Date(log.date).toLocaleDateString("en-NG") : "—"}</td>
+                      <td className="py-2 px-4 italic">{log.reference || "—"}</td>
+                      <td className="py-2 px-4 italic">{log.amount != null ? `₦${Number(log.amount).toLocaleString("en-NG")}` : "—"}</td>
+                      <td className="py-2 px-4 italic">{log.status || "—"}</td>
                     </tr>
                   )) : (
                     <tr>
