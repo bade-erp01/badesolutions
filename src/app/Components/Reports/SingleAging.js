@@ -1,92 +1,74 @@
 "use client";
 
-import React from "react";
+// "+120 days" ageing for one customer. The backend (GET /api/reports/credit-risk/customer/:id)
+// applies payments to the oldest invoices first, so the buckets are what is still owed and
+// add up to the customer's balance. (This used to bucket invoice totals in the browser and
+// never subtracted payments.)
+
+import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import moment from "moment";
 import { FaDownload } from "react-icons/fa";
+import { Loader2 } from "lucide-react";
+import api from "@/lib/api";
+import { ErrorMessage } from "../../../../Functions/Mics";
 
-const AgingReportDownloader = ({ customer, invoices, Rep }) => {
+const AgingReportDownloader = ({ customer, Rep }) => {
+  const [busy, setBusy] = useState(false);
+
   const handleDownload = async () => {
+    if (busy || !customer?._id) return;
+    setBusy(true);
     try {
-      const periods = [
-        { name: "1-30 days", start: moment().subtract(30, "days"), end: moment() },
-        { name: "31-60 days", start: moment().subtract(60, "days"), end: moment().subtract(31, "days") },
-        { name: "61-90 days", start: moment().subtract(90, "days"), end: moment().subtract(61, "days") },
-        { name: "91-120 days", start: moment().subtract(120, "days"), end: moment().subtract(91, "days") },
-        { name: ">121 days", start: moment().subtract(9999, "days"), end: moment().subtract(121, "days") },
-      ];
+      const r = await api.get(`/api/reports/credit-risk/customer/${customer._id}`);
+      if (!r.ok) throw new Error(r.error || "Could not build the ageing report");
+      const rep = r.data;
+      const label = Object.fromEntries(rep.buckets.map((b) => [b.key, b.label]));
 
-      const aging = [];
-
-      const customerInvoices = invoices.filter(
-        (entry) =>
-          entry.customer &&
-          customer._id &&
-          entry.customer.toString() === customer._id.toString() &&
-          !["Draft", "Cancelled", "Requisition"].includes(entry.billStatus)
-      );
-
-      const agingData = {
-        Name: customer.Username,
-        Rep: Rep,
-        Current: customer.Debt || 0,
+      const summary = {
+        Name: rep.customer.name || customer.Username,
+        Rep: Rep || "",
+        Balance: rep.customer.debt,
+        ...Object.fromEntries(rep.buckets.map((b) => [label[b.key], rep.aging[b.key]])),
+        "Not on statement": rep.notOnStatement,
+        "Oldest open (days)": rep.oldestDays,
+        "Avg days to pay": rep.avgDaysToPay ?? "",
+        "Last payment": rep.lastPayment ? moment(rep.lastPayment).format("YYYY-MM-DD") : "",
+        "Credit limit": rep.customer.creditLimit || "",
       };
+      const open = rep.openInvoices.map((i) => ({
+        Reference: i.reference,
+        Date: moment(i.date).format("YYYY-MM-DD"),
+        "Invoice amount": i.amount,
+        Outstanding: i.outstanding,
+        "Age (days)": i.ageDays,
+        Bucket: label[i.bucket],
+      }));
 
-      let carryOver = 0;
-
-      periods.forEach((period) => {
-        const periodInvoices = customerInvoices.filter((entry) =>
-          moment(entry.startDate).isBetween(period.start, period.end, null, "[]")
-        );
-
-        const invoiceTotal = periodInvoices.reduce(
-          (total, inv) => total + Number(inv.grandTotal || 0),
-          0
-        );
-
-        let paymentTotal = periodInvoices.reduce(
-          (total, inv) => total + Number(inv.paymentMethod || 0),
-          0
-        );
-
-        // Add carryover from previous bucket
-        if (carryOver < 0) {
-          paymentTotal = -carryOver;
-          carryOver = 0;
-        }
-
-        let periodBalance = invoiceTotal - paymentTotal;
-
-        // If still positive, carry forward remainder
-        if (periodBalance < 0) {
-          carryOver = periodBalance;
-          
-        }
-
-        agingData[period.name] = Math.max(periodBalance, 0);
-      });
-
-      aging.push(agingData);
-
-      const worksheet = XLSX.utils.json_to_sheet(aging);
-      const workbook = { Sheets: { "Aging Report": worksheet }, SheetNames: ["Aging Report"] };
-      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-      });
-      saveAs(blob, "Aging_Report.xlsx");
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([summary]), "Aging Report");
+      XLSX.utils.book_append_sheet(
+        wb,
+        open.length ? XLSX.utils.json_to_sheet(open) : XLSX.utils.aoa_to_sheet([["No open invoices"]]),
+        "Open invoices",
+      );
+      const out = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const safeName = String(summary.Name || "customer").replace(/[^\w.-]+/g, "_").slice(0, 40);
+      saveAs(new Blob([out], { type: "application/octet-stream" }), `Aging_${safeName}_${moment().format("YYYY-MM-DD")}.xlsx`);
     } catch (error) {
-      console.error("Error generating report");
+      ErrorMessage(error.message || "Could not build the ageing report");
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
     <div
       onClick={handleDownload}
-      className="flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out cursor-pointer"
+      className={`flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-gray-800 transition-all duration-200 ease-in-out ${busy ? "opacity-70 cursor-wait" : "cursor-pointer"}`}
     >
-      <FaDownload />
+      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FaDownload />}
       <span className="text-xs">+120 Days Aging Report</span>
     </div>
   );
