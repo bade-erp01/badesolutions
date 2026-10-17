@@ -39,7 +39,7 @@ import {
   MapPin,
 } from "lucide-react";
 
-import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import { SuccessToast, plsWait,ErrorMessage } from "../../../../Functions/Mics";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
 import Nav2 from "@/app/Components/Nav2";
@@ -262,19 +262,9 @@ export default function DashboardLayout({ userData, baseUrl }) {
       plsWait("Please wait while we switch your tenant...");
 
       try {
-        const response = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(userData.user._id)}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              access: `${Encrypt(userData.user._id)}`,
-              sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`,
-            },
-            body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
-          },
-        );
+        const response = await api.patch(`/api/switch-tenant/${userData.user._id}`, {
+          tenantId,
+        });
 
         if (!response.ok) {
           throw new Error("Failed to switch tenant.");
@@ -499,18 +489,11 @@ export function MainDash({ userData, baseUrl }) {
       if (!isVisible || !isOnline || status === "Inactive") return;
 
       try {
-        const res = await fetch(`${baseUrl}/api/Sales_Portal/Dashboard`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${userData.SessionId}`,
-          },
-        });
+        const res = await api.get("/api/Sales_Portal/Dashboard");
 
         if (!res.ok) throw new Error("Failed to fetch dashboard data");
 
-        const data = await res.json();
+        const data = res.data;
         setTenantData(data);
       } catch (err) {
         setError(
@@ -804,9 +787,9 @@ export function MainDash({ userData, baseUrl }) {
                             </TableCell>
                             <TableCell>
                               <Link
-                                href={`/${userData.business.companyName}/${Encrypt(
-                                  userData.user._id,
-                                )}/bill/bill/${Encrypt(invoice._id)}`}
+                                href={`/${userData.business.companyName}/${
+                                  userData.user._id
+                                }/bill/bill/${invoice._id}`}
                                 className="font-medium text-primary hover:underline"
                               >
                                 {invoice.billReferenceNo}/

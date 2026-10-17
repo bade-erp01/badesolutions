@@ -1,7 +1,7 @@
 import Notch from "@/app/Components/Notch";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import BackButton from "@/app/Components/BackBotton";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import DebitNoteModal from "@/app/Components/Accounting/DebitNoteModal";
 import DebitnoteTable from "@/app/Components/debiNoteTable";
@@ -62,17 +62,9 @@ export default async function AccountingPage({ children, params }) {
 
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Debit/Note`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    },
-  });
+  const res = await serverApi(`/api/Debit/Note`);
 
-  const data = await res.json();
+  const data = res.data || {};
 
   try {
     return (

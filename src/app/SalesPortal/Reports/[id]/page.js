@@ -4,10 +4,7 @@ import { useState, useEffect, Suspense, useRef } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import {
-  Encrypt,
-  EXPRESS_PRIVATE_URL,
-} from "../../../../../Functions/Functions";
+import api from "@/lib/api";
 import {
   ErrorMessage,
   SuccessToast,
@@ -113,23 +110,14 @@ export default function DraftInvoicePage({ Business, bill, user }) {
     setSaving(key, true);
 
     try {
-      const url = `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/Position/Cart/Update/${Encrypt(Singlebill._id)}`;
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({
+      const url = `/api/Sales_Portal/stock/Position/Cart/Update/${Singlebill._id}`;
+      const res = await api(url, { method: "PUT", body: {
           billId: itemId, // Inventory.$[elem]._id
           value,
           toUpdate,
-        }),
-      });
+        } });
 
-      const data = await res.json();
+      const data = res.data || {};
       if (res.ok) {
         SuccessToast(data.message || "Update successful");
       } else {
@@ -150,21 +138,12 @@ export default function DraftInvoicePage({ Business, bill, user }) {
     remarkTimer.current = setTimeout(async () => {
       setSaving("remark", true);
       try {
-        const url = `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/Position/Cart/Update/${Encrypt(Singlebill._id)}`;
-        const res = await fetch(url, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${user.SessionId}`,
-          },
-          body: JSON.stringify({
+        const url = `/api/Sales_Portal/stock/Position/Cart/Update/${Singlebill._id}`;
+        const res = await api(url, { method: "PUT", body: {
             value,
             toUpdate: "remark",
-          }),
-        });
-        const data = await res.json();
+          } });
+        const data = res.data || {};
         if (res.ok) SuccessToast(data.message || "Update successful");
         else ErrorMessage(data.error || "Failed to save remark");
       } catch {
@@ -222,21 +201,12 @@ export default function DraftInvoicePage({ Business, bill, user }) {
     if (!canEdit) return;
     setSaving("images", true);
     try {
-      const url = `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/Position/Cart/Update/${Encrypt(Singlebill._id)}`;
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${user.SessionId}`,
-        },
-        body: JSON.stringify({
+      const url = `/api/Sales_Portal/stock/Position/Cart/Update/${Singlebill._id}`;
+      const res = await api(url, { method: "PUT", body: {
           value: imageUrl,
           toUpdate: "removeImage",
-        }),
-      });
-      const data = await res.json();
+        } });
+      const data = res.data || {};
       if (res.ok) {
         setExistingImages((prev) => prev.filter((img) => img !== imageUrl));
         SuccessToast(data.message || "Update successful");
@@ -257,20 +227,9 @@ export default function DraftInvoicePage({ Business, bill, user }) {
       const formData = new FormData();
       newImages.forEach((img) => formData.append("images", img.file));
 
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/Position/Upload/${Encrypt(Singlebill._id)}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${user.SessionId}`,
-          },
-          body: formData,
-        },
-      );
+      const res = await api(`/api/Sales_Portal/stock/Position/Upload/${Singlebill._id}`, { method: "POST", body: formData });
 
-      const data = await res.json();
+      const data = res.data || {};
       if (res.ok) {
         SuccessToast(data.message || "Images uploaded");
         const uploaded = data.images || data.urls || [];
@@ -305,19 +264,10 @@ export default function DraftInvoicePage({ Business, bill, user }) {
 
     try {
       plsWait("Submitting...");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/Position/${Encrypt(Singlebill._id)}`;
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${user.SessionId}`,
-        },
-        body: JSON.stringify({ status }),
-      });
+      const url = `/api/Sales_Portal/stock/Position/${Singlebill._id}`;
+      const response = await api(url, { method: "PATCH", body: { status } });
 
-      const resultData = await response.json();
+      const resultData = response.data || {};
       if (response.ok) {
         SuccessToast(resultData.message);
         router.refresh();
@@ -626,9 +576,7 @@ export default function DraftInvoicePage({ Business, bill, user }) {
                     <TableRow key={item._id}>
                       <TableCell className="align-top py-3">
                         <a
-                          href={`/SalesPortal/Products/${Encrypt(
-                            item?.productId?._id,
-                          )}`}
+                          href={`/SalesPortal/Products/${item?.productId?._id}`}
                           className="text-primary hover:underline text-xs font-medium line-clamp-2"
                         >
                           {item?.productId?.Name}

@@ -1,8 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
-import axios from "axios";
-import Employee from "../../../../../../../models/Users";
+import { serverApi } from "@/lib/serverApi";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Badge } from "@/components/ui/badge"
 import BackButton from "@/app/Components/BackBotton";
@@ -20,27 +18,20 @@ export default async function StoreLayout2({ params }) {
   const decoy = await params;
   let data = {};
   let PriceList = [];
-  const staffRaw = await Employee.findByTenant(userData.business.tenantId)
-    .select("firstName lastName")
-    .lean();
-  const StringedStaff = JSON.stringify(staffRaw);
-  const ParsedStaff = JSON.parse(StringedStaff);
+  const staffRes = await serverApi("/api/Users");
+  const ParsedStaff = (staffRes.data?.data || []).map(({ _id, firstName, lastName }) => ({
+    _id,
+    firstName,
+    lastName,
+  }));
 
   try {
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    
-    const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-    access: `${Encrypt(userData.user._id)}`,
-    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-  };
-
   // Run both requests in parallel
   const [res, request] = await Promise.all([
-    axios.get(`${baseUrl}/api/crm/${decoy.id}`, { headers }),
-    axios.get(`${baseUrl}/api/priceLists`, { headers })
+    serverApi(`/api/crm/${decoy.id}`),
+    serverApi("/api/priceLists")
   ]);
+  if (!res.ok || !request.ok) throw new Error(res.error || request.error);
 
   // Extract data
    data = res.data;

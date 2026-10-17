@@ -6,7 +6,8 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import withReactContent from "sweetalert2-react-content";
-import { plsWait, ErrorMessage, Encrypt } from "../../../Functions/Mics";
+import { plsWait, ErrorMessage } from "../../../Functions/Mics";
+import api from "@/lib/api";
 import { motion } from "framer-motion";
 import {
   Chart as ChartJS,
@@ -20,7 +21,6 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { useUser } from "@/components/UserProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -52,7 +52,6 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
   const [invoices, setInvoices] = useState([]);
   const [range, setRange] = useState("6m"); // default to full 6-month window
   const [showModal, setShowModal] = useState(false);
-  const { user } = useUser();
   const openedRef = useRef(false);
 
   const fetchData = useCallback(async () => {
@@ -64,29 +63,15 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
       const endDate = moment().format("YYYY-MM-DD");
       const startDate = moment().subtract(6, "months").format("YYYY-MM-DD");
 
-      const res = await fetch(
-        `${baseUrl}/api/Invoice/report?startDate=${startDate}&endDate=${endDate}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-            access: `${Encrypt(user.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
-        }
+      const res = await api.get(
+        `/api/Invoice/report?startDate=${startDate}&endDate=${endDate}`
       );
 
       if (!res.ok) {
-        let message = "Failed to fetch sales data";
-        try {
-          const err = await res.json();
-          message = err.error || err.message || message;
-        } catch (_) {}
-        throw new Error(message);
+        throw new Error(res.error || "Failed to fetch sales data");
       }
 
-      const fetchedData = await res.json();
+      const fetchedData = res.data || {};
       setInvoices(fetchedData.invoices || []);
 
       Swal.close();
@@ -98,7 +83,7 @@ const SalesDashboard = ({ baseUrl, triggerButton = true }) => {
       setLoading(false);
       ErrorMessage(error.message || "Something went wrong");
     }
-  }, [baseUrl, user]);
+  }, []);
 
   useEffect(() => {
     if (!triggerButton) fetchData();

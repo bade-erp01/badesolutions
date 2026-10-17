@@ -1,7 +1,7 @@
 
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Storelayout from "./page"
-import {Encrypt,Dencrypt} from "../../../../../../Functions/Functions"
+import { serverApi } from "@/lib/serverApi";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -46,18 +46,9 @@ export const metadata = {
 export default async function layout({children}) {
      const userData = await fetchUser();
 
-      const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-       const res = await fetch(`${baseUrl}/api/Purchasees`, {
-         method: "GET",
-         headers: {
-           "Content-Type": "application/json",
-           "Authorization": `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access:`${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-         }
-       })
+       const res = await serverApi("/api/Purchasees")
      
-       const data = await res.json()
+       const data = res.data || {}
   
     //  get vendor list
     const VendorList = data.VendorList

@@ -1,5 +1,6 @@
 import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh";
-import {Encrypt,Dencrypt} from "../../../../../../../../../Functions/Functions"
+import {Dencrypt} from "../../../../../../../../../Functions/Functions"
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from 'next/navigation';
 import Page from "./page"
 
@@ -50,20 +51,12 @@ export default async function page({children, params }) {
   // fetch all credit payment from all bank account 
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
     const [creditNote] = await Promise.all([
-        fetch(`${baseUrl}/api/VendorDebit/${moduleList.VendorDebitid}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-    }),
+        serverApi(`/api/VendorDebit/${moduleList.VendorDebitid}`),
 
 
     ])
-    
-    const CN = await creditNote.json();
+
+    const CN = creditNote.data;
     const navHeader = Dencrypt(CN)
 
     if(!navHeader) return notFound()

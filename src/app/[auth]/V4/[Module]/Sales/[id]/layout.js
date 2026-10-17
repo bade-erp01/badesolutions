@@ -1,8 +1,7 @@
 import React, { Suspense } from "react";
 import SingleInvoice from "./page";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../Functions/Functions";
-import axios from "axios";
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import BackButton from "@/app/Components/BackBotton";
@@ -77,18 +76,10 @@ async function StoreLayoutContent({ params }) {
   }
 
   try {
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+    const res = await serverApi(`/api/Invoice/${Params.id}`);
+    if (!res.ok) throw new Error(res.error);
 
-    const res = await axios.get(`${baseUrl}/api/Invoice/${Params.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-        access: `${Encrypt(userInfo.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-      },
-    });
-
-    const data = await res.data;
+    const data = res.data;
 
     Inv = data.Inv || [];
     cust = data.cust || [];
@@ -136,7 +127,6 @@ async function StoreLayoutContent({ params }) {
           firstName={userInfo.user.firstName}
           userId={userInfo.user._id}
           businessToken={userInfo.business.tenantId}
-          sessionId={userInfo.SessionId}
         />
         <ShareInvToStore
           baseUrl={process.env.EXPRESS_PRIVATE_URL}

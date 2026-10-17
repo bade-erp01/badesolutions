@@ -23,8 +23,8 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import moment from "moment";
 
-import { plsWait, Encrypt } from "../../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
+import { plsWait } from "../../../../Functions/Mics";
+import api from "@/lib/api";
 
 const SalesDumpModal = ({ business, Employees, activeUser }) => {
   const [open, setOpen] = useState(false);
@@ -169,20 +169,11 @@ const SalesDumpModal = ({ business, Employees, activeUser }) => {
     // plsWait("Generating Sales Dump..."); // You can keep if needed
 
     try {
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Report/Generate?Startdate=${filters.startDate}&Enddate=${filters.endDate}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(activeUser._id)}`,
-            sessionKey: `Bearer ${Encrypt(activeUser.SessionId)}`,
-          },
-        }
+      const res = await api.get(
+        `/api/Report/Generate?Startdate=${filters.startDate}&Enddate=${filters.endDate}`
       );
 
-      const data = await res.json();
+      const data = res.data || {};
 
       if (!res.ok) {
         alert(data.message || "Failed to fetch sales data");

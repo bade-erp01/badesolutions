@@ -21,7 +21,8 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { plsWait, ErrorMessage, SuccessToast, Encrypt } from "../../../../Functions/Mics";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
+import api from "@/lib/api";
 
 export default function DebitNoteModal({ customersList, baseUrl, userData, Accounts }) {
   const [open, setOpen] = useState(false);
@@ -41,32 +42,23 @@ export default function DebitNoteModal({ customersList, baseUrl, userData, Accou
 
     plsWait("Working on things...please wait.");
 
-    const request = await fetch(`${baseUrl}/api/DebitNote/new`, {
-      method: "POST",
-      body: JSON.stringify({
-        Date: date,
-        Total: amount,
-        reference: remarks,
-        customerId,
-        bankID: bankID || null,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
+    const r = await api.post("/api/DebitNote/new", {
+      Date: date,
+      Total: amount,
+      reference: remarks,
+      customerId,
+      bankID: bankID || null,
     });
 
-    const response = await request.json();
-    if (request.ok) {
+    const response = r.data || {};
+    if (r.ok) {
       SuccessToast("Debit note has been created successfully. Awaiting Approval");
       Router.push(
-        `/${Path.auth}/V4/${Path.Module}/${Path.Module}/debit-note/debit-note/${Encrypt(response.data)}`
+        `/${Path.auth}/V4/${Path.Module}/${Path.Module}/debit-note/debit-note/${response.data}`
       );
       setOpen(false);
     } else {
-      ErrorMessage(response.error);
+      ErrorMessage(response.error || r.error);
     }
   };
 

@@ -20,7 +20,8 @@ import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Encrypt, Dencrypt } from "../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import Notch from "@/app/Components/Notch";
 
@@ -67,7 +68,6 @@ export const metadata = {
 export default async function AssetLayout({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   const AssetFinder = userData.user.Apps.find((app) => {
     return app.Name === "Asset Register";
@@ -77,18 +77,9 @@ export default async function AssetLayout({ children, params }) {
     return notFound();
   }
 
-  const Assets = await fetch(`${baseUrl}/api/Assets`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-    next: { revalidate: 60 },
-  });
+  const Assets = await serverApi("/api/Assets", { next: { revalidate: 60 } });
 
-  const assetList = await Assets.json();
+  const assetList = Assets.data || {};
   const assets = Dencrypt(assetList.Asset) || [];
 
   // KPI Calculations
@@ -204,7 +195,7 @@ export default async function AssetLayout({ children, params }) {
                   assets.map((asset) => (
                     <TableRow key={asset._id}>
                       <TableCell className="font-medium">
-                        <Link href={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${Encrypt(asset._id)}`} className="text-indigo-500">
+                        <Link href={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${asset._id}`} className="text-indigo-500">
                          {asset.Name || "Unnamed Asset"}
                         </Link>
                       </TableCell>

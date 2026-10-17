@@ -9,7 +9,7 @@ import Image from "next/image"
 import moment from "moment"
 import Swal from "sweetalert2"
 import { plsWait, ErrorMessage, SuccessToast } from "../../../../../../../Functions/Mics"
-import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../../../../../Functions/Functions"
+import api from "@/lib/api"
 
 export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
   const router = useRouter()
@@ -29,22 +29,17 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
       plsWait("Processing...")
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/payment/revoke/${Encrypt(id)}?action=${action}`,
+      const res = await api.patch(
+        `/api/payment/revoke/${id}?action=${action}`,
+        { date: moment().format("L") },
         {
-          method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
             "idempotency-key": `payment-${action}-${id}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
           },
-          body: JSON.stringify({ date: moment().format("L") }),
         }
       )
 
-      const data = await res.json()
+      const data = res.data || {}
       if (data.message) {
         SuccessToast(data.message)
         router.refresh()

@@ -1,67 +1,21 @@
-import { cookies } from "next/headers";
-import { Dencrypt,Encrypt } from "./Functions";
-import User from "../models/Users";
-import Business from "../models/Business";
-import dbConnect from "../lib/mongoose";
-import { NextResponse } from "next/server";
+import { serverApi } from "../src/lib/serverApi";
 
+// The logged-in user and business, from the backend's session (the httpOnly bade_sid
+// cookie is forwarded). It used to trust browser cookies and read MongoDB directly,
+// which anyone could forge.
+//
+// No try/catch here: serverApi never throws for network or HTTP errors, and the only
+// thing it can throw is Next's "this page reads cookies, render it per request" signal,
+// which must reach Next (swallowing it made /Login look static and broke the build).
+// Not a server action ("use server"): it is only called from server components.
 const fetchUser = async () => {
-  "use server";
-  try {
-    // Retrieve cookies
-    const cookieStore = await cookies();
-    const userToken = cookieStore.get("userInfo")?.value;
-    const businessToken = cookieStore.get("businessInfo")?.value;
-    const StoredSession = cookieStore.get("SessionId")?.value;
-    const RustyRoof = cookieStore.get("rustyRoof")?.value;
-
-    if (!userToken || !businessToken || Dencrypt(RustyRoof) === null ) {
-      //redirect to login page
-      return { error: "Session expired, please log in again." };
-    }
- 
-    // Decode JWT Tokens
-    let decodedUser, decodedBusiness, decodedSessionId;
-    try {
-      decodedUser = Dencrypt(userToken);
-      decodedBusiness = Dencrypt(businessToken);
-      decodedSessionId = Dencrypt(StoredSession);
-    } catch (error) {
-      return { error: "Invalid session tokens, please log in again." };
-    }
-    
-    await dbConnect("BadeAdmin");
-    // await dbConnect(Dencrypt(RustyRoof));
-    
-    // Fetch user & business details
-    const rawUserInfo = await User.findById(decodedUser)
-    .select("-password -__v -createdAt -updatedAt -opsCode")
-    .populate({
-        path: "toogledTenants.tenantIds",
-        select: "companyName tenantId isActive",
-      }).lean();
-
-    if (!rawUserInfo) {
-      return { error: "User information not found." };
-    }
-
-    const rawBusinessInfo = await Business.findOne({ tenantId: rawUserInfo.tenantId })
-      .select("-payStackApiKey -priceList")
-      .lean();
-    if (!rawUserInfo || !rawBusinessInfo) {
-      return { error: "User or Business information not found." };
-    }
-
-    // Convert data to plain objects
-    return {
-      user: JSON.parse(JSON.stringify(rawUserInfo)),
-      business: JSON.parse(JSON.stringify(rawBusinessInfo)),
-      SessionId: decodedSessionId
-    };
-    
-  } catch (err) {
-    return { error: "An unexpected error occurred, please try again later." };
+  const r = await serverApi("/api/v1/Session?full=1");
+  if (r.status === 0) return { error: "Can't reach the server, please try again." };
+  if (r.status === 401) return { error: "Session expired, please log in again." };
+  if (!r.ok || !r.data?.user || !r.data?.business) {
+    return { error: "User or Business information not found." };
   }
+  return { user: r.data.user, business: r.data.business };
 };
 
 export { fetchUser };

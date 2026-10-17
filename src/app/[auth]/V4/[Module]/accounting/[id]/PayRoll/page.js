@@ -19,11 +19,10 @@ import {
 
 import { useUser } from "@/components/UserProvider";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL } from "../../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -107,28 +106,17 @@ export default function PayrollDashboard() {
   const me = user?.user?.user || {};
   const canCreate = Boolean(me.isHRM || me.isAdmin);
 
-  const headers = useCallback(
-    (extra = {}) => ({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-      access: `${Encrypt(user.user.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-      ...extra,
-    }),
-    [user]
-  );
-
   const load = useCallback(async () => {
     try {
       setError("");
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/PayRoll`, { headers: headers(), cache: "no-store" });
-      const body = await res.json().catch(() => ({}));
+      const res = await api.get(`/api/PayRoll`);
+      const body = res.data || {};
       if (!res.ok) throw new Error(body.error || "Failed to load payrolls");
       setData(body);
     } catch (err) {
       setError(err.message);
     }
-  }, [headers]);
+  }, []);
 
   useEffect(() => {
     if (user?.user) load();
@@ -151,18 +139,16 @@ export default function PayrollDashboard() {
     if (!form.title.trim() || !form.date) return;
     setCreating(true);
     try {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/PayRoll`, {
-        method: "POST",
-        headers: headers({ "idempotency-key": `payroll-create-${crypto.randomUUID()}` }),
-        body: JSON.stringify({
-          data: Encrypt({
+      const res = await api.post(`/api/PayRoll`, {
+          data: {
             title: form.title.trim(),
             date: format(form.date, "yyyy-MM-dd"),
             description: form.description.trim(),
-          }),
-        }),
+          },
+        }, {
+        headers: { "idempotency-key": `payroll-create-${crypto.randomUUID()}` },
       });
-      const body = await res.json().catch(() => ({}));
+      const body = res.data || {};
       if (!res.ok) throw new Error(body.error || "Failed to create payroll");
       SuccessToast("Payroll created with a payslip for every active employee");
       setCreateOpen(false);
@@ -285,9 +271,9 @@ export default function PayrollDashboard() {
                     </TableRow>
                   )}
                   {rows.map((p) => (
-                    <TableRow key={p._id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(detailHref(Encrypt(p._id)))}>
+                    <TableRow key={p._id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(detailHref(p._id))}>
                       <TableCell className="font-medium">
-                        <Link href={detailHref(Encrypt(p._id))} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                        <Link href={detailHref(p._id)} className="hover:underline" onClick={(e) => e.stopPropagation()}>
                           {String(p.title || "").toUpperCase()}
                         </Link>
                         {p.description && <div className="max-w-xs truncate text-xs text-muted-foreground">{p.description}</div>}

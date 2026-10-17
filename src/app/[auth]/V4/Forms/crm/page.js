@@ -1,9 +1,9 @@
 "use client";
-import axios from "axios";
+import api from "@/lib/api";
 import { useState } from "react";
 import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
-import { plsWait, ErrorMessage, SuccessToast, Encrypt } from "../../../../../../Functions/Mics";
-import { Dencrypt, EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../../../../Functions/Mics";
+import { Dencrypt } from "../../../../../../Functions/Functions";
 import { useRouter, useParams } from 'next/navigation';
 
 // Shadcn UI Components
@@ -94,20 +94,10 @@ export default function NewCustomerForm({
     try {
       plsWait('Submitting customer data...');
       
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-        },
-      };
-
-      const response = await axios.post(
-        `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
-        formData,
-        config
-      );
+      const response = await api.post("/api/Sales/Register-customer", formData);
+      if (!response.ok) {
+        throw new Error(response.data?.message || response.error);
+      }
 
       SuccessToast(response.data?.message || "Customer created successfully!");
       setFormData({});
@@ -116,7 +106,7 @@ export default function NewCustomerForm({
       router.push(`/${params.auth}/V4/crm/crm/${response.data.newCustomer}`);
      
     } catch (error) {
-      const errorMsg = error.response?.data?.message || error.message || "Failed to create customer.";
+      const errorMsg = error.message || "Failed to create customer.";
       ErrorMessage(errorMsg);
       setServerError(errorMsg);
     } finally {

@@ -6,7 +6,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import {useRouter} from "next/navigation";
 import {BanknotesIcon} from "@heroicons/react/24/outline";
 import moment from "moment";
-import {Encrypt} from "../../../Functions/Functions"
+import api from "@/lib/api";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
 const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
@@ -102,15 +102,11 @@ const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
     });
 
     try {
-      const response = await fetch(
-        `${baseUrl}/api/Payment/${customerId}`,
+      // session cookie + CSRF (src/lib/api.js); idempotency etc. from config are kept
+      const { Authorization, authorization, access, sessionKey, sessionkey, ...extraHeaders } = config?.headers || {};
+      const r = await api.post(
+        `/api/Payment/${customerId}`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(config?.headers || {}),
-          },
-          body: JSON.stringify({
             customer: customerId,
             Amount: formValues.amount,
             Date: formValues.date,
@@ -118,14 +114,15 @@ const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
             type: formValues.type,
             Accountant: user,
             BillNo: formValues.Invoice,
-          }),
-        }
+          },
+        { headers: extraHeaders },
       );
 
-      const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Payment failed");
+
+      const data = r.data || {};
+      if (!r.ok) {
+        throw new Error(data.error || r.error || "Payment failed");
       }
 
       Swal.fire({
@@ -142,7 +139,7 @@ const InvoicePaymentForm = ({ customerId, user, config, invoices,baseUrl }) => {
       });
 
       // Redirect after success
-      Router.push(`/auth/${Encrypt(user._id)}/payment/payment/${Encrypt(data.data)}?Module=payment`);
+      Router.push(`/auth/${user._id}/payment/payment/${data.data}?Module=payment`);
 
     } catch (err) {
       Swal.fire({

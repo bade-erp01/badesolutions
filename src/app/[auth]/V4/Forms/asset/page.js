@@ -5,8 +5,8 @@ import {
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../Functions/Mics";
-import axios from "axios";
-import { Encrypt, Dencrypt } from "../../../../../../Functions/Functions";
+import api from "@/lib/api";
+import { Dencrypt } from "../../../../../../Functions/Functions";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -25,12 +25,6 @@ export default function Page({ userInfo, baseUrl, StoresList }) {
   const [formData, setFormData] = useState({});
   const router = useRouter();
   const Params = useParams();
-  const [headers] = useState({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    access: `${Encrypt(userInfo.user._id)}`,
-    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-  });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,11 +38,9 @@ export default function Page({ userInfo, baseUrl, StoresList }) {
     try {
       e.preventDefault();
       plsWait("Onboarding new Asset please wait...");
-      const { data } = await axios.post(
-        `${baseUrl}/api/createAsset`,
-        formData,
-        { headers },
-      );
+      const r = await api.post("/api/createAsset", formData);
+      if (!r.ok) throw new Error(r.error);
+      const { data } = r;
 
       if (data && data.data) {
         SuccessToast("Asset List updated...");

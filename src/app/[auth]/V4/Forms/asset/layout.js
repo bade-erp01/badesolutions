@@ -1,7 +1,8 @@
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import { notFound } from "next/navigation";
 import Page from "./page";
-import { Encrypt,Dencrypt } from "../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -55,21 +56,14 @@ export default async function ExpenseLayout({ children, params }) {
   }
 
    const [Stores] = await Promise.all([
-      fetch(`${baseUrl}/api/Stores`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-          access: `${Encrypt(userData.user._id)}`,
-        },
+      serverApi("/api/Stores", {
         next: {
           revalidate: 120,
         },
       }),
     ]);
   
-    const StoresList = await Stores.json();
+    const StoresList = Stores.data;
 
   try {
     return (

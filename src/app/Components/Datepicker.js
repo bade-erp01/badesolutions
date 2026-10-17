@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics"
-import { Encrypt } from "../../../Functions/Functions"
+import api from "@/lib/api"
 import { useRouter } from "next/navigation"
 
 export default function DaySelector({ useCase, userData, baseUrl, id }) {
@@ -12,7 +12,7 @@ export default function DaySelector({ useCase, userData, baseUrl, id }) {
   const router = useRouter()
 
   useEffect(() => {
-    if (useCase === "RouteDays") setUrl(`customer/${Encrypt(id)}/routeDay`)
+    if (useCase === "RouteDays") setUrl(`customer/${id}/routeDay`)
   }, [useCase, id])
 
   const handleChange = async (selectedDay) => {
@@ -20,17 +20,8 @@ export default function DaySelector({ useCase, userData, baseUrl, id }) {
 
     try {
       plsWait("Adding set date")
-      const request = await fetch(`${baseUrl}/api/${url}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-        },
-        body: JSON.stringify({ day: selectedDay }),
-      })
-      const result = await request.json()
+      const request = await api.put(`/api/${url}`, { day: selectedDay })
+      const result = request.data || { error: request.error }
       if(result.message){
         SuccessToast(result.message)
         router.refresh()

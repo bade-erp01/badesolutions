@@ -1,9 +1,9 @@
 import Swal from "sweetalert2";
 import "animate.css";
-import jwt from 'jsonwebtoken'
 import {EXPRESS_PRIVATE_URL} from './Functions'
 import { escapeHtml } from "../src/lib/security/escapeHtml";
 import { safeUrl } from "../src/lib/security/safeUrl";
+import api from "../src/lib/api";
 
 export function SuccessToast(message) {
     Swal.fire({
@@ -121,18 +121,10 @@ export async function AppDescription (params,Module) {
   }
 }
 
-// Encrypt data from frontend
+// Pass-through: ids go to the backend as they are (see Encrypt in Functions.js).
 export function Encrypt(arg) {
-  // if (!process.env.TenantToken) {
-  //   throw new Error("TenantToken is not defined in environment variables");
-  // }
-  return jwt.sign(
-    { id: arg },
-    "THESTARTUPWAY",
-    { expiresIn: "3d" } 
-  );
+  return arg;
 }
-
 
 export const SendTimeOutLink = async (id,Business,user,url) => {
   const { isConfirmed } = await Swal.fire({
@@ -156,20 +148,12 @@ export const SendTimeOutLink = async (id,Business,user,url) => {
   plsWait("Please wait...")
 
   try {
-    const response = await fetch(`${url}/api/timeOff_invitation/${Encrypt(id)}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(Business)}`,
-        access: `${Encrypt(user)}`
-      },
-    });
-
-    const data = await response.json();
+    const r = await api.get(`${url}/api/timeOff_invitation/${id}`);
+    const data = r.data || {};
     if (data.message) {
       SuccessToast(data.message);
     } else {
-      throw new Error(data.error || "Failed to send mail");
+      throw new Error(data.error || r.error || "Failed to send mail");
     }
   } catch (error) {
     ErrorMessage(error.message);

@@ -6,8 +6,8 @@ import { Loader2 } from "lucide-react";
 import {
   ErrorMessage,
   SuccessToast,
-  Encrypt,
 } from "../../../../../../../../Functions/Mics";
+import api from "@/lib/api";
 
 import {
   Card,
@@ -86,28 +86,19 @@ export default function Page({
       setLoadingId(selectedAction.id);
       setLoading(true);
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Equity/journal/${Encrypt(
-          selectedAction.id
-        )}`,
+      const response = await api.patch(
+        `/api/Equity/journal/${selectedAction.id}`,
         {
-          method: "PATCH",
+          status: selectedAction.action,
+        },
+        {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(
-              userData.business.tenantId
-            )}`,
-            access: `${Encrypt(userData.user._id)}`,
             "idempotency-key": `Equity-${selectedAction.action}-${selectedAction.id}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
           },
-          body: JSON.stringify({
-            status: selectedAction.action,
-          }),
         }
       );
 
-      const result = await response.json();
+      const result = response.data || {};
 
       if (!response.ok) {
         throw new Error(result.error || "Failed to update");

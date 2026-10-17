@@ -1,6 +1,6 @@
 
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import DraftPurchasePage from "./page";
 import { notFound } from "next/navigation";
 import BackButton from "@/app/Components/BackBotton";
@@ -61,24 +61,14 @@ export default async function storelayout({ params, children }) {
   }
 
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
-  const res = await fetch(`${baseUrl}/api/Purchase/${query}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-    // next: { revalidate: 60 }, // cache for 1 minute
-  });
+  const res = await serverApi(`/api/Purchase/${query}`);
 
   if (!res.ok) {
     return notFound();
   }
 
-  const data = await res.json();
+  const data = res.data || {};
 
   return (
     <div className="flex flex-col">

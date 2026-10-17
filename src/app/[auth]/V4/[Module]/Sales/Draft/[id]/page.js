@@ -14,12 +14,11 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import BackButton from "@/app/Components/BackBotton";
 import {
-  Encrypt,
   Dencrypt,
   totalInWords,
-  EXPRESS_PRIVATE_URL,
   pricelistSetter,
 } from "../../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import {
   ErrorMessage,
   SuccessToast,
@@ -787,28 +786,17 @@ const generatePdf = async (business, customer, billData) => {
 
       if (!cleanedProducts) throw new Error("Product not found");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(
-        bill._id,
-      )}?productId=${productId}&priceList=${Singlebill.priceList}`;
+      const url = `/api/Draft/add/order/${bill._id}?productId=${productId}&priceList=${Singlebill.priceList}`;
 
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({ product: cleanedProducts.storeId }),
-      });
+      const res = await api.put(url, { product: cleanedProducts.storeId });
 
-      const data = await res.json();
+      const data = res.data || {};
       if (data.message) {
         SuccessToast(data.message);
         setInputValue("");
         setSinglebill(data.updatedBill);
       } else {
-        throw new Error(data.error || "Unknown error occurred.");
+        throw new Error(data.error || res.error || "Unknown error occurred.");
       }
     } catch (error) {
       ErrorMessage(error.message);
@@ -832,26 +820,19 @@ const generatePdf = async (business, customer, billData) => {
       if (!result.isConfirmed) return;
 
       plsWait("Deleting draft. Please wait.");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/order/Delete/${Encrypt(
-        bill._id,
-      )}`;
-      const response = await fetch(url, {
-        method: "DELETE",
+      const url = `/api/Draft/order/Delete/${bill._id}`;
+      const response = await api.del(url, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
           "idempotency-key": `delete-${bill._id}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
         },
       });
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         router.back();
       } else {
-        ErrorMessage(data.error || "Failed to delete draft invoice.");
+        ErrorMessage(data.error || response.error || "Failed to delete draft invoice.");
         Swal.close();
         router.refresh();
       }
@@ -874,28 +855,17 @@ const generatePdf = async (business, customer, billData) => {
     try {
       plsWait("Updating cart...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Invoice/Cart/Update?user=${Encrypt(
-        userId,
-      )}`;
+      const url = `/api/Invoice/Cart/Update?user=${userId}`;
 
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
-      });
+      const response = await api.put(url, { lineId, value, toUpdate, billId, storeId });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         setSinglebill(Dencrypt(data.Updatedinvoice));
       } else {
-        throw new Error(data.error || "An unknown error occurred.");
+        throw new Error(data.error || response.error || "An unknown error occurred.");
       }
     } catch (err) {
       ErrorMessage(err.message);
@@ -931,34 +901,28 @@ const generatePdf = async (business, customer, billData) => {
         "Please wait while I process your request. Do not reload this page...",
       );
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/wareHouse/Bill?user=${Encrypt(
-          user._id,
-        )}&ops=${Encrypt(userInput)}`,
+      const response = await api.patch(
+        `/api/wareHouse/Bill`,
         {
-          method: "PATCH",
+          billId: bill._id,
+          customer: Singlebill.customer._id,
+          restriction: userInfo.business?.InvoiceRestriction,
+          ops: userInput, // ops code in the body, never the URL
+        },
+        {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
             "idempotency-key": `invoice-${bill._id}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
           },
-          body: JSON.stringify({
-            billId: bill._id,
-            customer: Singlebill.customer._id,
-            restriction: userInfo.business?.InvoiceRestriction,
-          }),
         },
       );
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (response.ok) {
         SuccessToast(data.message || "Operation completed successfully!");
-        router.push(`/${params.auth}/V4/Sales/Sales/${Encrypt(bill._id)}`);
+        router.push(`/${params.auth}/V4/Sales/Sales/${bill._id}`);
       } else {
-        throw new Error(data.error || "An error occurred.");
+        throw new Error(data.error || response.error || "An error occurred.");
       }
     } catch (error) {
       ErrorMessage(error.message);
@@ -973,28 +937,17 @@ const generatePdf = async (business, customer, billData) => {
     try {
       plsWait("Removing item from order...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/delete/order?user=${Encrypt(
-        user._id,
-      )}`;
+      const url = `/api/Draft/delete/order?user=${user._id}`;
 
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({ lineId, billId: bill._id }),
-      });
+      const response = await api.del(url, { body: { lineId, billId: bill._id } });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         setSinglebill(data.updatedBill);
       } else {
-        ErrorMessage(data.error || "Something went wrong.");
+        ErrorMessage(data.error || response.error || "Something went wrong.");
         router.refresh();
       }
     } catch {
@@ -1007,28 +960,17 @@ const generatePdf = async (business, customer, billData) => {
     try {
       plsWait("Updating Discount");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/discount/update?user=${Encrypt(
-        user._id,
-      )}`;
+      const url = `/api/Draft/discount/update?user=${user._id}`;
 
-      const response = await fetch(url, {
-        body: JSON.stringify({ billId, value }),
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.patch(url, { billId, value });
 
-      const result = await response.json();
+      const result = response.data || {};
 
       if (result.message) {
         SuccessToast(result.message);
         setSinglebill(Dencrypt(result.Updatedinvoice));
       } else {
-        throw new Error(result.error || "Something went wrong.");
+        throw new Error(result.error || response.error || "Something went wrong.");
       }
     } catch (error) {
       ErrorMessage(
@@ -1243,9 +1185,7 @@ const generatePdf = async (business, customer, billData) => {
                   <td className="px-4 py-2 text-center text-xs">{index + 1}</td>
                   <td className="px-4 py-2 text-center">
                     <Link
-                      href={`/${params.auth}/V4/product/product/${Encrypt(
-                        billItem.item._id,
-                      )}`}
+                      href={`/${params.auth}/V4/product/product/${billItem.item._id}`}
                       className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-medium"
                     >
                       {billItem.item.Name}
@@ -1406,9 +1346,7 @@ const generatePdf = async (business, customer, billData) => {
                 />
                 <div className="flex-1 min-w-0">
                   <Link
-                    href={`/${params.auth}/V4/product/product/${Encrypt(
-                      billItem.item._id,
-                    )}`}
+                    href={`/${params.auth}/V4/product/product/${billItem.item._id}`}
                     className="font-medium text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
                     {billItem.item.Name}

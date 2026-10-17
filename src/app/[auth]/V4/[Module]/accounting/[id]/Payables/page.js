@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
+import api from "@/lib/api";
 import moment from "moment";
-import { Dencrypt, Encrypt } from "../../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../../Functions/Functions";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,17 +30,10 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
     const fetchBills = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(
-          `${baseUrl}/api/Payables?page=${currentPage}&limit=100`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-              access: `Bearer ${Encrypt(userData.user._id)}`,
-            },
-          }
+        const response = await api.get(
+          `/api/Payables?page=${currentPage}&limit=100`
         );
+        if (!response.ok) throw new Error(response.error);
 
         const data = response.data;
         setBillList(Dencrypt(data.data) || []);
@@ -149,7 +142,7 @@ export default function AccountPayablesPage({ baseUrl, userData, VendorList, Ban
                       <TableRow key={bill._id} className="hover:bg-muted/50">
                         <TableCell>
                           <Link
-                            href={`/${params.auth}/${params.Tenant}/${params.module}/${params.module}/vendorsPayment/vendorsPayment/${Encrypt(bill._id)}`}
+                            href={`/${params.auth}/${params.Tenant}/${params.module}/${params.module}/vendorsPayment/vendorsPayment/${bill._id}`}
                             className="font-medium text-primary hover:underline"
                           >
                             {bill.billReferenceNo}

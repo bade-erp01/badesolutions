@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Encrypt } from "../../../Functions/Mics";
-import axios from "axios";
+import api from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -52,16 +51,10 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
           itemsPerPage,
         }).toString();
 
-        const response = await axios.get(`${baseUrl}/api/ExpenseList?${query}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-          },
-        });
+        const response = await api.get(`/api/ExpenseList?${query}`);
+        if (!response.ok) throw new Error(response.error);
 
-        const data = response.data;
+        const data = response.data || {};
 
         setBillList(data.expenses || []);
         setTotalPages(data.pagination?.totalPages || 1);
@@ -115,7 +108,7 @@ export default function InvoiceLandingPage({ baseUrl, userData }) {
                       <TableRow key={expense._id}>
                         <TableCell>
                           <Link
-                            href={`/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(expense._id)}`}
+                            href={`/${params.auth}/V4/${params.Module}/${params.Module}/${expense._id}`}
                             className="text-blue-500 hover:underline" >
                             {expense.refNo}
                           </Link>

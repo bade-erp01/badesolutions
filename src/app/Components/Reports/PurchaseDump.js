@@ -5,7 +5,8 @@ import Swal from "sweetalert2";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { ShoppingBag, Loader2 } from "lucide-react";
-import { plsWait, Encrypt, ErrorMessage } from "../../../../Functions/Mics";
+import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
+import api from "@/lib/api";
 
 import {
   Dialog,
@@ -23,7 +24,6 @@ import { escapeHtml } from "@/lib/security/escapeHtml";
 const PurchaseDumpModal = ({
   business,
   Products,
-  EXPRESS_PRIVATE_URL,
   storesData,
   vendorsData,
   userData,
@@ -174,20 +174,11 @@ const PurchaseDumpModal = ({
     plsWait("Generating export data...");
 
     try {
-      const request = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Purchasees/report?Startdate=${filters.startDate}&Enddate=${filters.endDate}&supplier=${filters.supplier}&store=${filters.store}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: Encrypt(userData.user._id),
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-          },
-        }
+      const request = await api.get(
+        `/api/Purchasees/report?Startdate=${filters.startDate}&Enddate=${filters.endDate}&supplier=${filters.supplier}&store=${filters.store}`
       );
 
-      const data = await request.json();
+      const data = request.data || {};
 
       if (!request.ok) {
         Swal.fire(

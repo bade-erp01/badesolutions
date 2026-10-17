@@ -8,8 +8,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import api from "@/lib/api";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
   plsWait,
@@ -55,7 +55,6 @@ export default function TransferPage({
   bill,
   products,
   Whouse,
-  EXPRESS_PRIVATE_URL,
 }) {
   const [Singlebill, setsingleBill] = useState(bill);
   const [cust] = useState(customer);
@@ -90,29 +89,16 @@ export default function TransferPage({
     }
 
     try {
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/TransferLineAdd/${Encrypt(
-          Singlebill._id
-        )}?product=${Encrypt(cleanedProducts._id)}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
-        }
-      );
+      const res = await api.put(`/api/TransferLineAdd/${Singlebill._id}?product=${cleanedProducts._id}`);
 
-      const data = await res.json();
+      const data = res.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         router.refresh();
         window.location.reload();
       } else {
-        throw new Error(data.error);
+        throw new Error(data.error || res.error);
       }
     } catch (error) {
       ErrorMessage(error.message);
@@ -123,28 +109,18 @@ export default function TransferPage({
     try {
       plsWait("Removing product from cart");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransfer/${Encrypt(
-        bill._id
-      )}?items=${encodeURIComponent(Encrypt(id))}`;
+      const url = `/api/RemoveLineTransfer/${bill._id}?items=${encodeURIComponent(id)}`;
 
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.del(url);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         router.refresh();
         window.location.reload();
       } else {
-        throw new Error(data.error || "Unknown error occurred");
+        throw new Error(data.error || response.error || "Unknown error occurred");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -167,26 +143,18 @@ export default function TransferPage({
 
       plsWait("Deleting Transfer...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/DraftTranfer/${encodeURIComponent(
-        Encrypt(id)
+      const url = `/api/DraftTranfer/${encodeURIComponent(
+        id
       )}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.del(url);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         setTimeout(() => router.back(), 2000);
       } else {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data.error || response.error || "Something went wrong");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -197,29 +165,21 @@ export default function TransferPage({
     try {
       plsWait("updating...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Virtual/Product/TransferForm/${encodeURIComponent(
-        Encrypt(Singlebill._id)
+      const url = `/api/Virtual/Product/TransferForm/${encodeURIComponent(
+        Singlebill._id
       )}?${field}=${newQty}&lineId=${encodeURIComponent(
         lineId
       )}&update=${field}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.patch(url);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         location.reload();
       } else {
-        throw new Error(data.error || "Update failed");
+        throw new Error(data.error || response.error || "Update failed");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -245,29 +205,18 @@ export default function TransferPage({
 
       plsWait("Updating transfer...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Transfer/${Encrypt(
-        Singlebill._id
-      )}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
+      const url = `/api/Transfer/${Singlebill._id}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.patch(url, { status });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         window.location.reload();
         router.refresh();
       } else {
-        throw new Error(data.error || "Update failed");
+        throw new Error(data.error || response.error || "Update failed");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -669,9 +618,7 @@ export default function TransferPage({
                   <TableRow key={line._id}>
                     <TableCell className="font-medium text-primary max-w-[180px]">
                       <Link
-                        href={`/${Business.companyName}/${Encrypt(
-                          user._id
-                        )}/product/product/${Encrypt(line.item._id)}`}
+                        href={`/${Business.companyName}/${user._id}/product/product/${line.item._id}`}
                         className="hover:underline line-clamp-2"
                       >
                         {line.item?.Name}
@@ -708,7 +655,7 @@ export default function TransferPage({
                             if (e.target.value !== "") {
                               handleQtyChange(
                                 isNaN(val) || val < 0 ? 0 : val,
-                                Encrypt(line._id),
+                                line._id,
                                 "Qty"
                               );
                             }
@@ -772,9 +719,7 @@ export default function TransferPage({
                     />
                     <div className="min-w-0 flex-1">
                       <Link
-                        href={`/${Business.companyName}/${Encrypt(
-                          user._id
-                        )}/product/product/${Encrypt(line.item._id)}`}
+                        href={`/${Business.companyName}/${user._id}/product/product/${line.item._id}`}
                         className="font-medium text-primary hover:underline text-sm line-clamp-2"
                       >
                         {line.item?.Name}
@@ -827,7 +772,7 @@ export default function TransferPage({
                             if (e.target.value !== "") {
                               handleQtyChange(
                                 isNaN(val) || val < 0 ? 0 : val,
-                                Encrypt(line._id),
+                                line._id,
                                 "Qty"
                               );
                             }

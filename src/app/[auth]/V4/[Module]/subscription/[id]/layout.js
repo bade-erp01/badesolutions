@@ -3,7 +3,8 @@ import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
 import Page from "./page";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import {notFound} from "next/navigation";
 
 export const metadata = {
@@ -55,21 +56,13 @@ export default async function StoreLayout2({ children, params }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const query = await params;
 
-  const res = await fetch(`${baseUrl}/api/Subscription/${query.id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    }
-  });
+  const res = await serverApi(`/api/Subscription/${query.id}`);
 
   if (!res.ok) {
     return notFound();
   }
 
-  const data = await res.json(); 
+  const data = res.data || {};
 
   return (
     <div className="flex flex-col">

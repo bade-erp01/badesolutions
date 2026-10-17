@@ -1,6 +1,7 @@
 import TransferPage from "./page"
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import BackButton from "@/app/Components/BackBotton"
 import Notch from "@/app/Components/Notch";
 
@@ -55,18 +56,8 @@ export default async function Productlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
 
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
     const [res] = await Promise.all([
-      fetch(`${baseUrl}/api/Transfer/${moduleList.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-      },
-    }),
-
+      serverApi(`/api/Transfer/${moduleList.id}`),
     ])
   
     if (!res.ok) {
@@ -75,7 +66,7 @@ export default async function Productlayout({ children, params }) {
       ); 
     }
   
-    const data = await res.json();
+    const data = res.data || {};
     const Transfer = Dencrypt(data.Transfer);
     const productsList = Dencrypt(data.products);
 
@@ -104,7 +95,7 @@ export default async function Productlayout({ children, params }) {
    
         {/* Main Content (Right Side) */}
         <main className="flex-1">
-           <TransferPage bill={Transfer} products={productsList} Business={userData.business} user={userData.user} EXPRESS_PRIVATE_URL={baseUrl}/>;
+           <TransferPage bill={Transfer} products={productsList} Business={userData.business} user={userData.user}/>;
         </main>
        </div>
     );

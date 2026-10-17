@@ -23,14 +23,13 @@ import {
 } from "lucide-react";
 import { useUser } from "@/components/UserProvider";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../Functions/Mics";
 import {
-  EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../../Functions/Functions";
+import api from "@/lib/api";
 
 import {
   Dialog,
@@ -93,22 +92,13 @@ async function fetchSubscriptions(user) {
     throw new Error("User not available");
   }
 
-  const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Contracts`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-      access: `${Encrypt(user.user.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-    },
-    next: { revalidate: 60 },
-  });
+  const res = await api.get("/api/Contracts");
 
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
 
-  const data = await res.json();
+  const data = res.data;
 
   return Dencrypt(data.data);
 }
@@ -126,24 +116,15 @@ export default function SubscriptionDashboard() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Contracts`, {
-        method: "POST",
-        body: JSON.stringify({
-          data: Encrypt(newSubscription),
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-          access: `${Encrypt(user.user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-        },
+      const res = await api.post("/api/Contracts", {
+        data: newSubscription,
       });
 
       if (!res.ok) {
         throw new Error("Failed to create contract");
       }
 
-      const reqData = await res.json();
+      const reqData = res.data;
 
       SuccessToast("Contract created successfully!");
 
@@ -335,9 +316,7 @@ function SubscriptionTableContent({ user }) {
               <TableRow key={item._id} className="hover:bg-muted/50">
                 <TableCell className="font-medium">
                   <Link
-                    href={`/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(
-                      item._id,
-                    )}`}
+                    href={`/${params.auth}/V4/${params.Module}/${params.Module}/${item._id}`}
                     className="hover:underline"
                   >
                     {item.contractNumber?.toUpperCase() || "—"}
@@ -446,29 +425,13 @@ function NewSubscriptionModal({ children, onSubscriptionCreated, user }) {
       setLoadingCustomers(true);
 
       try {
-        const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/crm`, {
-          method: "GET",
-
-          headers: {
-            "Content-Type": "application/json",
-
-            Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-
-            access: `${Encrypt(user.user.user._id)}`,
-
-            sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-          },
-
-          next: {
-            revalidate: 120,
-          },
-        });
+        const res = await api.get("/api/crm");
 
         if (!res.ok) {
           throw new Error("Failed to load customers");
         }
 
-        const data = await res.json();
+        const data = res.data;
 
         const decrypted = data;
 
@@ -534,30 +497,15 @@ function NewSubscriptionModal({ children, onSubscriptionCreated, user }) {
       setInvoices([]);
 
       try {
-        const res = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/Contract/invoice/${Encrypt(
-            selectedCustomerId,
-          )}`,
-          {
-            method: "GET",
-
-            headers: {
-              "Content-Type": "application/json",
-
-              Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-
-              access: `${Encrypt(user.user.user._id)}`,
-
-              sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-            },
-          },
+        const res = await api.get(
+          `/api/Contract/invoice/${selectedCustomerId}`,
         );
 
         if (!res.ok) {
           throw new Error("Failed to load invoices");
         }
 
-        const data = await res.json();
+        const data = res.data;
 
         const decrypted = Dencrypt(data.data);
 

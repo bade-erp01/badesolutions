@@ -1,7 +1,8 @@
 "use client"
 
 import React from 'react'
-import {Dencrypt,Encrypt} from "../../../../../../../../../Functions/Functions"
+import {Dencrypt} from "../../../../../../../../../Functions/Functions"
+import api from "@/lib/api"
 import Image from "next/image"
 import moment from "moment"
 import {SuccessToast,ErrorMessage,plsWait} from "../../../../../../../../../Functions/Mics"
@@ -31,17 +32,9 @@ const Delete = async () => {
     plsWait("deleting...");
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    const res = await fetch(`${baseUrl}/api/Payable/${Encrypt(payment._id)}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        access: `${Encrypt(userInfo.user._id)}`,
-        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-    });
+    const res = await api.del(`/api/Payable/${payment._id}`);
 
-    const data = await res.json();
+    const data = res.data || {};
 
     if (data.message) {
       SuccessToast(data.message);
@@ -70,21 +63,12 @@ const Delete = async () => {
     try {
       plsWait('Processing...')
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const res = await fetch(
-        `${baseUrl}/api/Payable/update/${Encrypt(payment._id)}`,
-        {
-          method: "PATCH",
-          headers: { 
-              "Content-Type": "application/json",
-               access:`${Encrypt(userInfo.user._id)}`,
-               Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-               sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
-          },
-          body: JSON.stringify({action,user:`${userInfo.user.firstName} ${userInfo.user.lastName}` }),
-        }
+      const res = await api.patch(
+        `/api/Payable/update/${payment._id}`,
+        {action,user:`${userInfo.user.firstName} ${userInfo.user.lastName}` },
       );
-  
-      const data = await res.json();
+
+      const data = res.data || {};
   
       if (data.message) {
         SuccessToast(data.message);

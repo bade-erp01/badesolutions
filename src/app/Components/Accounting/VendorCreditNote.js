@@ -8,8 +8,8 @@ import {
     plsWait,
     ErrorMessage,
     SuccessToast,
-    Encrypt,
 } from "../../../../Functions/Mics";
+import api from "@/lib/api";
 import { useRouter, useParams } from "next/navigation";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
@@ -112,20 +112,10 @@ const VendorCreditNoteModal = ({
         }).then(async (result) => {
             if (result.isConfirmed) {
                 plsWait("Working on things..please wait.");
-                const request = await fetch(`${baseUrl}/api/VendorCredit`, {
-                    method: "POST",
-                    body: JSON.stringify(result.value),
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${userData.business.tenantId}`,
-                        dbConnect: `Bearer ${userData.business.rustyRoof}`,
-                        access: `Bearer ${Encrypt(userData.user._id)}`,
-                        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-                    },
-                });
+                const r = await api.post("/api/VendorCredit", result.value);
 
-                const response = await request.json();
-                if (request.ok) {
+                const response = r.data || {};
+                if (r.ok) {
                     MySwal.fire({
                         icon: "success",
                         title: "Success!",
@@ -138,12 +128,10 @@ const VendorCreditNoteModal = ({
                         buttonsStyling: false,
                     });
                     Router.push(
-                        `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/Vendor-CreditNote/Vendor-CreditNote/${Encrypt(
-                            response.data
-                        )}`
+                        `/${Path.auth}/${Path.Tenant}/${Path.module}/${Path.module}/Vendor-CreditNote/Vendor-CreditNote/${response.data}`
                     );
                 } else {
-                    ErrorMessage(response.error);
+                    ErrorMessage(response.error || r.error);
                 }
             }
         });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import Swal from "sweetalert2";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
@@ -58,16 +58,7 @@ const GeoUpdater = ({ userData, baseUrl }) => {
 
     const sendToServer = async (latitude, longitude) => {
       try {
-        const res = await fetch(`${baseUrl}/api/update-location`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${userData.SessionId}`,
-          },
-          body: JSON.stringify({ latitude, longitude }),
-        });
+        const res = await api.post("/api/update-location", { latitude, longitude });
 
         if (!res.ok) {
           throw new Error(`Server error: ${res.status}`);

@@ -5,7 +5,6 @@ import CookiesPolicyAlert from "@/app/Components/Cookies"
 import TenantPage from "./page"
 import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
-import { Dencrypt } from "../../../../Functions/Functions"
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
 import PushNotificationGate from "@/app/Components/PushNotificationGate";
 import { Toaster } from "@/components/ui/sonner";
@@ -44,11 +43,10 @@ export const dynamic = "force-dynamic";
 
 export default async function Layout() {
   const userData = await fetchUser();
-  const SessionId = Dencrypt(userData?.SessionId)
   const baseUrl = process.env.EXPRESS_PRIVATE_URL
 
   // Redirect if either user OR business is missing 
-  if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId || !userData.user.isSalesRep) {
+  if (!userData?.user || !userData?.business || userData.user.status !== "active" || !userData.user.isSalesRep) {
     redirect('/SalesPortal/Login');
   }
 

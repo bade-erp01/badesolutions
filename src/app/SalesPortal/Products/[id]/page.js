@@ -5,13 +5,11 @@ import {
   ErrorMessage,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import axios from "axios";
+import api from "@/lib/api";
 import moment from "moment";
 import { useEffect, Suspense } from "react";
 import Plotly from "plotly.js-dist-min";
 import {
-  Encrypt,
-  EXPRESS_PRIVATE_URL,
   pricelistSetter
 } from "../../../../../Functions/Functions";
 import { driver } from "driver.js";
@@ -327,23 +325,11 @@ function ProductChart({ productId, productName, umo, business, user }) {
     const fetchProductData = async () => {
       try {
         const currentYear = moment().format("YYYY");
-        const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}`;
+        const url = `/api/SalseandStock?Year=${currentYear}`;
 
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
-          next: {
-            revalidate: 120,
-            cache: "force-cache",
-          },
-        });
+        const response = await api.get(url);
 
-        const result = await response.json();
+        const result = response.data;
         if (!result?.invoice) return;
 
         const data = result.invoice
@@ -541,18 +527,14 @@ export function CommentForm({ userData, product }) {
   const handleSubmit = async () => {
     plsWait("Submitting review.");
     try {
-      const request = await axios.post(
-        `${EXPRESS_PRIVATE_URL}/api/product/review/${Encrypt(product._id)}`,
+      const request = await api.post(
+        `/api/product/review/${product._id}`,
         formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.tenantId)}`,
-            access: `${Encrypt(userData._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-          },
-        },
       );
+      if (!request.ok) {
+        ErrorMessage(request.data?.error || "Error saving review");
+        return;
+      }
 
       const response = request.data;
 

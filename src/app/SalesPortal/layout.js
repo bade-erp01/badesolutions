@@ -1,7 +1,6 @@
 import React from "react";
 import GeoUpdater from "@/app/Components/LocationGrabber";
 import { fetchUser } from "../../../Functions/whoIsSalesPerson";
-import {Dencrypt} from "../../../Functions/Functions";
 import LocationGuard from "@/app/Components/GpsTracker";
 
 // Prevent static prerendering (session data is only available at request time)
@@ -11,9 +10,8 @@ export default async function layout({ children }) {
   const userData = await fetchUser();
 
  const hasValidSession = Boolean(
-    userData?.user?.SessionId &&
-    userData?.business &&
-    userData.user.SessionId === Dencrypt(userData.SessionId)
+    userData?.user &&
+    userData?.business
   );
 
   return (

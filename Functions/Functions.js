@@ -10,6 +10,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 import { escapeHtml } from "../src/lib/security/escapeHtml";
+import api from "../src/lib/api";
 
 const EXPRESS_PRIVATE_URL = "https://api.badesolutions.com.ng"
 // const EXPRESS_PRIVATE_URL = "http://localhost:3000" 
@@ -62,13 +63,11 @@ async function termsAndConditions(payload) {
   }
 }
 
-// Encrypt data from frontend
+// Ids and values go to the backend as they are, over HTTPS. This used to sign them with a
+// key shipped to every browser, which proved nothing; the server session now decides who
+// may do what. Kept as a pass-through so existing call sites keep working.
 function Encrypt(arg) {
-  return jwt.sign(
-    { id: arg },
-    "THESTARTUPWAY", //  Use a secure secret key
-    { expiresIn: "3d" } //  Token expires in 3 days
-  );
+  return arg;
 }
 
 function formatMongooseError(err) {
@@ -101,11 +100,15 @@ function formatMongooseError(err) {
   return "An unexpected error occurred. Please try again.";
 }
 
-// Encrypt data from frontend
+// Reads a value the backend sent signed (older responses), or returns a plain value as is.
+// No secret needed: the signature is the server's business, not the browser's.
 function Dencrypt(payload) {
-  const data = jwt.verify(payload,"THESTARTUPWAY");
-
-  return data.id || null
+  if (payload === undefined || payload === null || payload === "") return null;
+  if (typeof payload === "string" && /^[\w-]+\.[\w-]+\.[\w-]+$/.test(payload)) {
+    const data = jwt.decode(payload);
+    return data?.id ?? null;
+  }
+  return payload;
 }
 
 
@@ -129,53 +132,44 @@ const UpdateEmployeeData = async (id, fieldName, value,userInfo, businessInfo, S
   try {
     plsWait(`Updating User...⌛`);
 
-    const { data } = await axios.patch(
-      `${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(id)}`,
-      {
-        [fieldName]: value,
-        id,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          access: `${Encrypt(userInfo._id)}`,
-        },
-      }
-    );
+    const r = await api.patch(`/api/updateUser/${id}`, {
+      [fieldName]: value,
+      id,
+    });
+    if (!r.ok) {
+      ErrorMessage(r.data?.error || "Something went wrong");
+      return;
+    }
 
-    SuccessToast(data.message);
+    SuccessToast(r.data?.message);
   } catch (error) {
-    console.log(err.message)
     ErrorMessage(error.response?.data?.error || "Something went wrong");
   }
 };
 
 
+// Grant / remove one app for an employee (backend checks admin + business).
 const UpdateEmployeeModules = async (id, object) => {
   try {
     plsWait("Attempting remote access on user Work space");
-    const body = JSON.stringify({
-      id,
-      object,
-    });
-    const response = await fetch("/api/EmployeeUpdate", {
-      method: "PUT",
-      body,
-      timeout: 10000, //10s timeout for better error handling
+    const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/users/${id}/apps`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json", "x-csrf-token": csrfToken() },
+      body: JSON.stringify({ appId: object?._id }),
     });
     const req = await response.json();
-
-    if (req.message) {
-      SuccessToast(req.message);
-
-    } else {
-      throw new Error(req.error);
-    }
+    if (!response.ok) throw new Error(req.error || "Something went wrong");
+    SuccessToast(req.message);
   } catch (error) {
     ErrorMessage(error.message);
   }
+};
+
+const csrfToken = () => {
+  if (typeof document === "undefined") return "";
+  const m = document.cookie.match(/(?:^|;\s*)bade_csrf=([^;]*)/);
+  return m ? decodeURIComponent(m[1]) : "";
 };
 
 
@@ -419,26 +413,29 @@ async function postPayment(customerId, user, config) {
   });
 
   try {
-    const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/Payment/${customerId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(config?.headers || {})
-      },
-      body: JSON.stringify({
+    // Only non-auth headers (e.g. an idempotency key) are passed on; the session cookie authenticates.
+    const extraHeaders = Object.fromEntries(
+      Object.entries(config?.headers || {}).filter(
+        ([k]) => !["authorization", "access", "sessionkey", "dbconnect", "rustyroof", "content-type"].includes(k.toLowerCase())
+      )
+    );
+    const response = await api.post(
+      `/api/Payment/${customerId}`,
+      {
         customer: customerId,
         Amount: formValues.amount,
         Date: formValues.date,
         paymentReferenceNo: formValues.reference,
         type: formValues.type,
         Accountant: user
-      })
-    });
+      },
+      { headers: extraHeaders }
+    );
 
-    const data = await response.json();
+    const data = response.data || {};
 
     if (!response.ok) {
-      throw new Error(data.error || 'Payment failed');
+      throw new Error(data.error || response.error || 'Payment failed');
     }
 
     Swal.fire({
@@ -453,7 +450,7 @@ async function postPayment(customerId, user, config) {
       confirmButtonText: 'OK'
     });
 
-    window.location.href = `/auth/V4/payment/payment/${Encrypt(data.data)}?Module=payment`;
+    window.location.href = `/auth/V4/payment/payment/${data.data}?Module=payment`;
   } catch (err) {
     Swal.fire({
       icon: 'error',

@@ -2,7 +2,8 @@
 
 import Swal from "sweetalert2";
 import moment from "moment";
-import { plsWait, Encrypt, ErrorMessage } from "../../../../Functions/Mics";
+import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
+import api from "@/lib/api";
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
@@ -52,19 +53,11 @@ export default function StockReportModal({ baseUrl, userData }) {
     try {
       plsWait("Loading Stock Valuation Report...");
 
-      const res = await fetch(`${baseUrl}/api/Products/report`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        },
-      });
+      const res = await api.get("/api/Products/report");
 
       if (!res.ok) throw new Error("Failed to fetch product data");
 
-      const fetchedData = await res.json();
+      const fetchedData = res.data || {};
       try {
         Swal.close();
       } catch (_) {}

@@ -1,6 +1,7 @@
 import TransferPage from "./page"
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import { Encrypt,Dencrypt } from "../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -53,27 +54,12 @@ export default async function Productlayout({ children, params }) {
 
     const baseUrl = process.env.EXPRESS_PRIVATE_URL;
     const [res,stores] = await Promise.all([
-      fetch(`${baseUrl}/api/Transfers`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        access: `${Encrypt(userData.user._id)}`
-
-      },
+      serverApi("/api/Transfers", {
       next: { revalidate: 60 } // cache for 1 minutes
     }),
 
     // get all store
-    fetch(`${baseUrl}/api/Stores`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        access: `${Encrypt(userData.user._id)}`
-      },
+    serverApi("/api/Stores", {
        next: { revalidate: 60 } // cache for 1 minutes
     })
 
@@ -85,9 +71,9 @@ export default async function Productlayout({ children, params }) {
       ); 
     }
   
-    const data = await res.json();
+    const data = res.data || {};
     const TransfersList = Dencrypt(data.TransferList)
-    const StoreList = await stores.json()
+    const StoreList = stores.data
 
    return <TransferPage purchaseList={TransfersList} userData={userData} Store={StoreList} baseUrl={baseUrl}/>;
 }

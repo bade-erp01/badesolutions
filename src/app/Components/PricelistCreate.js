@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorMessage, plsWait,SuccessToast } from "../../../Functions/Mics";
-import { Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 
 export default function AddPriceListModal({baseUrl,userData}) {
   const [priceListName, setPriceListName] = useState("");
@@ -48,23 +48,14 @@ export default function AddPriceListModal({baseUrl,userData}) {
       /**
        * Replace with your real endpoint
        */
-      const response = await fetch(`${baseUrl}/api/pricelist`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-           Authorization: `Bearer ${Encrypt(userData.user.tenantId)}`,
-           access: `${Encrypt(userData.user._id)}`,
-           sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-        },
-        body: JSON.stringify({
-          Name: priceListName.trim(),
-        }),
+      const response = await api.post("/api/pricelist", {
+        Name: priceListName.trim(),
       });
 
-      const requestResponse = await response.json();
+      const requestResponse = response.data || {};
 
       if (!response.ok) {
-        throw new Error(requestResponse.error);
+        throw new Error(requestResponse.error || response.error);
       }
 
       setPriceListName("");

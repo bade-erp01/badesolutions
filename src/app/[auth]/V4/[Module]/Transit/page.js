@@ -6,8 +6,8 @@ import moment from "moment";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
   plsWait,
@@ -27,7 +27,6 @@ export default function TransitPage({
   Business,
   DecryptedData,
   products,
-  EXPRESS_PRIVATE_URL,
 }) {
   const [Singlebill] = useState(DecryptedData);
   const [productList] = useState(products);
@@ -42,29 +41,16 @@ export default function TransitPage({
     });
 
     try {
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/TransitOrderProductAdd/${Encrypt(
-          Singlebill._id
-        )}?product=${Encrypt(cleanedProducts._id)}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
-        }
-      );
+      const res = await api.put(`/api/TransitOrderProductAdd/${Singlebill._id}?product=${cleanedProducts._id}`);
 
-      const data = await res.json();
+      const data = res.data || {};
 
       if (data.message) {
         SuccessToast(data.message); // Replace with your custom ShowServerResponse
         router.refresh();
         window.location.reload();
       } else {
-        throw new Error(data.error); // Replace with your custom serverError
+        throw new Error(data.error || res.error); // Replace with your custom serverError
       }
     } catch (error) {
       ErrorMessage(error.message);
@@ -75,28 +61,18 @@ export default function TransitPage({
     try {
       plsWait("Removing product from cart");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLineTransit/${Encrypt(
-        Singlebill._id
-      )}?items=${encodeURIComponent(Encrypt(id))}`;
+      const url = `/api/RemoveLineTransit/${Singlebill._id}?items=${encodeURIComponent(id)}`;
 
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-        },
-      });
+      const response = await api.del(url);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         router.refresh();
         window.location.reload(); // Consider using router.reload() if you're using Next.js router
       } else {
-        throw new Error(data.error || "Unknown error occurred");
+        throw new Error(data.error || response.error || "Unknown error occurred");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -121,20 +97,12 @@ export default function TransitPage({
 
   //     plsWait("Deleteing Transfer...");
 
-  //     const url = `${EXPRESS_PRIVATE_URL}/api/DraftTranfer/${encodeURIComponent(
-  //       Encrypt(id)
+  //     const url = `/api/DraftTranfer/${encodeURIComponent(
+  //       id
   //     )}`;
-  //     const response = await fetch(url, {
-  //       method: "DELETE",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-  //         access: `${Encrypt(user._id)}`,
-    //       sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-  //       },
-  //     });
+  //     const response = await api.del(url);
 
-  //     const data = await response.json();
+  //     const data = response.data || {};
 
   //     if (data.message) {
   //       SuccessToast(data.message);
@@ -153,25 +121,17 @@ export default function TransitPage({
     try {
       plsWait("updating...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/transitLine/${encodeURIComponent(Encrypt(Singlebill._id))}?${field}=${newQty}&lineId=${encodeURIComponent(lineId)}&update=${field}`;
+      const url = `/api/transitLine/${encodeURIComponent(Singlebill._id)}?${field}=${newQty}&lineId=${encodeURIComponent(lineId)}&update=${field}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-        },
-      });
+      const response = await api.patch(url);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         location.reload(); // Or use router.refresh() if you're in App Router
       } else {
-        throw new Error(data.error || "Update failed");
+        throw new Error(data.error || response.error || "Update failed");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -199,31 +159,20 @@ export default function TransitPage({
 
       plsWait("Updating Request for Purchase");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Transit/status/${Encrypt(
-        Singlebill._id
-      )}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
+      const url = `/api/Transit/status/${Singlebill._id}?user=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        body: JSON.stringify({
+      const response = await api.patch(url, {
           status: status,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-        },
-      });
+        });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         window.location.reload();
         router.refresh(); // Or use router.refresh() if you're in App Router
       } else {
-        throw new Error(data.error || "Update failed");
+        throw new Error(data.error || response.error || "Update failed");
       }
     } catch (error) {
       ErrorMessage(error.message || "Network error");
@@ -616,9 +565,7 @@ export default function TransitPage({
                 >
                   <td className="flex-2 px-4 py-2 text-indigo-700 font-medium text-center text-xs">
                     <Link
-                      href={`/${Business.companyName}/${Encrypt(
-                        user._id
-                      )}/product/product/${Encrypt(bill.item.productId)}`}
+                      href={`/${Business.companyName}/${user._id}/product/product/${bill.item.productId}`}
                       className="hover:underline"
                     >
                       {bill.item.productName}
@@ -650,7 +597,7 @@ export default function TransitPage({
                           if (val !== "") {
                             handleQtyChange(
                               isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                              Encrypt(bill._id),
+                              bill._id,
                               "Qty"
                             );
                           }
@@ -673,7 +620,7 @@ export default function TransitPage({
                             if(val !==""){
                               handleQtyChange(
                                 isNaN(val) || val < 0 ? 0 : val, // sanitized value
-                                Encrypt(bill._id),
+                                bill._id,
                                 "Pcs"
                               );
                             }

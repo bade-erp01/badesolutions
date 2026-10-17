@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { CalendarDays } from "lucide-react";
 import {plsWait,ErrorMessage, SuccessToast} from "../../../../Functions/Mics";
-import {Encrypt} from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export default function Page({user,baseUrl}) {
@@ -57,21 +57,15 @@ export default function Page({user,baseUrl}) {
       plsWait("Submitting your request...");
       setLoading(true);
 
-      const res = await fetch(`${baseUrl}/api/new/timeout/${Encrypt(user._id)}`, {
-        method: "POST",
+      const res = await api.post(`/api/new/timeout/${user._id}`, form, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
           "idempotency-key": `Timeout-${form.RefNo}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`
         },
-        body: JSON.stringify(form),
       });
 
       if (!res.ok) throw new Error("Failed to submit request");
 
-      const data = await res.json();
+      const data = res.data;
 
       SuccessToast("Request submitted successfully");
 

@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams, useParams } from "next/navigation";
-import { Dencrypt,Encrypt } from "../../../../Functions/Functions";
+import { Dencrypt } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import {ErrorMessage,SuccessToast, plsWait,} from "../../../../Functions/Mics"
 import SearchCard from "../../Components/SearchResult";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
@@ -44,15 +45,9 @@ export default function SearchResultPage({ result, linkData, baseUrl }) {
         plsWait(`Submiting request to delete ${selectedIds.length} entr${selectedIds.length > 1 ? "ies" : "y"}`)
 
         // Call your backend delete API
-        const response = await fetch(`${baseUrl}/api/delete/multiple`, {
+        const response = await api("/api/delete/multiple", {
           method: "DELETE",
-          headers: { 
-            "Content-Type": "application/json",
-             Authorization: `Bearer ${Encrypt(UserData.business.tenantId)}`,
-             access: `${Encrypt(UserData.user._id)}`,
-             sessionKey: `Bearer ${Encrypt(UserData.SessionId)}`
-           },
-          body: JSON.stringify({ ids: Encrypt(selectedIds) }),
+          body: { ids: selectedIds },
         });
 
         if (!response.ok) {

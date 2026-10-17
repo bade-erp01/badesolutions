@@ -3,7 +3,7 @@ import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import Link from "next/link";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import StoreChart from "@/app/Components/StoreChart";
-import { Encrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import {
   ShoppingCartIcon,
   WrenchScrewdriverIcon,
@@ -61,19 +61,9 @@ export default async function page({ children, params }) {
   const userData = await fetchUser();
   const Params = await params;
 
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Stores/${Params.id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-    next: { revalidate: 120 },
-  });
+  const res = await serverApi(`/api/Stores/${Params.id}`);
 
-  const data = await res.json();
+  const data = res.data || {};
 
   return (
     <div className="flex flex-col">

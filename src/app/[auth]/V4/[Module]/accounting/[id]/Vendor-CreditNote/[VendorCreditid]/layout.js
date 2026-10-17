@@ -2,9 +2,9 @@ import Notch from "@/app/Components/Notch";
 import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh";
 import BackButton from "@/app/Components/BackBotton";
 import {
-  Encrypt,
   Dencrypt,
 } from "../../../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -71,18 +71,10 @@ export default async function page({ children, params }) {
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const [creditNote] = await Promise.all([
-    fetch(`${baseUrl}/api/VendorCredit/${moduleList.VendorCreditid}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
-    }),
+    serverApi(`/api/VendorCredit/${moduleList.VendorCreditid}`),
   ]);
 
-  const CN = await creditNote.json();
+  const CN = creditNote.data;
   const navHeader = Dencrypt(CN);
 
   if (!navHeader) return notFound();

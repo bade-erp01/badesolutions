@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-export default function Login({ userInfo, businessInfo, url, SessionId }) {
+export default function Login({ userInfo, businessInfo, url }) {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -101,7 +101,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ formData: Encrypt(formData) }),
+        credentials: "include", // keep the session cookie
+        body: JSON.stringify(formData), // plain over HTTPS
       });
 
       const data = await response.json();
@@ -110,7 +111,6 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         dispatch(
           loginSuccess({
             salesPerson: Dencrypt(data.Newcustomer),
-            SessionId: data.SessionId,
           })
         );
 
@@ -132,11 +132,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     }
   };
 
-  const isLoggedIn =
-    userInfo &&
-    businessInfo &&
-    SessionId &&
-    Dencrypt(SessionId) === userInfo?.SessionId;
+  // the layout only passes a user when the backend session is valid
+  const isLoggedIn = Boolean(userInfo && businessInfo);
 
   return (
     <div

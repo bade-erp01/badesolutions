@@ -1,6 +1,7 @@
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import { notFound } from "next/navigation";
-import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import ContractDetailsPage from "./page";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Suspense } from "react";
@@ -50,18 +51,9 @@ export default async function ExpenseLayout({ children, params }) {
   const moduleList = await params;
 
   // fetch all credit payment from all bank account
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Contract/${moduleList.id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    },
-  });
+  const res = await serverApi(`/api/Contract/${moduleList.id}`);
 
-  const data = await res.json();
+  const data = res.data || {};
 
   if (!data.data) return notFound();
 
@@ -72,7 +64,6 @@ export default async function ExpenseLayout({ children, params }) {
       <ContractDetailsPage
         data={Dencrypt(data.data)}
         payment={Dencrypt(data.payments)}
-        baseUrl={baseUrl}
         Currentuser={userData.user}
         business={userData.business}
       />

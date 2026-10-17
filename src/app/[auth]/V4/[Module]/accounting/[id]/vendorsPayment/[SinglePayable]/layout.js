@@ -1,9 +1,6 @@
 import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh";
 import BackButton from "@/app/Components/BackBotton";
-import {
-  Encrypt,
-  Dencrypt,
-} from "../../../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import Link from "next/link";
 import { CreditCardIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import { notFound } from "next/navigation";
@@ -67,21 +64,11 @@ export default async function AccountingPage({ params }) {
 
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const payable = await fetch(
-    `${baseUrl}/api/Payable/Payment/${moduleList.SinglePayable}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
-      // next: { revalidate: 120 }, // Revalidate every 2 minutes
-    },
+  const payable = await serverApi(
+    `/api/Payable/Payment/${moduleList.SinglePayable}`,
   );
 
-  const SinglePayable = await payable.json();
+  const SinglePayable = payable.data;
   try {
     return (
       <div className="flex flex-col">

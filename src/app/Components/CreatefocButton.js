@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
-import { Encrypt, plsWait, ErrorMessage, SuccessToast } from '../../../Functions/Mics';
-import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import api from "@/lib/api";
+import { plsWait, ErrorMessage, SuccessToast } from '../../../Functions/Mics';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import {
@@ -28,19 +27,17 @@ const CreateFocButton = ({ productId, business, user }) => {
       setLoading(true);
       plsWait('Creating FOC copy...');
 
-      const { data } = await axios.post(
-        `${EXPRESS_PRIVATE_URL}/api/Clone/Product`,
-        { PRODUCTID: Encrypt(productId) },
+      const r = await api.post(
+        "/api/Clone/Product",
+        { PRODUCTID: productId },
         {
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
             "idempotency-key": `FOC-CLONE-${productId}`,
           }
         }
       );
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data || {};
 
       if (data.message) {
         SuccessToast(data.message);

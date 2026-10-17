@@ -42,7 +42,6 @@ import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import BackButton from "@/app/Components/BackBotton";
 import Swal from "sweetalert2";
 import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
-import { Encrypt, EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import {
   Sheet,
   SheetContent,
@@ -53,6 +52,7 @@ import {
 import { Menu } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../../lib/User";
+import api, { logout as serverLogout } from "@/lib/api";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
 
 // Normalize ids (ObjectId / string)
@@ -258,26 +258,17 @@ export default function Wrapper({ children }) {
       plsWait("Please wait while we switch your tenant...");
 
       try {
-        const response = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(user.user._id)}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-              access: `${Encrypt(user.user._id)}`,
-              sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-            },
-            body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
-          },
-        );
+        const response = await api.patch(`/api/switch-tenant/${user.user._id}`, {
+          tenantId,
+        });
 
         if (!response.ok) {
           throw new Error("Failed to switch tenant.");
         }
 
         SuccessToast("Tenant switched successfully.");
-        await dispatch(logoutAction());
+        await serverLogout().catch(() => {}); // end the server session too
+      await dispatch(logoutAction());
         router.refresh();
       } catch (error) {
         ErrorMessage("An error occurred while switching tenant.");
@@ -585,7 +576,6 @@ export default function Wrapper({ children }) {
           <PrivacyIdleOverlay
             idleTimeMs={300000}
             userData={user}
-            SessionId={user.SessionId}
             requirePin={false}
           >
             <CookiesPolicyAlert />
@@ -646,6 +636,7 @@ export function UserProfile({ user, biz }) {
   const logout = async () => {
     try {
       await logoutOneSignal();
+      await serverLogout().catch(() => {}); // end the server session too
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");
       router.push("/Login");

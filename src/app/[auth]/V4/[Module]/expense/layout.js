@@ -5,7 +5,7 @@ import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import { TagIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { Encrypt } from "../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import ExpenseCategoryModal from "@/app/Components/CreateExpenseCat";
 import ExpenseCategoriesModal from "@/app/Components/expensecateTable";
 import ExpenseReportModal from "@/app/Components/ExpenseReport";
@@ -67,21 +67,14 @@ export default async function ExpenseLayout({ children, params }) {
   }
 
   const [cat] = await Promise.all([
-    fetch(`${baseUrl}/api/ExpenseCat`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
+    serverApi("/api/ExpenseCat", {
       next: {
         revalidate: 120,
       },
     }),
   ]);
 
-  const catList = await cat.json();
+  const catList = cat.data;
 
   try {
     return (

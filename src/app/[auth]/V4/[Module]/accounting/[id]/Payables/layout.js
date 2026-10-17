@@ -1,5 +1,5 @@
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import Notch from "@/app/Components/Notch";
 import BackButton from "@/app/Components/BackBotton";
 import Page from "./page";
@@ -72,33 +72,14 @@ export default async function AccountingPage({ children, params }) {
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const [vendors, Banks] = await Promise.all([
-    fetch(`${baseUrl}/api/Vendors`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
-      next: { revalidate: 120 }, // Revalidate every 2 minutes
-    }),
+    serverApi(`/api/Vendors`),
 
     //  get all banks
-    fetch(`${baseUrl}/api/Bank/Accounts`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        dbConnect: `Bearer ${userData.business.rustyRoof}`,
-        access: `${Encrypt(userData.user._id)}`,
-        // sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-      next: { revalidate: 120 }, // Revalidate every 2 minutes
-    }),
+    serverApi(`/api/Bank/Accounts`),
   ]);
 
-  const VendorList = await vendors.json();
-  const BanksList = await Banks.json();
+  const VendorList = vendors.data;
+  const BanksList = Banks.data;
 
   try {
     return (
@@ -110,7 +91,7 @@ export default async function AccountingPage({ children, params }) {
               {(userData.user.creditOfficer || userData.user.isAccountant) && (
                 <>
                   <Link
-                    href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-CreditNote/Vendor-CreditNote`}
+                    href={`/${userData.business.companyName.replace(/\s+/g, "")}/${userData.user._id}/${moduleList.module}/${moduleList.module}/Vendor-CreditNote/Vendor-CreditNote`}
                     title={"Credit Notes"}
                     className="flex items-center gap-3 p-3 rounded-md hover:transition"
                   >
@@ -119,7 +100,7 @@ export default async function AccountingPage({ children, params }) {
                   </Link>
 
                   <Link
-                    href={`/${userData.business.companyName.replace(/\s+/g, "")}/${Encrypt(userData.user._id)}/${moduleList.module}/${moduleList.module}/Vendor-DebitNote/Vendor-DebitNote`}
+                    href={`/${userData.business.companyName.replace(/\s+/g, "")}/${userData.user._id}/${moduleList.module}/${moduleList.module}/Vendor-DebitNote/Vendor-DebitNote`}
                     title={"Debit Notes"}
                     className="flex items-center gap-3 p-3 rounded-md hover:transition"
                   >
@@ -131,7 +112,7 @@ export default async function AccountingPage({ children, params }) {
 
               {StoreFinder && (
                 <Link
-                  href={`/${userData.business.companyName}/${Encrypt(userData.user._id)}/${StoreFinder.url
+                  href={`/${userData.business.companyName}/${userData.user._id}/${StoreFinder.url
                     .toLowerCase()
                     .replace(/\s+/g, "")}/${StoreFinder.url
                     .toLowerCase()

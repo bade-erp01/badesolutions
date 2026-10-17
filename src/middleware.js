@@ -1,7 +1,8 @@
 // Edge middleware for every document request:
-//   1. Auth gate: bounce requests with no session cookies away from the
-//      protected areas before any rendering or DB work. This only checks the
-//      cookies exist; the layouts (fetchUser) still validate the session.
+//   1. Auth gate: bounce requests without the backend's session cookie (bade_sid,
+//      httpOnly, set at login for .badesolutions.com.ng) away from the protected
+//      areas before any rendering. This only checks it exists; the layouts
+//      (fetchUser → backend /api/v1/Session) validate it.
 //   2. Per-request nonce-based Content-Security-Policy plus baseline security
 //      headers. Next reads the nonce from the request's CSP header and adds it
 //      to its own scripts; layouts read it from `x-nonce` (e.g. next-themes).
@@ -17,12 +18,12 @@ import {
 
 // /{tenant}/V4 and everything below it: [auth]/V4/layout.js redirects to /Login.
 const ERP_PATH = /^\/[^/]+\/V4(?:\/|$)/;
-const ERP_COOKIES = ["userInfo", "businessInfo", "SessionId"];
+const ERP_COOKIES = ["bade_sid"];
 
 // Sales Portal pages whose layouts redirect to /SalesPortal/Login.
 const SALES_PATH =
   /^\/SalesPortal\/(?:Dashboard|Route|(?:Customers|Products|Reports|Requisitions)\/[^/]+)(?:\/|$)/;
-const SALES_COOKIES = ["salesPerson", "SessionId"];
+const SALES_COOKIES = ["bade_sid"];
 
 function hasCookies(request, names) {
   return names.every((name) => Boolean(request.cookies.get(name)?.value));

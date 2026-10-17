@@ -3,7 +3,7 @@ import "animate.css";
 import React, { useState, useEffect } from "react";
 import dummyData from "../../../data/dummyData.json";
 import Image from "next/image";
-import { EXPRESS_PRIVATE_URL } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import Nav1 from "@/app/Components/Nav1";
 import Footer2 from "@/app/Components/Footer2";
 import {
@@ -11,7 +11,6 @@ import {
   ErrorMessage,
   AppDescription,
 } from "../../../../Functions/Mics";
-import { Encrypt } from "../../../../Functions/Functions";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -108,7 +107,6 @@ const ModuleCard = ({ item, userInfo }) => {
   const [expanded, setExpanded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const TenantId = userInfo?.business._id || "";
 
   useEffect(() => {
     setIsMounted(true);
@@ -125,21 +123,10 @@ const ModuleCard = ({ item, userInfo }) => {
       plsWait(`Setting up installation for ${module.Name} Module.`);
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      const request = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Payment_Collection`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${await Encrypt(TenantId)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-          },
-          body: JSON.stringify(module),
-        }
-      );
+      const request = await api.post("/api/Payment_Collection", module);
 
-      const response = await request.json();
+      const response = request.data;
+      if (!response) throw new Error(request.error);
 
       if (response.error) {
         throw new Error(response.error);

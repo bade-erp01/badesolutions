@@ -1,5 +1,6 @@
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt,Dencrypt } from "../../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import Notch from "@/app/Components/Notch";
 import BackButton from "@/app/Components/BackBotton";
 import Page from "./page"
@@ -54,18 +55,9 @@ export default async function paymentlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Equity`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-    },
-     next: { revalidate: 60 } // cache for 1 minutes
-  });
+  const res = await serverApi(`/api/Equity`);
 
-  const data = await res.json()
+  const data = res.data || {}
 
   // decrypt the data 
   const DecryptedData = Dencrypt(data);

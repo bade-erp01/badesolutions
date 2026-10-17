@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
-import { Encrypt, plsWait, ErrorMessage, SuccessToast } from '../../../Functions/Mics';
-import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
+import api from "@/lib/api";
+import { plsWait, ErrorMessage, SuccessToast } from '../../../Functions/Mics';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import {
@@ -28,18 +27,16 @@ const DeleteButton = ({ productId, business, user }) => {
       setLoading(true);
       plsWait('Deleting Product...');
 
-      const { data } = await axios.delete(
-        `${EXPRESS_PRIVATE_URL}/api/Product/Delete/${Encrypt(productId)}`,
+      const r = await api.del(
+        `/api/Product/Delete/${productId}`,
         {
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
             "idempotency-key": `DELETE-PRODUCT-${productId}`,
           }
         }
       );
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data || {};
 
       if (data.message) {
         SuccessToast(data.message);

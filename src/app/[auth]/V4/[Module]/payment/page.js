@@ -1,11 +1,10 @@
 import PaymentListpage from "@/app/Components/PaymentList";
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
-import Users from "../../../../../../models/Users";
 import Notch from "@/app/Components/Notch";
 
 export const metadata = {
@@ -55,24 +54,19 @@ export const metadata = {
 export default async function paymentlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/cashRegister`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-    },
+  const res = await serverApi("/api/cashRegister", {
      next: { revalidate: 60 } // cache for 1 minutes
   });
 
-  const data = await res.json()
+  const data = res.data || {}
 
   // get sales rep names and manager 
-    const RawUsers = await Users.findByTenant(userData.business.tenantId).select("firstName lastName").lean();
-    const StringedUser = JSON.stringify(RawUsers);
-    const parsedUsers = JSON.parse(StringedUser);
+    const usersRes = await serverApi("/api/Users");
+    const parsedUsers = (usersRes.data?.data || []).map(({ _id, firstName, lastName }) => ({
+      _id,
+      firstName,
+      lastName,
+    }));
 
   return (
     <div className="flex flex-col">

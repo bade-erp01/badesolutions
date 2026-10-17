@@ -1,6 +1,5 @@
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Dencrypt,Encrypt } from "../../../../../../../Functions/Functions";
-import axios from "axios";
+import { serverApi } from "@/lib/serverApi";
 import SinglePymentpage from "./page";
 import BackButton from "@/app/Components/BackBotton"
 import PaymentReceipt from "@/app/Components/PrintReciept";
@@ -53,21 +52,11 @@ export const metadata = {
 export default async function paymentlayout({ params }) {
   const decoy = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
-  const res = await axios.get(
-    `${baseUrl}/api/cashRegister/${decoy.id}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access:`${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-    }
-  );
+  const res = await serverApi(`/api/cashRegister/${decoy.id}`);
+  if (!res.ok) throw new Error(res.error);
 
-  const data = await res.data;
+  const data = res.data;
   return (
      <div className="flex flex-col">
          {/* Sidebar (collapsible on mobile) */}

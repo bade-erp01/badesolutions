@@ -1,6 +1,6 @@
 import React from "react";
 import Page from "./page";
-import {Dencrypt,Encrypt} from "../../../../Functions/Functions"
+import {Dencrypt} from "../../../../Functions/Functions"
 import { notFound } from "next/navigation";
 
 export const metadata = {
@@ -60,13 +60,11 @@ export default async function Layout({ params }) {
     }
 
   // find the ware house storekeeper from the bill whId and return the user
-  const verifyBillStoreKeeper = await fetch(`${baseUrl}/api/Order/verify/${Encrypt(decoded.id)}`, {
-    method: "GET",  
-    cache: "no-store",      // disable caching
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${Encrypt(decoded.tenantId)}`,
-    },
+  // The emailed link's token goes back as it came; the backend checks its signature
+  // and takes the order and the business from it.
+  const verifyBillStoreKeeper = await fetch(`${baseUrl}/api/Order/verify/${encodeURIComponent(Token.id)}`, {
+    method: "GET",
+    cache: "no-store",
   });
 
   const invoice = await verifyBillStoreKeeper.json();

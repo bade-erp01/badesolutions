@@ -21,7 +21,8 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { plsWait, ErrorMessage, SuccessToast, Encrypt } from "../../../../Functions/Mics";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
+import api from "@/lib/api";
 
 export default function CreditNoteModal({ customersList, baseUrl, userData, BankAccounts }) {
   const [open, setOpen] = useState(false);
@@ -41,32 +42,23 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
 
     plsWait("Working on things...please wait.");
 
-    const request = await fetch(`${baseUrl}/api/Credit/new`, {
-      method: "POST",
-      body: JSON.stringify({
-        Date: date,
-        Total: amount,
-        reference: remarks,
-        customerId,
-        bankID: bankID || null,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
+    const r = await api.post("/api/Credit/new", {
+      Date: date,
+      Total: amount,
+      reference: remarks,
+      customerId,
+      bankID: bankID || null,
     });
 
-    const response = await request.json();
-    if (request.ok) {
+    const response = r.data || {};
+    if (r.ok) {
       SuccessToast("Credit note has been created successfully. Awaiting Approval");
       Router.push(
-        `/${Path.auth}/V4/${Path.Module}/${Path.Module}/credit-note/credit-note/${Encrypt(response.data)}`
+        `/${Path.auth}/V4/${Path.Module}/${Path.Module}/credit-note/credit-note/${response.data}`
       );
       setOpen(false);
     } else {
-      ErrorMessage(response.error);
+      ErrorMessage(response.error || r.error);
     }
   };
 

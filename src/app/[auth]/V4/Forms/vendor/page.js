@@ -5,9 +5,8 @@ import {
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../Functions/Mics";
-import axios from "axios";
+import api from "@/lib/api";
 import {
-  Encrypt,
   Dencrypt,
 } from "../../../../../../Functions/Functions";
 import { useState } from "react";
@@ -21,12 +20,6 @@ export default function SingleVendorpage({
   const [formData,setFormData] = useState({});
   const router = useRouter();
   const Params = useParams()
-  const [headers] = useState({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-    access: `${Encrypt(userInfo.user._id)}`,
-  });
 
 
   const handleChange = (e) => {
@@ -42,11 +35,9 @@ export default function SingleVendorpage({
     try {
       e.preventDefault();
       plsWait("Onboarding new supplier please wait...");
-      const { data } = await axios.post(
-        `${baseUrl}/api/Vendor/New`,
-        formData,
-        { headers }
-      );
+      const r = await api.post("/api/Vendor/New", formData);
+      if (!r.ok) throw new Error(r.error);
+      const { data } = r;
 
       if (data && data.data) {
         SuccessToast("New supplier added to list ");

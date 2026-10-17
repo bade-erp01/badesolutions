@@ -1,7 +1,7 @@
 import React from "react";
 import { fetchUser } from "../../../../../Functions/whoIsSalesPerson";
 import { redirect } from "next/navigation";
-import { Encrypt, Dencrypt } from "../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import SingleProductpage from "./page";
 import BackButton from "@/app/Components/BackBotton";
 
@@ -62,17 +62,13 @@ export const dynamic = "force-dynamic";
 
 export default async function layout({ params }) {
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const SessionId = Dencrypt(userData?.SessionId);
   const Params = await params;
 
   // Redirect if either user OR business is missing
   if (
     !userData?.user ||
     !userData?.business ||
-    !SessionId ||
     userData.user.status !== "active" ||
-    SessionId !== userData.user.SessionId ||
     !userData.user.isSalesRep
   ) {
     redirect("/SalesPortal/Login");
@@ -81,17 +77,9 @@ export default async function layout({ params }) {
   let data;
 
   try {
-    const res = await fetch(`${baseUrl}/api/Product/${Params.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${userData.SessionId}`,
-      },
-    });
+    const res = await serverApi(`/api/Product/${Params.id}`);
 
-    data = await res.json();
+    data = res.data;
 
     if (!res.ok) {
       return (

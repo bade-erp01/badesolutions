@@ -8,11 +8,10 @@ import React, {
 } from "react";
 import Image from "next/image";
 import {
-  EXPRESS_PRIVATE_URL,
   Dencrypt,
-  Encrypt,
   pricelistSetter,
 } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
 import Marquee from "react-fast-marquee";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
@@ -139,18 +138,11 @@ export default function MainDash({ userData }) {
       }
 
       try {
-        const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Report`, {
-          headers: {
-            Authorization: `Bearer ${Encrypt(userData?.business.tenantId)}`,
-            access: `${Encrypt(userData?.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-            // cache: "force-cache" // or "default", "reload", "no-store"
-          },
-        });
+        const res = await api.get("/api/Report");
 
         if (!res.ok) throw new Error("Failed to fetch dashboard data");
 
-        const data = await res.json();
+        const data = res.data;
         setTenantData(data);
       } catch (err) {
         setError(
@@ -245,7 +237,7 @@ export default function MainDash({ userData }) {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [userData, EXPRESS_PRIVATE_URL, Encrypt]);
+  }, [userData]);
 
   if (loading) {
     return (
@@ -491,7 +483,7 @@ export default function MainDash({ userData }) {
                             </TableCell>
                             <TableCell className="font-semibold">
                               <Link
-                                href={`/${Params.auth}/V4/Sales/Sales/${Encrypt(invoice._id)}`}
+                                href={`/${Params.auth}/V4/Sales/Sales/${invoice._id}`}
                                 className="text-indigo-600 hover:underline"
                               >
                                 {invoice.billReferenceNo}/
@@ -592,7 +584,7 @@ export default function MainDash({ userData }) {
                             </TableCell>
                             <TableCell className="font-semibold">
                               <Link
-                                href={`/${Params.auth}/V4/product/product/${Encrypt(product.productId)}`}
+                                href={`/${Params.auth}/V4/product/product/${product.productId}`}
                                 className="text-indigo-600 hover:underline"
                               >
                                 {product.productName}

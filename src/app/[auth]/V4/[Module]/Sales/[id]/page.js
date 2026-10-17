@@ -7,10 +7,8 @@ import { React, useState } from "react";
 import Swal from "sweetalert2";
 import Image from "next/image";
 import {
-  Encrypt,
   Dencrypt,
   totalInWords,
-  EXPRESS_PRIVATE_URL,
 } from "../../../../../../../Functions/Functions";
 import {
   ErrorMessage,
@@ -19,7 +17,7 @@ import {
 } from "../../../../../../../Functions/Mics";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import axios from "axios";
+import api from "@/lib/api";
 import moment from "moment";
 import { useRouter, useParams } from "next/navigation";
 import {
@@ -1099,15 +1097,6 @@ const generatePdf = async (business, customer, bill) => {
 };
 
 
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      access: `${Encrypt(userInfo.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-    },
-  };
-
   const handleQtyChange = async (
     lineId,
     value,
@@ -1119,28 +1108,17 @@ const generatePdf = async (business, customer, bill) => {
     try {
       plsWait("Updating cart...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Recalled/Cart/Update?user=${Encrypt(
-        userInfo.user._id,
-      )}`;
+      const url = `/api/Recalled/Cart/Update?user=${userInfo.user._id}`;
 
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-          access: `${Encrypt(userInfo.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-        },
-        body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
-      });
+      const response = await api.put(url, { lineId, value, toUpdate, billId, storeId });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
         setSinglebill(Dencrypt(data.Updatedinvoice));
       } else {
-        throw new Error(data.error || "An unknown error occurred.");
+        throw new Error(data.error || response.error || "An unknown error occurred.");
       }
     } catch (err) {
       ErrorMessage(err.message);
@@ -1154,19 +1132,17 @@ const generatePdf = async (business, customer, bill) => {
     );
 
     try {
-      const Biller = Encrypt(userInfo.user._id);
-      const url = `${EXPRESS_PRIVATE_URL}/api/Redo/invoice/${Encrypt(
-        Singlebill._id,
-      )}?Biller=${Biller}`;
+      const Biller = userInfo.user._id;
+      const url = `/api/Redo/invoice/${Singlebill._id}?Biller=${Biller}`;
 
-      const { data } = await axios.post(url, {}, config);
+      const r = await api.post(url, {});
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data;
 
       if (data && data.result) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         Router.push(
-          `/${path.auth}/V4/Sales/Sales/Draft/${Encrypt(
-            data.result,
-          )}`,
+          `/${path.auth}/V4/Sales/Sales/Draft/${data.result}`,
         );
       } else {
         Swal.fire({
@@ -1177,7 +1153,7 @@ const generatePdf = async (business, customer, bill) => {
         });
       }
     } catch (error) {
-      ErrorMessage(error?.response?.data?.error || error.message);
+      ErrorMessage(error.message);
     }
   };
 
@@ -1562,26 +1538,17 @@ const generatePdf = async (business, customer, bill) => {
 
     try {
       plsWait("Processing Request...");
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Recalled/invoice/${Encrypt(
-          orderId,
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(
-          opCode,
-        )}&option=${option}`,
+      const res = await api.post(
+        `/api/Recalled/invoice/${orderId}?option=${option}`,
+        { id: orderId, ops: opCode }, // ops code in the body, never the URL
         {
-          method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
             "idempotency-key": `recalled-${option}-${Singlebill._id}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
           },
-          body: JSON.stringify({ id: Encrypt(orderId) }),
         },
       );
 
-      const result = await res.json();
+      const result = res.data || {};
 
       if (res.ok) {
         SuccessToast(result.message);
@@ -1592,7 +1559,7 @@ const generatePdf = async (business, customer, bill) => {
 
         Router.refresh();
       } else {
-        throw new Error(result.error || "Request failed");
+        throw new Error(result.error || res.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(
@@ -1631,25 +1598,12 @@ const generatePdf = async (business, customer, bill) => {
 
     try {
       plsWait("Processing Request...");
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/SingleReturn/${Encrypt(
-          orderId,
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(
-          opCode,
-        )}&option=${option}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          },
-          body: JSON.stringify({ id: Encrypt(orderId) }),
-        },
+      const res = await api.patch(
+        `/api/SingleReturn/${orderId}?option=${option}`,
+        { id: orderId, ops: opCode }, // ops code in the body, never the URL
       );
 
-      const result = await res.json();
+      const result = res.data || {};
 
       if (res.ok) {
         SuccessToast(result.message);
@@ -1658,7 +1612,7 @@ const generatePdf = async (business, customer, bill) => {
           setSinglebill(Dencrypt(result.Updatedinvoice));
         }
       } else {
-        throw new Error(result.error || "Request failed");
+        throw new Error(result.error || res.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(
@@ -1697,36 +1651,25 @@ const generatePdf = async (business, customer, bill) => {
 
     try {
       plsWait("Processing Request...");
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/REQToDRAFT/${Encrypt(
-          orderId,
-        )}?user=${Encrypt(userInfo.user._id)}&ops=${Encrypt(
-          opCode,
-        )}&option=${option}`,
+      const res = await api.patch(
+        `/api/REQToDRAFT/${orderId}?option=${option}`,
+        { id: orderId, ops: opCode }, // ops code in the body, never the URL
         {
-          method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
             "idempotency-key": `Requisitions-${orderId}`,
           },
-          body: JSON.stringify({ id: Encrypt(orderId) }),
         },
       );
 
-      const result = await res.json();
+      const result = res.data || {};
 
       if (res.ok) {
         SuccessToast(result.message);
         Router.push(
-          `/${path.auth}/V4/${path.Module}/${path.Module}/Draft/${Encrypt(
-            orderId,
-          )}`,
+          `/${path.auth}/V4/${path.Module}/${path.Module}/Draft/${orderId}`,
         );
       } else {
-        throw new Error(result.error || "Request failed");
+        throw new Error(result.error || res.error || "Request failed");
       }
     } catch (err) {
       ErrorMessage(

@@ -1,7 +1,8 @@
 "use client";
 import Swal from "sweetalert2";
 import { TagIcon } from "@heroicons/react/24/outline";
-import { Encrypt, Dencrypt } from "../../../Functions/Functions";
+import { Dencrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { escapeHtml } from "@/lib/security/escapeHtml";
@@ -67,28 +68,15 @@ export default function ExpenseCategoriesModal({
 
               try {
                 // Example API request — adjust URL & payload to your backend
-                const res = await fetch(
-                  `${baseUrl}/api/expenseCategory/update/${Encrypt(
-                    categoryId
-                  )}`,
-                  {
-                    method: "PATCH",
-                    body: JSON.stringify({ status: newStatus }),
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${Encrypt(
-                        userData.business.tenantId
-                      )}`,
-                      access: `${Encrypt(userData.user._id)}`,
-                      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-                    },
-                  }
+                const res = await api.patch(
+                  `/api/expenseCategory/update/${categoryId}`,
+                  { status: newStatus }
                 );
 
-                const response = await res.json()
+                const response = res.data || {}
                 
                 if (!res.ok) {
-                    throw new Error(response.error || "Something went wrong");
+                    throw new Error(response.error || res.error || "Something went wrong");
                 }
                 
                 Swal.showValidationMessage(

@@ -49,7 +49,7 @@ import {
   TableCell,
   TableBody,
 } from "@/components/ui/table";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import api from "@/lib/api";
 
 import { Badge } from "@/components/ui/badge";
 import moment from "moment";
@@ -160,26 +160,15 @@ export default function Page({ baseUrl, userData, data }) {
       }
 
       setLoading(true);
-      const res = await fetch(
-        `${baseUrl}/api/Generate/profitandLoss?period=${period}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-          },
-          // cache: "force-cache", // Try cache first
-          // next: { revalidate: 60 }, // cache for 1 minutes
-        },
+      const res = await api.get(
+        `/api/Generate/profitandLoss?period=${period}`,
       );
 
       if (!res.ok) {
         throw new Error("Could not generate the income statement.");
       }
 
-      const { data } = await res.json();
+      const { data } = res.data || {};
 
       setReport(toReport(data));
       setReportYear(Number(period));

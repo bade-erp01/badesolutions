@@ -1,6 +1,6 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
@@ -54,18 +54,9 @@ export const metadata = {
 export default async function paymentlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Bank/Accounts`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-    },
-  });
+  const res = await serverApi(`/api/Bank/Accounts`);
 
-  const data = await res.json();
+  const data = res.data || {};
 
   return (
     <div className="flex flex-col">
@@ -77,7 +68,7 @@ export default async function paymentlayout({ children, params }) {
                 {data.map((account) => (
                   <Link
                     key={account._id}
-                    href={`/${moduleList.auth}/V4/accounting/accounting/Bank-Accounts/Bank-Accounts/${Encrypt(account._id)}`}
+                    href={`/${moduleList.auth}/V4/accounting/accounting/Bank-Accounts/Bank-Accounts/${account._id}`}
                     title={account.NAME}
                     className="block w-full h-full text-xs"
                     style={{ textDecoration: "none" }}

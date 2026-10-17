@@ -9,8 +9,8 @@ import {
   plsWait,
   ErrorMessage,
   SuccessToast,
-  Encrypt,
 } from "../../../../../../../Functions/Mics";
+import api from "@/lib/api";
 
 import {
   Card,
@@ -33,7 +33,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-export default function Page({ data, Currentuser, business, baseUrl }) {
+export default function Page({ data, Currentuser, business }) {
   const [expense] = useState(data.expense);
   const Router = useRouter();
   const [AccountList] = useState(data.Accounts || []);
@@ -79,21 +79,13 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
 
     try {
       plsWait("Deleting expense...");
-      const res = await fetch(`${baseUrl}/api/Expense/${Encrypt(expense._id)}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-          access: `${Encrypt(Currentuser._id)}`,
-          sessionKey: `Bearer ${Encrypt(Currentuser.SessionId)}`,
-        },
-      });
+      const res = await api.del(`/api/Expense/${expense._id}`);
 
       if (res.ok) {
         Swal.fire("Deleted!", "Expense has been deleted successfully.", "success");
         Router.back();
       } else {
-        const error = await res.json();
+        const error = res.data || {};
         throw new Error(error.error || "Failed to delete");
       }
     } catch (err) {
@@ -123,18 +115,9 @@ export default function Page({ data, Currentuser, business, baseUrl }) {
 
       plsWait(`${action}ing expense...`);
 
-      const res = await fetch(`${baseUrl}/api/Expense/${Encrypt(expense._id)}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-          access: `${Encrypt(Currentuser._id)}`,
-          sessionKey: `Bearer ${Encrypt(Currentuser.SessionId)}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await api.patch(`/api/Expense/${expense._id}`, formData);
 
-      const response = await res.json();
+      const response = res.data || {};
 
       if (res.ok) {
         SuccessToast(response.message || "Action completed successfully");

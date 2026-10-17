@@ -1,6 +1,6 @@
 import Notch from "@/app/Components/Notch";
 import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt,Dencrypt } from "../../../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import BankStatement from "@/app/Components/Reports/BankStatement"
@@ -55,19 +55,9 @@ export const metadata = {
 export default async function paymentlayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Bank/Account/${moduleList.account}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-    },
-    next: { revalidate: 60 } // cache for 1 minutes
-  });
+  const res = await serverApi(`/api/Bank/Account/${moduleList.account}`);
 
-  const data = await res.json();
+  const data = res.data || {};
   if(!data.account) return notFound()
 
   return (

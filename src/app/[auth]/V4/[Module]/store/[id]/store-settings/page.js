@@ -1,6 +1,7 @@
 "use client";
 
-import { Dencrypt, Encrypt } from "../../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { plsWait, ErrorMessage, SuccessToast } from "../../../../../../../../Functions/Mics";
@@ -13,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 
-export default function Page({ staffs, store, currentStoreKeeper, EXPRESS_PRIVATE_URL, userId, SessionId }) {
+export default function Page({ staffs, store, currentStoreKeeper }) {
   const Router = useRouter();
 
   const parsedStaffs = useMemo(() => {
@@ -54,20 +55,11 @@ export default function Page({ staffs, store, currentStoreKeeper, EXPRESS_PRIVAT
     plsWait("Saving store settings...");
 
     try {
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/warehouse/edit/${Encrypt(store._id)}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(store.tenantId)}`,
-          access: userId,
-          sessionKey: `Bearer ${Encrypt(SessionId)}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await api.patch(`/api/warehouse/edit/${store._id}`, formData);
 
       if (!response.ok) throw new Error("Failed to update store");
 
-      const data = await response.json();
+      const data = response.data || {};
       SuccessToast(data.result || "Store settings updated successfully");
       Router.refresh();
     } catch (error) {

@@ -1,19 +1,12 @@
 import React from "react";
 import SettingsPage from "./page";
 import { fetchUser } from "../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 
 export default async function layout({ children }) {
   const userData = await fetchUser();
   const businessInfo = userData.business;
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    access: `${Encrypt(userData.user._id)}`,
-  };
 
   // Heavy caching – 1 hour (change number as needed)
   const cacheOptions = {
@@ -25,28 +18,16 @@ export default async function layout({ children }) {
 
   // Fetch Users, Customers and Stores in parallel with heavy caching
   const [usersRes, customersRes, storeRes] = await Promise.all([
-    fetch(`${baseUrl}/api/Users`, {
-      method: "GET",
-      headers,
-      ...cacheOptions,
-    }),
-    fetch(`${baseUrl}/api/crm`, {
-      method: "GET",
-      headers,
-      ...cacheOptions,
-    }),
-    fetch(`${baseUrl}/api/Stores`, {
-      method: "GET",
-      headers,
-      ...cacheOptions,
-    }),
+    serverApi("/api/Users", cacheOptions),
+    serverApi("/api/crm", cacheOptions),
+    serverApi("/api/Stores", cacheOptions),
   ]);
 
-  const [userList, customerList, storeList] = await Promise.all([
-    usersRes.json(),
-    customersRes.json(),
-    storeRes.json(),
-  ]);
+  const [userList, customerList, storeList] = [
+    usersRes.data,
+    customersRes.data,
+    storeRes.data,
+  ];
 
   return (
     <SettingsPage

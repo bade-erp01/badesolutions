@@ -1,7 +1,8 @@
 "use client"
 import React from 'react'
 import {useRouter, useParams} from "next/navigation"
-import { plsWait,ErrorMessage,Encrypt,SuccessToast } from '../../../../../../../../../Functions/Mics';
+import { plsWait,ErrorMessage,SuccessToast } from '../../../../../../../../../Functions/Mics';
+import api from "@/lib/api";
 
 export default function Page({ data,userData,baseurl }) {
   const Router = useRouter()
@@ -11,24 +12,15 @@ export default function Page({ data,userData,baseurl }) {
     if (!confirm(`Are you sure you want to ${action} this credit note?`)) return;
     plsWait('')
     try {
-      const response = await fetch(`${baseurl}/api/Vendor/Memo/${Params.VendorCreditid}`,
+      const response = await api.patch(`/api/Vendor/Memo/${Params.VendorCreditid}`,
         {
-          method: "PATCH",
-          body:JSON.stringify({
             ApprovedBy:`${userData.user.firstName} ${userData.user.lastName}`,
             action:action
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-          },
         }
       );
 
       if (!response.ok) throw new Error('Failed to approve credit note');
-      const request = await response.json()
+      const request = response.data
       SuccessToast(request.message)
       if(action === "Delete"){
         Router.push(`/${Params.auth}/${Params.Tenant}/${Params.module}/${Params.module}/Vendor-CreditNote/Vendor-CreditNote`)

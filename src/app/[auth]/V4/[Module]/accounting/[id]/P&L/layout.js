@@ -2,7 +2,7 @@ import React from "react";
 import Page from "./page";
 import { notFound } from "next/navigation";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt, Dencrypt } from "../../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import moment from "moment";
 
 export const metadata = {
@@ -53,26 +53,15 @@ export default async function layout({ params }) {
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
-  const res = await fetch(
-    `${baseUrl}/api/Generate/profitandLoss?period=${moment().year()}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-      // cache: "force-cache",
-      // next: { revalidate: 60 },
-    },
+  const res = await serverApi(
+    `/api/Generate/profitandLoss?period=${moment().year()}`,
   );
 
   if (!res.ok) {
     throw new Error("Failed to fetch balance data");
   }
 
-  const response = await res.json();
+  const response = res.data;
 
   return <Page userData={userData} baseUrl={baseUrl} data={response} />;
 }

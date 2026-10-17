@@ -1,7 +1,7 @@
 import Notch from "@/app/Components/Notch";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import BackButton from "@/app/Components/BackBotton";
-import {Encrypt} from "../../../../../../../../Functions/Mics"
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from 'next/navigation';
 import VendorCreditnoteTable from "@/app/Components/VendorCreditNoteTable"
 import VendorDebitNoteModal from "@/app/Components/Accounting/VendorDebitNote"
@@ -69,33 +69,15 @@ export default async function page({ params }) {
   // fetch all credit payment from all bank account 
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
     const [vendors,VendorDebitNotes] = await Promise.all([
-        fetch(`${baseUrl}/api/Vendors`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-      next: { revalidate: 120 }, // Revalidate every 2 minutes
-    }),
+        serverApi(`/api/Vendors`),
 
     // get vendor memo
-     fetch(`${baseUrl}/api/VendorDebit`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-      next: { revalidate: 120 }, // Revalidate every 2 minutes
-    })
+     serverApi(`/api/VendorDebit`)
 
     ])
-    
-    const vendorsList = await vendors.json();
-    const VendorDrNs = await VendorDebitNotes.json();
+
+    const vendorsList = vendors.data;
+    const VendorDrNs = VendorDebitNotes.data || {};
     
   try {
    

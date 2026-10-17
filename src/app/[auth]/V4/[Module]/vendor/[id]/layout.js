@@ -1,6 +1,6 @@
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import SingleVendorpage from "./page";
-import { Encrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -46,36 +46,13 @@ export const metadata = {
 
 export default async function SingleVendorPagelayout({ params }) {
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const Params = await params;
 
   const [res,Acc] = await Promise.all([
-    await fetch(`${baseUrl}/api/Vendor/${Params.id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access:`${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`
-    },
-    // Optional: Add caching headers if needed
-    next: { revalidate: 120 }, // Revalidate every 2 minutes
-  }),
+    serverApi(`/api/Vendor/${Params.id}`),
 
   // get all bank  accounts
-  await fetch(`${baseUrl}/api/Bank/Accounts`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access:`${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`
-    },
-    // Optional: Add caching headers if needed
-    next: { revalidate: 120 }, // Revalidate every 2 minutes
-  })
-
-  
+    serverApi(`/api/Bank/Accounts`),
   ])
 
   // check if business has Accounting module enabled
@@ -92,12 +69,12 @@ const AccountingFinder = userData.business.modules.find(app=>{
     );
   }
 
-  const req = await res.json();
-  const Accs = await Acc.json();
+  const req = res.data || {};
+  const Accs = Acc.data;
 
   return (
     <div>
-      <SingleVendorpage AccountingFinder={AccountingFinder} banks={Accs} Backdata={req.vendor} Locations={req.Locations} wh={req.WH} userInfo={userData} baseUrl={baseUrl} />
+      <SingleVendorpage AccountingFinder={AccountingFinder} banks={Accs} Backdata={req.vendor} Locations={req.Locations} wh={req.WH} userInfo={userData} />
     </div>
   );
 }

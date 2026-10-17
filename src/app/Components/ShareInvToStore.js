@@ -3,36 +3,26 @@
 import React from 'react';
 import { ShareIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import {plsWait, SuccessToast, ErrorMessage} from '../../../Functions/Mics';
 import {useRouter} from 'next/navigation';
-import { useUser } from "@/components/UserProvider";
 
 const ShareInvToStore = ({ 
     billStatus = '',
     billId,
-    firstName,
-    userId,
-    businessToken,
-    baseUrl
 }) => {
     const router = useRouter();
-    const {user} = useUser()
     const onMailClick = async () => {
         plsWait("Sending Mail");
-        const api = `${baseUrl}/api/sendMail_To_Store/${Encrypt(billId)}`;
+        const mailPath = `/api/sendMail_To_Store/${billId}`;
 
-        const request = await fetch(api, {
-            method: "GET",
+        // POST: sending mail is a write, so it carries the CSRF token
+        const request = await api.post(mailPath, undefined, {
             headers: {
-                "content-type": "application/json",
-                Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-                access: `${Encrypt(user.user_id)}`,
                 "idempotency-key": `Mail-${billId}`,
-                sessionKey: `Bearer ${Encrypt(user.SessionId)}`
             },
         });
-        const response = await request.json();
+        const response = request.data || { error: request.error };
 
         if (response.message) {
             SuccessToast(response.message);

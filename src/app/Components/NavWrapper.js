@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import axios from "axios";
+import api from "@/lib/api";
 import {
   LayoutDashboard,
   Package,
@@ -21,7 +21,6 @@ import Swal from "sweetalert2";
 import Nav2 from "@/app/Components/Nav2";
 import Logout from "@/app/Components/Logout";
 import UserNotification from "@/app/Components/UserNotification";
-import { Encrypt, EXPRESS_PRIVATE_URL } from "../../../Functions/Functions";
 import { plsWait, SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 
 import { Button } from "@/components/ui/button";
@@ -138,19 +137,9 @@ export default function NavWrapper({ userData, data, navtitle }) {
       plsWait("Please wait while we switch your tenant...");
 
       try {
-        const response = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/switch-tenant/${Encrypt(userData.user._id)}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              access: `${Encrypt(userData.user._id)}`,
-              sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`,
-            },
-            body: JSON.stringify({ tenantId: Encrypt(tenantId) }),
-          },
-        );
+        const response = await api.patch(`/api/switch-tenant/${userData.user._id}`, {
+          tenantId,
+        });
 
         if (!response.ok) {
           throw new Error("Failed to switch tenant.");
@@ -429,20 +418,10 @@ export function DialogDemo({ userData }) {
     e.preventDefault();
     try {
       plsWait("Submitting customer data...");
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
-          sessionkey: `Bearer ${userData.SessionId}`,
-        },
-      };
-
-      const response = await axios.post(
-        `${EXPRESS_PRIVATE_URL}/api/Sales/Register-customer`,
-        formData,
-        config,
-      );
+      const response = await api.post("/api/Sales/Register-customer", formData);
+      if (!response.ok) {
+        throw new Error(response.data?.message || response.error);
+      }
 
       SuccessToast(response.data?.message || "Customer created successfully!");
       setFormData({ salesPerson: userData.user._id, signUpVia: "sales-app" });
@@ -589,7 +568,7 @@ export function Card({ data, module }) {
     }`;
 
   const imageSrc = data.image || data.Image || data.icon || "/preview.png";
-  const linkHref = `/SalesPortal/${module}/${Encrypt(data._id)}`;
+  const linkHref = `/SalesPortal/${module}/${data._id}`;
 
   return (
     <HoverCard>

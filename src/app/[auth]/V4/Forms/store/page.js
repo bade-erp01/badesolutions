@@ -5,7 +5,7 @@ const NaijaStates = require("naija-state-local-government");
 import {PhotoIcon,UserCircleIcon,ChevronDownIcon,} from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { ErrorMessage,SuccessToast,plsWait } from "../../../../../../Functions/Mics";
-import {Encrypt,EXPRESS_PRIVATE_URL} from '../../../../../../Functions/Functions'
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -26,21 +26,10 @@ export default function StoreForm({business, user}) {
       e.preventDefault();
       plsWait('Creating New Store...⌛');
 
-      const encryptedTenantId = Encrypt(business?.tenantId);
-
       try {
-        const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/warehouse/create-new`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${encryptedTenantId}`,
-            access:`${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
-          body: JSON.stringify(formData),
-        });
+        const response = await api.post("/api/warehouse/create-new", formData);
 
-        const data = await response.json();
+        const data = response.data || {};
 
         if (data.success) {
           SuccessToast(data.success);

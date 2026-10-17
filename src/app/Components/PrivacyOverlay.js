@@ -15,7 +15,6 @@ export default function PrivacyIdleOverlay({
   idleTimeMs = 60_000, // 1 minute
   onLock,
   userData,
-  SessionId,
   children,
   requirePin = false,
 }) {
@@ -24,23 +23,6 @@ export default function PrivacyIdleOverlay({
   const [locked, setLocked] = useState(false);
   const [pin, setPin] = useState("");
   const timerRef = useRef(null);
-
-  /**
-   * Session Validation
-   */
-  useEffect(() => {
-    if (!userData?.user || !SessionId) return;
-
-    const userSession = userData.user.SessionId;
-
-    if (userSession !== SessionId) {
-      ErrorMessage("Your account has been logged in elsewhere.");
-
-      setTimeout(() => {
-        router.replace("/Login");
-      }, 500);
-    }
-  }, [userData?.user?.SessionId, SessionId, router]);
 
   /**
    * Reset idle timer

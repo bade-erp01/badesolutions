@@ -1,11 +1,11 @@
 import React from 'react'
 import Page from "./page"
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Encrypt, Dencrypt } from "../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import Notch from "@/app/Components/Notch";
 import BackButton from "@/app/Components/BackBotton";
-import Users from "../../../../../../../models/Users"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -63,39 +63,15 @@ export default async function layout({params}) {
         return notFound();
       }
 
-      const users = await Users.findByTenant(userData.business.tenantId).lean()
-      const StringedUsers = JSON.stringify(users)
-      const ParsedUser = JSON.parse(StringedUsers)
-    
-      const [Assets,Stores] = await Promise.all([
-        fetch(`${baseUrl}/api/asset/${moduleList.id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-            access:`${Encrypt(userData.user._id)}`
-          },
-        }),
-
-        fetch(`${baseUrl}/api/Stores`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-          access: `${Encrypt(userData.user._id)}`
-        },
-        next: {
-          revalidate: 120,
-        },
-      }),
-
-
+      const [UsersRes, Assets, Stores] = await Promise.all([
+        serverApi("/api/Users"),
+        serverApi(`/api/asset/${moduleList.id}`),
+        serverApi("/api/Stores", { next: { revalidate: 120 } }),
       ]);
-    
-      const asset = await Assets.json();
-      const StoreList = await Stores.json()
+
+      const ParsedUser = UsersRes.data?.data || []
+      const asset = Assets.data || {};
+      const StoreList = Stores.data
       const DecryptedAsset = Dencrypt(asset.Asset)
 
       if(!DecryptedAsset){

@@ -8,12 +8,11 @@ import {
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../../Functions/Mics";
-import axios from "axios";
+import api from "@/lib/api";
 import moment from "moment";
 import { useEffect, Suspense } from "react";
 import ImageUploader from "@/app/Components/ImageUploade";
 import {
-  Encrypt,
   EXPRESS_PRIVATE_URL,
   pricelistSetter,
 } from "../../../../../../../Functions/Functions";
@@ -74,7 +73,7 @@ export default function SingleProductpage({
   const [isOpen3, setIsOpen3] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const link = `/${navigation.auth}/V4/product/product/${Encrypt(Backdata.CopyID)}`;
+  const link = `/${navigation.auth}/V4/product/product/${Backdata.CopyID}`;
   const [BuyingPrice, setBuyingPrice] = useState({
     BuyingPrice:
       Number(Backdata?.BuyingPrice) || Number(Backdata?.vendor_Price) || 0,
@@ -124,21 +123,12 @@ export default function SingleProductpage({
 
             const resizedImage = canvas.toDataURL("image/jpeg", 0.7); // Adjust quality as needed
 
-            const request = await fetch(
-              `${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${module}`,
-              {
-                method: "POST",
-                body: JSON.stringify({ image: resizedImage }),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-                  access: `${Encrypt(userInfo._id)}`,
-                  sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-                },
-              },
+            const request = await api.post(
+              `/api/images/upload?id=${id}&module=${module}`,
+              { image: resizedImage },
             );
 
-            const response = await request.json();
+            const response = request.data || {};
             if (response.message) {
               Swal.fire({
                 title: "Your uploaded File",
@@ -156,13 +146,6 @@ export default function SingleProductpage({
       ErrorMessage("Error uploading file:", error.message);
     }
   };
-
-  const [headers] = useState({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-    access: `${Encrypt(userInfo._id)}`,
-    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-  });
 
   const [formData, setFormData] = useState({ ...data });
 
@@ -200,19 +183,15 @@ export default function SingleProductpage({
         throw new Error("Please enter a valid buying price greater than zero.");
       }
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/${Encrypt(Backdata._id)}/BuyingPrice_change`,
+      const response = await api.patch(
+        `/api/${Backdata._id}/BuyingPrice_change`,
         {
-          method: "PATCH",
-          headers: headers, // Use the state-defined headers
-          body: JSON.stringify({
-            productId: Backdata._id,
-            updatedBuyingPrice: priceValue,
-          }),
+          productId: Backdata._id,
+          updatedBuyingPrice: priceValue,
         },
       );
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (response.ok && data.message) {
         SuccessToast(data.message);
@@ -247,11 +226,12 @@ export default function SingleProductpage({
         Nafdac: formData.Nafdac,
         LeadTime: formData.LeadTime,
       };
-      const { data } = await axios.patch(
-        `${EXPRESS_PRIVATE_URL}/api/Products/${Encrypt(Backdata._id)}/edit`,
+      const r = await api.patch(
+        `/api/Products/${Backdata._id}/edit`,
         form,
-        { headers },
       );
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data;
 
       if (data && data.result) {
         SuccessToast(data.result);
@@ -286,7 +266,7 @@ export default function SingleProductpage({
             <div className="flex items-center space-x-6 max-w-full">
               <div
                 onClick={() => {
-                  uploadFiles(Encrypt(data._id), "product");
+                  uploadFiles(data._id, "product");
                 }}
                 className="rounded overflow-hidden flex items-center justify-center"
               >
@@ -1043,7 +1023,7 @@ export default function SingleProductpage({
                                 <TableCell>
                                   <Link
                                     className="font-medium text-indigo-700 hover:underline visited:text-purple-600"
-                                    href={`/${navigation.auth}/V4/inventory/inventory/${Encrypt(product._id)}`}
+                                    href={`/${navigation.auth}/V4/inventory/inventory/${product._id}`}
                                   >
                                     View Stock Position in{" "}
                                     {log.warehouseName.toLowerCase()}
@@ -1233,21 +1213,13 @@ export function ProductChart({ productId, productName, business, user }) {
       setError("");
 
       const currentYear = moment().format("YYYY");
-      const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}&productId=${productId}`;
+      const url = `/api/SalseandStock?Year=${currentYear}&productId=${productId}`;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.get(url);
 
       if (!response.ok) throw new Error("Failed to fetch product sales");
 
-      const result = await response.json();
+      const result = response.data || {};
 
       setMonthlySalesArray(result.monthlySalesArray || []);
       setTotalSales(result.totalSales || 0);
@@ -1464,23 +1436,14 @@ export function ProductPriceList({ initialData, Biz, user }) {
     }
 
     try {
-      const request = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/updatePriceLists/${Encrypt(initialData._id)}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-            access: Encrypt(user._id),
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
-          body: JSON.stringify(update),
-        },
+      const request = await api.patch(
+        `/api/updatePriceLists/${initialData._id}`,
+        update,
       );
 
-      const response = await request.json();
+      const response = request.data || {};
       if (!request.ok) {
-        throw new Error(response.error);
+        throw new Error(response.error || request.error);
       }
 
       SuccessToast(response.message);

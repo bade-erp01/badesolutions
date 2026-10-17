@@ -6,7 +6,6 @@ import BackButton from "@/app/Components/BackBotton";
 import Link from "next/link";
 import Image from "next/image";
 import Footer2 from "@/app/Components/Footer2";
-import Business from "../../../../../models/Business";
 import { notFound } from "next/navigation";
 import CreateBusinessTenant from "@/app/Components/AddTenant"
 
@@ -71,11 +70,12 @@ export default async function SetUpLayout({ children, params }) {
     return notFound();
   }
 
-  const RawBusiness = await Business.findById(Dencrypt(moduleList.id))
-    .select("-payStackApiKey")
-    .lean();
-  const parsedBusiness = JSON.parse(JSON.stringify(RawBusiness));
-  const business = JSON.parse(JSON.stringify(parsedBusiness));
+  // The backend session already carries this business (without payStackApiKey);
+  // this page only ever opens the logged-in tenant's own business.
+  if (String(Dencrypt(moduleList.id)) !== String(userData.business?._id)) {
+    return notFound();
+  }
+  const business = JSON.parse(JSON.stringify(userData.business));
 
   if (!business) return notFound();
 

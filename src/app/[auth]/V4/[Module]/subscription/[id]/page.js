@@ -34,6 +34,7 @@ import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Encrypt } from "../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 
 export default function Page({ data, baseUrl, subscribers }) {
   const [formData, setFormData] = useState({
@@ -99,14 +100,10 @@ export default function Page({ data, baseUrl, subscribers }) {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${baseUrl}/api/subscriptions/${data._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          fee: Number(formData.fee),
-          completionDate: Number(formData.completionDate),
-        }),
+      const res = await api.put(`/api/subscriptions/${data._id}`, {
+        ...formData,
+        fee: Number(formData.fee),
+        completionDate: Number(formData.completionDate),
       });
 
       if (!res.ok) throw new Error("Update failed");

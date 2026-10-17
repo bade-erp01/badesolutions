@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ChartBarIcon } from "@heroicons/react/24/outline"
 import Swal from "sweetalert2"
 import withReactContent from "sweetalert2-react-content"
-import { Encrypt } from "../../../Functions/Functions"
+import api from "@/lib/api"
 import { plsWait, ErrorMessage } from "../../../Functions/Mics"
 import { escapeHtml } from "@/lib/security/escapeHtml"
 
@@ -20,23 +20,14 @@ export default function ExpenseReportModal({ userData, baseUrl }) {
 
     const handleSubmit = async () => {
         plsWait("Generating report...")
-        const request = await fetch(
-            `${baseUrl}/api/ExpenseReport?Startdate=${Startdate}&Enddate=${Enddate}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-                    access: `${Encrypt(userData.user._id)}`,
-                    sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-                },
-            }
+        const request = await api.get(
+            `/api/ExpenseReport?Startdate=${Startdate}&Enddate=${Enddate}`
         )
-        const response = await request.json()
+        const response = request.data || {}
 
         // if respons has an error, show error message
-        if (response.error || !request.ok || response.ExpensesList.length === 0) {
-           ErrorMessage(response.error || "No  expenses found for the selected dates")
+        if (response.error || !request.ok || !response.ExpensesList || response.ExpensesList.length === 0) {
+           ErrorMessage(response.error || (request.status === 401 ? request.error : null) || "No  expenses found for the selected dates")
            return
         }
         setDateModalOpen(false)

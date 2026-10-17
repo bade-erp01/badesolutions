@@ -1,7 +1,7 @@
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import { notFound } from "next/navigation";
 import Page from "./page";
-import {Encrypt} from "../../../../../../Functions/Functions"
+import { serverApi } from "@/lib/serverApi"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -49,32 +49,17 @@ export default async function ExpenseLayout({ children, params }) {
    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
 const [storeRes, ExpenseCat] = await Promise.all([
-  fetch(`${baseUrl}/api/Stores`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
+  serverApi("/api/Stores", {
     next: {
       revalidate: 120,
     },
   }),
 
-  fetch(`${baseUrl}/api/ExpenseCat`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    },
-  }),
+  serverApi("/api/ExpenseCat"),
 ]);
 
-const StoreList = await storeRes.json();
-const ExpenseCatList = await ExpenseCat.json();
+const StoreList = storeRes.data;
+const ExpenseCatList = ExpenseCat.data;
 
   // check if user has access to crm and cash register
   const ExpenseFinder = userData.user.Apps.find((app) => {

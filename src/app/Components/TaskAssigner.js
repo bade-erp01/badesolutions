@@ -3,10 +3,9 @@
 import {useState} from 'react'
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import axios from 'axios';
+import api from "@/lib/api";
 import { useRouter } from 'next/navigation';
 import {ErrorMessage,plsWait,SuccessToast} from "../../../Functions/Mics"
-import {Encrypt} from "../../../Functions/Functions"
 import { escapeHtml } from "@/lib/security/escapeHtml";
 import {
   TicketIcon
@@ -14,7 +13,7 @@ import {
 
 const MySwal = withReactContent(Swal);
 
-export default function TaskAssigner({users, userInfo , EXPRESS_PRIVATE_URL}) {
+export default function TaskAssigner({users, userInfo}) {
     const navigation = useRouter()
     const [userList] = useState(users || [])
 
@@ -80,21 +79,14 @@ export default function TaskAssigner({users, userInfo , EXPRESS_PRIVATE_URL}) {
         if (result.isConfirmed) {
             plsWait("");
             try {
-                const data = await axios.put(
-                    `${EXPRESS_PRIVATE_URL}/api/Activity_Schedula/${Encrypt(userInfo.user._id)}`,
+                const data = await api.put(
+                    `/api/Activity_Schedula/${userInfo.user._id}`,
                     {
                         ...result.value,
                         creatorID: `${userInfo.user.firstName} ${userInfo.user.lastName}` ,
-                    },
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-                            access: `${Encrypt(userInfo.user._id)}`,
-                            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
-                        },
                     }
                 );
+                if (!data.ok) throw new Error(data.error);
                 SuccessToast(data.data.message);
                 navigation.refresh();
             } catch (error) {

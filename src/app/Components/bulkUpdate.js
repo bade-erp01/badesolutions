@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import { plsWait ,ErrorMessage,SuccessToast} from "../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
@@ -104,20 +104,11 @@ const BulkUpdate = ({ tenantId, collectionName,WHID }) => {
   const uploadToDB = async (data) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/updatebulk/${Encrypt(WHID)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Encrypt(tenantId.business.tenantId)}`,
-          access: `${Encrypt(tenantId.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(tenantId.SessionId)}`
-        },
-        body: JSON.stringify({data:Encrypt(data), collectionName:Encrypt(collectionName)}),
-      });
+      const res = await api.post(`/api/updatebulk/${WHID}`, { data, collectionName });
 
       if (!res.ok) throw new Error('Upload failed');
 
-      SuccessToast(res.message);
+      SuccessToast(res.data?.message);
     } catch (err) {
       ErrorMessage(err.message);
     } finally {

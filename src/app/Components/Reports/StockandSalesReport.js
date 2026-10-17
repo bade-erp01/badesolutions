@@ -5,7 +5,8 @@ import Swal from "sweetalert2";
 import { SwatchIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { downloadExcel, Encrypt } from "../../../../Functions/Functions";
+import { downloadExcel } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -94,16 +95,6 @@ export default function StockandSalesReport({ baseUrl, userData }) {
   const [loading, setLoading] = useState(false);
   const [dateDialogOpen, setDateDialogOpen] = useState(false);
   const [dateRange, setDateRange] = useState(undefined);
-
-  const getAuthHeaders = useCallback(
-    () => ({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    }),
-    [userData?.business?.tenantId, userData?.user?._id, userData?.SessionId]
-  );
 
   const buildSummaryRows = useCallback(
     (productList, storeList, vendorList, invoicesAll, purchasesAll, inventory) => {
@@ -668,20 +659,16 @@ export default function StockandSalesReport({ baseUrl, userData }) {
         const start = format(range.from, "yyyy-MM-dd");
         const end = format(range.to, "yyyy-MM-dd");
 
-        const res = await fetch(
-          `${baseUrl}/api/Products/report?startDate=${encodeURIComponent(
+        const res = await api.get(
+          `/api/Products/report?startDate=${encodeURIComponent(
             start
-          )}&endDate=${encodeURIComponent(end)}`,
-          {
-            method: "GET",
-            headers: getAuthHeaders(),
-          }
+          )}&endDate=${encodeURIComponent(end)}`
         );
 
-        const fetchedData = await res.json();
+        const fetchedData = res.data;
 
         if (!res.ok) {
-          throw new Error(fetchedData?.error || "Failed to fetch product data");
+          throw new Error(fetchedData?.error || res.error || "Failed to fetch product data");
         }
 
         Swal.close();
@@ -694,7 +681,7 @@ export default function StockandSalesReport({ baseUrl, userData }) {
         setLoading(false);
       }
     },
-    [baseUrl, getAuthHeaders, showReportModal]
+    [showReportModal]
   );
 
   return (

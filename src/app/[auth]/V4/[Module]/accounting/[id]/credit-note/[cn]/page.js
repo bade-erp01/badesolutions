@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useRouter, useParams } from "next/navigation";
-import { plsWait, ErrorMessage, SuccessToast, Encrypt } from '../../../../../../../../../Functions/Mics';
+import { plsWait, ErrorMessage, SuccessToast } from '../../../../../../../../../Functions/Mics';
+import api from "@/lib/api";
 import { Dencrypt } from "../../../../../../../../../Functions/Functions";
 
 import {
@@ -26,24 +27,18 @@ export default function Page({ data, userData, baseurl }) {
 
     plsWait('');
     try {
-      const response = await fetch(`${baseurl}/api/Customer/Memo/${Params.cn}`, {
-        method: "PATCH",
-        body: JSON.stringify({
+      const response = await api.patch(`/api/Customer/Memo/${Params.cn}`, {
           ApprovedBy: `${userData.user.firstName} ${userData.user.lastName}`,
           action: action,
-        }),
+        }, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-          access: `${Encrypt(userData.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
           "idempotency-key": `CN-${action}-${Dencrypt(Params.cn)}`,
         },
       });
 
       if (!response.ok) throw new Error('Failed to process credit note');
-      
-      const request = await response.json();
+
+      const request = response.data;
       SuccessToast(request.message);
 
       if (action === "Delete") {

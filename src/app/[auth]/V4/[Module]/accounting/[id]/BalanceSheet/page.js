@@ -16,7 +16,8 @@ import {
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Dencrypt, Encrypt } from "../../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import BackButton from "@/app/Components/BackBotton";
 import {
   Popover,
@@ -92,24 +93,15 @@ export default function BalanceSheet({ data, baseUrl, userData }) {
   const FetchSnapShot = async (year) => {
     try {
       plsWait(`Fecthing snapshots for ${year}`);
-      const res = await fetch(
-        `${baseUrl}/api/Generate/BalanceSheet?period=${year}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-          },
-        },
+      const res = await api.get(
+        `/api/Generate/BalanceSheet?period=${year}`,
       );
 
       if (!res.ok) {
         throw new Error("Failed to fetch balance data");
       }
 
-      const response = await res.json();
+      const response = res.data;
       setBalance(Dencrypt(response.data));
       setYear(year);
       setCoa(Dencrypt(response.coaBal));

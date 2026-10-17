@@ -4,7 +4,8 @@ import moment from "moment";
 import { useState } from "react";
 import {downloadExcel,Dencrypt} from "../../../../Functions/Functions"
 import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
-import {plsWait,ErrorMessage,SuccessToast, Encrypt} from "../../../../Functions/Mics"
+import {plsWait,ErrorMessage,SuccessToast} from "../../../../Functions/Mics"
+import api from "@/lib/api"
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
 export default function PayableRegister({ customers,userData ,baseUrl}) {
@@ -19,19 +20,11 @@ export default function PayableRegister({ customers,userData ,baseUrl}) {
    const fetchData = async () => {
       try {
         plsWait("Loading Report Data...");
-        const res = await fetch(`${baseUrl}/api/PayableReports`, {
-          method: "GET",
-           headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              access: `${Encrypt(userData.user._id)}`,
-              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-            },
-        });
+        const res = await api.get("/api/PayableReports");
   
         if (!res.ok) throw new Error("Failed to fetch product data");
   
-        const fetchedData = await res.json();
+        const fetchedData = res.data || {};
         // decrypt/assign data
         const transactions = Dencrypt(fetchedData.Transactions) || [];
         setData(transactions);

@@ -11,13 +11,13 @@ import {
 } from "react";
 import { io } from "socket.io-client";
 import { toast } from "sonner";
-import { Encrypt } from "../../../Functions/Functions";
+import { API_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
-const SOCKET_URL =
-  process.env.EXPRESS_PRIVATE_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:3000";
+// Same backend (and so the same session cookie domain) as src/lib/api.js. The old
+// fallback sent production browsers to http://localhost:3000 whenever
+// NEXT_PUBLIC_API_URL was unset (EXPRESS_PRIVATE_URL is never exposed to the browser).
+const SOCKET_URL = API_URL;
 
 const WebSocketContext = createContext(null);
 
@@ -29,17 +29,15 @@ export function WebSocketProvider({ children, user }) {
 
   const [status, setStatus] = useState("disconnected");
 
+  // The socket authenticates with the session cookie (withCredentials); this only decides
+  // whether to connect, and reconnects when the user or business changes.
   const auth = useMemo(() => {
-    if (!user?.business?.tenantId || !user?.user?._id || !user?.SessionId) {
+    if (!user?.business?.tenantId || !user?.user?._id) {
       return null;
     }
 
-    return {
-      authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-      access: Encrypt(user.user._id),
-      sessionkey: `Bearer ${Encrypt(user.SessionId)}`,
-    };
-  }, [user]);
+    return `${user.business.tenantId}:${user.user._id}`;
+  }, [user?.business?.tenantId, user?.user?._id]);
 
   const notifyListeners = useCallback((eventType, data) => {
     const listeners = listenersRef.current.get(eventType);
@@ -145,11 +143,7 @@ export function WebSocketProvider({ children, user }) {
     }
 
     const socket = io(SOCKET_URL, {
-      auth: {
-        authorization: auth.authorization,
-        access: auth.access,
-        sessionkey: auth.sessionkey,
-      },
+      withCredentials: true,
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -295,7 +289,7 @@ export function WebSocketProvider({ children, user }) {
           const invoiceId = data?._id || data?.id;
           if (invoiceId) {
             router.push(
-              `/Notification/V4/Sales/Sales/${Encrypt(invoiceId)}`
+              `/Notification/V4/Sales/Sales/${invoiceId}`
             );
           }
         },

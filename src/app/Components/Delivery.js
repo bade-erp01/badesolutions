@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { NewspaperIcon } from "@heroicons/react/24/outline";
 import { ErrorMessage, SuccessToast, plsWait } from "../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL, Dencrypt,Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 
 export default function DeliveryModal({ id, user, business }) {
   const [open, setOpen] = useState(false);
@@ -46,20 +46,15 @@ export default function DeliveryModal({ id, user, business }) {
       WayBillNo: `WB${Math.floor(Math.random() * 12345)}${plateNumber.substring(0, 3)}`
     };
 
-    const url = `${EXPRESS_PRIVATE_URL}/api/delivery/${id}/${user.firstName}`;
+    const url = `/api/delivery/${id}/${user.firstName}`;
 
     try {
-      const response = await fetch(url, {
-        method: "PATCH",
+      const response = await api.patch(url, deliveryData, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
           "idempotency-key": `delivery-${id}`,
         },
-        body: JSON.stringify(deliveryData),
       });
+      if (response.status === 0) throw new Error(response.error);
 
       if (response.ok) {
         SuccessToast("Invoice generated successfully!");

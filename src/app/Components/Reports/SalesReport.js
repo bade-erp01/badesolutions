@@ -10,10 +10,9 @@ import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import {
   downloadExcel,
   pricelistSetter,
-  Encrypt,
 } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
-import { useUser } from "@/components/UserProvider";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -45,7 +44,6 @@ export default function SalesRportModal({ user, business, baseUrl }) {
   const [loading, setLoading] = useState(false);
   const [dateDialogOpen, setDateDialogOpen] = useState(false);
   const [dateRange, setDateRange] = useState(undefined);
-  const currentUser = useUser();
 
   const fetchData = async (range) => {
     if (!range?.from || !range?.to) {
@@ -60,20 +58,10 @@ export default function SalesRportModal({ user, business, baseUrl }) {
       const start = format(range.from, "yyyy-MM-dd");
       const end = format(range.to, "yyyy-MM-dd");
 
-      const res = await fetch(`${baseUrl}/api/Invoice/report?startDate=${start}&endDate=${end}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(
-            currentUser.user.business.tenantId
-          )}`,
-          access: `${Encrypt(currentUser.user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`,
-        },
-      });
+      const res = await api.get(`/api/Invoice/report?startDate=${start}&endDate=${end}`);
 
-      const fetchedData = await res.json();
-      if (!res.ok) throw new Error(fetchedData.error || `Failed to fetch product data`);
+      const fetchedData = res.data || {};
+      if (!res.ok) throw new Error(fetchedData.error || res.error || `Failed to fetch product data`);
 
 
       try {

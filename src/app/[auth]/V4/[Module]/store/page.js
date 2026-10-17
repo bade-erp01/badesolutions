@@ -1,7 +1,7 @@
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Link from "next/link";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
-import { Encrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 
 import {
   Table,
@@ -77,22 +77,9 @@ export const metadata = {
 export default async function storelayout({ children, params }) {
   const moduleList = await params;
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
+  const res = await serverApi(`/api/Stores`);
 
-  const res = await fetch(`${baseUrl}/api/Stores`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-    next: {
-      revalidate: 120,
-    },
-  });
-
-  const StoreList = await res.json();
+  const StoreList = res.data;
   const stores = StoreList || [];
 
   return (
@@ -179,7 +166,7 @@ export default async function storelayout({ children, params }) {
                   stores.map((store) => (
                     <TableRow key={store._id}>
                       <TableCell className="font-medium">
-                        <Link href={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${Encrypt(store._id)}`} className="text-indigo-500">
+                        <Link href={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${store._id}`} className="text-indigo-500">
                           {store.WHName || "Unnamed Store"}
                         </Link>
                       </TableCell>

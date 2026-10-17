@@ -1,6 +1,6 @@
 import React from "react";
 import SingleProductpage from "./page";
-import { Dencrypt, Encrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
@@ -51,20 +51,11 @@ export const metadata = {
 
 export default async function layout({ params, children }) {
   const userInfo = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
   const decoy = await params;
 
-  const res = await fetch(`${baseUrl}/api/Product/${decoy.id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      access: `${Encrypt(userInfo.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-    },
-  });
+  const res = await serverApi(`/api/Product/${decoy.id}`);
 
-  const data = await res.json();
+  const data = res.data;
 
   if (!res.ok) {
     return (

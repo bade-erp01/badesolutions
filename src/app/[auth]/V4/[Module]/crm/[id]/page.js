@@ -13,15 +13,14 @@ import {
   pricelistSetter,
   EXPRESS_PRIVATE_URL,
 } from "../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import { useState } from "react";
 import DaySelector from "@/app/Components/Datepicker";
 import {
   plsWait,
-  Encrypt,
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../../Functions/Mics";
-import axios from "axios";
 import moment from "moment";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import AgingReportDownloader from "@/app/Components/Reports/SingleAging";
@@ -192,26 +191,15 @@ export default function CustomerForm({
 
       plsWait("Please wait...This should only take a bit.");
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/update/customer/balance/${Encrypt(
-          userInfo.user._id,
-        )}/${Encrypt(cust._id)}/${field}`,
+      const response = await api.patch(
+        `/api/update/customer/balance/${userInfo.user._id}/${cust._id}/${field}`,
         {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          },
-          body: JSON.stringify({
-            id: Encrypt(cust._id),
-            [field]: value,
-          }),
+          id: cust._id,
+          [field]: value,
         },
       );
 
-      const data = await response.json();
+      const data = response.data || {};
       if (response.ok) {
         SuccessToast(data.message);
         navigation.refresh();
@@ -281,21 +269,11 @@ export default function CustomerForm({
 
     try {
       const { startDate, endDate } = formValues;
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/customerReport/${customerId}?Start=${startDate}&End=${endDate}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          },
-          cache: "no-store",
-        },
+      const res = await api.get(
+        `/api/customerReport/${customerId}?Start=${startDate}&End=${endDate}`,
       );
 
-      const TransactionResult = await res.json();
+      const TransactionResult = res.data;
       if (!res.ok || TransactionResult.length < 1) {
         throw new Error("No transactions found.");
       }
@@ -381,14 +359,8 @@ export default function CustomerForm({
     }
   }
 
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      access: `${Encrypt(userInfo.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-    },
-  };
+  // Passed to postPayment / InvoicePaymentForm; the session cookie authenticates.
+  const config = { headers: {} };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -415,10 +387,10 @@ export default function CustomerForm({
     try {
       plsWait("Submitting customer update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
-        cust._id,
-      )}`;
-      const { data } = await axios.patch(url, formData, config);
+      const url = `/api/customer/update/${cust._id}`;
+      const r = await api.patch(url, formData);
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data;
 
       if (data && data.message) {
         SuccessToast(data.message);
@@ -436,19 +408,18 @@ export default function CustomerForm({
       "Hold tight — we’re preparing everything for you. This won’t take long ⏳ Please don’t refresh or leave this page.",
     );
     try {
-      const url = `${EXPRESS_PRIVATE_URL}/api/SalesDraft/${Encrypt(
-        userInfo.user._id,
-      )}`;
-      const { data } = await axios.post(
+      const url = `/api/SalesDraft/${userInfo.user._id}`;
+      const r = await api.post(
         url,
         { customer: cust._id, whId: cust.location },
-        config,
       );
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data;
 
       if (data && data.result) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         navigation.push(
-          `/${router.auth}/V4/Sales/Sales/Draft/${Encrypt(data.result)}`,
+          `/${router.auth}/V4/Sales/Sales/Draft/${data.result}`,
         );
       } else {
         Swal.fire({
@@ -465,14 +436,13 @@ export default function CustomerForm({
   const updateServiceLocation = async () => {
     try {
       plsWait("Updating service location... Please wait.");
-      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
-        cust._id,
-      )}`;
-      const { data } = await axios.patch(
+      const url = `/api/customer/update/${cust._id}`;
+      const r = await api.patch(
         url,
         { location: formData.location },
-        config,
       );
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data;
       if (data && data.message) {
         SuccessToast(data.message);
         navigation.refresh();
@@ -581,7 +551,7 @@ export default function CustomerForm({
 
             <button
               type="button"
-              onClick={() => GenerateSummary(Encrypt(cust._id))}
+              onClick={() => GenerateSummary(cust._id)}
               className={btnOutline}
             >
               <PrinterIcon className="w-4 h-4" />
@@ -594,7 +564,7 @@ export default function CustomerForm({
                   type="button"
                   onClick={() =>
                     postPayment(
-                      Encrypt(cust._id),
+                      cust._id,
                       `${userInfo.user.firstName} ${userInfo.user.lastName}`,
                       config,
                     )
@@ -607,7 +577,7 @@ export default function CustomerForm({
 
                 {userInfo.business.subscriptionplan === "Standard" && (
                   <InvoicePaymentForm
-                    customerId={Encrypt(cust._id)}
+                    customerId={cust._id}
                     user={`${userInfo.user.firstName} ${userInfo.user.lastName}`}
                     config={config}
                     invoices={Sales.filter(

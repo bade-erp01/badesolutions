@@ -1,6 +1,6 @@
 import SingleStoreProductpage from "./page";
 import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
 import SideNavWrapper from "@/app/Components/sideNavWrapper";
@@ -9,18 +9,10 @@ export default async function StoreLayout({ params }) {
   try {
     const userInfo = await fetchUser();
     const param = await params;
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const res = await fetch(`${baseUrl}/api/SingleStorePoduct/${param.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-        access: `${Encrypt(userInfo.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-      },
-    });
+    const res = await serverApi(`/api/SingleStorePoduct/${param.id}`);
 
-    const StoreProd = await res.json();
+    const StoreProd = res.data;
+    if (!StoreProd) throw new Error(res.error);
 
     return (
       <div className="flex flex-col">

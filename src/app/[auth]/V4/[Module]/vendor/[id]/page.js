@@ -3,11 +3,11 @@
 import { useRouter,useParams } from "next/navigation";
 import { ShoppingCartIcon, ShoppingBagIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import { plsWait, ErrorMessage, SuccessToast } from "../../../../../../../Functions/Mics";
-import axios from "axios";
+import api from "@/lib/api";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Plotly from "plotly.js-dist-min";
-import { Encrypt, Dencrypt, EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../Functions/Functions";
 import Image from "next/image";
 
 // Shadcn UI Components
@@ -36,7 +36,6 @@ export default function SingleVendorpage({
   userInfo,
   Backdata,
   wh,
-  baseUrl,
   banks,
   Locations,
 }) {
@@ -45,13 +44,6 @@ export default function SingleVendorpage({
   const router = useRouter();
   const path = useParams()
   const [formData, setFormData] = useState({ ...Backdata });
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    access: `${Encrypt(userInfo.user._id)}`,
-    sessionKey: `Bearer ${Encrypt(userInfo.user.SessionId)}`,
-  };
 
   // Form Handlers
   const handleChange = (e) => {
@@ -66,11 +58,11 @@ export default function SingleVendorpage({
     e.preventDefault();
     try {
       plsWait("Updating...");
-      const response = await axios.patch(
-        `${baseUrl}/api/vendor/update/${Encrypt(Backdata._id)}`,
-        formData,
-        { headers }
+      const response = await api.patch(
+        `/api/vendor/update/${Backdata._id}`,
+        formData
       );
+      if (!response.ok) throw new Error(response.error);
 
       if (response.data?.message) {
         SuccessToast(response.data.message);
@@ -102,18 +94,14 @@ export default function SingleVendorpage({
     plsWait("Setting things up...");
 
     try {
-      const request = await fetch(`${baseUrl}/api/purchase/request`, {
-        method: "POST",
-        body: JSON.stringify(poForm),
-        headers,
-      });
+      const request = await api.post(`/api/purchase/request`, poForm);
 
-      const res = await request.json();
+      const res = request.data || {};
 
       if (res.newPurchase) {
         router.push(`/${path.auth}/V4/purchase/purchase/${res.newPurchase}`);
       } else {
-        ErrorMessage(res.error || "Failed to create purchase order");
+        ErrorMessage(res.error || request.error || "Failed to create purchase order");
       }
     } catch (err) {
       ErrorMessage("An error occurred");
@@ -139,18 +127,14 @@ export default function SingleVendorpage({
     plsWait("Setting things up...");
 
     try {
-      const request = await fetch(`${baseUrl}/api/Transit`, {
-        method: "POST",
-        body: JSON.stringify(gitForm),
-        headers,
-      });
+      const request = await api.post(`/api/Transit`, gitForm);
 
-      const res = await request.json();
+      const res = request.data || {};
 
       if (res.newPurchase) {
         router.push(`/${path.auth}/V4/Transit/Transit/${res.newPurchase}`);
       } else {
-        ErrorMessage(res.error || "Failed to create G.I.T request");
+        ErrorMessage(res.error || request.error || "Failed to create G.I.T request");
       }
     } catch (err) {
       ErrorMessage("An error occurred");
@@ -177,9 +161,7 @@ export default function SingleVendorpage({
     plsWait("Registering Vendor payment…");
 
     try {
-      const response = await fetch(`${baseUrl}/api/Payable/Payment`, {
-        method: "POST",
-        body: JSON.stringify({
+      const response = await api.post(`/api/Payable/Payment`, {
           vendor: Dencrypt(Backdata._id),
           Amount: paymentForm.amount,
           PaymentDate: paymentForm.date,
@@ -187,13 +169,11 @@ export default function SingleVendorpage({
           bankAccount: Dencrypt(paymentForm.type),
           location: paymentForm.location ? Dencrypt(paymentForm.location) : "",
           AccountatntId: `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-        }),
-        headers,
-      });
+        });
 
-      const data = await response.json();
+      const data = response.data || {};
 
-      if (!response.ok) throw new Error(data.error || "Payment failed");
+      if (!response.ok) throw new Error(data.error || response.error || "Payment failed");
 
       SuccessToast("Payment Registered and pending approval");
       window.location.href = `/${path.auth}/V4/accounting/accounting/vendorsPayment/${data.data}`;

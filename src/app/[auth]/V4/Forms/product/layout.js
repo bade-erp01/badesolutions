@@ -1,7 +1,7 @@
 import React from 'react'
 import ProductForm from "./page"
 import {fetchUser} from '../../../../../../Functions/useerDataRefresh'
-import {Encrypt} from "../../../../../../Functions/Functions"
+import { serverApi } from "@/lib/serverApi"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -52,14 +52,7 @@ export default async function Productlayout({ children, params }) {
   // const module = await params;
   const userData = await fetchUser();
    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Vendors`, {
-    method: "GET",
-    headers: {
-         "Content-Type": "application/json",
-         Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-         access: `${Encrypt(userData.user._id)}`,
-         sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-       },
+  const res = await serverApi("/api/Vendors", {
      // cache: 'no-store', // Ensures fresh data on every request
     next: {
       revalidate: 60 ,// revalidate every 60 seconds
@@ -67,7 +60,7 @@ export default async function Productlayout({ children, params }) {
     }
   })
 
-  const VendorList = await res.json()
+  const VendorList = res.data
 
   return (
     <div className="flex flex-col">

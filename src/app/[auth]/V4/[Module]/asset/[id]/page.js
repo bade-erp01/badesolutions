@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Encrypt } from "../../../../../../../Functions/Functions";
 import { plsWait, ErrorMessage, SuccessToast } from "../../../../../../../Functions/Mics";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import api from "@/lib/api";
 
 import {
   Card,
@@ -39,20 +38,13 @@ import { Separator } from "@/components/ui/separator";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseUrl }) {
+export default function Page({ DecryptedAsset, StoreList, userInfo, users }) {
   const [Stores] = useState(StoreList);
   const [formData, setFormData] = useState(DecryptedAsset || {});
   const [user] = useState(userInfo);
   const [usersList] = useState(users || []);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-    access: `${Encrypt(userInfo.user._id)}`,
-    sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-  };
 
   const activityLogs = DecryptedAsset?.AcivityLog || [];
   const totalPages = Math.ceil(activityLogs.length / ITEMS_PER_PAGE);
@@ -75,11 +67,12 @@ export default function Page({ DecryptedAsset, StoreList, userInfo, users, baseU
     e.preventDefault();
     try {
       plsWait("Updating asset...");
-      const { data } = await axios.patch(
-        `${baseUrl}/api/update/asset/${Encrypt(DecryptedAsset._id)}`,
-        formData,
-        { headers }
+      const r = await api.patch(
+        `/api/update/asset/${DecryptedAsset._id}`,
+        formData
       );
+      if (!r.ok) throw new Error(r.error);
+      const data = r.data;
 
       if (data?.message) {
         SuccessToast("Asset updated successfully");

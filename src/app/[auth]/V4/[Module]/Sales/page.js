@@ -3,9 +3,8 @@
 import { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
-import { Encrypt } from "../../../../../../Functions/Mics";
-import { pricelistSetter, EXPRESS_PRIVATE_URL } from "../../../../../../Functions/Functions";
+import api from "@/lib/api";
+import { pricelistSetter } from "../../../../../../Functions/Functions";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import { Paperclip, ShoppingCart } from "lucide-react";
 import {
@@ -32,7 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/components/UserProvider";
 
-export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
+export default function InvoiceLandingPage() {
   const [searchRef, setSearchRef] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -73,17 +72,10 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         if (startDate) queryParams.set("startDate", startDate);
         if (endDate) queryParams.set("endDate", endDate);
 
-        const response = await axios.get(
-          `${baseUrl}/api/Invoice?${queryParams.toString()}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-              access: `${Encrypt(userData.user._id)}`,
-              sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-            },
-          }
+        const response = await api.get(
+          `/api/Invoice?${queryParams.toString()}`
         );
+        if (!response.ok) throw new Error(response.error);
 
         const data = response.data;
         const newInvoices = data.invoices || [];
@@ -105,7 +97,7 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
         setIsLoadingMore(false);
       }
     },
-    [baseUrl, userData, searchRef, startDate, endDate]
+    [userData, searchRef, startDate, endDate]
   );
 
   // ────────────────────────────────────────────────
@@ -224,8 +216,8 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
                     {billList.map((bill) => {
                       const url =
                         bill.billStatus?.toLowerCase() === "draft"
-                          ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${Encrypt(bill._id)}`
-                          : `/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(bill._id)}`;
+                          ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${bill._id}`
+                          : `/${params.auth}/V4/${params.Module}/${params.Module}/${bill._id}`;
 
                       return (
                         <TableRow key={bill._id}>
@@ -278,8 +270,8 @@ export default function InvoiceLandingPage({ baseUrl = EXPRESS_PRIVATE_URL }) {
                 {billList.map((bill) => {
                   const url =
                     bill.billStatus?.toLowerCase() === "draft"
-                      ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${Encrypt(bill._id)}`
-                      : `/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(bill._id)}`;
+                      ? `/${params.auth}/V4/${params.Module}/${params.Module}/Draft/${bill._id}`
+                      : `/${params.auth}/V4/${params.Module}/${params.Module}/${bill._id}`;
 
                   return (
                     <Card

@@ -3,7 +3,7 @@ import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { SquaresPlusIcon } from "@heroicons/react/24/outline";
-import { Encrypt,Dencrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import {ErrorMessage,SuccessToast,plsWait,} from "../../../Functions/Mics"
 import { useRouter } from "next/navigation";
 
@@ -62,24 +62,15 @@ const ExpenseCategoryModal = ({ baseUrl,userData }) => {
         plsWait("Please wait.")
         const { tagName, expenseType } = result.value;
         // send request to server
-        const request = await fetch(`${baseUrl}/api/expense/Category/create`,{
-            method:"POST",
-            body:JSON.stringify({NAME:tagName,type:expenseType}),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-                access: `${Encrypt(userData.user._id)}`,
-                sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-            }
-        })
+        const request = await api.post("/api/expense/Category/create", {NAME:tagName,type:expenseType})
         
-        const response = await request.json()
+        const response = request.data || {}
 
         if(request.ok){
           SuccessToast(response.message)
           Router.refresh()
         }else{
-          ErrorMessage(response.error)
+          ErrorMessage(response.error || request.error)
           Router.refresh()
         }
       }

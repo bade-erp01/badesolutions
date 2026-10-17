@@ -1,7 +1,7 @@
 import React from 'react'
 import NewCustomerForm from "./page"
 import {fetchUser} from '../../../../../../Functions/useerDataRefresh'
-import EMPLOYEES from "../../../../../../models/Users"
+import { serverApi } from "@/lib/serverApi"
 import {notFound} from "next/navigation"
 
 
@@ -30,8 +30,8 @@ export default async function crmLayout({ params }) {
   if (!userData.user.createCustomer)  notFound()
     
   const moduleParams = params;
-  const Stringedsalesperson = await EMPLOYEES.findByTenant(userData.business.tenantId).select("firstName lastName _id ").lean();
-  const paresedSalesperson = JSON.parse(JSON.stringify(Stringedsalesperson));
+  const usersRes = await serverApi("/api/Users");
+  const paresedSalesperson = (usersRes.data?.data || []).map(({ firstName, lastName, _id }) => ({ firstName, lastName, _id }));
 
 
   return (
@@ -39,7 +39,7 @@ export default async function crmLayout({ params }) {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
-         <NewCustomerForm userData={userData} businessData={userData.business} salesperson={paresedSalesperson} sessionId={userData.SessionId}/>
+         <NewCustomerForm userData={userData} businessData={userData.business} salesperson={paresedSalesperson}/>
         </main>
       </div>
   );

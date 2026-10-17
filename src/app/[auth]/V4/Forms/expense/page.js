@@ -1,13 +1,12 @@
 "use client";
 import React from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   plsWait,
   ErrorMessage,
   SuccessToast,
-  Encrypt,
 } from "../../../../../../Functions/Mics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,20 +57,10 @@ export default function Page({
     try {
       plsWait("Submitting Expense data...");
       setLoading(true);
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
-          access: `${Encrypt(userData._id)}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-        },
-      };
-
-      const response = await axios.post(
-        `${baseUrl}/api/Expense`,
-        formData,
-        config,
-      );
+      const response = await api.post("/api/Expense", formData);
+      if (!response.ok) {
+        throw new Error(response.data?.message || response.error);
+      }
 
       SuccessToast(response.data?.message || "Expense created successfully!");
       setFormData({});
@@ -81,8 +70,7 @@ export default function Page({
       );
     } catch (error) {
       ErrorMessage(
-        error.response?.data?.message ||
-          error.message ||
+        error.message ||
           "Failed to create expense. Please try again.",
       );
     } finally {

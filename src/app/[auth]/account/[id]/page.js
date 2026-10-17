@@ -8,14 +8,14 @@ import Link from "next/link";
 import { useState } from "react";
 import moment from "moment";
 import currency from "../../../../data/currencies.json";
-import axios from "axios";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   ErrorMessage,
   plsWait,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import { Encrypt, Dencrypt, pricelistSetter } from "../../../../../Functions/Functions";
+import { Dencrypt, pricelistSetter } from "../../../../../Functions/Functions";
 import { Badge } from "@/components/ui/badge";
 
 // shadcn/ui imports
@@ -90,22 +90,13 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
 
             const resizedImage = canvas.toDataURL("image/jpeg", 0.7);
 
-            const request = await fetch(
-              `${baseUrl}/api/images/upload?id=${id}&module=${moduleList}`,
-              {
-                method: "POST",
-                body: JSON.stringify({ image: resizedImage }),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-                  access: `${Encrypt(userInfo.user._id)}`,
-                  sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-                },
-              },
+            const request = await api.post(
+              `/api/images/upload?id=${id}&module=${moduleList}`,
+              { image: resizedImage },
             );
 
-            const response = await request.json();
-            if (response.message) {
+            const response = request.data;
+            if (response?.message) {
               Swal.fire({
                 title: "Your uploaded File",
                 imageUrl: resizedImage,
@@ -123,22 +114,14 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
     }
   };
 
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      access: `${Encrypt(userInfo.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-    },
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       plsWait("Submitting Business update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const url = `${baseUrl}/api/account/${Encrypt(formData._id)}`;
-      const { data: responseData } = await axios.patch(url, formData, config);
+      const r = await api.patch(`/api/account/${formData._id}`, formData);
+      if (!r.ok) throw new Error(r.error);
+      const responseData = r.data;
 
       if (responseData && responseData.message) {
         SuccessToast(responseData.message);
@@ -148,7 +131,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
         throw new Error("Something went wrong");
       }
     } catch (error) {
-      ErrorMessage(error?.response?.data?.error || error.message);
+      ErrorMessage(error.message);
     }
   };
 
@@ -224,7 +207,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => uploadFiles(Encrypt(formData._id), "Business")}
+                onClick={() => uploadFiles(formData._id, "Business")}
                 className="flex items-center gap-2"
               >
                 <PhotoIcon className="h-5 w-5" />
@@ -244,9 +227,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
                 href={`/${data?.companyName
                   .toLowerCase()
                   .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")}/${Encrypt(
-                  userInfo?.user._id,
-                )}/Module/Forms/employee`}
+                  .replace(/[^a-z0-9-]/g, "")}/${userInfo?.user._id}/Module/Forms/employee`}
               >
                 <UserPlusIcon className="h-5 w-5" />
                 Add User

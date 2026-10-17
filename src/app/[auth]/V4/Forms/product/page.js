@@ -6,8 +6,7 @@ import {
   SuccessToast,
   ErrorMessage,
 } from "../../../../../../Functions/Mics";
-import { Encrypt } from "../../../../../../Functions/Functions";
-import axios from "axios";
+import api from "@/lib/api";
 import { useRouter, useParams } from "next/navigation";
 // shadcn/ui components
 import { Separator } from "@/components/ui/separator";
@@ -72,15 +71,6 @@ export default function ProductForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(businessData.tenantId)}`,
-      access: `${Encrypt(userData._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    },
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -88,9 +78,9 @@ export default function ProductForm({
     try {
       plsWait("Creating Product...");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Product/Create-new`;
-
-      const { data } = await axios.post(url, formData, config);
+      const r = await api.post("/api/Product/Create-new", formData);
+      if (!r.ok) throw new Error(r.error);
+      const { data } = r;
 
       if (data.Message) {
         SuccessToast(data.Message);

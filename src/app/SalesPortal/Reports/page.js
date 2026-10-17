@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import NavWrapper from "@/app/Components/NavWrapper";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
-import {Encrypt,Dencrypt} from "../../../../Functions/Functions"
+import { serverApi } from "@/lib/serverApi";
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -59,29 +59,20 @@ export const dynamic = "force-dynamic";
 
 export default async function layout({ children }) {
   const userData = await fetchUser();
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const SessionId = Dencrypt(userData?.SessionId)
   
     // Redirect if either user OR business is missing 
-    if (!userData?.user || !userData?.business || !SessionId || userData.user.status !== "active" || SessionId !== userData.user.SessionId) {
+    if (!userData?.user || !userData?.business || userData.user.status !== "active") {
       redirect('/SalesPortal/Login');
     }
 
 
   let Array = [];
   try {
-    const res = await fetch(`${baseUrl}/api/Sales_Portal/stock/position`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData?.user?.tenantId)}`,
-        access: `${Encrypt(userData?.user?._id)}`,
-        sessionKey: `Bearer ${userData.SessionId}`
-      },
+    const res = await serverApi(`/api/Sales_Portal/stock/position`, {
       next: { revalidate: 60 },
     });
     if (res.ok) {
-      Array = await res.json();
+      Array = res.data;
     }
   } catch (err) {
     throw new Error("Failed to fetch data");

@@ -12,7 +12,8 @@ import {
   TrendingUp,      // Income Statement
   BookOpen,        // Charts of Account
   Building,
-  Coins
+  Coins,
+  Receipt          // Tax Report
 } from "lucide-react";
 import {useParams} from "next/navigation"
 
@@ -29,6 +30,7 @@ export default function AccountingERP() {
     { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Beta", url:"Chart-Of-Accounts" },
     { label: "Bank Account", id:"Bank-Accounts", icon: Building, badge:"Core", url:"Bank-Accounts"},
     { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll"},
+    { label: "Tax Report", id:"Tax-Report", icon: Receipt, badge:"New", url:"Tax-Report"},
   ];
 
   return (

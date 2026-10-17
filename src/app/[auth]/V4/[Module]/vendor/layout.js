@@ -1,5 +1,5 @@
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import Nav1 from "@/app/Components/Nav1";
 import Link from "next/link";
 import Image from "next/image";
@@ -58,18 +58,9 @@ export const metadata = {
 export default async function layout({ children, params }) {
   const userData = await fetchUser();
   const Module = await params;
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Vendors`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    },
-  });
+  const res = await serverApi(`/api/Vendors`);
 
-  const vendorList = await res.json();
+  const vendorList = res.data;
   return (
     <div className="flex flex-col">
       <Notch>

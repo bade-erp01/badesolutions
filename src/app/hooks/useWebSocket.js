@@ -5,7 +5,6 @@ import { io } from "socket.io-client";
 
 export default function useWebSocket({
   url,
-  auth,
   onMessage,
   onOpen,
   onAuthenticated,
@@ -36,11 +35,6 @@ export default function useWebSocket({
       return;
     }
 
-    if (!auth?.authorization) {
-      console.error("Socket.IO authentication data is missing");
-      return;
-    }
-
     if (socketRef.current?.connected) return;
 
     manuallyClosedRef.current = false;
@@ -52,12 +46,9 @@ export default function useWebSocket({
       socketRef.current = null;
     }
 
+    // Authenticated by the backend session cookie.
     const socket = io(url, {
-      auth: {
-        authorization: auth.authorization,
-        access: auth.access,
-        sessionkey: auth.sessionkey || auth.sessionKey,
-      },
+      withCredentials: true,
       transports: ["websocket", "polling"],
       reconnection: reconnect,
       reconnectionAttempts: 10,
@@ -109,7 +100,6 @@ export default function useWebSocket({
     });
   }, [
     url,
-    auth,
     onMessage,
     onOpen,
     onAuthenticated,

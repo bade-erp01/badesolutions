@@ -7,7 +7,6 @@ import CustomerSales from "@/app/Components/CustomerSales";
 import autoTable from "jspdf-autotable";
 import {
   postPayment,
-  EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../Functions/Functions";
 import { useState, useEffect, useRef } from "react";
@@ -42,11 +41,10 @@ import { v4 as uuidv4 } from "uuid";
 
 import {
   plsWait,
-  Encrypt,
   ErrorMessage,
   SuccessToast,
 } from "../../../../../Functions/Mics";
-import axios from "axios";
+import api from "@/lib/api";
 import moment from "moment";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
@@ -223,21 +221,9 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
 
     try {
       const { startDate, endDate } = formValues;
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/customerReport/${customerId}?Start=${startDate}&End=${endDate}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
-          },
-          cache: "no-store", // Optional: disables caching for fresh data
-        },
-      );
+      const res = await api.get(`/api/customerReport/${customerId}?Start=${startDate}&End=${endDate}`);
 
-      const TransactionResult = await res.json();
+      const TransactionResult = res.data || [];
 
       if (!res.ok || TransactionResult.length < 1) {
         throw new Error(data.error || "No transactions found.");
@@ -376,16 +362,6 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     }
   }
 
-  // Use a single config object for axios
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-      access: `${Encrypt(userInfo.user._id)}`,
-      sessionKey: `Bearer ${userInfo.SessionId}`
-    },
-  };
-
   // Initialize form data (bankJournal may not exist on cust)
 
   // Prepare monthly sales data from data.SandS (array of invoices)
@@ -439,11 +415,10 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
     try {
       plsWait("Submitting customer update...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const url = `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
-        cust._id,
-      )}`;
-      // Await axios call directly
-      const { data } = await axios.patch(url, formData, config);
+      const url = `/api/customer/update/${cust._id}`;
+      const r = await api.patch(url, formData);
+      if (!r.ok) throw new Error(r.data?.error || r.error);
+      const { data } = r;
 
       if (data && data.message) {
         SuccessToast(data.message);
@@ -466,21 +441,18 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
       const user = userInfo;
 
       // Avoid unnecessary template literals
-      const url = `${EXPRESS_PRIVATE_URL}/api/Sales_Portal/requisition/new/${Encrypt(user.user._id)}`;
+      const url = `/api/Sales_Portal/requisition/new/${user.user._id}`;
 
-      // Await axios call directly
-      const { data } = await axios.post(
-        url,
-        { customer: cust._id, whId: cust.location },
-        config,
-      );
+      const r = await api.post(url, { customer: cust._id, whId: cust.location });
+      if (!r.ok) throw new Error(r.data?.error || r.error);
+      const { data } = r;
 
       // Handle response (redirect or update UI as needed)
       // Redirect to the new invoice page
       if (data && data.result) {
         // Simulate a delay for the sake of example
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        navigation.push(`/SalesPortal/Requisitions/${Encrypt(data.result)}`);
+        navigation.push(`/SalesPortal/Requisitions/${data.result}`);
       } else {
         Swal.fire({
           icon: "error",
@@ -554,7 +526,7 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
           <MyComponent cust={cust} userInfo={userInfo} />
 
           <span
-            onClick={() => GenerateSummary(Encrypt(cust._id))}
+            onClick={() => GenerateSummary(cust._id)}
             className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="Print Statement"
           >
@@ -569,9 +541,8 @@ export default function CustomerForm({ userInfo, data, cust, salesPerson }) {
               <span
                 onClick={() =>
                   postPayment(
-                    Encrypt(cust._id),
+                    cust._id,
                     `${userInfo.user.firstName} ${userInfo.user.lastName}`,
-                    config,
                   )
                 }
                 className="flex items-center gap-2 bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-lg shadow cursor-pointer hover:bg-gray-800 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -1262,21 +1233,9 @@ export function TextareaButton({ user, cust }) {
 
             const resizedImage = canvas.toDataURL("image/jpeg", 0.7);
 
-            const request = await fetch(
-              `${EXPRESS_PRIVATE_URL}/api/attachement`,
-              {
-                method: "POST",
-                body: JSON.stringify({ image: resizedImage }),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-                  access: `${Encrypt(user._id)}`,
-                  sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-                },
-              },
-            );
+            const request = await api(`/api/attachement`, { method: "POST", body: { image: resizedImage } });
 
-            const response = await request.json();
+            const response = request.data || {};
             resolve({ success: !!response.message });
             setPhoto((prev) => [
               ...prev,
@@ -1334,25 +1293,13 @@ export function TextareaButton({ user, cust }) {
 
     try {
       plsWait("Creating new ticket...");
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/tickets/${Encrypt(cust)}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
-          body: JSON.stringify({
+      const response = await api(`/api/tickets/${cust}`, { method: "POST", body: {
             message,
             attachments: photo,
             SLA,
-          }),
-        },
-      );
+          } });
 
-      const result = await response.json();
+      const result = response.data || {};
       if (result.message) {
         SuccessToast(result.message);
         setMessage("");
@@ -1445,26 +1392,18 @@ export function MyComponent({ cust, userInfo }) {
   const handleCreateInvoice = async () => {
     try {
       plsWait("Generating stock card...");
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/Sales_Portal/stock/position/new`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(userInfo.user.tenantId)}`,
-          access: `${Encrypt(userInfo.user._id)}`,
-          sessionKey: `Bearer ${userInfo.SessionId}`,
-          // "idempotency-key": `STOCK-CARD-${cust._id}`
-        },
-        body: JSON.stringify({ leadId:Encrypt(cust._id)}),
+      const response = await api.post(`/api/Sales_Portal/stock/position/new`, { leadId: cust._id }, {
+        // headers: { "idempotency-key": `STOCK-CARD-${cust._id}` },
       });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
+      const data = response.data;
 
       SuccessToast("Redirecting!");
-      router.push(`/SalesPortal/Reports/${Encrypt(data.data)}`);
+      router.push(`/SalesPortal/Reports/${data.data}`);
     } catch (error) {
       ErrorMessage("Error creating new template for stock card");
       router.refresh()
@@ -1528,27 +1467,15 @@ export function GeoButton({ userData, cust }) {
             // );
           }
 
-          await axios.patch(
-            `${EXPRESS_PRIVATE_URL}/api/customer/update/${Encrypt(
-              cust._id
-            )}`,
+          const r = await api.patch(
+            `/api/customer/update/${cust._id}`,
             {
               latitude,
               longitude,
               // address,
             },
-            {
-              headers: {
-                Authorization: `Bearer ${Encrypt(
-                  userData.business.tenantId
-                )}`,
-                access: Encrypt(
-                  userData.user._id
-                ),
-                sessionKey: `Bearer ${userData.SessionId}`
-              },
-            }
           );
+          if (!r.ok) throw new Error(r.data?.error || r.error);
 
           SuccessToast(
             "Customer geo-coordinates updated successfully."

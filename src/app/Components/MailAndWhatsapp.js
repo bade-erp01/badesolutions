@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AtSymbolIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
-import { Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { plsWait, SuccessToast, ErrorMessage } from '../../../Functions/Mics';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -13,10 +13,6 @@ const MailAndWhatsapp = ({
     billStatus = '',
     billId,
     firstName,
-    userId,
-    businessToken,
-    baseUrl,
-    sessionId
 }) => {
     const router = useRouter();
     const [isMailLoading, setIsMailLoading] = useState(false);
@@ -26,20 +22,17 @@ const MailAndWhatsapp = ({
         plsWait("Sending email...");
 
         try {
-            const api = `${baseUrl}/api/sendmail/${Encrypt(billId)}/${firstName}`;
+            const mailPath = `/api/sendmail/${billId}/${encodeURIComponent(firstName || "")}`;
 
-            const request = await fetch(api, {
-                method: "GET",
+            // POST: sending mail is a write, so it carries the CSRF token
+            const request = await api.post(mailPath, undefined, {
                 headers: {
-                    "content-type": "application/json",
-                    Authorization: `Bearer ${Encrypt(businessToken)}`,
-                    access: Encrypt(userId),
-                    sessionKey: `Bearer ${Encrypt(sessionId)}`,
                     "idempotency-key": `quote-${billId}`,
                 },
             });
+            if (request.status === 0) throw new Error(request.error);
 
-            const response = await request.json();
+            const response = request.data || { error: request.error };
 
             if (response.message) {
                 SuccessToast(response.message);

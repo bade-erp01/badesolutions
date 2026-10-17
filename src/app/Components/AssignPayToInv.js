@@ -26,8 +26,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog"
-import { Encrypt, ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics"
-import { EXPRESS_PRIVATE_URL } from "../../../Functions/Functions"
+import { ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics"
+import api from "@/lib/api"
 
 export default function DialogDemo({ PayId, pendingInvoices, userData }) {
   const [invoices] = useState(pendingInvoices || [])
@@ -38,23 +38,17 @@ export default function DialogDemo({ PayId, pendingInvoices, userData }) {
     try {
       plsWait("Registering payment to sales...")
 
-      const formData = { invId:Encrypt(invoice) }
+      const formData = { invId:invoice }
 
-      const response = await fetch(`${EXPRESS_PRIVATE_URL}/api/DownPayToInvoice/${Encrypt(PayId._id)}`, {
-        method: "PATCH",
+      const response = await api.patch(`/api/DownPayToInvoice/${PayId._id}`, formData, {
         headers: {
-          "Content-Type": "application/json",
-           Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-           access: `${Encrypt(userData.user._id)}`,
           "idempotency-key": `assign-payment-${PayId._id}`,
-          sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
         },
-        body: JSON.stringify(formData),
       })
 
-      const data = await response.json()
+      const data = response.data || {}
       if (!response.ok) {
-        throw new Error(data.error)
+        throw new Error(data.error || response.error)
       } else {
         SuccessToast(data.message)
         router.refresh()

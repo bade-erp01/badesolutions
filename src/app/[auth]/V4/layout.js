@@ -46,15 +46,13 @@ export default async function layout({ children }) {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const userInfo = userData?.user;
   const businessInfo = userData?.business;
-  const SessionId = userData?.SessionId;
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  // Redirect if either user OR business is missing
+  // Redirect if either user OR business is missing (fetchUser already checked the
+  // backend session)
   if (
     !userInfo ||
     !businessInfo ||
-    !SessionId ||
-    userInfo.status !== "active" ||
-    SessionId !== userInfo.SessionId
+    userInfo.status !== "active"
   ) {
     redirect("/Login");
   }

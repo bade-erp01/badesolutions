@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { CloudArrowUpIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
-import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { plsWait } from "../../../Functions/Mics";
 import { useRouter } from "next/navigation";
 import { escapeHtml } from "@/lib/security/escapeHtml";
@@ -84,17 +84,7 @@ const BulkUploader = ({ tenantId, collectionName }) => {
   const uploadToDB = async (data) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/uploadbulk`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tenantId.business.tenantId}`,
-          dbConnect: `Bearer ${tenantId.business.rustyRoof}`,
-          access: `${Encrypt(tenantId.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(tenantId.SessionId)}`
-        },
-        body: JSON.stringify({ collectionName, data }),
-      });
+      const res = await api.post("/api/uploadbulk", { collectionName, data });
 
       if (!res.ok) throw new Error('Upload failed');
 

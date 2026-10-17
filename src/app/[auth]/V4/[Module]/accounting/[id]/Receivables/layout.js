@@ -1,14 +1,13 @@
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import Notch from "@/app/Components/Notch";
 import BackButton from "@/app/Components/BackBotton";
-import {Encrypt} from "../../../../../../../../Functions/Mics"
+import { serverApi } from "@/lib/serverApi";
 import Page from "./page"
 import Link from "next/link"
 import DebtorsReportModal from "@/app/Components/Reports/DebtorsReport";
 import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
 import { CreditCardIcon,BanknotesIcon } from "@heroicons/react/24/outline";
 import { notFound } from 'next/navigation';
-import Users from"../../../../../../../../models/Users"
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -54,9 +53,8 @@ export default async function AccountingPage({ children, params }) {
   const userData = await fetchUser();
   const moduleList = await params;
 
-    const RawUsers = await Users.findByTenant(userData.business.tenantId)
-    const StringedUser = JSON.stringify(RawUsers)
-    const parsedUsers = JSON.parse(StringedUser)
+    const usersRes = await serverApi(`/api/Users`)
+    const parsedUsers = usersRes.data?.data || []
 
    // check if user has access to crm and cash register
   const AccountingFinder = userData.user.Apps.find(app=>{
@@ -69,18 +67,9 @@ export default async function AccountingPage({ children, params }) {
 
   
   // fetch all credit payment from all bank account
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const res = await fetch(`${baseUrl}/api/crm`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-    });
-  
-    const data = await res.json()
+    const res = await serverApi(`/api/crm`);
+
+    const data = res.data
   try {
    
     return (

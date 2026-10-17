@@ -5,11 +5,11 @@ import { MapPin } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import {
-  Encrypt,
   UpdateEmployeeData,
   EXPRESS_PRIVATE_URL,
   Dencrypt,
 } from "../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import { useUser } from "@/components/UserProvider";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 const NaijaStates = require("naija-state-local-government");
@@ -55,7 +55,6 @@ const formatNumberShort = (num) => {
 export default function SingleEmployeeView({
   userInfo,
   businessInfo,
-  SessionId,
   Backdata,
   module,
   businessData,
@@ -93,19 +92,8 @@ export default function SingleEmployeeView({
       }
 
       plsWait("Applying changes, Please wait...");
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/EmployeeUpdate/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-            access: `${Encrypt(userInfo._id)}`,
-            sessionKey: `Bearer ${Encrypt(SessionId)}`
-          },
-        },
-      );
-      const data = await response.json();
+      const response = await api.patch(`/api/EmployeeUpdate/${id}`);
+      const data = response.data || {};
       if (response.ok) {
         SuccessToast(data.message);
         location.reload();
@@ -131,17 +119,11 @@ export default function SingleEmployeeView({
       if (result.isConfirmed) {
         plsWait("Deleting...⌛");
 
-        const request = await fetch(
-          `${EXPRESS_PRIVATE_URL}/api/Delete/Attachment/${id}?model=${model}&attachmentId=${attachmentId}`,
-          {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            dbConnect: `Bearer ${businessInfo.rustyRoof}`,
-            access: `${Encrypt(userInfo._id)}`,
-          },
+        const request = await api.del(
+          `/api/Delete/Attachment/${id}?model=${model}&attachmentId=${attachmentId}`,
         );
 
-        const response = await request.json();
+        const response = request.data || {};
         if (response.message) {
           Swal.fire({
             title: "Deleted!",
@@ -150,7 +132,7 @@ export default function SingleEmployeeView({
           });
           location.reload();
         } else {
-          ErrorMessage(response.error);
+          ErrorMessage(response.error || request.error);
         }
       }
     });
@@ -199,20 +181,9 @@ export default function SingleEmployeeView({
 
             const resizedImage = canvas.toDataURL("image/jpeg", 0.7); // Adjust quality as needed
 
-            const request = await fetch(
-              `${EXPRESS_PRIVATE_URL}/api/images/upload?id=${id}&module=${module}`,
-              {
-                method: "POST",
-                body: JSON.stringify({ image: resizedImage }),
-                headers: {
-                  "Content-Type": "application/json",
-                  dbConnect: `Bearer ${businessInfo.rustyRoof}`,
-                  access: `${Encrypt(userInfo._id)}`,
-                },
-              },
-            );
+            const request = await api.post(`/api/images/upload?id=${id}&module=${module}`, { image: resizedImage });
 
-            const response = await request.json();
+            const response = request.data || {};
             if (response.message) {
               Swal.fire({
                 title: "Your uploaded File",
@@ -263,18 +234,9 @@ export default function SingleEmployeeView({
     try{
       plsWait("Updating user data...");
       e.preventDefault();
-      const request = await fetch(`${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(data._id)}`,{
-        method:"PATCH",
-        body:JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          access: `${Encrypt(userInfo._id)}`,
-        },
-      })
+      const request = await api.patch(`/api/updateUser/${data._id}`, formData)
 
-    const response = await request.json();
+    const response = request.data || {};
 
     if (response.message) {
       SuccessToast(response.message);
@@ -320,20 +282,9 @@ export default function SingleEmployeeView({
 
             // UploadURL.push({resizedImage})
 
-            const request = await fetch(
-              `${EXPRESS_PRIVATE_URL}/api/Employee/attachments?employee=${data._id}`,
-              {
-                method: "POST",
-                body: JSON.stringify({ image: resizedImage }),
-                headers: {
-                  "Content-Type": "application/json",
-                  dbConnect: `Bearer ${businessInfo.rustyRoof}`,
-                  access: `${Encrypt(userInfo._id)}`,
-                },
-              },
-            );
+            const request = await api.post(`/api/Employee/attachments?employee=${data._id}`, { image: resizedImage });
 
-            const response = await request.json();
+            const response = request.data || {};
             // UploadURL.push({Url:response.image})
             resolve({ success: !!response.message });
           };
@@ -459,7 +410,7 @@ export default function SingleEmployeeView({
 
               <button
                 onClick={() => {
-                  uploadFiles(Encrypt(data._id), "Employee");
+                  uploadFiles(data._id, "Employee");
                 }}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition"
               >
@@ -478,7 +429,7 @@ export default function SingleEmployeeView({
                 </label>
                 <button
                   onClick={() => {
-                    uploadLPOFile(Encrypt(data._id), "Employee");
+                    uploadLPOFile(data._id, "Employee");
                   }}
                   className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md shadowtransition"
                 >
@@ -517,7 +468,7 @@ export default function SingleEmployeeView({
                 type="file"
                 name="Image"
                 accept="image/*"
-                onChange={() => uploadFiles(Encrypt(data._id), "Employee")}
+                onChange={() => uploadFiles(data._id, "Employee")}
                 className="block w-full text-sm  file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
             </div>
@@ -529,7 +480,6 @@ export default function SingleEmployeeView({
             business={businessInfo}
             userInfo={user}
             custList={custList || []}
-            SessionId={SessionId}
           />
           <br />
           {/* dashboard for sales person */}
@@ -1434,18 +1384,15 @@ export default function SingleEmployeeView({
             {(!data.firstTimeOnboard && businessInfo.Pendinglicense > 0 ) && (
               <>
                <SendInviteButton
-                id={Encrypt(String(data._id))} 
-                url={EXPRESS_PRIVATE_URL}
-                user={Encrypt(String(userInfo._id))}
-                biz={Encrypt(String(businessInfo.tenantId))}
+                id={String(data._id)} 
+                user={String(userInfo._id)}
+                biz={String(businessInfo.tenantId)}
               />
               
                <AssignLicenceButton
-                id={Encrypt(String(data._id))} 
-                url={EXPRESS_PRIVATE_URL}
-                user={Encrypt(String(userInfo._id))}
-                biz={Encrypt(String(businessInfo.tenantId))}
-                SessionId={userInfo.SessionId}
+                id={String(data._id)} 
+                user={String(userInfo._id)}
+                biz={String(businessInfo.tenantId)}
               />
               </>
             )}
@@ -1453,7 +1400,7 @@ export default function SingleEmployeeView({
             {data.firstTimeOnboard && (
               <button
                 type="submit"
-                onClick={() => DeactivateUser(Encrypt(data._id))}
+                onClick={() => DeactivateUser(data._id)}
                 className={`rounded-md 
                 ${data.status === "suspended" ? "bg-green-600" : "bg-red-600"}
                 px-3 py-2 text-sm font-semibold text-white shadow-md hover:bg-${
@@ -1472,7 +1419,7 @@ export default function SingleEmployeeView({
   );
 }
 
-function SalePersonChart({ customerId, customerName,userInfo, business, custList,SessionId }) {
+function SalePersonChart({ customerId, customerName,userInfo, business, custList }) {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -1482,19 +1429,11 @@ function SalePersonChart({ customerId, customerName,userInfo, business, custList
     const fetchSalesData = async () => {
       try {
         const currentYear = moment().format("YYYY");
-        const url = `${EXPRESS_PRIVATE_URL}/api/SalseandStock?Year=${currentYear}`;
+        const url = `/api/SalseandStock?Year=${currentYear}`;
 
-        const request = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            sessionKey: `Bearer ${Encrypt(SessionId)}`,
-            access: `${Encrypt(userInfo._id)}`,
-          },
-        });
+        const request = await api.get(url);
 
-        const response = await request.json();
+        const response = request.data || {};
 
         if (!response.invoice) {
           setErrorMsg("No sales records available.");
@@ -1663,7 +1602,7 @@ export function DashboardStats({ Sales_Target,todaysSale,custList }) {
 }
 
 
-export function SendInviteButton({ id, url, user, biz }) {
+export function SendInviteButton({ id, user, biz }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -1673,18 +1612,9 @@ export function SendInviteButton({ id, url, user, biz }) {
       setLoading(true);
       setMessage("");
 
-      const response = await fetch(`${url}/api/onboard/invite/${id}`, {
-        method: "PATCH",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
-          access: `${Encrypt(currentUser.user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`
-        },
-      });
+      const response = await api.patch(`/api/onboard/invite/${id}`);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (!response.ok) {
         throw new Error(data?.message || "Failed to send invite");
@@ -1775,7 +1705,7 @@ export function SendInviteButton({ id, url, user, biz }) {
 }
 
 
-export function AssignLicenceButton({ id, url, userToken, bizToken,SessionId }) {
+export function AssignLicenceButton({ id, userToken, bizToken }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const currentUser = useUser()
@@ -1783,19 +1713,9 @@ export function AssignLicenceButton({ id, url, userToken, bizToken,SessionId }) 
     try {
       setLoading(true);
 
-      const response = await fetch(`${url}/api/licence/assign/${id}`, {
-        method: "PATCH",
-         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(currentUser.user.business.tenantId)}`,
-          access: `${Encrypt(currentUser.user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`,
-          "Idempotency-Key": `Assign-Licence-${Dencrypt(id)}`,
-        },
-      });
+      const response = await api.patch(`/api/licence/assign/${id}`, undefined, { headers: { "Idempotency-Key": `Assign-Licence-${Dencrypt(id)}` } });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (!response.ok) {
         throw new Error(data?.message || "Failed to assign licence");
@@ -1883,24 +1803,13 @@ export function LiveLocationMap({ userData, baseUrl }) {
     try {
       setError(null);
 
-      const res = await fetch(
-        `${baseUrl}/api/location/${Encrypt(userData.user._id)}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-            access: `${Encrypt(userData.user._id)}`,
-            sessionKey: `Bearer ${userData.SessionId}`,
-          },
-        }
-      );
+      const res = await api.get(`/api/location/${userData.user._id}`);
 
       if (!res.ok) {
         throw new Error("Failed to fetch location");
       }
 
-      const data = await res.json();
+      const data = res.data || {};
 
       // Expected response from Redis:
       // { latitude: number, longitude: number, updatedAt: number } or null

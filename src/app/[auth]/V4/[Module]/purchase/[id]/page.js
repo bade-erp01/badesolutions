@@ -21,15 +21,14 @@ import {
 import { Loader2 } from "lucide-react";
 
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
   plsWait,
 } from "../../../../../../../Functions/Mics";
 import {
   totalInWords,
-  EXPRESS_PRIVATE_URL,
 } from "../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -145,21 +144,12 @@ export default function DraftPurchasePage({
 
             const resizedImage = canvas.toDataURL("image/jpeg", 0.7);
 
-            const request = await fetch(
-              `${EXPRESS_PRIVATE_URL}/api/attachement?po=${Encrypt(bill._id)}`,
-              {
-                method: "POST",
-                body: JSON.stringify({ image: resizedImage }),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-                  access: `${Encrypt(user._id)}`,
-                  sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-                },
-              }
+            const request = await api.post(
+              `/api/attachement?po=${bill._id}`,
+              { image: resizedImage }
             );
 
-            const response = await request.json();
+            const response = request.data || {};
             resolve({ success: !!response.message });
           };
           img.src = e.target.result;
@@ -233,20 +223,11 @@ export default function DraftPurchasePage({
     );
 
     try {
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/VendorProduct/lpo?product=${cleanedProducts.storeId}&po=${bill._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
-        }
+      const res = await api.put(
+        `/api/VendorProduct/lpo?product=${cleanedProducts.storeId}&po=${bill._id}`
       );
 
-      const data = await res.json();
+      const data = res.data || { error: res.error };
       if (data.message) {
         SuccessToast(data.message);
         if (data.updatedInvoice) {
@@ -270,18 +251,10 @@ export default function DraftPurchasePage({
       setUpdatingLineId(id);
       plsWait("Removing product from cart");
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/RemoveLinePo?po=${bill._id}&items=${encodeURIComponent(id)}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const url = `/api/RemoveLinePo?po=${bill._id}&items=${encodeURIComponent(id)}`;
+      const response = await api.del(url);
 
-      const data = await response.json();
+      const data = response.data || { error: response.error };
       if (data.message) {
         SuccessToast(data.message);
         if (data.updatedInvoice) {
@@ -322,18 +295,10 @@ export default function DraftPurchasePage({
       if (!result.isConfirmed) return;
 
       plsWait("");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Vendor/Bill/${encodeURIComponent(id)}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const url = `/api/Vendor/Bill/${encodeURIComponent(id)}`;
+      const response = await api.del(url);
 
-      const data = await response.json();
+      const data = response.data || { error: response.error };
       if (data.message) {
         SuccessToast(data.message);
         setTimeout(() => {
@@ -356,21 +321,13 @@ export default function DraftPurchasePage({
     try {
       setUpdatingLineId(lineId);
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/updateLinePo/?po=${encodeURIComponent(
+      const url = `/api/updateLinePo/?po=${encodeURIComponent(
         Singlebill._id
       )}&${field}=${newQty}&lineId=${encodeURIComponent(lineId)}&update=${field}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.patch(url);
 
-      const data = await response.json();
+      const data = response.data || { error: response.error };
 
       if (data.message && data.updatedInvoice) {
         setsingleBill(data.updatedInvoice);
@@ -406,23 +363,17 @@ export default function DraftPurchasePage({
       if (!result.isConfirmed) return;
 
       plsWait("Updating Request for Purchase");
-      const url = `${EXPRESS_PRIVATE_URL}/api/VendorBillPost?po=${Singlebill._id}&user=${encodeURIComponent(
+      const url = `/api/VendorBillPost?po=${Singlebill._id}&user=${encodeURIComponent(
         `${user.firstName} ${user.lastName}`
       )}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
+      const response = await api.patch(url, { status }, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
           "idempotency-key": `${status}-${Singlebill._id}`,
         },
       });
 
-      const data = await response.json();
+      const data = response.data || { error: response.error };
       if (data.message) {
         SuccessToast(data.message);
         if (data.updatedInvoice) {
@@ -456,22 +407,13 @@ export default function DraftPurchasePage({
       if (!result.isConfirmed) return;
 
       plsWait("Updating Request for Purchase");
-      const url = `${EXPRESS_PRIVATE_URL}/api/VendorBillPost?po=${Singlebill._id}&user=${encodeURIComponent(
+      const url = `/api/VendorBillPost?po=${Singlebill._id}&user=${encodeURIComponent(
         `${user.firstName} ${user.lastName}`
       )}`;
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
+      const response = await api.patch(url, payload);
 
-      const data = await response.json();
+      const data = response.data || { error: response.error };
       if (data.message) {
         SuccessToast(data.message);
         if (data.updatedInvoice) {
@@ -510,22 +452,17 @@ export default function DraftPurchasePage({
 
     try {
       plsWait("Reversing purchase");
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/purchase/${encodeURIComponent(Singlebill._id)}/reverse`,
+      const response = await api.patch(
+        `/api/purchase/${encodeURIComponent(Singlebill._id)}/reverse`,
+        { reason: reason.trim() },
         {
-          method: "PATCH",
-          body: JSON.stringify({ reason: reason.trim() }),
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
             "idempotency-key": `reverse-${Singlebill._id}-${crypto.randomUUID()}`,
           },
         }
       );
 
-      const data = await response.json();
+      const data = response.data || { error: response.error };
       if (response.ok && data.message) {
         SuccessToast(`${Singlebill.billReferenceNo} reversed`);
         setTimeout(() => window.location.reload(), 1500);
@@ -1114,7 +1051,7 @@ export default function DraftPurchasePage({
                       >
                         <TableCell className="text-center font-medium">
                           <Link
-                            href={`/${params.auth}/V4/inventory/inventory/${Encrypt(line.item._id)}`}
+                            href={`/${params.auth}/V4/inventory/inventory/${line.item._id}`}
                             className="text-primary hover:underline text-xs sm:text-sm"
                           >
                             {line.item.productName}

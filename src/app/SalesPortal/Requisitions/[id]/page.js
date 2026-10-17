@@ -8,9 +8,9 @@ import Image from "next/image";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
 import {
   totalInWords,
-  Encrypt,
   EXPRESS_PRIVATE_URL,
 } from "../../../../../Functions/Functions";
+import api from "@/lib/api";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import moment from "moment";
@@ -333,18 +333,9 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
         throw new Error("Product not found");
       }
 
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/add/order/${Encrypt(bill._id)}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({ product: cleanedProducts.storeId }),
-      });
-      const data = await res.json();
+      const url = `/api/Draft/add/order/${bill._id}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
+      const res = await api(url, { method: "PUT", body: { product: cleanedProducts.storeId } });
+      const data = res.data || {};
       if (data.message) {
         SuccessToast(data.message);
         setInputValue("");
@@ -376,18 +367,9 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       if (!result.isConfirmed) return;
 
       plsWait("Deleting Requisition. Please wait.");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/order/Delete/${Encrypt(bill._id)}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          "idempotency-key": `delete-${bill._id}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-      });
-      const data = await response.json();
+      const url = `/api/Draft/order/Delete/${bill._id}`;
+      const response = await api(url, { method: "DELETE", headers: { "idempotency-key": `delete-${bill._id}` } });
+      const data = response.data || {};
 
       if (data.message) {
         SuccessToast(data.message);
@@ -414,22 +396,13 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
   ) => {
     try {
       plsWait("Updating cart...");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Invoice/Cart/Update?user=${Encrypt(userId)}`;
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({ lineId, value, toUpdate, billId, storeId }),
-      });
+      const url = `/api/Invoice/Cart/Update?user=${userId}`;
+      const response = await api(url, { method: "PUT", body: { lineId, value, toUpdate, billId, storeId } });
 
-      const data = await response.json();
+      const data = response.data || {};
       if (data.message) {
         SuccessToast(data.message);
-        mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${Encrypt(billId)}`);
+        mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${billId}`);
         router.refresh();
       } else {
         throw new Error(data.error || "An unknown error occurred.");
@@ -468,26 +441,14 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
         "Please wait while i process your request. This should only take a bit. Do not reload this page...",
       );
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/wareHouse/Bill?user=${Encrypt(user._id)}&ops=${Encrypt(userInput)}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-            access: `${Encrypt(user._id)}`,
-            "idempotency-key": `Draft-${bill._id}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
-          body: JSON.stringify({
+      const response = await api(`/api/wareHouse/Bill`, { method: "PATCH", body: {
             billId: bill._id,
             customer: Singlebill.customer._id,
             restriction: userInfo.business?.InvoiceRestriction,
-          }),
-        },
-      );
+            ops: userInput, // ops code in the body, never the URL
+          }, headers: { "idempotency-key": `Draft-${bill._id}` } });
 
-      const data = await response.json();
+      const data = response.data || {};
       if (response.ok) {
         SuccessToast(data.message || "Operation completed successfully!");
         router.refresh();
@@ -505,19 +466,10 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
   const removeLineItem = async (lineId) => {
     try {
       plsWait("Removing item from order...");
-      const url = `${EXPRESS_PRIVATE_URL}/api/Draft/delete/order?user=${Encrypt(user._id)}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(Business.tenantId)}`,
-          access: `${Encrypt(user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-        },
-        body: JSON.stringify({ lineId, billId: bill._id }),
-      });
+      const url = `/api/Draft/delete/order?user=${user._id}`;
+      const response = await api(url, { method: "DELETE", body: { lineId, billId: bill._id } });
 
-      const data = await response.json();
+      const data = response.data || {};
       if (data.message) {
         SuccessToast(data.message);
         router.refresh();
@@ -675,7 +627,7 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
                         </span>
                       ) : (
                         <a
-                          href={`/SalesPortal/Products/${Encrypt(line.item._id)}`}
+                          href={`/SalesPortal/Products/${line.item._id}`}
                           className="text-primary hover:underline block truncate"
                         >
                           {line.item?.Name}

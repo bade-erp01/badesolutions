@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import{  ErrorMessage, SuccessToast} from "../../../../../../../Functions/Mics";
-import { Encrypt, Dencrypt} from "../../../../../../../Functions/Functions";
+import { Dencrypt} from "../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -57,7 +58,6 @@ const formatDateTime = (dateString) => {
 export default function ContractDetailsPage({
   data,
   payment,
-  baseUrl,
   Currentuser,
   business,
 }) {
@@ -83,22 +83,13 @@ export default function ContractDetailsPage({
     setLoading((prev) => ({ ...prev, activate: true }));
 
     try {
-      const response = await fetch(`${baseUrl}/api/Contract/${Encrypt(contract._id)}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-          access: `${Encrypt(Currentuser._id)}`,
-          sessionKey: `Bearer ${Encrypt(Currentuser.SessionId)}`,
-        },
-        body: JSON.stringify({ update: Encrypt(status) }),
-      });
+      const response = await api.patch(`/api/Contract/${contract._id}`, { update: status });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = response.data || {};
         throw new Error(errorData.message || "Failed to update contract");
       }else{
-         const updatedContract = await response.json();
+         const updatedContract = response.data;
         SuccessToast(updatedContract.message)
         setContract(Dencrypt(updatedContract.data));
       }
@@ -140,25 +131,14 @@ export default function ContractDetailsPage({
     setLoading((prev) => ({ ...prev, delete: true }));
 
     try {
-      const response = await fetch(
-        `${baseUrl}/api/Contract/${Encrypt(contract._id)}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(business.tenantId)}`,
-            access: `${Encrypt(Currentuser._id)}`,
-            sessionKey: `Bearer ${Encrypt(Currentuser.SessionId)}`,
-          },
-        }
-      );
+      const response = await api.del(`/api/Contract/${contract._id}`);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = response.data || {};
         throw new Error(errorData.message || "Failed to delete contract");
       }
 
-      const result = await response.json();
+      const result = response.data || {};
 
       SuccessToast(result.message || "Contract deleted successfully");
 
@@ -473,7 +453,7 @@ export default function ContractDetailsPage({
                 <button
                   onClick={() =>
                     router.push(
-                      `/${params.auth}/V4/Sales/Sales/${Encrypt(contract.invoiceId._id)}`,
+                      `/${params.auth}/V4/Sales/Sales/${contract.invoiceId._id}`,
                     )
                   }
                   className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"

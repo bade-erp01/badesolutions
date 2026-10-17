@@ -8,10 +8,7 @@ import {
   LockKeyhole,
 } from "lucide-react";
 
-import {
-  EXPRESS_PRIVATE_URL,
-  Encrypt,
-} from "../../../../../Functions/Functions";
+import { EXPRESS_PRIVATE_URL } from "../../../../../Functions/Functions";
 
 import {
   plsWait,
@@ -101,7 +98,7 @@ const PasswordReset = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            password: Encrypt(newPassword),
+            newPassword,
           }),
         }
       );

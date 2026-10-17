@@ -28,11 +28,11 @@ import {
 } from "lucide-react";
 import { useUser } from "@/components/UserProvider";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL, Dencrypt } from "../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../Functions/Functions";
+import api from "@/lib/api";
 
 import {
   Dialog,
@@ -87,22 +87,13 @@ function SubscriptionTableSkeleton() {
 async function fetchSubscriptions(user) {
   if (!user?.user) throw new Error("User not available");
 
-  const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Subscriptions`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-      access: `${Encrypt(user.user.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-    },
-    next: { revalidate: 60 },
-  });
+  const res = await api.get(`/api/Subscriptions`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch subscriptions");
   }
 
-  const data = await res.json();
+  const data = res.data || {};
   return Dencrypt(data.data);
 }
 
@@ -116,20 +107,11 @@ export default function SubscriptionDashboard() {
   const handleNewSubscription = async (newSubscription) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api/Subscriptions`, {
-        method: "POST",
-        body: JSON.stringify({ data: Encrypt(newSubscription) }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-          access: `${Encrypt(user.user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-        },
-      });
+      const res = await api.post(`/api/Subscriptions`, { data: newSubscription });
 
       if (!res.ok) throw new Error("Failed to create subscription");
 
-      const reqData = await res.json();
+      const reqData = res.data || {};
 
       SuccessToast("Subscription created successfully!");
       
@@ -292,7 +274,7 @@ function SubscriptionTableContent({ user }) {
               <TableRow key={item._id} className="hover:bg-muted/50">
                 <TableCell className="font-medium">
                   <Link
-                    href={`/${params.auth}/V4/${params.Module}/${params.Module}/${Encrypt(item._id)}`}
+                    href={`/${params.auth}/V4/${params.Module}/${params.Module}/${item._id}`}
                     className="hover:underline"
                   >
                     {item.title?.toUpperCase() || "—"}

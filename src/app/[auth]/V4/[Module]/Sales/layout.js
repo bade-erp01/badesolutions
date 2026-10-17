@@ -6,7 +6,7 @@ import InvoiceLandingPage from "./page";
 import SalesRportModal from "@/app/Components/Reports/SalesReport";
 import DeliveryRportModal from "@/app/Components/Reports/DeliveryReport";
 import SalesDumpModal from "@/app/Components/Reports/salesDump";
-import EMPLOYEES from "../../../../../../models/Users";
+import { serverApi } from "@/lib/serverApi";
 import Notch from "@/app/Components/Notch";
 
 
@@ -40,9 +40,9 @@ export const metadata = {
 
 export default async function Employeelayout({ children, params }) {
   const userData = await fetchUser();
-  const user = await EMPLOYEES.findByTenant(userData.business.tenantId).select("-Apps").lean();
-  const stringedUser = JSON.stringify(user);
-  const parsedUser = JSON.parse(stringedUser);
+  // GET /api/Users -> { success, data: [{ _id, firstName, lastName, Email, image, status }] }
+  const usersRes = await serverApi("/api/Users");
+  const parsedUser = usersRes.ok ? usersRes.data?.data || [] : [];
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   return (

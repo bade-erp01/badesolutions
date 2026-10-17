@@ -17,7 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/components/UserProvider";
-import { EXPRESS_PRIVATE_URL, Encrypt } from "../../../../../Functions/Functions";
+import api from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -200,7 +200,7 @@ export default function AssistantPage() {
   }, [busy]);
 
   const send = async (question) => {
-    const AGENT_URL = `${EXPRESS_PRIVATE_URL}/api/Invoice/agent`;
+    const AGENT_URL = "/api/Invoice/agent";
     const REQUEST_TIMEOUT_MS = 90000; // financial statements can take up to ~40s; the backend may also queue for 15s
     const MAX_HISTORY = 10;
 
@@ -227,23 +227,16 @@ export default function AssistantPage() {
     }, REQUEST_TIMEOUT_MS);
 
     try {
-      const res = await fetch(AGENT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(user.user.tenantId)}`,
-          access: `${Encrypt(user.user._id)}`,
-          sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({ question: content, history }),
-        signal: controller.signal,
-      });
+      const res = await api.post(
+        AGENT_URL,
+        { question: content, history },
+        { signal: controller.signal },
+      );
 
-      const body = await res.json().catch(() => ({}));
+      const body = res.data || {};
 
       if (!res.ok) {
-        let message = body.error || `Request failed (${res.status}).`;
+        let message = body.error || (res.status === 0 ? res.error : `Request failed (${res.status}).`);
         if (res.status === 401) message = body.error || "Your session has expired. Please sign in again.";
         if ((res.status === 429 || res.status === 503) && body.retryAfter) {
           message = `${body.error || "The assistant is busy."} Try again in ${body.retryAfter} seconds.`;

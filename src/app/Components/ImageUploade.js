@@ -13,11 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import {
-  EXPRESS_PRIVATE_URL,
-  Dencrypt,
-  Encrypt,
-} from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { useUser } from "@/components/UserProvider";
 import {useRouter} from "next/navigation"
 
@@ -132,28 +128,16 @@ export default function ImageUploader({ id, module }) {
       const resizedImages = await Promise.all(files.map(resizeImage));
       setProgress(40);
 
-      const businessInfo = user.business.tenantId
-      const userInfo = user.user._id
-
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/images/upload?id=${Encrypt(id)}&module=${module}`,
+      const response = await api.post(
+        `/api/images/upload?id=${id}&module=${module}`,
         {
-          method: "POST",
-          body: JSON.stringify({
-            image : resizedImages,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(businessInfo)}`,
-            access: `${Encrypt(userInfo)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-          },
+          image : resizedImages,
         }
       );
 
       setProgress(80);
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (!response.ok) {
         throw new Error(data.error || "Upload failed");

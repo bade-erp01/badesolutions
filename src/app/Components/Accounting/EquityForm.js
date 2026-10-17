@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Encrypt } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import {
   ErrorMessage,
   SuccessToast,
@@ -89,36 +89,22 @@ export default function EquityForm({
           debitCredit = "credit";
       }
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/Equity/journal`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(
-              user.tenantId
-            )}`,
-            access: Encrypt(user._id),
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
-          body: JSON.stringify({
-            accountType,
-            amount: Number(amount),
-            debitCredit,
-            date,
-            description,
-            raisedBy: `${user.firstName} ${user.lastName}`,
-            bank,
-            vendor: vendor || null,
-          }),
-        }
-      );
+      const response = await api.post("/api/Equity/journal", {
+        accountType,
+        amount: Number(amount),
+        debitCredit,
+        date,
+        description,
+        raisedBy: `${user.firstName} ${user.lastName}`,
+        bank,
+        vendor: vendor || null,
+      });
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Failed to create entry"
+          data.error || response.error || "Failed to create entry"
         );
       }
 

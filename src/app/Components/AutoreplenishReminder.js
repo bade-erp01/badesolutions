@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 
-import { Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 
 import {
   ErrorMessage,
@@ -67,36 +67,23 @@ export default function ReplenishFeature({
 
       plsWait("");
 
-      const response = await fetch(
-        `${baseUrl}/api/Replenish/${Encrypt(
-          storeProduct._id,
-        )}`,
+      const response = await api.patch(
+        `/api/Replenish/${storeProduct._id}`,
         {
-          method: "PATCH",
+          replenishLevel,
 
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(user.tenantId)}`,
-            dbConnect: `Bearer ${business.rustyRoof}`,
-            access: `${Encrypt(user._id)}`,
-            sessionKey: `Bearer ${Encrypt(user.SessionId)}`
-          },
+          replenishQuantity,
 
-          body: JSON.stringify({
-            replenishLevel,
-
-            replenishQuantity,
-
-            user: `${user.firstName} ${user.lastName}`,
-          }),
+          user: `${user.firstName} ${user.lastName}`,
         },
       );
 
-      const data = await response.json();
+      const data = response.data || {};
 
       if (!response.ok) {
         throw new Error(
           data.message ||
+            response.error ||
             "Failed to action auto replenishment",
         );
       }

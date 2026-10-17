@@ -4,8 +4,8 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import moment from "moment";
 import { TruckIcon } from "@heroicons/react/24/outline";
-import { useUser } from "@/components/UserProvider";
-import { downloadExcel, Encrypt } from "../../../../Functions/Functions";
+import { downloadExcel } from "../../../../Functions/Functions";
+import api from "@/lib/api";
 import { plsWait, ErrorMessage } from "../../../../Functions/Mics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,8 +30,6 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
   const [dateDialogOpen, setDateDialogOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
-  const currentUser = useUser();
 
   const fetchData = async () => {
     if (!startDate || !endDate) {
@@ -58,45 +56,15 @@ export default function DeliveryRportModal({ user, business, baseUrl }) {
         dateField: "DELIVERYDATE", // ← filters by delivery date
       });
 
-      const tenantId =
-        currentUser?.user?.business?.tenantId ||
-        business?.tenantId;
-
-      const userId =
-        currentUser?.user?.user?._id ||
-        currentUser?.user?._id;
-
-      const sessionId =
-        currentUser?.user?.SessionId;
-
-      const res = await fetch(
-        `${baseUrl}/api/Invoice/report?${params.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(tenantId)}`,
-            access: `${Encrypt(userId)}`,
-            sessionKey: `Bearer ${Encrypt(sessionId)}`,
-          },
-          cache: "no-store",
-        }
+      const res = await api.get(
+        `/api/Invoice/report?${params.toString()}`
       );
 
       if (!res.ok) {
-        let message = "Failed to fetch logistics report.";
-
-        try {
-          const errorData = await res.json();
-          message =  errorData.error || message;
-        } catch {
-          // Keep the default error message if the response is not JSON.
-        }
-
-        throw new Error(message);
+        throw new Error(res.data?.error || "Failed to fetch logistics report.");
       }
 
-      const fetchedData = await res.json();
+      const fetchedData = res.data || {};
 
       setCustomersList(fetchedData.customers || []);
       setStoresList(fetchedData.stores || []);

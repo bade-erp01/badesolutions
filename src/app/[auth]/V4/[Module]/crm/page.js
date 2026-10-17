@@ -1,15 +1,13 @@
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import DebtorsReportModal from "@/app/Components/Reports/DebtorsReport";
 import ReceivablesAgingModal from "@/app/Components/Reports/AgingSchedul";
-import Users from "../../../../../../models/Users";
 import Link from "next/link";
-import { Encrypt } from "../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import { pricelistSetter } from "../../../../../../Functions/Functions";
 import CustomerCategoryPieChart from "@/app/Components/CustomerCategory";
 import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import BulkUploader from "@/app/Components/BulkUploadProduct";
 import { notFound } from "next/navigation";
-import axios from "axios";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import React, { Suspense } from "react";
 import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
@@ -19,11 +17,12 @@ import { PlusIcon, UserIcon,Plus,Package } from "lucide-react";
 
 export default async function crmLayout({ params }) {
   const userData = await fetchUser(); // Fetch user data
-  const RawUsers = await Users.findByTenant(userData.business.tenantId)
-    .select("firstName lastName")
-    .lean();
-  const StringedUser = JSON.stringify(RawUsers);
-  const parsedUsers = JSON.parse(StringedUser);
+  const usersRes = await serverApi("/api/Users");
+  const parsedUsers = (usersRes.data?.data || []).map(({ _id, firstName, lastName }) => ({
+    _id,
+    firstName,
+    lastName,
+  }));
 
   let customerList = [];
 
@@ -44,17 +43,8 @@ export default async function crmLayout({ params }) {
       return notFound(); // or redirect, or show upgrade message
     }
 
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-
-    const res = await axios.get(`${baseUrl}/api/crm`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
-      next: { revalidate: 120 }, // cache for 2 minutes
-    });
+    const res = await serverApi("/api/crm", { next: { revalidate: 120 } }); // cache for 2 minutes
+    if (!res.ok) throw new Error(res.error);
 
     customerList = res.data;
   } catch (error) {

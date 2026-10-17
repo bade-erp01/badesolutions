@@ -20,11 +20,10 @@ import {
 
 import { useUser } from "@/components/UserProvider";
 import {
-  Encrypt,
   ErrorMessage,
   SuccessToast,
 } from "../../../../../../../../../Functions/Mics";
-import { EXPRESS_PRIVATE_URL } from "../../../../../../../../../Functions/Functions";
+import backendApi from "@/lib/api";
 
 import {
   Table,
@@ -138,30 +137,18 @@ export default function PayrollPage() {
   const [bankAccount, setBankAccount] = useState("");
   const [reverseOpen, setReverseOpen] = useState(false);
 
-  const headers = useCallback(
-    (extra = {}) => ({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(user.user.business.tenantId)}`,
-      access: `${Encrypt(user.user.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(user.user.SessionId)}`,
-      ...extra,
-    }),
-    [user]
-  );
-
   const api = useCallback(
     async (path, { method = "GET", body, idempotent = false } = {}) => {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api${path}`, {
+      const res = await backendApi(`/api${path}`, {
         method,
-        headers: headers(idempotent ? { "idempotency-key": `${method}-${path}-${crypto.randomUUID()}` } : {}),
-        body: body ? JSON.stringify(body) : undefined,
-        cache: "no-store",
+        headers: idempotent ? { "idempotency-key": `${method}-${path}-${crypto.randomUUID()}` } : {},
+        body: body || undefined,
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || data.message || `Request failed (${res.status})`);
+      const data = res.data || {};
+      if (!res.ok) throw new Error(res.error);
       return data;
     },
-    [headers]
+    []
   );
 
   const load = useCallback(async () => {

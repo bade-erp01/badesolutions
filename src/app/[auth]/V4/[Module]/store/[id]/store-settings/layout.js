@@ -2,10 +2,9 @@ import React from "react";
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import Footer2 from "@/app/Components/Footer2";
-import Users from '../../../../../../../../models/Users'
+import { serverApi } from "@/lib/serverApi";
 import Page from './page'
 import BackButton from "@/app/Components/BackBotton";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
 import SideNavWrapper from "@/app/Components/sideNavWrapper";
 
 
@@ -63,32 +62,22 @@ export const metadata = {
 
 export default async function storelayout({ params }) {
   const userData = await fetchUser();
-  const Employee = await Users.findByTenant(userData.business.tenantId).select("firstName lastName").lean();
+  // GET /api/Users -> { success, data: [{ _id, firstName, lastName, Email, image, status }] }
+  const usersRes = await serverApi("/api/Users");
+  const Employee = usersRes.ok ? usersRes.data?.data || [] : [];
   const Params = await params;
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/Stores/${Params.id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      sessionKey: `Bearer ${Encrypt(userData.user.SessionId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-    },
-    next: {
-        revalidate: 120, // 2 minutes
-      },
-    });
-    
-    const data = await res.json();
+  const res = await serverApi(`/api/Stores/${Params.id}`);
+
+    const data = res.data || {};
     const stores = data.Store;
 
     // find current storekeeper from employee list
-    const currentStoreKeeper = Employee.find(staff => staff._id.toString() === stores.StoreKeeper.toString());
+    const currentStoreKeeper = Employee.find(staff => String(staff._id) === String(stores.StoreKeeper));
 
   return (
     <div className="flex flex-col ">
         <main className="flex-1">
-          <Page staffs={JSON.stringify(Employee)} store={stores} currentStoreKeeper={currentStoreKeeper} EXPRESS_PRIVATE_URL={baseUrl} userId={Encrypt(userData.user._id)} SessionId={userData.SessionId}/>
+          <Page staffs={JSON.stringify(Employee)} store={stores} currentStoreKeeper={currentStoreKeeper} />
         </main>
       </div>
   );

@@ -1,6 +1,7 @@
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import TransitPage from "./page";
-import { Encrypt, Dencrypt } from "../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
 import { notFound } from "next/navigation";
@@ -53,22 +54,13 @@ export default async function layout({ children, params }) {
     const userData = await fetchUser();
     const Pramas = await params;
 
-    const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-    const res = await fetch(`${baseUrl}/api/Transit/${Pramas.transit}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
-    });
+    const res = await serverApi(`/api/Transit/${Pramas.transit}`);
 
     if (!res.ok) {
       return notFound();
     }
 
-    const data = await res.json();
+    const data = res.data || {};
     const DecryptedData = Dencrypt(data.transit);
     const DecryptedProducts = Dencrypt(data.products);
 
@@ -100,7 +92,6 @@ export default async function layout({ children, params }) {
             DecryptedData={DecryptedData}
             userData={userData}
             products={DecryptedProducts}
-            EXPRESS_PRIVATE_URL={baseUrl}
             Business={userData.business}
             user={userData.user}
           />

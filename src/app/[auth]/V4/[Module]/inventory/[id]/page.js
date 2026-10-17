@@ -1,15 +1,13 @@
 'use client';
 
-import { EXPRESS_PRIVATE_URL } from "../../../../../../../Functions/Functions";
+import api from "@/lib/api";
 import Image from "next/image";
 import { useState } from "react";
 import {
   plsWait,
-  Encrypt,
   SuccessToast,
   ErrorMessage,
 } from "../../../../../../../Functions/Mics";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,22 +32,15 @@ export default function SingleStoreProductpage({ storeProduct, userInfo }) {
     e.preventDefault();
     try {
       plsWait("Updating Fields...");
-      const response = await axios.patch(
-        `${EXPRESS_PRIVATE_URL}/api/Adjust/Product/${Encrypt(formData._id)}`,
+      const response = await api.patch(
+        `/api/Adjust/Product/${formData._id}`,
         {
           currentQty: formData.currentQty,
           pcs: formData.pcs,
           isActivated: formData.isActivated,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(userInfo.business.tenantId)}`,
-            access: `${Encrypt(userInfo.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`
-          },
         }
       );
+      if (!response.ok) throw new Error(response.error);
 
       if (response.data.message) {
         SuccessToast(response.data.message);

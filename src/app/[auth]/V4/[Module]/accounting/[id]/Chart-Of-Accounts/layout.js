@@ -1,6 +1,6 @@
 
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import FinancialOverview from "./page"
 
@@ -59,17 +59,9 @@ export default async function AccountingPage({ children, params }) {
 
   // fetch all credit payment from all bank account
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
-  const res = await fetch(`${baseUrl}/api/COA`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-    },
-  });
+  const res = await serverApi(`/api/COA`);
 
-  const data = await res.json();
+  const data = res.data || {};
 
   try {
     return (

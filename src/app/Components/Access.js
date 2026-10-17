@@ -1,5 +1,5 @@
 "use client";
-import { UpdateEmployeeData ,EXPRESS_PRIVATE_URL} from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ErrorMessage, plsWait, SuccessToast } from "../../../Functions/Mics";
@@ -23,31 +23,14 @@ export default function AccessControl({
     return biz?.companyName || "N/A";
   };
 
+  // backend: admins only, apps from this business's own modules (src/lib/api.js session)
   const UpdateEmployeeModules = async (id, object) => {
     try {
       plsWait("Attempting remote access on user Work space");
-      const body = JSON.stringify({
-        id,
-        object,
-      });
-      const response = await fetch("/api/EmployeeUpdate", {
-        method: "PUT",
-        body,
-        headers: {
-          Authorization: `Bearer ${businessInfo.tenantId}`,
-          access: `${Encrypt(formData._id)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-        },
-        timeout: 10000,
-      });
-      const req = await response.json();
-
-      if (req.message) {
-        SuccessToast(req.message);
-        router.refresh();
-      } else {
-        throw new Error(req.error);
-      }
+      const r = await api.patch(`/api/users/${id}/apps`, { appId: object._id });
+      if (!r.ok) throw new Error(r.error);
+      SuccessToast(r.data.message);
+      router.refresh();
     } catch (error) {
       ErrorMessage(error.message);
     }
@@ -61,21 +44,9 @@ export default function AccessControl({
     }));
    
     plsWait("Updating user access...")
-    const request = await fetch(
-      `${EXPRESS_PRIVATE_URL}/api/updateUser/${Encrypt(formData._id)}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({[name]:checked}),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-          sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          access: `${Encrypt(userInfo._id)}`,
-        },
-      },
-    );
-
-    const response = await request.json();
+    // the id stays Encrypt()-ed until the backend takes plain ids
+    const r = await api.patch(`/api/updateUser/${Encrypt(formData._id)}`, { [name]: checked });
+    const response = r.data || { error: r.error };
 
     if (response.message) {
       SuccessToast(response.message);
@@ -664,24 +635,11 @@ export function AssignTenantDropdown({
       setIsAssigning(true);
       plsWait("Assigning tenant...");
 
-      const response = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/assign-tenant/${Encrypt(data._id)}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(businessInfo.tenantId)}`,
-            access: `${Encrypt(userInfo._id)}`,
-            sessionKey: `Bearer ${Encrypt(userInfo.SessionId)}`,
-          },
-          body: JSON.stringify({ tenantId: Encrypt(tenant._id) }),
-        }
-      );
+      const r = await api.post(`/api/assign-tenant/${Encrypt(data._id)}`, { tenantId: Encrypt(tenant._id) });
+      const resData = r.data || {};
 
-      const resData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(resData?.message || "Failed to assign tenant.");
+      if (!r.ok) {
+        throw new Error(resData?.error || resData?.message || r.error || "Failed to assign tenant.");
       }
 
       SuccessToast(resData.message || "Tenant assigned successfully.");

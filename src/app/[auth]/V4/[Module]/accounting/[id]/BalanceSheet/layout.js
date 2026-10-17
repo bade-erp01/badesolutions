@@ -1,5 +1,5 @@
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../../../Functions/Mics";
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import BalanceSheet from "./page";
 import moment from "moment"
@@ -39,23 +39,13 @@ export default async function AccountingPage({ children, params }) {
   }
 
   try {
-    const res = await fetch(`${baseUrl}/api/Generate/BalanceSheet?period=${moment().year()}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`
-      },
-      // cache: "force-cache",
-      // next: { revalidate: 60 },
-    });
+    const res = await serverApi(`/api/Generate/BalanceSheet?period=${moment().year()}`);
 
     if (!res.ok) {
       throw new Error("Failed to fetch balance data");
     }
 
-    const response = await res.json();
+    const response = res.data;
 
     return <BalanceSheet baseUrl={baseUrl} userData={userData} data={response}/>;
 

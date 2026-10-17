@@ -26,10 +26,7 @@ import {
   SuccessToast,
   plsWait,
 } from "../../../../../Functions/Mics";
-import {
-  Encrypt,
-  EXPRESS_PRIVATE_URL,
-} from "../../../../../Functions/Functions";
+import api from "@/lib/api";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
 
@@ -192,26 +189,12 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
         posBiller: formData.posBiller || "",
       };
 
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/account/${Encrypt(formData._id)}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(
-              userData?.business?.tenantId || formData.tenantId,
-            )}`,
-            access: `${Encrypt(userData?.user?._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData?.SessionId)}`,
-          },
-          body: JSON.stringify(payload),
-        },
-      );
+      const res = await api.patch(`/api/account/${formData._id}`, payload);
 
-      const result = await res.json();
+      const result = res.data;
 
       if (!res.ok) {
-        throw new Error(result?.error || result?.message || "Update failed");
+        throw new Error(result?.error || result?.message || (res.status === 0 ? res.error : "Update failed"));
       }
 
       SuccessToast(result?.message || "Company profile updated successfully");
@@ -859,27 +842,14 @@ function UsersPermissionsPage({ users }) {
         DOB: newUser.DOB,
       };
 
-      const req = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/createUser/${Encrypt(
-          currentUser.user.user._id,
-        )}`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(
-              currentUser.user.business.tenantId,
-            )}`,
-            access: `${Encrypt(currentUser.user.user._id)}`,
-            sessionKey: `Bearer ${Encrypt(currentUser.user.SessionId)}`,
-          },
-        },
+      const req = await api.post(
+        `/api/createUser/${currentUser.user.user._id}`,
+        payload,
       );
 
-      const res = await req.json();
+      const res = req.data;
       if (!req.ok) {
-        throw new Error(res?.message || "Failed to create user");
+        throw new Error(res?.message || (req.status === 0 ? req.error : "Failed to create user"));
       }
 
       resetForm();
@@ -993,9 +963,7 @@ function UsersPermissionsPage({ users }) {
                           className="cursor-pointer"
                           onClick={() =>
                             router.push(
-                              `/${Path.auth}/V4/users/users/${Encrypt(
-                                getUserId(user),
-                              )}`,
+                              `/${Path.auth}/V4/users/users/${getUserId(user)}`,
                             )
                           }
                         >
@@ -1252,26 +1220,12 @@ function NotificationSettings({ data, userData, onSubmit }) {
         monthlyCutStatement: settings.monthlyCutStatement,
       };
 
-      const res = await fetch(
-        `${EXPRESS_PRIVATE_URL}/api/account/${Encrypt(data._id)}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Encrypt(
-              userData?.business?.tenantId || data.tenantId,
-            )}`,
-            access: `${Encrypt(userData?.user?._id)}`,
-            sessionKey: `Bearer ${Encrypt(userData?.SessionId)}`,
-          },
-          body: JSON.stringify(payload),
-        },
-      );
+      const res = await api.patch(`/api/account/${data._id}`, payload);
 
-      const result = await res.json();
+      const result = res.data;
 
       if (!res.ok) {
-        throw new Error(result?.error || result?.message || "Update failed");
+        throw new Error(result?.error || result?.message || (res.status === 0 ? res.error : "Update failed"));
       }
 
       SuccessToast(result?.message || "Notification settings saved");

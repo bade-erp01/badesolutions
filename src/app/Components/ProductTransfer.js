@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Encrypt } from "../../../Functions/Functions";
+import api from "@/lib/api";
 import { ErrorMessage, plsWait } from "../../../Functions/Mics";
 import Swal from "sweetalert2";
 
@@ -44,23 +44,14 @@ export default function ProductTransfer({ Store, userData, baseUrl }) {
     }
 
     plsWait("Creating Transfer Request...");
-    const request = await fetch(`${baseUrl}/api/Transfer`, {
-      method: "POST",
-      body: JSON.stringify({
-        from,
-        to,
-        date,
-        user: `${userData.user.firstName} ${userData.user.lastName}`,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
+    const request = await api.post("/api/Transfer", {
+      from,
+      to,
+      date,
+      user: `${userData.user.firstName} ${userData.user.lastName}`,
     });
 
-    const response = await request.json();
+    const response = request.data || {};
 
     if (request.ok) {
       setOpen(false);

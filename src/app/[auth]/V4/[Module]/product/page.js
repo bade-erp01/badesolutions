@@ -6,7 +6,7 @@ import ProductXLSXDownload from "@/app/Components/productListXLSX.js";
 import StockReportModal from "@/app/Components/Reports/StockReport";
 import StockandSalesReport from "@/app/Components/Reports/StockandSalesReport";
 import BulkUpdate from "@/app/Components/bulkUpdate";
-import { Encrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 import PurchaseDumpModal from "@/app/Components/Reports/PurchaseDump";
 import AddPriceListModal from "@/app/Components/PricelistCreate";
 import { Plus, Package } from "lucide-react";
@@ -58,20 +58,11 @@ export default async function Productlayout({ children, params }) {
   const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
   try {
-    const res = await fetch(`${baseUrl}/api/Products`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-        access: `${Encrypt(userData.user._id)}`,
-        sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-      },
-      next: { revalidate: 120 },
-    });
+    const res = await serverApi("/api/Products", { next: { revalidate: 120 } });
 
     if (!res.ok) throw new Error("Failed to fetch product data");
 
-    const { productList, vendorList, storeList } = await res.json();
+    const { productList, vendorList, storeList } = res.data;
 
     return (
       <div className="flex min-w-0 flex-col bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
@@ -141,7 +132,7 @@ export default async function Productlayout({ children, params }) {
                       key={element._id}
                       data={element}
                       module="product"
-                      url={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${Encrypt(element._id)}`}
+                      url={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${element._id}`}
                     />
                   ))}
               </div>

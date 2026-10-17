@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 
 import { logout as logoutAction } from "../../../lib/User";
+import { logout as serverLogout } from "@/lib/api";
 import { SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
 
@@ -24,6 +25,7 @@ export default function Logout({ userData }) {
       SuccessToast("Signing out...");
 
       await logoutOneSignal();
+      await serverLogout().catch(() => {}); // end the server session too
       await dispatch(logoutAction());
 
       SuccessToast("You have been logged out successfully.");

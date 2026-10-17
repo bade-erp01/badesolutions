@@ -30,7 +30,6 @@ import {
   CheckCircle2,
   Receipt,
 } from 'lucide-react';
-import { Encrypt } from '../../../../../../Functions/Mics';
 import { useUser } from '@/components/UserProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,7 +53,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { EXPRESS_PRIVATE_URL } from '../../../../../../Functions/Functions';
+import { api as callApi } from '@/lib/api';
 
 // ============== CONSTANTS ==============
 const LOW_STOCK_THRESHOLD = 10;
@@ -112,36 +111,17 @@ export default function POS() {
   }, []);
 
   // ============== API ==============
-  const headers = useCallback(
-    (extra = {}) => ({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${Encrypt(user.business.tenantId)}`,
-      access: `${Encrypt(user.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(user.SessionId)}`,
-      ...extra,
-    }),
-    [user]
-  );
-
-  const api = useCallback(
-    async (path, { method = 'GET', body, extraHeaders } = {}) => {
-      const res = await fetch(`${EXPRESS_PRIVATE_URL}/api${path}`, {
-        method,
-        headers: headers(extraHeaders),
-        body: body ? JSON.stringify(body) : undefined,
-        cache: 'no-store',
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const err = new Error(data.error || `Request failed (${res.status})`);
-        err.details = data.details;
-        err.status = res.status;
-        throw err;
-      }
-      return data;
-    },
-    [headers]
-  );
+  // Server session cookie + CSRF token (src/lib/api.js); no ids or tokens built here.
+  const api = useCallback(async (path, { method = 'GET', body, extraHeaders } = {}) => {
+    const r = await callApi(`/api${path}`, { method, body, headers: extraHeaders });
+    if (!r.ok) {
+      const err = new Error(r.error);
+      err.details = r.data?.details;
+      err.status = r.status;
+      throw err;
+    }
+    return r.data || {};
+  }, []);
 
   const loadAll = useCallback(
     async ({ silent = false } = {}) => {
@@ -328,7 +308,7 @@ export default function POS() {
           items: items(),
           discount: discountAmount,
           payment: { method: paymentMethod, tendered: paymentMethod === 'cash' ? tenderedNum : undefined },
-          ops: Encrypt(opsCode.trim()), // never sent in the URL
+          ops: opsCode.trim(), // in the body over HTTPS, never in the URL
         },
         extraHeaders: { 'Idempotency-Key': attemptKeyRef.current },
       });

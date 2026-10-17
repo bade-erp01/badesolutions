@@ -33,7 +33,7 @@ import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function Login({ userInfo, businessInfo, url, SessionId }) {
+export default function Login({ userInfo, businessInfo, url }) {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -115,10 +115,12 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     try {
       setLoading(true);
 
+      // plain over HTTPS; credentials so the browser keeps the session cookies
       const response = await fetch(`${url}/api/v1/Login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formData: Encrypt(formData) }),
+        credentials: "include",
+        body: JSON.stringify({ email: formData.email, password: formData.password, location: formData.location }),
       });
 
       let data;
@@ -147,8 +149,6 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
         loginSuccess({
           user: decryptedUser,
           business: data.Tenant,
-          SessionId: data.SessionId,
-          rustyRoof: data.rustyRoof,
         })
       );
 
@@ -175,8 +175,8 @@ export default function Login({ userInfo, businessInfo, url, SessionId }) {
     }
   };
 
-  const isLoggedIn =
-    userInfo && businessInfo && SessionId === userInfo?.SessionId;
+  // fetchUser() only returns a user when the backend session is valid
+  const isLoggedIn = Boolean(userInfo && businessInfo);
 
   const logout = async () => {
     try {

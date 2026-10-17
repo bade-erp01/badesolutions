@@ -12,7 +12,7 @@ import { Users, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import { Encrypt } from "../../../../../../Functions/Functions";
+import { serverApi } from "@/lib/serverApi";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -45,19 +45,10 @@ export const metadata = {
 export default async function Vendorlayout({ params }) {
   const userData = await fetchUser();
   const Module = await params;
-  const baseUrl = process.env.EXPRESS_PRIVATE_URL;
 
-  const res = await fetch(`${baseUrl}/api/vendors`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${Encrypt(userData.business.tenantId)}`,
-      access: `${Encrypt(userData.user._id)}`,
-      sessionKey: `Bearer ${Encrypt(userData.SessionId)}`,
-    },
-  });
+  const res = await serverApi(`/api/vendors`);
 
-  const vendorList = await res.json();
+  const vendorList = res.data;
 
   // KPI Calculations
   const totalVendors = vendorList.length;
@@ -122,9 +113,7 @@ export default async function Vendorlayout({ params }) {
                     <TableCell className="font-medium">
                       <Link
                         className="text-blue-600 hover:underline"
-                        href={`/${Module.auth}/V4/${Module.Module}/${Module.Module}/${Encrypt(
-                          vendor._id
-                        )}`}
+                        href={`/${Module.auth}/V4/${Module.Module}/${Module.Module}/${vendor._id}`}
                       >
                         {vendor.Name || "N/A"}
                       </Link>
