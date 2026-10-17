@@ -13,7 +13,8 @@ import {
   BookOpen,        // Charts of Account
   Building,
   Coins,
-  Receipt          // Tax Report
+  Receipt,         // Tax Report
+  ShieldAlert      // Credit Risk
 } from "lucide-react";
 import {useParams} from "next/navigation"
 
@@ -31,6 +32,7 @@ export default function AccountingERP() {
     { label: "Bank Account", id:"Bank-Accounts", icon: Building, badge:"Core", url:"Bank-Accounts"},
     { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll"},
     { label: "Tax Report", id:"Tax-Report", icon: Receipt, badge:"New", url:"Tax-Report"},
+    { label: "Credit Risk", id:"Credit-Risk", icon: ShieldAlert, badge:"New", url:"Credit-Risk"},
   ];
 
   return (

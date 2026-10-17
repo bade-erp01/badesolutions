@@ -20,7 +20,6 @@ import ExcelDownloadBtn from "@/app/Components/ExcelDownloadBtn";
 import {
   ShoppingBagIcon,
   ArrowTrendingDownIcon,
-  ShoppingCartIcon,
   ArrowTrendingUpIcon,
   BanknotesIcon,
 } from "@heroicons/react/24/outline";
@@ -50,9 +49,6 @@ export default function MainDash({ userData }) {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  // for monitored products
-  const [monitoredCurrentPage, setMonitoredCurrentPage] = useState(1);
-  const monitoredItemsPerPage = 5;
   const [status, setStatus] = useState("Active"); // UI status indicator
   const MySwal = withReactContent(Swal);
   const Params = useParams();
@@ -69,7 +65,7 @@ export default function MainDash({ userData }) {
     );
   }, [tenantData]);
 
-  // Memoized paginated invoices MonitoredProduct
+  // Memoized paginated invoices
   const paginatedInvoices = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return sortedInvoices.slice(start, start + itemsPerPage);
@@ -89,38 +85,6 @@ export default function MainDash({ userData }) {
       }
     },
     [totalPages],
-  );
-
-  // Memoized paginated MonitoredProduct
-  // Memoized sorted monitored products
-  const sortedMonitoredProducts = useMemo(() => {
-    return (
-      tenantData?.MonitoredProduct?.sort((a, b) =>
-        a.productName.localeCompare(b.productName),
-      ) || []
-    );
-  }, [tenantData]);
-
-  //  Memoized paginated MonitoredProduct
-  const paginatedMonitoredProduct = useMemo(() => {
-    const start = (monitoredCurrentPage - 1) * monitoredItemsPerPage;
-    return sortedMonitoredProducts.slice(start, start + monitoredItemsPerPage);
-  }, [sortedMonitoredProducts, monitoredCurrentPage]);
-
-  const totalMonitoredProductPages = useMemo(() => {
-    return Math.ceil(sortedMonitoredProducts.length / monitoredItemsPerPage);
-  }, [sortedMonitoredProducts]);
-
-  // ⏱ Debounced page change
-  const handleMonitoredProductPageChange = useCallback(
-    (page) => {
-      if (page >= 1 && page <= totalMonitoredProductPages) {
-        setTimeout(() => {
-          setMonitoredCurrentPage(page);
-        }, 300); // 300ms debounce
-      }
-    },
-    [totalMonitoredProductPages],
   );
 
   useEffect(() => {
@@ -552,108 +516,8 @@ export default function MainDash({ userData }) {
                 </div>
               </div>
 
-              {/* === MONITORED PRODUCTS TABLE (shadcn) === */}
-              {sortedMonitoredProducts.length > 0 && (
-                <div className="rounded-xl p-3 sm:p-6 mt-6  border-0">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold">
-                      Monitored Products
-                    </h3>
-                  </div>
-
-                  <div className="overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12">S/N</TableHead>
-                          <TableHead>Product Name</TableHead>
-                          <TableHead>In Stock</TableHead>
-                          <TableHead>Monitor</TableHead>
-                          <TableHead>Re-Order Qty</TableHead>
-                          <TableHead className="w-16"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {paginatedMonitoredProduct.map((product, index) => (
-                          <TableRow key={index} className="">
-                            <TableCell className="font-medium">
-                              {(monitoredCurrentPage - 1) *
-                                monitoredItemsPerPage +
-                                index +
-                                1}
-                            </TableCell>
-                            <TableCell className="font-semibold">
-                              <Link
-                                href={`/${Params.auth}/V4/product/product/${product.productId}`}
-                                className="text-indigo-600 hover:underline"
-                              >
-                                {product.productName}
-                              </Link>
-                            </TableCell>
-                            <TableCell>{product.currentQty}</TableCell>
-                            <TableCell>{product.replenishMin}</TableCell>
-                            <TableCell>{product.replenishQty}</TableCell>
-                            <TableCell>
-                              <button
-                                className="hover:text-indigo-600 transition-colors"
-                                title="Raise purchase order"
-                              >
-                                <ShoppingCartIcon className="h-5 w-5" />
-                              </button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-
-                  {/* Monitored Products Pagination */}
-                  <div className="flex flex-wrap justify-center items-center gap-2 mt-6">
-                    <button
-                      onClick={() =>
-                        handleMonitoredProductPageChange(
-                          monitoredCurrentPage - 1,
-                        )
-                      }
-                      disabled={monitoredCurrentPage === 1}
-                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors "
-                    >
-                      Prev
-                    </button>
-                    {Array.from(
-                      { length: totalMonitoredProductPages },
-                      (_, i) => (
-                        <button
-                          key={i}
-                          onClick={() =>
-                            handleMonitoredProductPageChange(i + 1)
-                          }
-                          className={`px-4 py-2 rounded-md border transition-colors ${
-                            monitoredCurrentPage === i + 1
-                              ? "bg-indigo-600 border-indigo-600"
-                              : "border-gray-300 "
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ),
-                    )}
-                    <button
-                      onClick={() =>
-                        handleMonitoredProductPageChange(
-                          monitoredCurrentPage + 1,
-                        )
-                      }
-                      disabled={
-                        monitoredCurrentPage === totalMonitoredProductPages
-                      }
-                      className="px-4 py-2 rounded-md border border-gray-300  disabled:opacity-50 transition-colors"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Low stock: no table here any more — the hourly stock monitor sends
+                  alerts to storekeepers, admins and purchase officers. */}
             </section>
             <aside className="min-w-0 rounded p-3 sm:p-6 border-0 text-xs  animate__animated animate__fadeInRight animate__faster">
               <h3 className="text-lg font-semibold mb-4">Quick Stats Widget</h3>
