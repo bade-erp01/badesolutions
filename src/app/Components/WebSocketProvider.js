@@ -60,7 +60,8 @@ export function WebSocketProvider({ children, user }) {
       text = "",
       actionLabel = null,
       onAction = null,
-      playSound = true,
+      playSound = false,
+      sticky = false, // stays until closed (things someone has to act on)
     }) => {
       // If socket is not connected, do nothing
       if (!socketRef.current?.connected) return;
@@ -94,7 +95,8 @@ export function WebSocketProvider({ children, user }) {
 
       const options = {
         description: text,
-        duration: Infinity,
+        // only alerts that need action stay; everything else closes by itself
+        duration: sticky ? Infinity : 8000,
       };
 
       if (actionLabel && typeof onAction === "function") {
@@ -271,14 +273,19 @@ export function WebSocketProvider({ children, user }) {
   // ========== Global Event Listeners ==========
   useEffect(() => {
     // lib/notifications.js notify(): { title, message, url, level }
+    // lib/notifications.js notify(): { title, message, url, level, priority }
+    // priority "action": stays until closed, with sound; "security" (sign-ins): closes by itself
     const unsubNotification = subscribe("notification", (data) => {
       const url = typeof data?.url === "string" && data.url.startsWith("/") ? data.url : "";
+      const action = data?.priority === "action";
       showNotification({
         icon: ["success", "warning", "error"].includes(data?.level) ? data.level : "info",
         title: data?.title || "Notification",
         text: data?.message && data.message !== data.title ? data.message : "",
         actionLabel: url ? "View" : null,
         onAction: url ? () => router.push(url) : null,
+        playSound: action,
+        sticky: action,
       });
     });
 
@@ -325,7 +332,6 @@ export function WebSocketProvider({ children, user }) {
         title: "Customer Notification",
         text:
           data?.message || "A new customer notification has been received.",
-        playSound: true,
       });
     });
 
@@ -346,6 +352,8 @@ export function WebSocketProvider({ children, user }) {
         icon: "error",
         title: "Error",
         text: data.message,
+        playSound: true,
+        sticky: true,
       });
     });
 
@@ -364,7 +372,6 @@ export function WebSocketProvider({ children, user }) {
         icon: "info",
         title: data?.message || "Daily Business Report",
         text: text || "Yesterday's business report is ready.",
-        playSound: true,
       });
     });
 

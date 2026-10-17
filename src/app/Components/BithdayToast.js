@@ -64,6 +64,9 @@ const BirthdayGreetings = ({ user, Business }) => {
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
+        // how long the pieces last, in frames (~60 a second): the default 200 (~3.3 s)
+        // plus 4 seconds
+        ticks: 440,
       });
 
       // Play birthday sound
