@@ -54,6 +54,9 @@ import { logout as logoutAction } from "../../../lib/User";
 import api, { logout as serverLogout } from "@/lib/api";
 import NotificationBell from "@/app/Components/NotificationBell";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
+// phones (below 768px) only: header, bottom tabs and menu in the Sales Portal's style
+import { MobileHeader, MobileMenu, MobileTabBar } from "@/app/Components/mobile/MobileShell";
+import UsageBeacon from "@/app/Components/UsageBeacon";
 
 // Normalize ids (ObjectId / string)
 const toId = (v) =>
@@ -65,8 +68,25 @@ export default function Wrapper({ children }) {
   const { user } = useUser();
   const Params = useParams();
   const [searchTerm, setSearchTerm] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const page = Params.Module;
   const dispatch = useDispatch();
+
+  // pages with the module search (header search box; on phones, the header's search button)
+  const searchAllowed =
+    user.business &&
+    user.user &&
+    pathname !== `/${Params.auth}/V4` &&
+    !pathname.includes("Search") &&
+    !pathname.includes("Assistant") &&
+    !pathname.includes("store") &&
+    !pathname.includes("purchases") &&
+    !pathname.includes("product-transfer") &&
+    !pathname.includes("Forms") &&
+    !pathname.includes("inventory") &&
+    !pathname.includes("pos") &&
+    pathname !== `/${Params.auth}/V4/Settings` &&
+    Params.Module !== `accounting`;
 
   // Active tenants from toogledTenants
   const activeTenants = useMemo(() => {
@@ -358,8 +378,16 @@ export default function Wrapper({ children }) {
 
       {/* Main Content */}
       <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+        {/* ========== PHONE HEADER (below 768px; the header below takes over from 768px) ========== */}
+        <MobileHeader
+          user={user}
+          apps={navApps}
+          onOpenMenu={() => setMobileMenuOpen(true)}
+          search={{ allowed: Boolean(searchAllowed), value: searchTerm, onChange: setSearchTerm, onSubmit: handleSearch, module: page }}
+        />
+
         {/* ========== TOP HEADER ========== */}
-        <div className="border-b bg-card px-2 sm:px-4 py-2 sm:py-3">
+        <div className="max-md:hidden border-b bg-card px-2 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center gap-2 sm:gap-3">
             {/* ===== LEFT ZONE ===== */}
             <div className="flex items-center gap-3 shrink-0">
@@ -515,19 +543,7 @@ export default function Wrapper({ children }) {
 
             {/* ===== CENTER ZONE (Search) ===== */}
             <div className="flex-1 flex justify-center min-w-0">
-              {user.business &&
-                user.user &&
-                pathname !== `/${Params.auth}/V4` &&
-                !pathname.includes("Search") &&
-                !pathname.includes("Assistant") &&
-                !pathname.includes("store") &&
-                !pathname.includes("purchases") &&
-                !pathname.includes("product-transfer") &&
-                !pathname.includes("Forms") &&
-                !pathname.includes("inventory") &&
-                !pathname.includes("pos") &&
-                pathname !== `/${Params.auth}/V4/Settings` &&
-                Params.Module !== `accounting` && (
+              {searchAllowed && (
                   <form
                     onSubmit={handleSearch}
                     className="flex items-center gap-2 w-full max-w-md search-form"
@@ -573,7 +589,7 @@ export default function Wrapper({ children }) {
         </div>
 
         {/* Main View */}
-        <div className="flex-1 min-w-0 overflow-auto p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8 view">
+        <div className="flex-1 min-w-0 overflow-auto p-3 sm:p-4 lg:p-6 space-y-6 sm:space-y-8 view max-md:pb-28">
           <PrivacyIdleOverlay
             idleTimeMs={300000}
             userData={user}
@@ -584,6 +600,21 @@ export default function Wrapper({ children }) {
             {children}
           </PrivacyIdleOverlay>
         </div>
+
+        {/* anonymous page counts (which screens are used on phones) */}
+        <UsageBeacon />
+
+        {/* ========== PHONE TABS + MENU (below 768px) ========== */}
+        <MobileTabBar apps={navApps} onOpenMenu={() => setMobileMenuOpen(true)} />
+        <MobileMenu
+          open={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          user={user}
+          apps={navApps}
+          tenants={activeTenants}
+          selectedTenantId={selectedTenantId}
+          onSwitchTenant={handleTenantSwitch}
+        />
       </div>
     </div>
   );

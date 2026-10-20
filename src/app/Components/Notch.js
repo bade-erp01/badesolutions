@@ -115,6 +115,8 @@ export default function Notch({ children }) {
         fixed
         bottom-6
         right-6
+        max-md:bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))]
+        max-md:right-4
 
         z-50
       "

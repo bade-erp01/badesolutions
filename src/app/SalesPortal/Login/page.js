@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { loginSuccess, loginFailure } from "../../../../lib/SalesPortalUser";
 import { Dencrypt } from "../../../../Functions/Functions";
 import { Alert, Avatar, Button, Field, Input, LinkButton, PoweredByBade } from "../_ui/ui";
@@ -58,15 +58,38 @@ export default function Login({ userInfo, businessInfo, url }) {
     }
   };
 
+  // Phones: the form alone. From 768px (md): a brand panel on the left, in the style of the
+  // Sales Portal landing page, and the same form on the right.
   return (
-    <main className="sales-app mx-auto flex min-h-dvh max-w-sm flex-col justify-center bg-sp-bg px-5 py-10 text-sp-ink">
+    <div className="sales-app min-h-dvh bg-sp-bg text-sp-ink md:grid md:grid-cols-2 lg:grid-cols-[1.1fr_1fr]">
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white md:flex md:flex-col md:justify-between md:p-10 lg:p-14">
+        <div className="absolute inset-0 bg-[url('/salesfolks.jpg')] bg-cover bg-center opacity-25" aria-hidden />
+        <Link href="/SalesPortal" className="relative flex items-center gap-3" aria-label="BADE Sales home">
+          <Image src="/icons/icon-192.png" alt="" width={40} height={40} className="h-10 w-10 rounded-xl" />
+          <span className="text-lg font-semibold">BADE Sales</span>
+        </Link>
+        <div className="relative max-w-md space-y-5">
+          <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">Your route, customers and orders, in one place.</h2>
+          <ul className="space-y-3 text-[15px] text-slate-200">
+            {["Today's route and customer visits", "Orders with cases and pieces, from the customer's shop", "Stock checks with photos, sent straight to your company"].map((t) => (
+              <li key={t} className="flex items-start gap-3">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" aria-hidden />
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="relative text-xs text-slate-400">Powered by BADE ERP · badesolutions.com.ng</p>
+      </aside>
+
+    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-5 py-10 md:w-full md:max-w-md md:px-10">
       <div className="mb-8 space-y-3">
         <Link href="/SalesPortal" aria-label="BADE Sales">
           <Image src="/icons/icon-192.png" priority alt="BADE" width={48} height={48} className="h-12 w-12 rounded-2xl" />
         </Link>
         <h1 className="text-2xl font-bold tracking-tight">{isLoggedIn ? "Welcome back" : "Sales sign in"}</h1>
         <p className="text-sm text-sp-muted">
-          {isLoggedIn ? "You're already signed in on this phone." : "Use the email and password your company gave you."}
+          {isLoggedIn ? "You're already signed in on this device." : "Use the email and password your company gave you."}
         </p>
       </div>
 
@@ -86,7 +109,7 @@ export default function Login({ userInfo, businessInfo, url }) {
           </LinkButton>
         </div>
       ) : (
-        <form onSubmit={submit} className="space-y-4">
+        <form method="post" onSubmit={submit} className="space-y-4">{/* post: a tap before the page has loaded must never put the password in the address */}
           <Field label="Email address">
             <Input type="email" name="email" autoComplete="username" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" required />
           </Field>
@@ -113,5 +136,6 @@ export default function Login({ userInfo, businessInfo, url }) {
 
       <PoweredByBade className="mt-10" />
     </main>
+    </div>
   );
 }

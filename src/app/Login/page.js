@@ -330,7 +330,7 @@ export default function Login({ userInfo, businessInfo, url }) {
                       </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form method="post" onSubmit={handleSubmit} className="space-y-5">{/* post: a tap before the page has loaded must never put the password in the address */}
                       <div>
                         <label
                           htmlFor="email"

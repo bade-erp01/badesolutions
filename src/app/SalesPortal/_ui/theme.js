@@ -7,7 +7,8 @@
 // runs before the first paint (SalesPortal/layout.js) so a dark-mode phone never flashes white.
 
 import { useCallback, useEffect, useState } from "react";
-import { THEME_KEY } from "./themeBoot";
+import { usePathname } from "next/navigation";
+import { THEME_KEY, isLanding } from "./themeBoot";
 
 const CHANGED = "bade:sales-theme-changed";
 const BAR = { light: "#ffffff", dark: "#151b23" }; // browser bar = header colour
@@ -25,7 +26,7 @@ const phoneIsDark = () => typeof window !== "undefined" && Boolean(window.matchM
 const resolve = (choice) => (choice === "dark" || (choice === "system" && phoneIsDark()) ? "dark" : "light");
 
 function apply(choice) {
-  const dark = resolve(choice) === "dark";
+  const dark = !isLanding(window.location.pathname) && resolve(choice) === "dark";
   const html = document.documentElement;
   html.classList.toggle("sp-dark", dark);
   html.classList.toggle("dark", dark);
@@ -34,6 +35,7 @@ function apply(choice) {
 
 /** Keeps the page in the chosen mode (and follows the phone when set to "Phone setting"). */
 export function SalesTheme() {
+  const pathname = usePathname(); // re-applied on navigation (the landing page stays light)
   useEffect(() => {
     const sync = () => apply(read());
     sync();
@@ -48,7 +50,7 @@ export function SalesTheme() {
       // leaving the Sales Portal for the ERP: its own theme provider takes over
       document.documentElement.classList.remove("sp-dark", "dark");
     };
-  }, []);
+  }, [pathname]);
   return null;
 }
 

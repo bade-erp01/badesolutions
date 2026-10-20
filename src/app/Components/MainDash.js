@@ -399,8 +399,10 @@ export default function MainDash({ userData }) {
             </Card>
           </section>
 
-          {/* where the sales reps are now (hidden when the business has none) */}
-          <SalesTeamMap />
+          {/* where the sales reps are now (hidden when the business has none).
+              For now only the BADE team (isDev) sees it; the API still requires the C-level
+              dashboard. TODO: drop the isDev check to show it to every C-level user again. */}
+          {userData.user.isDev && <SalesTeamMap />}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}
