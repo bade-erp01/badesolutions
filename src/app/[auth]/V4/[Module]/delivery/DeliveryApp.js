@@ -13,9 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import DeliveryPeople from "../merchant-biller/DeliveryPeople";
 import CustomerMap from "./CustomerMap";
+import SalesTeamMap from "@/app/Components/SalesTeamMap";
 import { ErrorMessage } from "../../../../../../Functions/Mics";
 
 const noSubscribe = () => () => {};
+// the driver's open delivery, under their name on the live map
+const driverJob = (d) =>
+  !d.job ? "No open delivery" : `${d.job.status === "out" ? "Delivering to" : "Next:"} ${d.job.customerName || d.job.ref}${d.job.open > 1 ? ` (+${d.job.open - 1} more)` : ""}`;
 const FILTERS = [
   ["", "All"],
   ["assigned", "Assigned"],
@@ -71,6 +75,7 @@ export default function DeliveryApp({ auth, isAdmin }) {
       <div className="flex gap-1 overflow-x-auto border-b" role="tablist">
           {[
             ["deliveries", "Deliveries"],
+            ["drivers", "Drivers live map"],
             ["map", "Customer map"],
             ...(isAdmin ? [["people", "Delivery people"]] : []),
           ].map(([key, label]) => (
@@ -88,6 +93,19 @@ export default function DeliveryApp({ auth, isAdmin }) {
 
       {tab === "people" && isAdmin && <DeliveryPeople />}
       {tab === "map" && <CustomerMap />}
+      {tab === "drivers" && (
+        <SalesTeamMap
+          endpoint="/api/delivery-agents/locations"
+          itemsKey="drivers"
+          title="Delivery people – live locations"
+          footnote="Drivers send their position every 2 minutes while the delivery app is open on their phone. Positions are kept for a day."
+          hideWhenEmpty={false}
+          emptyText="No delivery people yet. Add them under Delivery people."
+          detailOf={driverJob}
+          summaryExtra={(c) => `${c.onDelivery || 0} on a delivery`}
+          className=""
+        />
+      )}
 
       {tab === "deliveries" && (
         <>

@@ -36,7 +36,8 @@ const when = (d) => (d ? moment(d).format("D MMM YYYY, h:mm a") : null);
 export default function DeliveryPanel({ billId, billStatus, canAssign: canAssignRole }) {
   // works on any confirmed sale, but only where the Delivery app is installed (on its own or in
   // the Merchant app); the backend refuses assigning otherwise (lib/portals/staffRoutes.js)
-  const locked = useUser()?.business?.lockedApps || [];
+  // UserProvider holds the session view ({ user, business }) as `user`
+  const locked = useUser()?.user?.business?.lockedApps || [];
   const appOn = !locked.includes("delivery") || !locked.includes("merchant-biller");
   const canAssign = canAssignRole && appOn;
   const [delivery, setDelivery] = useState(null);
@@ -239,7 +240,7 @@ function AssignDialog({ billId, reassign, onClose, onDone }) {
 // what delivery would do here, and the way to the app store (admins install, others ask them).
 function DeliveryPromo() {
   const { auth } = useParams() || {};
-  const isAdmin = Boolean(useUser()?.user?.isAdmin);
+  const isAdmin = Boolean(useUser()?.user?.user?.isAdmin);
   return (
     <section id="delivery" className="mb-6 rounded-lg border border-dashed border-border bg-muted/20 p-4 scroll-mt-24">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

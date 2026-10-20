@@ -49,7 +49,7 @@ function FitTo({ reps, selected }) {
   return null;
 }
 
-export default function SalesTeamMapView({ reps, selectedId, onSelect }) {
+export default function SalesTeamMapView({ reps, selectedId, onSelect, detailOf = null }) {
   const onMap = useMemo(() => reps.filter((r) => Number.isFinite(r.latitude) && Number.isFinite(r.longitude)), [reps]);
   const selected = onMap.find((r) => r.id === selectedId) || null;
 
@@ -64,7 +64,9 @@ export default function SalesTeamMapView({ reps, selectedId, onSelect }) {
               <p className="font-semibold">{r.name}</p>
               <p className="text-xs" style={{ color: STATUS_COLORS[r.status] }}>
                 {STATUS_LABELS[r.status]} · {r.updatedAt ? `${moment(r.updatedAt).fromNow()} (${moment(r.updatedAt).format("h:mm a")})` : ""}
+                {Number.isFinite(r.accuracy) && r.accuracy > 0 ? ` · within ${r.accuracy} m` : ""}
               </p>
+              {detailOf && detailOf(r) && <p className="text-xs">{detailOf(r)}</p>}
               <p className="flex gap-3 pt-1">
                 {r.phone && (
                   <a href={`tel:${r.phone}`} className="text-blue-600 underline">
