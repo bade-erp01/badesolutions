@@ -1,89 +1,45 @@
-import React from "react";
-import { fetchUser } from "../../../../Functions/whoIsSalesPerson";
 import { redirect } from "next/navigation";
-import NavWrapper from "@/app/Components/NavWrapper";
+import { fetchUser } from "../../../../Functions/whoIsSalesPerson";
+import { serverApi } from "@/lib/serverApi";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
 import BirthdayGreetings from "@/app/Components/BithdayToast";
-import { serverApi } from "@/lib/serverApi";
+import ListScreen from "../_ui/ListScreen";
 
 export const metadata = {
-  title: "B.A.D.E ERP Platform",
-  description:
-    "Configure and manage your stores with B.A.D.E — Nigeria’s leading AI-powered ERP solution for businesses of all sizes. Built for scalability, automation, and real-time insights.",
-  keywords: [
-    "Store Management",
-    "ERP Nigeria",
-    "Business Automation",
-    "B.A.D.E",
-    "AI ERP",
-    "Retail Optimization",
-    "Inventory Control",
-    "Bernard Fidels Ogoh",
-    "ERP Abuja",
-    "ERP Lagos",
-    "ERP Port Harcourt",
-    "Nigerian Business Software",
-    "SME ERP",
-    "Enterprise Resource Planning",
-    "AI Business Tools",
-    "Affordable ERP Nigeria",
-    "Scalable ERP",
-    "Digital Transformation",
-    "Next-gen ERP",
-    "Business Intelligence",
-    "Workflow Automation",
-    "Store Settings Dashboard",
-    "Tenant Management",
-    "Multi-store ERP",
-  ],
-  author: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
-  ogTitle: " B.A.D.E ERP Platform",
-  ogDescription:
-    "Take control of your store operations with B.A.D.E — the smart ERP for Nigerian enterprises.",
-  ogImage: "/assets/store-settings-og.png",
-  ogUrl: "https://badesolutions.com.ng/storelayout",
-  ogType: "website",
-  twitterCard: "summary_large_image",
-  twitterTitle: " B.A.D.E ERP Platform",
-  twitterDescription:
-    "Manage your stores with ease using B.A.D.E — Nigeria’s AI-powered ERP solution.",
-  twitterImage: "/assets/store-settings-og.png",
-  applicationName: "B.A.D.E ERP",
-  creator: "Bernard Fidels Ogoh",
-  favicon: "favicon.ico",
+  title: "Stock reports",
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function layout({ children }) {
+export default async function ReportsPage() {
   const userData = await fetchUser();
-  
-    // Redirect if either user OR business is missing 
-    if (!userData?.user || !userData?.business || userData.user.status !== "active") {
-      redirect('/SalesPortal/Login');
-    }
 
+  // Redirect if either user OR business is missing
+  if (!userData?.user || !userData?.business || userData.user.status !== "active") {
+    redirect(userData?.reason === "elsewhere" ? "/SalesPortal/Login?reason=elsewhere" : "/SalesPortal/Login");
+  }
 
-  let Array = [];
+  let items = [];
+  let error = "";
   try {
-    const res = await serverApi(`/api/Sales_Portal/stock/position`, {
-      next: { revalidate: 60 },
+    const res = await serverApi("/api/Sales_Portal/stock/position", {
+      cache: "no-store", // personal, changing data: always fresh (it was cached for 60 s, so new lines showed late)
     });
     if (res.ok) {
-      Array = res.data;
+      items = res.data?.data || [];
+    } else {
+      error = "Couldn't load stock reports. Please try again.";
     }
-  } catch (err) {
-    throw new Error("Failed to fetch data");
+  } catch {
+    error = "Couldn't load stock reports. Please try again.";
   }
 
   return (
-    <NavWrapper userData={userData} navtitle="Reports" data={Array.data}>
-      {children}
-      <SubscriptionReminder Business={userData?.business} />
-      <BirthdayGreetings Business={userData?.business} user={userData?.user} />
-    </NavWrapper>
+    <>
+      <ListScreen userData={userData} module="Reports" items={items} error={error} />
+      <SubscriptionReminder Business={userData.business} />
+      <BirthdayGreetings Business={userData.business} user={userData.user} />
+    </>
   );
 }
-

@@ -1,6 +1,5 @@
 "use client";
 import Nav1 from "@/app/Components/Nav1";
-import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import Link from "next/link";
 import Image from "next/image";
@@ -50,7 +49,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
     const s = status.toLowerCase();
     if (s.includes("draft")) return "bg-yellow-500 text-black";
     if (s.includes("approved")) return "bg-green-500";
-    if (s.includes("rejected")) return "bg-red-500";
+    if (s.includes("rejected") || s.includes("declined")) return "bg-red-500";
     if (s.includes("posted") || s.includes("warehouse") || s.includes("inventory")) return "bg-indigo-500";
     return "bg-gray-500";
   };
@@ -120,7 +119,7 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
           <label className="block mb-3">
             <div className="text-sm text-white/70 mb-1">Status</div>
             <div className="flex flex-wrap gap-2">
-              {["", "Draft", "Pending", "Converted"].map((s) => (
+              {["", "Draft", "Pending", "Converted", "Declined"].map((s) => (
                 <button
                   key={s}
                   onClick={() => {
@@ -228,6 +227,13 @@ export default function TransferPage({ purchaseList, userData, VendorList, Store
                           >
                             {element.status || "Unknown"}
                           </Badge>
+                          {element.merchantRequest?.state && (
+                            <span className="ml-2 inline-flex rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800">
+                              {element.merchantRequest.origin === "merchant"
+                                ? element.merchantRequest.state === "awaiting_business" ? "From merchant · review" : "From merchant"
+                                : { awaiting_merchant: "With merchant", accepted: "Merchant accepted", declined: "Merchant declined", withdrawn: "Merchant" }[element.merchantRequest.state] || "Merchant"}
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell>
                           {element.recievedDate

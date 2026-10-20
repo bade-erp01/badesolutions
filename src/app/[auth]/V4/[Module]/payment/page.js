@@ -2,7 +2,6 @@ import PaymentListpage from "@/app/Components/PaymentList";
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import { serverApi } from "@/lib/serverApi";
-import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import CashregisterReport from "@/app/Components/Reports/CashregisterReport";
 import Notch from "@/app/Components/Notch";

@@ -8,7 +8,10 @@
 //   const { ok, status, data, error } = await api.get("/api/Pos/config");
 //   await api.post("/api/Pos/checkout", body, { headers: { "Idempotency-Key": key } });
 
+// NEXT_PUBLIC_API_URL=same-origin: call the backend through this site (dev proxy, see
+// ERP_API_PROXY in next.config.mjs) — one tunnel serves a phone the whole app
 export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL === "same-origin" ? "" :
   process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== "undefined" && window.location.hostname === "localhost"
     ? "http://localhost:3000"
@@ -70,20 +73,21 @@ export async function api(path, { method = "GET", body, headers = {}, signal } =
     : sessionEnded
       ? "Your session has ended. Please log in again."
       : data?.error || data?.message || `Request failed (${res.status})`;
-  if (sessionEnded) sendToLogin();
+  if (sessionEnded) sendToLogin(res.headers.get("X-Session-Reason"));
   return { ok: res.ok, status: res.status, data, error };
 }
 
 // The backend marks login problems (no session, expired, suspended, logged in elsewhere)
 // with X-Session-Ended; other 401s, e.g. a wrong ops code, stay on the page.
 let redirecting = false;
-function sendToLogin() {
+function sendToLogin(reason) {
   if (typeof window === "undefined" || redirecting) return;
   const path = window.location.pathname;
   const login = path.startsWith("/SalesPortal") ? "/SalesPortal/Login" : "/Login";
   if (path === login) return;
   redirecting = true;
-  window.location.assign(login);
+  // "elsewhere": this account signed in on another device (one device at a time)
+  window.location.assign(reason === "elsewhere" ? `${login}?reason=elsewhere` : login);
 }
 
 api.get = (path, opts) => api(path, { ...opts, method: "GET" });

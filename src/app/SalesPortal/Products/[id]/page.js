@@ -1,729 +1,233 @@
 "use client";
+
+// One product: photo and code, this year's sales by the rep, details, price lists, reviews.
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  plsWait,
-  ErrorMessage,
-  SuccessToast,
-} from "../../../../../Functions/Mics";
-import api from "@/lib/api";
 import moment from "moment";
-import { useEffect, Suspense } from "react";
 import Plotly from "plotly.js-dist-min";
-import {
-  pricelistSetter
-} from "../../../../../Functions/Functions";
 import { driver } from "driver.js";
-import "driver.js/dist/driver.css"; // Make sure the CSS is imported!
-import { useState } from "react";
-import Image from "next/image";
-import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import "driver.js/dist/driver.css";
+import { toast } from "sonner";
+import { Star, TrendingUp } from "lucide-react";
+import api from "@/lib/api";
+import { pricelistSetter } from "../../../../../Functions/Functions";
+import AppShell from "../../_ui/AppShell";
+import { Badge, Button, Card, CardTitle, Field, KeyValue, Loading, Textarea } from "../../_ui/ui";
+import { currencyOf, day, money2, toNumber } from "../../_ui/format";
+import { useSalesTheme } from "../../_ui/theme";
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+export default function ProductPage({ userInfo, businessInfo, Backdata }) {
+  const p = Backdata;
+  const currency = currencyOf(businessInfo);
+  const code = p.ADCcode || p.ACDcode;
+  const vat = toNumber(p.VAT);
 
-export default function SingleProductpage({
-  userInfo,
-  businessInfo,
-  Backdata,
-}) {
-  const [data] = useState(Backdata);
-  const [isOpen3, setIsOpen3] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-
-  useProductEditTour(Backdata.Name); // for driver
-
-  const [formData] = useState({ ...data });
+  useProductTour(p.Name);
 
   return (
-    <Suspense fallback={<SuspenenseFallBack pagedata={`${data.Name}`} />}>
-      <div className="m-0 sm:m-5 p-3 sm:p-4 rounded shadow-2xl border-lg border-2-black bg-white animate__animated animate__fadeInUpBig animate__delay-2s">
-        <form className="space-y-5 mx-auto">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <span
-              className={`px-5 py-1.5 rounded-full font-small font-semibold tracking-wide shadow-sm border bg-indigo-50 text-gray-700 border-indigo-200`}
-            >
-              {formData.ADCcode || formData.ACDcode}
-            </span>
+    <AppShell userData={{ user: userInfo, business: businessInfo }} title={p.Name || "Product"} subtitle={code || "Product"} back tabs={false}>
+      <Card className="flex items-center gap-4 p-4">
+        { }
+        <img src={p.image || "/preview.png"} alt={p.Name} className="h-24 w-24 shrink-0 rounded-xl border border-sp-line bg-white object-contain" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <p className="font-semibold leading-snug">{p.Name}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {code && <Badge tone="ink">{code}</Badge>}
+            {p.category && <Badge>{p.category}</Badge>}
           </div>
+        </div>
+        {p.QrCode && (
+           
+          <img id="qrcode" src={p.QrCode} alt="Product QR code" className="h-20 w-20 shrink-0 rounded-lg border border-sp-line bg-white p-1" />
+        )}
+      </Card>
 
-          {/* Avatar & Attachment */}
-          <div className="flex flex-wrap gap-4 sm:gap-8 items-center py-4">
-            {/* Avatar */}
-            <div className="flex items-center space-x-6">
-              <div className="w-28 h-28 rounded overflow-hidden flex items-center justify-center">
-                <Image
-                  height={70}
-                  width={70}
-                  src={data.image || "/preview.png"}
-                  alt="Avatar"
-                  className="w-full h-full object-cover shadow-lg drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]"
-                  loading="eager"
-                  priority={true}
-                  quality={100}
-                />
-              </div>
-            </div>
+      <SalesChart productId={p._id} business={businessInfo} user={userInfo} currency={currency} />
 
-            {/* Divider */}
-            <div className="hidden md:block h-24 border-l border-gray-200 mx-2"></div>
+      <Card id="others" className="divide-y divide-sp-line">
+        <CardTitle className="border-b-0">Details</CardTitle>
+        <KeyValue label="Category" value={p.category} />
+        <KeyValue label="Sub-category" value={p.Subcategory} />
+        <KeyValue label="Manufacturer" value={p.Manufacturer} />
+        <KeyValue label="Barcode" value={p.Manufacture_code} />
+        <KeyValue label="Unit" value={p.UMO} />
+        <KeyValue label={`Pieces per ${p.UMO || "case"}`} value={p.Pieces} />
+        <KeyValue label="VAT" value={`${vat}%`} />
+      </Card>
 
-            {/* qrcode */}
-            {data.QrCode && (
-              <div
-                id="qrcode"
-                className="w-28 h-28 rounded overflow-hidden bg-gradient-to-tr from-gray-200 to-gray-300 shadow-sm border-2 border-gray-300 flex items-center justify-center"
-              >
-                <Image
-                  width={10}
-                  height={10}
-                  src={data.QrCode || ""}
-                  alt="QrCode"
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  priority={true}
-                  quality={100}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Sales Insight */}
-          <ProductChart
-            productId={Backdata._id}
-            productName={Backdata.Name}
-            umo={Backdata.UMO}
-            business={businessInfo}
-            user={userInfo}
-          />
-          <div className="border rounded-lg overflow-hidden">
-            <span
-              onClick={() => setIsOpen3(!isOpen3)}
-              className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
-            >
-              <h2 className="text-base/7 font-semibold text-gray-900">
-                Product Information
-              </h2>
-              <svg
-                className={`w-5 h-5 transform transition-transform duration-300 ${
-                  isOpen3 ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </span>
-            <div
-              className={`px-3 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
-                isOpen3 ? "block" : "hidden"
-              }`}
-            >
-              <div className="border-b bg- border-gray-900/10 pb-8 sm:pb-12">
-                <div className="mt-4 sm:mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                  <div className="sm:col-span-3">
-                    <label
-                      htmlFor="Name"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Name
-                    </label>
-                    <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900 break-words">
-                        {formData.Name}
-                      </h3>
-                    </div>
+      <Card>
+        <CardTitle>Prices</CardTitle>
+        {p.PriceLists?.length > 0 ? (
+          <ul className="divide-y divide-sp-line">
+            {p.PriceLists.map((price, i) => {
+              const promoOn = Number(price.promo) > 0 && (!price.PromoDate || moment(price.PromoDate).isSameOrAfter(moment(), "day"));
+              return (
+                <li key={i} className="space-y-1 px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="min-w-0 truncate font-medium">{pricelistSetter(price.Name ?? "Unknown price list", businessInfo)}</span>
+                    <span className="shrink-0 font-semibold tabular-nums">{money2(price.price, currency)}</span>
                   </div>
+                  <p className="text-xs text-sp-muted">
+                    {price.vat ? `${vat}% VAT applied` : "No VAT"}
+                    {Number(price.promo) > 0 && (
+                      <span className={promoOn ? "text-sp-accent" : ""}>
+                        {" "}
+                        · Discount {money2(price.promo, currency)}
+                        {price.PromoDate ? ` until ${day(price.PromoDate)}` : ""}
+                      </span>
+                    )}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="px-4 py-6 text-center text-sm text-sp-muted">No prices set.</p>
+        )}
+        <p className="border-t border-sp-line px-4 py-3 text-xs text-sp-muted">Prices are changed in the main ERP by an administrator.</p>
+      </Card>
 
-                  <div className="sm:col-span-3">
-                    <label
-                      htmlFor="ADCcode"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Product Code
-                    </label>
-                    <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900 break-words">
-                        {formData.ADCcode || formData.ACDcode}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2 sm:col-start-1">
-                    <label
-                      htmlFor="category"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Product category
-                    </label>
-                    <div className="mt-2">
-                      <h3 className="font-semibold text-gray-900 break-words">
-                        {formData.category}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2 sm:col-start-1">
-                    <label
-                      htmlFor="Subcategory"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Product Sub-Category
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Subcategory}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="Manufacturer"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Manufacturer
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Manufacturer}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="Manufacture_code"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Bar Code
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Manufacture_code}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2 sm:col-start-1">
-                    <label
-                      htmlFor="Pieces"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Define Pieces in {formData.UMO || "Case"}
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.Pieces}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="UMO"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      Standard Unit of Measure
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.UMO}
-                      </h5>
-                    </div>
-                  </div>
-
-                  <div id="others" className="sm:col-span-2 sm:col-start-1">
-                    <label
-                      htmlFor="VAT"
-                      className="block text-sm/6 font-medium text-gray-900"
-                    >
-                      VAT Percentage (%)
-                    </label>
-                    <div className="mt-2">
-                      <h5 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6">
-                        {formData.VAT?.$numberDecimal}
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <br />
-
-            <div className="border rounded-lg overflow-hidden">
-              <span
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-3 sm:px-4 py-3 flex justify-between items-center text-left text-gray-800 font-medium cursor-pointer hover:bg-gray-100 transition"
-              >
-                <h2 className="text-base/7 font-semibold text-gray-900">
-                 Rates & Discounts
-                </h2>
-                <svg
-                  className={`w-5 h-5 transform transition-transform duration-300 ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </span>
-              <div
-                className={`px-3 sm:px-4 py-3 text-gray-600 transition-all duration-300 ${
-                  isOpen ? "block" : "hidden"
-                }`}
-              >
-                {/* pricelist display */}
-
-                <ProductPriceList
-                  initialData={data}
-                  Biz={businessInfo}
-                  user={userInfo}
-                />
-              </div>
-            </div>
-          </div>
-
-          <CommentForm userData={userInfo} product={data} />
-        </form>
-      </div>
-    </Suspense>
+      <ReviewForm user={userInfo} product={p} />
+    </AppShell>
   );
 }
 
-function ProductChart({ productId, productName, umo, business, user }) {
-  const [loading, setLoading] = useState(true);
-  const [monthlySalesArray, setMonthlySalesArray] = useState([]);
-  const [errormssg, setErrorMssg] = useState("");
-  const [tottalSales, setTotalSales] = useState();
+// This rep's sales of the product, month by month, this year.
+function SalesChart({ productId, business, user, currency }) {
+  const [months, setMonths] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const currentYear = moment().format("YYYY");
-        const url = `/api/SalseandStock?Year=${currentYear}`;
-
-        const response = await api.get(url);
-
-        const result = response.data;
-        if (!result?.invoice) return;
-
-        const data = result.invoice
-          .filter((entry) => entry.salesPerson === user._id)
-          .flatMap((invoice) =>
-            invoice.orders.map((order) => ({
-              sold: order.total,
-              InvoiceDate: invoice.startDate,
-              _id: order.item._id,
-            })),
-          );
-
-        const productSales = data.filter((item) => item._id === productId);
-
-        const monthlySales = productSales.reduce((acc, curr) => {
-          const month = moment(curr.InvoiceDate).format("MM");
-          acc[month] = acc[month] || { sold: 0 };
-          acc[month].sold += curr.sold;
-          return acc;
-        }, {});
-
-        for (let i = 1; i <= 12; i++) {
-          const monthStr = i.toString().padStart(2, "0");
-          if (!monthlySales[monthStr]) {
-            monthlySales[monthStr] = { sold: 0 };
-          }
-        }
-
-        const formattedArray = Object.entries(monthlySales)
-          .map(([month, data]) => ({ month, ...data }))
-          .sort((a, b) => a.month.localeCompare(b.month));
-
-        setMonthlySalesArray(formattedArray);
-      } catch (err) {
-        setErrorMssg("❌" + err.message);
-      } finally {
-        setLoading(false);
-      }
+    let alive = true;
+    (async () => {
+      const r = await api.get(`/api/SalseandStock?Year=${moment().format("YYYY")}`);
+      if (!alive) return;
+      if (!r.ok) return setError("Couldn't load sales for this product.");
+      const totals = new Array(12).fill(0);
+      (r.data?.invoice || [])
+        .filter((inv) => inv.salesPerson === user._id)
+        .forEach((inv) =>
+          (inv.orders || []).forEach((o) => {
+            if (o.item?._id === productId) totals[moment(inv.startDate).month()] += Number(o.total) || 0;
+          }),
+        );
+      setMonths(totals);
+    })().catch(() => alive && setError("Couldn't load sales for this product."));
+    return () => {
+      alive = false;
     };
+  }, [productId, user._id]);
 
-    fetchProductData(); // Initial fetch
-  }, [productId, productName, umo, business]);
+  const total = months ? months.reduce((a, b) => a + b, 0) : 0;
 
+  const [, , mode] = useSalesTheme();
   useEffect(() => {
-    if (!loading && monthlySalesArray.length > 0) {
-      const NDxArray = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      const NDyArray = monthlySalesArray.map((item) => item.sold);
-      const totalSales = NDyArray.reduce((sum, val) => sum + val, 0).toFixed(1);
-
-      const chartTitle = `estimated net sales of ${
-        business.currency?.currency?.Symbol
-      }${totalSales} for ${moment().format("YYYY")}`;
-      const chartColor = business?.Color || "#1e2939";
-
-      const dataPlot = [
-        {
-          x: NDxArray,
-          y: NDyArray,
-          type: "scatter",
-          mode: "lines+markers",
-          marker: { color: chartColor },
-        },
-      ];
-      setTotalSales(chartTitle);
-
-      const layoutPlot = {
-        title: chartTitle,
-        autosize: true,
-        margin: { l: 48, r: 16, t: 64, b: 40 },
-      };
-
-      Plotly.newPlot("myPlot", dataPlot, layoutPlot, { responsive: true });
-    }
-  }, [loading, monthlySalesArray, business]);
+    if (!months) return;
+    // the Sales Portal's colours for the current light / dark mode
+    const css = getComputedStyle(document.documentElement);
+    const ink = css.getPropertyValue("--color-sp-ink").trim() || "#111827";
+    const muted = css.getPropertyValue("--color-sp-muted").trim() || "#6b7280";
+    const line = css.getPropertyValue("--color-sp-line").trim() || "#e5e7eb";
+    const colour = business?.Color || ink;
+    Plotly.newPlot(
+      "myPlot",
+      [{ x: MONTHS, y: months, type: "scatter", mode: "lines+markers", line: { color: colour, width: 3 }, marker: { color: colour } }],
+      {
+        autosize: true, margin: { l: 44, r: 12, t: 12, b: 32 }, paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+        font: { size: 11, color: muted }, xaxis: { gridcolor: line, zerolinecolor: line }, yaxis: { gridcolor: line, zerolinecolor: line },
+      },
+      { responsive: true, displayModeBar: false },
+    );
+  }, [months, business, mode]);
 
   return (
-    <>
-      {/* Show error if exists */}
-      {errormssg ? (
-        <div className="flex items-center justify-center min-h-[50dvh] px-4">
-          <div className="text-red-500 text-base sm:text-lg font-semibold text-center break-words">{errormssg}</div>
-        </div>
-      ) : // No error: show loading spinner or chart
-      loading ? (
-        <div className="flex items-center justify-center min-h-[50dvh]">
-          <div className="animate-spin rounded-full h-9 w-9 border-t-2 border-blue-500"></div>
-        </div>
+    <Card id="code">
+      <CardTitle action={<TrendingUp className="h-4 w-4 text-sp-muted" />}>Your sales this year</CardTitle>
+      {error ? (
+        <p className="px-4 py-8 text-center text-sm text-sp-muted">{error}</p>
+      ) : !months ? (
+        <Loading label="Loading sales…" />
       ) : (
-        <div id="code">
-          <div className="text-base font-semibold text-gray-700 mb-1 break-words">
-            📈 Sales Insight for {productName},{tottalSales}
-            <hr />
-            <br />
-          </div>
-          <i className="text-gray-500 text-sm">
-            Last updated: {moment().format("YYYY-MM-DD HH:mm:ss")}
-          </i>
-          <div
-            id="myPlot"
-            className="h-[300px] w-full sm:h-[400px]"
-          />
+        <div className="p-3">
+          <p className="px-1 text-2xl font-bold tabular-nums">{money2(total, currency)}</p>
+          <p className="px-1 text-xs text-sp-muted">Estimated net sales in {moment().format("YYYY")}</p>
+          <div id="myPlot" className="mt-2 h-56 w-full" />
         </div>
       )}
-    </>
-  );
-}
-
-function useProductEditTour(product) {
-  useEffect(() => {
-    if (typeof window === "undefined") return; // Prevent SSR crash
-
-    const ProductTour = localStorage.getItem("ProductTour");
-
-    if (!ProductTour && product) {
-      const timeoutId = setTimeout(() => {
-        localStorage.setItem("ProductTour", "ProductTour");
-
-        const driverObj = driver({
-          showProgress: true,
-          popoverClass: "driverjs-theme",
-          steps: [
-            {
-              element: "#code",
-              popover: {
-                title: "Product sales Insight",
-                description: `Get real-time analytics insight on ${product} estimated sales for the current year.`,
-                side: "left",
-                align: "start",
-              },
-            },
-            {
-              element: "#qrcode",
-              popover: {
-                title: "QR-CODE",
-                description:
-                  "Scan the QR code to view product on another device.",
-                side: "right",
-                align: "end",
-              },
-            },
-            {
-              element: "#others",
-              popover: {
-                title: "VAT & Others",
-                description:
-                  "Manage VAT and other applicable charges on the product.",
-                side: "left",
-                align: "start",
-              },
-            },
-          ],
-        });
-
-        driverObj.drive();
-      }, 60000); //  Delay for 1 minute (60000 ms)
-
-      // Cleanup in case the component unmounts before timeout
-      return () => clearTimeout(timeoutId);
-    }
-  }, [product]);
-}
-
-// comment
-export function CommentForm({ userData, product }) {
-  const [formData, setFormData] = useState({
-    comment: "",
-    rating: 0,
-    userId: userData._id,
-    userName: userData.firstName,
-  });
-
-  const router = useRouter();
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleRating = (value) => {
-    setFormData({ ...formData, rating: value });
-  };
-
-  const handleSubmit = async () => {
-    plsWait("Submitting review.");
-    try {
-      const request = await api.post(
-        `/api/product/review/${product._id}`,
-        formData,
-      );
-      if (!request.ok) {
-        ErrorMessage(request.data?.error || "Error saving review");
-        return;
-      }
-
-      const response = request.data;
-
-      if (response.message) {
-        SuccessToast(response.message || "Review submitted successfully!");
-        setFormData({});
-        router.refresh(); // refresh page or redirect
-      }
-    } catch (err) {
-      ErrorMessage(err.response?.data?.error || "Error saving review");
-    }
-  };
-
-  return (
-    <Card className="max-w-full mx-auto shadow-lg">
-      <CardHeader>
-        <CardTitle className="break-words">Submit a Review for {product.Name?.toLowerCase()}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="comment">Comment</Label>
-          <Textarea
-            id="comment"
-            name="comment"
-            placeholder="Write your review..."
-            maxLength={500}
-            required
-            value={formData.comment}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="rating">Rating</Label>
-          <div className="flex items-center gap-1 sm:gap-2">
-            {[1, 2, 3, 4, 5].map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => handleRating(value)}
-                className={`text-3xl transition-colors ${
-                  formData.rating >= value
-                    ? "text-yellow-400"
-                    : "text-gray-300 hover:text-yellow-300"
-                }`}
-                aria-label={`${value} star${value > 1 ? "s" : ""}`}
-              >
-                {formData.rating >= value ? "★" : "☆"}
-              </button>
-            ))}
-          </div>
-          <input type="hidden" name="rating" value={formData.rating} />
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        <Button
-          onClick={handleSubmit}
-          type="button"
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          Submit Review
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
 
+function useProductTour(product) {
+  useEffect(() => {
+    if (typeof window === "undefined" || !product) return;
+    let seen = null;
+    try {
+      seen = localStorage.getItem("ProductTour");
+    } catch {
+      return;
+    }
+    if (seen) return;
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem("ProductTour", "ProductTour");
+      } catch {
+        // tour shows again next time
+      }
+      driver({
+        showProgress: true,
+        popoverClass: "driverjs-theme",
+        steps: [
+          { element: "#code", popover: { title: "Product sales insight", description: `Your estimated sales of ${product} this year.`, side: "bottom", align: "start" } },
+          { element: "#qrcode", popover: { title: "QR code", description: "Scan the QR code to view the product on another device.", side: "left", align: "end" } },
+          { element: "#others", popover: { title: "VAT & others", description: "VAT and other details of the product.", side: "top", align: "start" } },
+        ],
+      }).drive();
+    }, 60000); // after a minute on the page
+    return () => clearTimeout(t);
+  }, [product]);
+}
 
-// diplay pricelist
-export function ProductPriceList({ initialData, Biz, user }) {
-  const [formData] = useState(initialData);
+function ReviewForm({ user, product }) {
+  const router = useRouter();
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(0);
+  const [busy, setBusy] = useState(false);
 
-  const handleChange = (e) => {
-    ErrorMessage("Price editing is currently disabled to prevent accidental changes. Please contact your administrator to update product price from main ERP.");
+  const submit = async () => {
+    if (!comment.trim()) return toast.error("Write a short comment first.");
+    setBusy(true);
+    const r = await api.post(`/api/product/review/${product._id}`, { comment, rating, userId: user._id, userName: user.firstName });
+    setBusy(false);
+    if (!r.ok) return toast.error(r.data?.error || "Error saving review.");
+    toast.success(r.data?.message || "Review submitted.");
+    setComment("");
+    setRating(0);
+    router.refresh();
   };
 
-
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
-      {formData.PriceLists.length > 0 ? (
-        formData.PriceLists.map((price, idx) => (
-          <Card
-            key={idx}
-            className="group w-full sm:max-w-xs rounded-sm hover:shadow-md hover:border-border transition-all duration-300 bg-white"
-          >
-            <CardContent className="p-3 space-y-2">
-              {/* Header */}
-              <div className="flex items-center justify-between gap-2">
-                <Badge
-                  variant="secondary"
-                  title={pricelistSetter(price.Name ?? "Unknown PriceList", Biz)}
-                  className="max-w-[140px] truncate lowercase text-xs font-semibold px-2 py-0.5"
-                >
-                  {pricelistSetter(price.Name ?? "Unknown PriceList", Biz)}
-                </Badge>
-
-                <p className="text-xs text-muted-foreground truncate">
-                  {price.vat
-                    ? `${formData.VAT.$numberDecimal}% VAT applied`
-                    : "VAT not applied"}
-                </p>
-              </div>
-
-              {/* Base Price */}
-              <div className="space-y-1">
-                <Label
-                  htmlFor={`price-${price.Name}`}
-                  className="text-xs font-medium text-muted-foreground"
-                >
-                  Base price
-                </Label>
-                <Input
-                  id={`price-${price.Name}`}
-                  name={price.Name}
-                  type="number"
-                  step="any"
-                  value={price.price || ""}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  className="h-9 w-full text-base sm:h-8 sm:text-sm"
-                />
-              </div>
-
-              {/* Promo */}
-              <div className="space-y-1">
-                <Label
-                  htmlFor={`promo-${price.Name}`}
-                  className="text-xs font-medium text-muted-foreground"
-                >
-                  Discounts
-                </Label>
-                <Input
-                  id={`promo-${price.Name}`}
-                  name={`promo-${price.Name}`}
-                  type="number"
-                  step="any"
-                  value={price.promo}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  className="h-9 w-full text-base sm:h-8 sm:text-sm"
-                />
-              </div>
-
-              {/* Promo Date */}
-              <div className="space-y-1">
-                <Label
-                  htmlFor={`promoDate-${price.Name}`}
-                  className="text-xs font-medium text-muted-foreground"
-                >
-                  Discounts ends
-                </Label>
-                <Input
-                  id={`promoDate-${price.Name}`}
-                  name={`promoDate-${price.Name}`}
-                  type="date"
-                  value={moment(price.PromoDate).format("YYYY-MM-DD")}
-                  onChange={handleChange}
-                  className="h-9 w-full text-base sm:h-8 sm:text-xs"
-                />
-              </div>
-
-              <div className="pt-1 border-t" />
-
-              {/* Footer VAT Notice */}
-              <div className="flex items-center justify-between gap-2">
-                <Label
-                  htmlFor={`vat-${price.Name}`}
-                  className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer"
-                >
-                  <Checkbox
-                    id={`vat-${price.Name}`}
-                    name={`vat-${price.Name}`}
-                    checked={price.vat || false}
-                    // onCheckedChange={(checked) =>
-                    //   handleChange({
-                    //     target: { name: `vat-${price.Name}`, value: checked },
-                    //   })
-                    // }
-                    className="h-4 w-4"
-                  />
-                  Apply {formData.VAT.$numberDecimal}% VAT
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      ) : (
-        <p className="font-italics text-xs">Nothing to show</p>
-      )}
-    </div>
+    <Card className="space-y-4 p-4">
+      <p className="font-semibold">What do customers say about it?</p>
+      <Field label="Comment">
+        <Textarea value={comment} onChange={(e) => setComment(e.target.value)} maxLength={500} placeholder="Feedback from the field…" />
+      </Field>
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium">Rating</p>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((v) => (
+            <button key={v} type="button" onClick={() => setRating(v)} className="rounded-lg p-1.5" aria-label={`${v} star${v > 1 ? "s" : ""}`} aria-pressed={rating >= v}>
+              <Star className={`h-7 w-7 ${rating >= v ? "fill-amber-400 text-amber-400" : "text-sp-line"}`} />
+            </button>
+          ))}
+        </div>
+      </div>
+      <Button className="w-full" onClick={submit} busy={busy}>
+        {busy ? "Sending…" : "Submit review"}
+      </Button>
+    </Card>
   );
 }

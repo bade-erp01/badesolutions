@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { subscriptionLabel } from "@/lib/subscription";
 import { PhotoIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import TermsAndConditionsLink from "@/app/Components/TermsAndCondition";
 import Swal from "sweetalert2";
@@ -346,12 +347,7 @@ export default function BusinessDatas({ data, userInfo, baseUrl }) {
           </div>
           <div className="pt-2">
             <p className="text-sm font-medium text-foreground">
-              {moment(formData.subscriptionEndDate).isValid() &&
-              moment(formData.subscriptionEndDate).isAfter(moment())
-                ? `Subscription ends in ${moment(
-                    formData.subscriptionEndDate,
-                  ).diff(moment(), "days")} day(s)`
-                : "Subscription has expired."}
+              {subscriptionLabel(formData.subscriptionEndDate) || "Subscription has expired."}
             </p>
           </div>
         </CardContent>

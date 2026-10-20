@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import api from "@/lib/api";
 import Nav1 from "@/app/Components/Nav1";
-import Footer2 from "@/app/Components/Footer2";
 import {
   plsWait,
   ErrorMessage,
@@ -29,8 +28,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ChevronDown, ChevronUp, Shield, Zap } from "lucide-react";
+import { ChevronDown, ChevronUp, PlayCircle, Shield, Zap } from "lucide-react";
 import { safeUrlOrNull } from "@/lib/security/safeUrl";
+import AddOnsBilling from "@/app/Components/AddOnsBilling";
 
 const ModulesPage = ({ userInfo }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -93,6 +93,13 @@ const ModulesPage = ({ userInfo }) => {
           </div>
         </div>
 
+        {/* Monthly apps (Merchant app, Delivery, Reg AI): signed-in admins subscribe here */}
+        {isMounted && userInfo?.user?.isAdmin && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+            <AddOnsBilling title="Monthly apps" />
+          </div>
+        )}
+
         {/* Modules Grid */}
         {isMounted && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24">
@@ -111,7 +118,6 @@ const ModulesPage = ({ userInfo }) => {
           </div>
         )}
       </div>
-      <Footer2 />
     </>
   );
 };
@@ -190,6 +196,9 @@ const ModuleCard = ({ item, userInfo }) => {
                 <Badge className="mt-2 bg-green-100 text-green-800 border-green-300">
                   ✓ Installed
                 </Badge>
+              )}
+              {!item.installed && item.comingSoon && (
+                <Badge className="mt-2 bg-amber-100 text-amber-800 border-amber-300">Coming soon</Badge>
               )}
             </div>
           </div>
@@ -285,13 +294,17 @@ const ModuleCard = ({ item, userInfo }) => {
               />
             </div>
 
+            {/* catalogue: comingSoon / purchasable: false → listed, but not on sale */}
             <Button
               onClick={() => handlePayment(item)}
-              disabled={isLoading}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-6 text-base"
+              disabled={isLoading || item.purchasable === false || item.comingSoon}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-6 text-base disabled:bg-slate-300 disabled:text-slate-600"
             >
-              {isLoading ? "Processing..." : "Start Your Experience"}
+              {item.comingSoon ? "Coming soon" : item.purchasable === false ? "Not available to buy" : isLoading ? "Processing..." : "Start Your Experience"}
             </Button>
+
+            {/* how the app works: catalogue videoUrl, YouTube until each app has its own video */}
+            {!item.comingSoon && item.purchasable !== false && <WatchVideo url={item.videoUrl} name={item.Name} />}
           </>
         )}
 
@@ -308,5 +321,15 @@ const ModuleCard = ({ item, userInfo }) => {
     </Card>
   );
 };
+
+// "Watch how it works": opens the app's video in a new tab
+export const WatchVideo = ({ url, name }) => (
+  <Button asChild variant="outline" className="w-full border-slate-300">
+    <a href={safeUrlOrNull(url) || "https://www.youtube.com"} target="_blank" rel="noopener noreferrer" aria-label={`Watch how ${name} works (opens YouTube in a new tab)`}>
+      <PlayCircle className="w-4 h-4 mr-2" />
+      Watch how it works
+    </a>
+  </Button>
+);
 
 export default ModulesPage;

@@ -1,1154 +1,436 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import moment from "moment";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import withReactContent from "sweetalert2-react-content";
-import Swal from "sweetalert2";
-import Marquee from "react-fast-marquee";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  LayoutDashboard,
-  Package,
-  FileBarChart2,
-  Users,
-  Map,
-  ClipboardList,
-  Warehouse,
-  X,
-  Navigation,
-  RefreshCcw,
-  TrendingUp,
-  TrendingDown,
+  AlertCircle,
   Banknote,
   Bell,
-  AlertCircle,
-  Store,
+  ChevronRight,
+  ClipboardList,
+  FileBarChart2,
+  Map,
   MapPin,
+  Navigation,
+  Package,
+  RefreshCw,
+  Store,
+  Tag,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  WifiOff,
 } from "lucide-react";
-
 import api from "@/lib/api";
-import { SuccessToast, plsWait,ErrorMessage } from "../../../../Functions/Mics";
 import GenerealSalesMargin from "@/app/Components/GenerealSalesMargin";
-import Nav2 from "@/app/Components/Nav2";
-import Logout from "@/app/Components/Logout";
-import NotificationBell from "@/app/Components/NotificationBell";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ChartContainer } from "@/components/ui/chart";
-import {
-  Label,
-  PolarGrid,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from "recharts";
-import { cn } from "@/lib/utils";
+import AppShell from "../_ui/AppShell";
+import { Alert, Badge, Card, CardTitle, StatusBadge } from "../_ui/ui";
+import { currencyOf, money, short, when } from "../_ui/format";
 
-// ─────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────
-const formatNumberShort = (num) => {
-  if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(2) + " B";
-  if (num >= 1_000_000) return (num / 1_000_000).toFixed(2) + " M";
-  if (num >= 1_000) return (num / 1_000).toFixed(2) + " K";
-  return num?.toString() || "0";
+const REFRESH_MS = 60 * 1000;
+const INACTIVITY_LIMIT = 5 * 60 * 1000;
+const SALES_PAGE = 5;
+
+const GREETINGS = {
+  en: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening", generic: "Hello" },
+  fr: { morning: "Bonjour", afternoon: "Bon après-midi", evening: "Bonsoir", generic: "Salut" },
+  es: { morning: "Buenos días", afternoon: "Buenas tardes", evening: "Buenas noches", generic: "Hola" },
+  de: { morning: "Guten Morgen", afternoon: "Guten Tag", evening: "Guten Abend", generic: "Hallo" },
 };
+
+function greeting(name) {
+  const hour = new Date().getHours();
+  const time = hour >= 5 && hour < 12 ? "morning" : hour >= 12 && hour < 17 ? "afternoon" : hour >= 17 && hour < 22 ? "evening" : "generic";
+  const lang = "en"; // one language (it used to pick a random one each visit)
+  return `${GREETINGS[lang][time]}, ${name || "there"}`;
+}
 
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// ─────────────────────────────────────────────────────────────
-// Dashboard Layout
-// ─────────────────────────────────────────────────────────────
-export default function DashboardLayout({ userData, baseUrl }) {
-  const [open, setOpen] = useState(false);
-  const [searchTerm] = useState("");
-  const router =  useRouter();
-  const languages = useMemo(() => ["es", "en", "de", "fr"], []);
+export default function DashboardLayout({ userData }) {
+  // random language each visit; picked in the browser so the server render matches
+  const [hello, setHello] = useState("");
+  useEffect(() => setHello(greeting(userData?.user?.firstName)), [userData?.user?.firstName]);
 
-  const getRandomLanguage = () =>
-    languages[Math.floor(Math.random() * languages.length)];
-
-  const getLocalizedGreeting = useMemo(() => {
-    return (name = "Guest", lang = getRandomLanguage()) => {
-      const hour = moment().hour();
-      const timeOfDay =
-        hour >= 5 && hour < 12
-          ? "morning"
-          : hour >= 12 && hour < 17
-            ? "afternoon"
-            : hour >= 17 && hour < 22
-              ? "evening"
-              : "generic";
-
-      const greetings = {
-        en: {
-          morning: "Good morning",
-          afternoon: "Good afternoon",
-          evening: "Good evening",
-          generic: "Hello",
-        },
-        fr: {
-          morning: "Bonjour",
-          afternoon: "Bon après-midi",
-          evening: "Bonsoir",
-          generic: "Salut",
-        },
-        es: {
-          morning: "Buenos días",
-          afternoon: "Buenas tardes",
-          evening: "Buenas noches",
-          generic: "Hola",
-        },
-        de: {
-          morning: "Guten Morgen",
-          afternoon: "Guten Tag",
-          evening: "Guten Abend",
-          generic: "Hallo",
-        },
-      };
-
-      return `${greetings[lang]?.[timeOfDay] || greetings.en[timeOfDay]}, ${name}.`;
-    };
-  }, [languages]);
-
-  const navItems = [
-    {
-      href: "/SalesPortal/Dashboard",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-      show: userData.user.c_levelDash,
-      active: true,
-    },
-    {
-      href: "/SalesPortal/Products",
-      label: "Products",
-      icon: Package,
-      show: true,
-      active: false,
-    },
-    {
-      href: "/SalesPortal/Reports",
-      label: "Product Report",
-      icon: FileBarChart2,
-      show: true,
-      active: false,
-    },
-    {
-      href: "/SalesPortal/Customers",
-      label: "My customers",
-      icon: Users,
-      show: true,
-      active: false,
-    },
-    {
-      href: "/SalesPortal/Route",
-      label: "My Route",
-      icon: Map,
-      show: true,
-      active: false,
-    },
-    {
-      href: "/SalesPortal/Requisitions",
-      label: "Requisitions",
-      icon: ClipboardList,
-      show: true,
-      active: false,
-    },
-    {
-      href: "/SalesPortal/Inventory",
-      label: "Inventory",
-      icon: Warehouse,
-      show: !!userData.user.workLocation,
-      active: false,
-    },
-  ];
-
-  const handleTenantSwitch = async (tenantId) => {
-    if (!tenantId || tenantId === userData?.business?.tenantId) return;
-
-    const isDark = document.documentElement.classList.contains("dark");
-
-    const result = await Swal.fire({
-      title: "Switch Tenant?",
-      html: `
-          <div class="py-4">
-            <p class="text-lg text-slate-600 dark:text-slate-400">
-              Are you sure you want to switch to this tenant?
-            </p>
-            <p class="text-sm text-slate-500 dark:text-slate-500 mt-3">
-              You will be logged into the new tenant's workspace.
-            </p>
-          </div>
-        `,
-      imageUrl: userData?.business?.companyLogo || "",
-      imageWidth: 80,
-      imageHeight: 80,
-      imageAlt: "Company Logo",
-      showCancelButton: true,
-      confirmButtonText: "Yes, Switch Tenant",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: isDark ? "#18181b" : "#0f172a",
-      cancelButtonColor: "#ef4444",
-      width: "440px",
-      padding: "2rem",
-      background: isDark ? "#0f172a" : "#ffffff",
-      color: isDark ? "#e2e8f0" : "#0f172a",
-      customClass: {
-        popup: `rounded-3xl shadow-2xl border ${isDark ? "border-slate-700" : "border-slate-200"}`,
-        title: `text-2xl font-semibold ${isDark ? "text-white" : "text-slate-900"}`,
-        htmlContainer: "text-center",
-        confirmButton: "rounded-xl font-medium px-8 py-2.5 text-base",
-        cancelButton: "rounded-xl font-medium px-8 py-2.5 text-base",
-        image: "mx-auto rounded-2xl object-contain",
-      },
-      reverseButtons: true,
-      allowOutsideClick: true,
-      allowEscapeKey: true,
-    });
-
-    if (result.isConfirmed) {
-      plsWait("Please wait while we switch your tenant...");
-
-      try {
-        const response = await api.patch(`/api/switch-tenant/${userData.user._id}`, {
-          tenantId,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to switch tenant.");
-        }
-
-        SuccessToast("Tenant switched successfully.");
-        router.refresh();
-      } catch (error) {
-        ErrorMessage("An error occurred while switching tenant.");
-      }
-    }
-  };
-
-  const SidebarContent = () => (
-    <div className="flex h-full flex-col">
-      <div className="px-1 pb-4">
-        <h2 className="text-sm font-semibold text-zinc-100 tracking-tight">
-          Menu
-        </h2>
-      </div>
-
-      <Separator className="bg-zinc-800 mb-4" />
-
-      <ScrollArea className="flex-1 pr-2">
-        <nav className="space-y-1">
-          {navItems
-            .filter((item) => item.show)
-            .map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                  item.active
-                    ? "bg-zinc-800 text-white font-medium"
-                    : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-100",
-                )}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                <span className="truncate">{item.label}</span>
-              </Link>
-            ))}
-        </nav>
-      </ScrollArea>
-
-      {/* Tenant Switch - Mobile only */}
-      {userData?.user?.toogledTenants?.filter(
-        (tenant) => tenant?.tenantIds?.isActive,
-      )?.length > 0 && (
-        <div className="pt-4 border-t border-white/10">
-          <div className="tenant-switch space-y-1.5">
-            <div className="text-sm text-white/60">Switch Tenants</div>
-            <Select
-              value={userData?.business?.tenantId}
-              onValueChange={handleTenantSwitch}
-            >
-              <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
-                <SelectValue placeholder="Select tenant..." />
-              </SelectTrigger>
-              <SelectContent>
-                {userData?.user?.toogledTenants?.map((tenant) => (
-                  <SelectItem
-                    key={tenant?.tenantIds?._id}
-                    value={tenant?.tenantIds?._id}
-                  >
-                    {tenant?.tenantIds?.companyName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-auto pt-6 space-y-3">
-        <div className="flex items-center gap-3 rounded-xl bg-zinc-800/80 px-3 py-2.5">
-          <Avatar className="h-9 w-9 border border-zinc-700">
-            <AvatarImage
-              src={userData?.user?.image || "/person.png"}
-              alt="User"
-            />
-            <AvatarFallback className="bg-zinc-700 text-zinc-200 text-xs">
-              {userData?.user?.firstName?.[0]}
-              {userData?.user?.lastName?.[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-zinc-100">
-              {userData?.user?.firstName} {userData?.user?.lastName}
-            </p>
-            <p className="text-xs text-zinc-500">My Account</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 rounded-md bg-zinc-800 px-2 py-1 text-zinc-100">
-          <NotificationBell />
-          <span className="text-sm">Notifications</span>
-        </div>
-
-        <Logout />
-      </div>
-    </div>
-  );
+  const today = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <div className="relative flex flex-col min-h-[90dvh] bg-background text-foreground">
-      <Nav2
-        navtitle="Dashboard"
-        onToggleSideNav={() => setOpen(true)}
-        onSearchChange={searchTerm}
-        userData={userData}
-      />
-
-      {/* Mobile Sidebar */}
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="left"
-          className="w-72 max-w-[85vw] border-r border-zinc-800 bg-zinc-950 p-0 text-zinc-100 [&>button]:hidden"
-        >
-          <div className="flex items-center justify-between px-5 py-4">
-            <SheetHeader className="p-0">
-              <SheetTitle className="text-base font-semibold text-zinc-100">
-                Navigation
-              </SheetTitle>
-            </SheetHeader>
-            <SheetClose asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-full border border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </SheetClose>
-          </div>
-          <Separator className="bg-zinc-800" />
-          <div className="h-[calc(100dvh-73px)] px-4 py-4">
-            <SidebarContent />
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Main Content */}
-      <main className="flex-1 m-3">
-        <header className="mb-6">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 shrink-0 border-2 border-border shadow-md">
-              <AvatarImage
-                src={
-                  userData.business.companyLogo ||
-                  userData.user.image ||
-                  "/person.png"
-                }
-                alt="user"
-              />
-              <AvatarFallback>{userData.user.firstName?.[0]}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl font-bold tracking-tight break-words">
-                {getLocalizedGreeting(userData.user.firstName)}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {`It's ${moment().format("dddd, Do MMMM YYYY")}`}
-              </p>
-            </div>
-          </div>
-        </header>
-
-        <MainDash userData={userData} baseUrl={baseUrl} />
-      </main>
-    </div>
+    <AppShell userData={userData}>
+      <div>
+        <h1 className="min-h-7 text-xl font-bold tracking-tight">{hello}</h1>
+        <p className="text-sm text-sp-muted" suppressHydrationWarning>
+          {today}
+        </p>
+      </div>
+      <MainDash userData={userData} />
+    </AppShell>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// Main Dashboard
-// ─────────────────────────────────────────────────────────────
-export function MainDash({ userData, baseUrl }) {
-  const [loading, setLoading] = useState(true);
-  const [tenantData, setTenantData] = useState(null);
-  const inactivityTimer = useRef(null);
-  const intervalRef = useRef(null);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-  const [status, setStatus] = useState("Active");
-  const MySwal = withReactContent(Swal);
+function MainDash({ userData }) {
+  const isManager = Boolean(userData?.user?.c_levelDash);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+  const [offline, setOffline] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const activeRef = useRef(true);
+  const idleTimer = useRef(null);
 
-  const INACTIVITY_LIMIT = 5 * 60 * 1000;
-
-  const sortedInvoices = useMemo(() => {
-    return (
-      tenantData?.invoice?.sort(
-        (a, b) => b.billReferenceNo - a.billReferenceNo,
-      ) || []
-    );
-  }, [tenantData]);
-
-  const paginatedInvoices = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return sortedInvoices.slice(start, start + itemsPerPage);
-  }, [sortedInvoices, currentPage]);
-
-  const totalPages = useMemo(() => {
-    return Math.ceil(sortedInvoices.length / itemsPerPage);
-  }, [sortedInvoices]);
-
-  const handlePageChange = useCallback(
-    (page) => {
-      if (page >= 1 && page <= totalPages) {
-        setTimeout(() => setCurrentPage(page), 300);
-      }
-    },
-    [totalPages],
-  );
+  const load = useCallback(async () => {
+    if (document.visibilityState !== "visible" || !navigator.onLine || !activeRef.current) return;
+    setRefreshing(true);
+    const r = await api.get("/api/Sales_Portal/Dashboard");
+    setRefreshing(false);
+    if (r.ok) {
+      setData(r.data);
+      setError("");
+    } else {
+      setError("The dashboard server can't be reached right now. It will try again in a minute.");
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchTenantData = async () => {
-      const isVisible = document.visibilityState === "visible";
-      const isOnline = navigator.onLine;
+    if (!isManager) return;
 
-      if (!isVisible || !isOnline || status === "Inactive") return;
-
-      try {
-        const res = await api.get("/api/Sales_Portal/Dashboard");
-
-        if (!res.ok) throw new Error("Failed to fetch dashboard data");
-
-        const data = res.data;
-        setTenantData(data);
-      } catch (err) {
-        setError(
-          "The dashboard server is currently down or unreachable. Please try again later or contact support if the issue persists.",
-        );
-      } finally {
-        setLoading(false);
-      }
+    // stop refreshing after 5 idle minutes; any touch wakes it again
+    const wake = () => {
+      const wasIdle = !activeRef.current;
+      activeRef.current = true;
+      clearTimeout(idleTimer.current);
+      idleTimer.current = setTimeout(() => (activeRef.current = false), INACTIVITY_LIMIT);
+      if (wasIdle) load();
     };
-
-    const resetInactivityTimer = () => {
-      setStatus("Active");
-      clearTimeout(inactivityTimer.current);
-      inactivityTimer.current = setTimeout(() => {
-        setStatus("Inactive");
-      }, INACTIVITY_LIMIT);
+    const onVisible = () => document.visibilityState === "visible" && load();
+    const onOnline = () => {
+      setOffline(false);
+      load();
     };
+    const onOffline = () => setOffline(true);
 
-    if (userData.user.c_levelDash) {
-      fetchTenantData();
-      resetInactivityTimer();
-      intervalRef.current = setInterval(fetchTenantData, 60000);
-    } else {
-      setLoading(false);
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && userData.user.c_levelDash) {
-        fetchTenantData();
-      }
-    };
-
-    const handleOnline = () => {
-      SuccessToast("Back online");
-      if (userData.user.c_levelDash) fetchTenantData();
-    };
-
-    const handleOffline = () => {
-      MySwal.fire({
-        toast: true,
-        position: "bottom-start",
-        icon: "info",
-        showConfirmButton: false,
-        customClass: { popup: "swal2-subscription-toast" },
-        html: `
-          <div style="display: flex; align-items: center;">
-            <div style="text-align: left;">
-              <strong style="font-size: 14px;">🧩 No internet connection</strong><br/>
-            </div>
-          </div>
-        `,
-      });
-      setTimeout(() => plsWait("Currently Offline"), 3000);
-    };
-
-    const activityEvents = ["mousemove", "keydown", "scroll", "touchstart"];
-    activityEvents.forEach((event) =>
-      window.addEventListener(event, resetInactivityTimer),
-    );
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
+    setOffline(!navigator.onLine);
+    wake();
+    load();
+    const t = setInterval(load, REFRESH_MS);
+    const events = ["pointerdown", "keydown", "scroll", "touchstart"];
+    events.forEach((e) => window.addEventListener(e, wake, { passive: true }));
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
     return () => {
-      clearInterval(intervalRef.current);
-      clearTimeout(inactivityTimer.current);
-      activityEvents.forEach((event) =>
-        window.removeEventListener(event, resetInactivityTimer),
-      );
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
+      clearInterval(t);
+      clearTimeout(idleTimer.current);
+      events.forEach((e) => window.removeEventListener(e, wake));
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
     };
-  }, [userData, baseUrl]);
+  }, [isManager, load]);
 
-  // Loading
-  if (loading) {
-    return (
-      <div className="w-full space-y-6 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="border-border/40 bg-card/50">
-              <CardContent className="p-6">
-                <Skeleton className="h-4 w-24 mb-4" />
-                <Skeleton className="h-9 w-32 mb-3" />
-                <Skeleton className="h-3 w-40" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-5">
-            <Skeleton className="h-72 w-full rounded-xl" />
-            <Skeleton className="h-80 w-full rounded-xl" />
-          </div>
-          <Skeleton className="h-[480px] w-full rounded-xl" />
-        </div>
-      </div>
-    );
-  }
+  if (!isManager) return <RepHome />;
 
-  // Error
-  if (error) {
-    return (
-      <Alert variant="destructive" className="max-w-xl mx-auto mt-12">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Dashboard Unavailable</AlertTitle>
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    );
-  }
+  const currency = currencyOf(userData.business);
 
-  // C-Level Dashboard
-  if (userData.user.c_levelDash) {
-    const currency = userData.business.currency?.currency.Symbol || "";
-
-    const todaySales = Number(tenantData?.TodaySale) || 0;
-    const yesterdaySales = Number(tenantData?.yesterdaySale) || 0;
-    const salesDiff = todaySales - yesterdaySales;
-    const salesPercentage =
-      yesterdaySales > 0
-        ? ((salesDiff / yesterdaySales) * 100).toFixed(1)
-        : "100";
-    const salesIsUp = todaySales > yesterdaySales;
-    const salesIsDown = todaySales < yesterdaySales;
-
-    const overdueTotal =
-      tenantData.Routes?.filter((c) => c.Debt > 0).reduce(
-        (sum, c) => sum + (Number(c.Debt) || 0),
-        0,
-      ) || 0;
-
-    const pendingTasks =
-      tenantData.result?.Task?.filter((t) => t.status === "pending").length ||
-      0;
-
-    return (
-      <div className="space-y-6 text-sm">
-        {/* KPI Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-          {/* Today's Sales */}
-          <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
-            <div className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
-            <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Today’s Sales
-                  </p>
-                  <p className="text-2xl font-bold tracking-tight break-words">
-                    {currency}
-                    {formatNumberShort(todaySales)}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-emerald-500/10 p-2.5 group-hover:bg-emerald-500/20 transition-colors">
-                  <TrendingUp className="h-5 w-5 text-emerald-500" />
-                </div>
-              </div>
-
-              <div className="mt-3">
-                {salesIsUp ? (
-                  <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/10 gap-1 border-0">
-                    <TrendingUp className="h-3.5 w-3.5" />+{salesPercentage}% vs
-                    yesterday
-                  </Badge>
-                ) : salesIsDown ? (
-                  <Badge className="bg-red-500/10 text-red-400 hover:bg-red-500/10 gap-1 border-0">
-                    <TrendingDown className="h-3.5 w-3.5" />
-                    {salesPercentage}% vs yesterday
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="text-muted-foreground">
-                    No change vs yesterday
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Overdue Payments */}
-          <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
-            <div className="absolute left-0 top-0 h-full w-1 bg-violet-500" />
-            <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Overdue Payments
-                  </p>
-                  <p className="text-2xl font-bold tracking-tight break-words">
-                    {currency}
-                    {overdueTotal.toLocaleString()}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-violet-500/10 p-2.5 group-hover:bg-violet-500/20 transition-colors">
-                  <Banknote className="h-5 w-5 text-violet-500" />
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-muted-foreground">
-                {tenantData.Routes?.filter((c) => c.Debt > 0).length || 0}{" "}
-                customers with outstanding debt
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Today's Route */}
-          <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
-            <div className="absolute left-0 top-0 h-full w-1 bg-sky-500" />
-            <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Today’s Route
-                  </p>
-                  <p className="text-2xl font-bold tracking-tight break-words">
-                    {tenantData.Routes?.length || 0}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-sky-500/10 p-2.5 group-hover:bg-sky-500/20 transition-colors">
-                  <Map className="h-5 w-5 text-sky-500" />
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Customers scheduled for today
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Pending Tasks */}
-          <Card className="relative overflow-hidden border-border/40 bg-card/60 hover:bg-card/80 transition-all duration-300 hover:-translate-y-0.5 group">
-            <div className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
-            <CardContent className="p-5 pl-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Pending Tasks
-                  </p>
-                  <p className="text-2xl font-bold tracking-tight break-words">
-                    {pendingTasks}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-amber-500/10 p-2.5 group-hover:bg-amber-500/20 transition-colors">
-                  <Bell className="h-5 w-5 text-amber-500" />
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Tasks waiting for action
-              </p>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <section className="lg:col-span-2 space-y-6">
-            <Card className="border-border/40 bg-card/60">
-              <CardContent className="p-3 sm:p-4">
-                <GenerealSalesMargin
-                  yearlysales={tenantData.yearlysales}
-                  warehouses={tenantData.warehouses}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Today's Sales Table */}
-            <Card className="border-border/40 bg-card/60">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold">
-                  Today’s Sales
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-lg border border-border/50 overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/40 hover:bg-muted/40">
-                        <TableHead className="w-12">#</TableHead>
-                        <TableHead>Reference</TableHead>
-                        <TableHead>Customer</TableHead>
-                        <TableHead>Total</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedInvoices.length > 0 ? (
-                        paginatedInvoices.map((invoice, index) => (
-                          <TableRow key={invoice._id || index}>
-                            <TableCell className="font-medium text-muted-foreground">
-                              {(currentPage - 1) * itemsPerPage + index + 1}
-                            </TableCell>
-                            <TableCell>
-                              <Link
-                                href={`/${userData.business.companyName}/${
-                                  userData.user._id
-                                }/bill/bill/${invoice._id}`}
-                                className="font-medium text-primary hover:underline"
-                              >
-                                {invoice.billReferenceNo}/
-                                {invoice.invoicelocation}
-                              </Link>
-                            </TableCell>
-                            <TableCell>{invoice.customerName}</TableCell>
-                            <TableCell>
-                              {currency}
-                              {invoice.grandTotal?.toLocaleString()}
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  invoice.billStatus !== "Cancelled"
-                                    ? "default"
-                                    : "destructive"
-                                }
-                                className="capitalize"
-                              >
-                                {invoice.billStatus}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell
-                            colSpan={5}
-                            className="h-28 text-center text-muted-foreground"
-                          >
-                            No invoices found for this page.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {totalPages > 1 && (
-                  <div className="flex flex-wrap items-center justify-center gap-1.5 mt-5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      Prev
-                    </Button>
-
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <Button
-                        key={i}
-                        variant={currentPage === i + 1 ? "default" : "outline"}
-                        size="sm"
-                        className="w-9"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </Button>
-                    ))}
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* Right Sidebar */}
-          <aside className="space-y-6">
-            <Card className="border-border/40 bg-card/60">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold">
-                  Tasks & Target
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3">
-                    Task Reminder
-                  </h4>
-                  <ScrollArea className="h-56 pr-3">
-                    <div className="space-y-2.5">
-                      {tenantData.result?.Task?.length > 0 ? (
-                        tenantData.result.Task.map((task, idx) => (
-                          <div
-                            key={idx}
-                            className="flex gap-3 rounded-lg border border-border/50 bg-muted/20 p-3 hover:bg-muted/40 transition-colors"
-                            title={task.notes}
-                          >
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <p className="text-sm font-medium truncate">
-                                {task.Text}
-                              </p>
-                              <p className="text-xs text-muted-foreground line-clamp-1">
-                                {task.notes}
-                              </p>
-                              <p className="text-[11px] text-muted-foreground">
-                                {new Date(task.createdAt).toLocaleString(
-                                  "en-US",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  },
-                                )}
-                              </p>
-                            </div>
-                            <Badge
-                              variant={
-                                task.Status === "Done" ? "default" : "secondary"
-                              }
-                              className="shrink-0 self-start"
-                            >
-                              {task.Status === "Done" ? "Done" : "Pending"}
-                            </Badge>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-muted-foreground text-center py-8">
-                          No tasks available
-                        </p>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                <Separator className="bg-border/50" />
-
-                <ChartRadialShape data={tenantData?.result} />
-              </CardContent>
-            </Card>
-
-            <NearbyBusinessesMap />
-          </aside>
-        </div>
-
-        {/* Debtors Marquee */}
-        {tenantData.Routes?.filter((c) => c.Debt > 0).length > 0 && (
-          <Card className="border-border/40 bg-card/60 overflow-hidden">
-            <CardContent className="py-3 px-0">
-              <Marquee gradient={false} speed={32}>
-                <Badge variant="destructive" className="mr-4 ml-4">
-                  Debtors
-                </Badge>
-                {tenantData.Routes.filter((c) => c.Debt > 0).map((debtor) => (
-                  <span
-                    key={debtor._id}
-                    className="mx-2 inline-flex items-center rounded-md bg-muted px-2.5 py-1 text-xs font-medium"
-                  >
-                    {debtor.Username} owes {currency}
-                    {debtor.Debt?.toLocaleString()}
-                  </span>
-                ))}
-              </Marquee>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Promotions Marquee */}
-        {tenantData.promotions?.length > 0 && (
-          <Card className="border-border/40 bg-card/60 overflow-hidden">
-            <CardContent className="py-3 px-0">
-              <Marquee gradient={false} speed={38}>
-                <Badge className="mr-4 ml-4 bg-amber-500/15 text-amber-400 hover:bg-amber-500/15 border-0">
-                  Products On Promo
-                </Badge>
-                {tenantData.promotions.map((product) => (
-                  <span
-                    key={product._id}
-                    className="mx-2 inline-flex items-center rounded-md bg-muted px-2.5 py-1 text-xs font-medium"
-                  >
-                    {product.Name}: {currency}
-                    {(
-                      product.Pricelist1Promo ??
-                      product.Pricelist2Promo ??
-                      product.Pricelist3Promo ??
-                      product.Pricelist4Promo ??
-                      product.Pricelist5Promo ??
-                      product.Pricelist6Promo ??
-                      product.Pricelist7Promo
-                    )?.toLocaleString()}
-                  </span>
-                ))}
-              </Marquee>
-            </CardContent>
-          </Card>
-        )}
-
-        <footer className="pt-4 text-center text-xs text-muted-foreground">
-          © {moment().format("YYYY")} Business Automated Dynamic Enterprise —
-          All rights reserved.
-        </footer>
-      </div>
-    );
-  }
-
-  // Non C-Level Fallback
   return (
-    <section className="w-full max-w-3xl mx-auto py-10 sm:py-16 px-4 sm:px-6 text-center space-y-8">
-      <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
-        Track your sales performance, manage customer relationships, optimize
-        your routes, and monitor your daily activities all in one place.
-      </p>
-      <div className="flex justify-center">
-        <Avatar className="h-24 w-24 shadow-lg ring-4 ring-background">
-          <AvatarImage src={userData.business.companyLogo} alt="Company Logo" />
-          <AvatarFallback className="text-xl">CO</AvatarFallback>
-        </Avatar>
-      </div>
-      <p className="text-sm text-muted-foreground">
-        Navigate through the menu to explore your dashboard features.
-      </p>
-      <footer className="pt-10 border-t border-border text-xs text-muted-foreground">
-        © {moment().format("YYYY")} Business Automated Dynamic Enterprise — All
-        rights reserved.
-      </footer>
-    </section>
+    <>
+      {offline && (
+        <Alert kind="warn">
+          <WifiOff className="mr-1.5 inline h-4 w-4" /> You&apos;re offline. Figures will update when you&apos;re back online.
+        </Alert>
+      )}
+      {error && !data && (
+        <Alert>
+          <AlertCircle className="mr-1.5 inline h-4 w-4" /> {error}
+        </Alert>
+      )}
+
+      {!data && !error ? (
+        <DashboardSkeleton />
+      ) : data ? (
+        <ManagerHome data={data} userData={userData} currency={currency} onRefresh={load} refreshing={refreshing} />
+      ) : null}
+    </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// Radial Chart
-// ─────────────────────────────────────────────────────────────
-export function ChartRadialShape({ data }) {
-  const chartData = [
-    {
-      browser: "Target",
-      visitors: data?.salesTarget || 0,
-      fill: "var(--color-safari)",
-    },
-  ];
-
-  const chartConfig = {
-    visitors: { label: "Sales" },
-    safari: {
-      label: "Target set",
-      color: "var(--chart-2)",
-    },
-  };
+function ManagerHome({ data, userData, currency, onRefresh, refreshing }) {
+  const todaySales = Number(data.TodaySale) || 0;
+  const yesterdaySales = Number(data.yesterdaySale) || 0;
+  const diff = todaySales - yesterdaySales;
+  const pct = yesterdaySales > 0 ? ((diff / yesterdaySales) * 100).toFixed(1) : "100";
+  const routes = data.Routes || [];
+  const debtors = routes.filter((c) => Number(c.Debt) > 0).sort((a, b) => b.Debt - a.Debt);
+  const owed = debtors.reduce((s, c) => s + (Number(c.Debt) || 0), 0);
+  const tasks = data.result?.Task || [];
+  const pendingTasks = tasks.filter((t) => t.status === "pending").length;
 
   return (
-    <Card className="flex flex-col border-0 shadow-none bg-transparent">
-      <CardHeader className="items-center pb-0">
-        <CardTitle className="text-base">
-          {data?.firstName} Sales Target
-        </CardTitle>
-        <CardDescription>
-          from: {data?.start} - To: {data?.end}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[220px]"
-        >
-          <RadialBarChart
-            data={chartData}
-            startAngle={0}
-            endAngle={250}
-            outerRadius={90}
-            innerRadius={80}
-          >
-            <PolarGrid
-              gridType="circle"
-              radialLines={false}
-              stroke="none"
-              className="first:fill-muted last:fill-background"
-              polarRadius={[90, 80]}
-            />
-            <RadialBar dataKey="visitors" background cornerRadius={10} />
-            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {(data?.totalSales || 0).toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 22}
-                          className="fill-muted-foreground text-sm"
-                        >
-                          Sales
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </PolarRadiusAxis>
-          </RadialBarChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex flex-wrap items-center justify-center gap-2 text-center leading-snug font-medium">
-          You have completed {(data?.totalSales || 0).toLocaleString()} /{" "}
-          {(data?.salesTarget || 0).toLocaleString()}
-          <TrendingUp className="h-4 w-4" />
+    <>
+      <div className="grid grid-cols-2 gap-3">
+        <Tile
+          icon={todaySales >= yesterdaySales ? TrendingUp : TrendingDown}
+          label="Sales today"
+          value={`${currency}${short(todaySales)}`}
+          note={
+            todaySales > yesterdaySales ? (
+              <span className="text-sp-accent">+{pct}% vs yesterday</span>
+            ) : todaySales < yesterdaySales ? (
+              <span className="text-sp-bad">{pct}% vs yesterday</span>
+            ) : (
+              "Same as yesterday"
+            )
+          }
+        />
+        <Tile icon={Banknote} label="Owed on today's route" value={`${currency}${short(owed)}`} tone={owed ? "bad" : ""} note={`${debtors.length} customer${debtors.length === 1 ? "" : "s"} owing`} />
+        <Tile icon={Map} label="Visits today" value={routes.length} href="/SalesPortal/Route" note="Open today's route" />
+        <Tile icon={Bell} label="Pending tasks" value={pendingTasks} tone={pendingTasks ? "warn" : ""} note={`${tasks.length} task${tasks.length === 1 ? "" : "s"} in all`} />
+      </div>
+
+      <SalesTarget result={data.result} currency={currency} />
+
+      <TodaysSales invoices={data.invoice || []} userData={userData} currency={currency} onRefresh={onRefresh} refreshing={refreshing} />
+
+      <Card>
+        <CardTitle>Sales this year</CardTitle>
+        <div className="p-2">
+          <GenerealSalesMargin yearlysales={data.yearlysales || []} warehouses={data.warehouses || []} />
         </div>
-        <div className="leading-none text-center text-muted-foreground">
-          {data?.percentage || "0.00"}% of target achieved
+      </Card>
+
+      {debtors.length > 0 && (
+        <Card>
+          <CardTitle action={<Badge tone="bad">{currency}{short(owed)}</Badge>}>Owing on today&apos;s route</CardTitle>
+          <ul className="divide-y divide-sp-line">
+            {debtors.slice(0, 8).map((c) => (
+              <li key={c._id}>
+                <Link href={`/SalesPortal/Customers/${c._id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-sp-bg">
+                  <span className="min-w-0 flex-1 truncate font-medium">{c.Username}</span>
+                  <span className="shrink-0 font-semibold tabular-nums text-sp-bad">{money(c.Debt, currency)}</span>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-sp-muted" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      <Tasks tasks={tasks} />
+
+      {data.promotions?.length > 0 && (
+        <Card>
+          <CardTitle action={<Tag className="h-4 w-4 text-sp-warn" />}>On promotion</CardTitle>
+          <ul className="divide-y divide-sp-line">
+            {data.promotions.map((p) => {
+              const promo =
+                p.Pricelist1Promo ?? p.Pricelist2Promo ?? p.Pricelist3Promo ?? p.Pricelist4Promo ?? p.Pricelist5Promo ?? p.Pricelist6Promo ?? p.Pricelist7Promo;
+              return (
+                <li key={p._id} className="flex items-center justify-between gap-3 px-4 py-3 text-[15px]">
+                  <span className="min-w-0 flex-1 truncate">{p.Name}</span>
+                  <span className="shrink-0 font-semibold tabular-nums">{money(promo, currency)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+
+      <NearbyBusinesses />
+    </>
+  );
+}
+
+function Tile({ icon: Icon, label, value, note, tone, href }) {
+  const toneCls = { warn: "text-sp-warn", bad: "text-sp-bad" }[tone] || "";
+  const body = (
+    <Card className="h-full space-y-1.5 p-4 transition hover:border-sp-ink/30">
+      <Icon className={`h-5 w-5 ${toneCls || "text-sp-muted"}`} />
+      <p className={`text-2xl font-bold tabular-nums tracking-tight ${toneCls}`}>{value ?? 0}</p>
+      <p className="text-sm font-medium leading-snug">{label}</p>
+      {note && <p className="text-xs text-sp-muted">{note}</p>}
+    </Card>
+  );
+  return href ? (
+    <Link href={href} className="block">
+      {body}
+    </Link>
+  ) : (
+    body
+  );
+}
+
+function SalesTarget({ result, currency }) {
+  const target = Number(result?.salesTarget) || 0;
+  const sold = Number(result?.totalSales) || 0;
+  const pct = target > 0 ? Math.min(100, (sold / target) * 100) : 0;
+  const shown = result?.percentage ?? pct.toFixed(2);
+
+  return (
+    <Card className="space-y-3 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 font-semibold">
+            <Target className="h-4 w-4 text-sp-muted" /> Sales target
+          </p>
+          {(result?.start || result?.end) && (
+            <p className="text-xs text-sp-muted">
+              {result?.start} – {result?.end}
+            </p>
+          )}
         </div>
-      </CardFooter>
+        <span className="text-2xl font-bold tabular-nums">{shown}%</span>
+      </div>
+      <div className="h-2.5 overflow-hidden rounded-full bg-sp-bg ring-1 ring-sp-line" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)}>
+        <div className="h-full rounded-full bg-sp-accent transition-all" style={{ width: `${pct}%` }} />
+      </div>
+      <p className="text-sm text-sp-muted">
+        <span className="font-semibold text-sp-ink">{money(sold, currency)}</span> of {money(target, currency)} sold
+      </p>
     </Card>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// Nearby Businesses Map
-// ─────────────────────────────────────────────────────────────
-export function NearbyBusinessesMap() {
-  const [location, setLocation] = useState(null);
-  const [businesses, setBusinesses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function TodaysSales({ invoices, userData, currency, onRefresh, refreshing }) {
+  const [shown, setShown] = useState(SALES_PAGE);
+  const sorted = useMemo(() => [...invoices].sort((a, b) => b.billReferenceNo - a.billReferenceNo), [invoices]);
+  const total = sorted.filter((i) => i.billStatus !== "Cancelled").reduce((s, i) => s + (Number(i.grandTotal) || 0), 0);
 
-  useEffect(() => {
-    fetchNearbyBusinesses();
-  }, []);
+  return (
+    <Card>
+      <CardTitle
+        action={
+          <button type="button" onClick={onRefresh} className="-mr-2 rounded-lg p-2 text-sp-muted hover:bg-sp-bg hover:text-sp-ink" aria-label="Refresh">
+            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+          </button>
+        }
+      >
+        Today&apos;s sales {sorted.length > 0 && <span className="font-normal text-sp-muted">· {money(total, currency)}</span>}
+      </CardTitle>
+      {sorted.length === 0 ? (
+        <p className="px-4 py-8 text-center text-sm text-sp-muted">No sales yet today.</p>
+      ) : (
+        <>
+          <ul className="divide-y divide-sp-line">
+            {sorted.slice(0, shown).map((inv, i) => (
+              <li key={inv._id || i}>
+                <Link
+                  href={`/${userData.business.companyName}/${userData.user._id}/bill/bill/${inv._id}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-sp-bg"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{inv.customerName}</p>
+                    <p className="truncate text-xs text-sp-muted">
+                      #{inv.billReferenceNo}
+                      {inv.invoicelocation ? ` · ${inv.invoicelocation}` : ""}
+                    </p>
+                  </div>
+                  <div className="shrink-0 space-y-1 text-right">
+                    <p className="font-semibold tabular-nums">{money(inv.grandTotal, currency)}</p>
+                    <StatusBadge status={inv.billStatus} />
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {sorted.length > shown && (
+            <button type="button" onClick={() => setShown(shown + SALES_PAGE * 2)} className="w-full border-t border-sp-line py-3 text-sm font-semibold text-sp-info">
+              Show more ({sorted.length - shown})
+            </button>
+          )}
+        </>
+      )}
+    </Card>
+  );
+}
 
-  const fetchNearbyBusinesses = () => {
-    setLoading(true);
-    setError(null);
+function Tasks({ tasks }) {
+  if (!tasks.length) return null;
+  return (
+    <Card>
+      <CardTitle>Tasks</CardTitle>
+      <ul className="divide-y divide-sp-line">
+        {tasks.map((task, i) => (
+          <li key={task._id || i} className="flex gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium">{task.Text}</p>
+              {task.notes && <p className="line-clamp-2 text-sm text-sp-muted">{task.notes}</p>}
+              <p className="mt-0.5 text-xs text-sp-muted">{when(task.createdAt)}</p>
+            </div>
+            <Badge tone={task.Status === "Done" ? "ok" : "warn"}>{task.Status === "Done" ? "Done" : "Pending"}</Badge>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
 
+// Reps without the manager dashboard: shortcuts to their day.
+function RepHome() {
+  const links = [
+    ["/SalesPortal/Route", Map, "Today's route", "Customers to visit today"],
+    ["/SalesPortal/Customers", Users, "My customers", "Balances, payments, new leads"],
+    ["/SalesPortal/Requisitions", ClipboardList, "Requisitions", "Orders you've raised"],
+    ["/SalesPortal/Products", Package, "Products", "Prices and product details"],
+    ["/SalesPortal/Reports", FileBarChart2, "Stock reports", "Shelf and back-store counts"],
+  ];
+  return (
+    <>
+      <Card>
+        <ul className="divide-y divide-sp-line">
+          {links.map(([href, Icon, title, text]) => (
+            <li key={href}>
+              <Link href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-sp-bg">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sp-bg">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">{title}</p>
+                  <p className="truncate text-sm text-sp-muted">{text}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-sp-muted" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <NearbyBusinesses />
+    </>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-3" aria-busy="true" aria-label="Loading dashboard">
+      <div className="grid grid-cols-2 gap-3">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-32 animate-pulse rounded-2xl bg-sp-surface ring-1 ring-sp-line" />
+        ))}
+      </div>
+      <div className="h-28 animate-pulse rounded-2xl bg-sp-surface ring-1 ring-sp-line" />
+      <div className="h-64 animate-pulse rounded-2xl bg-sp-surface ring-1 ring-sp-line" />
+    </div>
+  );
+}
+
+// Shops, offices and other businesses within 10 km: prospects for new leads.
+function NearbyBusinesses() {
+  const [state, setState] = useState({ loading: true, error: "", location: null, places: [] });
+  const [showAll, setShowAll] = useState(false);
+
+  const find = useCallback(() => {
+    setState((s) => ({ ...s, loading: true, error: "" }));
     if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
-      setLoading(false);
+      setState({ loading: false, error: "This phone can't share its location.", location: null, places: [] });
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      async ({ coords: { latitude, longitude } }) => {
         try {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          setLocation({ latitude, longitude });
-
           const radius = 10000;
           const query = `
             [out:json][timeout:25];
@@ -1159,234 +441,96 @@ export function NearbyBusinessesMap() {
             );
             out body 30;
           `;
-
-          const response = await fetch(
-            "https://overpass-api.de/api/interpreter",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: `data=${encodeURIComponent(query)}`,
-            },
-          );
-
-          if (!response.ok)
-            throw new Error("Failed to fetch nearby businesses");
-
-          const data = await response.json();
-
-          const formatted = (data.elements || [])
-            .filter((item) => item.tags?.name)
-            .map((item) => {
-              const distance = getDistance(
-                latitude,
-                longitude,
-                item.lat,
-                item.lon,
-              );
-
-              return {
-                _id: item.id,
-                name: item.tags.name,
-                address:
-                  item.tags["addr:street"] ||
-                  item.tags["addr:full"] ||
-                  item.tags["addr:place"] ||
-                  "Address not available",
-                latitude: item.lat,
-                longitude: item.lon,
-                distance,
-                type:
-                  item.tags.shop ||
-                  item.tags.amenity ||
-                  item.tags.office ||
-                  "Business",
-              };
-            })
+          const res = await fetch("https://overpass-api.de/api/interpreter", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `data=${encodeURIComponent(query)}`,
+          });
+          if (!res.ok) throw new Error("Couldn't load nearby businesses.");
+          const json = await res.json();
+          const places = (json.elements || [])
+            .filter((p) => p.tags?.name)
+            .map((p) => ({
+              id: p.id,
+              name: p.tags.name,
+              address: p.tags["addr:street"] || p.tags["addr:full"] || p.tags["addr:place"] || "",
+              lat: p.lat,
+              lon: p.lon,
+              distance: getDistance(latitude, longitude, p.lat, p.lon),
+              type: (p.tags.shop || p.tags.amenity || p.tags.office || "business").replace(/_/g, " "),
+            }))
             .sort((a, b) => a.distance - b.distance)
             .slice(0, 20);
-
-          setBusinesses(formatted);
+          setState({ loading: false, error: "", location: { latitude, longitude }, places });
         } catch (err) {
-          setError(err.message || "Something went wrong");
-        } finally {
-          setLoading(false);
+          setState({ loading: false, error: err.message || "Something went wrong.", location: null, places: [] });
         }
       },
-      () => {
-        setError("Location permission denied");
-        setLoading(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-      },
+      () => setState({ loading: false, error: "Location permission is needed to find businesses near you.", location: null, places: [] }),
+      { enableHighAccuracy: true, timeout: 10000 },
     );
-  };
+  }, []);
 
-  if (loading) {
-    return (
-      <Card className="border-border/40 bg-card/60">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Nearby Businesses</CardTitle>
-          <CardDescription>Scanning your area…</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-[160px] w-full rounded-xl" />
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex gap-3">
-                <Skeleton className="h-9 w-9 rounded-md shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  useEffect(() => {
+    find();
+  }, [find]);
 
-  if (!location || error) {
-    return (
-      <Card className="border-border/40 bg-card/60">
-        <CardContent className="flex flex-col items-center justify-center py-12 gap-4 text-center">
-          <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center">
-            <AlertCircle className="h-7 w-7 text-muted-foreground" />
-          </div>
-          <div className="space-y-1">
-            <p className="font-medium">Unable to load map</p>
-            <p className="text-sm text-muted-foreground max-w-[240px]">
-              {error || "Location permission is required"}
-            </p>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={fetchNearbyBusinesses}
-            className="gap-2"
-          >
-            <RefreshCcw className="h-3.5 w-3.5" />
-            Try again
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const { loading, error, places } = state;
+  const list = showAll ? places : places.slice(0, 5);
 
   return (
-    <Card className="border-border/40 bg-card/60 overflow-hidden">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <CardTitle className="text-base flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary" />
-              Nearby Businesses
-            </CardTitle>
-            <CardDescription className="mt-1">
-              {businesses.length} places within 10 km
-            </CardDescription>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={fetchNearbyBusinesses}
-            className="h-9 w-9 shrink-0"
-          >
-            <RefreshCcw className={cn("h-4 w-4", loading && "animate-spin")} />
-          </Button>
+    <Card>
+      <CardTitle
+        action={
+          <button type="button" onClick={find} disabled={loading} className="-mr-2 rounded-lg p-2 text-sp-muted hover:bg-sp-bg hover:text-sp-ink" aria-label="Refresh nearby businesses">
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+        }
+      >
+        <span className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-sp-muted" /> Businesses near you
+        </span>
+      </CardTitle>
+      {loading ? (
+        <p className="px-4 py-8 text-center text-sm text-sp-muted">Looking around you…</p>
+      ) : error ? (
+        <p className="px-4 py-8 text-center text-sm text-sp-muted">{error}</p>
+      ) : places.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+          <Store className="h-7 w-7 text-sp-muted" />
+          <p className="text-sm text-sp-muted">No businesses found within 10 km.</p>
         </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4 p-0">
-        <div className="relative mx-4 rounded-xl overflow-hidden border border-border/50">
-          <iframe
-            width="100%"
-            height="160"
-            loading="lazy"
-            allowFullScreen
-            className="border-0"
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(location.latitude)},${encodeURIComponent(location.longitude)}&z=14&output=embed`}
-          />
-          <div className="absolute top-2 left-2">
-            <Badge
-              variant="secondary"
-              className="bg-background/80 backdrop-blur text-xs"
-            >
-              <MapPin className="h-3 w-3 mr-1 text-primary" />
-              You are here
-            </Badge>
-          </div>
-        </div>
-
-        <Separator className="bg-border/50" />
-
-        <ScrollArea className="h-[300px] px-4">
-          {businesses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 py-10 text-center">
-              <Store className="h-10 w-10 text-muted-foreground/50" />
-              <div>
-                <p className="text-sm font-medium">No businesses found</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Try refreshing or move to a busier area
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-1 pb-4">
-              {businesses.map((biz, index) => (
-                <div
-                  key={biz._id}
-                  className="group flex gap-3 rounded-lg p-3 hover:bg-muted/40 transition-colors"
-                >
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary text-xs font-semibold">
-                    {index + 1}
-                  </div>
-
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <p className="text-sm font-medium leading-none truncate">
-                      {biz.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {biz.address}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] px-1.5 py-0 h-5 font-medium border-blue-500/30 text-blue-400"
-                      >
-                        {biz.distance < 1
-                          ? `${Math.round(biz.distance * 1000)} m`
-                          : `${biz.distance.toFixed(1)} km`}
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="text-[10px] px-1.5 py-0 h-5 capitalize"
-                      >
-                        {biz.type.replace(/_/g, " ")}
-                      </Badge>
-                    </div>
-
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(biz.latitude)},${encodeURIComponent(biz.longitude)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 mt-1.5 py-1 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-                    >
-                      <Navigation className="h-3 w-3" />
-                      Directions
-                    </a>
-                  </div>
+      ) : (
+        <>
+          <ul className="divide-y divide-sp-line">
+            {list.map((p) => (
+              <li key={p.id} className="flex items-center gap-3 px-4 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{p.name}</p>
+                  <p className="truncate text-xs capitalize text-sp-muted">
+                    {p.distance < 1 ? `${Math.round(p.distance * 1000)} m` : `${p.distance.toFixed(1)} km`} · {p.type}
+                    {p.address ? ` · ${p.address}` : ""}
+                  </p>
                 </div>
-              ))}
-            </div>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.lat},${p.lon}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-sp-line px-3 text-sm font-semibold hover:bg-sp-bg"
+                  aria-label={`Directions to ${p.name}`}
+                >
+                  <Navigation className="h-4 w-4" /> Go
+                </a>
+              </li>
+            ))}
+          </ul>
+          {places.length > 5 && (
+            <button type="button" onClick={() => setShowAll(!showAll)} className="w-full border-t border-sp-line py-3 text-sm font-semibold text-sp-info">
+              {showAll ? "Show fewer" : `Show all ${places.length}`}
+            </button>
           )}
-        </ScrollArea>
-      </CardContent>
+        </>
+      )}
     </Card>
   );
 }

@@ -1,7 +1,6 @@
 import Notch from "@/app/Components/Notch";
 import { fetchUser } from "../../../../../../../../../Functions/useerDataRefresh";
 import { serverApi } from "@/lib/serverApi";
-import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import BankStatement from "@/app/Components/Reports/BankStatement"
 import { notFound } from "next/navigation";

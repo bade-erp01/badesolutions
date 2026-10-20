@@ -289,11 +289,11 @@ export default function AssistantPage() {
             <div>
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 <Sparkles className="h-5 w-5 shrink-0" />
-                Kamsi, your business assistant
+                Reg AI, your business assistant
               </CardTitle>
               <CardDescription className="mt-1 text-sm">
                 Ask about {user?.business?.companyName || "your"} invoices, customer balances, payments, stock, staff,
-                {canSeePayroll ? " payroll," : ""} profit and loss, and the balance sheet in plain language. Kamsi reads
+                {canSeePayroll ? " payroll," : ""} profit and loss, and the balance sheet in plain language. Reg AI reads
                 your records and can check a change for you, but never changes anything itself.
               </CardDescription>
             </div>

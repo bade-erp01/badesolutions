@@ -11,7 +11,10 @@ import { serverApi } from "../src/lib/serverApi";
 const fetchUser = async () => {
   const r = await serverApi("/api/v1/Session?full=1");
   if (r.status === 0) return { error: "Can't reach the server, please try again." };
-  if (r.status === 401) return { error: "Session expired, please log in again." };
+  if (r.status === 401) {
+    // reason "elsewhere": this account signed in on another device (one device at a time)
+    return { error: r.data?.error || "Session expired, please log in again.", ...(r.data?.reason ? { reason: r.data.reason } : {}) };
+  }
   if (!r.ok || !r.data?.user || !r.data?.business) {
     return { error: "User or Business information not found." };
   }

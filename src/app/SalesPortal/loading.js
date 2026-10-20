@@ -1,68 +1,28 @@
-"use client";
-
-import React from "react";
-import { motion } from "framer-motion";
-
+// Shown while a Sales Portal screen loads: the app frame with grey placeholders.
 export default function Loading() {
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black">
-      {/* Soft radial glow background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_60%)]" />
-
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative flex flex-col items-center"
-      >
-        {/* Soft bloom behind the logo */}
-        <div className="absolute inset-0 rounded-full bg-white/10 blur-3xl" />
-
-        {/* Main Logo Text */}
-        <motion.h1
-          animate={{
-            textShadow: [
-              "0 0 10px rgba(255,255,255,0.5)",
-              "0 0 25px rgba(255,255,255,0.8)",
-              "0 0 50px rgba(255,255,255,1)",
-              "0 0 25px rgba(255,255,255,0.8)",
-              "0 0 10px rgba(255,255,255,0.5)",
-            ],
-            scale: [1, 1.03, 1],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="relative text-2xl font-black uppercase tracking-[0.4em] text-white md:text-3xl"
-        >
-          B.A.D.E
-        </motion.h1>
-
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-4 text-center text-xs uppercase tracking-[0.3em] text-zinc-500 md:text-sm"
-        >
-          Business Automated Dynamic Enterprise
-        </motion.p>
-
-        {/* Progress bar */}
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: "220px" }}
-          transition={{
-            duration: 1.8,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut",
-          }}
-          className="mt-8 h-0.5 rounded-full bg-white/70"
-        />
-      </motion.div>
+    <div className="sales-app min-h-dvh bg-sp-bg" aria-busy="true" aria-label="Loading">
+      <div className="sticky top-0 border-b border-sp-line bg-sp-surface">
+        <div className="mx-auto flex h-14 max-w-xl items-center gap-3 px-4">
+          <div className="h-8 w-8 animate-pulse rounded-lg bg-sp-line" />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3 w-32 animate-pulse rounded bg-sp-line" />
+            <div className="h-2.5 w-20 animate-pulse rounded bg-sp-line" />
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto max-w-xl space-y-3 px-4 pt-4">
+        <div className="h-12 animate-pulse rounded-xl bg-sp-surface ring-1 ring-sp-line" />
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center gap-3 rounded-2xl bg-sp-surface p-4 ring-1 ring-sp-line">
+            <div className="h-11 w-11 animate-pulse rounded-xl bg-sp-line" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-3/5 animate-pulse rounded bg-sp-line" />
+              <div className="h-2.5 w-2/5 animate-pulse rounded bg-sp-line" />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

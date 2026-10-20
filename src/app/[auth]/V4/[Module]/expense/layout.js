@@ -1,6 +1,5 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
-import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import { TagIcon, PlusCircleIcon } from "@heroicons/react/24/outline";

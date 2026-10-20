@@ -5,6 +5,8 @@ import api from "@/lib/api";
 import Swal from "sweetalert2";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 
+const SILENT = true;
+
 const GeoUpdater = ({ userData, baseUrl }) => {
   const retryCount = useRef(0);
   const retryTimeout = useRef(null);
@@ -31,8 +33,11 @@ const GeoUpdater = ({ userData, baseUrl }) => {
       }
     };
 
+    // The Sales Portal's own location sheet (Components/GpsTracker.js) asks the rep to turn
+    // location on; a second, differently styled box on top of it was confusing. This component
+    // only sends the position.
     const promptEnableLocation = (message) => {
-      if (hasPrompted.current || !isMounted) return;
+      if (SILENT || hasPrompted.current || !isMounted) return;
       hasPrompted.current = true;
 
       Swal.fire({

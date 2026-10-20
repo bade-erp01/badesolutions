@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/table";
 import { useParams } from "next/navigation";
 import {Separator} from "@/components/ui/separator";
+import SalesTeamMap from "@/app/Components/SalesTeamMap";
 
 export default function MainDash({ userData }) {
   const [loading, setLoading] = useState(true);
@@ -397,6 +398,9 @@ export default function MainDash({ userData }) {
               </CardContent>
             </Card>
           </section>
+
+          {/* where the sales reps are now (hidden when the business has none) */}
+          <SalesTeamMap />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity / feed */}

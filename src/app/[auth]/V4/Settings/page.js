@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { subscriptionLabel } from "@/lib/subscription";
 import {
   UserPlus,
   Search,
@@ -28,6 +29,7 @@ import {
 } from "../../../../../Functions/Mics";
 import api from "@/lib/api";
 import BuyLicencesButton from "@/app/Components/BuyLicencesButton";
+import AddOnsBilling from "@/app/Components/AddOnsBilling";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
 
@@ -553,12 +555,7 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
           <CardHeader>
             <CardTitle>Subscription Details</CardTitle>
             <span className={`${badgeCls} border text-foreground`}>
-              {moment(formData.subscriptionEndDate).isValid() &&
-              moment(formData.subscriptionEndDate).isAfter(moment())
-                ? `Subscription ends in ${moment(
-                    formData.subscriptionEndDate,
-                  ).diff(moment(), "days")} day(s)`
-                : "Subscription has expired."}
+              {subscriptionLabel(formData.subscriptionEndDate) || "Subscription has expired."}
             </span>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -584,13 +581,11 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
                 <BuyLicencesButton plan={formData.subscriptionplan} />
               </div>
             </div>
-            <hr className="border-border" />
-            <div className="flex flex-wrap justify-between gap-2 text-sm">
-              <div>Notifications Token</div>
-              <div className="font-bold">0</div>
-            </div>
           </CardContent>
         </Card>
+
+        {/* Monthly apps and SMS credit (shown to admins of businesses on add-on billing) */}
+        <AddOnsBilling />
 
         {/* Services */}
         <Card>

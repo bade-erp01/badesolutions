@@ -1,41 +1,13 @@
 import React from 'react'
 import { fetchUser } from "../../../../Functions/whoIsSalesPerson";
 import { redirect } from "next/navigation";
-import CookiesPolicyAlert from "@/app/Components/Cookies"
 import TenantPage from "./page"
-import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
-import OneSignalProvider from "@/app/Components/OneSignalProvider";
-import PushNotificationGate from "@/app/Components/PushNotificationGate";
-import { Toaster } from "@/components/ui/sonner";
+import { isSubscriptionExpired as subscriptionExpired } from "@/lib/subscription";
 
 export const metadata = {
-  title: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  description:
-    "Business Automated Dynamic Enterprise [B.A.D.E] - Automate, Optimize, and Scale Your Business Operations",
-  keywords: [
-    "Business Automation",
-    "Enterprise Solutions",
-    "B.A.D.E",
-    "AI-powered Business",
-    "Workflow Optimization",
-    "Process Automation",
-  ],
-  author: "Business Automated Dynamic Enterprise",
-  robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1",
-  ogTitle:
-    "Business Automated Dynamic Enterprise [B.A.D.E] | Next-Level Automation",
-  ogDescription:
-    "Streamline your business with AI-driven automation, real-time insights, and scalability",
-  ogImage: "/assets/bade.png",
-  ogUrl: "https://badesolutions.com.ng",
-  twitterCard: "favicon.ico",
-  twitterTitle: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  twitterDescription:
-    "Automate and optimize your enterprise with cutting-edge business solutions",
-  twitterImage: "favicon.ico",
-  favicon: "favicon.ico",
+  title: "Home",
+  robots: { index: false, follow: false },
 };
 
 // Force dynamic rendering
@@ -45,24 +17,18 @@ export default async function Layout() {
   const userData = await fetchUser();
   const baseUrl = process.env.EXPRESS_PRIVATE_URL
 
-  // Redirect if either user OR business is missing 
+  // Redirect if either user OR business is missing
   if (!userData?.user || !userData?.business || userData.user.status !== "active" || !userData.user.isSalesRep) {
-    redirect('/SalesPortal/Login');
+    redirect(userData?.reason === "elsewhere" ? "/SalesPortal/Login?reason=elsewhere" : "/SalesPortal/Login");
   }
 
-  const isSubscriptionExpired = moment().isAfter(moment(userData.business.subscriptionEndDate));
+  const isSubscriptionExpired = subscriptionExpired(userData.business.subscriptionEndDate); // to the end of the end date
 
   if (isSubscriptionExpired) {
     // Show renewal component directly
     return <RenewSubscription business={userData.business} baseUrl={baseUrl} User={userData}/>;
   }
 
-  return (
-    <OneSignalProvider user={userData}>
-      <Toaster position="top-right" closeButton />
-      <PushNotificationGate />
-      <CookiesPolicyAlert />
-      <TenantPage userData={userData} baseUrl={baseUrl}/>
-    </OneSignalProvider>
-  );
+  // (the toaster, push notifications and live updates are in the Sales Portal layout, for every screen)
+  return <TenantPage userData={userData} baseUrl={baseUrl}/>;
 }

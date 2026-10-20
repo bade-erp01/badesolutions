@@ -18,11 +18,13 @@ export const metadata = {
 };
 import ModulesPage from './page'
 import { fetchUser } from '../../../../Functions/useerDataRefresh';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 export default async function Appslayout({children}) {
    const userInfo = await fetchUser();
 
+   // logged out (no business in the session): log in first instead of crashing
+   if (!userInfo?.business) redirect("/Login")
    if(userInfo.business.subscriptionplan !== "Standard")  return notFound()
 
 

@@ -2,67 +2,20 @@ import React from "react";
 import { fetchUser } from "../../../../../Functions/whoIsSalesPerson";
 import { redirect } from "next/navigation";
 import { serverApi } from "@/lib/serverApi";
-import DraftInvoicePage from "./page";
-import BackButton from "@/app/Components/BackBotton";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import RequisitionPage from "./page";
+import AppShell from "../../_ui/AppShell";
+import { Alert } from "../../_ui/ui";
 
 export const metadata = {
-  title: "B.A.D.E ERP Platform",
-  description:
-    "Configure and manage your stores with B.A.D.E — Nigeria’s leading AI-powered ERP solution for businesses of all sizes. Built for scalability, automation, and real-time insights.",
-  keywords: [
-    "Store Management",
-    "ERP Nigeria",
-    "Business Automation",
-    "B.A.D.E",
-    "AI ERP",
-    "Retail Optimization",
-    "Inventory Control",
-    "Bernard Fidels Ogoh",
-    "ERP Abuja",
-    "ERP Lagos",
-    "ERP Port Harcourt",
-    "Nigerian Business Software",
-    "SME ERP",
-    "Enterprise Resource Planning",
-    "AI Business Tools",
-    "Affordable ERP Nigeria",
-    "Scalable ERP",
-    "Digital Transformation",
-    "Next-gen ERP",
-    "Business Intelligence",
-    "Workflow Automation",
-    "Store Settings Dashboard",
-    "Tenant Management",
-    "Multi-store ERP",
-  ],
-  author: "Business Automated Dynamic Enterprise [B.A.D.E]",
-  robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1, theme-color=#f4a8ff",
-  ogTitle: " B.A.D.E ERP Platform",
-  ogDescription:
-    "Take control of your store operations with B.A.D.E — the smart ERP for Nigerian enterprises.",
-  ogImage: "/assets/store-settings-og.png",
-  ogUrl: "https://badesolutions.com.ng/storelayout",
-  ogType: "website",
-  twitterCard: "summary_large_image",
-  twitterTitle: " B.A.D.E ERP Platform",
-  twitterDescription:
-    "Manage your stores with ease using B.A.D.E — Nigeria’s AI-powered ERP solution.",
-  twitterImage: "/assets/store-settings-og.png",
-  applicationName: "B.A.D.E ERP",
-  creator: "Bernard Fidels Ogoh",
-  favicon: "favicon.ico",
+  title: "Requisition",
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function layout({ params }) {
   const userData = await fetchUser();
-  const Params = await params;
+  const { id } = await params;
 
   // Redirect if either user OR business is missing
   if (
@@ -71,93 +24,35 @@ export default async function layout({ params }) {
     userData.user.status !== "active" ||
     !userData.user.isSalesRep
   ) {
-    redirect("/SalesPortal/Login");
+    redirect(userData?.reason === "elsewhere" ? "/SalesPortal/Login?reason=elsewhere" : "/SalesPortal/Login");
   }
 
-  let data;
-
+  let data = null;
+  let error = "";
   try {
-    const res = await serverApi(`/api/Invoice/${Params.id}`, {
-      next: { revalidate: 60 },
+    const res = await serverApi(`/api/Invoice/${id}`, {
+      cache: "no-store", // personal, changing data: always fresh (it was cached for 60 s, so new lines showed late)
     });
-
     data = res.data;
-
-    if (!res.ok) {
-      throw new Error(data?.error || "Failed to fetch data");
-    }
+    if (!res.ok) error = data?.error || "Failed to load the requisition.";
   } catch (err) {
+    error = err.message || "Failed to load the requisition.";
+  }
+
+  if (error || !data?.Inv) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center p-6">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertTitle>Unable to load invoice</AlertTitle>
-          <AlertDescription>
-            {err.message || "Failed to load invoice data. Please try again later."}
-          </AlertDescription>
-        </Alert>
-      </div>
+      <AppShell userData={userData} title="Requisition" back="/SalesPortal/Requisitions" tabs={false}>
+        <Alert>{error || "This requisition was not found."}</Alert>
+      </AppShell>
     );
   }
 
-  const invoice = data?.Inv;
-  const isCancelled = invoice?.billStatus?.toLowerCase() === "cancelled";
-
   return (
-    <div className="min-h-dvh bg-background">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          {/* Left – Invoice info */}
-          <div className="flex items-center gap-3 min-w-0">
-            <Avatar className="h-9 w-9 shrink-0 border shadow-sm">
-              <AvatarImage
-                src={userData.business?.companyLogo}
-                alt={userData.business?.companyName}
-              />
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-                {invoice?.billStatus?.charAt(0)?.toUpperCase() || "I"}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="min-w-0">
-              <h1 className="truncate text-base font-semibold tracking-tight text-foreground">
-                {invoice?.billStatus?.toUpperCase()}/{invoice?.billReferenceNo}
-              </h1>
-              {invoice?.customerName && (
-                <p className="truncate text-xs text-muted-foreground">
-                  {invoice.customerName}
-                </p>
-              )}
-            </div>
-
-            {invoice?.billStatus && (
-              <Badge
-                variant={isCancelled ? "destructive" : "default"}
-                className="hidden sm:inline-flex capitalize"
-              >
-                {invoice.billStatus}
-              </Badge>
-            )}
-          </div>
-
-          {/* Right – Back button */}
-          <div className="flex items-center gap-2 shrink-0">
-            <BackButton />
-          </div>
-        </div>
-      </header>
-
-      {/* Page Content */}
-      <main className="mx-auto max-w-7xl">
-        <DraftInvoicePage
-          user={userData.user}
-          customer={data.cust}
-          bill={data.Inv}
-          products={data.products}
-          Business={userData.business}
-          Whouse={data.wareHouse}
-        />
-      </main>
-    </div>
+    <RequisitionPage
+      user={userData.user}
+      bill={data.Inv}
+      products={data.products || []}
+      Business={userData.business}
+    />
   );
 }

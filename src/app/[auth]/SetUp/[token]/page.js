@@ -53,6 +53,8 @@ export default function BusinessSetup() {
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  // optional monthly apps (when offered): add-on id → units (0 when not priced per unit)
+  const [addOns, setAddOns] = useState({});
   const fileInputRef = useRef(null);
 
   const adopt = useCallback((view) => {
@@ -62,6 +64,7 @@ export default function BusinessSetup() {
       ...Object.fromEntries(SWITCHES.map(({ key }) => [key, Boolean(view[key])])),
     });
     setLogo(view.companyLogo || "");
+    setAddOns(Object.fromEntries((view.addOns?.selected || []).map((s) => [s.id, s.units || 0])));
     setDirty(false);
   }, []);
 
@@ -115,6 +118,27 @@ export default function BusinessSetup() {
   const progress = steps.length ? Math.round((steps.filter((s) => s.completed).length / steps.length) * 100) : 0;
   const allRequired = progress === 100;
   const canActivate = Boolean(saved?.setupComplete) && !dirty && !saving;
+  // what activation costs: the server's total after a save; while editing, an estimate
+  const offer = saved?.addOns?.offer || [];
+  const chosenMonthly = offer.reduce((t, o) => (o.id in addOns ? t + o.monthly + (o.unit ? o.unit.monthly * (Number(addOns[o.id]) || 0) : 0) : t), 0);
+  const payNow = dirty ? Number(saved?.amount || 0) + chosenMonthly : Number(saved?.total ?? saved?.amount ?? 0);
+  const toggleAddOn = (o, on) => {
+    setAddOns((cur) => {
+      const next = { ...cur };
+      // one app per feature: the Merchant app already includes the Delivery app, so picking one drops the other
+      if (on) for (const x of offer) if (x.id !== o.id && x.id in next && (x.features || []).some((f) => (o.features || []).includes(f))) delete next[x.id];
+      if (on) next[o.id] = o.unit ? Math.max(o.unit.min || 1, Number(cur[o.id]) || o.unit.min || 1) : 0;
+      else delete next[o.id];
+      return next;
+    });
+    setDirty(true);
+    setNotice("");
+  };
+  const setUnits = (o, v) => {
+    const n = Math.max(o.unit.min || 1, Math.min(o.unit.max || 500, Math.floor(Number(v)) || o.unit.min || 1));
+    setAddOns((cur) => ({ ...cur, [o.id]: n }));
+    setDirty(true);
+  };
 
   const change = (name, value) => {
     setForm((f) => ({ ...f, [name]: value }));
@@ -142,7 +166,11 @@ export default function BusinessSetup() {
     if (!allRequired || saving) return;
     setSaving(true);
     setError("");
-    const body = { ...form, ...(logo.startsWith("data:") ? { logo } : {}) };
+    const body = {
+      ...form,
+      ...(logo.startsWith("data:") ? { logo } : {}),
+      ...(saved?.addOns ? { addOns: Object.entries(addOns).map(([id, units]) => ({ id: Number(id), units })) } : {}),
+    };
     const r = await api.patch(`/api/v1/setup/${token}`, body);
     setSaving(false);
     if (!r.ok) return setError(r.error);
@@ -200,7 +228,7 @@ export default function BusinessSetup() {
         <div className="mb-8 sm:mb-10">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Business Profile Setup</h1>
           <p className="mt-2 text-muted-foreground">
-            Complete the required fields and save, then activate your {saved.plan} plan ({naira(saved.amount)}).
+            Complete the required fields and save, then activate your {saved.plan} plan ({naira(payNow)}{saved.addOns && Object.keys(addOns).length ? " with your extra apps" : ""}).
           </p>
           <div className="mt-6 space-y-3">
             <div className="flex items-center justify-between text-sm">
@@ -371,6 +399,70 @@ export default function BusinessSetup() {
             </CardContent>
           </Card>
 
+          {offer.length > 0 && (
+            <Card className="relative overflow-hidden border shadow-sm">
+              <div className="absolute inset-x-0 top-0 h-1 bg-foreground" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" /> Add more apps <span className="text-sm font-normal text-muted-foreground">(optional, monthly)</span>
+                </CardTitle>
+                <CardDescription>Pick extra apps now: you pay their first month today, then month by month under Billing. You can add or stop them later.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {offer.map((o) => {
+                  const on = o.id in addOns;
+                  const monthly = o.monthly + (o.unit && on ? o.unit.monthly * (Number(addOns[o.id]) || 0) : 0);
+                  return (
+                    <div key={o.id} className={`rounded-xl border px-4 py-3 ${on ? "border-foreground/40 bg-muted/40" : "bg-card"}`}>
+                      <div className="flex items-start gap-3">
+                        {o.icon ? <img src={o.icon} alt="" className="mt-0.5 h-8 w-8 shrink-0 object-contain" /> : null}
+                        <div className="min-w-0 flex-1">
+                          <Label htmlFor={`addon-${o.id}`} className="cursor-pointer font-semibold">{o.name}</Label>
+                          {o.description && <p className="text-sm text-muted-foreground">{o.description}</p>}
+                          {o.includes?.length > 1 && <p className="mt-1 text-xs text-muted-foreground">Includes: {o.includes.join(", ")}</p>}
+                          <p className="mt-1 text-sm">
+                            {o.monthly > 0 || (o.unit && o.unit.monthly > 0) ? (
+                              <>
+                                {o.monthly > 0 ? `${naira(o.monthly)}/month` : ""}
+                                {o.unit ? `${o.monthly > 0 ? " + " : ""}${naira(o.unit.monthly)} per ${o.unit.name}${o.monthly > 0 ? "" : "/month"}` : ""}
+                                {o.smsPrice ? ` · SMS ${naira(o.smsPrice)} each from your SMS credit` : ""}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground">Price to be confirmed</span>
+                            )}
+                          </p>
+                        </div>
+                        <Switch id={`addon-${o.id}`} className="shrink-0" checked={on} onCheckedChange={(c) => toggleAddOn(o, c)} />
+                      </div>
+                      {on && o.unit && (
+                        <div className="mt-3 flex flex-wrap items-center gap-3 pl-0 sm:pl-11">
+                          <Label htmlFor={`addon-units-${o.id}`} className="text-sm capitalize">{o.unit.plural}</Label>
+                          <Input id={`addon-units-${o.id}`} type="number" min={o.unit.min} max={o.unit.max} value={addOns[o.id]} onChange={(e) => setUnits(o, e.target.value)} className="w-24" />
+                          <span className="text-sm text-muted-foreground">{naira(monthly)}/month</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {saved.addOns?.lines?.length > 1 && !dirty && (
+                  <div className="rounded-xl border bg-muted/30 p-4 text-sm">
+                    {saved.addOns.lines.map((l) => (
+                      <div key={l.name} className="flex justify-between gap-3 py-0.5">
+                        <span className="text-muted-foreground">{l.name}</span>
+                        <span>{naira(l.amount)}</span>
+                      </div>
+                    ))}
+                    <Separator className="my-2" />
+                    <div className="flex justify-between gap-3 font-semibold">
+                      <span>Due today</span>
+                      <span>{naira(saved.total)}</span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="relative overflow-hidden border shadow-sm">
             <div className="absolute inset-x-0 top-0 h-1 bg-foreground" />
             <CardHeader>
@@ -418,7 +510,7 @@ export default function BusinessSetup() {
                 </Button>
                 <Button type="button" onClick={activate} disabled={!canActivate || paying}>
                   {paying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Activate my account
+                  Activate my account{payNow ? ` · ${naira(payNow)}` : ""}
                 </Button>
               </div>
             </CardFooter>

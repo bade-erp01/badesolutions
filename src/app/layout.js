@@ -162,7 +162,9 @@ export default async function RootLayout({ children }) {
   await headers();
 
   return (
-    <html lang="en">
+    // suppressHydrationWarning: theme scripts (the ERP's next-themes, the Sales Portal's
+    // dark mode) set <html class> before React loads. It covers this element's own attributes only.
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`
           ${geistSans.variable} 

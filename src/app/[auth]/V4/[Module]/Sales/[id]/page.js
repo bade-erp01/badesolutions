@@ -20,6 +20,7 @@ import autoTable from "jspdf-autotable";
 import api from "@/lib/api";
 import moment from "moment";
 import { useRouter, useParams } from "next/navigation";
+import DeliveryPanel from "@/app/Components/DeliveryPanel";
 import {
   ArrowPathRoundedSquareIcon,
   PrinterIcon,
@@ -1954,6 +1955,13 @@ const generatePdf = async (business, customer, bill) => {
             </button>
           )}
         </div>
+
+        {/* ========== DELIVERY (assign, status, proof) ========== */}
+        <DeliveryPanel
+          billId={Singlebill._id}
+          billStatus={Singlebill.billStatus}
+          canAssign={Boolean(userInfo.user.raiseInvoice || userInfo.user.isAdmin)}
+        />
 
         {/* ========== PRODUCT TABLE (Desktop) ========== */}
         <div className="hidden md:block overflow-x-auto rounded-lg border border-border bg-card mb-8 text-xs">

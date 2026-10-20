@@ -1,6 +1,6 @@
-import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
+import { fetchUser } from "../../../../../../../Functions/useerDataRefresh";
 import TransitPage from "./page";
-import { Dencrypt } from "../../../../../../Functions/Functions";
+import { Dencrypt } from "../../../../../../../Functions/Functions";
 import { serverApi } from "@/lib/serverApi";
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
@@ -87,7 +87,7 @@ export default async function layout({ children, params }) {
         </Notch>
 
         {/* Main Content */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <TransitPage
             DecryptedData={DecryptedData}
             userData={userData}

@@ -127,7 +127,7 @@ export default function Wrapper({ children }) {
         popover: {
           title: `How'dy ${escapeHtml(user.user.firstName)}, Welcome to Bade`,
           description:
-            "I’m Kamsi, your personal tour assistant. You’re exploring Bade ERP, version 4.1 — let’s make this journey effortless and exciting.",
+            "I’m Reg, your personal tour assistant. You’re exploring Bade ERP, version 4.1 — let’s make this journey effortless and exciting.",
           side: "right",
         },
       },
@@ -346,7 +346,7 @@ export default function Wrapper({ children }) {
               className="w-full justify-start cursor-pointer"
               onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
             >
-              Try Kamsi Ai <Sparkles className="h-5 w-5 shrink-0" />
+              Try Reg AI <Sparkles className="h-5 w-5 shrink-0" />
             </Button>
           )}
         </nav>
@@ -443,7 +443,7 @@ export default function Wrapper({ children }) {
                         className="w-full justify-start cursor-pointer"
                         onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
                       >
-                        Try Kamsi Ai <Sparkles className="h-5 w-5 shrink-0" />
+                        Try Reg AI <Sparkles className="h-5 w-5 shrink-0" />
                       </Button>
                     )}
                   </nav>

@@ -53,6 +53,9 @@ const IMAGE_HOSTS = [
 
 const ONESIGNAL = ["https://onesignal.com", "https://*.onesignal.com"];
 
+// Map tiles for the customer map (Delivery app, Leaflet + OpenStreetMap).
+const MAP_TILES = ["https://tile.openstreetmap.org", "https://*.tile.openstreetmap.org"];
+
 // Third-party APIs called from the browser (geocoding/weather in LocationGrabber, GpsTracker etc.).
 const GEO_APIS = [
   "https://nominatim.openstreetmap.org",
@@ -102,6 +105,7 @@ export function buildCsp(nonce) {
       "data:",
       "blob:",
       ...IMAGE_HOSTS,
+      ...MAP_TILES,
       ...ONESIGNAL,
       ...apiOrigins,
       !isProd && "http://localhost:*",

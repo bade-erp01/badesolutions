@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
 import Image from "next/image";
 import CustomerSalesLoader from "@/app/Components/CustomerSalesLoader";
-import autoTable from "jspdf-autotable";
 import InvoicePaymentForm from "@/app/Components/PaymentWithInv";
 import Link from "next/link";
 import {
@@ -14,6 +13,7 @@ import {
   EXPRESS_PRIVATE_URL,
 } from "../../../../../../../Functions/Functions";
 import api from "@/lib/api";
+import { saveCustomerStatementPdf } from "@/lib/pdf/customerStatementPdf";
 import { useState } from "react";
 import DaySelector from "@/app/Components/Datepicker";
 import {
@@ -213,34 +213,6 @@ export default function CustomerForm({
     }
   };
 
-  let jsPDF;
-  if (typeof window !== "undefined") {
-    jsPDF = require("jspdf").jsPDF;
-  }
-
-  const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
-    return new Promise((resolve, reject) => {
-      const img = new window.Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        ctx.font = "italic bold 16px 'Courier New'";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        ctx.globalAlpha = 0.5;
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = () => reject(new Error("Image loading failed"));
-      img.src = src;
-    });
-  };
-
   async function GenerateSummary(customerId) {
     const { value: formValues } = await Swal.fire({
       title: "Generate Statement",
@@ -282,79 +254,14 @@ export default function CustomerForm({
 
       Swal.close();
 
-      const imageDataURL = await loadImageAsDataURL(
-        userInfo.business.companyLogo,
-        "B.A.D.E",
-      );
-
-      const doc = new jsPDF();
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.text(`Transaction Statement`, 20, 20);
-      doc.text(`Customer: ${cust.Username}`, 20, 30);
-      doc.text(`Period: ${startDate} to ${endDate}`, 20, 35);
-      doc.setFontSize(8);
-      doc.text(
-        `Current Balance: ${cust.Debt?.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`,
-        20,
-        42,
-      );
-      doc.addImage(imageDataURL, "PNG", 150, 10, 35, 35);
-
-      const headers = [["#", "Reference No", "Date", "CR", "DR", "Balance"]];
-      const rows = TransactionResult.map((tx, i) => [
-        i + 1,
-        tx.ReferenceNo.toUpperCase(),
-        moment(new Date(tx.Date)).format("YYYY-MM-DD"),
-        tx.CreditAmount?.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-        tx.DebitAmount?.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-        tx.Balance?.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-      ]);
-
-      rows.push([
-        "",
-        "Current Balance",
-        "",
-        "",
-        "",
-        cust.Debt?.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-      ]);
-
-      autoTable(doc, {
-        head: headers,
-        body: rows,
-        startY: 50,
-        theme: "grid",
-        styles: { fontSize: 7, cellPadding: 3 },
-        headStyles: {
-          fillColor: [0, 102, 204],
-          textColor: 255,
-          fontStyle: "bold",
-        },
-        didParseCell: function (data) {
-          if (data.row.index === rows.length - 1) {
-            data.cell.styles.fontStyle = "bold";
-            data.cell.styles.fillColor = [230, 240, 255];
-          }
-        },
+      // The layout lives in src/lib/pdf/customerStatementPdf.js (shared with the Sales Portal).
+      await saveCustomerStatementPdf({
+        business: userInfo.business,
+        cust,
+        startDate,
+        endDate,
+        transactions: TransactionResult,
       });
-
-      doc.save(`${startDate}-${endDate}-Statement-${cust.Username}.pdf`);
       SuccessToast("Your report has been saved.");
     } catch (err) {
       ErrorMessage(err.message);

@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -52,6 +53,61 @@ export default function SingleVendorpage({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  // Merchant and Block switches save straight away, separate from the Update button
+  const [savingFlag, setSavingFlag] = useState("");
+  const toggleFlag = async (field, value, message) => {
+    setSavingFlag(field);
+    const response = await api.patch(`/api/vendor/update/${Backdata._id}`, { [field]: value });
+    setSavingFlag("");
+    if (!response.ok) return ErrorMessage(response.error);
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    SuccessToast(message);
+    router.refresh();
+  };
+  const toggleMerchant = (on) =>
+    toggleFlag("isMerchant", on, on ? `${formData.Name} is now a merchant` : `${formData.Name} is no longer a merchant`);
+  const toggleBlocked = (on) =>
+    toggleFlag("block_vendor", on, on ? `${formData.Name} is blocked` : `${formData.Name} is unblocked`);
+
+  // Merchant portal invitation (backend lib/portals/invites.js): login + temporary password by email
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState(Backdata.email || "");
+  const [inviting, setInviting] = useState(false);
+  // { state: none | invited | active | suspended, canInvite, lastLoginAt, invite } from the server,
+  // which also refuses invites once the merchant uses their own password
+  const [portal, setPortal] = useState(null);
+  const loadPortal = async () => {
+    const response = await api.get(`/api/vendors/${Backdata._id}/merchant-portal`);
+    if (response.ok) setPortal(response.data);
+  };
+  useEffect(() => {
+    if (formData.isMerchant) loadPortal();
+  }, [formData.isMerchant]);
+
+  // admins only: a merchant who already uses the portal forgot their password
+  const resetPortalPassword = async () => {
+    if (!window.confirm(`Email ${formData.Name} a new temporary password? Their current password will stop working.`)) return;
+    setInviting(true);
+    const response = await api.post(`/api/vendors/${Backdata._id}/reset-merchant-password`, {});
+    setInviting(false);
+    if (!response.ok) return ErrorMessage(response.error);
+    loadPortal();
+    SuccessToast(`New sign-in details sent to ${response.data.sentTo}.`);
+  };
+
+  const sendInvite = async () => {
+    setInviting(true);
+    const response = await api.post(`/api/vendors/${Backdata._id}/invite-merchant`, { email: inviteEmail.trim() });
+    setInviting(false);
+    if (!response.ok) {
+      loadPortal(); // e.g. they signed in meanwhile
+      return ErrorMessage(response.error);
+    }
+    setInviteOpen(false);
+    loadPortal();
+    SuccessToast(`Invitation sent to ${response.data.sentTo}. They sign in with ${response.data.login}.`);
   };
 
   const handleSubmit = async (e) => {
@@ -398,6 +454,99 @@ export default function SingleVendorpage({
             <h2 className="text-lg font-semibold ">Vendor Information</h2>
             <p className="mt-1 text-sm ">Ensure to provide correct information.</p>
 
+            <div className="mt-6 flex items-center justify-between gap-4 rounded-md border p-4">
+              <div>
+                <Label htmlFor="isMerchant">Merchant</Label>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Merchants can be billed from the Merchant biller app.
+                </p>
+                {/* the backend refuses (403) without it; the message says where to subscribe */}
+                {!formData.isMerchant && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Needs the Merchant app (Merchant biller + merchant portal + delivery), from the app store.
+                  </p>
+                )}
+              </div>
+              <Switch
+                id="isMerchant"
+                checked={Boolean(formData.isMerchant)}
+                disabled={!user.user.editVendor || Boolean(savingFlag)}
+                onCheckedChange={toggleMerchant}
+              />
+            </div>
+
+            {formData.isMerchant && !formData.block_vendor && (user.user.editVendor || user.user.isAdmin) && (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-md border p-4">
+                <div>
+                  <Label>Merchant portal</Label>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {!portal
+                      ? "Checking the merchant's portal login…"
+                      : portal.state === "active"
+                        ? `Active: signed in with their own password${portal.lastLoginAt ? `, last on ${moment(portal.lastLoginAt).format("D MMM YYYY, h:mm a")}` : ""}.`
+                        : portal.state === "suspended"
+                          ? "Their portal login is suspended."
+                          : portal.invite?.sentAt
+                            ? `Invited ${moment(portal.invite.sentAt).format("D MMM YYYY, h:mm a")} to ${portal.invite.sentTo}. Not signed in yet.`
+                            : "Email this merchant a login to see their stock, sales, deliveries and purchase orders."}
+                  </p>
+                </div>
+                {portal?.state === "active" ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">Portal active</span>
+                    {user.user.isAdmin && (
+                      <Button type="button" variant="outline" size="sm" disabled={inviting} onClick={resetPortalPassword}>
+                        Reset portal password
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <Button type="button" variant="outline" disabled={!portal?.canInvite} onClick={() => setInviteOpen(true)}>
+                    {portal?.invite?.sentAt ? "Resend invite" : "Invite to merchant portal"}
+                  </Button>
+                )}
+              </div>
+            )}
+
+            <Dialog open={inviteOpen} onOpenChange={(o) => !inviting && setInviteOpen(o)}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{portal?.invite?.sentAt ? "Resend the invitation" : "Invite to the merchant portal"}</DialogTitle>
+                  <DialogDescription>
+                    {formData.Name} gets an email with their login (phone {formData.vendor_tel || "not set"}) and a temporary password.
+                    {portal?.invite?.sentAt ? " Their old password stops working." : ""}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <Label htmlFor="inviteEmail">Merchant&apos;s email</Label>
+                  <Input id="inviteEmail" type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="sales@merchant.com" />
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" disabled={inviting} onClick={() => setInviteOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="button" disabled={inviting || !inviteEmail.trim()} onClick={sendInvite}>
+                    {inviting ? "Sending…" : "Send invitation"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <div className="mt-3 flex items-center justify-between gap-4 rounded-md border p-4">
+              <div>
+                <Label htmlFor="block_vendor">Blocked</Label>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  A blocked vendor can&apos;t get purchase orders or payments, and can&apos;t be billed in the Merchant biller.
+                </p>
+              </div>
+              <Switch
+                id="block_vendor"
+                checked={Boolean(formData.block_vendor)}
+                disabled={!user.user.editVendor || Boolean(savingFlag)}
+                onCheckedChange={toggleBlocked}
+              />
+            </div>
+
             <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="sm:col-span-3">
                 <Label htmlFor="Name">Name</Label>
@@ -449,19 +598,6 @@ export default function SingleVendorpage({
                 <Input id="Bank_name" name="Bank_name" value={formData.Bank_name || ""} onChange={handleChange} />
               </div>
 
-              <div className="sm:col-span-2">
-                <Label htmlFor="block_vendor">Block this vendor?</Label>
-                <div className="mt-3">
-                  <input
-                    type="checkbox"
-                    id="block_vendor"
-                    name="block_vendor"
-                    checked={formData.block_vendor || false}
-                    onChange={handleChange}
-                    className="h-5 w-5 rounded border-gray-300 text-indigo-600"
-                  />
-                </div>
-              </div>
             </div>
           </div>
 

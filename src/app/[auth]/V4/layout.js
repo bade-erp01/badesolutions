@@ -3,7 +3,6 @@ import Wrapper from "@/app/Components/Wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
 import { fetchUser } from "../../../../Functions/useerDataRefresh";
 import { UserProvider } from "@/components/UserProvider";
-import moment from "moment";
 import RenewSubscription from "@/app/Components/RenewSubcription";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -12,6 +11,8 @@ import OneSignalProvider from "@/app/Components/OneSignalProvider";
 import PushNotificationGate from "@/app/Components/PushNotificationGate";
 import { Toaster } from "sonner";
 import PaymentReturnNotice from "@/app/Components/PaymentReturnNotice";
+import AppInstalledGuard from "@/app/Components/AppInstalledGuard";
+import { isSubscriptionExpired as subscriptionExpired } from "@/lib/subscription";
 
 export const metadata = {
   title: "Business Automated Dynamic Enterprise [B.A.D.E]",
@@ -58,9 +59,8 @@ export default async function layout({ children }) {
     redirect("/Login");
   }
 
-  const isSubscriptionExpired = moment().isAfter(
-    moment(businessInfo.subscriptionEndDate),
-  );
+  // to the end of the end date, Lagos time (src/lib/subscription.js)
+  const isSubscriptionExpired = subscriptionExpired(businessInfo.subscriptionEndDate);
 
   if (isSubscriptionExpired) {
     // Show renewal component directly
@@ -112,7 +112,12 @@ export default async function layout({ children }) {
         </Suspense>
         <ThemeProvider nonce={nonce}>
           <UserProvider user={userData}>
-            <Wrapper>{children}</Wrapper>
+            <Wrapper>
+              {/* apps this business hasn't installed don't open (e.g. after switching business) */}
+              <AppInstalledGuard lockedApps={businessInfo.lockedApps || []} businessName={businessInfo.companyName}>
+                {children}
+              </AppInstalledGuard>
+            </Wrapper>
           </UserProvider>
         </ThemeProvider>
       </WebSocketProvider>

@@ -5,7 +5,6 @@ import Nav1 from "@/app/Components/Nav1";
 import BackButton from "@/app/Components/BackBotton";
 import Link from "next/link";
 import Image from "next/image";
-import Footer2 from "@/app/Components/Footer2";
 import { notFound } from "next/navigation";
 import CreateBusinessTenant from "@/app/Components/AddTenant"
 
@@ -192,7 +191,6 @@ export default async function SetUpLayout({ children, params }) {
           </section>
         </main>
       </div>
-      <Footer2 />
     </div>
   );
 }

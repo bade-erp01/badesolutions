@@ -46,6 +46,60 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* Sales Portal (mobile app): the BADE delivery app's palette. Dark ink, green for
+   good/paid, amber for waiting, red for owing/failed. Prefixed so it never clashes
+   with the ERP's shadcn tokens; its own dark mode is below (html.sp-dark). */
+@theme {
+  --color-sp-bg: #f4f6f8;
+  --color-sp-surface: #ffffff;
+  --color-sp-ink: #111827;
+  --color-sp-muted: #6b7280;
+  --color-sp-line: #e5e7eb;
+  --color-sp-accent: #047857;
+  --color-sp-accent-soft: #d1fae5;
+  --color-sp-warn: #b45309;
+  --color-sp-warn-soft: #fef3c7;
+  --color-sp-bad: #b91c1c;
+  --color-sp-bad-soft: #fee2e2;
+  --color-sp-info: #1d4ed8;
+  --color-sp-info-soft: #dbeafe;
+  --color-sp-on-ink: #ffffff; /* text on bg-sp-ink (primary buttons, selected tabs) */
+}
+
+.sales-app {
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sales Portal dark mode: the rep's choice in the menu (light / dark / phone setting),
+   applied as html.sp-dark by SalesPortal/_ui/theme.js. Screen only, so print-outs stay
+   black on white. */
+@media screen {
+  html.sp-dark {
+    --color-sp-bg: #0b0f14;
+    --color-sp-surface: #151b23;
+    --color-sp-ink: #f3f4f6;
+    --color-sp-muted: #9ca3af;
+    --color-sp-line: #2a323d;
+    --color-sp-accent: #059669;
+    --color-sp-accent-soft: #063d2e;
+    --color-sp-warn: #fbbf24;
+    --color-sp-warn-soft: #3d2a06;
+    --color-sp-bad: #f87171;
+    --color-sp-bad-soft: #3f1212;
+    --color-sp-info: #60a5fa;
+    --color-sp-info-soft: #172a4d;
+    --color-sp-on-ink: #111827;
+  }
+  html.sp-dark .sales-app {
+    color-scheme: dark;
+  }
+}
+
+.sales-app :is(button, a, input, select, textarea) {
+  touch-action: manipulation;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

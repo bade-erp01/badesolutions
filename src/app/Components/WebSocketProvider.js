@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 // Same backend (and so the same session cookie domain) as src/lib/api.js. The old
 // fallback sent production browsers to http://localhost:3000 whenever
 // NEXT_PUBLIC_API_URL was unset (EXPRESS_PRIVATE_URL is never exposed to the browser).
-const SOCKET_URL = API_URL;
+const SOCKET_URL = API_URL || undefined; // "" (same-origin dev proxy) → this site
 
 const WebSocketContext = createContext(null);
 

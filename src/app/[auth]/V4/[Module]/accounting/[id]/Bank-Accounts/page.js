@@ -1,7 +1,6 @@
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
 import { serverApi } from "@/lib/serverApi";
-import Footer2 from "@/app/Components/Footer2";
 import BackButton from "@/app/Components/BackBotton";
 import { notFound } from "next/navigation";
 import Link from "next/link";

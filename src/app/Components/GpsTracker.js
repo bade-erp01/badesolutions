@@ -3,15 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import { MapPin, RefreshCcw, Loader2, ShieldAlert } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export default function LocationGuard({ children }) {
   const [status, setStatus] = useState("checking"); // checking | granted | denied | unavailable
@@ -88,101 +79,49 @@ export default function LocationGuard({ children }) {
     };
   }, [status]);
 
-  if (status === "checking") {
+  if (status === "checking" || status === "unavailable" || status === "denied") {
     return (
       <>
-        <div className="pointer-events-none select-none opacity-30 blur-[1px]">
+        <div className="pointer-events-none select-none opacity-40 blur-[2px]" aria-hidden="true">
           {children}
         </div>
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-md">
-          <Card className="w-full max-w-sm mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
-            <CardContent className="flex flex-col items-center gap-4 pt-8 pb-8">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="text-sm text-zinc-400">Checking location access…</p>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (status === "unavailable") {
-    return (
-      <>
-        <div className="pointer-events-none select-none opacity-30 blur-[2px]">
-          {children}
-        </div>
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-md">
-          <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
-            <CardHeader className="items-center text-center space-y-4 pb-2">
-              <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center">
-                <ShieldAlert className="h-8 w-8 text-red-500" />
-              </div>
-              <div className="space-y-2">
-                <CardTitle className="text-xl text-zinc-50">
-                  Location Not Supported
-                </CardTitle>
-                <CardDescription className="text-zinc-400">
-                  Your browser or device does not support location services.
-                </CardDescription>
-              </div>
-            </CardHeader>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (status === "denied") {
-    return (
-      <>
-        <div className="pointer-events-none select-none opacity-40 blur-[2px]">
-          {children}
-        </div>
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-md">
-          <Card className="w-full max-w-md mx-4 border-border/50 bg-zinc-950 text-zinc-100 shadow-2xl">
-            <CardHeader className="items-center text-center space-y-4 pb-2">
-              <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
-                <MapPin className="h-10 w-10 text-amber-500" />
-              </div>
-              <div className="space-y-2">
-                <CardTitle className="text-xl sm:text-2xl text-zinc-50">
-                  Location Required
-                </CardTitle>
-                <CardDescription className="text-zinc-400 leading-relaxed">
-                  Please allow location access for this site and turn on device
-                  location.
-                </CardDescription>
-              </div>
-            </CardHeader>
-
-            <CardContent className="pt-2">
-              <Button
-                size="lg"
-                onClick={() => checkLocation(false)}
-                disabled={isRequesting}
-                className="w-full gap-2 bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
-              >
-                {isRequesting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Checking…
-                  </>
-                ) : (
-                  <>
-                    <RefreshCcw className="h-4 w-4" />
-                    Enable Location
-                  </>
-                )}
-              </Button>
-            </CardContent>
-
-            <CardFooter className="justify-center pb-6">
-              <p className="text-xs text-zinc-500 text-center">
-                Site settings → Location → Allow
-              </p>
-            </CardFooter>
-          </Card>
+        <div className="sales-app fixed inset-0 z-[99999] flex items-end justify-center bg-black/40 p-4 sm:items-center">
+          <div className="w-full max-w-sm space-y-4 rounded-3xl bg-white p-6 text-center text-[#111827] shadow-2xl">
+            {status === "checking" ? (
+              <>
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#6b7280]" />
+                <p className="text-sm text-[#6b7280]">Checking location access…</p>
+              </>
+            ) : status === "unavailable" ? (
+              <>
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fee2e2]">
+                  <ShieldAlert className="h-7 w-7 text-[#b91c1c]" />
+                </span>
+                <h2 className="text-xl font-bold tracking-tight">Location not supported</h2>
+                <p className="text-sm text-[#6b7280]">This phone or browser can&apos;t share its location. Use a phone with location services to work in the Sales Portal.</p>
+              </>
+            ) : (
+              <>
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fef3c7]">
+                  <MapPin className="h-7 w-7 text-[#b45309]" />
+                </span>
+                <h2 className="text-xl font-bold tracking-tight">Turn on your location</h2>
+                <p className="text-sm text-[#6b7280]">
+                  The Sales Portal records where you visit customers. Allow location for this site and turn on your phone&apos;s location.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => checkLocation(false)}
+                  disabled={isRequesting}
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#111827] text-[15px] font-semibold text-white disabled:opacity-60"
+                >
+                  {isRequesting ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
+                  {isRequesting ? "Checking…" : "Try again"}
+                </button>
+                <p className="text-xs text-[#6b7280]">Browser menu → Site settings → Location → Allow</p>
+              </>
+            )}
+          </div>
         </div>
       </>
     );

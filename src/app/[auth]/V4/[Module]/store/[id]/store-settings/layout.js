@@ -1,7 +1,6 @@
 import React from "react";
 import Nav1 from "@/app/Components/Nav1";
 import { fetchUser } from "../../../../../../../../Functions/useerDataRefresh";
-import Footer2 from "@/app/Components/Footer2";
 import { serverApi } from "@/lib/serverApi";
 import Page from './page'
 import BackButton from "@/app/Components/BackBotton";

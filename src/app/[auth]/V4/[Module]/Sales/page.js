@@ -209,6 +209,7 @@ export default function InvoiceLandingPage() {
                       <TableHead>Source</TableHead>
                       <TableHead>Raised By</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Delivery</TableHead>
                       <TableHead className="text-right">Value</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -252,6 +253,9 @@ export default function InvoiceLandingPage() {
                               {bill.billStatus}
                             </span>
                           </TableCell>
+                          <TableCell>
+                            <DeliveryBadge delivery={bill.delivery} />
+                          </TableCell>
                           <TableCell className="text-right font-bold">
                             ₦
                             {bill.grandTotal
@@ -288,9 +292,12 @@ export default function InvoiceLandingPage() {
                               ? `${bill.billReferenceNo}/${bill.invoicelocation}`
                               : "View Draft"}
                           </Link>
-                          <span className={getStatusBadge(bill.billStatus)}>
-                            {bill.billStatus}
-                          </span>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={getStatusBadge(bill.billStatus)}>
+                              {bill.billStatus}
+                            </span>
+                            <DeliveryBadge delivery={bill.delivery} />
+                          </div>
                         </div>
 
                         <div className="space-y-1">
@@ -381,5 +388,22 @@ export default function InvoiceLandingPage() {
         </CardContent>
       </Card>
     </Suspense>
+  );
+}
+
+// Delivery status from the merchant & delivery portals (bill.delivery); nothing when never assigned.
+const DELIVERY_BADGE = {
+  assigned: ["Assigned", "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"],
+  out: ["Out for delivery", "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"],
+  delivered: ["Delivered", "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"],
+  failed: ["Couldn't deliver", "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200"],
+};
+function DeliveryBadge({ delivery }) {
+  const hit = DELIVERY_BADGE[delivery?.status];
+  if (!hit) return <span className="text-xs text-muted-foreground">—</span>;
+  return (
+    <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${hit[1]}`} title={delivery.failReason || delivery.agentName || ""}>
+      {hit[0]}
+    </span>
   );
 }

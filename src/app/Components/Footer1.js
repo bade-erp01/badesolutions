@@ -59,27 +59,6 @@ export default function Footer2() {
         </Link>
       </div>
 
-      {/* Newsletter Signup */}
-      <form className="max-w-md mx-auto mb-6">
-        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-          Subscribe to our newsletter
-        </label>
-        <div className="flex">
-          <input
-            type="email"
-            id="email"
-            placeholder="you@example.com"
-            className="w-full min-w-0 px-4 py-2 rounded-l-md bg-gray-800 text-white border border-gray-700 focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-500 transition"
-          >
-            Subscribe
-          </button>
-        </div>
-      </form>
-
       {/* Copyright */}
       <div className="text-center text-sm text-gray-200">
         &copy; {new Date().getFullYear()} Business Automated Dynamic Enterprise. All rights reserved.

@@ -1,952 +1,449 @@
 "use client";
 
-import { mutate } from "swr";
-import { useState, useEffect, Suspense } from "react";
-import QRCode from "qrcode";
-import Swal from "sweetalert2";
-import Image from "next/image";
-import SuspenenseFallBack from "@/app/Components/SuspenenseFallBack";
-import {
-  totalInWords,
-  EXPRESS_PRIVATE_URL,
-} from "../../../../../Functions/Functions";
-import api from "@/lib/api";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import moment from "moment";
-import {
-  plsWait,
-  ErrorMessage,
-  SuccessToast,
-} from "../../../../../Functions/Mics";
+// One requisition (draft order): its lines, adding products, quantities, then checkout
+// with the rep's ops code. Also prints the quotation PDF (same document as the ERP's draft page).
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Trash2, Printer, ShoppingCart } from "lucide-react";
+import { mutate } from "swr";
+import moment from "moment";
+import { toast } from "sonner";
+import { Clock, KeyRound, Mail, Phone, Plus, Printer, Search, ShoppingCart, Trash2 } from "lucide-react";
+import api from "@/lib/api";
+import { printQuotationPdf } from "@/lib/pdf/quotationPdf";
+import { totalInWords, EXPRESS_PRIVATE_URL } from "../../../../../Functions/Functions";
+import AppShell from "../../_ui/AppShell";
+import { Alert, BottomBar, Button, Card, CardTitle, ConfirmSheet, Empty, Field, Input, Sheet, StatusBadge, When } from "../../_ui/ui";
+import { currencyOf, money2 } from "../../_ui/format";
 
-import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { cn } from "@/lib/utils";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-
-export default function DraftInvoicePage({ Business, bill, products, user }) {
-  const [inputValue, setInputValue] = useState("");
+export default function RequisitionPage({ Business, bill, products = [], user }) {
   const router = useRouter();
-  const [productOpen, setProductOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isAddingProduct, setIsAddingProduct] = useState(false);
-
-  const checkExpiryDate = (createdAt) => {
-    try {
-      const expiryTime = moment(createdAt).add(24, "hours");
-      const now = moment();
-      const duration = moment.duration(expiryTime.diff(now));
-      if (duration.asMilliseconds() <= 0) {
-        return "⛔ Expired";
-      } else {
-        const hours = Math.floor(duration.asHours());
-        const minutes = duration.minutes();
-        const seconds = duration.seconds();
-        return `⏳Expire in: ${hours}h ${minutes}m ${seconds}s`;
-      }
-    } catch (err) {
-      return "";
-    }
-  };
-
-  useEffect(() => {
-    Swal.close();
-  }, []);
-
-  const createdAt = moment(bill.createdAt);
-  const now = moment();
-  const isOlderThan24Hours = now.diff(createdAt, "hours") < 24;
-
-  const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
-    return new Promise((resolve, reject) => {
-      const img = new window.Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        ctx.font = "italic bold 16px 'Courier New'";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        ctx.globalAlpha = 0.5;
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 10);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = () => reject(new Error("Image loading failed"));
-      img.src = src;
-    });
-  };
-
-  const generatePdf = async (business, customer, bill) => {
-    try {
-      Swal.fire({
-        title: "Setting things up ⌛...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-
-      if (business.companyLogo) {
-        try {
-          const logo = await loadImageAsDataURL(business.companyLogo);
-          doc.addImage(logo, "JPEG", 10, 12, 30, 30);
-        } catch (err) {
-          console.warn("Logo failed to load");
-        }
-      }
-
-      doc.setFontSize(16).setFont("helvetica", "bold");
-      doc.text(business.companyName || "", pageWidth - 10, 12, {
-        align: "right",
-      });
-
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(
-        `${business.shopAddress || ""}, ${business.companyState || ""}, ${business.companyCity || ""}`,
-        pageWidth - 10,
-        20,
-        { align: "right" },
-      );
-      doc.text(business.email || "", pageWidth - 10, 26, { align: "right" });
-      doc.text(`Tel: ${business.Tel || "N/A"}`, pageWidth - 10, 32, {
-        align: "right",
-      });
-
-      let currentY = 50;
-
-      doc.setFontSize(15).setTextColor(0, 0, 0).setFont("helvetica", "bold");
-      doc.text("QUOTATION", 10, currentY);
-      currentY += 10;
-
-      doc.setFont("helvetica", "bold").setTextColor(0, 0, 0).setFontSize(13);
-      doc.text(`${bill.customerName?.toUpperCase() || ""}`, 10, currentY);
-      doc.setFontSize(8).setTextColor(0, 0, 0);
-      doc.text(`${customer?.billingAddress || "N/A"}`, 10, currentY + 6);
-      doc.text(`${customer?.phone || "N/A"}`, 10, currentY + 12);
-      doc.text(
-        `Contact Person: ${customer?.contactPerson || bill.customerName || "N/A"}`,
-        10,
-        currentY + 18,
-      );
-      doc.text(
-        `Download Date: ${moment().format("YYYY-MM-DD")}`,
-        10,
-        currentY + 24,
-      );
-
-      try {
-        const qrDataURL = await QRCode.toDataURL(
-          "https://badesolutions.com.ng",
-        );
-        doc.addImage(qrDataURL, "PNG", pageWidth - 40, currentY, 35, 35);
-      } catch (err) {
-        console.warn("QR code failed to generate");
-      }
-
-      currentY += 30;
-
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 80,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [],
-        theme: "plain",
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { hhalign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        head: [
-          [
-            "#",
-            "Product",
-            "Code",
-            "Price",
-            "Promo",
-            "CASE",
-            "PCS",
-            "VAT",
-            "Total",
-          ],
-        ],
-        body: bill.orders.map((ord, i) => [
-          i + 1,
-          ord.item?.Name || "N/A",
-          ord.item?.ACDcode || ord.item?.ADCcode || "N/A",
-          ord.priceListPrice || 0,
-          ord.promotionData || 0,
-          ord.Qty || 0,
-          ord.pcsReq || 0,
-          ord.item?.VAT?.$numberDecimal || ord.item?.VAT || 0,
-          ord.total?.toFixed(2) || "0.00",
-        ]),
-        theme: "grid",
-        styles: { fontSize: 9 },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      autoTable(doc, {
-        startY: currentY,
-        tableWidth: 76,
-        margin: { left: pageWidth - 90 },
-        head: [],
-        body: [
-          ["Tax Rate", `${bill.taxRate?.toFixed(2) || 0} (inc in sub.)`],
-          ["Subtotal", bill.subTotal?.toFixed(2) || "0.00"],
-          ["Discount", bill.discount?.toFixed(2) || "0.00"],
-          ["Total Due", bill.grandTotal?.toFixed(2) || "0.00"],
-        ],
-        theme: "grid",
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: {
-          0: { fontStyle: "bold", halign: "right" },
-          1: { halign: "right" },
-        },
-      });
-      currentY = doc.lastAutoTable.finalY + 10;
-
-      doc.setFontSize(10);
-      doc.text(
-        `${totalInWords(bill.grandTotal, business.currency?.currency)}`,
-        10,
-        currentY,
-      );
-      currentY += 10;
-      doc.text("Authorized signatories", 10, currentY);
-      currentY += 10;
-      doc.text(
-        `${business.companyName.toLowerCase()} _______________________________`,
-        10,
-        currentY,
-      );
-      currentY += 10;
-      doc.text(
-        "Customer Sign & Date _______________________________",
-        10,
-        currentY,
-      );
-      currentY += 10;
-      if (business.invoicePolicy) {
-        doc.text(business.invoicePolicy, 10, currentY);
-        currentY += 10;
-      }
-
-      doc.setFontSize(9);
-      doc.text(
-        `Kindly note that this ${bill.billStatus} is invalid after ${moment().format("l")}`,
-        10,
-        pageHeight - 20,
-      );
-
-      const totalPages = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.text(
-          `Page ${i} of ${totalPages}`,
-          pageWidth - 20,
-          pageHeight - 10,
-          { align: "right" },
-        );
-      }
-
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const win = window.open(url, "_blank");
-
-      if (win) {
-        win.onload = () => {
-          Swal.close();
-          win.print();
-        };
-      } else {
-        doc.save(`${bill.customerName || "invoice"}.pdf`);
-        Swal.close();
-      }
-    } catch (error) {
-      Swal.close();
-      console.error("Error generating PDF:");
-    }
-  };
-
-  const handleProductSelection = async (productId) => {
-    try {
-      setIsAddingProduct(true);
-      plsWait("Adding product...");
-      const cleanedProducts = await products.find((product) => {
-        return (
-          product.item?.ACDcode === productId ||
-          product.item?.ADCcode === productId
-        );
-      });
-
-      if (!cleanedProducts) {
-        throw new Error("Product not found");
-      }
-
-      const url = `/api/Draft/add/order/${bill._id}?productId=${productId}&priceList=${Singlebill.customer.priceList}`;
-      const res = await api(url, { method: "PUT", body: { product: cleanedProducts.storeId } });
-      const data = res.data || {};
-      if (data.message) {
-        SuccessToast(data.message);
-        setInputValue("");
-        router.refresh();
-      } else {
-        throw new Error(data.error || "Unknown error occurred.");
-      }
-    } catch (error) {
-      ErrorMessage(error.message);
-      setInputValue("");
-      router.refresh();
-    } finally {
-    setIsAddingProduct(false);
-    }
-  };
-
-  const deleteDraftInvoice = async () => {
-    try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      });
-
-      if (!result.isConfirmed) return;
-
-      plsWait("Deleting Requisition. Please wait.");
-      const url = `/api/Draft/order/Delete/${bill._id}`;
-      const response = await api(url, { method: "DELETE", headers: { "idempotency-key": `delete-${bill._id}` } });
-      const data = response.data || {};
-
-      if (data.message) {
-        SuccessToast(data.message);
-        router.back();
-      } else {
-        ErrorMessage(data.error || "Failed to delete Requisition.");
-        Swal.close();
-        router.refresh();
-      }
-    } catch (error) {
-      ErrorMessage(error.message || "Unexpected error occurred.");
-      Swal.close();
-      router.refresh();
-    }
-  };
-
-  const handleQtyChange = async (
-    lineId,
-    value,
-    toUpdate,
-    billId,
-    storeId,
-    userId,
-  ) => {
-    try {
-      plsWait("Updating cart...");
-      const url = `/api/Invoice/Cart/Update?user=${userId}`;
-      const response = await api(url, { method: "PUT", body: { lineId, value, toUpdate, billId, storeId } });
-
-      const data = response.data || {};
-      if (data.message) {
-        SuccessToast(data.message);
-        mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${billId}`);
-        router.refresh();
-      } else {
-        throw new Error(data.error || "An unknown error occurred.");
-      }
-    } catch (err) {
-      ErrorMessage(err.message);
-      router.refresh();
-    }
-  };
-
-  let isProcessing = false;
-
-  const processInvoice = async () => {
-    if (isProcessing) return;
-    isProcessing = true;
-
-    try {
-      const { value: userInput } = await Swal.fire({
-        title: "Enter your Operational Code",
-        input: "password",
-        inputLabel: "This action will Adjust Inventory of Billing location.",
-        inputPlaceholder: "Provide OPS CODE",
-        inputAutoFocus: true,
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (!value) return "You need to Enter your code!";
-        },
-      });
-
-      if (!userInput) {
-        isProcessing = false;
-        return;
-      }
-
-      plsWait(
-        "Please wait while i process your request. This should only take a bit. Do not reload this page...",
-      );
-
-      const response = await api(`/api/wareHouse/Bill`, { method: "PATCH", body: {
-            billId: bill._id,
-            customer: Singlebill.customer._id,
-            restriction: userInfo.business?.InvoiceRestriction,
-            ops: userInput, // ops code in the body, never the URL
-          }, headers: { "idempotency-key": `Draft-${bill._id}` } });
-
-      const data = response.data || {};
-      if (response.ok) {
-        SuccessToast(data.message || "Operation completed successfully!");
-        router.refresh();
-      } else {
-        throw new Error(data.error || "An error occurred.");
-      }
-    } catch (error) {
-      ErrorMessage(error.message);
-      router.refresh();
-    } finally {
-      isProcessing = false;
-    }
-  };
-
-  const removeLineItem = async (lineId) => {
-    try {
-      plsWait("Removing item from order...");
-      const url = `/api/Draft/delete/order?user=${user._id}`;
-      const response = await api(url, { method: "DELETE", body: { lineId, billId: bill._id } });
-
-      const data = response.data || {};
-      if (data.message) {
-        SuccessToast(data.message);
-        router.refresh();
-      } else {
-        ErrorMessage(data.error || "Something went wrong.");
-        router.refresh();
-      }
-    } catch (err) {
-      ErrorMessage("Unexpected error occurred.");
-      router.refresh();
-    }
-  };
-
   const userInfo = { user, business: Business };
-  const Singlebill = bill;
-  const isCancelled = Singlebill?.billStatus?.toLowerCase() === "cancelled";
-  const currency = userInfo.business.currency?.currency.Symbol || "";
-  const isDraft = Singlebill.billStatus?.toLowerCase() === "draft";
-  const canEdit =
-    user._id === Singlebill.invoicerId && user.raiseInvoice && isDraft;
+  const currency = currencyOf(Business);
+  const status = String(bill.billStatus || "");
+  const isDraft = status.toLowerCase() === "draft";
+  const isCancelled = status.toLowerCase() === "cancelled";
+  const canEdit = user._id === bill.invoicerId && user.raiseInvoice && isDraft;
+  const within24h = moment().diff(moment(bill.createdAt), "hours") < 24;
+  const canCheckout =
+    canEdit && (!Business.InvoiceRestriction || within24h) && (bill.orders?.length || 0) > 0;
+
+  const [picker, setPicker] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [checkout, setCheckout] = useState(false);
+  const [printing, setPrinting] = useState(false);
+
+  const addProduct = async (code) => {
+    setAdding(true);
+    try {
+      const product = products.find((p) => p.item?.ACDcode === code || p.item?.ADCcode === code);
+      if (!product) throw new Error("Product not found");
+      const res = await api(`/api/Draft/add/order/${bill._id}?productId=${code}&priceList=${bill.customer?.priceList}`, {
+        method: "PUT",
+        body: { product: product.storeId },
+      });
+      if (!res.data?.message) throw new Error(res.data?.error || "Couldn't add the product.");
+      toast.success(res.data.message);
+      setPicker(false);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setAdding(false);
+      router.refresh();
+    }
+  };
+
+  const changeQty = async (lineId, value, toUpdate, storeId) => {
+    const r = await api(`/api/Invoice/Cart/Update?user=${user._id}`, {
+      method: "PUT",
+      body: { lineId, value, toUpdate, billId: bill._id, storeId },
+    });
+    if (r.data?.message) {
+      toast.success(r.data.message);
+      mutate(`${EXPRESS_PRIVATE_URL}/api/Invoice/${bill._id}`);
+    } else {
+      toast.error(r.data?.error || r.error || "Couldn't update the quantity.");
+    }
+    router.refresh();
+  };
+
+  const removeLine = async (lineId) => {
+    const r = await api(`/api/Draft/delete/order?user=${user._id}`, { method: "DELETE", body: { lineId, billId: bill._id } });
+    if (r.data?.message) toast.success(r.data.message);
+    else toast.error(r.data?.error || "Something went wrong.");
+    router.refresh();
+  };
+
+  const deleteDraft = async () => {
+    setDeleting(true);
+    const r = await api(`/api/Draft/order/Delete/${bill._id}`, { method: "DELETE", headers: { "idempotency-key": `delete-${bill._id}` } });
+    if (r.data?.message) {
+      toast.success(r.data.message);
+      router.push("/SalesPortal/Requisitions");
+      router.refresh();
+      return;
+    }
+    setDeleting(false);
+    setConfirmDelete(false);
+    toast.error(r.data?.error || "Couldn't delete the requisition.");
+    router.refresh();
+  };
+
+  const print = async () => {
+    setPrinting(true);
+    try {
+      await printQuotationPdf(Business, bill.customer, bill);
+    } catch {
+      toast.error("Couldn't make the PDF.");
+    } finally {
+      setPrinting(false);
+    }
+  };
+
+  const subTotal = (Number(bill.subTotal) || 0) - (Number(bill.taxRate) || 0);
 
   return (
-    <Suspense fallback={<SuspenenseFallBack pagedata={"Draft"} />}>
-      <div className="max-w-6xl mx-auto px-3 py-4 sm:px-6 sm:py-8 bg-white shadow-2xl text-xs m-2 sm:m-6 border border-border overflow-x-hidden">
-        {/* Status + Date */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
-          <Badge
-            variant={isCancelled ? "destructive" : "default"}
-            className="w-fit text-xs sm:text-sm px-3 py-1"
-          >
-            {Singlebill.billStatus}
-          </Badge>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Created on:{" "}
-            <span className="font-medium text-foreground">
-              {moment(Singlebill.createdAt).format(
-                "dddd DD MMMM YYYY [at] hh:mm A",
-              )}
-            </span>
+    <AppShell userData={userInfo} title={bill.customerName || "Requisition"} subtitle={`${status} · #${bill.billReferenceNo ?? ""}`} back tabs={false}>
+      {/* Status */}
+      <Card className="space-y-3 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <StatusBadge status={status} />
+          <span className="text-xs text-sp-muted">Created <When iso={bill.createdAt} /></span>
+        </div>
+        {Business.InvoiceRestriction && isDraft && <Countdown createdAt={bill.createdAt} />}
+        <div className="space-y-1.5 text-sm">
+          <p className="font-semibold">{bill.customerName}</p>
+          {bill.customer?.billingAddress && <p className="text-sp-muted">{bill.customer.billingAddress}</p>}
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {bill.customer?.phone && (
+              <a href={`tel:${bill.customer.phone}`} className="inline-flex items-center gap-1.5 text-sp-info">
+                <Phone className="h-4 w-4" /> {bill.customer.phone}
+              </a>
+            )}
+            {bill.customer?.Email && (
+              <a href={`mailto:${bill.customer.Email}`} className="inline-flex min-w-0 items-center gap-1.5 text-sp-info">
+                <Mail className="h-4 w-4 shrink-0" /> <span className="truncate">{bill.customer.Email}</span>
+              </a>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* Lines */}
+      <Card>
+        <CardTitle
+          action={
+            canEdit && (
+              <Button size="sm" onClick={() => setPicker(true)} disabled={adding}>
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            )
+          }
+        >
+          Items ({bill.orders?.length || 0})
+        </CardTitle>
+        {(bill.orders || []).length === 0 ? (
+          <div className="px-4 py-10 text-center">
+            <p className="text-sm text-sp-muted">No items yet.</p>
+            {canEdit && (
+              <Button className="mt-3" onClick={() => setPicker(true)}>
+                <Plus className="h-5 w-5" /> Add a product
+              </Button>
+            )}
+          </div>
+        ) : (
+          <ul className="divide-y divide-sp-line">
+            {bill.orders.map((line) => (
+              <OrderLine
+                key={line._id}
+                line={line}
+                currency={currency}
+                canEdit={canEdit}
+                isDraft={isDraft}
+                allowPcs={Boolean(Business.allowSkuSplitting)}
+                onQty={(value, field) => changeQty(line._id, value, field, line.storeProductId)}
+                onRemove={() => removeLine(line._id)}
+              />
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      {/* Totals */}
+      <Card className="divide-y divide-sp-line">
+        <Line label="Subtotal" value={money2(subTotal, currency)} />
+        <Line label="Tax" value={money2(bill.taxRate, currency)} />
+        <Line label="Shipping" value={money2(bill.shippingFee, currency)} />
+        {Number(bill.discount) > 0 && <Line label="Discount" value={money2(bill.discount, currency)} />}
+        <div className="flex items-center justify-between gap-4 px-4 py-4">
+          <span className="font-semibold">Total</span>
+          <span className="text-xl font-bold tabular-nums">{money2(bill.grandTotal, currency)}</span>
+        </div>
+        <p className="px-4 py-3 text-sm italic text-sp-muted">{totalInWords(bill.grandTotal, Business.currency?.currency)}</p>
+      </Card>
+
+      {(Business.invoicePolicy || bill.RaiseBy) && (
+        <Card className="space-y-3 p-4 text-sm">
+          {bill.RaiseBy && (
+            <p>
+              <span className="text-sp-muted">Raised by </span>
+              <span className="font-medium">{bill.RaiseBy}</span>
+            </p>
+          )}
+          {Business.invoicePolicy && (
+            <div>
+              <p className="mb-1 font-semibold">Terms &amp; conditions</p>
+              <p className="whitespace-pre-line text-sp-muted">{Business.invoicePolicy}</p>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {!isDraft && (
+        <p className={`text-center text-sm font-semibold ${isCancelled ? "text-sp-bad" : "text-sp-muted"}`}>
+          {status.toUpperCase()} / {bill.billReferenceNo} / {bill.invoicelocation}
+        </p>
+      )}
+
+      {(canCheckout || isDraft || canEdit) && (
+        <BottomBar>
+          {canCheckout && (
+            <Button variant="success" className="flex-1" onClick={() => setCheckout(true)}>
+              <ShoppingCart className="h-5 w-5" /> Checkout
+            </Button>
+          )}
+          {isDraft && (
+            <Button variant="outline" className={canCheckout ? "" : "flex-1"} onClick={print} busy={printing} aria-label="Print quotation">
+              {!printing && <Printer className="h-5 w-5" />} {canCheckout ? "" : "Print quotation"}
+            </Button>
+          )}
+          {canEdit && (
+            <Button variant="danger" onClick={() => setConfirmDelete(true)} aria-label="Delete requisition">
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          )}
+        </BottomBar>
+      )}
+
+      <ProductPicker open={picker} onClose={() => setPicker(false)} products={products} busy={adding} onPick={addProduct} />
+
+      <ConfirmSheet
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        title="Delete this requisition?"
+        text="The requisition and all its items will be removed. This can't be undone."
+        confirmLabel="Yes, delete it"
+        variant="danger"
+        busy={deleting}
+        onConfirm={deleteDraft}
+      />
+
+      <CheckoutSheet open={checkout} onClose={() => setCheckout(false)} bill={bill} business={Business} currency={currency} />
+    </AppShell>
+  );
+}
+
+function Line({ label, value }) {
+  return (
+    <div className="flex items-center justify-between gap-4 px-4 py-3 text-[15px]">
+      <span className="text-sp-muted">{label}</span>
+      <span className="tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+function Countdown({ createdAt }) {
+  // ticks in the browser only (the server's clock would not match the phone's)
+  const [now, setNow] = useState(null);
+  useEffect(() => {
+    setNow(Date.now());
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  if (now === null) return null;
+  const left = moment(createdAt).add(24, "hours").valueOf() - now;
+  if (left <= 0) return <Alert kind="bad">This requisition has expired.</Alert>;
+  const d = moment.duration(left);
+  return (
+    <Alert kind="warn">
+      <Clock className="mr-1.5 inline h-4 w-4" /> Expires in {Math.floor(d.asHours())}h {d.minutes()}m {d.seconds()}s
+    </Alert>
+  );
+}
+
+// Cases and pieces, like the ERP draft: pieces only when the business allows SKU splitting,
+// and at most one case's worth (item.Pieces) per line, the limit the backend enforces.
+function OrderLine({ line, currency, canEdit, isDraft, allowPcs, onQty, onRemove }) {
+  const [removing, setRemoving] = useState(false);
+  const perCase = Number(line.item?.Pieces) || 0;
+  const save = (field) => (e) => {
+    let v = Number(e.target.value);
+    if (!Number.isFinite(v) || v < 0) v = 0;
+    if (field === "pcs" && perCase && v > perCase) {
+      toast.error(`${line.item?.Name} has ${perCase} pieces in a case. Enter ${perCase} or fewer pieces, or add a case.`);
+      e.target.value = line.pcsReq || 0;
+      return;
+    }
+    const before = Number(field === "Qty" ? line.Qty : line.pcsReq) || 0;
+    if (v !== before) onQty(v, field);
+  };
+
+  return (
+    <li className="space-y-3 px-4 py-3">
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          {isDraft || !line.item?._id ? (
+            <p className="font-medium">{line.item?.Name}</p>
+          ) : (
+            <Link href={`/SalesPortal/Products/${line.item._id}`} className="font-medium text-sp-info">
+              {line.item?.Name}
+            </Link>
+          )}
+          <p className="text-xs text-sp-muted">
+            {money2(line.priceListPrice, currency)} per case
+            {perCase > 0 && ` · ${perCase} pcs per case`}
+            {Number(line.promotionData) > 0 && ` · promo ${money2(line.promotionData, currency)}`}
           </p>
         </div>
-
-        {/* Company + Customer Info */}
-        <div className="border-t border-b py-6 sm:py-8 mb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border bg-white">
-              <Image
-                src={userInfo.business.companyLogo}
-                width={90}
-                height={90}
-                alt="logo"
-                className="object-cover w-full h-full"
-              />
-            </div>
-            <div className="w-full min-w-0 space-y-1 text-sm sm:w-auto">
-              <h3 className="text-sm sm:text-base font-extrabold tracking-tight truncate">
-                {Singlebill.customerName?.toUpperCase()}
-              </h3>
-              <p className="truncate text-xs sm:text-sm text-muted-foreground">
-                <a
-                  href={`mailto:${Singlebill.customer?.Email}`}
-                  className="hover:underline"
-                >
-                  {Singlebill.customer?.Email || "N/A"}
-                </a>
-              </p>
-              <p className="text-xs sm:text-sm text-muted-foreground break-words">
-                {Singlebill.customer?.phone}
-              </p>
-              <p className="truncate text-xs sm:text-sm text-muted-foreground">
-                {Singlebill.customer?.billingAddress?.slice(0, 80)}
-              </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                {moment(Singlebill.startDate).format("YYYY-MM-DD")}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-3 mb-6">
-          <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3">
-            {((!userInfo.business.InvoiceRestriction && canEdit) ||
-              (userInfo.business.InvoiceRestriction &&
-                canEdit &&
-                isOlderThan24Hours)) &&
-              Singlebill.orders?.length > 0 && (
-                <Button
-                  onClick={processInvoice}
-                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Checkout Cart
-                </Button>
-              )}
-
-            {canEdit && (
-              <Button
-                variant="destructive"
-                onClick={deleteDraftInvoice}
-                className="w-full sm:w-auto"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
-            )}
-
-            {isDraft && (
-              <Button
-                variant="secondary"
-                onClick={() => generatePdf(Business, Singlebill.customer, bill)}
-                className="w-full sm:w-auto"
-              >
-                <Printer className="mr-2 h-4 w-4" />
-                Print
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Product Table */}
-        <Card className="mb-6 sm:mb-8 overflow-hidden">
-          <ScrollArea className="w-full">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="text-center text-[10px] sm:text-xs uppercase">
-                    Product
-                  </TableHead>
-                  <TableHead className="text-center text-[10px] sm:text-xs uppercase">
-                    Case
-                  </TableHead>
-                  <TableHead className="text-center text-[10px] sm:text-xs uppercase">
-                    PCS
-                  </TableHead>
-                  <TableHead className="text-center text-[10px] sm:text-xs uppercase">
-                    Price
-                  </TableHead>
-                  <TableHead className="text-center text-[10px] sm:text-xs uppercase hidden sm:table-cell">
-                    Promo
-                  </TableHead>
-                  <TableHead className="text-right text-[10px] sm:text-xs uppercase">
-                    Total
-                  </TableHead>
-                  {canEdit && <TableHead className="w-10" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Singlebill.orders?.map((line) => (
-                  <TableRow key={line._id}>
-                    <TableCell className="text-center text-xs max-w-[140px] sm:max-w-none">
-                      {isDraft ? (
-                        <span className="block truncate font-medium">
-                          {line.item?.Name}
-                        </span>
-                      ) : (
-                        <a
-                          href={`/SalesPortal/Products/${line.item._id}`}
-                          className="text-primary hover:underline block truncate"
-                        >
-                          {line.item?.Name}
-                        </a>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="text-center">
-                      {canEdit ? (
-                        <Input
-                          type="number"
-                          defaultValue={line.Qty || 0}
-                          min={0}
-                          className="h-9 w-16 mx-auto px-1 text-center text-base sm:h-8 sm:text-xs"
-                          onBlur={(e) => {
-                            let val = e.target.value;
-                            if (val < 0) val = 0;
-                            handleQtyChange(
-                              line._id,
-                              val,
-                              "Qty",
-                              Singlebill._id,
-                              line.storeProductId,
-                              userInfo.user._id,
-                            );
-                          }}
-                        />
-                      ) : (
-                        <span className="text-xs">{line.Qty}</span>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="text-center">
-                      {Business.allowSkuSplitting && canEdit ? (
-                        <Input
-                          type="number"
-                          defaultValue={line.pcsReq || 0}
-                          min={0}
-                          className="h-9 w-16 mx-auto px-1 text-center text-base sm:h-8 sm:text-xs"
-                          onBlur={(e) => {
-                            let val = e.target.value;
-                            if (val < 0) val = 0;
-                            handleQtyChange(
-                              line._id,
-                              val,
-                              "pcs",
-                              Singlebill._id,
-                              line.storeProductId,
-                              userInfo.user._id,
-                            );
-                          }}
-                        />
-                      ) : (
-                        <span className="text-xs">{line.pcsReq || 0}</span>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="text-center text-xs whitespace-nowrap">
-                      {currency}
-                      {line.priceListPrice?.toFixed(2)}
-                    </TableCell>
-
-                    <TableCell className="text-center text-xs hidden sm:table-cell whitespace-nowrap">
-                      {currency}
-                      {line.promotionData || 0}
-                    </TableCell>
-
-                    <TableCell className="text-right font-bold text-xs whitespace-nowrap">
-                      {currency}
-                      {line.total?.toFixed(2)}
-                    </TableCell>
-
-                    {canEdit && (
-                      <TableCell className="text-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 text-destructive hover:text-destructive"
-                          onClick={() => removeLineItem(line._id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </Card>
-
-        {/* Add Product */}
-        {canEdit && (
-          <div className="mb-6 sm:mb-8 space-y-4 w-full min-w-0 overflow-hidden">
-            {/* Mobile */}
-            {/* <div className="block md:hidden space-y-2 w-full min-w-0">
-              <Label>Select {products.length} Products</Label>
-              <Select
-                onValueChange={(value) => {
-                  if (value) handleProductSelection(value);
-                }}
-              >
-                <SelectTrigger className="w-full max-w-full min-w-0">
-                  <SelectValue placeholder="Choose..." />
-                </SelectTrigger>
-                <SelectContent className="w-[var(--radix-select-trigger-width)] max-w-[calc(100vw-2rem)]">
-                  {products.map((product) => (
-                    <SelectItem
-                      key={product.item._id}
-                      value={product.item.ACDcode || product.item.ADCcode}
-                      className="max-w-full"
-                    >
-                      <span className="block max-w-[min(100%,280px)]">
-                        {product.item.Name} [Case: {product.Case} Pcs:{" "}
-                        {product.pcs}]
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div> */}
-            {/* Add Product — Combobox */}
-            {canEdit && (
-              <div className="block md:hidden space-y-2 w-full min-w-0">
-                <Label>Search {products?.length || 0} Products</Label>
-
-                <Popover open={productOpen} onOpenChange={setProductOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={productOpen}
-                      className="w-full justify-between max-w-full min-w-0"
-                      disabled={isAddingProduct}
-                    >
-                      <span className="truncate">
-                        {selectedProduct
-                          ? `${selectedProduct.item?.Name} [Case: ${selectedProduct.Case} Pcs: ${selectedProduct.pcs}]`
-                          : "Search and select product..."}
-                      </span>
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-
-                  <PopoverContent
-                    className="w-[var(--radix-popover-trigger-width)] max-w-[calc(100vw-2rem)] p-0"
-                    align="start"
-                  >
-                    <Command>
-                      <CommandInput placeholder="Search product..." className="text-base sm:text-sm" />
-                      <CommandList>
-                        <CommandEmpty>No products found.</CommandEmpty>
-                        <CommandGroup>
-                          {products?.map((product) => {
-                            const code =
-                              product.item?.ACDcode ||
-                              product.item?.ADCcode ||
-                              "";
-                            return (
-                              <CommandItem
-                                key={product.item?._id || code}
-                                value={`${product.item?.Name || ""} ${code}`}
-                                onSelect={() => {
-                                  setSelectedProduct(product);
-                                  setProductOpen(false);
-                                  if (code) handleProductSelection(code);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4 shrink-0",
-                                    selectedProduct?.item?._id ===
-                                      product.item?._id
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                <span className="truncate">
-                                  {product.item?.Name || "Unnamed"} [Case:{" "}
-                                  {product.Case} Pcs: {product.pcs}]
-                                </span>
-                              </CommandItem>
-                            );
-                          })}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            )}
-
-            {/* Desktop */}
-            <div className="hidden md:block space-y-2">
-              <Label>Search {products.length} Products</Label>
-              <Input
-                type="text"
-                list="productsList"
-                placeholder="Type to search products..."
-                defaultValue={inputValue}
-                className="max-w-xl w-full"
-                onBlur={(e) => {
-                  const trimmedValue = e.target.value.trim();
-                  setInputValue(trimmedValue);
-                  if (trimmedValue !== "") {
-                    handleProductSelection(trimmedValue);
-                    setInputValue("");
-                  }
-                  e.target.value = "";
-                }}
-              />
-              <datalist id="productsList">
-                {products.map((product) => (
-                  <option
-                    key={product.item._id}
-                    value={product.item.ACDcode || product.item.ADCcode}
-                  >
-                    {product.item.Name} [Case: {product.Case} Pcs: {product.pcs}
-                    ]
-                  </option>
-                ))}
-              </datalist>
-            </div>
-          </div>
-        )}
-
-        {/* Summary */}
-        <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-          <Card className="bg-gradient-to-br from-white via-orange-50 to-white border-orange-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base sm:text-lg">Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-xs sm:text-sm">
-              <div className="flex justify-between gap-2">
-                <span className="text-muted-foreground">Subtotal:</span>
-                <strong>
-                  {currency}
-                  {(Singlebill.subTotal - Singlebill.taxRate).toFixed(2)}
-                </strong>
-              </div>
-              <div className="flex justify-between gap-2">
-                <span className="text-muted-foreground">Tax Rate:</span>
-                <strong>
-                  {currency}
-                  {Singlebill.taxRate?.toFixed(2)}
-                </strong>
-              </div>
-              <div className="flex justify-between gap-2">
-                <span className="text-muted-foreground">Shipping Fee:</span>
-                <strong>
-                  {currency}
-                  {Singlebill.shippingFee?.toFixed(2)}
-                </strong>
-              </div>
-              <Separator className="my-2" />
-              <div className="flex justify-between gap-2 text-sm sm:text-base font-bold">
-                <span>Grand Total:</span>
-                <span>
-                  {currency}
-                  {Singlebill.grandTotal?.toFixed(2)}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base sm:text-lg">
-                Total In Words
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="italic text-sm sm:text-base text-orange-700">
-                {totalInWords(
-                  Singlebill.grandTotal,
-                  userInfo.business.currency?.currency,
-                )}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Terms + Issued by */}
-        <div className="mt-8 sm:mt-12 flex flex-col md:flex-row justify-between items-start gap-6 sm:gap-10">
-          <div className="max-w-md min-w-0 space-y-2 break-words">
-            <h4 className="font-semibold text-sm sm:text-base">
-              Terms & Conditions
-            </h4>
-            <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-line">
-              {userInfo.business.invoicePolicy}
-            </p>
-          </div>
-          <div className="space-y-2 md:text-right">
-            <h4 className="font-semibold text-sm sm:text-base">Issued by</h4>
-            <p className="text-xs sm:text-sm font-medium">
-              {Singlebill.RaiseBy}
-            </p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t text-center">
-          {userInfo.business.InvoiceRestriction ? (
-            <p className="text-sm font-medium">
-              {checkExpiryDate(Singlebill.createdAt)}
-            </p>
-          ) : (
-            <h2
-              className={`mt-2 sm:mt-3 font-bold text-sm sm:text-base tracking-wide break-words ${
-                isCancelled ? "text-destructive" : "text-foreground"
-              }`}
-            >
-              {Singlebill.billStatus?.toUpperCase()} /{" "}
-              {Singlebill.billReferenceNo} / {Singlebill.invoicelocation}
-            </h2>
-          )}
-        </div>
+        <span className="shrink-0 font-semibold tabular-nums">{money2(line.total, currency)}</span>
       </div>
-    </Suspense>
+      {canEdit ? (
+        <div className="flex items-end gap-2">
+          <label className="flex-1 space-y-1">
+            <span className="text-xs font-medium text-sp-muted">Cases</span>
+            <Input type="number" inputMode="numeric" min={0} defaultValue={line.Qty || 0} onBlur={save("Qty")} className="text-center" />
+          </label>
+          {allowPcs && (
+            <label className="flex-1 space-y-1">
+              <span className="text-xs font-medium text-sp-muted">Pieces</span>
+              <Input type="number" inputMode="numeric" min={0} max={perCase || undefined} defaultValue={line.pcsReq || 0} onBlur={save("pcs")} className="text-center" />
+            </label>
+          )}
+          {/* same 48px height as the quantity boxes; the icon size (not px-0, which md's px-5 overrode) keeps the bin visible */}
+          <Button
+            variant="danger"
+            size="icon"
+            onClick={async () => {
+              setRemoving(true);
+              await onRemove();
+              setRemoving(false);
+            }}
+            busy={removing}
+            aria-label={`Remove ${line.item?.Name}`}
+          >
+            {!removing && <Trash2 className="h-5 w-5" />}
+          </Button>
+        </div>
+      ) : (
+        <p className="text-sm text-sp-muted">
+          {line.Qty || 0} case{line.Qty === 1 ? "" : "s"}
+          {Number(line.pcsReq) > 0 && ` + ${line.pcsReq} pcs`}
+        </p>
+      )}
+    </li>
+  );
+}
+
+function ProductPicker({ open, onClose, products, busy, onPick }) {
+  const [q, setQ] = useState("");
+  const list = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    const all = products.filter((p) => p.item?.ACDcode || p.item?.ADCcode);
+    if (!s) return all.slice(0, 60);
+    return all
+      .filter((p) => `${p.item?.Name || ""} ${p.item?.ACDcode || ""} ${p.item?.ADCcode || ""}`.toLowerCase().includes(s))
+      .slice(0, 60);
+  }, [products, q]);
+
+  return (
+    <Sheet open={open} onClose={busy ? undefined : onClose} title="Add a product">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-sp-muted" />
+        <Input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${products.length} products`} className="pl-10" autoFocus />
+      </div>
+      {list.length === 0 ? (
+        <Empty title="No product found" text="Try another name or code." />
+      ) : (
+        <ul className="-mx-5 divide-y divide-sp-line border-y border-sp-line">
+          {list.map((p) => {
+            const code = p.item.ACDcode || p.item.ADCcode;
+            return (
+              <li key={p.item._id || code}>
+                <button type="button" disabled={busy} onClick={() => onPick(code)} className="flex w-full items-center gap-3 px-5 py-3 text-left hover:bg-sp-bg disabled:opacity-50">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{p.item.Name || "Unnamed"}</p>
+                    <p className="text-xs text-sp-muted">
+                      {code} · in stock: {p.Case ?? 0} case{p.Case === 1 ? "" : "s"}, {p.pcs ?? 0} pcs
+                    </p>
+                  </div>
+                  <Plus className="h-5 w-5 shrink-0 text-sp-muted" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Sheet>
+  );
+}
+
+function CheckoutSheet({ open, onClose, bill, business, currency }) {
+  const router = useRouter();
+  const [ops, setOps] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!ops) return setError("Enter your operational code.");
+    setBusy(true);
+    setError("");
+    const r = await api(`/api/wareHouse/Bill`, {
+      method: "PATCH",
+      body: {
+        billId: bill._id,
+        customer: bill.customer?._id,
+        restriction: business?.InvoiceRestriction,
+        ops, // ops code in the body, never the URL
+      },
+      headers: { "idempotency-key": `Draft-${bill._id}` },
+    });
+    setBusy(false);
+    if (r.ok) {
+      toast.success(r.data?.message || "Checked out.");
+      setOps("");
+      onClose();
+      router.refresh();
+    } else {
+      setError(r.data?.error || r.error || "Checkout failed.");
+    }
+  };
+
+  return (
+    <Sheet open={open} onClose={busy ? undefined : onClose} title="Checkout">
+      <form onSubmit={submit} className="space-y-4">
+        <Alert kind="info">
+          Checking out takes {money2(bill.grandTotal, currency)} of stock out of the billing location&apos;s inventory.
+        </Alert>
+        <Field label="Your operational code">
+          <div className="relative">
+            <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-sp-muted" />
+            <Input type="password" autoComplete="off" value={ops} onChange={(e) => setOps(e.target.value)} className="pl-10" autoFocus />
+          </div>
+        </Field>
+        {error && <Alert>{error}</Alert>}
+        <div className="flex gap-2 pt-1">
+          <Button variant="outline" onClick={onClose} disabled={busy}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="success" className="flex-1" busy={busy}>
+            {busy ? "Processing…" : "Confirm checkout"}
+          </Button>
+        </div>
+      </form>
+    </Sheet>
   );
 }
