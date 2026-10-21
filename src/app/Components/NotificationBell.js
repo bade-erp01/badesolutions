@@ -24,7 +24,9 @@ const LEVEL_ICON = {
   error: <XCircle className="h-4 w-4 text-red-600" />,
 };
 
-export default function NotificationBell() {
+// navigate={false} (Sales Portal): a click only marks the notification as read. Its link points
+// into the ERP, which a sales rep must not be sent to.
+export default function NotificationBell({ navigate = true }) {
   const router = useRouter();
   // pages outside the realtime provider still get the list, just not live updates
   const subscribe = useOptionalWebSocket()?.subscribe ?? noSubscribe;
@@ -77,7 +79,7 @@ export default function NotificationBell() {
       setUnseen((c) => Math.max(0, c - 1));
       markSeen(n._id);
     }
-    if (n.url) {
+    if (navigate && n.url) {
       setOpen(false);
       router.push(n.url);
     }

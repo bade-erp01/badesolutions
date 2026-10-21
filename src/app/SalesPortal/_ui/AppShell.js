@@ -79,7 +79,8 @@ export default function AppShell({ userData, title, subtitle, back, tabs = true,
             <p className="truncate text-xs text-sp-muted">{subtitle ?? business.companyName}</p>
           </div>
           <div className="text-sp-muted [&_button]:rounded-lg">
-            <NotificationBell />
+            {/* clicks only mark as read: notification links point into the ERP */}
+            <NotificationBell navigate={false} />
           </div>
           <button type="button" onClick={() => setMenuOpen(true)} className="rounded-lg p-2 text-sp-muted hover:bg-sp-bg hover:text-sp-ink" aria-label="Menu">
             <Menu className="h-5 w-5" />

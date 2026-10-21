@@ -99,7 +99,9 @@ export function WebSocketProvider({ children, user }) {
         duration: sticky ? Infinity : 8000,
       };
 
-      if (actionLabel && typeof onAction === "function") {
+      // no "View" in the Sales Portal: the links point into the ERP, where a sales rep must not go
+      const inSalesPortal = typeof window !== "undefined" && window.location.pathname.startsWith("/SalesPortal");
+      if (actionLabel && typeof onAction === "function" && !inSalesPortal) {
         options.action = {
           label: actionLabel,
           onClick: onAction,
