@@ -32,6 +32,7 @@ import BuyLicencesButton from "@/app/Components/BuyLicencesButton";
 import AddOnsBilling from "@/app/Components/AddOnsBilling";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
+import DeliveryFees from "./DeliveryFees";
 
 /* Shared Tailwind classes */
 const inputCls =
@@ -65,6 +66,7 @@ export default function SettingsPage({
     { id: "general", label: "Business Account" },
     { id: "users", label: "User and Permission" },
     { id: "notifications", label: "Notifications" },
+    { id: "delivery", label: "Delivery Fees" },
     { id: "audit", label: "Audit Logs" },
     { id: "App", label: "App Store" },
   ];
@@ -116,6 +118,7 @@ export default function SettingsPage({
         {activeTab === "notifications" && (
           <NotificationSettings data={businessInfo} userData={userData} />
         )}
+        {activeTab === "delivery" && <DeliveryFees isAdmin={userData?.user?.isAdmin === true} />}
         {activeTab === "audit" && <AuditLogsPanel logs={logs} />}
         {activeTab === "App" && (
           <Card>
