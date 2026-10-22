@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,19 @@ export default function DeliveryModal({ id, user, business }) {
   const [driverNumber, setDriverNumber] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [deliveryRemarks, setDeliveryRemarks] = useState("");
+
+  // the business's delivery fees (Settings → Delivery Fees), offered as choices; any other
+  // amount can still be typed in
+  const [fees, setFees] = useState(null);
+  useEffect(() => {
+    if (!open || fees !== null) return;
+    (async () => {
+      const r = await api.get("/api/DeliveryFees");
+      setFees(r.ok ? (r.data?.data || []).filter((f) => f.active).sort((a, b) => a.price - b.price || a.name.localeCompare(b.name)) : []);
+    })();
+  }, [open, fees]);
+  const naira = (n) => `₦${Number(n || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}`;
+  const pickedFee = (fees || []).find((f) => deliveryFee !== "" && Number(deliveryFee) === Number(f.price));
 
   const handleSubmit = async () => {
     if (!deliveryDate || !driverName || !driverNumber || !deliveryFee || !plateNumber) {
@@ -96,8 +109,35 @@ export default function DeliveryModal({ id, user, business }) {
                 <Input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} />
               </div>
               <div>
-                <Label className="mb-2">Delivery Fee *</Label>
-                <Input type="number" placeholder="0.00" value={deliveryFee} onChange={(e) => setDeliveryFee(e.target.value)} />
+                <Label className="mb-2" htmlFor="delivery-fee">Delivery Fee *</Label>
+                {fees?.length > 0 && (
+                  <select
+                    aria-label="Choose one of your delivery fees"
+                    className="mb-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    value={pickedFee?._id || ""}
+                    onChange={(e) => {
+                      const f = fees.find((x) => x._id === e.target.value);
+                      if (f) setDeliveryFee(String(f.price));
+                    }}
+                  >
+                    <option value="">{deliveryFee === "" ? "Choose a delivery fee…" : "Other amount (typed below)"}</option>
+                    {fees.map((f) => (
+                      <option key={f._id} value={f._id}>
+                        {f.name} — {naira(f.price)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <Input
+                  id="delivery-fee"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  placeholder={fees?.length ? "or type another amount" : "0.00"}
+                  value={deliveryFee}
+                  onChange={(e) => setDeliveryFee(e.target.value)}
+                />
               </div>
             </div>
 
