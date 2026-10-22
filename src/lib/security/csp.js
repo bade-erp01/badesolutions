@@ -148,8 +148,8 @@ export function buildCsp(nonce) {
   const parts = Object.entries(directives).map(
     ([name, values]) => `${name} ${unique(values).join(" ")}`
   );
-  // Breaks plain-http local backends, and is ignored in report-only mode anyway.
-  if (isProd) parts.push("upgrade-insecure-requests");
+  // Breaks plain-http local backends; browsers ignore it (with a console warning) in report-only mode.
+  if (isProd && process.env.CSP_MODE === "enforce") parts.push("upgrade-insecure-requests");
   return parts.join("; ");
 }
 

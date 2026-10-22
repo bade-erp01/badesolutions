@@ -21,6 +21,9 @@ export default function Login({ userInfo, businessInfo, url }) {
   // Cloudflare Turnstile: keeps bots off the sign-in (empty until the check passes)
   const [humanToken, setHumanToken] = useState("");
   const [humanReset, setHumanReset] = useState(0);
+  // the widget itself failed (bad key, blocked): don't lock people out; the backend decides
+  const [humanUnavailable, setHumanUnavailable] = useState(false);
+  const needHuman = Boolean(TURNSTILE_SITE_KEY) && !humanUnavailable;
   // ?reason=elsewhere: sent here because this account signed in on another device
   const [signedOutElsewhere, setSignedOutElsewhere] = useState(false);
   useEffect(() => {
@@ -33,7 +36,7 @@ export default function Login({ userInfo, businessInfo, url }) {
   const submit = async (e) => {
     e.preventDefault();
     if (busy) return;
-    if (TURNSTILE_SITE_KEY && !humanToken) {
+    if (needHuman && !humanToken) {
       setError("Please complete the security check.");
       return;
     }
@@ -129,8 +132,8 @@ export default function Login({ userInfo, businessInfo, url }) {
             <Alert>You were signed out because this account signed in on another device. One device at a time: sign in here to use this one instead.</Alert>
           )}
           {error && <Alert>{error}</Alert>}
-          <Turnstile onToken={setHumanToken} resetKey={humanReset} />
-          <Button type="submit" className="w-full" busy={busy} disabled={Boolean(TURNSTILE_SITE_KEY) && !humanToken}>
+          <Turnstile onToken={setHumanToken} onUnavailable={() => setHumanUnavailable(true)} resetKey={humanReset} />
+          <Button type="submit" className="w-full" busy={busy} disabled={needHuman && !humanToken}>
             {busy ? "Signing in…" : "Sign in"}
           </Button>
           <div className="flex items-center justify-between text-sm">

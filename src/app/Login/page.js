@@ -51,6 +51,9 @@ export default function Login({ userInfo, businessInfo, url }) {
   // Cloudflare Turnstile: keeps bots off the sign-in (empty until the check passes)
   const [humanToken, setHumanToken] = useState("");
   const [humanReset, setHumanReset] = useState(0);
+  // the widget itself failed (bad key, blocked): don't lock people out; the backend decides
+  const [humanUnavailable, setHumanUnavailable] = useState(false);
+  const needHuman = Boolean(TURNSTILE_SITE_KEY) && !humanUnavailable;
 
 
   /* ---------- DATE / LOCATION ---------- */
@@ -116,7 +119,7 @@ export default function Login({ userInfo, businessInfo, url }) {
       ErrorMessage("Email and password are required");
       return;
     }
-    if (TURNSTILE_SITE_KEY && !humanToken) {
+    if (needHuman && !humanToken) {
       ErrorMessage("Please complete the security check");
       return;
     }
@@ -419,11 +422,11 @@ export default function Login({ userInfo, businessInfo, url }) {
                         </div>
                       </div>
 
-                      <Turnstile onToken={setHumanToken} resetKey={humanReset} />
+                      <Turnstile onToken={setHumanToken} onUnavailable={() => setHumanUnavailable(true)} resetKey={humanReset} />
 
                       <Button
                         type="submit"
-                        disabled={loading || (Boolean(TURNSTILE_SITE_KEY) && !humanToken)}
+                        disabled={loading || (needHuman && !humanToken)}
                         className="group h-12 w-full rounded-xl bg-zinc-950 text-sm font-medium text-white shadow-lg shadow-zinc-950/10 transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
                       >
                         {loading ? (
