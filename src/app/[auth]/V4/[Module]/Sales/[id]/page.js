@@ -2072,7 +2072,7 @@ const generatePdf = async (business, customer, bill) => {
                         className="w-16 px-2 py-1 border border-border rounded text-center bg-background"
                       />
                     ) : (
-                      bill.RCRT
+                     "--" // bill.RCRT
                     )}
                   </td>
                   <td
@@ -2102,7 +2102,7 @@ const generatePdf = async (business, customer, bill) => {
                         }}
                       />
                     ) : (
-                      bill.RPCS || 0
+                      "--"// bill.RPCS || 0
                     )}
                   </td>
                   <td className="px-4 py-2 text-center text-xs">
