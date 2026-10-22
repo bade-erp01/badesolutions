@@ -9,6 +9,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { loginSuccess, loginFailure } from "../../../../lib/SalesPortalUser";
 import { Dencrypt } from "../../../../Functions/Functions";
 import { Alert, Avatar, Button, Field, Input, LinkButton, PoweredByBade } from "../_ui/ui";
+import Turnstile, { TURNSTILE_SITE_KEY } from "@/components/Turnstile";
 
 export default function Login({ userInfo, businessInfo, url }) {
   const dispatch = useDispatch();
@@ -17,6 +18,9 @@ export default function Login({ userInfo, businessInfo, url }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // Cloudflare Turnstile: keeps bots off the sign-in (empty until the check passes)
+  const [humanToken, setHumanToken] = useState("");
+  const [humanReset, setHumanReset] = useState(0);
   // ?reason=elsewhere: sent here because this account signed in on another device
   const [signedOutElsewhere, setSignedOutElsewhere] = useState(false);
   useEffect(() => {
@@ -29,6 +33,10 @@ export default function Login({ userInfo, businessInfo, url }) {
   const submit = async (e) => {
     e.preventDefault();
     if (busy) return;
+    if (TURNSTILE_SITE_KEY && !humanToken) {
+      setError("Please complete the security check.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -38,7 +46,7 @@ export default function Login({ userInfo, businessInfo, url }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // keep the session cookie
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ email: email.trim(), password, turnstileToken: humanToken }),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -53,6 +61,7 @@ export default function Login({ userInfo, businessInfo, url }) {
       const message = err.message === "Failed to fetch" ? "Can't reach the server. Check your connection." : err.message;
       setError(message);
       setPassword("");
+      setHumanReset((n) => n + 1); // a check is used once: get a fresh one
       dispatch(loginFailure(message));
       setBusy(false);
     }
@@ -120,7 +129,8 @@ export default function Login({ userInfo, businessInfo, url }) {
             <Alert>You were signed out because this account signed in on another device. One device at a time: sign in here to use this one instead.</Alert>
           )}
           {error && <Alert>{error}</Alert>}
-          <Button type="submit" className="w-full" busy={busy}>
+          <Turnstile onToken={setHumanToken} resetKey={humanReset} />
+          <Button type="submit" className="w-full" busy={busy} disabled={Boolean(TURNSTILE_SITE_KEY) && !humanToken}>
             {busy ? "Signing in…" : "Sign in"}
           </Button>
           <div className="flex items-center justify-between text-sm">

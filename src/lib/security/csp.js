@@ -89,6 +89,7 @@ export function buildCsp(nonce) {
       `'nonce-${nonce}'`,
       "'strict-dynamic'",
       "https://cdn.onesignal.com",
+      "https://challenges.cloudflare.com", // Cloudflare Turnstile on the sign-in pages
       // React Refresh / webpack eval source maps in dev only.
       !isProd && "'unsafe-eval'",
       ...extra("CSP_EXTRA_SCRIPT_SRC"),
@@ -130,6 +131,7 @@ export function buildCsp(nonce) {
       "https://checkout.paystack.com",
       "https://www.google.com",
       "https://maps.google.com",
+      "https://challenges.cloudflare.com", // Cloudflare Turnstile widget
       ...extra("CSP_EXTRA_FRAME_SRC"),
     ],
     "worker-src": ["'self'", "blob:"],

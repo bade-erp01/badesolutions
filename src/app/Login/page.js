@@ -31,6 +31,7 @@ import {
 } from "../../../lib/User";
 import { Encrypt, Dencrypt } from "../../../Functions/Functions";
 import { logout as serverLogout } from "@/lib/api";
+import Turnstile, { TURNSTILE_SITE_KEY } from "@/components/Turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -47,6 +48,9 @@ export default function Login({ userInfo, businessInfo, url }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showSplash, setShowSplash] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Cloudflare Turnstile: keeps bots off the sign-in (empty until the check passes)
+  const [humanToken, setHumanToken] = useState("");
+  const [humanReset, setHumanReset] = useState(0);
 
 
   /* ---------- DATE / LOCATION ---------- */
@@ -112,6 +116,10 @@ export default function Login({ userInfo, businessInfo, url }) {
       ErrorMessage("Email and password are required");
       return;
     }
+    if (TURNSTILE_SITE_KEY && !humanToken) {
+      ErrorMessage("Please complete the security check");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -121,7 +129,7 @@ export default function Login({ userInfo, businessInfo, url }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: formData.email, password: formData.password, location: formData.location }),
+        body: JSON.stringify({ email: formData.email, password: formData.password, location: formData.location, turnstileToken: humanToken }),
       });
 
       let data;
@@ -171,6 +179,7 @@ export default function Login({ userInfo, businessInfo, url }) {
       setShowSplash(false);
       setLoading(false);
       setFormData({ email: "", password: "" });
+      setHumanReset((n) => n + 1); // a check is used once: get a fresh one
       ErrorMessage(error?.message || "Something went wrong");
       dispatch(loginFailure(error?.message || "Login failed"));
     }
@@ -410,9 +419,11 @@ export default function Login({ userInfo, businessInfo, url }) {
                         </div>
                       </div>
 
+                      <Turnstile onToken={setHumanToken} resetKey={humanReset} />
+
                       <Button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || (Boolean(TURNSTILE_SITE_KEY) && !humanToken)}
                         className="group h-12 w-full rounded-xl bg-zinc-950 text-sm font-medium text-white shadow-lg shadow-zinc-950/10 transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
                       >
                         {loading ? (
