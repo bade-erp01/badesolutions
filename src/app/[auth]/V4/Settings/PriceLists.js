@@ -8,8 +8,11 @@ import api from "@/lib/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { ErrorMessage } from "../../../../../Functions/Mics";
+import { pricelistSetter } from "../../../../../Functions/Functions";
 
-export default function PriceLists() {
+export default function PriceLists({ business }) {
+  // "Pricelist1"… are stored codes: show the business's own name for each (pricelistSetter)
+  const nameOf = (name) => (business && pricelistSetter(name, business)) || name;
   const [lists, setLists] = useState(null);
   const [search, setSearch] = useState("");
 
@@ -27,8 +30,8 @@ export default function PriceLists() {
 
   const shown = useMemo(() => {
     const s = search.trim().toLowerCase();
-    return (lists || []).filter((l) => !s || String(l.Name || "").toLowerCase().includes(s));
-  }, [lists, search]);
+    return (lists || []).filter((l) => !s || String(nameOf(l.Name) || "").toLowerCase().includes(s));
+  }, [lists, search, business]);
 
   return (
     <div className="space-y-4">
@@ -68,7 +71,7 @@ export default function PriceLists() {
               shown.map((l, i) => (
                 <TableRow key={l._id || l.Name}>
                   <TableCell className="text-muted-foreground tabular-nums">{i + 1}</TableCell>
-                  <TableCell className="font-medium">{l.Name}</TableCell>
+                  <TableCell className="font-medium">{nameOf(l.Name)}</TableCell>
                 </TableRow>
               ))
             )}

@@ -128,7 +128,7 @@ export default function SettingsPage({
           <NotificationSettings data={businessInfo} userData={userData} />
         )}
         {activeTab === "delivery" && <DeliveryFees isAdmin={userData?.user?.isAdmin === true} />}
-        {activeTab === "pricelists" && <PriceLists />}
+        {activeTab === "pricelists" && <PriceLists business={businessInfo} />}
         {activeTab === "email" && (
           <EmailSending
             isAdmin={userData?.user?.isAdmin === true}
