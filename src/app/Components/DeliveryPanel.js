@@ -238,9 +238,14 @@ function AssignDialog({ billId, reassign, onClose, onDone }) {
 
 // Shown on a confirmed sale when the business has neither the Delivery app nor the Merchant app:
 // what delivery would do here, and the way to the app store (admins install, others ask them).
+// businesses that asked not to see this suggestion: All Channels Distributors (Karu) and (Niger)
+const NO_DELIVERY_PROMO = new Set(["650777d68f106e1a8f9b82f7", "6949246898508bd0255c512c"]);
+
 function DeliveryPromo() {
   const { auth } = useParams() || {};
-  const isAdmin = Boolean(useUser()?.user?.user?.isAdmin);
+  const session = useUser()?.user;
+  const isAdmin = Boolean(session?.user?.isAdmin);
+  if (NO_DELIVERY_PROMO.has(String(session?.business?.tenantId || session?.user?.tenantId || ""))) return null;
   return (
     <section id="delivery" className="mb-6 rounded-lg border border-dashed border-border bg-muted/20 p-4 scroll-mt-24">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
