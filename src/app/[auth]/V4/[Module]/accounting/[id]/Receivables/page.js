@@ -18,7 +18,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-export default function CustomersPage({ data }) {
+export default function CustomersPage({ data, users = [] }) {
+  // names of the sales rep and account manager, from their user ids
+  const nameOf = (id) => {
+    const u = id && users.find((x) => String(x._id) === String(id));
+    return u ? `${u.firstName || ""} ${u.lastName || ""}`.trim() : "—";
+  };
+  // customers store their state as "state" (older imports may have "State")
+  const stateOf = (c) => c.state || c.State || "—";
+
   // Filter customers with debt > 0 and sort by highest debt first
   const debtors = React.useMemo(() => {
     return (data || [])
@@ -108,6 +116,9 @@ export default function CustomersPage({ data }) {
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Rep</TableHead>
+                <TableHead>Manager</TableHead>
+                <TableHead>State</TableHead>
                 <TableHead className="text-right">Debt</TableHead>
                 <TableHead>Last Payment</TableHead>
                 <TableHead>Count</TableHead>
@@ -133,6 +144,9 @@ export default function CustomersPage({ data }) {
                     <TableCell>
                       <Badge variant="secondary">{cust.category}</Badge>
                     </TableCell>
+                    <TableCell className="whitespace-nowrap">{nameOf(cust.salesPerson)}</TableCell>
+                    <TableCell className="whitespace-nowrap">{nameOf(cust.accountManager)}</TableCell>
+                    <TableCell>{stateOf(cust)}</TableCell>
                     <TableCell className="text-right font-medium">
                       ₦{cust.Debt.toLocaleString()}
                     </TableCell>

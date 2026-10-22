@@ -106,7 +106,7 @@ export default async function AccountingPage({ children, params }) {
 
           {/* Main Content */}
           <main className="flex-1">
-             <Page data={data.filter((entry) => entry.Debt > 0)} />
+             <Page data={data.filter((entry) => entry.Debt > 0)} users={parsedUsers} />
           </main>
         </div>
     );

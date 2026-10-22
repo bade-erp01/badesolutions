@@ -30,6 +30,7 @@ import {
   logout as logoutAction,
 } from "../../../lib/User";
 import { Encrypt, Dencrypt } from "../../../Functions/Functions";
+import { logout as serverLogout } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -178,14 +179,22 @@ export default function Login({ userInfo, businessInfo, url }) {
   // fetchUser() only returns a user when the backend session is valid
   const isLoggedIn = Boolean(userInfo && businessInfo);
 
-  const logout = async () => {
-    try {
-      await logoutOneSignal();
+  const [signingOut, setSigningOut] = useState(false);
 
+  // Ends the server session (the cookie this page is checked against), clears this browser's
+  // state, then reloads the login page so it shows the form. It used to clear only the local
+  // state and go home: the session stayed valid, so the card came back on the next visit.
+  const logout = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await logoutOneSignal().catch(() => {});
+      await serverLogout();
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");
-      router.push("/");
+      window.location.replace("/Login");
     } catch {
+      setSigningOut(false);
       ErrorMessage("Logout failed. Please try again.");
     }
   };
@@ -499,10 +508,11 @@ export default function Login({ userInfo, businessInfo, url }) {
                   <Button
                     type="button"
                     onClick={logout}
+                    disabled={signingOut}
                     className="h-12 rounded-xl bg-red-500 text-white hover:bg-red-600"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                    {signingOut ? "Signing out…" : "Sign out"}
                   </Button>
                 </div>
               </div>

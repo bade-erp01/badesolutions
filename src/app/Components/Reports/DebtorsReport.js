@@ -35,15 +35,14 @@ export default function DebtorsReportModal({ data, business, users }) {
     };
   });
 
-  // get salesperson
+  // a user's name from their id (sales rep or account manager)
   const FilterSaLePerson = (id) => {
-    try {
-      const SP = users.find((user) => user._id === id);
-      return `${SP.firstName} ${SP.lastName}` || "N/A";
-    } catch (err) {
-      return "N/A";
-    }
+    const SP = id && users.find((user) => String(user._id) === String(id));
+    return SP ? `${SP.firstName || ""} ${SP.lastName || ""}`.trim() || "N/A" : "N/A";
   };
+
+  // customers store their state as "state" (older imports may have "State")
+  const stateOf = (c) => c.state || c.State || "";
 
   // get pricelist
   const FilterPriceList = (pricelist) => {
@@ -107,6 +106,8 @@ export default function DebtorsReportModal({ data, business, users }) {
           <td style="padding: 4px;">${escapeHtml(FilterPriceList(item.priceList))}</td>
           <td style="padding: 4px;">${escapeHtml(item.CustomerCode || "")}</td>
           <td style="padding: 4px;">${escapeHtml(FilterSaLePerson(item.salesPerson))}</td>
+          <td style="padding: 4px;">${escapeHtml(FilterSaLePerson(item.accountManager))}</td>
+          <td style="padding: 4px;">${escapeHtml(stateOf(item))}</td>
           <td style="padding: 4px;">${escapeHtml(item.phone)}</td>
           <td style="padding: 4px;">${escapeHtml((item.Debt || 0).toLocaleString())}</td>
           <td style="padding: 4px;">${escapeHtml(item.creditLimit)}</td>
@@ -187,6 +188,8 @@ export default function DebtorsReportModal({ data, business, users }) {
                 <th style="padding: 4px;">PriceList</th>
                 <th style="padding: 4px;">Code</th>
                 <th style="padding: 4px;">Rep</th>
+                <th style="padding: 4px;">Manager</th>
+                <th style="padding: 4px;">State</th>
                 <th style="padding: 4px;">Phone</th>
                 <th style="padding: 4px;">Debt</th>
                 <th style="padding: 4px;">Credit Limit</th>
@@ -197,7 +200,7 @@ export default function DebtorsReportModal({ data, business, users }) {
             <tbody id="debtorsTableBody"></tbody>
             <tfoot>
               <tr style="background-color: #f0f0f0; font-weight: bold;">
-                <td colspan="6">Total Debt</td>
+                <td colspan="8">Total Debt</td>
                 <td id="totalDebtCell"></td>
                 <td colspan="3"></td>
               </tr>
@@ -294,9 +297,10 @@ export default function DebtorsReportModal({ data, business, users }) {
               Customer: entry.Username,
               PriceList: FilterPriceList(entry.priceList),
               Rep: FilterSaLePerson(entry.salesPerson),
+              Manager: FilterSaLePerson(entry.accountManager),
               Code: entry.CustomerCode,
               Phone: entry.phone,
-              State: entry.State,
+              State: stateOf(entry),
               Email: entry.Email,
               Debt: entry.Debt?.toLocaleString(),
               "Credit Limit": entry.creditLimit,
@@ -381,9 +385,10 @@ export default function DebtorsReportModal({ data, business, users }) {
                 entry.Username,
                 FilterPriceList(entry.priceList),
                 FilterSaLePerson(entry.salesPerson),
+                FilterSaLePerson(entry.accountManager),
                 entry.CustomerCode || "",
                 entry.phone || "",
-                entry.State || "",
+                stateOf(entry),
                 Number(parseFloat(entry.Debt || 0)).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -407,6 +412,7 @@ export default function DebtorsReportModal({ data, business, users }) {
                 "Customer",
                 "PriceList",
                 "Rep",
+                "Manager",
                 "Code",
                 "Phone",
                 "State",
@@ -449,17 +455,18 @@ export default function DebtorsReportModal({ data, business, users }) {
               },
               alternateRowStyles: { fillColor: [245, 247, 250] },
               columnStyles: {
-                0: { cellWidth: 30, halign: "center" }, // #
-                1: { cellWidth: 100 }, // Customer
-                2: { cellWidth: 50 }, // PriceList
-                3: { cellWidth: 100 }, // Rep
-                4: { cellWidth: 50 }, // Code
-                5: { cellWidth: 70 }, // Phone
-                6: { cellWidth: 50 }, // State
-                7: { cellWidth: 80, halign: "right" }, // Debt
-                8: { cellWidth: 80, halign: "right" }, // Credit Limit
-                9: { cellWidth: 80, halign: "center" }, // Last Payment
-                10: { cellWidth: 50, halign: "center" }, // Days
+                0: { cellWidth: 22, halign: "center" }, // #
+                1: { cellWidth: 95 }, // Customer
+                2: { cellWidth: 45 }, // PriceList
+                3: { cellWidth: 80 }, // Rep
+                4: { cellWidth: 80 }, // Manager
+                5: { cellWidth: 45 }, // Code
+                6: { cellWidth: 65 }, // Phone
+                7: { cellWidth: 50 }, // State
+                8: { cellWidth: 75, halign: "right" }, // Debt
+                9: { cellWidth: 70, halign: "right" }, // Credit Limit
+                10: { cellWidth: 60, halign: "center" }, // Last Payment
+                11: { cellWidth: 35, halign: "center" }, // Days
               },
               // ensure table width does not exceed usable area
               tableWidth: usableWidth,

@@ -9,6 +9,8 @@ import MailAndWhatsapp from "@/app/Components/MailAndWhatsapp";
 import ShareInvToStore from "@/app/Components/ShareInvToStore";
 import PartialInvoiceDisplay from "@/app/Components/PartialInvoiceDisplay";
 import Notch from "@/app/Components/Notch";
+import Link from "next/link";
+import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 export const metadata = {
   title: "B.A.D.E ERP Platform",
@@ -97,6 +99,14 @@ async function StoreLayoutContent({ params }) {
       {/* Aside (Left Sidebar) */}
       <Notch>
         <BackButton />
+        {/* always a way to the sales list: "back" goes nowhere when the order was opened from a notification or a link */}
+        <Link
+          href={`/${Params.auth}/V4/Sales/Sales`}
+          className="flex items-center gap-3 p-3 rounded-md hover:transition"
+        >
+          <ClipboardDocumentListIcon className="h-6 w-6 text-gray-100" />
+          <span className="text-xs">Sales Management</span>
+        </Link>
         <hr className="my-4 border-gray-700" />
         <div
           className="rounded-lg shadow-md overflow-y-scroll max-h-[30vh]"

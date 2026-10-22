@@ -53,7 +53,7 @@ export default function CreditRisk() {
   const customers = useMemo(() => {
     const q = query.trim().toLowerCase();
     return (report?.customers || []).filter(
-      (c) => (level === "all" || c.level === level) && (!q || c.name.toLowerCase().includes(q) || (c.salesRep || "").toLowerCase().includes(q)),
+      (c) => (level === "all" || c.level === level) && (!q || [c.name, c.salesRep, c.accountManager, c.state].some((v) => (v || "").toLowerCase().includes(q))),
     );
   }, [report, level, query]);
 
@@ -87,6 +87,8 @@ export default function CreditRisk() {
         report.customers.map((c) => ({
           Customer: c.name,
           "Sales rep": c.salesRep || "",
+          Manager: c.accountManager || "",
+          State: c.state || "",
           Owes: c.debt,
           "Credit limit": c.creditLimit,
           "Limit used %": c.limitUsed ?? "",
@@ -206,7 +208,7 @@ export default function CreditRisk() {
                     ))}
                     <div className="relative ml-auto w-full sm:w-64">
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input className="pl-8" placeholder="Customer or sales rep" value={query} onChange={(e) => setQuery(e.target.value)} />
+                      <Input className="pl-8" placeholder="Customer, rep, manager or state" value={query} onChange={(e) => setQuery(e.target.value)} />
                     </div>
                   </div>
                   <div className="overflow-x-auto">
@@ -214,6 +216,8 @@ export default function CreditRisk() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Customer</TableHead>
+                          <TableHead>Manager</TableHead>
+                          <TableHead>State</TableHead>
                           <TableHead>Risk</TableHead>
                           <TableHead className="text-right">Owes</TableHead>
                           <TableHead className="text-right">Overdue</TableHead>
@@ -227,7 +231,7 @@ export default function CreditRisk() {
                       <TableBody>
                         {customers.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={9} className="text-center text-muted-foreground">
+                            <TableCell colSpan={11} className="text-center text-muted-foreground">
                               No customers match.
                             </TableCell>
                           </TableRow>
@@ -238,6 +242,8 @@ export default function CreditRisk() {
                               <div className="font-medium">{c.name}</div>
                               {c.salesRep && <div className="text-xs text-muted-foreground">{c.salesRep}</div>}
                             </TableCell>
+                            <TableCell className="whitespace-nowrap">{c.accountManager || "—"}</TableCell>
+                            <TableCell>{c.state || "—"}</TableCell>
                             <TableCell>
                               <Badge className={LEVEL_STYLE[c.level]}>{c.level}</Badge>
                             </TableCell>

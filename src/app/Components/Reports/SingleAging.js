@@ -28,7 +28,9 @@ const AgingReportDownloader = ({ customer, Rep }) => {
 
       const summary = {
         Name: rep.customer.name || customer.Username,
-        Rep: Rep || "",
+        Rep: Rep || rep.customer.salesRep || "",
+        Manager: rep.customer.accountManager || "",
+        State: rep.customer.state || customer.state || customer.State || "",
         Balance: rep.customer.debt,
         ...Object.fromEntries(rep.buckets.map((b) => [label[b.key], rep.aging[b.key]])),
         "Not on statement": rep.notOnStatement,

@@ -33,6 +33,8 @@ import AddOnsBilling from "@/app/Components/AddOnsBilling";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
 import DeliveryFees from "./DeliveryFees";
+import PriceLists from "./PriceLists";
+import EmailSending from "./EmailSending";
 
 /* Shared Tailwind classes */
 const inputCls =
@@ -58,6 +60,11 @@ export default function SettingsPage({
   storeList,
 }) {
   const [activeTab, setActiveTab] = useState("general");
+  // ?tab=email (e.g. from the "your email account isn't sending" notification) opens that tab
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    if (tab && ["general", "users", "notifications", "delivery", "pricelists", "email", "audit", "App"].includes(tab)) setActiveTab(tab);
+  }, []);
   const [users] = useState(
     userList?.data?.filter((user) => user.isDev !== true) || [],
   );
@@ -67,6 +74,8 @@ export default function SettingsPage({
     { id: "users", label: "User and Permission" },
     { id: "notifications", label: "Notifications" },
     { id: "delivery", label: "Delivery Fees" },
+    { id: "pricelists", label: "Price Lists" },
+    { id: "email", label: "Email Sending" },
     { id: "audit", label: "Audit Logs" },
     { id: "App", label: "App Store" },
   ];
@@ -119,6 +128,14 @@ export default function SettingsPage({
           <NotificationSettings data={businessInfo} userData={userData} />
         )}
         {activeTab === "delivery" && <DeliveryFees isAdmin={userData?.user?.isAdmin === true} />}
+        {activeTab === "pricelists" && <PriceLists />}
+        {activeTab === "email" && (
+          <EmailSending
+            isAdmin={userData?.user?.isAdmin === true}
+            adminEmail={userData?.user?.Email}
+            companyName={businessInfo?.companyName}
+          />
+        )}
         {activeTab === "audit" && <AuditLogsPanel logs={logs} />}
         {activeTab === "App" && (
           <Card>

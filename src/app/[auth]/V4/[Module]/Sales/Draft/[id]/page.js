@@ -29,6 +29,7 @@ import {
   PrinterIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/solid";
+import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 export default function DraftInvoicePage({ Business, bill, products, user }) {
   const router = useRouter();
@@ -324,6 +325,14 @@ export default function DraftInvoicePage({ Business, bill, products, user }) {
       <div className="px-3 sm:px-6 py-6 sm:py-10 bg-card text-card-foreground shadow-sm text-xs border border-border rounded-lg">
         <Notch>
           <BackButton />
+          {/* always a way to the sales list: "back" goes nowhere when the draft was opened from a notification or a link */}
+          <Link
+            href={`/${params.auth}/V4/Sales/Sales`}
+            className="flex items-center gap-3 p-3 rounded-md hover:transition"
+          >
+            <ClipboardDocumentListIcon className="h-6 w-6 text-gray-100" />
+            <span className="text-xs">Sales Management</span>
+          </Link>
           <hr className="my-4 border-gray-700" />
           <div className="bg-gray-700 rounded-lg shadow-md overflow-hidden">
             <ul className="divide-y divide-gray-700">
