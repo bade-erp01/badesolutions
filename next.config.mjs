@@ -86,6 +86,31 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
         pathname: "/**",
       },
+       {
+        protocol: "https",
+        hostname: "checkout.paystack.com",
+        pathname: "/**",
+      },
+       {
+        protocol: "https",
+        hostname: "challenges.cloudflare.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "maps.google.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "google.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+        pathname: "/**",
+      }
     ],
   },
 };
