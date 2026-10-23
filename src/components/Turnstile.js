@@ -10,7 +10,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAFf_KvT7txweThQQKJlI6iMXnHw";
+export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
 const LOAD_TIMEOUT_MS = 10_000;
 
