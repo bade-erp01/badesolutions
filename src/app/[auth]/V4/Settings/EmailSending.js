@@ -218,7 +218,7 @@ export default function EmailSending({ isAdmin, adminEmail, companyName }) {
   const failing = own && current.status === "failing";
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold">Email sending</h2>
         <p className="text-sm text-muted-foreground">
