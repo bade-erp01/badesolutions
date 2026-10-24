@@ -48,7 +48,7 @@ export default function PriceLists({ business }) {
         <Input placeholder="Search price lists" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-sm" />
       )}
 
-      <div className="rounded-md border overflow-x-auto max-w-2xl">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

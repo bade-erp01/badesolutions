@@ -93,7 +93,19 @@ export default function Nav1({ page, user, business, IconArray }) {
     ?.replace(/\s+/g, "-")
     ?.replace(/[^a-z0-9-]/g, "");
 
-  const href = business && user ? `/${sanitizedCompanyName}/V4` : "/";
+  const getDashboardHref = (business, user, sanitizedCompanyName) => {
+    if (!business || !user) return "/";
+
+    // Check if the user is a sales rep
+    if (user.isSalesRep) {
+      return `/SalesPortal/Dashboard`;
+    }
+
+    // Default dashboard for other users
+    return `/${sanitizedCompanyName}/V4`;
+  };
+
+  const href = getDashboardHref(business, user, sanitizedCompanyName);
 
   const publicLinks = [
     { href: "/why-bade", label: "Why Bade?" },
