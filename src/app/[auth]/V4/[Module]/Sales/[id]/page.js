@@ -1136,15 +1136,21 @@ const generatePdf = async (business, customer, bill) => {
       const Biller = userInfo.user._id;
       const url = `/api/Redo/invoice/${Singlebill._id}?Biller=${Biller}`;
 
-      const r = await api.post(url, {});
+      const r = await api.post(
+        url,
+        {},
+        {
+          headers: {
+            "idempotency-key": `Redo-${Singlebill._id}`,
+          },
+        },
+      );
+
       if (!r.ok) throw new Error(r.error);
       const data = r.data;
 
       if (data && data.result) {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        Router.push(
-          `/${path.auth}/V4/Sales/Sales/Draft/${data.result}`,
-        );
+        Router.push(`/${path.auth}/V4/Sales/Sales/Draft/${data.result}`);
       } else {
         Swal.fire({
           icon: "error",
