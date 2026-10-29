@@ -35,6 +35,7 @@ import { safeUrl } from "@/lib/security/safeUrl";
 import DeliveryFees from "./DeliveryFees";
 import PriceLists from "./PriceLists";
 import EmailSending from "./EmailSending";
+import NrsEInvoice from "./NrsEInvoice";
 
 /* Shared Tailwind classes */
 const inputCls =
@@ -63,7 +64,7 @@ export default function SettingsPage({
   // ?tab=email (e.g. from the "your email account isn't sending" notification) opens that tab
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get("tab");
-    if (tab && ["general", "users", "notifications", "delivery", "pricelists", "email", "audit", "App"].includes(tab)) setActiveTab(tab);
+    if (tab && ["general", "users", "notifications", "delivery", "pricelists", "email", "nrs", "audit", "App"].includes(tab)) setActiveTab(tab);
   }, []);
   const [users] = useState(
     userList?.data?.filter((user) => user.isDev !== true) || [],
@@ -76,6 +77,7 @@ export default function SettingsPage({
     { id: "delivery", label: "Delivery Fees" },
     { id: "pricelists", label: "Price Lists" },
     { id: "email", label: "Email Sending" },
+    { id: "nrs", label: "NRS E-Invoice" },
     { id: "audit", label: "Audit Logs" },
     { id: "App", label: "App Store" },
   ];
@@ -135,6 +137,9 @@ export default function SettingsPage({
             adminEmail={userData?.user?.Email}
             companyName={businessInfo?.companyName}
           />
+        )}
+        {activeTab === "nrs" && (
+          <NrsEInvoice isAdmin={userData?.user?.isAdmin === true} />
         )}
         {activeTab === "audit" && <AuditLogsPanel logs={logs} />}
         {activeTab === "App" && (

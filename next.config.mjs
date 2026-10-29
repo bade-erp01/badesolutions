@@ -19,6 +19,7 @@ const withPWA = nextPWA({
 
 const nextConfig = {
   reactStrictMode: true,
+  outputFileTracingRoot: process.cwd(),
 
   // Local testing only. ERP_API_PROXY=http://localhost:3000 (with NEXT_PUBLIC_API_URL=same-origin)
   // forwards the API and live updates through this site, so one HTTPS tunnel serves a phone the

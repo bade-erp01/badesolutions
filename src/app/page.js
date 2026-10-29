@@ -39,6 +39,20 @@ export default function LandingPage() {
           enterprise platform built for structured operations regardless of your business sector.
         </p>
 
+        <div className="mt-5 inline-flex max-w-full items-center gap-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900">
+          <Image
+            src="/nrs-e-invoicing-logo.png"
+            alt="Nigeria Revenue Service"
+            width={90}
+            height={38}
+            className="h-9 w-auto shrink-0 object-contain"
+          />
+
+          <span>
+            NRS e-invoicing integration for taxpayer reporting
+          </span>
+        </div>
+
         <div className="mt-8 flex justify-center gap-4 flex-wrap">
           <Button
             size="lg"
