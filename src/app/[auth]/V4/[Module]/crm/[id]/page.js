@@ -385,11 +385,16 @@ export default function CustomerForm({
       className="w-full min-w-0 space-y-6 p-3 sm:p-5 text-sm overflow-x-hidden"
     >
       {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <p className="text-sm text-muted-foreground italic">
-          Registration Date:{" "}
-          {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 space-y-1">
+          <h1 className="break-words text-xl font-semibold text-foreground sm:text-2xl">
+            {cust.Username || "Customer"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Registration Date:{" "}
+            {moment(cust.createdAt).format("dddd DD MMMM YYYY [at] hh:mm A")}
+          </p>
+        </div>
         <span
           className={`${badgeCls} w-fit text-sm px-4 py-1.5 ${
             cust.Debt < 0
