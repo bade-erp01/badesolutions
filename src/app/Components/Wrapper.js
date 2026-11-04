@@ -717,13 +717,14 @@ export function UserProfile({ user, biz }) {
 
         <DropdownMenuSeparator />
 
-        {user.isAdmin && (
-          <DropdownMenuItem
-            onClick={() => router.push(`/${Path.auth}/V4/Settings`)}
-          >
-            <Settings className="mr-2 h-4 w-4" /> Settings
-          </DropdownMenuItem>
-        )}
+       {(user.isAdmin || user.IsHRM) && (
+        <DropdownMenuItem
+          onClick={() => router.push(`/${Path.auth}/V4/Settings`)}
+        >
+          <Settings className="mr-2 h-4 w-4" />
+          Settings
+        </DropdownMenuItem>
+      )}
 
         <DropdownMenuItem>
           <TermsAndConditionsLink

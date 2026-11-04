@@ -17,28 +17,46 @@ import {
   ShieldAlert      // Credit Risk
 } from "lucide-react";
 import {useParams} from "next/navigation"
+import { useUser } from "@/components/UserProvider";
 
 export default function AccountingERP() {
   const router = useRouter();
   const Params = useParams();
+  const currentUser = useUser();
+  const accountUser = currentUser?.user?.user;
+  const isAdmin = accountUser?.isAdmin === true;
+  const isHRM = accountUser?.isHRM === true;
+  const isCFO = accountUser?.isCFO === true;
+  const isAccountant = accountUser?.isAccountant === true;
+  const accountingRoles = ["admin", "cfo", "accountant"];
 
   const modules = [
-    { label: "Equity", id: "dashboard", icon: BarChart3, badge: "Beta", url:"Equity" },
-    { label: "Accounts Receivable", id: "ar", icon: Users, badge: "Core", url:"Receivables" },
-    { label: "Accounts Payable", id: "ap", icon: CreditCard, badge: "Core", url:"Payables" },
-    { label: "Balance Sheet", id: "balance-sheet", icon: FileText, badge: "Beta", url:"BalanceSheet" },
-    { label: "Income Statement", id: "income-statement", icon: TrendingUp, badge: "Beta", url:"P&L" },
-    { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Beta", url:"Chart-Of-Accounts" },
-    { label: "Bank Account", id:"Bank-Accounts", icon: Building, badge:"Core", url:"Bank-Accounts"},
-    { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll"},
-    { label: "Tax Report", id:"Tax-Report", icon: Receipt, badge:"New", url:"Tax-Report"},
-    { label: "Credit Risk", id:"Credit-Risk", icon: ShieldAlert, badge:"New", url:"Credit-Risk"},
+    { label: "Equity", id: "dashboard", icon: BarChart3, badge: "Beta", url:"Equity", allowedRoles: accountingRoles },
+    { label: "Accounts Receivable", id: "ar", icon: Users, badge: "Core", url:"Receivables", allowedRoles: accountingRoles },
+    { label: "Accounts Payable", id: "ap", icon: CreditCard, badge: "Core", url:"Payables", allowedRoles: accountingRoles },
+    { label: "Balance Sheet", id: "balance-sheet", icon: FileText, badge: "Beta", url:"BalanceSheet", allowedRoles: accountingRoles },
+    { label: "Income Statement", id: "income-statement", icon: TrendingUp, badge: "Beta", url:"P&L", allowedRoles: accountingRoles },
+    { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Beta", url:"Chart-Of-Accounts", allowedRoles: accountingRoles },
+    { label: "Bank Account", id:"Bank-Accounts", icon: Building, badge:"Core", url:"Bank-Accounts", allowedRoles: accountingRoles},
+    { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll", allowedRoles: [...accountingRoles, "hrm"]},
+    { label: "Tax Report", id:"Tax-Report", icon: Receipt, badge:"New", url:"Tax-Report", allowedRoles: accountingRoles},
+    { label: "Credit Risk", id:"Credit-Risk", icon: ShieldAlert, badge:"New", url:"Credit-Risk", allowedRoles: accountingRoles},
   ];
+  const userRoles = [
+    isAdmin && "admin",
+    isHRM && "hrm",
+    isCFO && "cfo",
+    isAccountant && "accountant",
+  ].filter(Boolean);
+  const visibleModules = modules.filter((item) =>
+    item.allowedRoles.some((role) => userRoles.includes(role)),
+  );
 
   return (
     <div className="bg-background text-foreground p-0 sm:p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {modules.map((item) => (
+      {visibleModules.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {visibleModules.map((item) => (
           <Button
             key={item.id}
             variant="outline"
@@ -59,7 +77,12 @@ export default function AccountingERP() {
             </p>
           </Button>
         ))}
-      </div>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          No accounting modules are available for your role.
+        </p>
+      )}
     </div>
   );
 }

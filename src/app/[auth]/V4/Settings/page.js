@@ -61,6 +61,9 @@ export default function SettingsPage({
   storeList,
 }) {
   const [activeTab, setActiveTab] = useState("general");
+  // Determine user role
+  const isAdmin = userData?.user?.isAdmin === true;
+  const isHRM = userData?.user?.isHRM === true;
   // ?tab=email (e.g. from the "your email account isn't sending" notification) opens that tab
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get("tab");
@@ -70,17 +73,25 @@ export default function SettingsPage({
     userList?.data?.filter((user) => user.isDev !== true) || [],
   );
 
-  const tabs = [
-    { id: "general", label: "Business Account" },
-    { id: "users", label: "User and Permission" },
-    { id: "notifications", label: "Notifications" },
-    { id: "delivery", label: "Delivery Fees" },
-    { id: "pricelists", label: "Price Lists" },
-    { id: "email", label: "Email Sending" },
-    { id: "nrs", label: "NRS E-Invoice" },
-    { id: "audit", label: "Audit Logs" },
-    { id: "App", label: "App Store" },
-  ];
+  // Tabs visibility logic
+  let tabs = [];
+  if (isAdmin) {
+    tabs = [
+      { id: "general", label: "Business Account" },
+      { id: "users", label: "User and Permission" },
+      { id: "notifications", label: "Notifications" },
+      { id: "delivery", label: "Delivery Fees" },
+      { id: "pricelists", label: "Price Lists" },
+      { id: "email", label: "Email Sending" },
+      { id: "nrs", label: "NRS E-Invoice" },
+      { id: "audit", label: "Audit Logs" },
+      { id: "App", label: "App Store" },
+    ];
+  } else if (isHRM) {
+    tabs = [
+      { id: "users", label: "User and Permission" },
+    ];
+  }
 
   const logs =
     auditLogs?.length > 0
@@ -117,7 +128,8 @@ export default function SettingsPage({
           ))}
         </div>
 
-        {activeTab === "general" && (
+        {/* Render tab content only if user has access */}
+        {activeTab === "general" && isAdmin && (
           <CompanyProfileForm
             data={businessInfo}
             userData={userData}
@@ -125,24 +137,24 @@ export default function SettingsPage({
             storeList={storeList}
           />
         )}
-        {activeTab === "users" && <UsersPermissionsPage users={users} />}
-        {activeTab === "notifications" && (
+        {activeTab === "users" && (isAdmin || isHRM) && <UsersPermissionsPage users={users} />}
+        {activeTab === "notifications" && isAdmin && (
           <NotificationSettings data={businessInfo} userData={userData} />
         )}
-        {activeTab === "delivery" && <DeliveryFees isAdmin={userData?.user?.isAdmin === true} />}
-        {activeTab === "pricelists" && <PriceLists business={businessInfo} />}
-        {activeTab === "email" && (
+        {activeTab === "delivery" && isAdmin && <DeliveryFees isAdmin={userData?.user?.isAdmin === true} />}
+        {activeTab === "pricelists" && isAdmin && <PriceLists business={businessInfo} />}
+        {activeTab === "email" && isAdmin && (
           <EmailSending
             isAdmin={userData?.user?.isAdmin === true}
             adminEmail={userData?.user?.Email}
             companyName={businessInfo?.companyName}
           />
         )}
-        {activeTab === "nrs" && (
+        {activeTab === "nrs" && isAdmin && (
           <NrsEInvoice isAdmin={userData?.user?.isAdmin === true} />
         )}
-        {activeTab === "audit" && <AuditLogsPanel logs={logs} />}
-        {activeTab === "App" && (
+        {activeTab === "audit" && isAdmin && <AuditLogsPanel logs={logs} />}
+        {activeTab === "App" && isAdmin && (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Button asChild>

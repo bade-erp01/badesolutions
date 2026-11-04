@@ -387,7 +387,7 @@ export default function CustomerForm({
       {/* Top Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0 space-y-1">
-          <h1 className="break-words text-xl font-semibold text-foreground sm:text-2xl">
+          <h1 className="wrap-break-word text-xl font-semibold text-foreground sm:text-2xl">
             {cust.Username || "Customer"}
           </h1>
           <p className="text-sm text-muted-foreground">
