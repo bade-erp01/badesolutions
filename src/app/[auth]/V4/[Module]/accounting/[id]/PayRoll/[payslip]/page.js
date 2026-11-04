@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import * as XLSX from "xlsx";
 import moment from "moment";
 import {
   Download,
@@ -68,6 +69,28 @@ const num = (v) => {
 };
 const naira = (v) =>
   `₦${num(v).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const readValue = (obj, keys) => {
+  for (const key of keys) {
+    if (!key) continue;
+    if (key.includes(".")) {
+      const parts = key.split(".");
+      let current = obj;
+      let found = true;
+      for (const part of parts) {
+        if (current == null || !(part in current)) {
+          found = false;
+          break;
+        }
+        current = current[part];
+      }
+      if (found && current !== undefined && current !== null && current !== "") return current;
+      continue;
+    }
+    if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") return obj[key];
+  }
+  return "";
+};
 
 // Must match computePayslip() in the backend (controllers/DepreciationShedule.js)
 const EARNINGS = ["BASIC", "HRA", "TRANSPORT", "WELFARE", "ADHOC", "MEDICAL", "Bonus", "Cash_Retirement"];
@@ -280,10 +303,15 @@ export default function PayrollPage() {
 
   const downloadCsv = () => {
     if (!entries.length) return;
-    const cols = [
+
+    const payrollMonth = payroll?.date ? moment(payroll.date).format("MM") : "";
+    const payrollYear = payroll?.date ? moment(payroll.date).format("YYYY") : "";
+    const defaultEmployerCode = readValue(payroll, ["employerCode", "EmployerCode", "employer_code", "companyCode", "CompanyCode"]) || "";
+
+    const mainCols = [
       ["SN", (e, i) => i + 1],
-      ["Employee", employeeName],
-      ["Staff ID", (e) => e.employeeId?.staffId || e.employeeId?.employeeCode || ""],
+      ["Employee", (e) => employeeName(e)],
+      ["Staff ID", (e) => readValue(e, ["employeeId.staffId", "employeeId.employeeCode", "staffId", "employeeCode", "StaffID", "StaffId"])],
       ["Department", (e) => e.DEPT || ""],
       ["Job Role", (e) => e.JOB_ROLE || ""],
       ["Basic", (e) => num(e.BASIC)],
@@ -303,24 +331,76 @@ export default function PayrollPage() {
       ["IOU Repayment", (e) => num(e.IOU_DEDUCTED)],
       ["Total Deduction", (e) => num(e.TOTAL_DEDUCTION)],
       ["Net Payable", (e) => num(e.NET_PAYABLE)],
-      ["PFA", (e) => e.PFA || ""],
-      ["PFA Code", (e) => e.PFA_CODE || ""],
+      ["PFA", (e) => readValue(e, ["PFA", "pfa"])],
+      ["PFA Code", (e) => readValue(e, ["PFA_CODE", "PFACode", "pfaCode", "PFA code"])],
     ];
-    const cell = (v) => {
-      const s = String(v ?? "");
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-    };
-    const csv = [
-      cols.map(([h]) => h).join(","),
-      ...entries.map((e, i) => cols.map(([, get]) => cell(get(e, i))).join(",")),
-    ].join("\n");
-    const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${String(payroll.title || "payroll").replace(/[^\w.-]+/g, "_")}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+
+    const salaryRows = entries.map((e) => ({
+      ValidAccountName: readValue(e.employeeId, ["fullName", "name", "firstName", "lastName"]) || employeeName(e),
+      Bankcode: readValue(e, ["bankCode", "BankCode", "bankCode", "Bankcode"]) || readValue(e.employeeId, ["bankCode", "BankCode", "bankAccountBankCode", "bankSortCode"]) || "",
+      AccountNO: readValue(e, ["accountNumber", "AccountNumber", "accountNo", "AccountNo", "bankAccountNumber", "bankAccountNo"]) || readValue(e.employeeId, ["accountNumber", "AccountNumber", "accountNo", "AccountNo"]) || "",
+      Amount: num(e.NET_PAYABLE),
+      Narration: `Salary payment - ${employeeName(e)} - ${moment(payroll?.date).format("MMM YYYY")}`,
+    }));
+
+    const pensionRows = entries.map((e) => {
+      const monthContribution = num(e.PENSION);
+      const employeeNormal = monthContribution || num(e.CONTRIBUTION_8) || 0;
+      const employerNormal = monthContribution || num(e.CONTRIBUTION_10) || 0;
+      const voluntaryEmployee = num(readValue(e, ["VOLUNTARY_CONTRIBUTION_EMPLOYEE", "VoluntaryContributionEmployee", "voluntaryContributionEmployee"])) || 0;
+      const voluntaryEmployer = num(readValue(e, ["VOLUNTARY_CONTRIBUTION_EMPLOYER", "VoluntaryContributionEmployer", "voluntaryContributionEmployer"])) || 0;
+      const otherContribution = num(e.CLA) + num(e.IOU_DEDUCTED);
+      const totalAmount = employeeNormal + employerNormal + voluntaryEmployee + voluntaryEmployer + otherContribution;
+
+      return {
+        "Employer Code": defaultEmployerCode,
+        Month: payrollMonth,
+        Year: payrollYear,
+        "Staff ID": readValue(e, ["employeeId.staffId", "employeeId.employeeCode", "staffId", "employeeCode", "StaffID", "StaffId"]) || "",
+        "RSA pin": readValue(e.employeeId, ["pension", "pensionNo", "rsaPin", "RSApin", "RSA_pin", "PensionNo"]) || readValue(e, ["pension", "pensionNo", "rsaPin", "RSApin", "RSA_pin", "PensionNo"]) || "",
+        "Name Of Employee": employeeName(e),
+        "Normal Contribution Employee": employeeNormal,
+        "Normal Contribution Employer": employerNormal,
+        "Voluntary Contribution Employee": voluntaryEmployee,
+        "Voluntary Contribution Employer": voluntaryEmployer,
+        "Other Contribution": otherContribution,
+        "Total Amount": totalAmount,
+        "PFA Code": readValue(e, ["PFA_CODE", "PFACode", "pfaCode", "PFA code"]) || readValue(e.employeeId, ["PFA_CODE", "PFACode", "pfaCode", "PFA code"]) || "",
+      };
+    });
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(entries.map((e, i) => ({
+      SN: i + 1,
+      Employee: employeeName(e),
+      "Staff ID": readValue(e, ["employeeId.staffId", "employeeId.employeeCode", "staffId", "employeeCode", "StaffID", "StaffId"]) || "",
+      Department: e.DEPT || "",
+      "Job Role": e.JOB_ROLE || "",
+      Basic: num(e.BASIC),
+      HRA: num(e.HRA),
+      Transport: num(e.TRANSPORT),
+      Welfare: num(e.WELFARE),
+      Adhoc: num(e.ADHOC),
+      Medical: num(e.MEDICAL),
+      Bonus: num(e.Bonus),
+      "Cash Retirement": num(e.Cash_Retirement),
+      Gross: num(e.GROSS),
+      Pension: num(e.PENSION),
+      PAYE: num(e.PAYEE),
+      "Contribution 8%": num(e.CONTRIBUTION_8),
+      "Contribution 10%": num(e.CONTRIBUTION_10),
+      CLA: num(e.CLA),
+      "IOU Repayment": num(e.IOU_DEDUCTED),
+      "Total Deduction": num(e.TOTAL_DEDUCTION),
+      "Net Payable": num(e.NET_PAYABLE),
+      PFA: readValue(e, ["PFA", "pfa"]) || "",
+      "PFA Code": readValue(e, ["PFA_CODE", "PFACode", "pfaCode", "PFA code"]) || "",
+    }))), "Payroll");
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(salaryRows), "SALARY INCENTIVE");
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(pensionRows), "PENSION TEMPLATE");
+
+    const fileName = `${String(payroll.title || "payroll").replace(/[^\w.-]+/g, "_")}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
   // ---------- render ----------

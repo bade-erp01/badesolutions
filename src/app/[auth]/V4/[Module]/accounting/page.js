@@ -29,14 +29,15 @@ export default function AccountingERP() {
   const isCFO = accountUser?.isCFO === true;
   const isAccountant = accountUser?.isAccountant === true;
   const accountingRoles = ["admin", "cfo", "accountant"];
+  const cfoAdminOnlyRoles = ["admin", "cfo"];
 
   const modules = [
-    { label: "Equity", id: "dashboard", icon: BarChart3, badge: "Beta", url:"Equity", allowedRoles: accountingRoles },
+    { label: "Equity", id: "dashboard", icon: BarChart3, badge: "Beta", url:"Equity", allowedRoles: cfoAdminOnlyRoles },
     { label: "Accounts Receivable", id: "ar", icon: Users, badge: "Core", url:"Receivables", allowedRoles: accountingRoles },
     { label: "Accounts Payable", id: "ap", icon: CreditCard, badge: "Core", url:"Payables", allowedRoles: accountingRoles },
-    { label: "Balance Sheet", id: "balance-sheet", icon: FileText, badge: "Beta", url:"BalanceSheet", allowedRoles: accountingRoles },
-    { label: "Income Statement", id: "income-statement", icon: TrendingUp, badge: "Beta", url:"P&L", allowedRoles: accountingRoles },
-    { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Beta", url:"Chart-Of-Accounts", allowedRoles: accountingRoles },
+    { label: "Balance Sheet", id: "balance-sheet", icon: FileText, badge: "Beta", url:"BalanceSheet", allowedRoles: cfoAdminOnlyRoles },
+    { label: "Income Statement", id: "income-statement", icon: TrendingUp, badge: "Beta", url:"P&L", allowedRoles: cfoAdminOnlyRoles },
+    { label: "Charts of Account", id: "chart-of-account", icon: BookOpen, badge: "Beta", url:"Chart-Of-Accounts", allowedRoles: cfoAdminOnlyRoles },
     { label: "Bank Account", id:"Bank-Accounts", icon: Building, badge:"Core", url:"Bank-Accounts", allowedRoles: accountingRoles},
     { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll", allowedRoles: [...accountingRoles, "hrm"]},
     { label: "Tax Report", id:"Tax-Report", icon: Receipt, badge:"New", url:"Tax-Report", allowedRoles: accountingRoles},
