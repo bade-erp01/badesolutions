@@ -33,6 +33,7 @@ import AddOnsBilling from "@/app/Components/AddOnsBilling";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
 import DeliveryFees from "./DeliveryFees";
+import CancellationReasons from "./CancellationReasons";
 import PriceLists from "./PriceLists";
 import EmailSending from "./EmailSending";
 import NrsEInvoice from "./NrsEInvoice";
@@ -67,7 +68,7 @@ export default function SettingsPage({
   // ?tab=email (e.g. from the "your email account isn't sending" notification) opens that tab
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get("tab");
-    if (tab && ["general", "users", "notifications", "delivery", "pricelists", "email", "nrs", "audit", "App"].includes(tab)) setActiveTab(tab);
+    if (tab && ["general", "users", "notifications", "delivery", "cancellations", "pricelists", "email", "nrs", "audit", "App"].includes(tab)) setActiveTab(tab);
   }, []);
   const [users] = useState(
     userList?.data?.filter((user) => user.isDev !== true) || [],
@@ -81,6 +82,7 @@ export default function SettingsPage({
       { id: "users", label: "User and Permission" },
       { id: "notifications", label: "Notifications" },
       { id: "delivery", label: "Delivery Fees" },
+      { id: "cancellations", label: "Cancellation Reasons" },
       { id: "pricelists", label: "Price Lists" },
       { id: "email", label: "Email Sending" },
       { id: "nrs", label: "NRS E-Invoice" },
@@ -142,6 +144,7 @@ export default function SettingsPage({
           <NotificationSettings data={businessInfo} userData={userData} />
         )}
         {activeTab === "delivery" && isAdmin && <DeliveryFees isAdmin={userData?.user?.isAdmin === true} />}
+        {activeTab === "cancellations" && isAdmin && <CancellationReasons isAdmin={isAdmin} />}
         {activeTab === "pricelists" && isAdmin && <PriceLists business={businessInfo} />}
         {activeTab === "email" && isAdmin && (
           <EmailSending
