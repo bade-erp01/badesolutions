@@ -359,16 +359,7 @@ export default function Wrapper({ children }) {
             </Button>
           )}
 
-          {user.user.isDev && (
-            <Button
-              variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
-              disabled={pathname === `/${Params.auth}/V4/Assistant`}
-              className="w-full justify-start cursor-pointer"
-              onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
-            >
-              Try Reg AI <Sparkles className="h-5 w-5 shrink-0" />
-            </Button>
-          )}
+          
         </nav>
 
         <div className="p-1 border-t w-full user-profile">
@@ -464,16 +455,7 @@ export default function Wrapper({ children }) {
                         Business Overview
                       </Button>
                     )}
-                    {user.user.isDev && (
-                      <Button
-                        variant={pathname === `/${Params.auth}/V4/Assistant` ? "destructive" : "ghost"}
-                        disabled={pathname === `/${Params.auth}/V4/Assistant`}
-                        className="w-full justify-start cursor-pointer"
-                        onClick={() => router.push(`/${Params.auth}/V4/Assistant`)}
-                      >
-                        Try Reg AI <Sparkles className="h-5 w-5 shrink-0" />
-                      </Button>
-                    )}
+                    
                   </nav>
 
                   {/* Tenant Switch - Mobile */}
@@ -717,7 +699,7 @@ export function UserProfile({ user, biz }) {
 
         <DropdownMenuSeparator />
 
-       {(user.isAdmin || user.IsHRM) && (
+       {(user.isAdmin || user.isHRM) && (
         <DropdownMenuItem
           onClick={() => router.push(`/${Path.auth}/V4/Settings`)}
         >
