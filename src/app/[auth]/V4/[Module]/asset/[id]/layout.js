@@ -124,7 +124,7 @@ export default async function layout({params}) {
                 </Notch>
       
                 {/* Main Content */}
-                <main className="overflow-y-auto  w-full">
+                <main className="overflow-hidden  w-full">
                   <Page DecryptedAsset={DecryptedAsset} StoreList={StoreList} userInfo={userData} users={ParsedUser} baseUrl={baseUrl}/>
                 </main>
               </div>

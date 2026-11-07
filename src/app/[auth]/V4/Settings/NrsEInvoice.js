@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Loader2, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,22 @@ export default function NrsEInvoice({ isAdmin }) {
   });
   const [busy, setBusy] = useState("");
   const [problem, setProblem] = useState("");
+  const [failedInvoices, setFailedInvoices] = useState([]);
+  const [failedLoading, setFailedLoading] = useState(false);
+  const [failedProblem, setFailedProblem] = useState("");
+
+  const loadFailedInvoices = async () => {
+    if (!isAdmin) return;
+    setFailedLoading(true);
+    const response = await api.get("/api/NrsEInvoice/Failed");
+    setFailedLoading(false);
+    if (!response.ok) {
+      setFailedProblem(response.error || "Could not load failed NRS invoices");
+      return;
+    }
+    setFailedInvoices(Array.isArray(response.data?.data) ? response.data.data : []);
+    setFailedProblem("");
+  };
 
   const load = async () => {
     const response = await api.get("/api/NrsEInvoice");
@@ -45,6 +61,7 @@ export default function NrsEInvoice({ isAdmin }) {
 
   useEffect(() => {
     load();
+    loadFailedInvoices();
   }, []);
 
   const set = (key, value) => setForm((current) => ({ ...current, [key]: value }));
@@ -91,6 +108,19 @@ export default function NrsEInvoice({ isAdmin }) {
     await load();
   };
 
+  const requeue = async (billId) => {
+    setBusy(billId);
+    setFailedProblem("");
+    const response = await api.post(`/api/Invoice/${billId}/Nrs/retry`, {});
+    setBusy("");
+    if (!response.ok) {
+      setFailedProblem(response.error || "Could not requeue this invoice");
+      return;
+    }
+    SuccessToast("Invoice added to the NRS submission queue");
+    await loadFailedInvoices();
+  };
+
   if (!settings) {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
@@ -111,16 +141,18 @@ export default function NrsEInvoice({ isAdmin }) {
       </header>
 
       <div className="flex items-start gap-3 rounded-md border p-4 text-sm">
-        {settings.configured ? (
+        {settings.ready ? (
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
         ) : (
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         )}
         <div>
-          <p className="font-medium">{settings.enabled ? "NRS reporting is enabled" : settings.configured ? "NRS account connected" : "Not connected"}</p>
+          <p className="font-medium">{settings.ready ? "NRS reporting is ready" : settings.configured ? "NRS reporting is not ready" : "Not connected"}</p>
           <p className="mt-1 text-muted-foreground">
-            {settings.configured
+            {settings.ready
               ? `API key ${settings.hasApiKey ? "saved" : "missing"} · API secret ${settings.hasApiSecret ? "saved" : "missing"}`
+              : settings.configured
+                ? `Reporting is ${settings.enabled ? "enabled" : "disabled"}. Enable it and provide valid NRS credentials to submit invoices.`
               : "Add the NRS details below to configure this business."}
           </p>
         </div>
@@ -179,6 +211,51 @@ export default function NrsEInvoice({ isAdmin }) {
         </form>
       ) : (
         <p className="text-sm text-muted-foreground">Only a business admin can configure NRS credentials.</p>
+      )}
+
+      {isAdmin && (
+        <section className="space-y-3" aria-labelledby="nrs-failed-title">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 id="nrs-failed-title" className="font-semibold">Failed submissions</h3>
+              <p className="text-sm text-muted-foreground">Invoices that need attention before they can be reported to NRS.</p>
+            </div>
+            <Button type="button" variant="outline" size="sm" disabled={failedLoading} onClick={loadFailedInvoices} aria-label="Refresh failed NRS submissions">
+              {failedLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              <span className="ml-2">Refresh</span>
+            </Button>
+          </div>
+
+          {failedProblem && <p className="text-sm text-destructive" role="alert">{failedProblem}</p>}
+          {failedLoading && failedInvoices.length === 0 ? (
+            <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground" role="status">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading failed submissions…
+            </div>
+          ) : failedInvoices.length === 0 ? (
+            <p className="rounded-md border px-4 py-6 text-center text-sm text-muted-foreground">No failed NRS submissions.</p>
+          ) : (
+            <div className="divide-y rounded-md border">
+              {failedInvoices.map((invoice) => (
+                <article key={invoice._id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 space-y-1">
+                    <p className="font-medium">Invoice {invoice.billReferenceNo || "(no reference)"}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {[invoice.customerName, invoice.startDate, invoice.nrsFiscalization?.irn].filter(Boolean).join(" · ") || "Invoice details unavailable"}
+                    </p>
+                    <p className="flex items-start gap-1.5 break-words text-sm text-destructive">
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                      {invoice.nrsFiscalization?.lastError || "NRS submission failed without an error message."}
+                    </p>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" disabled={Boolean(busy) || !settings.ready} onClick={() => requeue(invoice._id)} className="shrink-0" title={!settings.ready ? "Enable NRS and complete its settings to requeue" : undefined}>
+                    {busy === invoice._id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                    {busy === invoice._id ? "Queueing…" : "Requeue"}
+                  </Button>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       )}
 
       {problem && !isAdmin && <p className="text-sm text-destructive" role="alert">{problem}</p>}

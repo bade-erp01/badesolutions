@@ -1,5 +1,6 @@
 "use client";
 import MainDash from "@/app/Components/MainDash";
+import HrmDashboard from "@/app/Components/HrmDashboard";
 import { useUser } from "@/components/UserProvider";
 import moment from "moment";
 import SubscriptionReminder from "@/app/Components/SubscritionReminder";
@@ -221,8 +222,16 @@ export default function Dashboard() {
       <BirthdayGreetings Business={user?.business} user={user?.user} />
 
       {/* Dashboards */}
-      {user?.user?.c_levelDash ? (
-        <MainDash userData={user} />
+      {user?.user?.c_levelDash || user?.user?.isHRM ? (
+        <>
+          {user?.user?.c_levelDash && (
+            <MainDash userData={user} />
+          )}
+
+          {user?.user?.isHRM && (
+            <HrmDashboard userData={user} />
+          )}
+        </>
       ) : (
         <DemoDashboardPlaceholder />
       )}

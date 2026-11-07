@@ -57,6 +57,11 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
     Reversed: "bg-red-100 text-red-800",
     Reject: "bg-gray-100 text-gray-800",
   }
+  const activityLog = Array.isArray(payment.ActitvityLog)
+    ? payment.ActitvityLog
+    : Array.isArray(payment.ActivityLog)
+      ? payment.ActivityLog
+      : [];
 
   return (
     <div className="container max-w-full py-2 sm:py-8">
@@ -93,6 +98,24 @@ export default function SinglePaymentPage({ userInfo, payment, cust, bank }) {
           <Detail label="Registered By" value={payment?.Accountant} />
           <Detail label="Gateway" value={payment?.type} />
         </CardContent>
+
+        {activityLog.length > 0 && (
+          <CardContent className="space-y-3 border-t pt-5">
+            <h2 className="font-semibold">Payment activity</h2>
+            <ol className="divide-y rounded-md border">
+              {activityLog.slice().reverse().map((entry, index) => (
+                <li key={entry._id || `${entry.logMsg || entry.message}-${index}`} className="p-3 text-sm">
+                  <p>{entry.logMsg || entry.message || "Payment updated"}</p>
+                  {entry.at || entry.createdAt || entry.date ? (
+                    <time className="mt-1 block text-xs text-muted-foreground">
+                      {moment(entry.at || entry.createdAt || entry.date).format("DD MMM YYYY, hh:mm A")}
+                    </time>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        )}
 
         <CardFooter className="flex flex-col gap-4">
           {payment.status === "pending" && userInfo?.user?.isAccountant && (

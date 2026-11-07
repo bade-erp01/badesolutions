@@ -47,7 +47,13 @@ export default function InvoicePage({
   const [cust] = useState(customerList);
   const [InventoryItem] = useState(Inventory)
   const [Singlebill, setSinglebill] = useState(SinglebillItem);
+  const [nrsSubmitting, setNrsSubmitting] = useState(false);
   const isCancelled = Singlebill.billStatus?.toUpperCase() === "CANCELLED";
+  const cancellationReason = String(
+    Singlebill.Cancelreason || Singlebill.cancelReason || Singlebill.cancellationReason || "",
+  ).trim();
+  const nrsStatus = String(Singlebill.nrsFiscalization?.status || "").toLowerCase();
+  const canReportToNrs = Boolean(userInfo.user.isAdmin || userInfo.user.isAccountant);
 
   //  Safe image loader as Data URL
   const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {
@@ -440,6 +446,13 @@ const generatePdf = async (business, customer, bill) => {
               ).format("DD MMM YYYY")
             : "N/A",
         ],
+        ...(String(bill?.billStatus || "").toUpperCase() === "CANCELLED" &&
+        String(bill?.Cancelreason || bill?.cancelReason || bill?.cancellationReason || "").trim()
+          ? [[
+              "Cancellation Reason",
+              String(bill.Cancelreason || bill.cancelReason || bill.cancellationReason).trim(),
+            ]]
+          : []),
       ],
 
       theme: "plain",
@@ -1577,9 +1590,52 @@ const generatePdf = async (business, customer, bill) => {
   };
 
   const cancelSales = async (orderId, option) => {
+    let cancellationReason = "";
+    if (!option) {
+      try {
+        const reasonsResponse = await api.get("/api/CancellationReasons");
+        const reasons = reasonsResponse.data?.data || [];
+        if (!reasonsResponse.ok) throw new Error(reasonsResponse.error || "Could not load cancellation reasons");
+
+        const reasonOptions = Object.fromEntries(
+          [...reasons.map((reason) => [reason, reason]), ["other", "Other (type a reason)"]]
+        );
+
+        const selected = await Swal.fire({
+          title: "Why is this invoice being cancelled?",
+          input: "select",
+          inputOptions: reasonOptions,
+          inputPlaceholder: "Select a cancellation reason",
+          inputValidator: (value) => value ? undefined : "Select a reason to continue",
+          showCancelButton: true,
+          confirmButtonText: "Continue",
+        });
+        if (!selected.isConfirmed || !selected.value) return;
+
+        if (selected.value === "other") {
+          const customReason = await Swal.fire({
+            title: "Enter a reason",
+            input: "text",
+            inputLabel: "Other reason",
+            inputPlaceholder: "Type the cancellation reason",
+            inputValidator: (value) => value && value.trim() ? undefined : "Please enter a reason to continue",
+            showCancelButton: true,
+            confirmButtonText: "Continue",
+          });
+          if (!customReason.isConfirmed || !customReason.value) return;
+          cancellationReason = customReason.value.trim();
+        } else {
+          cancellationReason = selected.value;
+        }
+      } catch (error) {
+        ErrorMessage(error.message || "Could not load cancellation reasons");
+        return;
+      }
+    }
+
     const confirmed = await Swal.fire({
-      title: "Confirm Action?",
-      text: "Are you sure you want to proceed with this action?",
+      title: option ? "Confirm Action?" : "Confirm full invoice return?",
+      text: option ? "Are you sure you want to proceed with this action?" : `Reason: ${cancellationReason}`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, Proceed",
@@ -1605,10 +1661,10 @@ const generatePdf = async (business, customer, bill) => {
 
     try {
       plsWait("Processing Request...");
-      const res = await api.patch(
-        `/api/SingleReturn/${orderId}?option=${option}`,
-        { id: orderId, ops: opCode }, // ops code in the body, never the URL
-      );
+      const optionQuery = option ? `?option=${encodeURIComponent(option)}` : "";
+      const body = { id: orderId, ops: opCode };
+      if (!option) body.Cancelreason = cancellationReason;
+      const res = await api.patch(`/api/SingleReturn/${orderId}${optionQuery}`, body);
 
       const result = res.data || {};
 
@@ -1700,6 +1756,42 @@ const generatePdf = async (business, customer, bill) => {
     }
   }
 
+  const reportInvoiceToNrs = async () => {
+    const confirmation = await Swal.fire({
+      title: "Report invoice to NRS?",
+      text: "This submits the finalized invoice to the Nigeria Revenue Service for fiscalization.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Report invoice",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#15803d",
+    });
+    if (!confirmation.isConfirmed) return;
+
+    setNrsSubmitting(true);
+    try {
+      const response = await api.post(`/api/Invoice/${Singlebill._id}/Nrs`, {});
+      if (!response.ok) throw new Error(response.error || "Could not report invoice to NRS");
+
+      const irn = response.data?.irn || Singlebill.nrsFiscalization?.irn || "";
+      setSinglebill((current) => ({
+        ...current,
+        nrsFiscalization: {
+          ...current.nrsFiscalization,
+          status: "submitted",
+          irn,
+          submittedAt: new Date().toISOString(),
+        },
+      }));
+      SuccessToast(response.data?.message || "Invoice reported to NRS");
+    } catch (error) {
+      ErrorMessage(error.message || "Could not report invoice to NRS");
+      Router.refresh();
+    } finally {
+      setNrsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <div className="text-xs px-3 sm:px-6 py-6 sm:py-10 bg-card text-card-foreground animate__animated animate__fadeIn invoicecontainer border border-border rounded-lg">
@@ -1725,6 +1817,13 @@ const generatePdf = async (business, customer, bill) => {
           </div>
         </div>
 
+        {isCancelled && cancellationReason && (
+          <section className="mb-6 rounded-md border-l-4 border-red-500 bg-red-50 px-4 py-3 dark:bg-red-950/30" aria-label="Cancellation reason">
+            <p className="text-xs font-semibold uppercase text-red-700 dark:text-red-300">Cancellation reason</p>
+            <p className="mt-1 whitespace-pre-wrap wrap-break-word text-sm text-red-950 dark:text-red-100">{cancellationReason}</p>
+          </section>
+        )}
+
         {/* ========== COMPANY + CUSTOMER INFO ========== */}
         <div className="flex flex-col lg:flex-row justify-between gap-8 border-t border-b border-border py-6 sm:py-8 mb-6">
           {/* Left - Business Info */}
@@ -1739,7 +1838,7 @@ const generatePdf = async (business, customer, bill) => {
               quality={100}
               className="rounded-md shrink-0"
             />
-            <div className="text-sm space-y-1 min-w-0 break-words">
+            <div className="text-sm space-y-1 min-w-0 wrap-break-word">
               <h3 className="text-base sm:text-lg font-extrabold text-foreground tracking-tight">
                 {userInfo.business.companyName}
               </h3>
@@ -1824,6 +1923,33 @@ const generatePdf = async (business, customer, bill) => {
 
         {/* ========== ACTION BUTTONS ========== */}
         <div className="flex flex-wrap gap-2 mb-6 justify-start sm:justify-end">
+          {Singlebill.billStatus?.toUpperCase() === "INVOICE" && canReportToNrs && (
+            nrsStatus === "submitted" ? (
+              <Badge variant="secondary" className="inline-flex items-center gap-2 px-3 py-2 text-xs sm:text-sm">
+                <ShieldCheckIcon className="h-4 w-4 text-emerald-600" />
+                Reported to NRS{Singlebill.nrsFiscalization?.irn ? ` · ${Singlebill.nrsFiscalization.irn}` : ""}
+              </Badge>
+            ) : nrsStatus === "submitting" ? (
+              <Badge variant="secondary" className="px-3 py-2 text-xs sm:text-sm">NRS submission in progress</Badge>
+            ) : nrsStatus === "failed" ? (
+              <Badge variant="destructive" className="px-3 py-2 text-xs sm:text-sm">NRS submission failed; contact an admin to retry</Badge>
+            ) : (
+              <button
+                type="button"
+                onClick={reportInvoiceToNrs}
+                disabled={nrsSubmitting}
+                className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 text-white font-semibold text-xs sm:text-sm transition"
+              >
+                {nrsSubmitting ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+                ) : (
+                  <ShieldCheckIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                )}
+                {nrsSubmitting ? "Reporting to NRS…" : "Report to NRS"}
+              </button>
+            )
+          )}
+
           {(Singlebill.billStatus?.toUpperCase() === "INVOICE" ||
             (Singlebill.billStatus?.toUpperCase() === "ORDER" &&
               Singlebill.billStatus?.toUpperCase() !== "RECALLED")) &&

@@ -98,19 +98,25 @@ export default function Wrapper({ children }) {
   }, [user?.user?.toogledTenants]);
 
   const navApps = useMemo(() => {
+    let apps;
     if (user?.business?.subscriptionplan?.trim() === "Basic") {
-      return [
+      apps = [
         { Name: "CRM", url: "crm" },
         { Name: "Product Management", url: "product" },
         { Name: "Cash Register", url: "payment" },
         { Name: "Stores Operations", url: "store" },
       ];
-    }
-    return (
-      user?.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) =>
+    } else {
+      apps = user?.user?.Apps?.filter((app) => app.url !== "employee").sort((a, b) =>
         a.Name.localeCompare(b.Name),
-      ) ?? []
-    );
+      ) ?? [];
+    }
+
+    const hasCrmAccess = apps.some((app) => app.url?.toLowerCase() === "crm");
+    const hasSalesManagement = apps.some((app) => app.url?.toLowerCase() === "sales");
+    return hasCrmAccess && !hasSalesManagement
+      ? [...apps, { Name: "Sales Management", url: "Sales" }]
+      : apps;
   }, [user?.business?.subscriptionplan, user?.user?.Apps]);
 
   // Selected value must come from the toogledTenants array

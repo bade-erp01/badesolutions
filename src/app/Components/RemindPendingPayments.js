@@ -1,27 +1,38 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import { escapeHtml } from "@/lib/security/escapeHtml";
 import { safeUrl } from "@/lib/security/safeUrl";
 // Ensure Animate.css is imported globally: import 'animate.css';
 
-const PendingPaymentReminder = ( {data, business }) => {
-  const MySwal = withReactContent(Swal);
-  const [pendingPayments] = useState(data || []);
+const PendingPaymentReminder = ({ data, business }) => {
+  const pendingPayments = Array.isArray(data) ? data : [];
+  const shownPaymentSignature = useRef("");
+  const paymentSignature = JSON.stringify(
+    pendingPayments
+      .map((payment) => String(
+        payment?._id ||
+        payment?.paymentReferenceNo ||
+        `${payment?.PaymentDate || ""}:${payment?.Amount ?? payment?.crAmount ?? ""}`,
+      ))
+      .sort(),
+  );
 
   useEffect(() => {
-      MySwal.fire({
-        toast: true,
-        position: "top-end", // top right
-        showConfirmButton: false,
-        timer: 10000,
-        timerProgressBar: true,
-        customClass: {
-          popup: "swal2-pending-toast animate__animated animate__slideInRight",
-        },
-        background: "#f9f9f9", // softer background color
-        html: `
+    if (!pendingPayments.length || shownPaymentSignature.current === paymentSignature) return;
+    shownPaymentSignature.current = paymentSignature;
+
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 10000,
+      timerProgressBar: true,
+      customClass: {
+        popup: "swal2-pending-toast animate__animated animate__slideInRight",
+      },
+      background: "#f9f9f9",
+      html: `
             <div style="display: flex; align-items: center;">
                 <img src="${escapeHtml(safeUrl(business?.companyLogo || "", ""))}" 
                     alt="Company Logo" 
@@ -40,8 +51,8 @@ const PendingPaymentReminder = ( {data, business }) => {
                 </div>
             </div>
             `,
-      });
-  }, [pendingPayments, business]);
+    });
+  }, [paymentSignature, pendingPayments.length, business?.companyLogo]);
 
   return null; // Component only triggers the toast
 };
