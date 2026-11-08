@@ -18,7 +18,7 @@ export default function CustomerGrid({ customerList, moduleParams }) {
     a.Username.localeCompare(b.Username),
   );
 
-  const paged = selectedLetter
+  const filtered = selectedLetter
     ? sortedCustomers.filter((c) => {
         const firstChar = c.Username.charAt(0);
         if (selectedLetter === "#") {
@@ -28,8 +28,8 @@ export default function CustomerGrid({ customerList, moduleParams }) {
       })
     : sortedCustomers;
 
-  const totalPages = Math.max(1, Math.ceil(paged.length / perPage));
-  const paged = paged.slice((page - 1) * perPage, page * perPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const paged = filtered.slice((page - 1) * perPage, page * perPage);
 
   const numbers = Array.from({ length: 10 }, (_, i) => i.toString());
   const uppercase = Array.from({ length: 26 }, (_, i) =>
@@ -39,7 +39,7 @@ export default function CustomerGrid({ customerList, moduleParams }) {
   const alphabet = [...specials, ...numbers, ...uppercase];
 
   const categories = Array.from(
-    new Set(paged.map((c) => c.category || "Uncategorized")),
+    new Set(filtered.map((c) => c.category || "Uncategorized")),
   );
 
   return (
@@ -178,3 +178,6 @@ export default function CustomerGrid({ customerList, moduleParams }) {
         </button>
       </div>
     </div>
+  );
+}
+
