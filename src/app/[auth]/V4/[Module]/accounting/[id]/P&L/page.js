@@ -72,6 +72,8 @@ import {
 } from "@/components/ui/select";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+const months = [
   "January",
   "February",
   "March",
