@@ -17,7 +17,12 @@ import {
 
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
-import { ErrorMessage, SuccessToast } from "../../../../../../../../Functions/Mics";
+
+import {
+  ErrorMessage,
+  SuccessToast,
+} from "../../../../../../../../Functions/Mics";
+
 import { Dencrypt } from "../../../../../../../../Functions/Functions";
 
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
@@ -94,7 +99,6 @@ const months = [
 
 function toReport(payload) {
   if (Array.isArray(payload)) return payload;
-
   if (!payload) return [];
 
   if (typeof payload === "string") {
@@ -141,11 +145,9 @@ function Amount({ value, currency, className = "" }) {
 export default function Page({ baseUrl, userData, data }) {
   const [report, setReport] = useState(() => toReport(data));
   const [reportYear, setReportYear] = useState(moment().year());
-
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
-
   const [monthIndex, setMonthIndex] = useState("");
 
   const [dates, setDates] = useState({
@@ -209,31 +211,69 @@ export default function Page({ baseUrl, userData, data }) {
           label: "Revenue",
           data: revenue,
           borderColor: "#2563eb",
-          backgroundColor: "#2563eb",
+          backgroundColor: "rgba(37, 99, 235, 0.08)",
           tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
         },
         {
           label: "Net Profit",
           data: netIncome,
           borderColor: "#16a34a",
-          backgroundColor: "#16a34a",
+          backgroundColor: "rgba(22, 163, 74, 0.08)",
           tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
         },
       ],
     };
   }, [snapshotsByMonth]);
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: "index",
+    },
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          usePointStyle: true,
+          boxWidth: 8,
+          padding: 15,
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) =>
+            `${context.dataset.label}: ${formatAmount(
+              context.parsed.y,
+              currency
+            )}`,
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) =>
+            `${currency}${Number(value).toLocaleString()}`,
+        },
+      },
+    },
+  };
+
   async function GeneratePNLSummary() {
     try {
-      const period = Number(dates.period);
+      const { period } = dates;
 
-      if (
-        !dates.period ||
-        !Number.isInteger(period) ||
-        period < 2026
-      ) {
-        ErrorMessage("Please enter a valid year.");
-        return;
+      if (!period || !Number.isInteger(Number(period))) {
+        throw new Error("Please enter a valid year.");
       }
 
       setLoading(true);
@@ -242,36 +282,31 @@ export default function Page({ baseUrl, userData, data }) {
         `/api/Generate/profitandLoss?period=${period}`
       );
 
-      const requestSucceeded =
-        res?.ok ??
-        (res?.status >= 200 && res?.status < 300);
+      const responseBody = res?.data ?? {};
 
-      if (!requestSucceeded) {
-        throw new Error(
-          res?.data?.message ||
-          "Could not generate the income statement."
-        );
+      const reportPayload =
+        responseBody &&
+        typeof responseBody === "object" &&
+        Object.prototype.hasOwnProperty.call(responseBody, "data")
+          ? responseBody.data
+          : responseBody;
+
+      const generatedReport = toReport(reportPayload);
+
+      if (!generatedReport.length) {
+        throw new Error("No income statement data was returned.");
       }
 
-      const responseData = res?.data?.data;
-
-      const generatedReport = toReport(responseData);
-
       setReport(generatedReport);
-      setReportYear(period);
+      setReportYear(Number(period));
 
+      SuccessToast("Income statement generated");
       setOpenDialog(false);
-
-      SuccessToast(
-        generatedReport.length
-          ? "Income statement generated"
-          : "No income statement records found for this year."
-      );
     } catch (err) {
       ErrorMessage(
         err?.response?.data?.message ||
-        err?.message ||
-        "Could not generate the income statement."
+          err.message ||
+          "Could not generate the income statement."
       );
     } finally {
       setLoading(false);
@@ -291,12 +326,12 @@ export default function Page({ baseUrl, userData, data }) {
         totals,
         year: reportYear,
         monthIndex: Number(monthIndex),
-        business: userData.business,
+        business: userData?.business,
         currencySymbol: currency,
       });
     } catch (err) {
       ErrorMessage(
-        err?.message || "Could not create the PDF."
+        err.message || "Could not create the PDF."
       );
     } finally {
       setDownloading(false);
@@ -307,11 +342,8 @@ export default function Page({ baseUrl, userData, data }) {
     ? `${months[Number(monthIndex)]} ${reportYear}`
     : null;
 
-  const companyName =
-    userData?.business?.companyName || "Business";
-
   return (
-    <div className="flex flex-col min-h-screen gap-4">
+    <div className="flex flex-col">
       <Notch>
         <BackButton />
 
@@ -331,7 +363,7 @@ export default function Page({ baseUrl, userData, data }) {
             </DialogHeader>
 
             <div className="space-y-4">
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="report-year">
                   Select year
                 </Label>
@@ -340,8 +372,6 @@ export default function Page({ baseUrl, userData, data }) {
                   id="report-year"
                   type="number"
                   min="2026"
-                  max={moment().year()}
-                  placeholder="Enter year"
                   value={dates.period}
                   onChange={(e) =>
                     setDates({
@@ -349,6 +379,7 @@ export default function Page({ baseUrl, userData, data }) {
                       period: e.target.value,
                     })
                   }
+                  placeholder="Enter year"
                 />
               </div>
             </div>
@@ -375,7 +406,7 @@ export default function Page({ baseUrl, userData, data }) {
 
         {report.length > 0 && (
           <div className="space-y-3 w-full rounded p-4">
-            <h2 className="text-sm font-medium">
+            <h2 className="text-sm">
               Select P&L month ({reportYear})
             </h2>
 
@@ -388,17 +419,17 @@ export default function Page({ baseUrl, userData, data }) {
                 Select Month
               </option>
 
-              {months.map((month, idx) => {
-                const hasData = snapshotsByMonth.has(idx + 1);
+              {months.map((month, index) => {
+                const hasData = snapshotsByMonth.has(index + 1);
 
                 return (
                   <option
                     key={month}
-                    value={String(idx)}
+                    value={String(index)}
                     disabled={!hasData}
                   >
                     {month}
-                    {!hasData ? " (No data)" : ""}
+                    {!hasData ? " - No data" : ""}
                   </option>
                 );
               })}
@@ -411,12 +442,11 @@ export default function Page({ baseUrl, userData, data }) {
         <Card className="shadow-lg">
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
             <CardTitle>
-              <span className="inline-flex rounded-md border px-3 py-1.5 text-sm font-medium whitespace-normal">
+              <span className="inline-flex rounded-md border px-3 py-2 text-sm font-medium whitespace-normal">
                 {periodLabel
                   ? `P&L Summary for ${periodLabel}`
-                  : "P&L Summary"}
-                {" — "}
-                {companyName}
+                  : "P&L Summary"}{" "}
+                — {userData?.business?.companyName}
               </span>
             </CardTitle>
 
@@ -427,7 +457,7 @@ export default function Page({ baseUrl, userData, data }) {
               disabled={!selectedMonth || downloading}
             >
               {downloading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="animate-spin h-4 w-4 mr-2" />
               ) : (
                 <Download className="h-4 w-4 mr-2" />
               )}
@@ -436,13 +466,32 @@ export default function Page({ baseUrl, userData, data }) {
           </CardHeader>
 
           <CardContent>
-            {!selectedMonth ? (
-              <div className="py-12 text-center text-sm text-muted-foreground">
-                {report.length
-                  ? "Select a month with available P&L data."
-                  : "No income statement data available. Select a period to generate a report."}
+            {chartData.labels.length > 0 ? (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold mb-3">
+                  Revenue and Net Profit Trajectory
+                </h3>
+
+                <div className="h-[220px] w-full">
+                  <Line
+                    data={chartData}
+                    options={chartOptions}
+                  />
+                </div>
               </div>
             ) : (
+              <div className="mb-6 rounded-lg border border-dashed py-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Generate an income statement to view the graph.
+                </p>
+              </div>
+            )}
+
+            <div className="border-t pt-5">
+              <h3 className="text-base font-semibold mb-3">
+                Income Statement
+              </h3>
+
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -485,9 +534,15 @@ export default function Page({ baseUrl, userData, data }) {
                     <TableCell>[C] C.O.G.S</TableCell>
 
                     <TableCell className="text-right">
-                      <Accordion type="single" collapsible>
-                        <AccordionItem value="cogs">
-                          <AccordionTrigger className="justify-end">
+                      <Accordion
+                        type="single"
+                        collapsible
+                      >
+                        <AccordionItem
+                          value="cogs"
+                          className="border-b-0"
+                        >
+                          <AccordionTrigger className="justify-end py-2">
                             <Amount
                               value={totals.COGS}
                               currency={currency}
@@ -521,7 +576,9 @@ export default function Page({ baseUrl, userData, data }) {
                               ].map(([label, value, cls]) => (
                                 <div
                                   key={label}
-                                  className={`flex justify-between gap-4 ${cls || ""}`}
+                                  className={`flex justify-between gap-4 ${
+                                    cls || ""
+                                  }`}
                                 >
                                   <dt className="text-left">
                                     {label}
@@ -616,39 +673,9 @@ export default function Page({ baseUrl, userData, data }) {
                   </TableRow>
                 </TableBody>
               </Table>
-            )}
+            </div>
           </CardContent>
         </Card>
-
-        {selectedMonth && chartData.labels.length > 0 && (
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>Trajectory</CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <div className="w-full min-w-0">
-                <Line
-                  data={chartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                      legend: {
-                        position: "top",
-                      },
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                      },
-                    },
-                  }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </main>
     </div>
   );
