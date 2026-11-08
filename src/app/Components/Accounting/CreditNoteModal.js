@@ -21,7 +21,10 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { plsWait, ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 
 export default function CreditNoteModal({ customersList, baseUrl, userData, BankAccounts }) {
@@ -31,7 +34,7 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
   const [customerId, setCustomerId] = useState("");
   const [bankID, setBankID] = useState("");
   const [remarks, setRemarks] = useState("");
-  const [customerSearch, setCustomerSearch] = useState("");
+  const [customerOpen, setCustomerOpen] = useState(false);
   const Router = useRouter();
   const Path = useParams();
 
@@ -101,28 +104,39 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
 
             <div>
               <label className="text-xs font-semibold">Customer</label>
-              <Input
-                placeholder="Search customer..."
-                value={customerSearch}
-                onChange={(e) => setCustomerSearch(e.target.value)}
-                className="mb-2"
-              />
-              <Select onValueChange={setCustomerId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a customer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {customersList
-                    .filter((c) =>
-                      (c.Username || "").toLowerCase().includes(customerSearch.toLowerCase()),
-                    )
-                    .map((c) => (
-                      <SelectItem key={c._id} value={c._id}>
-                        {c.Username}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              <Popover open={customerOpen} onOpenChange={setCustomerOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" className="w-full justify-between">
+                    {customerId
+                      ? customersList.find((c) => c._id === customerId)?.Username
+                      : "Select a customer"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Search customer..." />
+                    <CommandList>
+                      <CommandEmpty>No customer found.</CommandEmpty>
+                      <CommandGroup>
+                        {customersList.map((c) => (
+                          <CommandItem
+                            key={c._id}
+                            value={c.Username}
+                            onSelect={() => {
+                              setCustomerId(c._id);
+                              setCustomerOpen(false);
+                            }}
+                          >
+                            <Check className={cn("mr-2 h-4 w-4", customerId === c._id ? "opacity-100" : "opacity-0")} />
+                            {c.Username}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
