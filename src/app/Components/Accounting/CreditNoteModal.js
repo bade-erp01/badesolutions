@@ -100,28 +100,27 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
 
             <div>
               <label className="text-xs font-semibold">Customer</label>
+              <Input
+                placeholder="Search customer..."
+                value={customerSearch}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                className="mb-2"
+              />
               <Select onValueChange={setCustomerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
-              <SelectContent>
-                <div className="p-2">
-                  <Input
-                    placeholder="Search customer..."
-                    value={customerSearch}
-                    onChange={(e) => setCustomerSearch(e.target.value)}
-                  />
-                </div>
-                {customersList
-                  .filter((c) =>
-                    c.Username.toLowerCase().includes(customerSearch.toLowerCase()),
-                  )
-                  .map((c) => (
-                    <SelectItem key={c._id} value={c._id}>
-                      {c.Username}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
+                <SelectContent>
+                  {customersList
+                    .filter((c) =>
+                      (c.Username || "").toLowerCase().includes(customerSearch.toLowerCase()),
+                    )
+                    .map((c) => (
+                      <SelectItem key={c._id} value={c._id}>
+                        {c.Username}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
               </Select>
             </div>
 

@@ -98,18 +98,17 @@ export default function DebitNoteModal({ customersList, baseUrl, userData, Accou
 
             <div>
               <label className="text-xs font-semibold">Customer</label>
+              <Input
+                placeholder="Search customer..."
+                value={customerSearch}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                className="mb-2"
+              />
               <Select onValueChange={setCustomerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
-                  <div className="p-2">
-                    <Input
-                      placeholder="Search customer..."
-                      value={customerSearch}
-                      onChange={(e) => setCustomerSearch(e.target.value)}
-                    />
-                  </div>
                   {customersList
                     .filter((c) =>
                       (c.Username || "").toLowerCase().includes(customerSearch.toLowerCase()),
