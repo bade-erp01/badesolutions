@@ -1,28 +1,38 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import moment from "moment";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
 import BackButton from "@/app/Components/BackBotton";
-
-import {
-  ErrorMessage,
-  SuccessToast,
-} from "../../../../../../../../Functions/Mics";
-
+import Notch from "@/app/Components/Notch";
+import { ErrorMessage, SuccessToast } from "../../../../../../../../Functions/Mics";
 import { Dencrypt } from "../../../../../../../../Functions/Functions";
 
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { Download, Loader2 } from "lucide-react";
-import Notch from "@/app/Components/Notch";
+
 import {
   downloadIncomeStatement,
   formatAmount,
   toNumber,
 } from "@/app/Components/Reports/IncomeStatementPdf";
-/* shadcn/ui */
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   Dialog,
   DialogContent,
@@ -32,7 +42,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
 
 import {
   Accordion,
@@ -49,29 +64,18 @@ import {
   TableCell,
   TableBody,
 } from "@/components/ui/table";
+
 import api from "@/lib/api";
 
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
+ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
   Title,
   Tooltip,
-  Legend,
-} from "chart.js";
-import moment from "moment";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+  Legend
+);
 
 const months = [
   "January",
@@ -88,11 +92,11 @@ const months = [
   "December",
 ];
 
-// The API answers { data: <encrypted array> }; the layout passes that raw
-// response, the client re-fetch passes the decrypted array.
 function toReport(payload) {
   if (Array.isArray(payload)) return payload;
+
   if (!payload) return [];
+
   if (typeof payload === "string") {
     try {
       return toReport(Dencrypt(payload));
@@ -100,24 +104,34 @@ function toReport(payload) {
       return [];
     }
   }
-  if (typeof payload === "object" && "data" in payload) return toReport(payload.data);
+
+  if (typeof payload === "object" && "data" in payload) {
+    return toReport(payload.data);
+  }
+
   return [];
 }
 
-// 1-12 for a snapshot. `generatedAt` holds the month number; fall back to a
-// date in case a snapshot stores one.
 function monthOf(entry) {
   const n = Number(entry?.generatedAt);
-  if (Number.isInteger(n) && n >= 1 && n <= 12) return n;
+
+  if (Number.isInteger(n) && n >= 1 && n <= 12) {
+    return n;
+  }
+
   const d = moment(entry?.generatedAt);
+
   return d.isValid() ? d.month() + 1 : null;
 }
 
 function Amount({ value, currency, className = "" }) {
   const negative = toNumber(value) < 0;
+
   return (
     <span
-      className={`whitespace-nowrap tabular-nums ${negative ? "text-red-600" : ""} ${className}`}
+      className={`whitespace-nowrap tabular-nums ${
+        negative ? "text-red-600" : ""
+      } ${className}`}
     >
       {formatAmount(value, currency)}
     </span>
@@ -127,85 +141,138 @@ function Amount({ value, currency, className = "" }) {
 export default function Page({ baseUrl, userData, data }) {
   const [report, setReport] = useState(() => toReport(data));
   const [reportYear, setReportYear] = useState(moment().year());
+
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
+
   const [monthIndex, setMonthIndex] = useState("");
 
   const [dates, setDates] = useState({
     period: "",
   });
 
-  const currency = userData?.business?.currency?.currency?.Symbol || "₦";
+  const currency =
+    userData?.business?.currency?.currency?.Symbol || "₦";
 
-  // month number (1-12) -> snapshot
   const snapshotsByMonth = useMemo(() => {
     const map = new Map();
+
     for (const entry of report) {
-      const m = monthOf(entry);
-      if (m) map.set(m, entry);
+      const month = monthOf(entry);
+
+      if (month) {
+        map.set(month, entry);
+      }
     }
+
     return map;
   }, [report]);
 
-  // Default to the latest month that has a snapshot.
   useEffect(() => {
     if (!snapshotsByMonth.size) {
       setMonthIndex("");
       return;
     }
+
     const latest = Math.max(...snapshotsByMonth.keys());
+
     setMonthIndex(String(latest - 1));
   }, [snapshotsByMonth]);
 
   const selectedMonth =
-    monthIndex === "" ? null : snapshotsByMonth.get(Number(monthIndex) + 1) || null;
+    monthIndex === ""
+      ? null
+      : snapshotsByMonth.get(Number(monthIndex) + 1) || null;
+
   const totals = selectedMonth?.totals || {};
 
   const chartData = useMemo(() => {
     const labels = [];
     const revenue = [];
     const netIncome = [];
+
     for (let i = 1; i <= 12; i++) {
-      const s = snapshotsByMonth.get(i);
-      if (!s) continue;
+      const snapshot = snapshotsByMonth.get(i);
+
+      if (!snapshot) continue;
+
       labels.push(months[i - 1]);
-      revenue.push(toNumber(s.totals?.revenue));
-      netIncome.push(toNumber(s.totals?.netIncome));
+      revenue.push(toNumber(snapshot.totals?.revenue));
+      netIncome.push(toNumber(snapshot.totals?.netIncome));
     }
+
     return {
       labels,
       datasets: [
-        { label: "Revenue", data: revenue, borderColor: "#2563eb", tension: 0.3 },
-        { label: "Net Profit", data: netIncome, borderColor: "#16a34a", tension: 0.3 },
+        {
+          label: "Revenue",
+          data: revenue,
+          borderColor: "#2563eb",
+          backgroundColor: "#2563eb",
+          tension: 0.3,
+        },
+        {
+          label: "Net Profit",
+          data: netIncome,
+          borderColor: "#16a34a",
+          backgroundColor: "#16a34a",
+          tension: 0.3,
+        },
       ],
     };
   }, [snapshotsByMonth]);
-    try {
-      const { period } = dates;
-      setOpenDialog(true);
 
-      if (!period) {
-        throw new Error("Please select a period.");
+  async function GeneratePNLSummary() {
+    try {
+      const period = Number(dates.period);
+
+      if (
+        !dates.period ||
+        !Number.isInteger(period) ||
+        period < 2026
+      ) {
+        ErrorMessage("Please enter a valid year.");
+        return;
       }
 
       setLoading(true);
+
       const res = await api.get(
-        `/api/Generate/profitandLoss?period=${period}`,
+        `/api/Generate/profitandLoss?period=${period}`
       );
 
-      if (!res.ok) {
-        throw new Error("Could not generate the income statement.");
+      const requestSucceeded =
+        res?.ok ??
+        (res?.status >= 200 && res?.status < 300);
+
+      if (!requestSucceeded) {
+        throw new Error(
+          res?.data?.message ||
+          "Could not generate the income statement."
+        );
       }
 
-      const { data } = res.data || {};
+      const responseData = res?.data?.data;
 
-      setReport(toReport(data));
-      setReportYear(Number(period));
-      SuccessToast("Income statement generated");
+      const generatedReport = toReport(responseData);
+
+      setReport(generatedReport);
+      setReportYear(period);
+
       setOpenDialog(false);
+
+      SuccessToast(
+        generatedReport.length
+          ? "Income statement generated"
+          : "No income statement records found for this year."
+      );
     } catch (err) {
-      ErrorMessage(err.message);
+      ErrorMessage(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Could not generate the income statement."
+      );
     } finally {
       setLoading(false);
     }
@@ -216,8 +283,10 @@ export default function Page({ baseUrl, userData, data }) {
       ErrorMessage("Select a month with a P&L snapshot first.");
       return;
     }
+
     try {
       setDownloading(true);
+
       await downloadIncomeStatement({
         totals,
         year: reportYear,
@@ -226,7 +295,9 @@ export default function Page({ baseUrl, userData, data }) {
         currencySymbol: currency,
       });
     } catch (err) {
-      ErrorMessage(err.message || "Could not create the PDF.");
+      ErrorMessage(
+        err?.message || "Could not create the PDF."
+      );
     } finally {
       setDownloading(false);
     }
@@ -236,126 +307,155 @@ export default function Page({ baseUrl, userData, data }) {
     ? `${months[Number(monthIndex)]} ${reportYear}`
     : null;
 
+  const companyName =
+    userData?.business?.companyName || "Business";
+
   return (
-    <div className="flex flex-col">
-        {/* BLACK SIDEBAR */}
-        <Notch>
-          <BackButton />
+    <div className="flex flex-col min-h-screen gap-4">
+      <Notch>
+        <BackButton />
 
-          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger asChild>
-              <Button className="w-full flex gap-2">
-                <CalendarDaysIcon className="h-5 w-5" />
-                Select Period
-              </Button>
-            </DialogTrigger>
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+          <DialogTrigger asChild>
+            <Button className="w-full flex gap-2">
+              <CalendarDaysIcon className="h-5 w-5" />
+              Select Period
+            </Button>
+          </DialogTrigger>
 
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Generate Income Statement</DialogTitle>
-              </DialogHeader>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                Generate Income Statement
+              </DialogTitle>
+            </DialogHeader>
 
-              <div className="space-y-4">
-                <div>
-                  <Label>Select year</Label>
-                  <Input
-                    type="number"
-                    min="2026"
-                    value={dates.period}
-                    onChange={(e) =>
-                      setDates({
-                        ...dates,
-                        period: e.target.value,
-                      })
-                    }
-                  />
-                </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="report-year">
+                  Select year
+                </Label>
+
+                <Input
+                  id="report-year"
+                  type="number"
+                  min="2026"
+                  max={moment().year()}
+                  placeholder="Enter year"
+                  value={dates.period}
+                  onChange={(e) =>
+                    setDates({
+                      ...dates,
+                      period: e.target.value,
+                    })
+                  }
+                />
               </div>
+            </div>
 
-              <DialogFooter>
-                <Button
-                  onClick={GeneratePNLSummary}
-                  disabled={loading}
-                  className="w-full"
-                  type="button"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    "Generate"
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            <DialogFooter>
+              <Button
+                onClick={GeneratePNLSummary}
+                disabled={loading}
+                className="w-full"
+                type="button"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-          {/* months */}
-         {report.length > 0 && (
-           <div className="space-y-4 w-full rounded p-4">
-            <h2 className="text-sm">Select P&L month ({reportYear})</h2>
-            <Select value={monthIndex} onValueChange={setMonthIndex}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select Month" />
-              </SelectTrigger>
-              <SelectContent>
-                {months.map((m, idx) => {
-                  const hasData = snapshotsByMonth.has(idx + 1);
-                  return (
-                    <SelectItem key={m} value={String(idx)} disabled={!hasData}>
-                      {m}
-                      {!hasData && (
-                        <span className="ml-2 text-xs text-muted-foreground">No data</span>
-                      )}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+        {report.length > 0 && (
+          <div className="space-y-3 w-full rounded p-4">
+            <h2 className="text-sm font-medium">
+              Select P&L month ({reportYear})
+            </h2>
+
+            <select
+              value={monthIndex}
+              onChange={(e) => setMonthIndex(e.target.value)}
+              className="w-full max-w-[220px] rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="" disabled>
+                Select Month
+              </option>
+
+              {months.map((month, idx) => {
+                const hasData = snapshotsByMonth.has(idx + 1);
+
+                return (
+                  <option
+                    key={month}
+                    value={String(idx)}
+                    disabled={!hasData}
+                  >
+                    {month}
+                    {!hasData ? " (No data)" : ""}
+                  </option>
+                );
+              })}
+            </select>
           </div>
         )}
-        </Notch>
+      </Notch>
 
-        {/* MAIN */}
-        <main className="flex-1 min-w-0">
-          <Card className="shadow-lg">
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
-              <CardTitle>
-                <Badge variant="outline" className="text-sm whitespace-normal text-left">
-                  {periodLabel ? `P&L Summary for ${periodLabel}` : "P&L Summary"}{" "}
-                  — {userData.business.companyName}
-                </Badge>
-              </CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownload}
-                disabled={!selectedMonth || downloading}
-              >
-                {downloading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <Download />
-                )}
-                Download income statement
-              </Button>
-            </CardHeader>
+      <main className="flex-1 min-w-0 space-y-4">
+        <Card className="shadow-lg">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+            <CardTitle>
+              <span className="inline-flex rounded-md border px-3 py-1.5 text-sm font-medium whitespace-normal">
+                {periodLabel
+                  ? `P&L Summary for ${periodLabel}`
+                  : "P&L Summary"}
+                {" — "}
+                {companyName}
+              </span>
+            </CardTitle>
 
-            <CardContent>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              disabled={!selectedMonth || downloading}
+            >
+              {downloading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 mr-2" />
+              )}
+              Download income statement
+            </Button>
+          </CardHeader>
+
+          <CardContent>
+            {!selectedMonth ? (
+              <div className="py-12 text-center text-sm text-muted-foreground">
+                {report.length
+                  ? "Select a month with available P&L data."
+                  : "No income statement data available. Select a period to generate a report."}
+              </div>
+            ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>
-                      <Badge variant="outline" className="text-sm">
+                      <span className="text-sm font-semibold">
                         Heads
-                      </Badge>
+                      </span>
                     </TableHead>
+
                     <TableHead className="text-right">
-                      <Badge variant="outline" className="text-sm">
+                      <span className="text-sm font-semibold">
                         Amount
-                      </Badge>
+                      </span>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -364,41 +464,74 @@ export default function Page({ baseUrl, userData, data }) {
                   <TableRow>
                     <TableCell>[A] Revenue</TableCell>
                     <TableCell className="text-right">
-                      <Amount value={totals.revenue} currency={currency} />
+                      <Amount
+                        value={totals.revenue}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[B] Returns [less]</TableCell>
                     <TableCell className="text-right">
-                      <Amount value={totals.salesReturns} currency={currency} />
+                      <Amount
+                        value={totals.salesReturns}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
-                    {/* First cell: the label */}
                     <TableCell>[C] C.O.G.S</TableCell>
 
-                    {/* Second cell: accordion with value + expandable details */}
                     <TableCell className="text-right">
                       <Accordion type="single" collapsible>
                         <AccordionItem value="cogs">
                           <AccordionTrigger className="justify-end">
-                            <Amount value={totals.COGS} currency={currency} />
+                            <Amount
+                              value={totals.COGS}
+                              currency={currency}
+                            />
                           </AccordionTrigger>
+
                           <AccordionContent>
                             <dl className="ml-auto max-w-xs space-y-2 text-sm">
                               {[
-                                ["Opening Inventory", totals.OpeningInvntry],
-                                ["+ Net Purchase", totals.netPurchase],
-                                ["+ Goods in Transit", totals.gitTotal],
-                                ["C.O.G.A.S", totals.COGAS, "font-bold"],
-                                ["- Closing Inventory", totals.closingInvntry],
+                                [
+                                  "Opening Inventory",
+                                  totals.OpeningInvntry,
+                                ],
+                                [
+                                  "+ Net Purchase",
+                                  totals.netPurchase,
+                                ],
+                                [
+                                  "+ Goods in Transit",
+                                  totals.gitTotal,
+                                ],
+                                [
+                                  "C.O.G.A.S",
+                                  totals.COGAS,
+                                  "font-bold",
+                                ],
+                                [
+                                  "- Closing Inventory",
+                                  totals.closingInvntry,
+                                ],
                               ].map(([label, value, cls]) => (
-                                <div key={label} className={`flex justify-between gap-4 ${cls || ""}`}>
-                                  <dt className="text-left">{label}</dt>
+                                <div
+                                  key={label}
+                                  className={`flex justify-between gap-4 ${cls || ""}`}
+                                >
+                                  <dt className="text-left">
+                                    {label}
+                                  </dt>
+
                                   <dd>
-                                    <Amount value={value} currency={currency} />
+                                    <Amount
+                                      value={value}
+                                      currency={currency}
+                                    />
                                   </dd>
                                 </div>
                               ))}
@@ -412,42 +545,60 @@ export default function Page({ baseUrl, userData, data }) {
                   <TableRow>
                     <TableCell>[D] Gross Profit</TableCell>
                     <TableCell className="text-right">
-                      <Amount value={totals.grossProfit} currency={currency} />
+                      <Amount
+                        value={totals.grossProfit}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[E] Operating Expenses</TableCell>
                     <TableCell className="text-right font-semibold">
-                      <Amount value={totals.operatingExpenses} currency={currency} />
+                      <Amount
+                        value={totals.operatingExpenses}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[F] EBIT</TableCell>
                     <TableCell className="text-right">
-                      <Amount value={totals.ebit} currency={currency} />
+                      <Amount
+                        value={totals.ebit}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[G] Other income</TableCell>
                     <TableCell className="text-right">
-                      <Amount value={totals.otherIncome} currency={currency} />
+                      <Amount
+                        value={totals.otherIncome}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[H] Interest</TableCell>
                     <TableCell className="text-right">
-                      <Amount value={totals.interest} currency={currency} />
+                      <Amount
+                        value={totals.interest}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
                   <TableRow>
                     <TableCell>[I] Taxes</TableCell>
                     <TableCell className="text-right font-semibold">
-                      <Amount value={totals.taxes} currency={currency} />
+                      <Amount
+                        value={totals.taxes}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
 
@@ -455,26 +606,50 @@ export default function Page({ baseUrl, userData, data }) {
                     <TableCell className="font-bold text-base sm:text-lg">
                       Net Profit
                     </TableCell>
+
                     <TableCell className="text-right font-bold text-base sm:text-lg">
-                      <Amount value={totals.netIncome} currency={currency} />
+                      <Amount
+                        value={totals.netIncome}
+                        currency={currency}
+                      />
                     </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        {selectedMonth && chartData.labels.length > 0 && (
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Trajectory</CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <div className="w-full min-w-0">
+                <Line
+                  data={chartData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                      legend: {
+                        position: "top",
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                      },
+                    },
+                  }}
+                />
+              </div>
             </CardContent>
           </Card>
-
-          {chartData.labels.length > 0 && (
-            <Card className="shadow-lg mt-4">
-              <CardHeader>
-                <CardTitle>Trajectory</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Line data={chartData} />
-              </CardContent>
-            </Card>
-          )}
-        </main>
-      </div>
+        )}
+      </main>
+    </div>
   );
 }
