@@ -1,4 +1,4 @@
-import Card from "@/app/Components/Card";
+import ProductGrid from "./ProductGrid";
 import ProductSalesChart from "@/app/Components/productChart";
 import { fetchUser } from "../../../../../../Functions/useerDataRefresh";
 import Link from "next/link";
@@ -124,18 +124,7 @@ export default async function Productlayout({ children, params }) {
                 <ProductSalesChart productsList={productList} />
               )}
 
-              <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                {productList
-                  .sort((a, b) => a.Name.trim().localeCompare(b.Name.trim()))
-                  .map((element) => (
-                    <Card
-                      key={element._id}
-                      data={element}
-                      module="product"
-                      url={`/${moduleList.auth}/V4/${moduleList.Module}/${moduleList.Module}/${element._id}`}
-                    />
-                  ))}
-              </div>
+               <ProductGrid productList={productList} moduleParams={moduleList.Module} />
             </>
           ) : (
             <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
