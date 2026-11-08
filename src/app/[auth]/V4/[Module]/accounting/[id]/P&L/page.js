@@ -51,7 +51,17 @@ import {
 } from "@/components/ui/table";
 import api from "@/lib/api";
 
-import { Badge } from "@/components/ui/badge";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import moment from "moment";
 import {
   Select,
@@ -61,7 +71,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const months = [
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
   "January",
   "February",
   "March",
@@ -150,7 +160,25 @@ export default function Page({ baseUrl, userData, data }) {
     monthIndex === "" ? null : snapshotsByMonth.get(Number(monthIndex) + 1) || null;
   const totals = selectedMonth?.totals || {};
 
-  async function GeneratePNLSummary() {
+  const chartData = useMemo(() => {
+    const labels = [];
+    const revenue = [];
+    const netIncome = [];
+    for (let i = 1; i <= 12; i++) {
+      const s = snapshotsByMonth.get(i);
+      if (!s) continue;
+      labels.push(months[i - 1]);
+      revenue.push(toNumber(s.totals?.revenue));
+      netIncome.push(toNumber(s.totals?.netIncome));
+    }
+    return {
+      labels,
+      datasets: [
+        { label: "Revenue", data: revenue, borderColor: "#2563eb", tension: 0.3 },
+        { label: "Net Profit", data: netIncome, borderColor: "#16a34a", tension: 0.3 },
+      ],
+    };
+  }, [snapshotsByMonth]);
     try {
       const { period } = dates;
       setOpenDialog(true);
@@ -433,6 +461,17 @@ export default function Page({ baseUrl, userData, data }) {
               </Table>
             </CardContent>
           </Card>
+
+          {chartData.labels.length > 0 && (
+            <Card className="shadow-lg mt-4">
+              <CardHeader>
+                <CardTitle>Trajectory</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Line data={chartData} />
+              </CardContent>
+            </Card>
+          )}
         </main>
       </div>
   );
