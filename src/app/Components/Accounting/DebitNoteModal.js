@@ -30,7 +30,7 @@ export default function DebitNoteModal({ customersList, baseUrl, userData, Accou
   const [amount, setAmount] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [bankID, setBankID] = useState("");
-  const [remarks, setRemarks] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
   const Router = useRouter();
   const Path = useParams();
 
@@ -103,8 +103,18 @@ export default function DebitNoteModal({ customersList, baseUrl, userData, Accou
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
+                  <div className="p-2">
+                    <Input
+                      placeholder="Search customer..."
+                      value={customerSearch}
+                      onChange={(e) => setCustomerSearch(e.target.value)}
+                    />
+                  </div>
                   {customersList
-                    .slice() // Create a copy to avoid mutating original array
+                    .filter((c) =>
+                      (c.Username || "").toLowerCase().includes(customerSearch.toLowerCase()),
+                    )
+                    .slice()
                     .sort((a, b) => a.Username?.localeCompare(b.Username || ""))
                     .map((c) => (
                       <SelectItem key={c._id} value={c._id}>
