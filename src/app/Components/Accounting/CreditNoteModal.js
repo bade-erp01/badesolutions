@@ -30,6 +30,7 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
   const [amount, setAmount] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [bankID, setBankID] = useState("");
+  const [remarks, setRemarks] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
   const Router = useRouter();
   const Path = useParams();
