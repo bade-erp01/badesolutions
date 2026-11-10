@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "idempotency-key" : `Reset-${email}`,
+          // "idempotency-key" : `Reset-${email}`,
         },
       });
 
