@@ -17,13 +17,24 @@ import api from "@/lib/api";
 export default function AuditSnapshotButton({ productId, storeProduct }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   async function querySnapshot() {
+    if (!startDate || !endDate) {
+      ErrorMessage("Please select both start date and end date.");
+      return;
+    }
+    if (new Date(endDate) < new Date(startDate)) {
+      ErrorMessage("End date must be on or after start date.");
+      return;
+    }
+
     try {
       setLoading(true);
       plsWait("Querying audit snapshot...");
       const r = await api.get(
-        `/api/Store/AuditSnapshot?productId=${productId}`,
+        `/api/Store/AuditSnapshot?productId=${productId}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`,
         { responseType: "blob" },
       );
       if (!r.ok) throw new Error(r.error || "Failed to fetch audit snapshot");
@@ -31,7 +42,7 @@ export default function AuditSnapshotButton({ productId, storeProduct }) {
       const url = URL.createObjectURL(new Blob([r.data]));
       const a = document.createElement("a");
       a.href = url;
-      a.download = `audit-snapshot-${productId}.xlsx`;
+      a.download = `audit-snapshot-${productId}-${startDate}-to-${endDate}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -48,7 +59,7 @@ export default function AuditSnapshotButton({ productId, storeProduct }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full flex gap-2" onClick={querySnapshot}>
+        <Button variant="outline" className="w-full flex gap-2" onClick={() => setOpen(true)}>
           <CalendarDaysIcon className="h-5 w-5" />
           Query Audit Snapshot
         </Button>
@@ -59,9 +70,32 @@ export default function AuditSnapshotButton({ productId, storeProduct }) {
         </DialogHeader>
         <ScrollArea className="h-80">
           <div className="space-y-4 p-2">
-            <p className="text-sm text-muted-foreground">
-              Click below to download the audit snapshot for this product as XLSX.
-            </p>
+            <div className="space-y-2">
+              <label className="text-sm font-medium block">Start Date</label>
+              <input
+                type="date"
+                className="w-full border rounded px-2 py-1 text-sm"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium block">End Date</label>
+              <input
+                type="date"
+                className="w-full border rounded px-2 py-1 text-sm"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={querySnapshot}
+              disabled={loading || !startDate || !endDate}
+            >
+              {loading ? "Downloading..." : "Download XLSX"}
+            </Button>
           </div>
         </ScrollArea>
       </DialogContent>
