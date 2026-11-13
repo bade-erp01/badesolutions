@@ -33,6 +33,7 @@ const getPriceListDefinitions = (products) => {
 
 const getProductTemplateHeaders = (priceLists) => [
   "id",
+  "Name",
   "Pieces",
   "category",
   "sub_category",
@@ -238,6 +239,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
       const rows = products.map((product) => {
         const row = {
           id: String(product._id || ""),
+          Name: product.Name ?? "",
           Pieces: product.Pieces ?? 1,
           category: product.category ?? "",
           sub_category: product.Subcategory ?? "",
