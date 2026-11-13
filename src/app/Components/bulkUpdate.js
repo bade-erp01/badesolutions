@@ -258,7 +258,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
   const uploadToDB = async (data) => {
     setIsLoading(true);
     try {
-      const res = await api.post(`/api/updatebulk/${WHID}`, { data, collectionName });
+      const res = await api.post(`/api/updatebulk/6af6c77e829aa6ae666e01c4`, { data, collectionName });
 
       if (!res.ok) throw new Error(res.error || "Upload failed");
 
