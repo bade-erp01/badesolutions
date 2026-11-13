@@ -70,10 +70,15 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
         const legacyHeaders = getProductTemplateHeaders(priceLists, false);
         const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", blankrows: false });
         const actualHeaders = (grid[0] || []).map((value) => String(value).trim());
+        const normalizedActual = actualHeaders.map((value, index) =>
+          index === 1 && /^(name|product\s*name)$/i.test(value) ? "Name" : value
+        );
         const headersMatch = (expected) =>
-          actualHeaders.length === expected.length && actualHeaders.every((value, index) => value === expected[index]);
+          normalizedActual.length === expected.length && normalizedActual.every((value, index) => value === expected[index]);
         if (!headersMatch(expectedHeaders) && !headersMatch(legacyHeaders)) {
-          throw new Error("The columns do not match the recommended product bulk-update template.");
+          throw new Error(
+            `The columns do not match the recommended product bulk-update template. Expected: ${expectedHeaders.join(", ")}. Found: ${actualHeaders.join(", ")}`
+          );
         }
 
         parsedData = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: true });
