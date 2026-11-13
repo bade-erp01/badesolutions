@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { CloudArrowUpIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
-import { plsWait ,ErrorMessage,SuccessToast} from "../../../Functions/Mics";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../Functions/Mics";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { escapeHtml } from "@/lib/security/escapeHtml";
@@ -56,7 +56,11 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
 
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data, { cellDates: true });
-      if (collectionName === "product" && (workbook.SheetNames.length !== 1 || workbook.SheetNames[0] !== "ProductBulkUpdate")) {
+      
+      if (
+        collectionName === "product" &&
+        (workbook.SheetNames.length !== 1 || workbook.SheetNames[0] !== "ProductBulkUpdate")
+      ) {
         throw new Error("This is not the recommended product bulk-update template.");
       }
 
@@ -68,13 +72,18 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
         const priceLists = getPriceListDefinitions(products);
         const expectedHeaders = getProductTemplateHeaders(priceLists);
         const legacyHeaders = getProductTemplateHeaders(priceLists, false);
+        
         const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", blankrows: false });
         const actualHeaders = (grid[0] || []).map((value) => String(value).trim());
+        
         const normalizedActual = actualHeaders.map((value, index) =>
           index === 1 && /^(name|product\s*name)$/i.test(value) ? "Name" : value
         );
+        
         const headersMatch = (expected) =>
-          normalizedActual.length === expected.length && normalizedActual.every((value, index) => value === expected[index]);
+          normalizedActual.length === expected.length &&
+          normalizedActual.every((value, index) => value === expected[index]);
+
         if (!headersMatch(expectedHeaders) && !headersMatch(legacyHeaders)) {
           throw new Error(
             `The columns do not match the recommended product bulk-update template. Expected: ${expectedHeaders.join(", ")}. Found: ${actualHeaders.join(", ")}`
@@ -84,12 +93,17 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
         parsedData = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: true });
         const knownProductIds = new Set(products.map((product) => String(product._id)));
         const seenIds = new Set();
+
         uploadData = parsedData.map((row, index) => {
           const id = String(row.id || "").trim();
+          
           if (!/^[a-f\d]{24}$/i.test(id) || !knownProductIds.has(id)) {
             throw new Error(`Row ${index + 2} has an invalid or unknown product id.`);
           }
-          if (seenIds.has(id)) throw new Error(`Row ${index + 2} repeats a product id.`);
+          
+          if (seenIds.has(id)) {
+            throw new Error(`Row ${index + 2} repeats a product id.`);
+          }
           seenIds.add(id);
 
           const pieces = Number(row.Pieces);
@@ -99,6 +113,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
 
           const productPriceLists = priceLists.map(({ key, name }) => {
             const values = { Name: name };
+
             const price = row[key];
             if (price !== "") {
               if (!Number.isFinite(Number(price)) || Number(price) < 0) {
@@ -109,10 +124,18 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
 
             const vat = row[`${key}_VAT`];
             if (vat !== "") {
-              if (![true, false, 1, 0, "1", "0", "true", "false"].includes(typeof vat === "string" ? vat.toLowerCase() : vat)) {
+              if (
+                ![true, false, 1, 0, "1", "0", "true", "false"].includes(
+                  typeof vat === "string" ? vat.toLowerCase() : vat
+                )
+              ) {
                 throw new Error(`Row ${index + 2} has an invalid ${key}_VAT value; use true or false.`);
               }
-              values.vat = vat === true || vat === 1 || vat === "1" || String(vat).toLowerCase() === "true";
+              values.vat =
+                vat === true ||
+                vat === 1 ||
+                vat === "1" ||
+                String(vat).toLowerCase() === "true";
             }
 
             const promo = row[`${key}_Promo`];
@@ -150,34 +173,41 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
         uploadData = parsedData;
       }
 
-      if (parsedData.length === 0) throw new Error("The template contains no product rows.");
+      if (parsedData.length === 0) {
+        throw new Error("The template contains no product rows.");
+      }
+      
       if (parsedData.length > MAX_BULK_UPDATE_ROWS) {
         throw new Error(`Limit exceeded. Upload no more than ${MAX_BULK_UPDATE_ROWS} records at once.`);
       }
 
       showPreviewModal(parsedData, uploadData);
     } catch (error) {
-      ErrorMessage( error.message || 'Failed to process the file. Please ensure it is a valid Excel or CSV file.' );
+      ErrorMessage(error.message || "Failed to process the file. Please ensure it is a valid Excel or CSV file.");
     } finally {
       e.target.value = "";
     }
   };
 
   const showPreviewModal = (data, uploadData) => {
-    const tableHeaders = Object.keys(data[0] || {}).map(
-      (key) => `<th style="padding:8px; border-bottom:1px solid #ddd;">${escapeHtml(key)}</th>`
-    ).join('');
+    const tableHeaders = Object.keys(data[0] || {})
+      .map((key) => `<th style="padding:8px; border-bottom:1px solid #ddd;">${escapeHtml(key)}</th>`)
+      .join("");
 
-    const tableRows = data.map((row, i) => `
-      <tr style="background-color:${i % 2 === 0 ? '#fff' : '#f9f9f9'};">
-        ${Object.values(row).map(
-          (val) => `<td style="padding:8px; border-bottom:1px solid #eee;">${escapeHtml(val)}</td>`
-        ).join('')}
+    const tableRows = data
+      .map(
+        (row, i) => `
+      <tr style="background-color:${i % 2 === 0 ? "#fff" : "#f9f9f9"};">
+        ${Object.values(row)
+          .map((val) => `<td style="padding:8px; border-bottom:1px solid #eee;">${escapeHtml(val)}</td>`)
+          .join("")}
       </tr>
-    `).join('');
+    `
+      )
+      .join("");
 
     MySwal.fire({
-      title: 'Data Preview',
+      title: "Data Preview",
       html: `
         <div style="max-height:300px; overflow-y:auto; width:100%;">
           <table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -200,21 +230,20 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
         </div>
       `,
       showConfirmButton: false,
-      width: '1100px',
+      width: "1100px",
       didOpen: () => {
-        const btn = document.getElementById('uploadToDB');
+        const btn = document.getElementById("uploadToDB");
         btn.onclick = () => {
-          // Confirmation before upload
           Swal.fire({
-            title: 'Confirm Upload',
+            title: "Confirm Upload",
             text: `Ensure that billing is not ongoing while uploading ${data.length} records to the database.`,
-            icon: 'warning',
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonText: 'Yes, upload to server',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "Yes, upload to server",
+            cancelButtonText: "Cancel",
           }).then((result) => {
             if (result.isConfirmed) {
-              plsWait('Uploading to server...');
+              plsWait("Uploading to server...");
               uploadToDB(uploadData);
             }
           });
@@ -228,7 +257,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
     try {
       const res = await api.post(`/api/updatebulk/${WHID}`, { data, collectionName });
 
-      if (!res.ok) throw new Error(res.error || 'Upload failed');
+      if (!res.ok) throw new Error(res.error || "Upload failed");
 
       SuccessToast(res.data?.message);
     } catch (err) {
@@ -242,8 +271,10 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
   const downloadProductTemplate = () => {
     try {
       if (products.length === 0) throw new Error("No products are available for the template.");
+      
       const priceLists = getPriceListDefinitions(products);
       const headers = getProductTemplateHeaders(priceLists, true);
+      
       const rows = products.map((product) => {
         const row = {
           id: String(product._id || ""),
@@ -252,9 +283,14 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
           category: product.category ?? "",
           sub_category: product.Subcategory ?? "",
         };
+        
         const productPriceLists = new Map(
-          (Array.isArray(product.PriceLists) ? product.PriceLists : []).map((priceList) => [String(priceList.Name), priceList])
+          (Array.isArray(product.PriceLists) ? product.PriceLists : []).map((priceList) => [
+            String(priceList.Name),
+            priceList,
+          ])
         );
+        
         priceLists.forEach(({ key, name }) => {
           const priceList = productPriceLists.get(name) || {};
           row[key] = priceList.price ?? "";
@@ -264,8 +300,10 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
             ? new Date(priceList.PromoDate).toISOString().slice(0, 10)
             : "";
         });
+        
         return row;
       });
+      
       const worksheet = XLSX.utils.json_to_sheet(rows, { header: headers });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "ProductBulkUpdate");
