@@ -31,9 +31,9 @@ const getPriceListDefinitions = (products) => {
   return Array.from(definitions, ([key, name]) => ({ key, name }));
 };
 
-const getProductTemplateHeaders = (priceLists) => [
+const getProductTemplateHeaders = (priceLists, includeName = true) => [
   "id",
-  "Name",
+  ...(includeName ? ["Name"] : []),
   "Pieces",
   "category",
   "sub_category",
@@ -67,9 +67,12 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
       if (collectionName === "product") {
         const priceLists = getPriceListDefinitions(products);
         const expectedHeaders = getProductTemplateHeaders(priceLists);
+        const legacyHeaders = getProductTemplateHeaders(priceLists, false);
         const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", blankrows: false });
         const actualHeaders = (grid[0] || []).map((value) => String(value).trim());
-        if (actualHeaders.length !== expectedHeaders.length || actualHeaders.some((value, index) => value !== expectedHeaders[index])) {
+        const headersMatch = (expected) =>
+          actualHeaders.length === expected.length && actualHeaders.every((value, index) => value === expected[index]);
+        if (!headersMatch(expectedHeaders) && !headersMatch(legacyHeaders)) {
           throw new Error("The columns do not match the recommended product bulk-update template.");
         }
 
@@ -235,7 +238,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
     try {
       if (products.length === 0) throw new Error("No products are available for the template.");
       const priceLists = getPriceListDefinitions(products);
-      const headers = getProductTemplateHeaders(priceLists);
+      const headers = getProductTemplateHeaders(priceLists, true);
       const rows = products.map((product) => {
         const row = {
           id: String(product._id || ""),
