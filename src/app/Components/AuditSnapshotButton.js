@@ -34,7 +34,7 @@ export default function AuditSnapshotButton({ productId, storeProduct }) {
       setLoading(true);
       plsWait("Querying audit snapshot...");
       const r = await api.get(
-        `/api/beamcards/audit-snapshot?productId=${productId}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`,
+        `/api/audit-snapshot?productId=${productId}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`,
         { responseType: "blob" },
       );
       if (!r.ok) throw new Error(r.error || "Failed to fetch audit snapshot");
