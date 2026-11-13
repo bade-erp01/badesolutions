@@ -4,6 +4,7 @@ import { serverApi } from "@/lib/serverApi";
 import BackButton from "@/app/Components/BackBotton";
 import Notch from "@/app/Components/Notch";
 import SideNavWrapper from "@/app/Components/sideNavWrapper";
+import AuditSnapshotButton from "@/app/Components/AuditSnapshotButton";
 
 export default async function StoreLayout({ params }) {
   try {
@@ -19,6 +20,10 @@ export default async function StoreLayout({ params }) {
         {/* Sidebar */}
         <Notch>
           <BackButton />
+          <AuditSnapshotButton
+            productId={StoreProd?._id || StoreProd?.productId?._id}
+            storeProduct={StoreProd}
+          />
           <hr />
           <ul className="divide-y divide-gray-700">
             <li className="py-3 px-4 text-xs text-italic">
