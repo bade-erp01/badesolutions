@@ -21,14 +21,17 @@ const getPriceListDefinitions = (products) => {
       if (!priceList?.Name) return;
       const name = String(priceList.Name).trim();
       const key = name.replace(/\s+/g, "_");
-      if (!definitions.has(key)) definitions.set(key, name);
-      else if (definitions.get(key) !== name) {
+      if (!definitions.has(key)) {
+        definitions.set(key, name);
+      } else if (definitions.get(key) !== name) {
         throw new Error("Price list names must be unique after replacing spaces with underscores.");
       }
     });
   });
 
-  return Array.from(definitions, ([key, name]) => ({ key, name }));
+  // Always return in alphabetical order so it matches your Excel
+  return Array.from(definitions, ([key, name]) => ({ key, name }))
+    .sort((a, b) => a.key.localeCompare(b.key));
 };
 
 const getProductTemplateHeaders = (priceLists, includeName = true) => [
@@ -37,7 +40,12 @@ const getProductTemplateHeaders = (priceLists, includeName = true) => [
   "Pieces",
   "category",
   "sub_category",
-  ...priceLists.flatMap(({ key }) => [key, `${key}_VAT`, `${key}_Promo`, `${key}_PromoDate`]),
+  ...priceLists.flatMap(({ key }) => [
+    key,
+    `${key}_VAT`,
+    `${key}_Promo`,
+    `${key}_PromoDate`,
+  ]),
 ];
 
 const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
@@ -56,7 +64,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
 
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data, { cellDates: true });
-      
+
       if (
         collectionName === "product" &&
         (workbook.SheetNames.length !== 1 || workbook.SheetNames[0] !== "ProductBulkUpdate")
@@ -72,21 +80,21 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
         const priceLists = getPriceListDefinitions(products);
         const expectedHeaders = getProductTemplateHeaders(priceLists);
         const legacyHeaders = getProductTemplateHeaders(priceLists, false);
-        
+
         const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", blankrows: false });
         const actualHeaders = (grid[0] || []).map((value) => String(value).trim());
-        
+
         const normalizedActual = actualHeaders.map((value, index) =>
           index === 1 && /^(name|product\s*name)$/i.test(value) ? "Name" : value
         );
-        
+
         const headersMatch = (expected) =>
           normalizedActual.length === expected.length &&
           normalizedActual.every((value, index) => value === expected[index]);
 
         if (!headersMatch(expectedHeaders) && !headersMatch(legacyHeaders)) {
           throw new Error(
-            `The columns do not match the recommended product bulk-update template. Expected: ${expectedHeaders.join(", ")}. Found: ${actualHeaders.join(", ")}`
+            `The columns do not match the recommended product bulk-update template.\n\nExpected: ${expectedHeaders.join(", ")}\n\nFound: ${actualHeaders.join(", ")}`
           );
         }
 
@@ -96,11 +104,10 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
 
         uploadData = parsedData.map((row, index) => {
           const id = String(row.id || "").trim();
-          
+
           if (!/^[a-f\d]{24}$/i.test(id) || !knownProductIds.has(id)) {
             throw new Error(`Row ${index + 2} has an invalid or unknown product id.`);
           }
-          
           if (seenIds.has(id)) {
             throw new Error(`Row ${index + 2} repeats a product id.`);
           }
@@ -115,7 +122,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
             const values = { Name: name };
 
             const price = row[key];
-            if (price !== "") {
+            if (price !== "" && price !== null && price !== undefined) {
               if (!Number.isFinite(Number(price)) || Number(price) < 0) {
                 throw new Error(`Row ${index + 2} has an invalid ${key} value.`);
               }
@@ -123,12 +130,9 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
             }
 
             const vat = row[`${key}_VAT`];
-            if (vat !== "") {
-              if (
-                ![true, false, 1, 0, "1", "0", "true", "false"].includes(
-                  typeof vat === "string" ? vat.toLowerCase() : vat
-                )
-              ) {
+            if (vat !== "" && vat !== null && vat !== undefined) {
+              const normalizedVat = typeof vat === "string" ? vat.toLowerCase() : vat;
+              if (![true, false, 1, 0, "1", "0", "true", "false"].includes(normalizedVat)) {
                 throw new Error(`Row ${index + 2} has an invalid ${key}_VAT value; use true or false.`);
               }
               values.vat =
@@ -139,7 +143,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
             }
 
             const promo = row[`${key}_Promo`];
-            if (promo !== "") {
+            if (promo !== "" && promo !== null && promo !== undefined) {
               if (!Number.isFinite(Number(promo)) || Number(promo) < 0) {
                 throw new Error(`Row ${index + 2} has an invalid ${key}_Promo value.`);
               }
@@ -147,7 +151,7 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
             }
 
             const promoDate = row[`${key}_PromoDate`];
-            if (promoDate === "") {
+            if (promoDate === "" || promoDate === null || promoDate === undefined) {
               values.PromoDate = null;
             } else if (promoDate instanceof Date && !Number.isNaN(promoDate.getTime())) {
               values.PromoDate = promoDate.toISOString();
@@ -176,7 +180,6 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
       if (parsedData.length === 0) {
         throw new Error("The template contains no product rows.");
       }
-      
       if (parsedData.length > MAX_BULK_UPDATE_ROWS) {
         throw new Error(`Limit exceeded. Upload no more than ${MAX_BULK_UPDATE_ROWS} records at once.`);
       }
@@ -271,26 +274,26 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
   const downloadProductTemplate = () => {
     try {
       if (products.length === 0) throw new Error("No products are available for the template.");
-      
+
       const priceLists = getPriceListDefinitions(products);
       const headers = getProductTemplateHeaders(priceLists, true);
-      
+
       const rows = products.map((product) => {
         const row = {
           id: String(product._id || ""),
           Name: product.Name ?? "",
           Pieces: product.Pieces ?? 1,
           category: product.category ?? "",
-          sub_category: product.Subcategory ?? "",
+          sub_category: product.Subcategory ?? product.sub_category ?? "",
         };
-        
+
         const productPriceLists = new Map(
-          (Array.isArray(product.PriceLists) ? product.PriceLists : []).map((priceList) => [
-            String(priceList.Name),
-            priceList,
+          (Array.isArray(product.PriceLists) ? product.PriceLists : []).map((pl) => [
+            String(pl.Name).trim(),
+            pl,
           ])
         );
-        
+
         priceLists.forEach(({ key, name }) => {
           const priceList = productPriceLists.get(name) || {};
           row[key] = priceList.price ?? "";
@@ -300,10 +303,10 @@ const BulkUpdate = ({ collectionName, WHID, products = [] }) => {
             ? new Date(priceList.PromoDate).toISOString().slice(0, 10)
             : "";
         });
-        
+
         return row;
       });
-      
+
       const worksheet = XLSX.utils.json_to_sheet(rows, { header: headers });
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "ProductBulkUpdate");
