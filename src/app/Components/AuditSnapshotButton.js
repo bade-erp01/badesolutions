@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
-import { plsWait, ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
+import { plsWait, ErrorMessage, SuccessToast } from "../../../Functions/Mics";
 import api from "@/lib/api";
 
 export default function AuditSnapshotButton({ productId, storeProduct }) {
