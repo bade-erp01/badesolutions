@@ -318,6 +318,15 @@ export function WebSocketProvider({ children, user }) {
       });
     });
 
+
+    const unsubPendingPayment = subscribe("pending-payments", (data) => {
+      showNotification({
+        icon: "warning",
+        title: "Pending Payments Notification",
+        text: data?.message || "There are pending payments to process.",
+      });
+    });
+
     const unsubProduct = subscribe("product:notification", (data) => {
       showNotification({
         icon: "success",
@@ -381,6 +390,7 @@ export function WebSocketProvider({ children, user }) {
       unsubNotification();
       unsubInvoice();
       unsubPayment();
+      unsubPendingPayment();
       unsubProduct();
       unsubCustomer();
       unsubPurchase();
