@@ -327,6 +327,14 @@ export function WebSocketProvider({ children, user }) {
       });
     });
 
+    const unsubWrapUp = subscribe("wrap-up-reminder", (data) => {
+      showNotification({
+        icon: "warning",
+        title: "Wrap Up Financial Transactions",
+        text: data?.message || "Finish all financial transactions before accounting snapshots.",
+      });
+    });
+
     const unsubProduct = subscribe("product:notification", (data) => {
       showNotification({
         icon: "success",
@@ -391,6 +399,7 @@ export function WebSocketProvider({ children, user }) {
       unsubInvoice();
       unsubPayment();
       unsubPendingPayment();
+      unsubWrapUp();
       unsubProduct();
       unsubCustomer();
       unsubPurchase();
