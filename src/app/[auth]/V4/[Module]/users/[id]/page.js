@@ -242,6 +242,8 @@ export default function SingleEmployeeView({
     if (response.message) {
       SuccessToast(response.message);
       router.refresh();
+    } else {
+      throw new Error(response.error || response.err || "Failed to update user data. Please try again.");
     }
 
     }catch(err){
