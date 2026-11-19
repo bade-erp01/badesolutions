@@ -19,7 +19,7 @@ import { resetPostHog } from "@/app/Components/PostHogProvider";
 import { logout as serverLogout } from "@/lib/api";
 import { logout as logoutAction } from "../../../../lib/User";
 import { ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
-import { appMeta, inApp, tabApps } from "./apps";
+import { appHref, appMeta, inApp, tabApps } from "./apps";
 
 const toId = (v) => (v && typeof v === "object" ? String(v) : v != null ? String(v) : "");
 const initials = (s) =>
@@ -128,7 +128,7 @@ export function MobileTabBar({ apps, onOpenMenu }) {
           const { short, icon: Icon } = appMeta(app);
           const active = inApp(pathname, auth, app);
           return (
-            <Link key={app.url} href={`/${auth}/V4/${app.url}/${app.url}`} className={tabClass(active)} aria-current={active ? "page" : undefined}>
+            <Link key={app.url} href={appHref(auth, app)} className={tabClass(active)} aria-current={active ? "page" : undefined}>
               <span className={pill(active)}>
                 <Icon className="h-[18px] w-[18px]" />
               </span>
@@ -207,7 +207,7 @@ export function MobileMenu({ open, onClose, user, apps, tenants, selectedTenantI
               const { icon: Icon } = appMeta(app);
               const active = inApp(pathname, auth, app);
               return (
-                <button key={app._id || app.url} type="button" onClick={() => go(`/${auth}/V4/${app.url}/${app.url}`)} className={`${row} ${active ? "bg-muted font-semibold" : ""}`}>
+                <button key={app._id || app.url} type="button" onClick={() => go(appHref(auth, app))} className={`${row} ${active ? "bg-muted font-semibold" : ""}`}>
                   <Icon className="h-5 w-5 text-muted-foreground" />
                   <span className="flex-1">{app.Name}</span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />

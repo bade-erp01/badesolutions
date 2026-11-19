@@ -33,7 +33,7 @@ const APPS = {
   subscription: { short: "Subscriptions", icon: Repeat },
   purchase: { short: "Purchases", icon: ClipboardList },
   manufacturing: { short: "Production", icon: Factory },
-  "reg-ai": { short: "Reg AI", icon: Sparkles },
+  assistant: { short: "Reg AI", icon: Sparkles },
 };
 
 // bottom tabs: Home, then the first three of these the user has, then More
@@ -49,6 +49,19 @@ export function tabApps(apps = []) {
   return TAB_ORDER.map((u) => byUrl.get(u)).filter(Boolean).slice(0, 3);
 }
 
+// Apps whose page sits directly at /<business>/V4/<url> rather than /<url>/<url>
+// (Reg AI, url "Assistant", is the existing Assistant page).
+const SINGLE_SEGMENT = new Set(["assistant"]);
+
+/** Where an app's tile goes. */
+export const appHref = (auth, app) => {
+  const url = String(app?.url || "");
+  return SINGLE_SEGMENT.has(url.toLowerCase()) ? `/${auth}/V4/${url}` : `/${auth}/V4/${url}/${url}`;
+};
+
 /** Is `pathname` inside this app? (/<business>/V4/<url>/...) */
-export const inApp = (pathname, auth, app) =>
-  String(pathname || "").toLowerCase().startsWith(`/${String(auth || "").toLowerCase()}/v4/${String(app?.url || "").toLowerCase()}/`);
+export const inApp = (pathname, auth, app) => {
+  const base = `/${String(auth || "").toLowerCase()}/v4/${String(app?.url || "").toLowerCase()}`;
+  const p = String(pathname || "").toLowerCase();
+  return p.startsWith(`${base}/`) || (SINGLE_SEGMENT.has(String(app?.url || "").toLowerCase()) && p === base);
+};

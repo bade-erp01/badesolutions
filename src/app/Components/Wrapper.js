@@ -58,6 +58,7 @@ import { resetPostHog } from "@/app/Components/PostHogProvider";
 // phones (below 768px) only: header, bottom tabs and menu in the Sales Portal's style
 import { MobileHeader, MobileMenu, MobileTabBar } from "@/app/Components/mobile/MobileShell";
 import UsageBeacon from "@/app/Components/UsageBeacon";
+import { appHref } from "@/app/Components/mobile/apps";
 
 // Normalize ids (ObjectId / string)
 const toId = (v) =>
@@ -340,7 +341,7 @@ export default function Wrapper({ children }) {
 
           {navApps.map((item) => {
             const isActive =
-              pathname === `/${Params.auth}/V4/${item.url}/${item.url}`;
+              pathname === appHref(Params.auth, item);
 
             return (
               <Button
@@ -349,7 +350,7 @@ export default function Wrapper({ children }) {
                 variant={isActive ? "destructive" : "ghost"}
                 className="w-full justify-start cursor-pointer"
                 onClick={() =>
-                  router.push(`/${Params.auth}/V4/${item.url}/${item.url}`)
+                  router.push(appHref(Params.auth, item))
                 }
               >
                 {item.Name}
@@ -432,7 +433,7 @@ export default function Wrapper({ children }) {
                     {navApps.map((item) => {
                         const isActive =
                           pathname ===
-                          `/${Params.auth}/V4/${item.url}/${item.url}`;
+                          appHref(Params.auth, item);
                         return (
                           <Button
                             key={item._id || item.url}
@@ -441,7 +442,7 @@ export default function Wrapper({ children }) {
                             className="w-full justify-start cursor-pointer"
                             onClick={() =>
                               router.push(
-                                `/${Params.auth}/V4/${item.url}/${item.url}`,
+                                appHref(Params.auth, item),
                               )
                             }
                           >
