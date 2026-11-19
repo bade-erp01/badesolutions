@@ -53,6 +53,48 @@ const formatNumberShort = (num) => {
   return num.toString();
 };
 
+// Fields edited by the Personal Information and Work forms. Only these are sent on
+// save, and only when they changed, so a save can't overwrite anything else on the
+// employee (names and types match modules/Employees.js in the backend).
+const TEXT_FIELDS = [
+  "firstName", "lastName", "Email", "DOB", "telephone", "stateOfOrigin", "workTelephone",
+  "nextOfKin", "EmaergencyContact", "EmaergencyContactNumber", "HomeAddress", "Gender",
+  "workLocation", "staffId", "Department", "jobTittle", "pension", "BankName",
+  "StartDate", "EndDate", "pfa", "workEmail", "Target_Start", "Deadline",
+];
+const NUMBER_FIELDS = [
+  "LeaveDaysCount", "Salary", "Medical", "Transport", "Welfare", "penDeduction",
+  "Sales_Target", "ExpenseLimit",
+];
+const DATE_FIELDS = ["DOB", "StartDate", "EndDate", "Target_Start", "Deadline"];
+const REQUIRED_FIELDS = { firstName: "First name", lastName: "Last name", Email: "Email", telephone: "Phone number" };
+
+// <input type="date"> only shows "YYYY-MM-DD".
+function toDateInput(value) {
+  if (!value) return "";
+  const s = String(value);
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// Form values for an employee: every field defined (inputs stay controlled), dates
+// in input format, and the account number blank (the API never returns it).
+function employeeFormValues(employee = {}) {
+  const values = {};
+  for (const f of TEXT_FIELDS) {
+    const v = employee[f];
+    if (DATE_FIELDS.includes(f)) values[f] = toDateInput(v);
+    else if (v && typeof v === "object") values[f] = v.name || v.fullName || ""; // nextOfKin is stored as an object
+    else values[f] = v ?? "";
+  }
+  for (const f of NUMBER_FIELDS) values[f] = employee[f] ?? "";
+  values.AccountNumber = "";
+  return values;
+}
+
 export default function SingleEmployeeView({
   userInfo,
   businessInfo,
@@ -66,7 +108,9 @@ export default function SingleEmployeeView({
   let [user] = useState(userInfo || {});
   const [data] = useState(Backdata);
   const [Error, setError] = useState("");
-  const [formData, setFormData] = useState({ ...data });
+  // what was last saved, to send only what changed
+  const [savedValues, setSavedValues] = useState(() => employeeFormValues(Backdata));
+  const [formData, setFormData] = useState(() => ({ ...Backdata, ...employeeFormValues(Backdata) }));
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
   const [isOpen3, setIsOpen3] = useState(false);
@@ -228,26 +272,70 @@ export default function SingleEmployeeView({
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
-    try{
-      plsWait("Updating user data...");
-      e.preventDefault();
-      const request = await api.patch(`/api/updateUser/${data._id}`, formData)
+    e.preventDefault();
 
-    const response = request.data || {};
-
-    if (response.message) {
-      SuccessToast(response.message);
-      router.refresh();
-    } else {
-      throw new Error(response.error || response.err || "Failed to update user data. Please try again.");
+    // only the fields that changed
+    const changes = {};
+    for (const f of [...TEXT_FIELDS, ...NUMBER_FIELDS]) {
+      const now = formData[f] ?? "";
+      if (String(now) === String(savedValues[f] ?? "")) continue;
+      if (NUMBER_FIELDS.includes(f)) {
+        const n = Number(now);
+        if (now !== "" && Number.isNaN(n)) {
+          ErrorMessage(`${f} must be a number.`);
+          return;
+        }
+        changes[f] = now === "" ? 0 : n;
+      } else if (f === "workLocation" && !now) {
+        continue; // a store id; leave it as it is rather than clear it
+      } else {
+        changes[f] = typeof now === "string" ? now.trim() : now;
+      }
+    }
+    for (const [f, label] of Object.entries(REQUIRED_FIELDS)) {
+      if (f in changes && !changes[f]) {
+        ErrorMessage(`${label} can't be empty.`);
+        return;
+      }
     }
 
-    }catch(err){
-      ErrorMessage(err.message)
+    // The account number is never sent back by the API (it's encrypted): it's only
+    // saved when a new one is typed in.
+    const accountNumber = String(formData.AccountNumber || "").replace(/\s+/g, "");
+    if (accountNumber) {
+      if (!/^\d{10}$/.test(accountNumber)) {
+        ErrorMessage("Account number must be 10 digits (NUBAN).");
+        return;
+      }
+      changes.AccountNumber = accountNumber;
+    }
+
+    if (!Object.keys(changes).length) {
+      ErrorMessage("No changes to save.");
+      return;
+    }
+
+    try {
+      plsWait("Updating user data...");
+      const request = await api.patch(`/api/updateUser/${data._id}`, changes);
+      const response = request.data || {};
+
+      if (request.ok && response.message) {
+        const { AccountNumber, ...saved } = changes;
+        setSavedValues((prev) => ({ ...prev, ...saved }));
+        setFormData((prev) => ({ ...prev, AccountNumber: "" }));
+        SuccessToast(AccountNumber ? `${response.message} Account number updated.` : response.message);
+        router.refresh();
+      } else {
+        throw new Error(response.error || response.err || "Failed to update user data. Please try again.");
+      }
+    } catch (err) {
+      ErrorMessage(err.message);
     }
   };
 
@@ -527,7 +615,7 @@ export default function SingleEmployeeView({
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="first-name"
+                      htmlFor="firstName"
                       className="block text-sm/6 font-medium "
                     >
                       First Name
@@ -547,7 +635,7 @@ export default function SingleEmployeeView({
 
                   <div className="sm:col-span-3">
                     <label
-                      htmlFor="last-name"
+                      htmlFor="lastName"
                       className="block text-sm/6 font-medium "
                     >
                       Last Name
@@ -567,7 +655,7 @@ export default function SingleEmployeeView({
 
                   <div className="sm:col-span-2 sm:col-start-1">
                     <label
-                      htmlFor="city"
+                      htmlFor="Email"
                       className="block text-sm/6 font-medium "
                     >
                       Email
@@ -587,7 +675,7 @@ export default function SingleEmployeeView({
 
                   <div className="sm:col-span-2">
                     <label
-                      htmlFor="region"
+                      htmlFor="DOB"
                       className="block text-sm/6 font-medium "
                     >
                       Date of Birth
@@ -607,7 +695,7 @@ export default function SingleEmployeeView({
 
                   <div className="sm:col-span-2">
                     <label
-                      htmlFor=""
+                      htmlFor="telephone"
                       className="block text-sm/6 font-medium "
                     >
                       Telephone
@@ -647,7 +735,7 @@ export default function SingleEmployeeView({
 
                   <div className="sm:col-span-2">
                     <label
-                      htmlFor="region"
+                      htmlFor="stateOfOrigin"
                       className="block text-sm/6 font-medium "
                     >
                       State / Province
@@ -656,14 +744,15 @@ export default function SingleEmployeeView({
                       <select
                         id="stateOfOrigin"
                         name="stateOfOrigin"
+                        value={formData.stateOfOrigin}
                         onChange={handleChange}
                         autoComplete="stateOfOrigin"
                         className="col-start-1 w-full row-start-1 appearance-none rounded-md  py-1.5 pr-8 pl-3 text-base  outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       >
-                        <option value={formData.stateOfOrigin}>
-                          {" "}
-                          {formData.stateOfOrigin || "Choose..."}
-                        </option>
+                        <option value="">Choose...</option>
+                        {savedValues.stateOfOrigin && !states.includes(savedValues.stateOfOrigin) && (
+                          <option value={savedValues.stateOfOrigin}>{savedValues.stateOfOrigin}</option>
+                        )}
                         {states.map((state, index) => (
                           <option value={state} key={index}>
                             {state}
@@ -845,7 +934,7 @@ export default function SingleEmployeeView({
                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <div className="sm:col-span-2 sm:col-start-1">
                       <label
-                        htmlFor="city"
+                        htmlFor="workLocation"
                         className="block text-sm/6 font-medium "
                       >
                         Work Location
@@ -858,17 +947,7 @@ export default function SingleEmployeeView({
                           onChange={handleChange}
                           className="col-start-1 w-full row-start-1 appearance-none rounded-md  py-1.5 pr-8 pl-3 text-base  outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                         >
-                          <option value={formData.workLocation}>
-                            {
-                              // find assigne store and return store name
-                              (storeList &&
-                                storeList.find(
-                                  (store) =>
-                                    store._id === formData.workLocation,
-                                )?.WHName) ||
-                                "Choose..."
-                            }
-                          </option>
+                          <option value="">Choose...</option>
                           {storeList &&
                             storeList.map((store, index) => (
                               <option value={store._id} key={index}>
@@ -986,19 +1065,26 @@ export default function SingleEmployeeView({
 
                     <div className="sm:col-span-2 sm:col-start-1">
                       <label
-                        htmlFor="city"
+                        htmlFor="AccountNumber"
                         className="block text-sm/6 font-medium "
                       >
                         Account Number
                       </label>
                       <div className="mt-2">
                         <input
-                          id="nextOfKin"
-                          name="nextOfKin"
+                          id="AccountNumber"
+                          name="AccountNumber"
                           type="text"
-                          value={formData.pension}
-                          onChange={handleChange}
-                          autoComplete="address-level2"
+                          inputMode="numeric"
+                          maxLength={10}
+                          pattern="\d{10}"
+                          title="10-digit account number (NUBAN)"
+                          placeholder="Hidden for security. Type a new one to change it"
+                          value={formData.AccountNumber}
+                          onChange={(e) =>
+                            setFormData((prev) => ({ ...prev, AccountNumber: e.target.value.replace(/\D/g, "") }))
+                          }
+                          autoComplete="off"
                           className="block w-full rounded-md  px-3 py-1.5 text-base  outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                         />
                       </div>
