@@ -38,5 +38,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
-.env.local
+
+# local-only: Functions/Functions.js is tracked, so this line alone doesn't hide it.
+# Local edits to it are hidden with: git update-index --skip-worktree Functions/Functions.js
 Functions/Functions.js
+
+# product-video and marketing tooling: kept locally, not in the repo
+/marketing-videos/
+
+# next-pwa build output: a new random name on every build
+/public/fallback-*.js

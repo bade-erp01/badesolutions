@@ -8,7 +8,9 @@ export default function robots() {
         allow: ["/", "/auth/SignUp"],
         disallow: [
           "/api/",
+          "/ingest/", // PostHog proxy
           "/auth/",
+          "/*/V4", // the ERP (needs a login; pages also send X-Robots-Tag: noindex)
           "/SalesPortal/",
           "/Order/",
           "/Search/",

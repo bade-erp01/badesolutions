@@ -27,6 +27,7 @@ import {
   ShoppingCartIcon,
   ClipboardDocumentCheckIcon,
   PlusCircleIcon,
+  WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import Notch from "@/app/Components/Notch";
 
@@ -132,6 +133,17 @@ export default async function storelayout({ children, params }) {
               <span className="text-xs">Product Transfer</span>
             </Link>
           </>
+        )}
+
+        {/* paid add-on: the page explains when the business doesn't have it */}
+        {(userData?.user?.isAdmin || userData?.user?.editProduct || userData?.user?.wareHouseManager || userData?.user?.isAccountant || userData?.user?.isCFO) && (
+          <Link
+            href={`/${moduleList.auth}/V4/manufacturing/manufacturing`}
+            className="flex items-center text-xs gap-3 p-3 rounded-md hover:bg-gray-700 transition"
+          >
+            <WrenchScrewdriverIcon className="h-6 w-6" />
+            <span className="text-xs">Manufacturing</span>
+          </Link>
         )}
 
         {stores.length > 0 && (

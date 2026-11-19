@@ -19,6 +19,15 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { trackEvent } from "../Components/PostHogProvider";
+
+// Standard's free month is set up by the sales team (the backend has no self-serve
+// trial), so Standard starts on WhatsApp with a trial request.
+const STANDARD_TRIAL_WHATSAPP =
+  "https://wa.me/2347044889034?text=" +
+  encodeURIComponent(
+    "Hello B.A.D.E sales, I'd like to start the 1-month free trial of the Standard plan. My business name is: "
+  );
 
 export default function Pricing() {
   const router = useRouter();
@@ -65,7 +74,10 @@ export default function Pricing() {
               <Button
                 className="w-full rounded-xl"
                 variant="secondary"
-                onClick={() => router.push("/auth/SignUp?plan=Basic")}
+                onClick={() => {
+                  trackEvent("signup_started", { plan: "Basic", route: "online" });
+                  router.push("/auth/SignUp?plan=Basic");
+                }}
               >
                 Get started
               </Button>
@@ -105,25 +117,24 @@ export default function Pricing() {
                 </p>
               </div>
 
-              {/* <Button
-                className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
-                onClick={() => router.push("/auth/SignUp?plan=Standard")}
-              >
-                Start scaling
-              </Button> */}
-
-              <Button
-                className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
-                asChild
-              >
-                <Link
-                  href="https://wa.me/2347044889034?text=hello%20sales%2C%20i%27d%20like%20to%20book%20a%20demo"
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <div className="space-y-2">
+                <Button
+                  className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+                  asChild
                 >
-                  Contact Sales
-                </Link>
-              </Button>
+                  <Link
+                    href={STANDARD_TRIAL_WHATSAPP}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackEvent("signup_started", { plan: "Standard", route: "whatsapp-trial" })}
+                  >
+                    Start free trial
+                  </Link>
+                </Button>
+                <p className="text-xs text-center text-zinc-500">
+                  Our team sets up your free month on WhatsApp. No payment to start.
+                </p>
+              </div>
 
               <ul className="text-sm text-zinc-600 space-y-2">
                 <li>Financial module</li>

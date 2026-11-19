@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { logoutOneSignal } from "../Components/OneSignalProvider";
+import { resetPostHog } from "@/app/Components/PostHogProvider";
 
 import {
   ArrowRight,
@@ -201,6 +202,7 @@ export default function Login({ userInfo, businessInfo, url }) {
     setSigningOut(true);
     try {
       await logoutOneSignal().catch(() => {});
+      resetPostHog();
       await serverLogout();
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");

@@ -54,6 +54,7 @@ import { logout as logoutAction } from "../../../lib/User";
 import api, { logout as serverLogout } from "@/lib/api";
 import NotificationBell from "@/app/Components/NotificationBell";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
+import { resetPostHog } from "@/app/Components/PostHogProvider";
 // phones (below 768px) only: header, bottom tabs and menu in the Sales Portal's style
 import { MobileHeader, MobileMenu, MobileTabBar } from "@/app/Components/mobile/MobileShell";
 import UsageBeacon from "@/app/Components/UsageBeacon";
@@ -65,6 +66,9 @@ const toId = (v) =>
 export default function Wrapper({ children }) {
   const router = useRouter();
   const pathname = usePathname();
+  // The dashboard is /{tenant}/V4, with or without a trailing slash (Next doesn't strip it:
+  // skipTrailingSlashRedirect) and whatever the tenant's URL-encoding.
+  const isDashboard = /^\/[^/]+\/v4\/?$/i.test(pathname || "");
   const { user } = useUser();
   const Params = useParams();
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,7 +80,7 @@ export default function Wrapper({ children }) {
   const searchAllowed =
     user.business &&
     user.user &&
-    pathname !== `/${Params.auth}/V4` &&
+    !isDashboard &&
     !pathname.includes("Search") &&
     !pathname.includes("Assistant") &&
     !pathname.includes("store") &&
@@ -330,7 +334,7 @@ export default function Wrapper({ children }) {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-auto">
-          {user.business && user.user && pathname !== `/${Params.auth}/V4` && (
+          {user.business && user.user && !isDashboard && (
             <BackButton />
           )}
 
@@ -353,13 +357,11 @@ export default function Wrapper({ children }) {
             );
           })}
 
-          {pathname !== `/${Params.auth}/V4` && (
+          {!isDashboard && (
             <Button
-              variant={
-                pathname === `/${Params.auth}/V4` ? "destructive" : "ghost"
-              }
+              variant="ghost"
               className="w-full justify-start cursor-pointer"
-              onClick={() => router.push(`/${Params.auth}/V4/`)}
+              onClick={() => router.push(`/${Params.auth}/V4`)}
             >
               Business Overview
             </Button>
@@ -425,7 +427,7 @@ export default function Wrapper({ children }) {
                   <nav className="flex-1 p-4 space-y-1 overflow-auto">
                     {user.business &&
                       user.user &&
-                      pathname !== `/${Params.auth}/V4` && <BackButton />}
+                      !isDashboard && <BackButton />}
 
                     {navApps.map((item) => {
                         const isActive =
@@ -448,15 +450,11 @@ export default function Wrapper({ children }) {
                         );
                       })}
 
-                    {pathname !== `/${Params.auth}/V4` && (
+                    {!isDashboard && (
                       <Button
-                        variant={
-                          pathname === `/${Params.auth}/V4`
-                            ? "destructive"
-                            : "ghost"
-                        }
+                        variant="ghost"
                         className="w-full justify-start cursor-pointer"
-                        onClick={() => router.push(`/${Params.auth}/V4/`)}
+                        onClick={() => router.push(`/${Params.auth}/V4`)}
                       >
                         Business Overview
                       </Button>
@@ -656,6 +654,7 @@ export function UserProfile({ user, biz }) {
   const logout = async () => {
     try {
       await logoutOneSignal();
+      resetPostHog();
       await serverLogout().catch(() => {}); // end the server session too
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");

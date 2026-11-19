@@ -5,6 +5,7 @@ import GeoUpdater from "@/app/Components/LocationGrabber";
 import { fetchUser } from "../../../Functions/whoIsSalesPerson";
 import LocationGuard from "@/app/Components/GpsTracker";
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
+import { PostHogIdentify } from "@/app/Components/PostHogProvider";
 import PushNotificationGate from "@/app/Components/PushNotificationGate";
 import { WebSocketProvider } from "@/app/Components/WebSocketProvider";
 import InstallPrompt from "./_ui/InstallPrompt";
@@ -39,6 +40,7 @@ export default async function layout({ children }) {
   // with the prompts to turn notifications on and to install the app.
   const signedIn = (
     <OneSignalProvider user={userData}>
+      <PostHogIdentify user={userData} />
       <WebSocketProvider user={userData}>
         <GeoUpdater userData={userData} baseUrl={process.env.EXPRESS_PRIVATE_URL} />
         <PushNotificationGate />

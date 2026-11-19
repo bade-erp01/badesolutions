@@ -26,11 +26,35 @@ const nextConfig = {
   // whole ERP against the LOCAL backend. Unset (production, normal use) it does nothing. Next's
   // own routes (e.g. /api/csp-report) are matched before these rewrites.
   allowedDevOrigins: ["*.ngrok-free.app", "*.ngrok-free.dev", "*.ngrok.app", "*.ngrok.io"],
-  ...(process.env.ERP_API_PROXY ? { skipTrailingSlashRedirect: true } : {}), // socket.io paths end in "/"
-  async rewrites() {
-    const api = process.env.ERP_API_PROXY;
-    if (!api) return [];
+  // PostHog's endpoints (/ingest/e/, /ingest/decide/) and socket.io paths end in "/"; a redirect
+  // there would break them.
+  skipTrailingSlashRedirect: true,
+  // Other spellings of the public pages. Next matches redirect sources case-insensitively,
+  // so a case-only redirect (/pricing -> /Pricing) would also catch /Pricing and loop:
+  // only spellings that differ by more than case belong here.
+  async redirects() {
     return [
+      { source: "/about", destination: "/About_Us", permanent: true },
+      { source: "/about-us", destination: "/About_Us", permanent: true },
+      // sign-up starts from a plan on the pricing page (/auth/SignUp without ?plan= goes home)
+      { source: "/signup", destination: "/Pricing", permanent: true },
+      { source: "/sign-up", destination: "/Pricing", permanent: true },
+      { source: "/why", destination: "/why-bade", permanent: true },
+    ];
+  },
+  async rewrites() {
+    // PostHog, through our own origin (src/app/Components/PostHogProvider.js). Region host:
+    // us.i.posthog.com / us-assets.i.posthog.com, or eu.* for an EU project.
+    const posthogHost = process.env.POSTHOG_INGEST_HOST || "https://us.i.posthog.com";
+    const posthogAssets = process.env.POSTHOG_ASSETS_HOST || "https://us-assets.i.posthog.com";
+    const posthog = [
+      { source: "/ingest/static/:path*", destination: `${posthogAssets}/static/:path*` },
+      { source: "/ingest/:path*", destination: `${posthogHost}/:path*` },
+    ];
+    const api = process.env.ERP_API_PROXY;
+    if (!api) return posthog;
+    return [
+      ...posthog,
       { source: "/api/:path*", destination: `${api}/api/:path*` },
       // the Sales Portal login lives outside /api on the backend (not /SalesPortal, the app's pages)
       { source: "/Sales_Portal/:path*", destination: `${api}/Sales_Portal/:path*` },

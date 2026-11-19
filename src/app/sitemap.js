@@ -8,7 +8,6 @@ const routes = [
   { path: "/why-bade", changeFrequency: "monthly", priority: 0.8 },
   { path: "/About_Us", changeFrequency: "monthly", priority: 0.8 },
   { path: "/Careers", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/auth/SignUp", changeFrequency: "monthly", priority: 0.6 },
   { path: "/Login", changeFrequency: "yearly", priority: 0.4 },
 ];
 

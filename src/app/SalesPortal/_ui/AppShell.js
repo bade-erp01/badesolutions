@@ -26,6 +26,7 @@ import api, { logout as serverLogout } from "@/lib/api";
 import { logout as logoutAction } from "../../../../lib/User";
 import { logout as salesLogoutAction } from "../../../../lib/SalesPortalUser";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
+import { resetPostHog } from "@/app/Components/PostHogProvider";
 import NotificationBell from "@/app/Components/NotificationBell";
 import { Avatar, Button, ConfirmSheet, Segmented, Select, Sheet } from "./ui";
 import { useSalesTheme } from "./theme";
@@ -144,6 +145,7 @@ function MenuSheet({ open, onClose, userData, pathname }) {
     setSigningOut(true);
     try {
       await logoutOneSignal();
+      resetPostHog();
       await serverLogout().catch(() => {}); // end the server session too
       await dispatch(logoutAction());
       await dispatch(salesLogoutAction());

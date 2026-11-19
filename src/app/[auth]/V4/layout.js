@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { WebSocketProvider } from "@/app/Components/WebSocketProvider";
 import OneSignalProvider from "@/app/Components/OneSignalProvider";
+import { PostHogIdentify } from "@/app/Components/PostHogProvider";
 import PushNotificationGate from "@/app/Components/PushNotificationGate";
 import { Toaster } from "sonner";
 import PaymentReturnNotice from "@/app/Components/PaymentReturnNotice";
@@ -82,6 +83,7 @@ export default async function layout({ children }) {
 
   return (
     <OneSignalProvider user={userData}>
+      <PostHogIdentify user={userData} />
       <WebSocketProvider user={userData}>
         <Toaster
           position="top-right"

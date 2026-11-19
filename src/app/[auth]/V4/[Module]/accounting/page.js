@@ -14,7 +14,8 @@ import {
   Building,
   Coins,
   Receipt,         // Tax Report
-  ShieldAlert      // Credit Risk
+  ShieldAlert,     // Credit Risk
+  Layers           // Inventory Costing
 } from "lucide-react";
 import {useParams} from "next/navigation"
 import { useUser } from "@/components/UserProvider";
@@ -42,6 +43,8 @@ export default function AccountingERP() {
     { label: "Pay Roll", id:"Pay-Roll", icon: Coins, badge:"New", url:"PayRoll", allowedRoles: [...accountingRoles, "hrm"]},
     { label: "Tax Report", id:"Tax-Report", icon: Receipt, badge:"New", url:"Tax-Report", allowedRoles: accountingRoles},
     { label: "Credit Risk", id:"Credit-Risk", icon: ShieldAlert, badge:"New", url:"Credit-Risk", allowedRoles: accountingRoles},
+    // paid add-on: the page explains when the business doesn't have it
+    { label: "Inventory Costing", id:"Inventory-Costing", icon: Layers, badge:"Add-on", url:"Inventory-Costing", allowedRoles: accountingRoles},
   ];
   const userRoles = [
     isAdmin && "admin",

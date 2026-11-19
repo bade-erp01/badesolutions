@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Nav1 from "@/app/Components/Nav1";
 import Footer1 from "@/app/Components/Footer1";
+import api from "@/lib/api";
+import { ErrorMessage } from "../../../Functions/Mics";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,19 +29,23 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+const EMPTY_APPLICATION = {
+  fullName: "",
+  email: "",
+  phone: "",
+  company: "",
+  experience: "",
+  audience: "",
+  location: "",
+  marketingType: "",
+  portfolio: "",
+  motivation: "",
+};
+
 export default function BecomeMarketerPage() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    company: "",
-    experience: "",
-    audience: "",
-    location: "",
-    marketingType: "",
-    portfolio: "",
-    motivation: "",
-  });
+  const [formData, setFormData] = useState(EMPTY_APPLICATION);
+  const [sending, setSending] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -55,12 +61,19 @@ export default function BecomeMarketerPage() {
     });
   };
 
+  // Stored by the backend (POST /api/careers/apply, BadeAdmin CareerApplications)
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(formData);
-
-    // send to API here
+    if (sending) return;
+    setSending(true);
+    const res = await api.post("/api/careers/apply", formData);
+    setSending(false);
+    if (res.ok && res.data?.success) {
+      setSubmitted(true);
+      setFormData(EMPTY_APPLICATION);
+    } else {
+      ErrorMessage(res.error || "We couldn't send your application. Please try again.");
+    }
   };
 
   return (
@@ -170,6 +183,22 @@ export default function BecomeMarketerPage() {
 
           <Card className="rounded-3xl border border-zinc-200 shadow-xl bg-white">
             <CardContent className="p-5 sm:p-8 md:p-10">
+              {submitted ? (
+                <div role="status" className="py-10 text-center space-y-4">
+                  <h3 className="text-2xl font-semibold">Application received</h3>
+                  <p className="text-zinc-600 max-w-md mx-auto">
+                    Thank you. Our partnership team will review your details and
+                    contact you by email or phone.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="rounded-xl"
+                    onClick={() => setSubmitted(false)}
+                  >
+                    Submit another application
+                  </Button>
+                </div>
+              ) : (
               <form
                 onSubmit={handleSubmit}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
@@ -261,7 +290,7 @@ export default function BecomeMarketerPage() {
                 <div className="space-y-2">
                   <Label>Marketing channel</Label>
 
-                  <Select onValueChange={handleSelect}>
+                  <Select value={formData.marketingType} onValueChange={handleSelect}>
                     <SelectTrigger className="w-full h-12 data-[size=default]:h-12 rounded-xl">
                       <SelectValue placeholder="Select marketing type" />
                     </SelectTrigger>
@@ -335,12 +364,14 @@ export default function BecomeMarketerPage() {
                 <div className="md:col-span-2 pt-4">
                   <Button
                     type="submit"
+                    disabled={sending}
                     className="w-full h-14 rounded-2xl text-base font-medium"
                   >
-                    Submit application
+                    {sending ? "Sending..." : "Submit application"}
                   </Button>
                 </div>
               </form>
+              )}
             </CardContent>
           </Card>
         </div>

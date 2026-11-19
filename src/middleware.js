@@ -3,7 +3,10 @@
 //      httpOnly, set at login for .badesolutions.com.ng) away from the protected
 //      areas before any rendering. This only checks it exists; the layouts
 //      (fetchUser → backend /api/v1/Session) validate it.
-//   2. Per-request nonce-based Content-Security-Policy plus baseline security
+//   2. X-Robots-Tag: noindex on private pages (ERP, Sales Portal, account flows,
+//      order/search/time-off links), so they stay out of search results even
+//      where a page's own metadata says "index, follow".
+//   3. Per-request nonce-based Content-Security-Policy plus baseline security
 //      headers. Next reads the nonce from the request's CSP header and adds it
 //      to its own scripts; layouts read it from `x-nonce` (e.g. next-themes).
 //
@@ -25,6 +28,17 @@ const SALES_PATH =
   /^\/SalesPortal\/(?:Dashboard|Route|(?:Customers|Products|Reports|Requisitions)\/[^/]+)(?:\/|$)/;
 const SALES_COOKIES = ["bade_sid"];
 
+// Pages that must never appear in search results. /{tenant}/SignUp is public (its
+// canonical is /auth/SignUp); the other [auth] pages are private.
+const NOINDEX_PATH = new RegExp(
+  [
+    String.raw`^/[^/]+/(?:V4|account|Account_Activation|Apps|Forgot_password|Reset_password|SetUp|User_Activation)(?:/|$)`,
+    String.raw`^/SalesPortal(?:/|$)`,
+    String.raw`^/(?:Order|Search|timeoff-request)(?:/|$)`,
+    String.raw`^/(?:onboarding-success|onbarding-error|offline)(?:/|$)`,
+  ].join("|")
+);
+
 function hasCookies(request, names) {
   return names.every((name) => Boolean(request.cookies.get(name)?.value));
 }
@@ -40,10 +54,13 @@ function loginRedirect(request) {
   return null;
 }
 
-function withSecurityHeaders(response, headerName, csp) {
+function withSecurityHeaders(response, headerName, csp, pathname) {
   response.headers.set(headerName, csp);
   for (const [name, value] of Object.entries(securityHeaders())) {
     response.headers.set(name, value);
+  }
+  if (NOINDEX_PATH.test(pathname)) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
   return response;
 }
@@ -55,7 +72,12 @@ export function middleware(request) {
 
   const redirectTo = loginRedirect(request);
   if (redirectTo) {
-    return withSecurityHeaders(NextResponse.redirect(redirectTo), headerName, csp);
+    return withSecurityHeaders(
+      NextResponse.redirect(redirectTo),
+      headerName,
+      csp,
+      request.nextUrl.pathname
+    );
   }
 
   const requestHeaders = new Headers(request.headers);
@@ -65,7 +87,8 @@ export function middleware(request) {
   return withSecurityHeaders(
     NextResponse.next({ request: { headers: requestHeaders } }),
     headerName,
-    csp
+    csp,
+    request.nextUrl.pathname
   );
 }
 

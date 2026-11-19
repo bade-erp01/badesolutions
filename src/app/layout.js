@@ -1,8 +1,10 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import ClientProvider from "./ClientProvider";
+import PostHogProvider from "./Components/PostHogProvider";
 import { Analytics } from "@vercel/analytics/next"
 import { headers } from "next/headers";
+import { CORE_KEYWORDS, ORG_NAME, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 // Self-hosted (latin, variable weight) instead of next/font/google: the Google
 // loader crashes the build when Google Fonts returns a file URL without an
@@ -27,57 +29,30 @@ const dmSans = localFont({
   weight: "100 1000",
 });
 
- export const metadata = {
-  metadataBase: new URL("https://badesolutions.com.ng"),
+// Defaults for every page. Public pages override title, description and canonical
+// with pageMetadata() (src/lib/seo.js); there is deliberately no canonical here.
+export const metadata = {
+  metadataBase: new URL(SITE_URL),
 
   title: {
-    default:
-      "B.A.D.E ERP Software | Business Automated Dynamic Enterprise",
-    template: "%s | B.A.D.E ERP",
+    default: "B.A.D.E ERP | Cloud ERP Software for Businesses in Nigeria",
+    template: `%s | ${SITE_NAME}`,
   },
 
   description:
-    "B.A.D.E is a cloud-based ERP platform for Nigerian and African businesses. Manage inventory, accounting, HR, payroll, sales, CRM, warehouses, and operations from one secure enterprise system.",
+    "B.A.D.E is a cloud ERP for Nigerian and African businesses: inventory, accounting, POS, sales, HR and payroll, CRM, warehouses and NRS e-invoicing in one system.",
 
-  keywords: [
-    "ERP software Nigeria",
-    "Cloud ERP",
-    "Business automation software",
-    "Inventory management system",
-    "Accounting software Nigeria",
-    "HR and payroll software",
-    "CRM software",
-    "Enterprise resource planning",
-    "Warehouse management software",
-    "Business management platform",
-    "Sales management software",
-    "SME ERP Nigeria",
-    "B.A.D.E ERP",
-    "Business Automated Dynamic Enterprise",
-  ],
+  keywords: CORE_KEYWORDS,
 
-  authors: [
-    {
-      name: "Business Automated Dynamic Enterprise",
-      url: "https://badesolutions.com.ng",
-    },
-  ],
-
-  creator: "Bernard fidelis",
-  publisher: "Business Automated Dynamic Enterprise",
-
-  category: "technology",
-
-  applicationName: "B.A.D.E ERP",
-
-  alternates: {
-    canonical: "https://badesolutions.com.ng",
-  },
+  authors: [{ name: ORG_NAME, url: SITE_URL }],
+  creator: ORG_NAME,
+  publisher: ORG_NAME,
+  category: "Business Software",
+  applicationName: SITE_NAME,
 
   robots: {
     index: true,
     follow: true,
-    nocache: false,
     googleBot: {
       index: true,
       follow: true,
@@ -87,40 +62,21 @@ const dmSans = localFont({
     },
   },
 
+  // The share image comes from src/app/opengraph-image.js.
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: "https://badesolutions.com.ng",
-    siteName: "B.A.D.E ERP",
-
-    title:
-      "B.A.D.E ERP Software | Automate and Scale Your Business Operations",
-
+    locale: "en_NG",
+    siteName: SITE_NAME,
+    title: "B.A.D.E ERP | Cloud ERP Software for Businesses in Nigeria",
     description:
-      "Run your entire business from one ERP platform. Manage inventory, accounting, HR, CRM, payroll, warehouses, and operations with B.A.D.E ERP.",
-
-    images: [
-      {
-        url: "/assets/bade.png",
-        width: 1200,
-        height: 630,
-        alt: "B.A.D.E ERP Platform",
-      },
-    ],
+      "Run inventory, accounting, POS, sales, HR, payroll and CRM from one cloud ERP built for Nigerian businesses.",
   },
 
   twitter: {
     card: "summary_large_image",
-
-    title:
-      "B.A.D.E ERP Software | Cloud ERP for Modern Businesses",
-
+    title: "B.A.D.E ERP | Cloud ERP Software for Businesses in Nigeria",
     description:
-      "Centralize your business operations with B.A.D.E ERP. Inventory, accounting, HR, CRM, payroll, analytics, and automation in one platform.",
-
-    images: ["/assets/bade.png"],
-
-    creator: "@badesolutions",
+      "Run inventory, accounting, POS, sales, HR, payroll and CRM from one cloud ERP built for Nigerian businesses.",
   },
 
   icons: {
@@ -139,8 +95,14 @@ const dmSans = localFont({
     telephone: false,
   },
 
+  // Google Search Console / Bing Webmaster "HTML tag" verification codes (set on the host).
   verification: {
-    google: "YOUR_GOOGLE_SEARCH_CONSOLE_CODE",
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+      : {}),
+    ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+      : {}),
   },
 
   other: {
@@ -189,8 +151,10 @@ export default async function RootLayout({ children }) {
             /> 
           </div> 
           <ClientProvider>
-            {children}
-            <Analytics />
+            <PostHogProvider>
+              {children}
+              <Analytics />
+            </PostHogProvider>
           </ClientProvider>
         </div>
       </body>

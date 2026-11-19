@@ -5,12 +5,14 @@ import {
   Briefcase,
   Calculator,
   ClipboardList,
+  Factory,
   FileSignature,
   LayoutGrid,
   Package,
   Receipt,
   Repeat,
   ShoppingCart,
+  Sparkles,
   Store,
   Truck,
   Users,
@@ -30,6 +32,8 @@ const APPS = {
   contract: { short: "Contracts", icon: FileSignature },
   subscription: { short: "Subscriptions", icon: Repeat },
   purchase: { short: "Purchases", icon: ClipboardList },
+  manufacturing: { short: "Production", icon: Factory },
+  "reg-ai": { short: "Reg AI", icon: Sparkles },
 };
 
 // bottom tabs: Home, then the first three of these the user has, then More

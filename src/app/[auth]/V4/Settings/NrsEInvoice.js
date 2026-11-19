@@ -9,7 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ErrorMessage, SuccessToast } from "../../../../../Functions/Mics";
 
-const reportHostPattern = /^https:\/\/(?:[a-z0-9-]+\.)*nrs\.gov\.ng(?::\d+)?(?:\/[^\s]*)?$/i;
+// NRS's own domains, as the backend accepts them (lib/nrsEInvoice.js): the e-invoice API is on
+// nrs.gov.ng (einvoice1.nrs.gov.ng); the NRS MBS platform also uses firsmbs.com
+const reportHostPattern = /^https:\/\/(?:[a-z0-9-]+\.)*(?:nrs\.gov\.ng|firsmbs\.com)(?::\d+)?(?:\/[^\s]*)?$/i;
 
 export default function NrsEInvoice({ isAdmin }) {
   const [settings, setSettings] = useState(null);

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import ThemeToggle from "@/components/theme-toggle.jsx";
 import NotificationBell from "@/app/Components/NotificationBell";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
+import { resetPostHog } from "@/app/Components/PostHogProvider";
 import { logout as serverLogout } from "@/lib/api";
 import { logout as logoutAction } from "../../../../lib/User";
 import { ErrorMessage, SuccessToast } from "../../../../Functions/Mics";
@@ -161,6 +162,7 @@ export function MobileMenu({ open, onClose, user, apps, tenants, selectedTenantI
   const signOut = async () => {
     try {
       await logoutOneSignal();
+      resetPostHog();
       await serverLogout().catch(() => {}); // end the server session too
       await dispatch(logoutAction());
       SuccessToast("You have been logged out successfully.");

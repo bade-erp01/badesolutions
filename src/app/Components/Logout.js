@@ -8,6 +8,7 @@ import { logout as logoutAction } from "../../../lib/User";
 import { logout as serverLogout } from "@/lib/api";
 import { SuccessToast, ErrorMessage } from "../../../Functions/Mics";
 import { logoutOneSignal } from "@/app/Components/OneSignalProvider";
+import { resetPostHog } from "@/app/Components/PostHogProvider";
 
 import { Button } from "@/components/ui/button";
 import { Loader2, LogOut } from "lucide-react";
@@ -25,6 +26,7 @@ export default function Logout({ userData }) {
       SuccessToast("Signing out...");
 
       await logoutOneSignal();
+      resetPostHog();
       await serverLogout().catch(() => {}); // end the server session too
       await dispatch(logoutAction());
 
