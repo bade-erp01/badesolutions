@@ -1060,21 +1060,33 @@ export default function CustomerForm({
                     </div>
                   )}
 
+                {/* Plans are assigned from each plan's page (Subscriptions app); a customer can be on several */}
                 <div className="space-y-1.5 min-w-0">
-                  <label className={labelCls}>Subscription Plan</label>
-                  <select
-                    name="Subscription"
-                    value={formData.Subscription?._id || formData.Subscription || ""}
-                    onChange={handleChange}
-                    className={selectCls}
-                  >
-                    <option value="">Select plan</option>
-                    {data?.Subscription?.map((sub) => (
-                      <option key={sub._id} value={sub._id}>
-                        {sub.title}
-                      </option>
-                    ))}
-                  </select>
+                  <label className={labelCls}>Subscription plans</label>
+                  {(() => {
+                    const plans = new Map((data?.Subscription || []).map((p) => [String(p._id), p]));
+                    const rows = (cust.subscriptions || []).filter((e) => e.status !== "cancelled");
+                    if (!rows.length) {
+                      return <p className="text-sm text-muted-foreground">Not on any plan. Add customers from a plan's page in Subscriptions.</p>;
+                    }
+                    return (
+                      <ul className="space-y-1 text-sm">
+                        {rows.map((e) => {
+                          const p = plans.get(String(e.plan));
+                          return (
+                            <li key={e._id} className="flex flex-wrap items-center gap-2">
+                              <Link className="text-indigo-600 hover:underline" href={`/${router.auth}/V4/subscription/subscription/${e.plan}`}>
+                                {p?.title || "Plan"}
+                              </Link>
+                              <span className="text-xs text-muted-foreground">
+                                {e.status}{e.nextBillDate && !["paused"].includes(e.status) ? ` · next bill ${e.nextBillDate}` : ""}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -1325,7 +1337,8 @@ export default function CustomerForm({
               <path d="m6 9 6 6 6-6" />
             </svg>
           </summary>
-          <div className="pb-4 max-h-80 overflow-y-auto space-y-3">
+          <div className="pb-4 max-h-[32rem] overflow-y-auto space-y-3">
+            <CrmNewTicket customerId={cust?._id} />
             {data.SupportTicket?.length > 0 ? (
               data.SupportTicket.map((ticket, index) => (
                 <div key={index} className={`${cardCls} p-3`}>
@@ -1345,7 +1358,13 @@ export default function CustomerForm({
                     </div>
                     <span className="text-xs font-medium">{ticket.SLA}</span>
                   </div>
+                  {ticket.subject && <p className="text-sm font-medium">{ticket.subject}</p>}
                   <p className="text-sm whitespace-pre-line">{ticket.comment}</p>
+                  {(userInfo.user.isAdmin || userInfo.user.isHelpDeskOfficer) && (
+                    <Link href={`/${router.auth}/V4/Helpdesk/Helpdesk?ticket=${ticket._id}`} className="mt-2 inline-block text-xs font-medium text-primary underline">
+                      Open in Help Desk
+                    </Link>
+                  )}
                 </div>
               ))
             ) : (
@@ -1445,3 +1464,50 @@ const formatNumberShort = (num) => {
   if (num >= 1_000) return (num / 1_000).toFixed(3) + " K";
   return num?.toString() || "0";
 };
+
+// Raise a support ticket for this customer from the CRM (the Help Desk app works it).
+// Plain buttons: this sits inside the page's customer form.
+function CrmNewTicket({ customerId }) {
+  const [open, setOpen] = useState(false);
+  const [priority, setPriority] = useState("Medium");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  if (!customerId) return null;
+  const send = async () => {
+    if (!message.trim()) return;
+    setBusy(true);
+    const r = await api.post(`/api/helpdesk/tickets`, { customerId, priority, message, via: "erp" });
+    setBusy(false);
+    if (!r.ok) return Swal.fire({ icon: "error", text: r.data?.error || r.error || "Couldn't create the ticket" });
+    Swal.fire({ icon: "success", text: r.data?.message || "Ticket created", timer: 2500 });
+    setMessage("");
+    setOpen(false);
+  };
+  if (!open) {
+    return (
+      <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <Plus className="mr-1 h-4 w-4" /> New ticket
+      </Button>
+    );
+  }
+  return (
+    <div className="space-y-2 rounded-lg border p-3">
+      <div className="flex gap-2">
+        {["Low", "Medium", "High"].map((p) => (
+          <Button key={p} type="button" size="sm" variant={priority === p ? "default" : "outline"} onClick={() => setPriority(p)}>{p}</Button>
+        ))}
+      </div>
+      <textarea
+        className="min-h-24 w-full rounded-md border bg-background p-2 text-sm"
+        placeholder="Describe the problem"
+        value={message}
+        maxLength={5000}
+        onChange={(e) => setMessage(e.target.value)}
+      />
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>
+        <Button type="button" size="sm" onClick={send} disabled={busy || !message.trim()}>{busy ? "Creating…" : "Create ticket"}</Button>
+      </div>
+    </div>
+  );
+}

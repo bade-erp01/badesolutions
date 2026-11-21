@@ -29,6 +29,7 @@ import {
 } from "../../../../../Functions/Mics";
 import api from "@/lib/api";
 import BuyLicencesButton from "@/app/Components/BuyLicencesButton";
+import UpgradePlanButton from "@/app/Components/UpgradePlanButton";
 import AddOnsBilling from "@/app/Components/AddOnsBilling";
 import { useUser } from "@/components/UserProvider";
 import { safeUrl } from "@/lib/security/safeUrl";
@@ -37,6 +38,7 @@ import CancellationReasons from "./CancellationReasons";
 import PriceLists from "./PriceLists";
 import EmailSending from "./EmailSending";
 import NrsEInvoice from "./NrsEInvoice";
+import OnlinePayments from "./OnlinePayments";
 
 /* Shared Tailwind classes */
 const inputCls =
@@ -68,7 +70,7 @@ export default function SettingsPage({
   // ?tab=email (e.g. from the "your email account isn't sending" notification) opens that tab
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get("tab");
-    if (tab && ["general", "users", "notifications", "delivery", "cancellations", "pricelists", "email", "nrs", "audit", "App"].includes(tab)) setActiveTab(tab);
+    if (tab && ["general", "users", "notifications", "delivery", "cancellations", "pricelists", "email", "nrs", "payments", "audit", "App"].includes(tab)) setActiveTab(tab);
   }, []);
   const [users] = useState(
     userList?.data?.filter((user) => user.isDev !== true) || [],
@@ -86,6 +88,7 @@ export default function SettingsPage({
       { id: "pricelists", label: "Price Lists" },
       { id: "email", label: "Email Sending" },
       { id: "nrs", label: "NRS E-Invoice" },
+      { id: "payments", label: "Online payments" },
       { id: "audit", label: "Audit Logs" },
       { id: "App", label: "App Store" },
     ];
@@ -156,6 +159,7 @@ export default function SettingsPage({
         {activeTab === "nrs" && isAdmin && (
           <NrsEInvoice isAdmin={userData?.user?.isAdmin === true} />
         )}
+        {activeTab === "payments" && isAdmin && <OnlinePayments isAdmin={isAdmin} />}
         {activeTab === "audit" && isAdmin && <AuditLogsPanel logs={logs} />}
         {activeTab === "App" && isAdmin && (
           <Card>
@@ -605,6 +609,9 @@ function CompanyProfileForm({ data, userData, customerList, storeList }) {
                 <p className="font-semibold text-lg">
                   {formData.subscriptionplan}
                 </p>
+                <div className="mt-2">
+                  <UpgradePlanButton plan={formData.subscriptionplan} />
+                </div>
               </div>
               <span className={`${badgeCls} border text-foreground`}>
                 Expires: {formData.subscriptionEndDate || "—"}

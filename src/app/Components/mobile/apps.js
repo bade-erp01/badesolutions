@@ -8,6 +8,7 @@ import {
   Factory,
   FileSignature,
   LayoutGrid,
+  LifeBuoy,
   Package,
   Receipt,
   Repeat,
@@ -34,6 +35,7 @@ const APPS = {
   purchase: { short: "Purchases", icon: ClipboardList },
   manufacturing: { short: "Production", icon: Factory },
   assistant: { short: "Reg AI", icon: Sparkles },
+  helpdesk: { short: "Help Desk", icon: LifeBuoy },
 };
 
 // bottom tabs: Home, then the first three of these the user has, then More

@@ -111,6 +111,10 @@ export default function Pricing() {
             </CardHeader>
 
             <CardContent className="space-y-6">
+              <div>
+                <p className="text-3xl font-semibold"> ₦49,170</p>
+                <p className="text-sm text-zinc-500">/ Monthly</p>
+              </div>
               <div className="rounded-2xl bg-emerald-600 px-4 py-3 text-center text-white shadow-lg">
                 <p className="text-xl sm:text-2xl font-bold leading-none">
                   Get 1 Month Free Trial
@@ -141,7 +145,7 @@ export default function Pricing() {
                 <li>Sales module</li>
                 <li>Access to app store</li>
                 <li>10 active users</li>
-                <li>Access to Sales Portal</li>
+                <li>Sales Portal add-on: ₦3,000 per user/month</li>
                 <li>Free Training & onboarding</li>
                 <li>Priority email support</li>
                 <li>Multi-business management</li>

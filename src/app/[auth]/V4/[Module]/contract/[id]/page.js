@@ -20,6 +20,7 @@ import { useRouter, useParams } from "next/navigation";
 import{  ErrorMessage, SuccessToast} from "../../../../../../../Functions/Mics";
 import { Dencrypt} from "../../../../../../../Functions/Functions";
 import api from "@/lib/api";
+import ContractExtras from "./ContractExtras";
 import {
   Table,
   TableBody,
@@ -330,6 +331,9 @@ export default function ContractDetailsPage({
                 </Table>
               </div>
             </section>
+
+            {/* instalment schedule and completion document */}
+            <ContractExtras contractId={contract._id} />
           </div>
 
           {/* Right Sidebar */}

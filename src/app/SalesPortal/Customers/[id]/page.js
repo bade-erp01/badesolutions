@@ -3,7 +3,7 @@
 // One customer: balance, contact, quick actions (sell, stock check, payment, statement,
 // support ticket), then details, ledger, location and sales history in sections.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
@@ -198,6 +198,10 @@ export default function CustomerPage({ userInfo, data, cust }) {
 
       <Section title="Ledger" icon={FileText} open={open.ledger} onToggle={() => toggle("ledger")} meta={`${data.transcations?.length || 0}`}>
         <Ledger rows={data.transcations || []} cust={cust} business={business} currency={currency} />
+      </Section>
+
+      <Section title="Support tickets" icon={LifeBuoy} open={open.tickets} onToggle={() => toggle("tickets")}>
+        {open.tickets && <TicketsList cust={cust} />}
       </Section>
 
       <Section title="Location" icon={MapPin} open={open.location} onToggle={() => toggle("location")}>
@@ -740,6 +744,101 @@ function TicketSheet({ open, onClose, cust }) {
       <Button className="w-full" onClick={send} disabled={!words || uploading} busy={busy}>
         {busy ? "Sending…" : "Create ticket"}
       </Button>
+    </Sheet>
+  );
+}
+
+// The tickets this rep raised for the customer, each with its thread; the rep can add to it.
+// Internal notes of the help desk are never sent here (backend lib/helpdesk/tickets.js).
+const TICKET_TONE = { Open: "info", Processing: "warn", Waiting: "warn", Resolved: "ok", Closed: "muted" };
+
+function TicketsList({ cust }) {
+  const [rows, setRows] = useState(null);
+  const [error, setError] = useState("");
+  const [openId, setOpenId] = useState(null);
+  const load = async () => {
+    const r = await api.get(`/api/helpdesk/tickets?customerId=${cust._id}`);
+    if (r.ok) setRows(r.data?.tickets || []);
+    else setError(r.data?.error || r.error || "Couldn't load the tickets.");
+  };
+  useEffect(() => {
+    load();
+  }, [cust._id]);
+  if (error) return <div className="p-3"><Alert>{error}</Alert></div>;
+  if (!rows) return <p className="p-4 text-center text-sm text-sp-muted">Loading…</p>;
+  return (
+    <div className="divide-y divide-sp-line">
+      {!rows.length && <p className="p-4 text-center text-sm text-sp-muted">No tickets you raised for this customer.</p>}
+      {rows.map((t) => (
+        <button key={t._id} type="button" onClick={() => setOpenId(t._id)} className="flex w-full items-start gap-3 px-4 py-3 text-left">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{t.subject || t.comment}</p>
+            <p className="text-xs text-sp-muted">
+              {t.TicketId} · {t.SLA} · <When iso={t.createdAt} dateOnly />
+              {t.AssignedTo ? ` · ${`${t.AssignedTo.firstName || ""} ${t.AssignedTo.lastName || ""}`.trim()}` : ""}
+            </p>
+          </div>
+          <Badge tone={TICKET_TONE[t.status] || "muted"}>{t.status}</Badge>
+        </button>
+      ))}
+      <TicketThreadSheet id={openId} onClose={() => setOpenId(null)} onChanged={load} />
+    </div>
+  );
+}
+
+function TicketThreadSheet({ id, onClose, onChanged }) {
+  const [t, setT] = useState(null);
+  const [error, setError] = useState("");
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    setT(null);
+    setError("");
+    setBody("");
+    if (!id) return;
+    api.get(`/api/helpdesk/tickets/${id}`).then((r) => (r.ok ? setT(r.data?.ticket) : setError(r.data?.error || r.error || "Couldn't open the ticket.")));
+  }, [id]);
+  const send = async () => {
+    if (!body.trim()) return;
+    setBusy(true);
+    const r = await api.post(`/api/helpdesk/tickets/${id}/messages`, { body });
+    setBusy(false);
+    if (!r.ok) return toast.error(r.data?.error || r.error || "Couldn't send.");
+    setT(r.data?.ticket);
+    setBody("");
+    onChanged();
+  };
+  const thread = t ? [{ _id: "raised", author: t.raisedByName || "You", messageBody: t.comment, createdAt: t.createdAt }, ...(t.conversation || [])] : [];
+  return (
+    <Sheet open={Boolean(id)} onClose={busy ? undefined : onClose} title={t ? `${t.TicketId} · ${t.status}` : "Ticket"}>
+      {error && <Alert>{error}</Alert>}
+      {!t && !error && <p className="py-6 text-center text-sm text-sp-muted">Loading…</p>}
+      {t && (
+        <>
+          <div className="space-y-2">
+            {thread.map((m) => (
+              <div key={m._id} className="rounded-xl border border-sp-line p-3">
+                <p className="text-xs text-sp-muted">
+                  <span className="font-semibold text-sp-ink">{m.author || "Help desk"}</span> · <When iso={m.createdAt} />
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-sm">{m.messageBody}</p>
+              </div>
+            ))}
+          </div>
+          {t.status === "Closed" ? (
+            <Alert>This ticket is closed. Create a new ticket if the problem is back.</Alert>
+          ) : (
+            <>
+              <Field label="Add to the ticket">
+                <Textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={5000} placeholder="More details, or the customer's answer" className="min-h-24" />
+              </Field>
+              <Button className="w-full" onClick={send} disabled={!body.trim()} busy={busy}>
+                {busy ? "Sending…" : "Send"}
+              </Button>
+            </>
+          )}
+        </>
+      )}
     </Sheet>
   );
 }

@@ -18,6 +18,7 @@ import {
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import api from "@/lib/api";
+import { hasActiveAddOn } from "@/lib/addons";
 import moment from "moment";
 import { useRouter, useParams } from "next/navigation";
 import DeliveryPanel from "@/app/Components/DeliveryPanel";
@@ -53,7 +54,9 @@ export default function InvoicePage({
     Singlebill.Cancelreason || Singlebill.cancelReason || Singlebill.cancellationReason || "",
   ).trim();
   const nrsStatus = String(Singlebill.nrsFiscalization?.status || "").toLowerCase();
-  const canReportToNrs = Boolean(userInfo.user.isAdmin || userInfo.user.isAccountant);
+  // NRS e-invoicing is a paid add-on: the button shows only while the business has it, and only
+  // to the users who may report (admins and accountants)
+  const canReportToNrs = Boolean(userInfo.user.isAdmin || userInfo.user.isAccountant) && hasActiveAddOn(userInfo.business, "nrsEInvoice");
 
   //  Safe image loader as Data URL
   const loadImageAsDataURL = async (src, watermarkText = "B.A.D.E") => {

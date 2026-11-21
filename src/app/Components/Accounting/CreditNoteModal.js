@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { CreditCardIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,20 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
   const [bankID, setBankID] = useState("");
   const [remarks, setRemarks] = useState("");
   const [customerOpen, setCustomerOpen] = useState(false);
+  // subscription invoices of the chosen customer (only when the business has Subscriptions)
+  const [subInvoices, setSubInvoices] = useState([]);
+  const [invoiceId, setInvoiceId] = useState("");
+
+  useEffect(() => {
+    setInvoiceId("");
+    setSubInvoices([]);
+    if (!customerId) return undefined;
+    let live = true;
+    api.get(`/api/subscriptions/customer/${customerId}/invoices`).then((r) => {
+      if (live && r.ok && Array.isArray(r.data?.invoices)) setSubInvoices(r.data.invoices);
+    });
+    return () => { live = false; };
+  }, [customerId]);
   const Router = useRouter();
   const Path = useParams();
 
@@ -53,6 +67,7 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
       reference: remarks,
       customerId,
       bankID: bankID || null,
+      ...(invoiceId ? { invoiceId } : {}),
     });
 
     const response = r.data || {};
@@ -139,6 +154,29 @@ export default function CreditNoteModal({ customersList, baseUrl, userData, Bank
                 </PopoverContent>
               </Popover>
             </div>
+
+            {subInvoices.length > 0 && (
+              <div>
+                <label className="text-xs font-semibold">Subscription invoice (optional)</label>
+                <Select value={invoiceId || "none"} onValueChange={(v) => setInvoiceId(v === "none" ? "" : v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Not for a subscription invoice" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Not for a subscription invoice</SelectItem>
+                    {subInvoices.map((inv) => (
+                      <SelectItem key={inv._id} value={String(inv._id)}>
+                        {inv.billReferenceNo} · {inv.period} · ₦{Number(inv.total || 0).toLocaleString()}
+                        {inv.deferred ? ` · ₦${Number(inv.deferredLeft || 0).toLocaleString()} not yet earned` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  For a quarterly or yearly invoice, approving this credit stops the months not yet earned from being recognised as revenue.
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="text-xs font-semibold">

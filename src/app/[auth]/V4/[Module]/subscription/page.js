@@ -109,7 +109,7 @@ export default function SubscriptionDashboard() {
     try {
       const res = await api.post(`/api/Subscriptions`, { data: newSubscription });
 
-      if (!res.ok) throw new Error("Failed to create subscription");
+      if (!res.ok) throw new Error(res.data?.error || res.error || "Failed to create subscription");
 
       const reqData = res.data || {};
 
@@ -122,7 +122,7 @@ export default function SubscriptionDashboard() {
         );
       }, 1500);
     } catch (err) {
-      ErrorMessage("Failed to create subscription. Please try again.");
+      ErrorMessage(err.message || "Failed to create subscription. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -137,11 +137,6 @@ export default function SubscriptionDashboard() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
-
           <NewSubscriptionModal onSubscriptionCreated={handleNewSubscription}>
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -171,9 +166,32 @@ export default function SubscriptionDashboard() {
 }
 
 // ==================== TABLE + KPI ====================
+const naira = (n) => `₦${Number(n || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}`;
+const BILLS = { monthly: "Monthly", quarterly: "Quarterly", yearly: "Yearly" };
+
+// one CSV cell: quoted, and safe from spreadsheet formulas
+function csvCell(v) {
+  let t = v === null || v === undefined ? "" : String(v);
+  if (/^[=+\-@\t\r]/.test(t)) t = `'${t}`;
+  return `"${t.replace(/"/g, '""')}"`;
+}
+
+function downloadCsv(filename, rows) {
+  const csv = rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function SubscriptionTableContent({ user }) {
   const params = useParams();
   const [subscriptionData, setSubscriptionData] = useState(null);
+  const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -181,9 +199,13 @@ function SubscriptionTableContent({ user }) {
 
     const load = async () => {
       try {
-        const data = await fetchSubscriptions(user);
+        const [data, rep] = await Promise.all([
+          fetchSubscriptions(user),
+          api.get("/api/subscriptions/report?days=30"),
+        ]);
         if (mounted) {
           setSubscriptionData(data);
+          if (rep.ok) setReport(rep.data);
         }
       } catch (err) {
         console.error(err);
@@ -202,43 +224,37 @@ function SubscriptionTableContent({ user }) {
     };
   }, [user]);
 
+  const byPlan = useMemo(() => new Map((report?.plans || []).map((p) => [String(p.planId), p])), [report]);
+
   const kpiData = useMemo(() => {
-    if (!subscriptionData) return [];
-
-    const list = subscriptionData || [];
-    const pending = list.filter((entry) => entry.status === "pending");
-
+    const t = report?.totals;
     return [
-      {
-        title: "All Subscriptions",
-        value: list.length.toString(),
-        icon: Users,
-      },
-      {
-        title: "Active / Running",
-        value: list.filter((e) => e.status === "Active" || e.status === "Paid").length.toString(),
-        icon: TrendingUp,
-      },
-      {
-        title: "Pending",
-        value: pending.length.toString(),
-        icon: Clock,
-      },
-      {
-        title: "Active Sum",
-        value: `₦${list.filter((e) => e.status === "Active" || e.status === "Paid")
-          .reduce((acc, record) => acc + (record.fee || 0), 0)
-          .toLocaleString()}`,
-        icon: DollarSign,
-      },
+      { title: "Subscribers", value: String(t?.subscribers ?? 0), sub: `${t?.active ?? 0} active · ${t?.trial ?? 0} on trial`, icon: Users },
+      { title: "Monthly recurring revenue", value: naira(t?.mrr), sub: `${naira(t?.arr)} a year`, icon: DollarSign },
+      { title: "Overdue", value: String((report?.overdue || []).length), sub: `${t?.paused ?? 0} paused`, icon: Clock },
+      { title: "Renewing in 30 days", value: String((report?.upcoming || []).length), sub: naira((report?.upcoming || []).reduce((s, u) => s + (u.amount || 0), 0)), icon: TrendingUp },
     ];
-  }, [subscriptionData]);
+  }, [report]);
 
   if (loading || !subscriptionData) {
     return <SubscriptionTableSkeleton />;
   }
 
   const list = subscriptionData || [];
+
+  const exportCsv = () => {
+    const rows = [["Plan", "Bills", "Fee (before VAT)", "VAT %", "Duration (months)", "Status", "Active", "Trial", "Overdue", "Paused", "Cancelled", "Monthly recurring revenue"]];
+    for (const item of list) {
+      const r = byPlan.get(String(item._id));
+      rows.push([
+        item.title, BILLS[item.plan] || item.plan, item.fee, item.vatRate || 0, item.completionDate, item.status,
+        r?.counts?.active ?? 0, r?.counts?.trial ?? 0, r?.counts?.past_due ?? 0, r?.counts?.paused ?? 0, r?.counts?.cancelled ?? 0, r?.mrr ?? 0,
+      ]);
+    }
+    downloadCsv(`subscription-plans-${moment().format("YYYY-MM-DD")}.csv`, rows);
+  };
+
+  const planHref = (id) => `/${params.auth}/V4/${params.Module}/${params.Module}/${id}`;
 
   return (
     <>
@@ -252,68 +268,140 @@ function SubscriptionTableContent({ user }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl lg:text-3xl font-bold break-all">{kpi.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">{kpi.sub}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
+      <div className="flex justify-end mb-3">
+        <Button variant="outline" className="gap-2" onClick={exportCsv} disabled={!list.length}>
+          <Download className="h-4 w-4" />
+          Export CSV
+        </Button>
+      </div>
+
       {/* Table */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Subscription Plan</TableHead>
-            <TableHead>Renewable</TableHead>
-            <TableHead>Subscription Fee</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {list.length > 0 ? (
-            list.map((item) => (
-              <TableRow key={item._id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">
-                  <Link
-                    href={`/${params.auth}/V4/${params.Module}/${params.Module}/${item._id}`}
-                    className="hover:underline"
-                  >
-                    {item.title?.toUpperCase() || "—"}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  {item.plan || "—"}
-                </TableCell>
-                <TableCell className="font-mono">
-                  ₦{(item.fee ?? item.fee ?? 0).toLocaleString()}
-                </TableCell>
-                <TableCell className="font-mono">
-                  {item.completionDate || 0} Months
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    className={
-                      item.status === "Paid" || item.status === "Active"
-                        ? "bg-emerald-600 hover:bg-emerald-600"
-                        : "bg-amber-600 hover:bg-amber-600"
-                    }
-                  >
-                    {item.status || "Pending"}
-                  </Badge>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Subscription Plan</TableHead>
+              <TableHead>Bills</TableHead>
+              <TableHead>Fee (before VAT)</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Subscribers</TableHead>
+              <TableHead className="text-right">Monthly revenue</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {list.length > 0 ? (
+              list.map((item) => {
+                const r = byPlan.get(String(item._id));
+                const c = r?.counts || {};
+                return (
+                  <TableRow key={item._id} className="hover:bg-muted/50">
+                    <TableCell className="font-medium">
+                      <Link href={planHref(item._id)} className="hover:underline">
+                        {item.title?.toUpperCase() || "—"}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{BILLS[item.plan] || item.plan || "—"}</TableCell>
+                    <TableCell className="font-mono">{naira(item.fee)}{item.vatRate ? ` + ${item.vatRate}% VAT` : ""}</TableCell>
+                    <TableCell className="font-mono">{item.completionDate || 0} months</TableCell>
+                    <TableCell>
+                      {(c.active || 0) + (c.trial || 0) + (c.past_due || 0) + (c.paused || 0)}
+                      {c.past_due ? <span className="text-xs text-destructive"> · {c.past_due} overdue</span> : null}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">{naira(r?.mrr)}</TableCell>
+                    <TableCell>
+                      <Badge className={item.status === "active" ? "bg-emerald-600 hover:bg-emerald-600" : "bg-amber-600 hover:bg-amber-600"}>
+                        {item.status || "pending"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-16 text-muted-foreground">
+                  No subscriptions found
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-center py-16 text-muted-foreground"
-              >
-                No subscriptions found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {report && (report.overdue.length > 0 || report.upcoming.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          <Card className="border">
+            <CardHeader className="pb-2"><CardTitle className="text-base">Overdue</CardTitle></CardHeader>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Last invoice</TableHead>
+                    <TableHead className="text-right">Balance</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {report.overdue.length ? report.overdue.slice(0, 20).map((o, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Link className="text-indigo-600 hover:underline" href={`/${params.auth}/V4/crm/crm/${o.customerId}`}>{o.customer}</Link>
+                        {o.status === "paused" && <span className="block text-xs text-muted-foreground">paused</span>}
+                      </TableCell>
+                      <TableCell>{o.plan}</TableCell>
+                      <TableCell>{o.lastBillRef || "—"}<span className="block text-xs text-muted-foreground">{o.lastBilledOn}{o.daysSinceBill !== null ? ` · ${o.daysSinceBill} days ago` : ""}</span></TableCell>
+                      <TableCell className="text-right">{naira(o.balance)}</TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">Nobody is overdue.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          <Card className="border">
+            <CardHeader className="pb-2"><CardTitle className="text-base">Renewing in the next 30 days</CardTitle></CardHeader>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {report.upcoming.length ? report.upcoming.slice(0, 20).map((u, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="whitespace-nowrap">{u.nextBillDate}</TableCell>
+                      <TableCell>{u.customer}</TableCell>
+                      <TableCell>{u.plan}</TableCell>
+                      <TableCell className="text-right">{naira(u.amount)}</TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">Nothing due in the next 30 days.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {report && (
+        <p className="text-xs text-muted-foreground mt-6">
+          Last 12 months: {report.monthly.reduce((t, m) => t + m.started, 0)} new · {report.monthly.reduce((t, m) => t + m.cancelled, 0)} cancelled
+          {report.totals.deferredPending ? ` · ${naira(report.totals.deferredPending)} invoiced but not yet earned (deferred)` : ""}
+        </p>
+      )}
     </>
   );
 }
@@ -354,7 +442,7 @@ function NewSubscriptionModal({ children, onSubscriptionCreated }) {
     setDescription("");
     setOpen(false);
     setIsSubmitting(false);
-    setcompletionDate(0)
+    setcompletionDate(1)
   };
 
   return (
@@ -390,9 +478,9 @@ function NewSubscriptionModal({ children, onSubscriptionCreated }) {
                 <SelectValue placeholder="Select subscription type" />
               </SelectTrigger>
               <SelectContent>
-                {/* <SelectItem value="daily">Daily</SelectItem> */}
                 <SelectItem value="monthly">Monthly</SelectItem>
-                {/* <SelectItem value="yearly">Yearly</SelectItem> */}
+                <SelectItem value="quarterly">Quarterly (every 3 months)</SelectItem>
+                <SelectItem value="yearly">Yearly</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -22,6 +22,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useUser } from "@/components/UserProvider";
+import ContractTemplates from "./ContractTemplates";
 import {
   ErrorMessage,
   SuccessToast,
@@ -155,6 +156,8 @@ export default function SubscriptionDashboard() {
             <Download className="h-4 w-4" />
             Export CSV
           </Button>
+
+          <ContractTemplates isAdmin={user?.user?.user?.isAdmin === true} />
 
           {user.user.user.raiseInvoice && 
             <NewSubscriptionModal
