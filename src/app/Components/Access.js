@@ -498,19 +498,11 @@ export default function AccessControl({
             />
           </div>
 
-          {userInfo.isDev && (
-            <div className="flex items-center justify-between w-full max-w-md">
-            <label className="text-sm font-medium cursor-pointer" title={`Grant ${formData.firstName} access to sales portal.`}>
-              Access sales portal
-            </label>
-            <Switch
-              checked={formData.isSalesRep || false}
-              onCheckedChange={(checked) => {
-                const fakeEvent = { target: { name: "isSalesRep", checked } };
-                handleChange(fakeEvent);
-              }}
+          {(userInfo?.isAdmin === true || userInfo?.isHRM === true || userInfo?.isDev) && (
+            <SalesPortalAccess
+              user={formData}
+              onChanged={(checked) => setFormData((prev) => ({ ...prev, isSalesRep: checked }))}
             />
-            </div>
           )}
         </div>
       </fieldset>
@@ -601,6 +593,70 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+// Sales Portal access uses a Field sales seat (backend lib/fieldSales.js). A user with access is
+// a portal-only account. Admins and HR managers give or take it away; the seats come from
+// GET /api/field-sales/seats and the backend refuses access when every seat is taken.
+function SalesPortalAccess({ user, onChanged }) {
+  const router = useRouter();
+  const [seats, setSeats] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const has = user.isSalesRep === true;
+
+  const load = async () => {
+    const r = await api.get("/api/field-sales/seats");
+    if (r.ok) setSeats(r.data);
+  };
+  useEffect(() => {
+    load();
+  }, []);
+
+  const full = seats?.mode === "paid" && seats.used >= seats.limit;
+  const closed = seats?.mode === "closed";
+  const blocked = !has && (full || closed);
+
+  const toggle = async (checked) => {
+    if (busy) return;
+    if (checked) {
+      const ok = await Swal.fire({
+        icon: "question",
+        title: "Give Sales Portal access?",
+        text: `${user.firstName || "This user"} will use the Sales Portal only (no ERP sign-in) and takes one Field sales seat.`,
+        showCancelButton: true,
+        confirmButtonText: "Give access",
+      });
+      if (!ok.isConfirmed) return;
+    }
+    setBusy(true);
+    const r = await api.patch(`/api/updateUser/${Encrypt(user._id)}`, { isSalesRep: checked });
+    setBusy(false);
+    if (r.ok && r.data?.message) {
+      onChanged(checked);
+      SuccessToast(checked ? "Sales Portal access given" : "Sales Portal access removed");
+      load();
+      router.refresh();
+    } else {
+      ErrorMessage(r.data?.error || r.error || "Couldn't change Sales Portal access");
+    }
+  };
+
+  let note = "";
+  if (seats?.mode === "paid") note = `${seats.used} of ${seats.limit} Field sales seat${seats.limit === 1 ? "" : "s"} in use.${full && !has ? " Add seats under Settings → Billing." : ""}`;
+  else if (seats?.mode === "free") note = `Free until ${new Date(`${seats.freeUntil}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}; after that each user needs a Field sales seat (₦3,000/month). ${seats.used} user${seats.used === 1 ? " has" : "s have"} access.`;
+  else if (closed) note = seats.message || "The Sales Portal needs Field sales. Buy seats under Settings → Billing.";
+
+  return (
+    <div className="w-full max-w-md space-y-1">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium" title={`Give ${user.firstName || "this user"} access to the Sales Portal.`}>
+          Access sales portal
+        </label>
+        <Switch checked={has} disabled={busy || blocked} onCheckedChange={toggle} aria-label="Access sales portal" />
+      </div>
+      {note && <p className={`text-xs ${blocked ? "text-red-600" : "text-muted-foreground"}`}>{note}</p>}
+    </div>
+  );
+}
 
 export function AssignTenantDropdown({
   businessInfo,

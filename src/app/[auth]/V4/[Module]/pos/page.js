@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { printReceipt } from "@/lib/pos/printReceipt";
 import {
   Search,
   ShoppingCart,
@@ -829,7 +830,7 @@ export default function POS() {
             </div>
           )}
           <DialogFooter className="gap-2">
-            <Button variant="secondary" onClick={() => window.print()}>
+            <Button variant="secondary" onClick={() => printReceipt(receipt, business)}>
               <Printer className="h-4 w-4 mr-2" /> Print receipt
             </Button>
             <Button onClick={() => { setReceipt(null); searchInputRef.current?.focus(); }}>New sale</Button>
@@ -880,51 +881,6 @@ export default function POS() {
         </DialogContent>
       </Dialog>
 
-      {/* ========== PRINTABLE RECEIPT (80 mm) ========== */}
-      <div className="hidden print:block">
-        {receipt && (
-          <div className="mx-auto text-black" style={{ width: '72mm', fontFamily: 'monospace', fontSize: '11px' }}>
-            <div className="text-center mb-2">
-              {business.logo && <img src={business.logo} alt="" style={{ maxHeight: '18mm', margin: '0 auto 2mm' }} />}
-              <div style={{ fontSize: '14px', fontWeight: 700 }}>{business.name}</div>
-              {business.address && <div>{business.address}</div>}
-              {business.phone && <div>Tel: {business.phone}</div>}
-              <div style={{ marginTop: '2mm' }}>{new Date(receipt.date).toLocaleString()}</div>
-              <div>{receipt.reference}</div>
-              <div>Cashier: {receipt.payment?.cashier || receipt.cashier}</div>
-            </div>
-            <div style={{ borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '1mm 0' }}>
-              {receipt.lines.map((l, i) => (
-                <div key={i} style={{ marginBottom: '1mm' }}>
-                  <div>{l.name}</div>
-                  <div className="flex justify-between">
-                    <span>
-                      {l.pcs} pcs x {naira(l.piecePrice)}
-                      {l.vatPercent > 0 ? ` +${l.vatPercent}% VAT` : ''}
-                    </span>
-                    <span>{naira(l.total)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: '1mm' }}>
-              <div className="flex justify-between"><span>Subtotal</span><span>{naira(receipt.subTotal)}</span></div>
-              {receipt.discount > 0 && <div className="flex justify-between"><span>Discount</span><span>-{naira(receipt.discount)}</span></div>}
-              {receipt.vat > 0 && <div className="flex justify-between"><span>VAT included</span><span>{naira(receipt.vat)}</span></div>}
-              <div className="flex justify-between" style={{ fontWeight: 700, fontSize: '13px', borderTop: '1px solid #000', marginTop: '1mm', paddingTop: '1mm' }}>
-                <span>TOTAL</span><span>{naira(receipt.grandTotal)}</span>
-              </div>
-              <div className="flex justify-between" style={{ textTransform: 'capitalize' }}><span>Paid ({receipt.payment?.method})</span><span>{naira(receipt.payment?.tendered)}</span></div>
-              {receipt.payment?.change > 0 && <div className="flex justify-between"><span>Change</span><span>{naira(receipt.payment.change)}</span></div>}
-            </div>
-            <div className="text-center" style={{ marginTop: '3mm' }}>
-              <div>Thank you for your patronage!</div>
-              <div>Goods sold are not returnable without this receipt.</div>
-            </div>
-          </div>
-        )}
-      </div>
-
       <style jsx global>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
@@ -932,28 +888,6 @@ export default function POS() {
         }
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
-        }
-        @media print {
-          @page {
-            size: 80mm auto;
-            margin: 4mm;
-          }
-          body * {
-            visibility: hidden;
-          }
-          .print\\:block,
-          .print\\:block * {
-            visibility: visible;
-          }
-          .print\\:block {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
         }
       `}</style>
     </div>

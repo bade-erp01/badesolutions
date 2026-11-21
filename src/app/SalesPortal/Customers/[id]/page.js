@@ -26,6 +26,7 @@ import {
   Wallet,
 } from "lucide-react";
 import api from "@/lib/api";
+import { hasActiveAddOn } from "@/lib/addons";
 import { saveCustomerStatementPdf } from "@/lib/pdf/customerStatementPdf";
 import { downloadExcel } from "../../../../../Functions/Functions";
 import TextToSpeechPlayer from "@/app/Components/TextToSpeech";
@@ -89,12 +90,15 @@ export default function CustomerPage({ userInfo, data, cust }) {
     router.refresh();
   };
 
+  // support tickets only for businesses that pay for the Help Desk add-on
+  const helpdesk = hasActiveAddOn(business, "helpdesk");
+
   const actions = [
     canSell && { key: "sell", icon: ShoppingCart, label: "Sell to customer", onClick: sell },
     { key: "stock", icon: Camera, label: "Capture stock level", onClick: captureStock },
     canPay && { key: "payment", icon: Wallet, label: "Register payment", onClick: () => setSheet("payment") },
     { key: "statement", icon: ReceiptText, label: "Statement (PDF)", onClick: () => setSheet("statement") },
-    { key: "ticket", icon: LifeBuoy, label: "Support ticket", onClick: () => setSheet("ticket") },
+    helpdesk && { key: "ticket", icon: LifeBuoy, label: "Support ticket", onClick: () => setSheet("ticket") },
   ].filter(Boolean);
 
   return (
@@ -200,9 +204,11 @@ export default function CustomerPage({ userInfo, data, cust }) {
         <Ledger rows={data.transcations || []} cust={cust} business={business} currency={currency} />
       </Section>
 
-      <Section title="Support tickets" icon={LifeBuoy} open={open.tickets} onToggle={() => toggle("tickets")}>
-        {open.tickets && <TicketsList cust={cust} />}
-      </Section>
+      {helpdesk && (
+        <Section title="Support tickets" icon={LifeBuoy} open={open.tickets} onToggle={() => toggle("tickets")}>
+          {open.tickets && <TicketsList cust={cust} />}
+        </Section>
+      )}
 
       <Section title="Location" icon={MapPin} open={open.location} onToggle={() => toggle("location")}>
         <div className="space-y-3 p-3">
@@ -249,7 +255,7 @@ export default function CustomerPage({ userInfo, data, cust }) {
 
       <PaymentSheet open={sheet === "payment"} onClose={() => setSheet(null)} cust={cust} user={user} currency={currency} />
       <StatementSheet open={sheet === "statement"} onClose={() => setSheet(null)} cust={cust} business={business} />
-      <TicketSheet open={sheet === "ticket"} onClose={() => setSheet(null)} cust={cust} />
+      {helpdesk && <TicketSheet open={sheet === "ticket"} onClose={() => setSheet(null)} cust={cust} />}
       <GeoSheet open={sheet === "geo"} onClose={() => setSheet(null)} cust={cust} />
     </AppShell>
   );

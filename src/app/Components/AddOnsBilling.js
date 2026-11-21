@@ -60,6 +60,8 @@ export default function AddOnsBilling({ title = "Monthly apps & SMS credit" }) {
   };
 
   const owned = data?.addOns || [];
+  // Field sales starts with a seat for every user who already has Sales Portal access
+  const firstUnits = (o) => Math.max(o.unit?.min ?? 1, (o.features || []).includes("salesPortal") ? data?.salesPortal?.used || 0 : 0);
   if (!data || (!data.enforced && !owned.length && !(data.available || []).length)) return null;
   const paysSms = data.enforced || owned.some((a) => (a.features || []).includes("delivery"));
   const total = (data.addOns || []).filter((a) => a.status !== "cancelling").reduce((t, a) => t + a.monthly, 0);
@@ -124,6 +126,7 @@ export default function AddOnsBilling({ title = "Monthly apps & SMS credit" }) {
                         {naira(a.monthly)}/month · paid until {moment(a.paidUntil).format("D MMM YYYY")}
                         {entry?.unit ? ` · ${a.units} ${entry.unit.plural}` : ""}
                         {a.pendingUnits != null ? ` (${a.pendingUnits} from the next renewal)` : ""}
+                        {(a.features || []).includes("salesPortal") && data.salesPortal ? ` · ${data.salesPortal.used} in use (Settings → Users: "Access sales portal")` : ""}
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -178,7 +181,7 @@ export default function AddOnsBilling({ title = "Monthly apps & SMS credit" }) {
             <p className="text-sm font-medium">Add an app</p>
             <div className="grid gap-3 md:grid-cols-2">
               {data.available.map((o) => {
-                const n = Number(units[`new-${o.id}`] ?? o.unit?.min ?? 1);
+                const n = Number(units[`new-${o.id}`] ?? firstUnits(o));
                 const monthly = o.monthly + (o.unit ? o.unit.monthly * n : 0);
                 return (
                   <div key={o.id} className="flex flex-col justify-between gap-3 rounded-lg border p-4">
@@ -200,7 +203,7 @@ export default function AddOnsBilling({ title = "Monthly apps & SMS credit" }) {
                           type="number"
                           min={o.unit.min}
                           max={o.unit.max}
-                          value={units[`new-${o.id}`] ?? o.unit.min}
+                          value={units[`new-${o.id}`] ?? firstUnits(o)}
                           onChange={(e) => setUnits((u) => ({ ...u, [`new-${o.id}`]: e.target.value }))}
                           className="w-20"
                           aria-label={`Number of ${o.unit.plural}`}

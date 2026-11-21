@@ -13,6 +13,7 @@ import {
   EXPRESS_PRIVATE_URL,
 } from "../../../../../../../Functions/Functions";
 import api from "@/lib/api";
+import { hasActiveAddOn } from "@/lib/addons";
 import { saveCustomerStatementPdf } from "@/lib/pdf/customerStatementPdf";
 import { useState } from "react";
 import DaySelector from "@/app/Components/Datepicker";
@@ -1320,7 +1321,8 @@ export default function CustomerForm({
           </div>
         </details>
 
-        {/* SUPPORT TICKETS — pure HTML details */}
+        {/* SUPPORT TICKETS — only for businesses that pay for the Help Desk add-on */}
+        {hasActiveAddOn(userInfo.business, "helpdesk") && (
         <details className="group border rounded-lg px-4 min-w-0 open:bg-card">
           <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-base font-semibold select-none [&::-webkit-details-marker]:hidden">
             <span>{data.SupportTicket?.length || 0} Support Tickets</span>
@@ -1374,6 +1376,7 @@ export default function CustomerForm({
             )}
           </div>
         </details>
+        )}
       </div>
 
       {/* Save Buttons */}
